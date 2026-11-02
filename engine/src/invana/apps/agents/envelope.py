@@ -3,7 +3,7 @@
 docs/for-developers/modules/ask/spec.md rejected flow-as-code because a spec drives dispatch. A plan
 the *model* writes is authored too — by the model — so it stays safe the same
 way the ``plan`` task does: **the model proposes, the interpreter disposes**
-(docs/for-developers/modules/agents/spec.md).
+(specs/system-design/modules/agents.md).
 
 Two documents, one grammar:
 
@@ -14,7 +14,7 @@ Two documents, one grammar:
     ceilings are ``agents.effort``, handed in. **It does not name preconditions**: a step's ``requires`` is
     declared on its catalogue entry, so the planner reads it while drafting
     instead of being refused and redrafting
-    (docs/for-developers/orchestration.md §0.6).
+    (specs/system-design/orchestration.md § The catalogue).
 
 ``Plan``
     ``runs.plan`` — written per ask by the *Plan* step, either by matching
@@ -22,7 +22,7 @@ Two documents, one grammar:
     **before dispatch**, never at step 6.
 
 The grammar is inert data on purpose: ``${steps.X.y}`` is a path lookup, not an
-expression, so there is nowhere for a model to put code (docs/for-developers/modules/agents/spec.md).
+expression, so there is nowhere for a model to put code (specs/system-design/modules/agents.md).
 """
 
 from __future__ import annotations
@@ -158,7 +158,7 @@ class Envelope:
         steps = tuple(PlanStep.parse(s, index=i) for i, s in enumerate(raw_steps))
         pins = {k: v for k, v in (spec.get("pins") or {}).items() if isinstance(v, dict)}
         # An envelope with static steps but no explicit allow-list allows
-        # exactly what it declares — the degenerate case named in docs/for-developers/modules/agents/spec.md.
+        # exactly what it declares — the degenerate case named in specs/system-design/modules/agents.md.
         allow = spec.get("allow")
         allow_set = frozenset(allow) if allow else frozenset(s.task for s in steps)
         return cls(
@@ -199,7 +199,7 @@ def validate_plan(
     """Check a proposed plan against the envelope and the catalogue. Raises
     :class:`PlanRejected`.
 
-    Every check tabulated in docs/for-developers/modules/agents/spec.md, run at dispatch rather than at save
+    Every check tabulated in specs/system-design/modules/agents.md, run at dispatch rather than at save
     time — the validator is the same one because the grammar is the same.
     Errors accumulate so the model gets the whole list back on its one repair,
     not the first problem over and over.

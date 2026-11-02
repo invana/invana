@@ -38,6 +38,7 @@ import {
 import {
 	approvalsPath,
 	comparePath,
+	ReadState,
 	useRightSection,
 } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
@@ -49,7 +50,6 @@ import {
 	changeText,
 	changeTone,
 	day,
-	FleetReadState,
 	pct,
 	spreadTicks,
 	TONE_TEXT,
@@ -112,7 +112,7 @@ export function FleetSectionPage({
 					{data ? (
 						<OverviewBody data={data} graph={graph} />
 					) : (
-						<FleetReadState
+						<ReadState
 							loading={overview.isLoading}
 							error={overview.error}
 							what="the fleet"

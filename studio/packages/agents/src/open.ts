@@ -9,7 +9,7 @@
  */
 
 import { createContext, useContext } from "react";
-import type { AgentsSectionKey } from "./sections/spec";
+import type { AgentsSectionKey, RunSectionKey } from "./sections/spec";
 
 export interface AgentsOpen {
 	/** An agent's page, by `agents.id`. */
@@ -29,12 +29,11 @@ export interface AgentsOpen {
 	 * the page opens on Stages with that step under the canvas.
 	 */
 	run: (id: string, stepId?: string) => void;
-	/** A worker pool's page, by its name. */
-	pool: (name: string) => void;
-	/** A worker's page, by its name. */
-	worker: (name: string) => void;
-	/** Another Agents section, on one of its tabs. */
-	section: (key: AgentsSectionKey, tab?: string) => void;
+	/**
+	 * Another section, on one of its tabs — an Agents section, or Runs ·
+	 * Approvals · Ledger, which the host puts in Activity.
+	 */
+	section: (key: AgentsSectionKey | RunSectionKey, tab?: string) => void;
 }
 
 export const AgentsOpenContext = createContext<AgentsOpen | null>(null);

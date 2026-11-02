@@ -1,67 +1,6 @@
 # Distributed execution
 
-Every step leaves the interpreter as a **`TaskEnvelope`** — ids and args, all JSON — and is called by
-one function, **`worker.run_envelope()`**, which rebuilds the step's context from those ids. The
-`inline` executor calls it in-process today; a distributed executor calls it in a worker. This slice
-built the envelope and the call, then benchmarked three queues under the same workload and chose one.
-
-| | |
-|---|---|
-| Index | [13.11](../../../README.md#13--platform) · Slice **B14** |
-| Module | [Platform](../spec.md) |
-| API / CLI / Studio | — / — / — — engine only; workers run tool steps from [13.12](tool-plugins.md) |
-| Related | [the runtime](runtime.md) §2 · [plugins](plugins.md) · [products › plugins §5–§8](../../../../products/plugins.md#7-ready-for-n-workers) · [workers](../../agents/features/workers.md) 5.15 · the executor for workers on other machines, open: [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md) |
-
-> **As** an operator whose fan-outs outgrow one process, **I want** to start more workers and have
-> every step run on whichever is free, **so that** a 200-lane plan finishes in a ninth of the time on
-> nine workers, and a worker that dies mid-step costs a retry, not the run.
-
-## Capabilities
-
-| # | Capability | Detail |
-|---|---|---|
-| C1 | A step as JSON | `TaskEnvelope`: `run_id · node_id · attempt · plugin@version · key@version · args · graph_id · lens_id · actor_id`; `to_json` / `from_json` |
-| C2 | One call everywhere | `run_envelope(envelope, contexts=…)` resolves the task type, opens the context, stamps the idempotency key, applies `timeout_s`, maps `HTTPException` to a diagnosis |
-| C3 | Context rebuilt from ids | `RebuiltContexts` opens a session, reads the run and step rows, and rebuilds `RunVars` through `TaskRuntime.run_vars` — the same method the pass uses |
-| C4 | Idempotency key per attempt | `run_id:node_id:attempt` — equal on a redelivery, new on a retry the orchestrator decides; on `ctx.idempotency_key` |
-| C5 | Refuses what it does not carry | A `key@version` this process has not loaded is a `defect` failure, before any context opens |
-| C6 | The executor choice | **procrastinate** on the engine's Postgres — measured below |
-
-## Journey
-
-```mermaid
-sequenceDiagram
-    participant O as Orchestrator (API process)
-    participant Q as Queue
-    participant W as Worker
-    participant DB as App DB
-    O->>O: frontier → ready step
-    O->>Q: TaskEnvelope (JSON)
-    Q->>W: deliver
-    W->>DB: run row + step row → run_vars
-    W->>W: run_envelope → task type
-    alt returns
-        W->>DB: commit · frames on task_stream
-        W-->>O: Out
-        O->>O: settle row · move frontier
-    else worker dies
-        Q->>Q: no heartbeat → requeue
-        Q->>W: same envelope, same idempotency key
-    else signal / TaskFailure
-        W-->>O: propagated unchanged · orchestrator decides
-    end
-```
-
-## Seams
-
-| Seam | What happens |
-|---|---|
-| Step state on `RunVars` | Does not cross a process. `v.query`, `v.result`, `v.intent` set by one step are gone for the next step on another worker; only outputs and `${steps.x.y}` bindings travel. The NL chain (understand → translate → validate → execute → shape) stays inline until its steps hand over through outputs |
-| Frames from a worker | Land in `task_stream` (the emitter writes by run id), but the live broadcaster is per process — an SSE subscriber on the API process sees them only when the stream reader polls the table |
-| A redelivered write | Same idempotency key; the worker returns the outcome already recorded for it rather than running the task type again ([13.12](tool-plugins.md) TP6) |
-| A task type that overruns | Its manifest's `timeout_s` ends it as a `transient` failure, cause `task_timeout`, inline and in a worker alike |
-| A worker on an older engine | `key@version` it does not carry → `defect · unknown_task_type`; it never runs a neighbouring version |
-| The worker's transaction | `RebuiltContexts` commits when the task type returns and rolls back when it raises — the worker owns it, as a request does |
+System design: [runtime.md](../../../../../specs/system-design/runtime.md) — the `TaskEnvelope`, `run_envelope()`, the idempotency key, workers through the engine's gateway, procrastinate as the executor and its seams (§ Executor and workers). This file keeps the benchmark, the engine paths and the build plan.
 
 ## The benchmark
 
@@ -105,22 +44,7 @@ Prefect's server ran on its default SQLite. A Postgres-backed server would send 
 `.delay()` stays an HTTP round trip to a second service, against one batched insert for
 procrastinate — and losing a dead worker's envelopes does not depend on the database.
 
-## Decisions
-
-| # | Decision |
-|---|---|
-| DE1 | **procrastinate is the distributed executor.** It matches or beats Dramatiq on throughput, fan-out and latency, recovers a killed worker as fast, and adds no service: jobs live in the Postgres every install already runs, so `pip install invana` plus `invana worker` is the whole deployment. Dramatiq needs Redis for the same result; Prefect needs a second server and database — and on this workload it is send-bound at about two envelopes a second, so more workers made a fan-out slower, and it lost the envelopes of the worker that died |
-| DE2 | **A step travels as `TaskEnvelope`; nothing live crosses.** The worker rebuilds the context from ids with the same `TaskRuntime.run_vars` the pass uses, so a step sees one world wherever it runs. |
-| DE3 | **`run_envelope` is the only place a task type is called.** The `inline` executor and every worker go through it; inline resolves through `TASKS` (the seam tests substitute a step on), a worker through the frozen registry by `key@version`. |
-| DE4 | **The idempotency key is `run_id:node_id:attempt`.** Redelivery keeps it, a retry the orchestrator decides changes it — so "skip if written" is right for the first and wrong for neither. |
-| DE5 | **A declared `timeout_s` is applied** — by `run_envelope`, inline and in a worker — as a `transient` failure with cause `task_timeout`. `retries` stays declared: retry *policy* is the orchestrator's, redelivery is the queue's. |
-| DE6 | **The engine runs the reaper.** procrastinate does not requeue a dead worker's jobs by itself; the engine's gateway sweep retries the jobs of a worker silent 30 s, with workers heartbeating every 2 s ([workers](../../agents/features/workers.md)). |
-| DE7 | **Signals and failures cross unchanged.** `NeedsInput`, `CannotAnswer`, `Converse` and `TaskFailure` propagate out of `run_envelope`; the orchestrator decides what they mean. Their wire form is B06b's, with the first step that runs remotely. |
-| DE8 | **Only steps that hand over through outputs run remotely.** A step that reads state an earlier step left on `RunVars` stays inline until that state is an output. |
-| DE9 | **Workers reach procrastinate only through the engine's worker gateway.** A worker on any machine — Python, Docker or a Kubernetes Deployment — long-polls `POST /api/v1/workers/lease` over HTTPS with its pool credential; the engine takes the next job for that pool's queues from procrastinate, takes heartbeats and outcomes back, and runs the reaper. No worker holds a database credential, so scaling out is starting more workers against one engine URL. Hatchet, Temporal and DBOS are compared in [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md). |
-| DE10 | **B2–B5 of the executor benchmark are the gateway's acceptance tests.** Dial-out with no database route, the 700-agent run, a killed worker and a killed orchestrator are measured as part of F06; a failure that the gateway cannot close reopens the executor choice. Orchestrator take-over after a crash is scale-out work (a leased orchestrator), not F06's. |
-
-## Engine
+## Engine paths
 
 | Path | Holds |
 |---|---|
@@ -131,21 +55,9 @@ procrastinate — and losing a dead worker's envelopes does not depend on the da
 | `plugins/sdk/context.py` | `TaskContext.idempotency_key` |
 | `benchmarks/executors/` | the harness: `workload.py` and one adapter per executor |
 
-| `TaskEnvelope` field | Type | Notes |
-|---|---|---|
-| `run_id` | str | the run (`parent_run_id` of the step row) |
-| `node_id` | str | the step row |
-| `attempt` | int | the row's attempt |
-| `plugin` | str | `name@version` |
-| `task` | str | `key@version`, or a bare key |
-| `args` | dict | resolved, JSON only |
-| `graph_id` · `lens_id` · `actor_id` | str, optional | what the worker rebuilds from |
+## Plan
 
-## Not building
-
-| Not building | Because |
+| # | Plan |
 |---|---|
-| A worker process, `invana worker`, procrastinate as the `workers` extra, the wire forms | built in [13.12 Tool plugins](tool-plugins.md) — tool steps are the first to run in workers |
-| Moving the NL chain to workers | its steps hand over through `RunVars`; DE8 |
-| Routing envelopes to resource pools (GPU, `sim.*`) | later — one pool until a plugin declares `gpu` |
-| Celery, RQ, Temporal, Arq | not in the shortlist the product doc set |
+| DE10 | **B2–B5 of the executor benchmark are the gateway's acceptance tests.** Dial-out with no database route, the 700-agent run, a killed worker and a killed orchestrator are measured as part of F06; a failure that the gateway cannot close reopens the executor choice. Orchestrator take-over after a crash is scale-out work (a leased orchestrator), not F06's. |
+| Not building yet | A worker process, `invana worker`, procrastinate as the `workers` extra, the wire forms — built in [13.12 Tool plugins](tool-plugins.md) · routing envelopes to resource pools (GPU, `sim.*`) — later, one pool until a plugin declares `gpu` · Celery, RQ, Temporal, Arq — not in the shortlist |

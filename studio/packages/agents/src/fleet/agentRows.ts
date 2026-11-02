@@ -9,10 +9,10 @@
  */
 
 import type { ListQuery } from "@invana-studio/core";
+import { PAGE } from "@invana-studio/shell";
 import { useMemo } from "react";
 import { useAgentsQuery } from "../agents/queries";
 import type { Agent, AgentPage } from "../agents/types";
-import { PAGE } from "../lists";
 import { useFleetPerformanceQuery } from "./queries";
 import type { PerformanceRow } from "./types";
 

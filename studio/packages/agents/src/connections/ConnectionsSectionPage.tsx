@@ -11,13 +11,15 @@
  */
 
 import { Button } from "@invana/ui";
-import { useAuth } from "@invana-studio/core";
+import {
+	type McpServerRead,
+	useAuth,
+	usePluginsQuery,
+} from "@invana-studio/core";
+import { NEEDS_INSTALL_ADMIN } from "@invana-studio/shell";
 import { DetailStatus } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { NEEDS_INSTALL_ADMIN } from "../plugins/PluginToggle";
-import { usePluginsQuery } from "../plugins/queries";
-import type { McpServerRead } from "../plugins/types";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { AddMcpServerDialog } from "./AddMcpServerDialog";

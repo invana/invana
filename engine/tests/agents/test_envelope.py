@@ -1,4 +1,4 @@
-"""The envelope validator (docs/for-developers/modules/agents/spec.md) — the line that keeps a model-written
+"""The envelope validator (specs/system-design/modules/agents.md) — the line that keeps a model-written
 workflow inside the envelope (docs/for-developers/modules/ask/spec.md).
 
 The model proposes; the interpreter disposes. Everything here is about the
@@ -143,7 +143,7 @@ class TestModes:
 
 class TestTheCeilings:
     """`agents.budget`, read through `effective_budget`
-    ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md))."""
+    ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions))."""
 
     def test_a_row_that_sets_nothing_gets_every_ceiling(self):
         from invana.apps.agents.models import Agent

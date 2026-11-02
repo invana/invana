@@ -6,7 +6,7 @@ turns the settled row into the document, so a new entry ships ``result.json``
 by existing and none of them can ship a different shape (SR38).
 
 ``outputs`` is filtered to what the entry **declares**
-(docs/for-developers/orchestration.md §0.6). That filter is what makes the
+(specs/system-design/orchestration.md § The catalogue). That filter is what makes the
 document a contract rather than a dump of internals: a key a step recorded
 about itself — an LLM step's ``prompt`` and ``completion`` (SR42), a
 ``cannot_answer`` reason — stays on ``output``, where a reader can still see it

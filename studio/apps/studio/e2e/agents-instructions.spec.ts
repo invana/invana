@@ -124,7 +124,7 @@ test("AG-11 a plan with no replanned run says so", async ({ page }) => {
 	});
 });
 
-test("AG-13 Plugins lists the registry; a plugin and a function open", async ({
+test("AG-13 Settings › Plugins lists the registry; a plugin opens, off the Graph", async ({
 	page,
 }) => {
 	const registry = await api<{ items: { name: string; task_types: number }[] }>(
@@ -137,23 +137,19 @@ test("AG-13 Plugins lists the registry; a plugin and a function open", async ({
 	expect(core, "a core plugin with functions").toBeTruthy();
 	const name = (core as { name: string }).name;
 
-	await page.goto(`${AGENTS}/functions/plugins`);
+	await page.goto("/settings/plugins");
 	await page
 		.getByRole("row")
 		.filter({ hasText: name })
 		.first()
 		.click({ timeout: 30_000 });
-	await expect(page).toHaveURL(/[?&]page=plugin(:|%3A)/);
+	await expect(page).toHaveURL(/\/settings\/plugins\?.*page=plugin(:|%3A)/);
 	await expect(
 		page.getByText("Functions", { exact: true }).first(),
 	).toBeVisible({ timeout: 15_000 });
-	await page.getByRole("row").nth(1).click();
-	await expect(page.getByRole("tab", { name: "Contract" })).toBeVisible({
-		timeout: 15_000,
-	});
-	await expect(page.getByText("Calls · 30 days").first()).toBeVisible();
-	await page.getByRole("tab", { name: "Used by" }).click();
-	await expect(page).toHaveURL(/[?&]tab=used_by/);
+	await expect(page.getByRole("button", { name: "Switch graph" })).toHaveCount(
+		0,
+	);
 });
 
 test("AG-14 an agent pins a model version and History names it", async ({

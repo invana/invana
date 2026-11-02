@@ -1,4 +1,4 @@
-"""Browser telemetry proxy (docs/for-developers/modules/platform/features/telemetry.md).
+"""Browser telemetry proxy (specs/system-design/observability.md).
 
 The studio exports its OpenTelemetry spans, metrics and error logs over OTLP/HTTP (browsers
 can't speak OTLP gRPC), and we keep the collector off the public network. This

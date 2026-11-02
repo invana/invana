@@ -1,6 +1,6 @@
 """The executor — *where* a step runs
-(docs/for-developers/modules/platform/features/runtime.md §2,
-docs/for-developers/modules/platform/features/distributed-execution.md).
+(specs/system-design/runtime.md § The parts,
+specs/system-design/runtime.md § Executor and workers).
 
 Every step leaves the interpreter as a :class:`~invana.plugins.envelope.TaskEnvelope`
 and is called by :func:`~invana.plugins.worker.run_envelope`, whichever

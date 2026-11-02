@@ -1,5 +1,5 @@
 """`GET …/projection-templates` — this Graph's templates and the shipped ones, on
-the list contract (docs/for-developers/modules/platform/features/list-contract.md).
+the list contract (specs/system-design/api-and-cli.md § One list contract).
 
 Real Postgres, no mocks. Auth and membership are overridden — they have their
 own tests — so what is under test is the search, the filters and the counts.

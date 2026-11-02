@@ -7,7 +7,7 @@
  * than discovering one at run time.*
  *
  * A guardrail and a world are one record separated by `kind`
- * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)), so they
+ * ([govern.md](../../../../../specs/system-design/modules/govern.md)), so they
  * are one form. `kind` changes four things and nothing else: the word on the
  * header, whether the name field publishes, whether the save asks for the
  * impact first, and whether the `cast` section is drawn.
@@ -473,7 +473,7 @@ function RefusalCard({ refusal }: { refusal: Refusal }) {
  * One role, bound to a model — by picking from the configured providers.
  *
  * A plan names a **role** and the cast resolves it
- * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)): `decide`
+ * ([govern.md](../../../../../specs/system-design/modules/govern.md)): `decide`
  * says *how much this matters*, which stays true when the model line-up moves.
  * That is why this offers the role's meaning beside the model and not a bare
  * dropdown of ids.

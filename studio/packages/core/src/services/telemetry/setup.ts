@@ -1,5 +1,5 @@
 /**
- * OpenTelemetry-Web bootstrap (docs/for-developers/modules/platform/features/telemetry.md).
+ * OpenTelemetry-Web bootstrap (specs/system-design/observability.md).
  *
  * Registers a WebTracerProvider that ships spans — via the engine's OTLP/HTTP
  * proxy (`/api/v1/telemetry/traces`) — to the collector, and the default W3C
@@ -11,7 +11,7 @@
  * services/api/client.ts → `startClientSpan`), not via auto-XHR
  * instrumentation: the request crosses TanStack Query's async hops, and no web
  * context manager carries the active context across Vite's native async/await
- * (zone.js only patches down-levelled awaits). See docs/for-developers/modules/platform/features/telemetry.md.
+ * (zone.js only patches down-levelled awaits). See specs/system-design/observability.md.
  *
  * Sampling is parent-based on `VITE_TELEMETRY_SAMPLE_RATIO` (0–1, default 1):
  * a new action is kept at that ratio, and the engine honours the decision the
@@ -95,7 +95,7 @@ const SAMPLE_RATIO = sampleRatio(import.meta.env.VITE_TELEMETRY_SAMPLE_RATIO);
 /** Tracer name shared with ./tracer's span helpers. */
 const SERVICE_NAME = "invana-studio";
 
-/** Full URL of the engine's browser-span proxy (docs/for-developers/modules/platform/features/telemetry.md). */
+/** Full URL of the engine's browser-span proxy (specs/system-design/observability.md). */
 const TRACES_URL = `${API_BASE_URL}/api/v1/telemetry/traces`;
 
 /** Full URL of the engine's browser-metrics proxy. */

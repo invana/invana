@@ -36,5 +36,5 @@ async def _count_ledger(db: AsyncSession, graph: Graph, actor_id: str, params: L
     return (await LedgerManager().page(db, graph=graph, member=member, params=params, applied=[])).total
 
 
-register_board(Board("approvals", "Approvals", "/agents/approvals", ("ask", "asks"), APPROVAL_LIST, _count_approvals))
-register_board(Board("ledger", "Ledger", "/agents/ledger", ("row", "rows"), LEDGER_LIST, _count_ledger))
+register_board(Board("approvals", "Approvals", "/activity/approvals", ("ask", "asks"), APPROVAL_LIST, _count_approvals))
+register_board(Board("ledger", "Ledger", "/activity/ledger", ("row", "rows"), LEDGER_LIST, _count_ledger))

@@ -53,7 +53,7 @@ class AgentLifecycleManager:
 
     async def tokens_this_month(self, session: AsyncSession, *, graph_id: str) -> dict[str, int]:
         """``{agent_id: tokens}`` since the first of the month, for the list's
-        meter ([AG11](docs/for-developers/modules/agents/features/author-an-agent.md)).
+        meter ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
 
         It lives here rather than in ``apps/agents`` because it reads
         ``task_runs``, which an app may not (migration-plan §18.1.1). The window
@@ -180,7 +180,7 @@ class AgentLifecycleManager:
         )
 
     async def retire_ephemeral_for_task(self, session: AsyncSession, *, task_id: str, graph_id: str) -> None:
-        """Close out the agents a task's runs spawned (docs/for-developers/modules/work/spec.md).
+        """Close out the agents a task's runs spawned (specs/system-design/modules/work.md).
 
         An ephemeral agent exists for the task it was spawned for; when that task
         closes it is retired automatically, hidden from the list, and still fully

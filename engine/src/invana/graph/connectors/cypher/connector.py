@@ -50,7 +50,7 @@ def _classify_neo4j_error(code: str | None) -> str:
     return QueryErrorCategory.UNKNOWN
 
 
-# openCypher baseline capability profile (docs/for-developers/modules/graph-connectors/features/capabilities.md). Covers
+# openCypher baseline capability profile (specs/system-design/modules/graph-connectors.md § Capabilities). Covers
 # Neo4j + Memgraph, which
 # both speak Bolt/openCypher. Vendor connectors (e.g. invana-neo4j) narrow the
 # version window and add vendor features via ``CYPHER_PROFILE.merge(...)``.
@@ -129,7 +129,7 @@ class OpenCypherConnector(BaseConnector):
     #: The builder this connector's querysets compose with. A vendor whose dialect
     #: differs — Memgraph's ``id()`` for ``elementId()`` — subclasses the builder and
     #: names it here, rather than every queryset reaching for one fixed class
-    #: (docs/for-developers/modules/graph-connectors/features/languages.md LG10).
+    #: (specs/system-design/modules/graph-connectors.md § A query, either way).
     query_builder: ClassVar[type[OpenCypherQueryBuilder]] = OpenCypherQueryBuilder
 
     def lens_compiler(self) -> CypherLensCompiler:

@@ -10,7 +10,7 @@
  */
 
 import { EmptyState, Spinner } from "@invana/ui";
-import { EVERY } from "../lists";
+import { EVERY } from "@invana-studio/shell";
 import { useSkillsQuery } from "./queries";
 import { SkillDetail } from "./SkillDetail";
 

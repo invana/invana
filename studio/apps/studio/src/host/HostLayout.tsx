@@ -61,7 +61,7 @@ interface HostLayoutProps {
 
 // The keys the host itself owns, keyed into the shared `panel` param. A
 // product panel draws in `leftSection`; a section that is a page in the
-// Workbook — Graph settings, Rules, the Agents and IAM sections — passes none,
+// Workbook — Graph settings, Rules, the Agents, IAM and Activity sections — passes none,
 // so the column stays closed. A key not listed draws no left column.
 const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
@@ -81,10 +81,6 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"functions",
 	"connections",
 	"llms",
-	"runs",
-	"workers",
-	"approvals",
-	"ledger",
 	"concurrency",
 	// The IAM sections — pages too.
 	"iam-home",
@@ -94,6 +90,15 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"iam-policies",
 	"iam-tokens",
 	"iam-settings",
+	// The Activity sections — pages too.
+	"activity-runs",
+	"activity-approvals",
+	"activity-ledger",
+	"activity-schedules",
+	"activity-events",
+	"activity-inbox",
+	"activity-rules",
+	"activity-channels",
 	// The Projects product's own panel.
 	"decisions",
 ];

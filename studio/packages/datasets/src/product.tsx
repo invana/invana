@@ -9,7 +9,7 @@
  * | Standards | `/datasets/standards` | the library; `…/:publisher/:name` is one standard |
  * | Imports | `/datasets/imports` | the journal of every Graph's loads |
  *
- * Install-wide: the product sits above Graphs, so its routes start at
+ * A platform product: it sits above Graphs, so its routes start at
  * `/datasets` and the header shows no Graph. It does not own its regions — the
  * shell draws the `leftNav` from `nav` and the page fills `mainSection`. The
  * product root lands on Catalogue.
@@ -50,9 +50,9 @@ const byName = (p: Params) => p.name;
 export const datasets: ProductDefinition = {
 	id: "datasets",
 	name: "Datasets",
-	tagline: "Gather the data",
+	tagline: "Gather the data — belongs to no Graph",
 	icon: Database,
-	scope: "install",
+	scope: "platform",
 	landing: "catalogue",
 	nav: {
 		groups: [

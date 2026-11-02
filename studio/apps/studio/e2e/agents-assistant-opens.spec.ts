@@ -11,7 +11,7 @@ import { expect, test } from "@playwright/test";
 import { graphApi } from "./api";
 import { GRAPH } from "./explorer";
 
-const RUNS = `${GRAPH}/agents/runs`;
+const RUNS = `${GRAPH}/activity/runs`;
 
 test("a link the assistant wrote reloads to the same chips", async ({
 	page,

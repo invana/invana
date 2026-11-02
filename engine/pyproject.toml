@@ -164,7 +164,7 @@ ignore = [
 "src/invana/core/events/managers/event.py" = ["PLC0415"]
 "src/invana/apps/llm_providers/ping.py" = ["PLC0415"]
 "src/invana/apps/llm/providers/*" = ["PLC0415"]
-# The S12 nouns are mutually recursive by design (docs/for-developers/modules/work/spec.md): a Task is worked
+# The S12 nouns are mutually recursive by design (specs/system-design/modules/work.md): a Task is worked
 # through a Thinking, a Thinking settles a Task, and an agent's lifecycle reads
 # both. The cycle is the domain's, not an accident of layering, so the imports
 # that close it are deferred to the call site — where the dependency is obvious

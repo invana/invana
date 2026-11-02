@@ -69,6 +69,7 @@ docs/site/
 
 # ─── Design canvas cache (scripts/design-pull.py) ───
 .design/
+.agent-reports/
 
 # ─── pnpm's local content-addressable store (created by `pnpm add` in studio/) ───
 studio/.pnpm-store/
@@ -90,3 +91,9 @@ studio/apps/*/blob-report/
 # local agent skills (installed per machine)
 .agents/
 skills-lock.json
+
+# Agent hand-off prompts and their session logs
+.handoffs/
+
+# Live session status for the project dashboard (hooks write it)
+.claude/team/.live/

@@ -33,7 +33,7 @@ def _new_id() -> str:
 
 
 class ActorKind(enum.StrEnum):
-    """Which kind of principal emitted the event (docs/for-developers/modules/work/spec.md).
+    """Which kind of principal emitted the event (specs/system-design/modules/work.md).
 
     A polymorphic pair — ``(actor_kind, actor_id)`` — rather than a
     ``principals`` table (D5). ``actor_id`` therefore has **no FK**: it points
@@ -83,7 +83,7 @@ class Event(Base):
         # composite — Postgres can range-scan on the action prefix and order
         # by created_at within.
         Index("ix_events_action_created_at", "action", "created_at"),
-        # The activity tree for one task, and one run's rows (docs/for-developers/modules/work/spec.md).
+        # The activity tree for one task, and one run's rows (specs/system-design/modules/work.md).
         Index("ix_events_task_id_created_at", "task_id", "created_at"),
         Index("ix_events_run_id_created_at", "run_id", "created_at"),
     )
@@ -94,7 +94,7 @@ class Event(Base):
         ForeignKey("graphs.id", ondelete="SET NULL"),
         nullable=True,
     )
-    # No FK: ``actor_id`` is polymorphic over ``actor_kind`` (docs/for-developers/modules/work/spec.md). The
+    # No FK: ``actor_id`` is polymorphic over ``actor_kind`` (specs/system-design/modules/work.md). The
     # FK to ``users`` was dropped in migration 2c; the read path still LEFT
     # JOINs users, which resolves for ``actor_kind='user'`` and yields NULL for
     # the rest — exactly what the snapshot name in ``details`` is there for.
@@ -102,7 +102,7 @@ class Event(Base):
     actor_kind: Mapped[ActorKind] = mapped_column(_actor_kind_enum, nullable=False)
     # The human at the root of the chain. Set by the engine from the root
     # run's actor, **never** from task input — that is what makes
-    # attribution laundering impossible (docs/for-developers/modules/work/spec.md).
+    # attribution laundering impossible (specs/system-design/modules/work.md).
     on_behalf_of_user_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     # The causal parent: the assignment that opened the run, the step that
     # spawned the child. This column is what makes the activity view a *tree*

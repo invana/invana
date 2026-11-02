@@ -238,7 +238,7 @@ class FlowRunsManager:
         """How often each library entry ran, and how often it **served**.
 
         The verdict is not on the run — it is the *Verify* step's output
-        (``{"served": "yes" | "partial" | "no"}``, docs/for-developers/modules/agents/spec.md), which is the
+        (``{"served": "yes" | "partial" | "no"}``, specs/system-design/modules/agents.md), which is the
         only place a deterministic check wrote it. Reading it from there keeps one
         definition of *served*: the same one the card's badge shows.
         """

@@ -2,7 +2,7 @@
 
 Built once from the manifests on disk and then **frozen**: nothing registers a
 task type while plans run, which is what keeps the envelope enforceable
-(docs/for-developers/orchestration.md §0.6).
+(specs/system-design/orchestration.md § The catalogue).
 
 A plugin is a folder:
 

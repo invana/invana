@@ -2,7 +2,7 @@
 
 Memgraph is the module spec's own example of why a language connector is
 complete rather than abstract: it rides the Bolt driver and overrides almost
-nothing (docs/for-developers/modules/graph-connectors/spec.md § 3). *Almost*
+nothing (specs/system-design/modules/graph-connectors.md § Three layers). *Almost*
 is the word that matters — it has no ``elementId()``, and its ``id()`` returns
 an integer.
 

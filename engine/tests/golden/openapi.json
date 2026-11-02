@@ -837,7 +837,7 @@
         "type": "object"
       },
       "ActorKind": {
-        "description": "Which kind of principal emitted the event (docs/for-developers/modules/work/spec.md).\n\nA polymorphic pair \u2014 ``(actor_kind, actor_id)`` \u2014 rather than a\n``principals`` table (D5). ``actor_id`` therefore has **no FK**: it points\nat ``users.id`` or ``agents.id`` depending on the kind, and ``details``\nsnapshots the display name so a retired agent or a deleted user still reads\nby name.\n\n- ``user``: a human, identified by ``actor_id``.\n- ``agent``: an agent acting in the graph. ``on_behalf_of_user_id`` is\n  **NOT NULL** for these rows \u2014 the human at the root of the chain.\n- ``system``: background work the engine did on its own \u2014 auto-reconnect,\n  introspection completion, a dependency unblocking a task.\n- ``external``: a scoped token (S10). ``actor_id`` is the token id.\n- ``anonymous``: pre-auth events such as ``auth.login_failed``.",
+        "description": "Which kind of principal emitted the event (specs/system-design/modules/work.md).\n\nA polymorphic pair \u2014 ``(actor_kind, actor_id)`` \u2014 rather than a\n``principals`` table (D5). ``actor_id`` therefore has **no FK**: it points\nat ``users.id`` or ``agents.id`` depending on the kind, and ``details``\nsnapshots the display name so a retired agent or a deleted user still reads\nby name.\n\n- ``user``: a human, identified by ``actor_id``.\n- ``agent``: an agent acting in the graph. ``on_behalf_of_user_id`` is\n  **NOT NULL** for these rows \u2014 the human at the root of the chain.\n- ``system``: background work the engine did on its own \u2014 auto-reconnect,\n  introspection completion, a dependency unblocking a task.\n- ``external``: a scoped token (S10). ``actor_id`` is the token id.\n- ``anonymous``: pre-auth events such as ``auth.login_failed``.",
         "enum": [
           "user",
           "agent",
@@ -3235,7 +3235,7 @@
         "type": "object"
       },
       "AppliedDiffRead": {
-        "description": "How two runs narrowed the same participant differently.\n\n``differs`` names the fields of ``run_touches.applied`` that are not equal,\nand ``a`` / ``b`` carry only those fields \u2014 a reader is shown the difference,\nnot two whole documents to find it in\n([WO18](docs/for-developers/modules/govern/features/worlds.md)).",
+        "description": "How two runs narrowed the same participant differently.\n\n``differs`` names the fields of ``run_touches.applied`` that are not equal,\nand ``a`` / ``b`` carry only those fields \u2014 a reader is shown the difference,\nnot two whole documents to find it in\n(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md \u00a7 Decisions).",
         "properties": {
           "a": {
             "additionalProperties": true,
@@ -6313,7 +6313,7 @@
         "type": "object"
       },
       "CompareRead": {
-        "description": "Two runs, side by side. **The diff is the deliverable**, not the answers.\n\nNothing is simulated and no answer is synthesised from another\n([WO4](docs/for-developers/modules/govern/features/worlds.md)) \u2014 which is\nalso why comparing costs money and says so.",
+        "description": "Two runs, side by side. **The diff is the deliverable**, not the answers.\n\nNothing is simulated and no answer is synthesised from another\n(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md \u00a7 Decisions)\n\u2014 which is\nalso why comparing costs money and says so.",
         "properties": {
           "a": {
             "$ref": "#/components/schemas/CompareSideRead"
@@ -6657,7 +6657,7 @@
         "type": "object"
       },
       "ContentionRead": {
-        "description": "What is running in this Graph and what is waiting behind it.\n\nContention has to be **visible**\n(docs/for-developers/modules/agents/features/concurrency-and-contention.md C8):\nwhat is running, what is queued, and why. Without it, one agent starving the\nGraph looks exactly like the Graph being slow.",
+        "description": "What is running in this Graph and what is waiting behind it.\n\nContention has to be **visible**\n(specs/products/settings/features/ST-F06-workers-and-limits/feature.md):\nwhat is running, what is queued, and why. Without it, one agent starving the\nGraph looks exactly like the Graph being slow.",
         "properties": {
           "ceiling": {
             "title": "Ceiling",
@@ -15423,7 +15423,7 @@
         "type": "object"
       },
       "LLMModelStatus": {
-        "description": "Whether this model is still offered. Removing one a cast names is refused,\nnaming the worlds ([PM11](docs/for-developers/modules/agents/features/providers-and-models.md)).",
+        "description": "Whether this model is still offered. Removing one a cast names is refused,\nnaming the worlds ([ST-F05 \u00a7 Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)).",
         "enum": [
           "active",
           "removed"
@@ -16612,7 +16612,7 @@
         "type": "string"
       },
       "LensListResponse": {
-        "description": "The drawer's one read \u2014 and the one fact that decides what it may offer.\n\n``may_edit_guardrails`` rides on the list rather than on a permissions\nroute of its own because the drawer already asks for this exactly once, and\na second request would let the rules and the right to edit them arrive at\ndifferent moments \u2014 which is the one moment a control could flicker into\nexistence. The rules render for everyone either way\n([GR5](docs/for-developers/modules/govern/features/guardrails.md)); this\nsays whether the **authoring** controls are drawn at all.",
+        "description": "The drawer's one read \u2014 and the one fact that decides what it may offer.\n\n``may_edit_guardrails`` rides on the list rather than on a permissions\nroute of its own because the drawer already asks for this exactly once, and\na second request would let the rules and the right to edit them arrive at\ndifferent moments \u2014 which is the one moment a control could flicker into\nexistence. The rules render for everyone either way\n(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md \u00a7 Decisions);\nthis says whether the **authoring** controls are drawn at all.",
         "properties": {
           "items": {
             "items": {
@@ -17109,7 +17109,7 @@
         "type": "object"
       },
       "LifecycleAct": {
-        "description": "The two acts that disturb open work. Resume takes nothing away, so it has\nno preview ([LC10](docs/for-developers/modules/agents/features/lifecycle.md)).",
+        "description": "The two acts that disturb open work. Resume takes nothing away, so it has\nno preview ([AG-F01 \u00a7 Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).",
         "enum": [
           "pause",
           "retire"
@@ -19786,7 +19786,7 @@
         "type": "object"
       },
       "OfferedRule": {
-        "description": "One rule as it reached a step \u2014 the wording, and the rule to open.\n\n``statement`` is the **version's** wording, resolved from the\n``rule_version_id`` the step recorded, so rewording or deactivating the rule\nnever rewrites what a past step was given\n([RU4 \u00b7 RU12](docs/for-developers/modules/skills/features/rules.md)).\n``rule_id`` rides beside it because a board is bound to the rule, not to one\nof its versions \u2014 a step row shows the statement and opens the rule\n([RU11](docs/for-developers/modules/skills/features/rules.md)).\n\nIt lives here rather than beside the step schemas that carry it: a step is a\n``runtime`` row and a rule is this app's record, and **an app may not import\nthe runtime** (migration-plan \u00a718.1.1 S1). The runtime reads down to it.",
+        "description": "One rule as it reached a step \u2014 the wording, and the rule to open.\n\n``statement`` is the **version's** wording, resolved from the\n``rule_version_id`` the step recorded, so rewording or deactivating the rule\nnever rewrites what a past step was given\n([MO-F06 \u00a7 Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).\n``rule_id`` rides beside it because a board is bound to the rule, not to one\nof its versions \u2014 a step row shows the statement and opens the rule\n([MO-F06 \u00a7 Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).\n\nIt lives here rather than beside the step schemas that carry it: a step is a\n``runtime`` row and a rule is this app's record, and **an app may not import\nthe runtime** (migration-plan \u00a718.1.1 S1). The runtime reads down to it.",
         "properties": {
           "rule_id": {
             "title": "Rule Id",
@@ -22415,7 +22415,7 @@
         "type": "object"
       },
       "PlanUseRead": {
-        "description": "One composition: which library plan was inlined, and what it was tuned to.\n\n``latest_version`` is the newest version of that key the Graph holds, which\nis the one fact the caller cannot work out from its own rows. It is said,\nnever acted on: the copy is the point, and re-inlining is something somebody\nasks for ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "description": "One composition: which library plan was inlined, and what it was tuned to.\n\n``latest_version`` is the newest version of that key the Graph holds, which\nis the one fact the caller cannot work out from its own rows. It is said,\nnever acted on: the copy is the point, and re-inlining is something somebody\nasks for ([AG-F04 \u00a7 Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).",
         "properties": {
           "args": {
             "additionalProperties": true,
@@ -26116,7 +26116,7 @@
         "type": "object"
       },
       "ResolveElementsRequest": {
-        "description": "Which of these ids does the graph still hold, inside the picked world?\n\nA canvas reopens from its own snapshot, and the graph may have moved on. An\nelement that is gone is **kept and marked missing**\n(docs/for-developers/modules/explore/features/graph-canvas.md GC5) rather than\ndropped: a drawing that quietly loses a node is a drawing that lies about what\nwas explored. One the world excludes is in neither list (GC14).",
+        "description": "Which of these ids does the graph still hold, inside the picked world?\n\nA canvas reopens from its own snapshot, and the graph may have moved on. An\nelement that is gone is **kept and marked missing**\n(specs/products/explore/features/EX-F01-the-board-and-its-canvas/feature.md \u00a7 Decisions) rather than\ndropped: a drawing that quietly loses a node is a drawing that lies about what\nwas explored. One the world excludes is in neither list (GC14).",
         "properties": {
           "lens_id": {
             "anyOf": [
@@ -26580,7 +26580,7 @@
         "type": "object"
       },
       "RuleCitationsResponse": {
-        "description": "Where a rule was offered and where it was cited.\n\n``offered`` is a fact written by assembly; ``total`` is the model's own\nclaim, and the difference between them is *never cited* \u2014 which cannot be\ntold from *never offered* unless both are sent\n([RU7](docs/for-developers/modules/skills/features/rules.md) \u00b7\n[RU9](docs/for-developers/modules/skills/features/rules.md)). Both are over\n**every** version; each row says which wording it read, so deactivating or\nrewording never rewrites it.",
+        "description": "Where a rule was offered and where it was cited.\n\n``offered`` is a fact written by assembly; ``total`` is the model's own\nclaim, and the difference between them is *never cited* \u2014 which cannot be\ntold from *never offered* unless both are sent\n([MO-F06 \u00a7 Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions) \u00b7\n[RU9](docs/for-developers/modules/skills/features/rules.md)). Both are over\n**every** version; each row says which wording it read, so deactivating or\nrewording never rewrites it.",
         "properties": {
           "items": {
             "items": {
@@ -27019,7 +27019,7 @@
         "type": "object"
       },
       "RuleUpdate": {
-        "description": "A rewording, a reorder, or both.\n\nChanging the statement publishes the next version; ``order`` and ``active``\nare properties of the rule and are edited in place\n([RU4](docs/for-developers/modules/skills/features/rules.md)).",
+        "description": "A rewording, a reorder, or both.\n\nChanging the statement publishes the next version; ``order`` and ``active``\nare properties of the rule and are edited in place\n([MO-F06 \u00a7 Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).",
         "properties": {
           "because": {
             "anyOf": [
@@ -32400,7 +32400,7 @@
         "type": "object"
       },
       "SkillUsageVersion": {
-        "description": "Offered, applied and the gap, for one published version.\n\nCounts are per version and never summed across them: publishing v4 starts\nits own count and v3 keeps its history\n([US3](docs/for-developers/modules/skills/features/usage.md)). ``offered``\nis a fact written by prompt assembly; ``applied`` is the model's own report,\nwhich is why the surface says so rather than implying it away (US4).",
+        "description": "Offered, applied and the gap, for one published version.\n\nCounts are per version and never summed across them: publishing v4 starts\nits own count and v3 keeps its history\n([AG-F04 \u00a7 Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)). ``offered``\nis a fact written by prompt assembly; ``applied`` is the model's own report,\nwhich is why the surface says so rather than implying it away (US4).",
         "properties": {
           "applied": {
             "title": "Applied",
@@ -47101,7 +47101,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/connection/acknowledge-version": {
       "post": {
-        "description": "Accept the risk of an UNTESTED backend version \u2014 lifts the version read-only\n(docs/for-developers/modules/graph-connectors/features/capabilities.md).",
+        "description": "Accept the risk of an UNTESTED backend version \u2014 lifts the version read-only\n(specs/system-design/modules/graph-connectors.md \u00a7 Capabilities).",
         "operationId": "acknowledge_connection_version_api_v1_u__username___graphSlug__connection_acknowledge_version_post",
         "parameters": [
           {
@@ -47360,7 +47360,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/connection/version": {
       "patch": {
-        "description": "Declare a server version when auto-detection is unavailable (e.g. Gremlin)\n(docs/for-developers/modules/graph-connectors/features/capabilities.md).",
+        "description": "Declare a server version when auto-detection is unavailable (e.g. Gremlin)\n(specs/system-design/modules/graph-connectors.md \u00a7 Capabilities).",
         "operationId": "declare_connection_version_api_v1_u__username___graphSlug__connection_version_patch",
         "parameters": [
           {
@@ -50157,7 +50157,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/flows/{key}/export": {
       "get": {
-        "description": "The surface form (docs/for-developers/modules/agents/spec.md, *one schema, two encodings*).",
+        "description": "The surface form (specs/system-design/modules/agents.md, *one schema, two encodings*).",
         "operationId": "export_flow_api_v1_u__username___graphSlug__flows__key__export_get",
         "parameters": [
           {
@@ -51207,7 +51207,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/govern/lenses": {
       "get": {
-        "description": "The Worlds drawer, or the Guardrails one.\n\nA guardrail **never appears under ``kind=world``**\n([GR1](docs/for-developers/modules/govern/features/guardrails.md)) \u2014 that is\nwhat the filter is for, and why it is not one list with a badge.",
+        "description": "The Worlds drawer, or the Guardrails one.\n\nA guardrail **never appears under ``kind=world``**\n(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md \u00a7 Decisions) \u2014 that is\nwhat the filter is for, and why it is not one list with a badge.",
         "operationId": "list_lenses_api_v1_u__username___graphSlug__govern_lenses_get",
         "parameters": [
           {
@@ -68748,7 +68748,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/usage": {
       "get": {
-        "description": "Where this skill is carried, and where it was offered or reported.\n\nTwo levels, labelled honestly (docs/for-developers/modules/work/spec.md): *offered* is a fact written\nby prompt assembly; *reported* is the model saying it followed the prose.\n``reported`` on a row is the difference, and the badge says so.",
+        "description": "Where this skill is carried, and where it was offered or reported.\n\nTwo levels, labelled honestly (specs/system-design/modules/work.md): *offered* is a fact written\nby prompt assembly; *reported* is the model saying it followed the prose.\n``reported`` on a row is the difference, and the badge says so.",
         "operationId": "skill_usage_api_v1_u__username___graphSlug__skills__skill_id__usage_get",
         "parameters": [
           {
@@ -69134,7 +69134,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/versions/{version}/tasks": {
       "get": {
-        "description": "One version's plan, as nodes and edges.\n\nEach node carries the **band** it sits in and the sentence it was drawn\nfrom, so the Flow tab draws the six layers and the Playbook tab can show\neach sentence beside the step it produced\n([SK16 \u00b7 C11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "description": "One version's plan, as nodes and edges.\n\nEach node carries the **band** it sits in and the sentence it was drawn\nfrom, so the Flow tab draws the six layers and the Playbook tab can show\neach sentence beside the step it produced\n([AG-F04](specs/products/agents/features/AG-F04-skills/feature.md)).",
         "operationId": "skill_version_plan_api_v1_u__username___graphSlug__skills__skill_id__versions__version__tasks_get",
         "parameters": [
           {

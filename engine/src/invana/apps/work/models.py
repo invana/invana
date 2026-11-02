@@ -1,5 +1,5 @@
 """SQLAlchemy models for Work — ``projects``, ``project_assignments``, ``tasks``
-and ``task_dependencies`` (docs/for-developers/modules/work/spec.md), and the
+and ``task_dependencies`` (specs/system-design/modules/work.md), and the
 records a quest is made of — branches, findings, decisions, proposals and the
 report (docs/for-developers/modules/work/features/branches-and-decisions.md,
 project-reports.md), and the handle a branch keeps on a simulator run
@@ -33,11 +33,11 @@ def _new_id() -> str:
 
 
 class TaskStatus(enum.StrEnum):
-    """The states of a task (docs/for-developers/modules/work/spec.md)
+    """The states of a task (specs/system-design/modules/work.md)
 
     The one that carries the design is ``review``: **an agent never marks its
     own task done.** It posts a result and a human accepts — the governance
-    seam, and the capture signal the learning loop reads (docs/for-developers/modules/agents/spec.md).
+    seam, and the capture signal the learning loop reads (specs/system-design/modules/agents.md).
     """
 
     open = "open"
@@ -100,7 +100,7 @@ class Task(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     # The goal as prose. **This is the intent an agent plans from** — a
     # task-triggered run starts at *Plan* because the body already is an
-    # intent (docs/for-developers/modules/agents/spec.md).
+    # intent (specs/system-design/modules/agents.md).
     body: Mapped[str] = mapped_column(Text, default="", nullable=False)
     # What "done" means. Prose in v1; the Verify step reads the result, not this.
     acceptance: Mapped[str] = mapped_column(Text, default="", nullable=False)
@@ -144,7 +144,7 @@ class TaskDependency(Base):
         String(36), ForeignKey("todos.id", ondelete="CASCADE"), nullable=False, index=True
     )
     kind: Mapped[str] = mapped_column(String(24), default=DependencyKind.finish_to_start.value, nullable=False)
-    # Reserved (docs/for-developers/modules/work/spec.mda): a dependency that also *feeds* its result —
+    # Reserved (specs/system-design/modules/work.md): a dependency that also *feeds* its result —
     # {"baseline": "${tasks.t2.result.emitted[metric]}"} — is a chain of
     # runs one layer up. Not built; the column keeps it additive (R2, R5).
     binds: Mapped[dict | None] = mapped_column(JSON, nullable=True)
@@ -197,7 +197,7 @@ class Project(Base):
 
 
 class ProjectAssignment(Base):
-    """Staffing — *a default, not a permission* (docs/for-developers/modules/work/spec.md).
+    """Staffing — *a default, not a permission* (specs/system-design/modules/work.md).
 
     A principal staffed on a project appears in its assignee picker. An agent
     that is *not* staffed may still be assigned explicitly; nothing here grants

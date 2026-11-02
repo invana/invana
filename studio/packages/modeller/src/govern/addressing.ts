@@ -4,7 +4,7 @@
  * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  *
  * `<layer>/<sublayer>/<name>` is the only identifier a rule has
- * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)), and the
+ * ([govern.md](../../../../../specs/system-design/modules/govern.md)), and the
  * three wildcards are part of the vocabulary rather than an escape from it:
  * `*` is one segment, `**` is the rest, and a `*` **inside** a segment globs it
  * — which is how `graph_data/model/Deals@*` names a model across its versions

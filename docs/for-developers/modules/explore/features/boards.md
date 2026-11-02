@@ -12,51 +12,7 @@ where you left it — including how it got there. A board is either **drawn** �
 | Related | [graph-canvas](graph-canvas.md) · [selection-and-the-panel](selection-and-the-panel.md) |
 | Engine | [boards-migration.md](../../../building-engine/boards-migration.md) — the tables, the routes, the kind registry and the decisions B1–B16. Where it and this file disagree, it is right |
 
-> **As** someone mid-investigation, **I want** my working surface to survive a reload and a week,
-> **so that** I resume rather than reconstruct.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Named boards per Graph | Listed, searchable, reopenable |
-| C2 | A declared **kind** | One flat axis of thirteen — `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs · compare · skill · skill_usage · rule`. Set at creation, never changed (CV1) |
-| C2a | Drawn or declared is **`renders`** | A property of the kind, not a second column — `canvas` for the six that are drawn, `board` for the seven that are declared ([B3](../../../building-engine/boards-migration.md)) |
-| C2b | A declared board binds to one record | `subject_id` — a run, one task run, a plan. The same board for another run is the same kind with a different subject id |
-| C3 | Tabs | Several open at once; the tab bar is the switcher |
-| C4 | Autosave | Elements, layout and settings, without a save button — drawn boards only |
-| C5 | Version history | Every meaningful change is a version, with what changed |
-| C6 | Restore is additive | Restoring an old version creates a new one; nothing is lost |
-| C7 | Per-board settings | Layers, layout, colour mapping — stored with the board, and they survive a re-query ([B14](../../../building-engine/boards-migration.md)) |
-| C8 | Answers land in the open board | A subgraph emission draws where you are working — drawn kinds only |
-| C9 | A **report** is a frozen board | The panels with the numbers as they were. It is one version of the board, not a third kind ([B11](../../../building-engine/boards-migration.md)), and a live board has no row until the first one is saved |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Ask · draw] --> B[Autosaved as you go]
-    B --> C[Close the tab]
-    C --> D[Reopen from the boards list]
-    D --> E[Elements · layout · settings restored]
-    E --> F{Went wrong somewhere?}
-    F -->|yes| G[History: versions with what changed]
-    G --> H[Restore one]
-    H --> I[A new version · the old ones still there]
-    F -->|no| J[Keep working]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| First board | Created implicitly on the first answer, named after the question |
-| Many versions | Grouped by day; each says what changed, not just when |
-| Deleted board | Confirmed, and it names how many versions go with it |
-| Element removed from the graph | Kept and marked missing on reopen |
-| Two tabs on one board | Both see the same autosaved state; last write wins, and it is a version |
-| A board whose subject is gone | *This run is gone* — an orphan board, never a cascade that deletes what someone kept ([B8](../../../building-engine/boards-migration.md)) |
-| A report of a run still going | Says what it looked like at that moment, and keeps saying it |
+Product spec: [EX-F01 · The board and its canvas](../../../../../specs/products/explore/features/EX-F01-the-board-and-its-canvas/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -83,10 +39,6 @@ flowchart TD
 | # | Decision |
 |---|---|
 | CV1 | Kind is set at creation and does not change. |
-| CV2 | Autosave never overwrites history — every meaningful change is a version. Declared boards do not autosave: there is nothing of their own to save. |
-| CV3 | Restore creates a new version. |
-| CV4 | Settings belong to the board, not to the user — and they outlive its data ([B14](../../../building-engine/boards-migration.md)). |
-| CV5 | An answer draws into the open board. |
 | CV6 | **The canvas's own controls ride the board toolbar.** Layers · Styling · History are the toolbar's first group ([GC21](graph-canvas.md#decisions)), and each drops a card from its own button. One is open at a time: opening one closes the others. None of them is a `leftNav` panel, because they describe the canvas in front of you rather than a noun you browse. Help and Rename stay on the page strip, because they are about the page, not the drawing. |
 | CV7 | **The page host is not Explore's — it is every module's.** `mainSection` is one `Workbook` from `@invana/canvas-ui`, and the nine kinds in it are owned by four modules: `data` by Explore, `model` by Connect and model, `plan · workflow · envelope · lineage` by Work, `run · task_run · plan_runs` by Operate. So the host, the page list and the board record live in `studio/src/pages/graphs-detail/features/boards/`, a folder of their own, not under the module that owns one of the kinds ([code-shape.md](../../../building-studio/code-shape.md) §4.1b). |
 | CV8 | **A card goes where its subject lives, not where its button lives.** The CV6 controls ride one toolbar, and they still split: Layers and Styling describe what is *drawn*, so they are the Explorer's; History describes the *board record*, so it is Boards'. The toolbar is one owner of buttons, not one owner of code. |
@@ -113,7 +65,4 @@ flowchart TD
 | Not building | Because |
 |---|---|
 | Sharing a board with a link | Graph membership is the access model |
-| Real-time co-editing | last-write-wins with history is honest at this scale |
-| Folders of boards | a list with search is enough until it is not |
 | A row for every board opened | it would mirror `task_runs` and be written before every read ([B9](../../../building-engine/boards-migration.md)) |
-| Converting a board's kind | a drawn board and a declared one share no state; a flip would be a delete and a create wearing one id (CV1) |

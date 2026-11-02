@@ -51,7 +51,7 @@ class AgentQuerySet:
         """One page of the Graph's agents.
 
         With no ``status`` filter a retired agent is left out, and with no
-        ``ephemeral=shown`` a spawned helper is (docs/for-developers/modules/work/spec.md)
+        ``ephemeral=shown`` a spawned helper is (specs/system-design/modules/work.md)
         — both are still fully present in lineage and the trace. With helpers
         shown, ``unfiltered_total`` counts them too, so *N of M* is over the
         rows the list could show.

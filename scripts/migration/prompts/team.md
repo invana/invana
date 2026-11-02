@@ -25,7 +25,7 @@ Never give these to a part — they are where parallel edits collide:
 |---|---|
 | Wiring | `product.tsx`, any `index.ts` barrel, `apps/studio/src/host/declaredBoardBody.tsx`, `leftSectionContent.tsx`, `packages/shell/src/boards/boardKinds.ts`, route tables |
 | Contract | `types.ts`, `api.ts`, `queries.ts` of the package; engine `schemas.py`, `models.py`, migrations, `server/app.py` |
-| Docs and bookkeeping | `docs/products/migration-sessions.md`, feature files, module specs, `for-developers/README.md`, `the-screens.md`, `terminology.md`, `.changeset/*` |
+| Docs and bookkeeping | the runbook being run, feature files, module specs, `for-developers/README.md`, `the-screens.md`, `terminology.md`, `.changeset/*` |
 | Tests shared by all | `e2e/api.ts`, fixtures, golden files, `scripts/migration/*` |
 
 ## Rules every part follows (put them in its prompt)

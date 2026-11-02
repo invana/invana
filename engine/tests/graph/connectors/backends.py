@@ -1,5 +1,5 @@
 """The live databases the connector suite runs against
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md CC5).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 
 *Integrations are conformance-tested against a live database, not mocked.* One
 registry, so a test written once runs against every backend of its language and

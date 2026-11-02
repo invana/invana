@@ -10,50 +10,7 @@ declare, written with provenance, and the whole load is a run you can watch and 
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [inspect-what-landed](inspect-what-landed.md) · [domain-models](../../connect-and-model/features/domain-models.md) |
 
-> **As** someone whose pipeline already produces data, **I want** one command that loads it and tells
-> me exactly what was rejected, **so that** I can put it in a DAG and trust the result.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Import from the CLI | The primary path; exit codes a scheduler can branch on |
-| C2 | Import from Python | For an orchestrator holding the data already; returns a run id to wait on |
-| C3 | `--model` is required | The dataset states what it conforms to; nothing is inferred |
-| C4 | Per-record validation | One bad row does not fail the load |
-| C5 | Provenance on everything written | Node, edge, property → the dataset record it came from |
-| C6 | The run is a run | Streamed steps, retries with backoff, diagnosis on failure, cancellable |
-| C7 | Relationship-link records load like any other | The edges a stitch declared arrive as data |
-| C8 | Idempotent by the model's keys | Re-running the same file updates rather than duplicating |
-| C9 | The run records who ran it | The principal and the invocation, so the journal can name both |
-| C10 | A bundle is checked before it is imported | `invana records check` validates each dataset against its own model, then resolves the rules between them — no Graph, no connection, no model in a database |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[invana records import --model MarketData bars/] --> B[Resolve the model version]
-    B --> C[Open a Todo · kind = import]
-    C --> D[Validate each record]
-    D -->|accepted| E[Write with provenance]
-    D -->|rejected| F[Report row: which field, which rule]
-    E --> G[Progress streams: 8,900 / 12,401]
-    F --> G
-    G --> H{Finished?}
-    H -->|yes| I[Run complete · counts · report link]
-    H -->|cancelled| J[Accepted records stay ·<br/>the report says where it stopped]
-    B -->|no such model| K[Fails before writing anything,<br/>listing the Graph's models]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Model published mid-run | The run states the version it validated against and does not switch |
-| Database unreachable | Retries with backoff, shown as `retrying 2/3`, then a diagnosis |
-| Every record rejected | Not a crash: a report where every row has a reason |
-| Read-only connection | Refused at the start, naming the connection setting |
-| Same file twice | Keys decide; the report says updated versus created |
+Product spec: [DA-F02 · Bring data in](../../../../../specs/products/data/features/DA-F02-bring-data-in/feature.md) — DA-13 and DA-18; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -77,21 +34,10 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| LD1 | `--model` is required. There is no inference path. |
-| LD2 | Validation is per record; rejections are reported, never silent. |
-| LD3 | An import run is a Todo and uses the ordinary runtime. |
-| LD4 | Everything written carries provenance. |
 | LD5 | Import is CLI and API only. |
 | LD6 | The run's four steps are `validate_records · write_graph · stitch · snapshot_model`, under `dataset-import@1` — a **builtin workflow version** in the library ([§7 F9](../../workflows/spec.md)). They are *not planned*: there is nothing for a model to decide about a load. They are still **dispatched by the interpreter**, so a load retries, times out, cancels and gates like every other run ([spec BD12](../spec.md)). |
-| LD7 | An edge whose endpoint does not resolve is rejected with **both** endpoints named. A dangling edge is never written. |
-| LD8 | The run records the model version it validated against at the moment it started, and reads that row for the rest of the load. |
-| LD9 | The run records the principal that ran it and the invocation it came from. The load is the only place that knows them, so it is the place that writes them down. |
 | LD10 | **`invana loader --graph <ref>` is a run, and its kind is what says it validated nothing.** It walks `bulk-load@1` — one step, `bulk_write` — so it retries, cancels, streams and leaves a trace exactly as an import does. Two kinds of run, one journal: the kind is a column, not a separate surface, because the question *what changed my graph* has one answer. **A connection described on the command line is not journaled**: replaying such a run would need credentials, and credentials never ride a run's `params`, so `--uri` / `--username` / `--password` / `--connector` keep the direct path and say so. `--graph` on its own is the run. |
 | LD12 | **A bundle states its stitches, and the CLI checks them against the files.** `stitches.json` at a bundle's root names its datasets and the rules between them, in the vocabulary `POST …/model-links` already uses — `kind`, `source`, `target`, `identity_match`, `edge_type`, `dataset`. `invana records check <dir>` resolves each rule against `nodes/*.json` and `nodes/*.csv` and reports the count. It is a **preflight**: it reads files, never a Graph, and it declares nothing. The same manifest is declared against a Graph by `invana stitches apply` (stitch-models.md ST39) — one file, checked offline and applied online, never a second copy of the rules. |
-| LD13 | **The check counts distinct key values, because the preview does.** A rule joins values, not rows: 26 airlines share 24 hub codes. Reporting rows here and keys in Studio would make the same rule read two ways, so the CLI reports keys and names the row count beside it. |
-| LD14 | **A rule may declare that it is not meant to resolve fully.** `"partial": true` says the two sides overlap without either containing the other — a hashtag nobody filed a story under is an ordinary hashtag, not a broken key. Without it, one unresolved value fails the rule, so a silent partial match can never pass unnoticed. |
-| LD15 | **Structure first, then the joins.** `check` validates each dataset against its own `graph-model.json` and `model.json` before it resolves a single rule: ids unique, the identity key present and unique, every property declared on its type, enum values in range, declared types honoured, and each edge's endpoints landing on the source and target types the model names. A rule that fails because a type is malformed should say the type is malformed, not that the rule matched nothing. Both sections always run and both count toward the exit code. |
-| LD16 | **An endpoint is resolved against the whole bundle, and a leftover is deferred, not rejected.** `_validate_edges` already treats an endpoint the dataset does not carry as *possibly already in the graph* (LD7), so the preflight cannot call it an error: it resolves across every dataset in the bundle and reports what is left as deferred. Offline, a missing endpoint is a question; only the import can answer it. |
 | LD17 | **The run streams its journal as it happens; the summary is still the last word.** `import_dataset` takes an `on_progress` callback and calls it at every stage transition and every 500 records written, carrying the same `step` and `message` the run stores in **`run_logs`** — one journal, whether it is read live or read afterwards, and the same store every other run writes to ([13.8 §17](../../platform/features/runtime.md)). `import_jobs.logs` was a second one (BD12). The CLI renders it on **stderr**: a rewriting counter on a tty, one line per stage otherwise, so `stdout` carries only the summary a pipe parses (Surfaces). A 61k-record load is otherwise minutes of silence, which reads as a hang. |
 | LD18 | **The `stitch` step solves the Graph's active stitches too.** It already resolved the edges a dataset deferred; it now also runs every **active** stitch over the records this import just wrote, scoped by the job's provenance stamp (stitch-models.md ST47). A stitch is a standing rule, so data arriving after it was committed is stitched as it lands — nobody re-runs anything, and the step keeps the name it always had. |
 | LD19 | **A dataset ships a stitch's rows in `stitches/<EDGE_TYPE>.json`, and they load like any other records (C7).** The file holds `{id, from, to, properties}` — the same record shape `edges/` uses — and the edge type is in *neither* model, because a cross-model edge belongs to the stitch rather than to a domain. So the check is the stitch: the Graph must hold a **declared, active** link whose `dataset_id` is this dataset and whose `edge_type` is the file's stem, or the file is reported `no_stitch_for_edge` and nothing is written. Endpoints resolve by id against the whole graph, and one that resolves nowhere is rejected naming both (LD7). |
@@ -176,6 +122,3 @@ printed, and who ran it — with no steps, no report and no provenance, because 
 | Not building | Because |
 |---|---|
 | Import from Studio | a load is scripted and repeatable, not a click |
-| Streaming ingest | a batch with a report is what a person can audit |
-| Transformation on the way in | whatever produced the data transforms it better |
-| Upsert strategy settings | identity comes from the model's keys |

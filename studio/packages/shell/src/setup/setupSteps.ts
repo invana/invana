@@ -3,7 +3,7 @@ import type { SetupTarget } from "./SetupSlots";
 
 /**
  * What each setup step is called, why it is there, and where it is done
- * (docs/for-developers/modules/platform/features/setup.md §3).
+ * (specs/products/shell/features/SH-F02-create-a-graph/feature.md).
  *
  * One list, two renderings: the board on the graph page and the timeline in the
  * Info panel read the same rows, so the sequence cannot say two different things
@@ -137,8 +137,8 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			body: "Every answer traces back LLM \u2192 query \u2192 record \u2192 dataset. Nothing is invented to fill a gap — when the graph cannot answer, Invana says so.",
 		},
 		// A load is a TaskRun, so the step lands on the journal that lists them —
-		// the Runs panel, not an Imports panel.
-		settingsSection: "runs",
+		// Activity › Runs, not an Imports panel.
+		settingsSection: "activity-runs",
 		// Copied and run as-is, so it is the command's real signature: the group
 		// is `records` (a Dataset is not a container, so the group names the
 		// object), and `--name` and `--path` are required and not positional.
@@ -251,7 +251,7 @@ export const WHAT_NEXT: readonly {
 		label: "Schedule it",
 		description:
 			"A question worth asking once is usually worth asking nightly.",
-		settingsSection: "events",
+		settingsSection: "activity-events",
 	},
 	{
 		label: "Stitch a second model",

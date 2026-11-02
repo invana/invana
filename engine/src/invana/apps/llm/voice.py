@@ -1,6 +1,6 @@
 """An agent's voice — the dials, the soul, and the default when neither is set
 (docs/for-developers/modules/agents/features/soul.md ·
-docs/for-developers/modules/agents/features/author-an-agent.md § Voice dials).
+specs/products/agents/features/AG-F01-build-an-agent/feature.md).
 
 The voice is words and nothing else. It reaches the steps whose output a person
 reads — Understand's ``question`` and ``reason`` today — and is **not passed**

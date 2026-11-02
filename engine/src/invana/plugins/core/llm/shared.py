@@ -52,7 +52,7 @@ def _vocabulary(envelope) -> list[dict]:
 
     The allow-list narrows; the declaration describes. Handing the model both
     at once is what makes ``requires`` something it drafts *with* rather than
-    something it is refused by (docs/for-developers/orchestration.md §0.6).
+    something it is refused by (specs/system-design/orchestration.md § The catalogue).
     """
     from invana.runtime.catalogue import CATALOGUE
 

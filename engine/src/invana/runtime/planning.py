@@ -1,6 +1,6 @@
-"""Turning an agent's envelope into the rows a run runs (docs/for-developers/modules/agents/spec.md).
+"""Turning an agent's envelope into the rows a run runs (specs/system-design/modules/agents.md).
 
-Two modes, one function. docs/for-developers/modules/agents/spec.md ships both and makes the mode **the
+Two modes, one function. specs/system-design/modules/agents.md ships both and makes the mode **the
 agent's**, not the ask's — the envelope's ``entry`` says whether this agent
 plans, which is what keeps "two agents run the same run_ask differently"
 meaningful.
@@ -95,7 +95,7 @@ async def select_plan(
 
     A plan the envelope does not list is not selected even if the intent map
     points at it: the envelope permits, the map suggests, the Plan step selects
-    (docs/for-developers/modules/agents/spec.md).
+    (specs/system-design/modules/agents.md).
 
     Returns ``None`` — *plan it with the model* — in three cases, and they are
     deliberately the same answer: no intent match, the envelope forbids the key,

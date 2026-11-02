@@ -10,49 +10,7 @@ it is committed together.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [the-model-page](the-model-page.md) · [domain-models](domain-models.md) · [graph-canvas](../../explore/features/graph-canvas.md) · [selection-and-the-panel](../../explore/features/selection-and-the-panel.md) |
 
-> **As** someone authoring a model, **I want** to draw types and connect them and see the whole shape,
-> **so that** I am designing a structure rather than filling in a form.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Add a node type from the canvas | **Node type** on the bar over the canvas, or the drawer's `+` — one form (ME8) |
-| C2 | Connect two types into an edge type | **Edge type** on the bar; the form names the source and target |
-| C3 | Delete, staged | Nothing leaves until the commit |
-| C4 | Every change stages | The staged set is listed, counted and reversible before it lands |
-| C5 | Commit publishes | One action turns the staged set into the next version |
-| C6 | Published versions are pan-and-zoom only | Read-only, with no accidental edits |
-| C7 | The panel edits what the canvas selects | Properties, keys and constraints in the panel, never in a modal over the drawing |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Open a draft] --> B[Node type · Edge type · Delete from the bar and the form]
-    B --> C[Each change joins the staged set]
-    C --> D[Staged bar: 6 staged · what they are]
-    D --> E{Commit?}
-    E -->|discard one| B
-    E -->|discard all| F[Draft back to its last state]
-    E -->|commit| G[New published version]
-    G --> H[Canvas switches to read-only for that version]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Nothing staged | The commit action says there is nothing to commit |
-| A staged delete with dependents | Named dependents, before the commit, not after |
-| Two people on one draft | Single editor at a time; the second sees it read-only with who holds it |
-| Leaving mid-edit | The staged set survives; it is part of the draft, not of the session |
-| Opening a model | The drawing is laid out and fitted before the first frame — it never drifts into place |
-| A section with nothing in it | Its header still reads, with a `0`, and its body says what would go there (ME14) |
-| Switching model mid-edit | `Models` in the crumb, then the row. The staged set stays with the draft it belongs to |
-| Nothing selected yet | The model list fills the column, with `New model` · `Import` · `Starter models` on its header (ME17); the page reads every model ([MP2](the-model-page.md#decisions)) |
-| A type is selected | The panel row marks it; the type itself reads on the Model tab beneath the canvas (ME6, ME19) |
-| A long type list | It scrolls inside its own drawer. Edge types and Stitches keep their headers on screen (ME13) |
+Product spec: [MO-F02 · Change and publish a model](../../../../../specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -79,15 +37,8 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| ME1 | **The model canvas draws; the bar over it writes.** Adding a node type, adding an edge type and deleting are the only three writes, and none of them is a canvas gesture — the canvas is the shared model canvas and carries only its own behaviours (ME26). |
-| ME2 | Everything stages; nothing reaches a version until a commit. |
-| ME3 | A published version's canvas is read-only. |
-| ME4 | The staged set lives with the draft, so it survives a reload and is visible to anyone opening it. |
-| ME5 | Staged rows sort first in every type list, each carrying a `staged` chip, so what is about to land reads before what already has. |
 | ME6 | The selected type is edited in a form that spans the main column beneath the canvas — never in a modal over the drawing. |
-| ME7 | A run stages onto the same draft as a gesture does. There is one staged set and one commit, whoever wrote it. |
 | ME8 | A type is added from **either** side — the section's `add` in the panel, or **Node type** on the bar over the canvas — and both open the same form. Two affordances, one path. |
-| ME9 | A delete is confirmed as *staging* a delete, not as deleting. "Gone" and "gone when you commit" are different promises, and the confirm makes which one it is unmistakable. |
 | ME10 | The compatibility banner sits on the page header, under the model's version readout, because `Edit` and `Publish` are there and those are the writes the server would refuse. A warning shown where nothing is being written is a warning nobody reads. |
 | ME11 | **Selection is idempotent both ways.** A click announces `{ kind, id }` from `ClickSelectBehaviour`'s `selection:change`, and the canvas drops an announcement naming the selection it already draws; the page drops a write naming the selection it already holds. The panel selects by name and the canvas by id, and `ModelCanvas` maps one to the other. |
 | ME12 | **The model canvas lays out as the global model does — ELK, and only ELK.** Each run glides the camera with the nodes (`fitCamera`) — one behaviour for both modeller canvases ([GM3 · GM10](../../../building-studio/graph-model-canvas.md#decisions)). |
@@ -119,12 +70,3 @@ not wire them back in.
 | `NoSelectionPlaceholder.tsx` | with `DetailPanel` | each surface states its own empty state |
 | `PropertyKeyTable.tsx` | with `DetailPanel` | `PropertyEditor`, on the type that carries the key (ME20) |
 | `PropertyKeyFormDialog.tsx` | with `PropertyKeyTable` | `PropertyEditor` creates the key inline (ME20) |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Freehand layout saved per type | layout is a view, not part of the model |
-| Multi-user live editing | single editor with a visible holder is honest at this scale |
-| Auto-layout that rewrites positions on open | a model you arranged should stay arranged |
-| Writing from a canvas gesture — drag-to-connect, add on the canvas, a context menu | ME1 · ME26. The canvas is the global model canvas; the bar over it and the type form write |

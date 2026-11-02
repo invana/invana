@@ -19,7 +19,8 @@ import {
 	MetricTile,
 	TypographyInlineCode,
 } from "@invana/ui";
-import { FleetReadState, tokens } from "../overview/fleetParts";
+import { ReadState } from "@invana-studio/shell";
+import { tokens } from "../overview/fleetParts";
 import { useActorOptions } from "./actors";
 import { CountTable } from "./CountTable";
 import { byReason, n, SINCE_OPTIONS, sinceLabel } from "./ledgerParts";
@@ -73,7 +74,7 @@ export function LedgerActorTab({
 					description="Every act it made, and every act made through it, over the window."
 				/>
 			) : !d ? (
-				<FleetReadState
+				<ReadState
 					loading={read.isLoading}
 					error={read.error}
 					what="the actor"

@@ -10,44 +10,7 @@ A Graph holds many, and each one travels.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [model-editor](model-editor.md) · [share-a-model](share-a-model.md) · [stitch-models](stitch-models.md) · [publish-review](publish-review.md) |
 
-> **As** someone describing a domain, **I want** to model it once and reuse it, **so that** the second
-> Graph that needs `NewsArticles` does not retype a single property.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Node types with property keys and types | Types are resolved against what the database can hold |
-| C2 | Edge types with declared endpoints | Direction and cardinality stated |
-| C3 | Keys and constraints | What identity means for this type |
-| C4 | Draft → published version | A draft is editable; a published version never changes |
-| C5 | Many models per Graph | Each authored independently, none aware of the others |
-| C6 | Capability-gated property types | A type the connected database cannot hold is refused at authoring, with the reason |
-| C7 | Versions resolve forever | An import or answer that used v2 still resolves to v2 |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[New model] --> B[Name it after the domain]
-    B --> C[Add node types · property keys]
-    C --> D[Add edge types · endpoints]
-    D --> E{Property type supported<br/>by this database?}
-    E -->|no| F[Refused at authoring,<br/>naming the type and the version]
-    E -->|yes| G[Draft complete]
-    G --> H[Publish]
-    H --> I[Immutable version · joins the global model]
-    I --> J[Datasets may bind to it]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Editing a published version | Not possible — the action is "publish a new version" |
-| A type in use by a dataset | Removing it warns, naming the datasets that bind to it |
-| Database upgraded | Newly available property types appear; nothing already published changes |
-| Two models with the same type name | Allowed — they are different domains until a link says otherwise |
+Product spec: [MO-F01 · Start a model](../../../../../specs/products/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -68,28 +31,3 @@ flowchart TD
 | Capability resolution | server version → available property types, per connector |
 | Routes | `…/models*` · `…/models/{id}/versions*` · `POST …/models/{id}/publish` — additive now, breaking through a [review](publish-review.md) |
 | Events | `model.created · updated · published` |
-
-## Decisions
-
-| # | Decision |
-|---|---|
-| DM1 | A model is named for its domain and is portable; it does not belong to a Graph. |
-| DM2 | A published version is immutable. |
-| DM3 | Property types are gated by the connected database's real capability. |
-| DM4 | A Graph holds many models; they meet only through declared links. |
-| DM5 | The first published version diffs against nothing rather than against itself — it changed everything, and saying so is more honest than an empty diff. |
-| DM6 | **A published version declares its axes, and declaring one is a modelling act.** Which property carries valid time, which carries geography, and which named properties are selectable dimensions — stated here, in the model editor, and nowhere else. A world asking to slice along an axis the model never declared is **refused naming the model and the axis**, never silently ignored ([GV14](../../govern/spec.md)): a selector on an undeclared property is a query, and the product has one place to write a query. |
-| DM7 | **The default is `{}` — nothing is selectable.** A model that declares no axes can still be allowed or denied whole; it simply cannot be narrowed. Inferring an axis from a property's name or type would make *which rows did this run see* depend on a guess. |
-| DM8 | **The axes travel with the artefact, inside the content hash.** They are part of the *shape*, not a local setting: two Graphs whose models differ only in what they let a lens narrow are not running the same model. A version published from a draft carries them forward, because a published version that lost them would silently stop being sliceable and every world narrowing it would start refusing — a failure that reads as a governance bug rather than a lost column. |
-| DM9 | **An axis naming a property the version does not have is refused at import**, naming the axis and the property. A declaration that names nothing is worse than none: the model reads as sliceable, a world is authored against it, and the narrowing matches no rows. |
-| DM10 | **A new model starts from a description, a file or a starter — one dialog.** *New model* asks a name and a description and where to start; *Create draft* always lands on the new model's **draft** canvas (`models_view=schema`), never on a published version. The separate import dialog is gone: *A file* and *A starter* are the import path ([share-a-model](share-a-model.md) · [starter-models](starter-models.md)), the name typed in the dialog renaming what arrives. |
-| DM11 | **_Describe it_ is the assistant's draft, through the routes that exist.** *Create draft* makes the model and its empty draft (`POST …/models`), then opens a Modeller session bound to that model whose first ask is the description (`POST …/sessions` with `surface=modeller`, `model_id` and `message {mode: nl}`). The `model.propose` run stages node and edge types on the draft; the canvas opens with the assistant docked on that session, so the person watches the draft arrive and replies in the same thread. Nothing publishes. A Graph with no LLM refuses the ask as every ask is refused, and the empty draft stays to author by hand. |
-| DM12 | **The description is the model's description.** What the person typed to describe it is kept on the model, so the model page's head reads it — the prompt is not a second, hidden text. |
-
-## Not building
-
-| Not built | Because |
-|---|---|
-| Inheritance between node types | flattening is clearer, and inheritance leaks into every query |
-| Free-form property bags | a model that permits anything grounds nothing |
-| Auto-migration of data on a version change | data is imported against a version, not rewritten by one |

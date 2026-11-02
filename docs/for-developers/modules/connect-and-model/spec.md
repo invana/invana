@@ -11,6 +11,10 @@ here.
 | Depends on | — |
 | Depended on by | everything: the global model is the grounding context for every question |
 
+Product spec: [Model](../../../../specs/products/model/product.md) — the product, its features MO-F01–F04, and the module-wide product rules and decisions live there. This file keeps the engine shape.
+
+System design: [connect-and-model.md](../../../../specs/system-design/modules/connect-and-model.md) — the three layers, connecting and portability (§§ 2 · 4 · 5). This file keeps the vocabulary, what the module owns with how a model is stored, its decisions and the drawn states.
+
 ## 1. Vocabulary
 
 Product-wide words: [terminology.md](../../terminology.md). What this module adds:
@@ -23,29 +27,6 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | **Relationship link** | a declared cross-model edge type, whose records arrive in a dataset | an inference |
 | **Global model** | the read-time union of published models plus their links | a stored row |
 | **Physical** | the introspected mirror of what the database actually holds | the model |
-
-## 2. Three layers, one read
-
-```mermaid
-flowchart TD
-    P[Physical<br/>what the database holds] -.introspection seeds a draft.-> D[Draft model]
-    D -->|publish| V[Published version]
-    V --> M1[Domain model A]
-    V --> M2[Domain model B]
-    M1 --> L{Declared links}
-    M2 --> L
-    L -->|anchor · same entity| G[Global model<br/>derived at read time]
-    L -->|relationship · records from a dataset| G
-    G --> Q[Every question is grounded here]
-```
-
-| Rule | Detail |
-|---|---|
-| A published version is immutable | Editing publishes the next version; imports and answers that used the old one still resolve |
-| The global model is never stored | It is the union, computed on read. There is no row to edit and nothing to keep in sync |
-| Nothing is inferred | An anchor and a relationship link are both **declared**. Fuzzy matching would be a decision, not a default |
-| An anchor links, it never merges | Folding two nodes is lossy and has no undo |
-| Physical ≠ model | The mirror shows drift; it is never the grounding context |
 
 ## 3. What this module owns
 
@@ -84,48 +65,15 @@ flowchart LR
 One graph database holds the union of a Graph's models. The projector composes DDL from every active
 model onto it; the introspector reads back what is actually there. Neither writes the other's truth.
 
-
-## 4. Connecting
-
-| Rule | Detail |
-|---|---|
-| One Graph, one graph database | The binding is 1:1, set once, rarely touched |
-| Test gates save | A connection that has not connected cannot be saved |
-| The connector is read-only after the first save | Changing engine mid-Graph invalidates everything modelled against it |
-| Credentials are encrypted at rest | A blank field on edit means "keep", never "clear" |
-| Capability is resolved, not assumed | The server version decides which property types are available; unsupported ones are refused at authoring, not at write time |
-
-## 5. Portability
-
-A domain model belongs to a domain, not to the Graph that first held it.
-
-| Rule | Detail |
-|---|---|
-| One artefact | A published version exports as a single file |
-| Identity is package id + content hash | So `upgrade` is a real path, not a re-import |
-| Links travel only inside a bundle | Both endpoints must be present, or the link is dropped with a named reason |
-| A type the target cannot hold arrives as an unpublishable draft | Neither refused outright nor silently degraded |
-| Files and git are the registry | There is no server to publish to |
-
-[Starter models](features/starter-models.md) use exactly this path: an importable shape a Graph renames on
-arrival.
-
 ## 6. Cross-feature decisions
 
 | # | Decision |
 |---|---|
-| CM1 | A Graph binds to exactly one graph database, and the connector cannot change after the first save. |
-| CM2 | Models are authored per domain and are portable; a Graph holds many. |
-| CM3 | The global model is derived at read time and is the grounding context for every question — its types, properties, their descriptions and its active stitches are what an LLM step is told ([NL8](../ask/features/ask-in-natural-language.md#decisions)). The mirror is what a run's lens bounds ([GV33](../govern/spec.md#4-cross-feature-decisions)), never what the prompt describes. |
-| CM4 | Links are declared, never inferred; an anchor links and never merges. |
-| CM5 | A published version is immutable; changes publish a new one. |
-| CM6 | Introspection seeds a draft. It never writes a published version. |
 | CM7 | In Studio the module is two folders — `model/` is a model authored on its own, `stitch/` is what happens between two published ones. [code-shape.md](../../building-studio/code-shape.md) §4.1d. |
 | CM8 | **Setup is derived from facts, never from a checklist someone ticks.** A section is done when the thing it asks for exists. The engine reads that at serialize time and reports it in `setup_state`; nothing has to be told a thing happened. This module owns the `graphs.setup_state` column and the derivation; **which steps there are, what they are grouped into and how they are drawn is [13.7 Setup](../../modules/platform/features/setup.md)**, which is where the six sections and their conditions are stated. |
 | CM9 | The only thing `setup_state` **stores** is a skip. A required section cannot be skipped, so it has no stored state at all; an optional one is `done` (derived), `skipped` (stored) or `todo`. `POST /setup/{section}` takes `skip` and `reset`, and reset clears the skip rather than un-doing the work. |
 | CM10 | **Projecting a model's DDL is a run.** Publishing pushes constraints and indexes through `project_model` (bound `schema_write`), not through the projector called from a route — the one schema write that still reached the database with no run behind it. |
 | CM11 | **Every model surface is a tab of one page, and the model is a filter on it.** Overview · Model · Database · Usage · Performance · Growth, read at `All models` or one model; the panel lists models and a model's types, and every act on a model sits on the page header ([MP1 · MP2 · MP4](features/the-model-page.md#decisions)). |
-| CM12 | **A breaking publish needs a review.** Commit, activate and publish classify the draft against the published version; an additive draft publishes, a breaking one is refused on the direct paths and goes through a [publish review](features/publish-review.md) — a preview migration run, another owner's approval, then the migration run that publishes. |
 
 ## 6a. The drawn states
 
@@ -139,13 +87,3 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 | Model · a type selected — the form spans the main column | [model-editor](features/model-editor.md) | the selected type's form filling the main column under the canvas — name, parent, abstract, instance count, validation, and the property table with cardinality and constraint |
 | Model · generated by the Modeller agent | [model-editor](features/model-editor.md) | the same staged set arriving from a run rather than a gesture — understand · propose · validate, then the same Commit |
 | Model · Links and the global model | [stitch-models](features/stitch-models.md) | Anchors and Relationships as stacked sections, the derived global-model table (node types · edge types · links, with their counts and sources), and the physical mirror's label count beside it |
-
-## 7. Deliberately absent
-
-| Not built | Because |
-|---|---|
-| Fuzzy entity resolution | inference is a decision a person makes, not a config value |
-| Node merge on an anchor | lossy, and there is no undo |
-| A model registry service | files and git already version and share artefacts |
-| Multi-database Graphs | the Graph is the reasoning boundary, and one boundary is one database |
-| Write-back to the connected database from the modeller | the model describes; imports write |

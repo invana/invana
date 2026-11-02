@@ -16,11 +16,10 @@
  * | Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` |
  * | Connections | `/agents/connections/server` | This Graph's server · `mcp` |
  * | LLMs | `/agents/llms[/:provider]` | — an endpoint opens in a modal |
- * | Runs | `/agents/runs` | — a run opens as a tab (`?page=run:<id>`) |
- * | Workers | `/agents/workers` | Pools · `workers` · `capacity` · `tokens` — a pool or worker opens as a tab |
- * | Approvals | `/agents/approvals` | Waiting · `alerts` |
- * | Ledger | `/agents/ledger` | Rows · `actor` · `record` · `refusals` · `export` |
  * | Settings | `/agents/settings` | — |
+ *
+ * A run, the asks and the ledger are the Graph's Activity product's, which
+ * draws this package's Runs, Approvals and Ledger pages.
  *
  * A tab is not a level of the trail, so only a section and an endpoint carry
  * a crumb. The page itself is the app's product host, which composes every
@@ -31,7 +30,6 @@ import type { ProductDefinition } from "@invana-studio/core";
 import { ErrorPage, type ShellRouteHandle } from "@invana-studio/shell";
 import type { Params, RouteObject } from "react-router-dom";
 import { useAgentsSlots } from "./AgentsSlots";
-import { useAgentsNavBadges } from "./navBadges";
 import { searchAgents } from "./search";
 import { SECTIONS } from "./sections/spec";
 
@@ -64,10 +62,13 @@ const rail = (id: keyof typeof SECTIONS) => ({
 
 export const agents: ProductDefinition = {
 	id: "agents",
-	name: "Agents",
-	tagline: "Build, tune, watch",
+	name: "Agent Builder",
+	tagline: "Build agents and skills once",
 	icon: SECTIONS.agents.icon,
 	scope: "graph",
+	// Listed with the platform, for builders, until the Agent Builder takes its row.
+	group: "platform",
+	audience: "builders",
 	landing: "home",
 	nav: {
 		groups: [
@@ -80,12 +81,9 @@ export const agents: ProductDefinition = {
 				rail("connections"),
 				rail("llms"),
 			],
-			[rail("runs"), rail("workers")],
-			[rail("approvals"), rail("ledger")],
 		],
 		bottom: [rail("concurrency")],
 	},
-	useNavBadges: useAgentsNavBadges,
 	search: searchAgents,
 	commands: [
 		{
@@ -93,12 +91,6 @@ export const agents: ProductDefinition = {
 			label: "Templates",
 			keywords: ["projection", "answer"],
 			to: "functions/templates",
-		},
-		{
-			id: "plugins",
-			label: "Plugins",
-			keywords: ["registry", "tools"],
-			to: "functions/plugins",
 		},
 		{
 			id: "mcp-servers",
@@ -121,22 +113,10 @@ export const agents: ProductDefinition = {
 				level("performance", "Performance", tabs("skills", "plans", "llms")),
 				level("agents", "Agents"),
 				level("skills", "Skills"),
-				level(
-					"functions",
-					"Functions",
-					tabs("plans", "promoted", "templates", "plugins"),
-				),
+				level("functions", "Functions", tabs("plans", "promoted", "templates")),
 				level("connections", "Connections", tabs("server", "mcp")),
 				// The endpoint's crumb is its name, which the host reads; the id is no label.
 				level("llms", "LLMs", [level(":provider")]),
-				level("runs", "Runs"),
-				level("workers", "Workers", tabs("workers", "capacity", "tokens")),
-				level("approvals", "Approvals", tabs("alerts")),
-				level(
-					"ledger",
-					"Ledger",
-					tabs("actor", "record", "refusals", "export"),
-				),
 				level("settings", "Settings"),
 			],
 		},

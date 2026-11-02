@@ -10,57 +10,7 @@ model, validated, executed, projected — and answered only from what the graph 
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [clarifying-questions](clarifying-questions.md) · [streaming-and-the-workflow](streaming-and-the-workflow.md) · [when-it-cannot-answer](when-it-cannot-answer.md) |
 
-> **As** someone who knows the domain but not the query language, **I want** to ask plainly and get an
-> answer I can check, **so that** I trust it enough to act on it.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Ask in plain language | The composer offers the ask kind and the **world chip**; the world carries the circumstances, and its cast names the model |
-| C2 | Grounded in the global model | Translation names only types the model has |
-| C3 | Every answer cites | The query that produced it and the records behind it |
-| C4 | It asks back rather than guessing | An ambiguous question becomes a closed question, not an assumption |
-| C5 | It says when it cannot | The graph not holding something is an answer |
-| C6 | The run is visible while it runs | Steps and emissions stream |
-| C7 | A session is a thread of runs | Follow-ups keep the thread; each is its own run |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Question in the composer] --> B[Understand]
-    B -->|ambiguous| C[Ask back · a closed question]
-    C --> B
-    B -->|nothing in the graph could answer| D[Cannot answer, and why]
-    B -->|small talk · about Invana| V[Converse · a line in the agent's voice]
-    B --> E[Plan · template or generated]
-    E --> F[Translate against the global model]
-    F --> G{Valid?}
-    G -->|no| H[Repair once, with the error]
-    H --> G
-    G -->|yes| I[Execute]
-    I --> J[Project · emissions through a template]
-    J --> K[Verify: did it serve the intent?]
-    K --> W[Answer step · cited words, in the agent's voice]
-    W --> L[Answer with citations]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| No LLM provider configured | Named, with a link to configure one; the QL path still works |
-| The graph is empty | Cannot-answer that says so, not a zero-row table |
-| Question spans models with no link | Says which two, and that a link is not declared |
-| Repair fails twice | Stops, showing both attempts and the errors |
-| Cancelled mid-run | Steps completed stay in the thread; nothing partial is presented as an answer |
-| Small talk under a world that shuts the graph | The reply alone, with no choices — nothing it could offer would run ([NL14](#decisions)) |
-| The world does not send property values | Follow-ups still resolve (*load them on canvas*): the earlier asks and queries go, with each quoted literal sent as `'…'` and no rationale |
-| A table answer whose rows are things in the graph | The reply offers *Load to canvas*; a click runs the reply's `canvas_query` as its own ask and draws what it returns ([NL15](#decisions)) |
-| A ranking — *top 10 airports by routes* | Each row is an airport with its count, so the twin draws those airports (`… WITH a, count(r) AS n ORDER BY n DESC LIMIT 10 RETURN a`) |
-| A total, an average, counts per category | No offer — the rows are not things in the graph, so `canvas_query` is empty |
-| The world does not send property names | The ask is read against labels and stitches alone; the step's touch names `property_names` as cut, so a cannot-answer caused by the cut is traceable to it |
+Product spec: [EX-F03 · Ask a question](../../../../../specs/products/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -122,27 +72,14 @@ assembled at the crossing from structured turns, so each part is cut by its own 
 
 | # | Decision |
 |---|---|
-| NL1 | One question, one run. |
 | NL2 | **The lens names the model, not the agent and never a picker in the composer.** A plan names a role, the lens's `cast` resolves it to a model address, and the address names the configured provider whose credential is used ([GV10](../../govern/spec.md) · [PM1](../../agents/features/providers-and-models.md)). The composer offers the ask kind and the world chip; it never offers a model — the world's cast names it ([WO5](../../govern/features/worlds.md#decisions)). |
-| NL3 | Translation is grounded in the global model, and validation enforces it. |
-| NL4 | Ambiguity produces a question, not an assumption. |
-| NL5 | Every answer carries its query and its records. |
 | NL6 | **The read-only guard matches write clauses as words, never as substrings, and never inside a literal.** `offset`, `dataset` and `asset` all end in the letters *set*, and a query saying any of them was refused as a write; so was every read-only `CALL { … }` subquery, and any question containing the word *merge* in quotes. Word boundaries also close the other side — `CREATE(n)` written without a space used to pass. A subquery that writes is caught by the `CREATE` or `SET` inside it, so the brace is not a marker of its own. |
 | NL7 | **A refused query is a policy refusal, not a model failure.** The model answered; Invana declined the answer. It settles as `query_not_read_only` carrying the query as evidence — the same cause `validate_query` raises — rather than `llm_failed`, which told the reader *the model could not produce an answer* and sent them to check the LLM provider, the one part of the chain that was working. The guard stays the outermost of four: the connection's read-only flag, the envelope's pin on `execute_graph_query` and the `validate_query` step each check again closer to the database. |
 | NL8 | **The prompt describes the global model, not the mirror.** The grounding block is built from the authored models' active versions plus the active stitches ([CM3](../../connect-and-model/spec.md#6-cross-feature-decisions)) — that is where a type's description, a property's description and a stitch are authored, and they are what let the model map *length* to `longest` or read *which country* across two models. The introspected mirror carries none of them, and its `_inv_*` bookkeeping properties are not the domain. The mirror is still the version a run **engages** and the `QueryLens` is built from ([GV33](../../govern/spec.md#4-cross-feature-decisions)): what the model is told and what the lens bounds are different roles, and neither is traded for the other. A Graph with no authored model is grounded on the mirror, headed as undescribed, because labels alone beat no grounding. |
 | NL9 | **The grounding block is cut by the lens as well as by egress.** A type the run's `QueryLens` does not allow is not listed, a property it excludes is not listed on its type, and a stitch naming either is not listed. Telling the model about something the lens will refuse turns a clean *cannot answer* into a refused query. Descriptions travel with the thing they describe and under its class — a type's under `type_names`, a property's under `property_names` — so the closed egress set gains no class. |
 | NL10 | **Every LLM step records its exchange, whatever it concluded.** A *cannot answer* or a clarification from Understand keeps `prompt` and `completion` on `output` like an answer does ([SR42](../../operate/features/see-what-ran.md#decisions)). The prompt is the evidence for the judgement: without it, *the graph holds no runway length* cannot be told apart from *the prompt never mentioned `longest`*. |
 | NL11 | **A session's earlier turns go with every ask, and are cut by part, never whole.** A follow-up — *load them on canvas*, *only the top 5* — means nothing without the ask and the query before it, so the last 20 turns are always carried. What a turn holds is the ask, the query and its rationale; it never holds rows. So `property_values` governs only what can carry a value — a quoted literal in a query or a clarification is sent as `'…'`, and a rationale is dropped — and the ask and the query's shape still go. Dropping the whole transcript for a literal it might contain turned every governed session into a string of unrelated asks. Gremlin names its labels in quotes too, so under the cut its labels are masked with the values; the ask still carries what was meant. |
-| NL12 | **Small talk is conversed with, never refused.** *How are you*, *thanks*, *what can you do?* are not data questions, and *cannot answer · outside this graph* is the wrong outcome for them. Understand's fourth outcome, `converse`, replies in one or two lines in the agent's voice ([5.8](../../agents/features/soul.md)) and points at something this graph could answer. It runs no plan and no query, writes no emission, cites nothing and claims nothing about the data; the reply is the assistant message itself, drawn as a message and never as a cannot-answer, and the run's outcome is `conversed` ([CA8](when-it-cannot-answer.md#decisions)). |
 | NL13 | **A converse with no reply is a model error, never an empty message.** Understand refuses it the way it refuses a `cannot_answer` with no reason: the step fails as `llm_failed`, so a run never settles as `conversed` with nothing said. The reply names what the graph holds by its types and never quotes a number or a fact from it — nothing has been read, and a count in small talk would be a claim with no citation. |
-| NL14 | **Small talk may offer up to three next questions, and only ones this run could answer.** Where the message invites a next step — a greeting, *what can you do?* — Understand offers choices, each a question with the types it reads; a thanks or a goodbye gets the reply alone. A choice is kept only when every type it reads is one the grounding block lists — the same cut by the run's lens and egress ([NL9](#decisions)) — and only while the agent's envelope allows `execute_graph_query` and the world lets the run read the graph at all. None left is a plain reply, which is the honest answer under a world that shuts everything. The choices are drawn under the reply as suggestions, not answers — a `Try asking` eyebrow over rows that wear the prompt's `❯` caret, never a clarifying question's `○` — and ride the step's output, so a reload keeps them; a tap is a **new ask**, not an answer to the settled run, and only the latest turn's choices can be tapped. |
 | NL15 | **A reply offers what its result allows, never what a model suggests.** The offers are a fixed set, chosen from the result: *Load to canvas* when the reply holds a graph not yet drawn, or a table whose translation wrote a `canvas_query`. At most one offer per reply, and none on a metric, a chart or an aggregate. A click asks the twin as a query-language ask marked `operation = load`, in the same session, and it lands on the canvas — so the offer never runs anything by itself. Being an operation, the turn folds into the table's reply, the composer does not restore its mode, and the session history sent to the model skips it. The offer reads under the answer it acts on, after the emissions. |
 | NL16 | **Translate writes the canvas twin in the same call as the query.** A table ask returns scalar columns ([the prompt's presentation rule](#engine)); drawing it needs whole nodes, which those columns do not carry. Translate returns both: `query` for the reading, `canvas_query` for the drawing — the same filter, ordering and limit, returning whole nodes. A ranking counts: rows that each name one airport, a count beside it, are still airports to draw. Nothing extra is asked of the model when the person clicks, and when the rows are not things — a total, an average, counts per category — the twin is `""`, which is what tells the reply not to offer. A twin that does not read as read-only is dropped. |
 
-## Not building
-
-| Not building | Because |
-|---|---|
-| Answers blended with the model's own knowledge, unmarked | the claim is grounding; knowledge from beyond the graph comes only where a world allows it, badged third-party ([3.13](beyond-the-graph.md)) |
-| Conversational memory inside one run | context is assembled per run, from rules, skills and the graph |
-| Model-written follow-up questions | a follow-up is the user's move; a reply offers only what its result allows ([NL15](#decisions)) |

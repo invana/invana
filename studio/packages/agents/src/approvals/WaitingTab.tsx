@@ -23,13 +23,12 @@ import {
 } from "@invana/ui";
 import { useAuth, useListParams } from "@invana-studio/core";
 import type { Approval } from "@invana-studio/shell";
+import { filterValue, PAGE, ReadState, setOne } from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { ActorChain } from "../ledger/ledgerParts";
-import { filterValue, PAGE, setOne } from "../lists";
 import { useAgentsOpen } from "../open";
-import { FleetReadState } from "../overview/fleetParts";
 import { AskDialog } from "./AskDialog";
 import { answer, KindBadge, RunLink, routedTo, waited } from "./askParts";
 import { useAsksQuery, useDecideMutation } from "./queries";
@@ -83,9 +82,9 @@ export function WaitingTab({
 			<FormError error={decide.error} />
 
 			{query.isLoading ? (
-				<FleetReadState loading error={null} what="the asks" />
+				<ReadState loading error={null} what="the asks" />
 			) : query.error ? (
-				<FleetReadState loading={false} error={query.error} what="the asks" />
+				<ReadState loading={false} error={query.error} what="the asks" />
 			) : !page?.items.length ? (
 				<EmptyState
 					title={

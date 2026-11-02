@@ -1,7 +1,7 @@
 """Govern — what a run may **see**, **use** and **send**.
 
 One record (``Lens``) separated by ``kind`` into a *world* and a *guardrail*
-([GV1](docs/for-developers/modules/govern/spec.md)), one grammar over five
+([Model product § Decisions](specs/products/model/product.md#decisions)), one grammar over five
 layers, and one projection of the ledger (``RunTouch``) that makes the
 declaration checkable after the fact.
 

@@ -8,13 +8,13 @@ both are about **identity**:
    with ``KeyError: <DataType.custom: 0>``, for any element that has properties.
    So this connector speaks **GraphSON**, which passes an unknown ``@type``
    through as a plain map for the serializer to read
-   (docs/for-developers/modules/graph-connectors/features/languages.md LG9).
+   (specs/system-design/modules/graph-connectors.md § A query, either way).
 2. Its vertex id is a **long**. An id that made the round trip as a string has to
    become one again before it can address anything.
 
 Everything else — reading, writing, schema, filters, the script path — is
 inherited from the language connector and overridden nowhere
-(docs/for-developers/modules/graph-connectors/spec.md CN2).
+(specs/system-design/modules/graph-connectors.md).
 """
 
 from __future__ import annotations

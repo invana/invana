@@ -27,12 +27,12 @@ import {
 	ItemGroup,
 	ItemTitle,
 	SectionHeader,
-	Skeleton,
 } from "@invana/ui";
 import type { GraphRef } from "@invana-studio/core";
 import { CalendarClock, Plus } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { ActButton } from "../../access/ActButton";
+import { ReadState } from "../../lists/listParts";
 import { ComingUp } from "./ComingUp";
 import { cronWords, nextIn } from "./cron";
 import { useFiringsQuery, useSchedulesQuery } from "./queries";
@@ -94,10 +94,8 @@ function SchedulesBody({
 	const items = list.data?.items ?? [];
 	if (list.isLoading) {
 		return (
-			<div className="flex flex-col gap-2 p-4">
-				{["a", "b", "c"].map((k) => (
-					<Skeleton key={k} className="h-12 w-full" />
-				))}
+			<div className="p-4">
+				<ReadState loading error={null} what="the schedules" />
 			</div>
 		);
 	}

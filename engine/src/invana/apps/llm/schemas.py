@@ -39,6 +39,6 @@ class ToolResult:
     exchange: Exchange = field(default_factory=Exchange)
     # Wall-clock spent in the provider call(s) — summed across the corrective
     # round-trip when one happens. Lets callers report LLM time alongside query
-    # time so a slow NL turn shows where the time went (docs/for-developers/modules/platform/features/telemetry.md ·
+    # time so a slow NL turn shows where the time went (specs/system-design/observability.md ·
     # docs/for-developers/modules/ask/features/ask-in-natural-language.md).
     duration_ms: float = 0.0

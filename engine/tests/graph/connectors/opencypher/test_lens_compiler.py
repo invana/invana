@@ -1,5 +1,5 @@
 """The Cypher lens compiler, read as text
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 
 Compiling is a pure function from query text to query text, so these need no
 database — the rewrite either says what it should or it does not. What the

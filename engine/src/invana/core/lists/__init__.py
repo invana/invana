@@ -18,7 +18,7 @@ Usage::
         rows, info = await things.page(session, graph_id=graph.id, params=params)
         return Page[ThingRead].of([ThingRead.model_validate(r) for r in rows], info, applied_filters(params, SPEC))
 
-See ``docs/for-developers/modules/platform/features/list-contract.md``.
+See ``specs/system-design/api-and-cli.md § One list contract``.
 """
 
 from invana.core.lists.params import Filter, ListParams, ListSpec, list_params

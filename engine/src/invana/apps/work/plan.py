@@ -1,6 +1,6 @@
 """The derived plan: order, waves, blocked-by and the critical path.
 
-**Order is derived, never typed** (docs/for-developers/modules/work/spec.mda). There is deliberately no
+**Order is derived, never typed** (specs/system-design/modules/work.md). There is deliberately no
 manual rank column: two sources of order disagree, and the dependency graph is
 the one the agents obey. Everything here is a pure function over
 ``(tasks, edges)`` so it can be reasoned about — and tested — without a
@@ -125,7 +125,7 @@ def derive(
 
     wave: dict[str, int] = dict.fromkeys(ids, 1)
     # Longest path *by count* — MVP's definition of critical, until tasks carry
-    # an estimated duration (docs/for-developers/modules/work/spec.mda).
+    # an estimated duration (specs/system-design/modules/work.md).
     longest: dict[str, int] = dict.fromkeys(ids, 1)
     came_from: dict[str, str | None] = dict.fromkeys(ids)
     for tid in order:

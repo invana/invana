@@ -125,7 +125,7 @@ class Session(Base):
         index=True,
     )
 
-    # The agent this thread thinks through (docs/for-developers/modules/agents/spec.md). One agent per
+    # The agent this thread thinks through (specs/system-design/modules/agents.md). One agent per
     # session; the per-ask override lives on rethink, not in the composer, so
     # "which agent answered" stays a single lookup on the run row.
     # Nullable only for rows written before agents existed — the create path

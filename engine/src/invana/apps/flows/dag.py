@@ -211,7 +211,7 @@ def pinned_by(plan: Flow, agents: list[Agent]) -> dict[str, dict[str, Any]]:
     question is asked at — and returned as a **list of agents** so the UI can
     render a count and chips, never a singular claim that would be false the
     moment two agents pin the same thing
-    (docs/for-developers/modules/explore/features/selection-and-the-panel.md-D3).
+    (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
     """
     out: dict[str, dict[str, Any]] = {}
     for agent in agents:

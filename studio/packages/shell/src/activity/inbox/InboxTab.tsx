@@ -11,7 +11,6 @@ import {
 	EmptyState,
 	ItemGroup,
 	SectionHeader,
-	Skeleton,
 	ToggleGroup,
 	ToggleGroupItem,
 } from "@invana/ui";
@@ -19,6 +18,7 @@ import type { GraphRef, ProductId } from "@invana-studio/core";
 import { Inbox } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ReadState } from "../../lists/listParts";
 import { useProducts } from "../../products";
 import { activityPath, runPagePath } from "../activityPath";
 import { useMarkRead } from "../notifications/queries";
@@ -58,10 +58,8 @@ export function InboxTab({ graph }: { graph: GraphRef }) {
 
 	if (isLoading) {
 		return (
-			<div className="flex flex-col gap-2 p-4">
-				{["a", "b", "c"].map((k) => (
-					<Skeleton key={k} className="h-12 w-full" />
-				))}
+			<div className="p-4">
+				<ReadState loading error={null} what="the inbox" />
 			</div>
 		);
 	}

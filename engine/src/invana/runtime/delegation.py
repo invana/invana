@@ -1,4 +1,4 @@
-"""Delegation — agents that create agents (docs/for-developers/modules/work/spec.md).
+"""Delegation — agents that create agents (specs/system-design/modules/work.md).
 
 **No new mechanism.** These are four ordinary task functions that a plan may
 contain only if the agent's envelope names them, and the plan is validated

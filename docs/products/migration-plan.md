@@ -1,8 +1,8 @@
-# Migration plan — today's Studio → five products
+# Migration plan — today's Studio → products in two places
 
-How Studio moves from one graph page to five products under one shell, in phases small enough
-that each fits one Claude session. The session-by-session runbook is
-[migration-sessions.md](migration-sessions.md); progress is recorded in its [log](migration-sessions.md#log).
+How Studio moves from one graph page to products in two places — the platform and a Graph ([README › Two places](README.md#two-places)) — under one shell, in phases small enough
+that each fits one working session. The session-by-session runbook and its log are kept with the team's finished
+projects. The two-places split is built as a project of its own.
 
 | | |
 |---|---|
@@ -76,7 +76,11 @@ studio/
     ├── modeller/           @invana-studio/modeller
     ├── explorer/           @invana-studio/explorer
     ├── projects/           @invana-studio/projects
-    └── agents/             @invana-studio/agents
+    ├── iam/                @invana-studio/iam
+    ├── builder/            @invana-studio/builder         the Agent Builder (platform)
+    ├── platform/           @invana-studio/platform        Fleet and Settings (platform)
+    ├── activity/           @invana-studio/activity        Activity (a Graph)
+    └── graph-settings/     @invana-studio/graph-settings  Graph settings (a Graph)
 ```
 
 ### Packages
@@ -89,7 +93,8 @@ studio/
 | `canvases` | Canvas compositions used by more than one product — layered, model, taskflow | components, hooks |
 | `assistant` | The chat (centred start, docked right, closable), sessions, the answer surface, the composer with Ask · Cypher · Gremlin, **the Console** (`bottomSection`) | components, hooks |
 | `shell` | `AppLayoutV2` composition, header (launcher, wordmark, Graph picker, breadcrumbs, ⌘K, notifications, Assistant toggle, user menu), the Workbook, Activity (Inbox · Approvals · Runs · Schedules · Events · Rules · Channels), set-up, sign-in, Graph home, profile, platform pages, the action registry | `<StudioShell>`, hooks (`useBreadcrumbs`, `useOpenPage`, `useAction`) |
-| `datasets` · `modeller` · `explorer` · `projects` · `agents` | One product each | a `ProductDefinition` (default export) |
+| `datasets` · `modeller` · `explorer` · `projects` · `iam` · `builder` · `activity` · `graph-settings` | One product each | a `ProductDefinition` (default export) |
+| `platform` | Fleet and Settings | two `ProductDefinition`s |
 
 ### The product contract
 
@@ -97,9 +102,9 @@ Each product package default-exports one object. The app passes the list to the 
 
 | Field | Type | Meaning |
 |---|---|---|
-| `id` | `'datasets' \| 'modeller' \| 'explorer' \| 'projects' \| 'agents'` | Path segment and launcher key |
+| `id` | `'datasets' \| 'builder' \| 'fleet' \| 'settings' \| 'modeller' \| 'explorer' \| 'projects' \| 'iam' \| 'activity' \| 'graph-settings'` | Launcher key; the path segment is `path` |
 | `name` · `tagline` · `icon` | strings · icon | Launcher row and wordmark |
-| `scope` | `'graph' \| 'install'` | `install` hides the Graph picker (Datasets) |
+| `scope` | `'graph' \| 'platform'` | `platform` routes off any Graph and hides the Graph picker; the launcher groups by it |
 | `routes` | `RouteObject[]` | Lazy routes under `/:product`; each route's `handle.crumb` feeds the breadcrumbs |
 | `nav` | `{ groups: NavItem[][], bottom: NavItem[] }` \| `null` | The icon rail (`leftNav`); `null` for Explorer |
 | `landing` | path | Where the launcher and the Graph name go |
@@ -141,8 +146,10 @@ Each product package default-exports one object. The app passes the list to the 
 | `features/explorer` | `explorer` | |
 | `features/models` · `features/lenses` | `modeller` | lenses = worlds + guardrails |
 | `features/rules` | **split** — `RulesSection` → `modeller` · `ProjectRules` → `projects` | |
-| `features/graphs` | **split** — Info/Graph/Connection/Settings → `modeller` (Graph settings) · `PoolsTable`/`ConcurrencyFields` → `agents` (Settings) · `RecentSessions` → `assistant` | |
-| `features/agents` · `skills` · `plans` · `projections` · `llms` | `agents` | plans + projections = Library (Plans · Templates); the catalogue view becomes Agents › Plugins |
+| `features/graphs` | **split** — Info/Graph/Connection/Settings → `graph-settings` · `PoolsTable`/`ConcurrencyFields` → `platform` (Settings › Graph limits) · `RecentSessions` → `assistant` | |
+| `features/agents` · `skills` · `plans` · `projections` | `builder` | plans + projections = Library (Plans · Templates) |
+| `features/llms` · plugins · MCP · workers | `platform` | Settings › LLM providers · Plugins · MCP servers; Fleet |
+| runs · approvals · ledger | `activity` | with the shell's Schedules · Events · Inbox · Rules · Channels |
 | `features/projects` | `projects` | Projects + todos |
 | `pages/auth` · `pages/graphs` · `pages/settings` · `pages/platform` | `shell` | sign-in, Graph home, profile, platform |
 | imports (today inside runs, `kind in (import, bulk)`) | `datasets` | Imports journal, read-only |
@@ -162,39 +169,45 @@ Each product package default-exports one object. The app passes the list to the 
 
 ## 5. URLs
 
-| Product | Pattern | Example |
-|---|---|---|
-| Graph home | `/graphs` | unchanged |
-| Explorer | `/u/:user/:graph/explorer[/:session]` | `/u/admin/airways/explorer` |
-| Modeller | `/u/:user/:graph/modeller/<section>[/:id]` | `/u/admin/airways/modeller/models/airroutes` |
-| Projects | `/u/:user/:graph/projects/<section>[/:id[/branches/:b]]` | `/u/admin/arabidopsis/projects/early-flowering-under-drought/branches/h1-1` |
-| Agents | `/u/:user/:graph/agents/<section>[/:id]` | `/u/admin/airways/agents/skills/answer-nl` |
-| Activity | `/u/:user/:graph/activity/<tab>[/:id]` | `/u/admin/airways/activity/runs/15` |
-| Datasets | `/datasets/<section>[/:id]` | `/datasets/catalogue/accession-phenotypes` (install scope, no Graph) |
+| Product | Place | Pattern | Example |
+|---|---|---|---|
+| Home | platform | `/graphs` | unchanged |
+| Datasets | platform | `/datasets/<section>[/:id]` | `/datasets/catalogue/accession-phenotypes` |
+| Agent Builder | platform | `/builder/<section>[/:id]` | `/builder/skills/answer-nl` |
+| Fleet | platform | `/fleet/<section>[/:id]` | `/fleet/pools/egress` |
+| Settings | platform | `/settings/<section>[/:id]` | `/settings/graph-limits` |
+| Profile | — | `/profile` | a person's own settings, from the user menu |
+| Explorer | a Graph | `/u/:user/:graph/explorer[/:session]` | `/u/admin/airways/explorer` |
+| Modeller | a Graph | `/u/:user/:graph/modeller/<section>[/:id]` | `/u/admin/airways/modeller/models/airroutes` |
+| Projects | a Graph | `/u/:user/:graph/projects/<section>[/:id[/branches/:b]]` | `/u/admin/arabidopsis/projects/early-flowering-under-drought/branches/h1-1` |
+| IAM | a Graph | `/u/:user/:graph/iam/<section>` | `/u/admin/airways/iam/policies` |
+| Activity | a Graph | `/u/:user/:graph/activity/<section>[/:id]` | `/u/admin/airways/activity/runs/15` |
+| Graph settings | a Graph | `/u/:user/:graph/settings/<section>` | `/u/admin/airways/settings/members` |
 
-- The Graph root `/u/:user/:graph` redirects to the user’s last product, else Explorer.
+- The Graph root `/u/:user/:graph` redirects to the user’s last Graph product, else Explorer.
 - Tabs inside a page are `?tab=`, not a path level — matching the breadcrumb rule.
+- No `/u/:user/:graph/agents/…` path exists; nothing redirects from it.
 
 ### Redirects from today's `?panel=` values
 
 | `?panel=` | → |
 |---|---|
-| `info` | `modeller/settings?tab=info` |
-| `connection` · `settings` | `modeller/settings` |
+| `info` | `settings/general` |
+| `connection` · `settings` | `settings/connection` |
 | `explorer` · `canvases` · `layers` | `explorer` |
 | `sessions` · `messages` | `explorer?right=assistant` (sessions open in the chat history) |
 | `schema` · `model` · `links` | `modeller/global-model` |
-| `skills` | `agents/skills` |
-| `agents` · `llms` (+ `agent`, `provider`) | `agents/agents[/:agent]` · `agents/llms[/:provider]` |
-| `library` (+ `plan`) | `agents/library[/:plan]` |
-| `library` + `entry` (a catalogue entry) | `agents/plugins/tasks/:key` |
-| `library` + `template` | `agents/templates[/:template]` |
+| `skills` | `/builder/skills` |
+| `agents` · `llms` (+ `agent`, `provider`) | `/builder/agents[/:agent]` · `/settings/llm-providers[/:provider]` |
+| `library` (+ `plan`) | `/builder/library[/:plan]` |
+| `library` + `entry` (a catalogue entry) | `/builder/functions/:key` |
+| `library` + `template` | `/builder/templates[/:template]` |
 | `runs` (+ `run`) | `activity/runs[/:run]` |
 | `events` | `activity/events` |
 | `projects` (+ `project`, `todo`) | `projects[/:project]` · `projects/todos/:todo` |
 | `govern` (+ `world`, `guardrail`) | `modeller/worlds[/:world]` · `modeller/guardrails[/:guardrail]` |
 | legacy `?settings=` · `?drawer=` | as today, onto the same targets |
-| a product root — `modeller` · `agents` · `activity` · `agents/plugins` | its first section |
+| a product root — `modeller` · `activity` · `settings` | its first section |
 | any other value | the Graph root, key dropped |
 
 - A product's path renders the product host with that product's panel open. One table in Studio, `panelPaths.ts`, converts both ways, and the shell's `CanonicalRoute` applies it before any page renders. The other page params (`?page=`, `?right=`, `?tab=`) stay in the query string.
@@ -265,7 +278,7 @@ flowchart LR
 
 | Rule for every B session | Detail |
 |---|---|
-| Feature row first | `CLAUDE.md` scope rule: nothing is built that `for-developers/README.md` does not list. Each B session starts by adding its row and feature file there — the one place this plan reaches outside `docs/products/` |
+| Feature row first | `CLAUDE.md` scope rule: nothing is built that `specs/` does not specify. Each B session starts by adding its row and feature file there — the one place this plan reaches outside `docs/products/` |
 | Tests | Few positive and negative tests, against a real graph database (no mocks) — and per memory, graph-DB tests are run only when the user asks |
 | API shape | New routes are tagged per product area in OpenAPI so `core`'s client groups them |
 | Migrations | Alembic; PostgreSQL is the target, SQLite is not |
@@ -298,7 +311,7 @@ Each C session draws its boards from the [prototype](https://claude.ai/artifact/
 | Compiler fixes imports | Move, run `check-types`, fix what it names, `biome check --write` |
 | Barrels last | A package's `src/index.ts` is written after its files compile |
 | Same gates every time | `pnpm turbo run lint check-types test` · `pnpm knip` · e2e specs · boundary check (from A04) — all green before the session ends |
-| Log it | Update the session's row in the [log](migration-sessions.md#log) and write its hand-off note |
+| Log it | Update the session's row in the runbook's log and write its hand-off note |
 | Commits | Only when the user has asked in that session (`CLAUDE.md` rule 11). An automated run must carry that permission explicitly |
 | Branch | Never on `main`. One working branch per phase (`refactor/studio-phase-N`), merged by PR |
 | Size | A session moves at most ~60 files / ~10,000 lines; bigger folders are split into a/b sessions |

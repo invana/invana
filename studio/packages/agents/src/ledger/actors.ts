@@ -4,9 +4,9 @@
  */
 
 import { useMembersQuery } from "@invana-studio/core";
+import { EVERY } from "@invana-studio/shell";
 import { useMemo } from "react";
 import { useAgentsQuery } from "../agents/queries";
-import { EVERY } from "../lists";
 
 export interface ActorOption {
 	value: string;

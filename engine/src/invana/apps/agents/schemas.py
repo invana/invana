@@ -1,4 +1,4 @@
-"""Pydantic request/response models for the Agents API (docs/for-developers/modules/work/spec.md)."""
+"""Pydantic request/response models for the Agents API (specs/system-design/modules/work.md)."""
 
 from __future__ import annotations
 
@@ -234,7 +234,7 @@ class AgentLineageResponse(BaseModel):
 
 
 class RetireRequest(BaseModel):
-    # Where the agent's open tasks go. None leaves them `blocked` (docs/for-developers/modules/work/spec.md).
+    # Where the agent's open tasks go. None leaves them `blocked` (specs/system-design/modules/work.md).
     reassign_to_kind: str | None = None
     reassign_to_id: str | None = None
     #: Why it was retired, kept on the History row.
@@ -243,7 +243,7 @@ class RetireRequest(BaseModel):
 
 class LifecycleAct(enum.StrEnum):
     """The two acts that disturb open work. Resume takes nothing away, so it has
-    no preview ([LC10](docs/for-developers/modules/agents/features/lifecycle.md))."""
+    no preview ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions))."""
 
     pause = "pause"
     retire = "retire"
@@ -314,7 +314,7 @@ class SkillUsageVersion(BaseModel):
 
     Counts are per version and never summed across them: publishing v4 starts
     its own count and v3 keeps its history
-    ([US3](docs/for-developers/modules/skills/features/usage.md)). ``offered``
+    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)). ``offered``
     is a fact written by prompt assembly; ``applied`` is the model's own report,
     which is why the surface says so rather than implying it away (US4).
     """
@@ -326,7 +326,7 @@ class SkillUsageVersion(BaseModel):
     gap: int
     #: False below the floor the engine owns, so every surface draws
     #: *too few to read* at the same point instead of inventing a percentage
-    #: ([US6](docs/for-developers/modules/skills/features/usage.md)).
+    #: ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
     enough_to_read: bool
     #: Applied over offered; null below that floor, so no surface shows a share it cannot read.
     applied_rate: float | None = None

@@ -53,8 +53,8 @@ BOARD_KINDS: dict[str, BoardKindSpec] = {
         _declared("task_run", "a child task_runs.id"),
         _declared("plan_runs", "a flows.id"),
         # Two runs, side by side, with what each touched diffed
-        # (docs/for-developers/modules/govern/features/worlds.md WO4). Its
-        # subject is a pair rather than a row, because **compare is two runs,
+        # (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+        # Its subject is a pair rather than a row, because **compare is two runs,
         # not a diff engine**: there is nothing to key it on that is not the two
         # runs themselves, and a `comparisons` table would be a record of a
         # reading somebody can reproduce by opening the same two ids.

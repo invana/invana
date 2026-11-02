@@ -1,4 +1,4 @@
-"""Project rules — the folder a task is filed in (docs/for-developers/modules/work/spec.md).
+"""Project rules — the folder a task is filed in (specs/system-design/modules/work.md).
 
 Archiving freezes a project's tasks read-only. Running runs still finish:
 freezing is about what a person or an agent may *start*, not about killing work

@@ -270,7 +270,7 @@ def _conflict(exc: ValueError) -> HTTPException:
 
 async def _enforce_supported_type(session: AsyncSession, graph: Graph, type_str: str) -> None:
     """Reject a property type the bound backend can't store for its version
-    (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+    (specs/system-design/modules/graph-connectors.md § Capabilities).
 
     No-ops when no connection is bound or the connector reports no profile (unknown
     backend) — the modeller falls back to its full vocabulary in those cases.

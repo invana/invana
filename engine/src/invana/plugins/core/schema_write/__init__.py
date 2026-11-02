@@ -1,5 +1,5 @@
 """Bound: ``schema_write`` — the entries that touch a model draft
-(docs/for-developers/orchestration.md §0.6).
+(specs/system-design/orchestration.md § The catalogue).
 
 ``model.understand_ask`` binds the draft this run edits; ``model.validate_proposal`` checks
 referential integrity and reconciles the proposal into it. Both write to the

@@ -1,7 +1,7 @@
 """Plan — the flow one run runs, when no template fits.
 
 The common case never reaches this module: *Plan* matches a template by intent
-and costs no LLM call (docs/for-developers/modules/agents/spec.md). This is the other case — a
+and costs no LLM call (specs/system-design/modules/agents.md). This is the other case — a
 `compound` ask whose shape no library entry has — and it stays inside the envelope
 (docs/for-developers/modules/ask/spec.md) for the same reason the ``plan`` task does: the model proposes a
 **document**, and the interpreter validates it against the envelope before
@@ -67,7 +67,7 @@ def _vocabulary_lines(vocabulary: Sequence[Mapping[str, Any]]) -> str:
     """The allowed tasks, each with what must precede it and what it produces.
 
     **This is the catalogue's own declaration, not a second copy of it**
-    (docs/for-developers/orchestration.md § 0.6). The planner reads `requires`
+    (specs/system-design/orchestration.md § The catalogue). The planner reads `requires`
     while drafting rather than being refused and redrafting, and it can only
     write a `${steps.x.y}` that exists because the outputs are on the page.
     """

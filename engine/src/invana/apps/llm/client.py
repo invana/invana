@@ -34,8 +34,8 @@ from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.llm_providers.models import LLMProviderKind
 from invana.core.telemetry.recorders import record_llm_request
 
-# OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
-# docs/for-developers/modules/platform/features/telemetry.md); the LLM
+# OpenTelemetry lives in the optional ``telemetry`` extra (specs/system-design/observability.md ·
+# specs/system-design/observability.md); the LLM
 # client must import cleanly without it. Resolve a tracer lazily and fall back to
 # no-op spans — mirrors the graph connector's pattern so the NL translate step
 # shows up in the same FE→BE trace as the query execution.

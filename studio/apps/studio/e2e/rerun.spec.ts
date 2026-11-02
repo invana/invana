@@ -3,7 +3,7 @@ import { askForRun, graphApi } from "./api";
 import { GRAPH } from "./explorer";
 
 /**
- * Rerunning a settled ask from its run page in Agents › Runs: the same
+ * Rerunning a settled ask from its run page in Activity › Runs: the same
  * versions reproduce it, and the new run opens on its own page with Compare on
  * its header — and it answers.
  *
@@ -19,7 +19,7 @@ test("a settled run reruns on the same versions and links back", async ({
 		page,
 		`MATCH (n) RETURN n, ${Date.now()} AS t LIMIT 1`,
 	);
-	const runPage = `${GRAPH}/agents/runs?page=run%3A${runId}`;
+	const runPage = `${GRAPH}/activity/runs?page=run%3A${runId}`;
 	await page.goto(runPage);
 
 	// The act is offered once the run has settled; a slow stack settles late.

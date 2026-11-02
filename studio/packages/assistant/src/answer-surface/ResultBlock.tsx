@@ -74,9 +74,12 @@ export function ResultBlock({ result, runId }: ResultBlockProps) {
 	const navigate = useNavigate();
 	const open = (link: LinkEmission) =>
 		navigate(linkHref(link, username as string, graphSlug as string));
-	// Asked from Agents, the list opens itself as the link arrives; the card
-	// stays in the thread as the way back. A thread read later never re-opens.
-	const onAgents = Boolean(useMatch("/u/:username/:graphSlug/agents/*"));
+	// Asked from Agents or Activity, the list opens itself as the link arrives;
+	// the card stays in the thread as the way back. A thread read later never
+	// re-opens.
+	const onAgentsPath = useMatch("/u/:username/:graphSlug/agents/*");
+	const onActivityPath = useMatch("/u/:username/:graphSlug/activity/*");
+	const onAgents = Boolean(onAgentsPath || onActivityPath);
 	const arrived = links.at(-1);
 	useEffect(() => {
 		if (!arrived?.id || !onAgents || !streamed || opened.has(arrived.id))

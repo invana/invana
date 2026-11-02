@@ -1,5 +1,5 @@
 """The catalogue — the **closed** set of task types a plan may name
-(docs/for-developers/orchestration.md §0.6).
+(specs/system-design/orchestration.md § The catalogue).
 
 Task types are declared in plugins (:mod:`invana.plugins`), one folder each, and
 this package is the runtime's view of them: ``CATALOGUE`` is every loaded task

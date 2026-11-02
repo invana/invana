@@ -1,6 +1,6 @@
 """Seeded agents, the step labels, and the intent → template map.
 
-Both are **data** rather than code — docs/for-developers/modules/agents/spec.md
+Both are **data** rather than code — specs/system-design/modules/agents.md
 **V6**: an INSERT changes which template an intent picks, the same posture taken
 in docs/for-developers/modules/ask/spec.md for "adding an agent is an INSERT".
 
@@ -26,9 +26,9 @@ from typing import Any
 # ── Step labels ──────────────────────────────────────────────────────────────
 #
 # The words on the card. `nl.translate` was labelled *Understand* before
-# docs/for-developers/modules/agents/spec.md; calling translation "Understand" is what made "understand then
+# specs/system-design/modules/agents.md; calling translation "Understand" is what made "understand then
 # plan" sound like a duplicate. It is *Translate* now, and *Understand* is its
-# own step (docs/for-developers/modules/agents/spec.md "the current label lies").
+# own step (specs/system-design/modules/agents.md "the current label lies").
 
 LABELS: dict[str, str] = {
     "nl.understand": "Understand",
@@ -106,7 +106,7 @@ class SeededAgent:
     default: bool = False
     surface: str = "explorer"
     # The bounds the interpreter enforces on delegation — depth, fan-out, spend
-    # (docs/for-developers/modules/agents/features/delegation.md DG2). Empty on an
+    # (specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md § Decisions). Empty on an
     # agent that does not delegate, which is all of them but one.
     budget: dict = field(default_factory=dict)
     # Steps, replans, clarifications — how hard it tries (EB9). Its own column,
@@ -214,5 +214,5 @@ COORDINATOR = SeededAgent(
 SEEDED_AGENTS: tuple[SeededAgent, ...] = (EXPLORER, QL_AGENT, MODELLER, COORDINATOR)
 
 # Which seeded agent a surface starts a session with, when the graph has no
-# default of its own (docs/for-developers/modules/agents/spec.md: "defaulted at session creation by surface").
+# default of its own (specs/system-design/modules/agents.md: "defaulted at session creation by surface").
 SURFACE_DEFAULT_AGENT: dict[str, str] = {"explorer": "explorer", "modeller": "modeller"}

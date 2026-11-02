@@ -46,12 +46,11 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { useLensesQuery } from "@invana-studio/core";
-import { ActButton } from "@invana-studio/shell";
+import { ActButton, EVERY } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { BrainCircuit, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useModelPinsQuery } from "../fleet/queries";
-import { EVERY } from "../lists";
 import { useAgentsOpen } from "../open";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";

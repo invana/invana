@@ -12,91 +12,7 @@ back `derived`.
 | Product | [products/projects.md](../../../../products/projects.md) PJ-F6 · PJ-09 · P-06 · P-07 |
 | Related | [plugins](../../platform/features/plugins.md) (the simulator kind) · [branches-and-decisions](branches-and-decisions.md) · [datasets](../../bring-data-in/features/datasets.md) · [see what ran](../../operate/features/see-what-ran.md) |
 
-> **As** a scientist, **I want** to simulate crosses against target traits before making them, **so
-> that** I spend a season on the best bet.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | The installed simulators | `GET /api/v1/simulators` — each simulator's key, version, plugin, title, summary and the spec fields it takes |
-| C2 | Simulate on a branch | `POST …/projects/{key}/branches/{n}/simulations` with a simulator, a spec, the input dataset versions and an optional seed → `202`, the simulation queued |
-| C3 | The spec is checked before anything runs | Every required spec field is present and has its declared type; refused with the field named |
-| C4 | Inputs pinned | Each input is `publisher/name@v`; the version id and its content hash are recorded on the simulation and handed to the run |
-| C5 | Reproducible | The seed is recorded; when none is given Invana picks one. The same simulator version, spec, inputs and seed give the same result |
-| C6 | It is a run | A `simulate` run of the simulator's packaged flow, under the Graph's guardrails; its run page, trace and tokens are the run's own |
-| C7 | The result, ranked | Rows in the simulator's order, each with its own figures, and a summary; read off the run's step |
-| C8 | Output is derived | Every simulation reads `origin: derived`; saved as a dataset it is published with `origin derived` and the simulation's inputs as `derived_from` |
-| C9 | The list | `GET …/projects/{key}/simulations[?branch=n]`, newest first; `GET …/simulations/{n}` for one |
-| C10 | The CLI | `invana simulate --project --branch --plugin <name> --file <spec.json>` waits for the run and prints the ranked rows; `invana simulations list · show` |
-
-## Journey
-
-```mermaid
-flowchart TD
-    B[Branch page] --> S[Simulate]
-    S --> P[Pick simulator · parents · targets · inputs · progeny]
-    P --> C{Spec and inputs check}
-    C -->|unknown simulator| X1[422 · names the installed ones]
-    C -->|field missing or wrong type| X2[422 · names the field]
-    C -->|input does not resolve| X3[422 · names the input]
-    C -->|input retracted| X4[409 · names the version]
-    C -->|branch dropped or merged · project archived| X5[409]
-    C -->|ok| Q[202 · simulation s1 queued · run opened]
-    Q --> R[Run walks the simulator's flow]
-    R --> W{Simulator}
-    W -->|refuses the data — parent or trait missing, two inputs disagree| F[Run failed · the reason shown]
-    W -->|done| D[Result · ranked crosses · derived]
-    D --> A[Add finding — cites the run]
-    D --> DS[Save as dataset — origin derived, derived_from the inputs]
-    D --> RP[Open run page]
-```
-
-```mermaid
-sequenceDiagram
-    participant St as Studio
-    participant API as Engine API
-    participant RT as Runtime
-    participant Sim as Simulator plugin
-    St->>API: POST …/branches/2/simulations
-    API->>API: check spec · resolve and pin inputs
-    API-->>St: 202 SimulationRead (queued)
-    API->>RT: submit(run)
-    RT->>Sim: run(ctx, v) — spec · pinned inputs · seed
-    Sim->>Sim: read_inputs: records, hash checked
-    Sim-->>RT: Out — ranked · summary
-    St->>API: GET …/simulations/1 (poll)
-    API-->>St: status succeeded · result
-```
-
-## Seams
-
-| Seam | What the caller gets |
-|---|---|
-| While it runs | `status: queued · running`; `result` is null. Studio polls the simulation or follows the run's stream |
-| The simulator refuses the data | `status: failed`, `error` is the simulator's sentence (*"JG 11 is in none of the inputs"*); nothing is half-written |
-| An input retracted after the simulation opened | The run fails with *input retracted* before the simulator reads a record |
-| A simulator uninstalled since | The simulation still reads; its run keeps the key and version it ran. Simulating again with it is a 422 |
-| A private project the reader is not on | 404, as every project read ([9.7](private-projects.md)) |
-| A viewer | Reads; simulating is the `work` area — 403 naming who can ([11.6](../../identity-and-access/features/roles.md)) |
-| Reload | Everything is a record: the simulation, its run, its result on the run's step |
-| Tokens | The run's tokens, summed over its steps — `0` for a simulator that calls no model |
-| Add finding | The existing findings API with a `run` cite naming the simulation's run ([9.5](branches-and-decisions.md)) |
-| Save as dataset | The existing datasets API: a dataset with `origin: derived`, a version whose records are the ranked rows and whose `derived_from` is the simulation's `inputs[].ref` ([2.4](../../bring-data-in/features/datasets.md)) |
-
-## Surfaces
-
-Studio is `@invana-studio/projects` (C06).
-
-| Surface | Route | Consumes |
-|---|---|---|
-| *Simulate* on a branch's header and the project's header | — | `GET /api/v1/simulators` (hidden when none is installed) |
-| Simulate dialog (`projects.simulate`) | over the page | the simulator's spec fields · the branch's cited dataset versions for *Reads* · `POST …/branches/{n}/simulations` |
-| Simulation result (`projects.simulate.result`) | `…?page=project:<key>&simulation=<n>` | `GET …/simulations/{n}`, polled while queued or running · header from `simulator · inputs · tokens · started_at/finished_at`, the table from `result.ranked` |
-| Add finding (a row's act) | over the result | `POST …/branches/{n}/findings` with a `run` cite |
-| Save as dataset | over the result | `POST /api/v1/datasets` then `POST …/{publisher}/{name}/versions` |
-| Branch page *Simulations · N* tab | `…&branch=<n>` | `GET …/simulations?branch=n` |
-| CLI | | `invana simulate` · `invana simulations list · show` |
+Product spec: [PJ-F04 · Simulation and impact](../../../../../specs/products/projects/features/PJ-F04-simulation-and-impact/feature.md) — PJ-09; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 
@@ -167,6 +83,8 @@ All four carry the OpenAPI tag `simulations`.
 
 ## Decisions
 
+Engine and code rows; the product decisions are PJ-F04's.
+
 | # | Decision |
 |---|---|
 | SM1 | **A simulator is a plugin of kind `simulator`, and it does the science.** Invana owns the spec check, the pins, the run, the record and the `derived` label; it never computes a figure itself. The contract is in [13.9](../../platform/features/plugins.md) PL11–PL14. |
@@ -178,23 +96,6 @@ All four carry the OpenAPI tag `simulations`.
 | SM7 | **Simulating is a `work` act.** Its routes sit under `projects/…`, so the role table needs no new row. Dropped and merged branches and archived projects refuse it (409); a parked branch may still be simulated. |
 | SM8 | **Saving as a dataset and adding a finding reuse what exists.** A finding cites the simulation's run; a saved dataset is `derived` with the simulation's inputs as `derived_from`. Neither is a simulation endpoint. |
 | SM9 | **The genomic simulator is deliberately simple:** mid-parent plus independent Gaussian segregation per trait. A better model is a new version of the plugin, and simulations already run keep the version they ran. |
-| SM10 | **Numbered per project** (`s1`, `s2`), like branches, findings and decisions, because people type it. |
-| SM11 | **Studio offers *Simulate* wherever a branch can be simulated.** On a branch's header, and on the project's header with the branch to pick (dropped and merged branches are not offered). It is hidden while no simulator is installed and off on an archived project. |
 | SM12 | **The dialog is drawn from what the simulator declares, never from its science.** One control per spec field, by type: `int`/`float` a number (its default filled in), `str` a text field, `bool` a switch, `obj` JSON, `list` one entry per line. A list entry written `trait >= value` or `trait <= value`, optionally `± sd`, is sent as a target `{trait, op, value, sd}`; any other entry as its text. *Reads* lists the branch's cited dataset versions, all ticked, and takes more as `publisher/name@v`. The seed is optional. |
-| SM13 | **A refusal stays in the dialog with the engine's sentence**, and nothing opens. A `202` closes it and opens the simulation over the branch. |
 | SM14 | **The result is a drill-in of the project page, `simulation=<n>`.** It polls every 2 s while queued or running and draws the run's status meanwhile; a failed run shows the simulator's sentence beside *Open run page*. The table reads the ranked contract: the row label (`cross`, else its first text field), `meets_all` as a bar, each trait's `mean ± sd` and share meeting it, and any other plain figure as a column. A muted line says the rows are predictions, not observations. |
-| SM15 | **A row's *Add finding* opens Add a finding fixed to the simulation's branch**, the statement drawn from the row (*Col-0 × Ler-1: 41% of progeny meet every target*) and the simulation's run as its cite. |
 | SM16 | **Save as dataset writes one `derived` dataset.** Its key column is the row label; each row flattens to the label, `meets_all` and `<trait>_mean · _sd · _meets`; the version's `derived_from` is the simulation's inputs and its author chain one `original` step of kind `run` naming the simulation and its run. The licence is asked for. A refusal (a taken name, a role) stays in the dialog. |
-| SM17 | **The branch page lists its simulations** in a *Simulations · N* tab, newest first, each opening its result; the breadcrumb reads *Projects › project › H2 · title › Simulation s1*. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Impact — reach by hop and what-if values (PJ-10) | Reach by hop is [9.9](impact.md); what-if values arrive as a simulator plugin when a policy model exists |
-| Parameter sweeps · game theory | Still not built ([README](../../../README.md#not-building)) |
-| Enabling or disabling a simulator per install | An Admin enables plugins with B06b; a simulator loads whenever it is installed |
-| Simulators on a GPU worker pool | Workers and routing by `resources` are B14 |
-| Third-party simulator packages | Plugins live in the engine for now ([products › plugins](../../../../products/plugins.md#not-deciding-here)) |
-| An agent simulating | A simulation is a person's act on a branch; an agent proposes |
-| Editing or deleting a simulation | It is a record of a run; simulate again |

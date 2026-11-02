@@ -9,67 +9,19 @@ degradation named the day it ships.
 | Index | [5.10](../../../README.md#5--agents) · Slice **C10** |
 | Module | [Agents](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [envelope-and-budget](envelope-and-budget.md) · [pinned-model-versions](pinned-model-versions.md) · [change-log](../../operate/features/change-log.md) · products: [agents.md](../../../../products/agents.md) AG-01 · AG-15 |
+| Related | [envelope-and-budget](envelope-and-budget.md) · [pinned-model-versions](pinned-model-versions.md) · [change-log](../../operate/features/change-log.md) |
 
-> **As** a builder, **I want** what broke, waits, slowed down or changed, and speed, success and
-> tokens per agent and skill, **so that** I tend agents before users notice and regressions are caught
-> the day they ship.
+Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-17, AG-22 and AG-28; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape, and who pins a model until ST-F05 is written.
 
 ## Capabilities
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | Overview tiles | Runs today (against the same day last week) · failed today · waiting on a person · p95 run time over 7 days (against the 7 before) · tokens this month against the agents' month budgets · success rate over 7 days |
-| C2 | Needs attention | A plan or agent failing on its latest runs · an approval waiting on a person · a degraded agent — each with the one act that answers it |
-| C3 | Runs a day | 30 days, succeeded over failed, root runs only |
-| C4 | Changed recently | The newest agent and skill versions with who, when and the effect after — runs, failed, and p95 against the version before |
-| C5 | Performance tiles | Success rate · p50 · p95 · runs · tokens per run · degraded — over 7, 30 or 90 days, each against the window before |
-| C6 | Per agent, skill, plan and model | One row shape per subject: runs · success · p50 · p95 · trend · tokens per run · signal |
-| C7 | Degradation | p95 of the subject's last 3 runs each above 1.5× its 7-day baseline; names the change that came before the first slow run |
-| C8 | Trend | p95 a day for the most degraded agent (else the busiest), its baseline and the publishes in the window marked |
-| C9 | Who pins a model | Every model version a Graph offers, with the agents, skill versions and eval judges pinned to it |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Agents › Overview] --> B{Anything needs attention?}
-    B -->|failing| C[Open run → Activity › Runs › the run]
-    B -->|waiting| D[Review → Activity › Approvals]
-    B -->|degraded| E[Investigate → Agents › Performance]
-    B -->|nothing| F[/"Nothing needs attention"/]
-    A --> G[Changed recently]
-    G -->|skill| H[Compare → Activity › Changes › compare]
-    G -->|agent| I[History → the agent's page]
-    E --> J[Performance: tiles · trend · each agent · each skill]
-    J --> K{Window}
-    K --> L[7 · 30 · 90 days]
-    J --> M{Tab}
-    M --> N[Agents · Skills · Plans · LLMs]
-    J --> O[What changed → Compare the two versions]
-    A -->|no runs yet| P[/"Empty tiles read 0 or —; the chart says nothing ran"/]
-    A -->|engine error| Q[/"The page says it could not read the fleet, in the engine's words"/]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| While loading | The kit's spinner line in the page body; the header and its act are drawn at once |
-| No run yet | Tiles read `0` or `—`; *Runs a day* reads *Nothing ran in the last 30 days*; Needs attention reads *Nothing needs attention* |
-| No agent has a month budget | *Tokens this month* reads the tokens alone, with *no month budget* |
-| A degradation with no change before it | It is named by its numbers alone — *p95 7.4s, up from 4.6s* |
-| A version with fewer than 3 runs after it | Changed recently shows its runs and failed, and no p95 change |
-| Reload | The window and the tab ride the URL (`?window=` · `?tab=`) |
-| A member without access | The routes need Graph membership, like every Agents read; a non-member gets the shell's no-access page |
 
 ## Surfaces
 
 | Surface | Shape |
 |---|---|
-| `/agents/overview` (board `agents.overview`) | Header *Overview* · `n agents · n skills` · *New agent*; six `MetricTile`s; *Needs attention* beside *Runs a day*; *Changed recently* under them. Full width — the rail item opens no `leftSection` |
-| `/agents/performance` (board `agents.performance`) | Header *Performance* · `n degraded · n failing`; tabs *Agents · Skills · Plans · LLMs* and a 7 · 30 · 90 days control; six tiles; the trend beside *What changed*; *Each agent* and *Each skill* tables (one table per other tab) |
-| `/agents/llms[/:provider]` (board `agents.llms`) | Header *LLMs* · `n endpoints · n model versions` · *Add endpoint*; a notice when a pinned version is no longer offered; *Model versions* — model · version name · endpoint · pinned by · status. An endpoint opens its detail in a sheet; *Add endpoint* opens the form there |
 
 ## Engine
 
@@ -95,34 +47,15 @@ flowchart TD
 
 ## Decisions
 
+Engine rows, and the pages' old placement; the product decisions are AG-F03's.
+
 | # | Decision |
 |---|---|
+| FP17 | **The dashboard is the Agent Builder's Overview, and LLMs are Settings › LLM providers.** Overview reads every agent version across Graphs from stored per-run columns; a Graph's own numbers are Graph settings › Usage and Activity › Runs ([5.16](install-wide-agents-and-skills.md) C11, WD19) |
 | FP1 | **Computed at read, from the run rows.** No counter, no rollup table: the numbers come from `task_runs` roots in the window, the way the plan page's are, so they cannot disagree with the runs they count. Percentiles are computed in Python — SQLite has none, and dev and prod must agree. |
 | FP2 | **A run is a root.** Steps never count as runs; a root's tokens are its own and its direct steps', with eval runs (`role = evaluate`) left out, as the agent meters count them. |
-| FP3 | **Run time is queued → finished.** What a person waits for. A run still going has none and is left out of p50 and p95. |
-| FP4 | **Success is succeeded over settled.** Cancelled and running roots are in *runs* and out of the rate. |
-| FP5 | **Degraded:** a subject's last 3 settled runs each took more than 1.5× the p95 of its runs in the 7 days before the first of them, with at least 5 runs in that baseline. The change named is the newest agent or skill version published before the first slow run, among the agent's own and its bound skills', and inside that 7-day baseline — an older one is not named. p50 and p95 are over succeeded and failed roots only. |
-| FP6 | **Failing:** a subject whose latest settled runs failed, counted back to the first that did not. Two or more is a signal, and it outranks *degraded* on the same subject. The Performance tiles' `degraded` and `failing` count agents only. |
 | FP7 | **Subjects.** An agent is `task_runs.agent_id`; a skill is each skill version id in `skills_applied` on the root or its direct steps (the union), at the version the run applied; a plan is one row per ref `key@version` — the Flow's key, else `plan_origin` `template:<ref>`, and a keyless one-off plan is absent; a model is `task_runs.model_version` on the root or its steps. A run with none of one is absent from that table, not filed under *unknown*. |
-| FP8 | **The window's prior is the same length before it.** A tile's arrow compares the two. A skill row's prior is its previous version's runs inside the window when it ran there, else the window before. A change under 2% reads *flat*; a skill row's *vs previous* names the row's `prior_version`, and *the window before* when it is null. |
 | FP9 | **Waiting on a person** is pending approvals plus roots paused on a question (`needs_input` · `awaiting_input`), among the roots of the last 90 days — the window the page loads; *Changed recently*'s p95 change reads the same 90 days. |
-| FP9a | **Needs attention lists failing plans first, then agents.** An agent whose latest failure is a listed plan's run is not listed again. Overview's `agents` counts persistent, non-retired agents; `skills` counts all. Trend marks read `<name> v<n>`. |
 | FP10 | **The month budget on Overview is the sum of the agents' `max_tokens_month`.** Null when no agent declares one — *no month budget*, never zero. Budgets are declared, not enforced ([EB7](envelope-and-budget.md#decisions)). |
-| FP11 | **Tokens, never currency.** No cost tile, column or projection; `cost_usd` is not read. |
-| FP12 | **Pins are read where they live.** `agents.model_pin` (ephemeral agents included, retired ones not), the current published `skill_versions.model_pin`, and an eval set's `judge_model_pin`, grouped by address. A pin to an address the Graph no longer offers is still listed — it is the one that refuses runs. |
 | FP13 | **Overview, Performance and LLMs are pages, not panels.** Their rail items open no `leftSection`; the page fills `mainSection` in place of the Workbook, as an expanded Settings does. The Workbook's pages come back with the next rail item that has a panel. |
-| FP14 | **Every act on these pages is a link to where the act already lives.** *Open run* → Activity › Runs; *Review* → Activity › Approvals; *Investigate* → Performance; *Compare* → the change log's compare, previous version as `a` and the new one as `b` (a skill's first version has nothing to compare and offers no act); *History* (a later version) and *Open* (an agent's first) → the agent's page (`?page=agent:<id>`, its first tab — the tab is not in the URL); *New agent* → the Agents list's new-agent form. Nothing is decided on these pages. |
 | FP15 | **The LLMs page is the endpoint list.** The Agents panel is one section — agents; LLMs is a rail item and a page of its own. An endpoint's detail and the new-endpoint form open in a sheet over the page, at `/agents/llms/<provider>` and `/agents/llms/new`. |
-| FP17 | **Every change on these pages is the engine's `Change`, and Studio derives nothing.** Each tile's `FleetMeasure.change`, Overview's `runs_change` (today against the same weekday a week ago), a row's `p95_change` and a version's `RecentChange.p95_change` carry `by` (a ratio — `0.38` is 38% more — or, for success, points — `0.012` is 1.2 pt), `direction` and `tone`. One engine helper reads them all: a ratio within ±2% and points within ±0.1 are `flat`; run time and tokens read up as `worse`, success up as `better`, and run counts are `neutral` either way; there is no change against a missing or zero prior. A skill row names the version its prior was read off in `prior_version`. Studio turns a `Change` into `↑ 38%` · `▲ 1.2 pt` · `flat` and a tone into a colour — it never divides, subtracts or picks a threshold. |
-| FP16 | **A model's status is what the Graph offers.** `offered`; `no longer offered` for a removed model that something still pins; `not offered` for a pin to an address the Graph never offered. Invana tracks no provider release feed, so *a newer version is available* is not said; the page's notice names a pinned version that is no longer offered and who pins it. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| *Alert me when it degrades* (a notification on degradation) | A degradation is computed at read; no event is raised for a notification rule to match. Raising one is an engine change of its own |
-| A provider release feed (*a newer version is available*) | Invana does not poll vendors; a person adds the version they want |
-| Cost per run, per agent or per model | Tokens only |
-| *Roll back to vN* on Performance | Rollback lives on the skill's History, gated by its evals |
-| Custom windows or date ranges | 7, 30 and 90 days answer *since it shipped* |
-| A CLI | `invana performance` is in the product plan, not this slice |

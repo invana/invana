@@ -55,7 +55,7 @@ interface ApiSummary {
 	// the model it authors.
 	surface?: "explorer" | "modeller" | null;
 	model_id?: string | null;
-	// docs/for-developers/modules/agents/spec.md — the agent this session thinks through, resolved by the
+	// specs/system-design/modules/agents.md — the agent this session thinks through, resolved by the
 	// engine so the header names it without a second call.
 	agent_id?: string | null;
 	agent_name?: string | null;

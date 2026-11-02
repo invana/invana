@@ -277,7 +277,7 @@ class SkillDraftManager:
 
         The row records the version it inlined; the newest is looked up beside
         it so the surface can **say** *a newer version exists*
-        ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+        ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
         Saying it is the whole of it — nothing here re-inlines, because the copy
         is what makes a published skill do tomorrow what it did today.
         """
@@ -399,7 +399,7 @@ class SkillDraftManager:
     async def inlinable(self, session: AsyncSession, *, graph_id: str) -> list[InlinablePlan]:
         """The library plans a skill may inline, newest version of each.
 
-        Reusable only ([LB6](docs/for-developers/modules/workflows/features/the-library.md)):
+        Reusable only (specs/products/agents/features/AG-F06-plans-and-functions/feature.md § Decisions):
         a one-off plan belongs to the Todo it was drafted for, and offering it
         here would make the library a log. Each row carries the bands it will
         touch and what it offers a caller, so picking and tuning are one read.
@@ -973,7 +973,7 @@ class SkillDraftManager:
 
         It is written onto the version, not onto the plan: a redraw must never
         re-ask, and the answer is part of what publishes
-        ([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+        ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
         """
         draft = await self.ensure_draft(session, skill=skill)
         row = await self.clarifications_qs.get(session, clarification_id)

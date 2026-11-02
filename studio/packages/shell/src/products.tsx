@@ -125,13 +125,13 @@ export function useOpenGraph():
 
 /**
  * Where a product's routes start. A graph product lives under the open Graph;
- * an install product under its own id.
+ * a platform product under its own id.
  */
 export function productBase(
 	product: ProductDefinition,
 	graph: { username: string; graphSlug: string } | undefined,
 ): string | undefined {
-	if (product.scope === "install") return `/${product.id}`;
+	if (product.scope === "platform") return `/${product.id}`;
 	if (!graph) return undefined;
 	return `/u/${graph.username}/${graph.graphSlug}/${product.id}`;
 }

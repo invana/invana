@@ -35,20 +35,20 @@ import {
 	listQueryKey,
 	useListParams,
 } from "@invana-studio/core";
-import { useRunsQuery } from "@invana-studio/shell";
-import { FilterSelect } from "@invana-studio/ui";
-import { ShieldCheck } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import {
 	chipsOf,
 	FilteredEmpty,
 	filterValue,
 	ListStrip,
 	matchCount,
+	ReadState,
 	setOne,
-} from "../lists";
-import { FleetReadState } from "../overview/fleetParts";
+	useRunsQuery,
+} from "@invana-studio/shell";
+import { FilterSelect } from "@invana-studio/ui";
+import { ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useActorOptions } from "./actors";
 import { LedgerRowDrawer } from "./LedgerRowDrawer";
 import {
@@ -163,9 +163,9 @@ export function LedgerRowsTable({
 			)}
 
 			{query.isLoading ? (
-				<FleetReadState loading error={null} what="the ledger" />
+				<ReadState loading error={null} what="the ledger" />
 			) : query.error ? (
-				<FleetReadState loading={false} error={query.error} what="the ledger" />
+				<ReadState loading={false} error={query.error} what="the ledger" />
 			) : !page || page.items.length === 0 ? (
 				chips.length ? (
 					<FilteredEmpty noun="act" filters={chips} onClear={list.clear} />

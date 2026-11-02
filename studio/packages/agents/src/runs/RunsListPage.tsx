@@ -1,5 +1,5 @@
 /**
- * **Runs** — every root run in the Graph, newest first, at `/agents/runs`
+ * **Runs** — every root run in the Graph, newest first, at `/activity/runs`
  * (the-run-page.md › One runs list).
  *
  * *As a reviewer or an operator, I want every run in one list, so that I know
@@ -40,10 +40,6 @@ import {
 	useListParams,
 	useMembersQuery,
 } from "@invana-studio/core";
-import { FilterSelect } from "@invana-studio/ui";
-import { useMemo } from "react";
-import { RUN_FROM } from "../agents/agentParts";
-import { useAgentsQuery } from "../agents/queries";
 import {
 	chipsOf,
 	EVERY,
@@ -52,10 +48,15 @@ import {
 	ListStrip,
 	matchCount,
 	PAGE,
+	ReadState,
 	setOne,
-} from "../lists";
+} from "@invana-studio/shell";
+import { FilterSelect } from "@invana-studio/ui";
+import { useMemo } from "react";
+import { RUN_FROM } from "../agents/agentParts";
+import { useAgentsQuery } from "../agents/queries";
 import { useAgentsOpen } from "../open";
-import { FleetReadState, tokens } from "../overview/fleetParts";
+import { tokens } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { useRunsPageQuery, useRunsTilesQuery } from "./queries";
@@ -160,7 +161,7 @@ export function RunsListPage({ username, graphSlug }: SectionPageProps) {
 				{query.isLoading ? (
 					<Spinner />
 				) : query.error ? (
-					<FleetReadState loading={false} error={query.error} what="the runs" />
+					<ReadState loading={false} error={query.error} what="the runs" />
 				) : rows.length === 0 ? (
 					chips.length ? (
 						<FilteredEmpty noun="run" filters={chips} onClear={list.clear} />

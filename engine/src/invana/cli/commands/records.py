@@ -121,7 +121,7 @@ def import_cmd(
     """Validate records against their model, write them with provenance, and report what was not.
 
     The model is authored first and named here: `--model` is required and nothing
-    is derived from the data (docs/for-developers/modules/bring-data-in/features/load-data.md LD1).
+    is derived from the data (specs/products/data/features/DA-F02-bring-data-in/feature.md § Decisions).
     """
     asyncio.run(_run_import(graph_ref, name, model_name, path, user_ref, max_rejected))
 

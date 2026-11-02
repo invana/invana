@@ -149,7 +149,7 @@ class RunVars:
     envelope: Any = None
     run: TaskRun | None = None
     #: The lens this run froze, as the thing that decides and records
-    #: (docs/for-developers/modules/govern/spec.md GV26). It rides the run's
+    #: (specs/products/model/product.md § Decisions). It rides the run's
     #: state rather than the step's so no step can reach a different lens than
     #: the one the run opened under (GV8). ``None`` only outside the
     #: interpreter — a run always has one, and an ungoverned Graph's is the
@@ -355,7 +355,7 @@ async def engage(ctx: TaskContext, v: RunVars, *, address: str) -> Verdict:
 
     A refusal is written to the ledger and then ends the run in *cannot answer*
     naming its rule, for the two layers a run cannot continue without
-    (docs/for-developers/modules/govern/spec.md GV29). The run **succeeds**:
+    (specs/products/model/product.md § Decisions). The run **succeeds**:
     a bound doing its job is not an engine failure, and the answer says what it
     could not reach.
 
@@ -397,7 +397,8 @@ async def engaged(ctx: TaskContext, v: RunVars, *, address: str, verdict: Verdic
 def _refusal(address: str, verdict: Verdict) -> str:
     """The sentence a refused run ends on, naming what refused it.
 
-    [GR4](docs/for-developers/modules/govern/features/guardrails.md) wants a rule
+    specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions
+    wants a rule
     named, and a **closed layer** has none to name: nothing matched, because the
     layer admits only what it names ([GR15]). So the world is named instead —
     which is the actionable half anyway, since the recourse is to widen *this*
@@ -726,7 +727,8 @@ async def close_graph(
     """Record the read, both digests, and what the lens did to the query.
 
     ``in``: the data came *to* the run, and ``rows`` is the only count there is
-    ([WO19](docs/for-developers/modules/govern/features/worlds.md)) — what the
+    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
+    — what the
     unsliced query would have returned is knowable only by running it, and that
     is a second execution on every governed read.
     """
@@ -818,7 +820,7 @@ class Writes:
     """The model versions one step writes into — checked before, recorded after.
 
     A write is addressed by the version it lands in, the same string a read
-    engages ([GV35](docs/for-developers/modules/govern/spec.md)), so *which runs
+    engages ([Model product § Decisions](specs/products/model/product.md#decisions)), so *which runs
     touched Deals* finds the loads beside the questions. Only ``allow`` decides:
     a write that honoured a slice or a property exclusion would load half a
     record and call it a load.
@@ -1015,10 +1017,10 @@ def offered_skill_version_ids(v: RunVars) -> list[str]:
     the prompt — it stays true whether or not the model says anything about it.
 
     The **version** is what is recorded, never the bare skill id
-    ([SK3](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
+    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)):
     the prose in this prompt is one particular published text, and a count that
     spans a rewrite is a claim about two different skills wearing one name
-    ([US3](docs/for-developers/modules/skills/features/usage.md)).
+    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
     """
     return [s.current_version_id for s in v.skills if s.current_version_id]
 

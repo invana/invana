@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A live dashboard for the Agents build: the phases, the sessions working them, and each session's todos.
 
-Reads what the runner already writes — the runbook's log (``docs/products/agents-build-sessions.md``),
+Reads what the runner already writes — the runbook's log (``INVANA_RUNBOOK``, default ``.claude/team/projects/two-places/project.md``),
 ``.migration-cache/<ID>/*.jsonl`` (each headless session's event stream), each sub-agent's transcript under
 ``~/.claude/projects/<repo>/<session>/subagents/``, the design reviews and git — every time the page polls.
 A session's or sub-agent's live feed (its latest text, tool calls and results) comes from ``/api/feed``. Nothing is stored; standard library only.
@@ -10,6 +10,7 @@ Usage::
 
     python3 scripts/agents-build/dashboard.py            # http://localhost:8765
     python3 scripts/agents-build/dashboard.py --port 9000
+    INVANA_RUNBOOK=.claude/team/projects/two-places/project.md python3 scripts/agents-build/dashboard.py
 """
 from __future__ import annotations
 
@@ -24,7 +25,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-RUNBOOK = ROOT / "docs" / "products" / "agents-build-sessions.md"
+RUNBOOK = ROOT / os.environ.get("INVANA_RUNBOOK", ".claude/team/projects/two-places/project.md")
 CACHE = ROOT / ".migration-cache"
 # The runner writes reviews to scripts/migration/reviews; earlier phases wrote them here.
 REVIEWS = [ROOT / "scripts" / "migration" / "reviews", ROOT / "scripts" / "agents-build" / "reviews"]
@@ -32,7 +33,7 @@ RUN_LOG = CACHE / "agents-run.log"
 TRANSCRIPTS = Path.home() / ".claude" / "projects" / re.sub(r"[^A-Za-z0-9]", "-", str(ROOT))
 ID = re.compile(r"^[A-Z]\d{2}$")
 # A phase's product, by its id's letter.
-PRODUCT = {"F": "Agents", "I": "IAM", "M": "Modeller"}
+PRODUCT = {"F": "Agents", "I": "IAM", "M": "Modeller", "T": "Two places"}
 # The runner's context budget for the lead and every sub-agent, and the grace before it ends a session.
 LIMIT = int(os.environ.get("INVANA_MIGRATION_CONTEXT_LIMIT", "300000"))
 GRACE = int(os.environ.get("INVANA_RUNNER_HANDOFF_GRACE", "50000"))
@@ -263,7 +264,8 @@ def sh(*cmd: str) -> str:
 
 
 def state() -> dict:
-    runner = sh("pgrep", "-f", "scripts/migration/run.py")
+    # Anchored on the interpreter: a session whose prompt merely names run.py is not the runner.
+    runner = sh("pgrep", "-f", r"^[^ ]*[Pp]ython[0-9.]* [^ ]*scripts/migration/run\.py")
     log = RUN_LOG.read_text(errors="replace").splitlines()[-25:] if RUN_LOG.exists() else []
     return {"phases": phases(), "sessions": sessions(), "runner": bool(runner), "log": log,
             "limit": LIMIT, "hard_stop": LIMIT + GRACE,
@@ -339,8 +341,10 @@ async function tick() {
   document.getElementById('at').textContent = 'updated ' + new Date().toLocaleTimeString();
   const live = st.phases.find(p => p.status === 'in progress' || p.status === 'partial') || st.phases.find(p => p.status !== 'done');
   if (!pick) pick = (live || st.phases[0]).id;
+  // A phase marked in progress with no runner and no session stream is being worked by hand.
+  const outside = p => !st.runner && !(st.sessions[p.id] || []).length && (p.status === 'in progress' || p.status === 'partial');
   const card = p => `<div class="ph ${p.id === pick ? 'on' : ''}" data-id="${p.id}">
-    <div style="display:flex;justify-content:space-between"><span class="mono">${p.id}</span><span class="pill ${cls(p.status)}">${esc(p.status)}</span></div>
+    <div style="display:flex;justify-content:space-between"><span class="mono">${p.id}</span><span class="pill ${cls(p.status)}">${esc(p.status)}</span></div>${outside(p) ? '<div class="mut">outside runner · no feed</div>' : ''}
     <b>${esc(p.phase)}</b><span class="mut">${esc(p.date)}</span>${p.review ? `<div class="${p.review.includes('PASS') ? 'done' : 'blocked'}">${esc(p.review)}</div>` : ''}</div>`;
   const groups = [...new Set(st.phases.map(p => p.product))];
   document.getElementById('phases').innerHTML = groups.map(g => { const ps = st.phases.filter(p => p.product === g);
@@ -365,6 +369,7 @@ async function tick() {
     ${partsTable(s.parts, s.label)}
     ${s.said ? `<b>Last said</b><div class="mut">${esc(s.said)}</div>` : ''}
     <b>Latest</b><ul class="mono">${s.recent.slice().reverse().map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>`).join('')
+    : outside(p) ? '<div class="pad mut">This phase is being worked outside the runner, so it has no sessions or feed here. Follow it in its own terminal or with <span class="mono">claude -r</span>; the commits are under Branch.</div>'
     : '<div class="pad mut">No session has run this phase yet.</div>';
   if (!follow || follow.phase !== pick) {
     const lv = ss.slice().reverse().find(s => !s.finished) || ss[ss.length - 1];
@@ -380,7 +385,9 @@ async function tick() {
 const hm = s => s ? new Date(s).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}) : '';
 async function feedTick() {
   const box = document.getElementById('feed');
-  if (!follow) { box.innerHTML = ''; return; }
+  if (!follow) { box.innerHTML = '';
+    document.getElementById('ftitle').textContent = 'Live feed';
+    document.getElementById('fhint').textContent = pick ? `No runner session on ${pick} to follow.` : 'Click a session or a sub-agent to follow it.'; return; }
   const q = new URLSearchParams({phase: follow.phase, label: follow.label, agent: follow.agent});
   let f; try { f = await (await fetch('/api/feed?' + q)).json(); } catch { return; }
   document.getElementById('ftitle').textContent = `Live feed · ${follow.phase} · ${follow.name}`;

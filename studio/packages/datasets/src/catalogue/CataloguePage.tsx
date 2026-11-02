@@ -8,8 +8,8 @@
  * standards come from the engine's install-wide claims (`useClaimsQuery`).
  * Under it, the origin legend: what each origin means, once.
  *
- * A row opens the dataset's page. *Collect with an agent* is drawn and
- * disabled: the install has no collector agent to run. A dataset is created by
+ * A row opens the dataset's page. *Collect with an agent* is experimental —
+ * tagged, drawn and disabled: the install has no collector agent to run. A dataset is created by
  * `invana datasets import`, so the empty state shows that command.
  */
 
@@ -31,7 +31,7 @@ import {
 	Terminal,
 	TerminalLine,
 } from "@invana/ui";
-import { PanelSection } from "@invana-studio/ui";
+import { ExperimentalBadge, PanelSection } from "@invana-studio/ui";
 import { Bot, Table2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -155,6 +155,7 @@ export function CataloguePage() {
 					>
 						<Bot />
 						Collect with an agent
+						<ExperimentalBadge />
 					</ButtonWithTooltip>
 				}
 			/>

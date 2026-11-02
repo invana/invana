@@ -1,5 +1,5 @@
 /**
- * **Promote a plan** — the plan library's only write (docs/for-developers/modules/agents/spec.md).
+ * **Promote a plan** — the plan library's only write (specs/system-design/modules/agents.md).
  *
  * Authoring a plan from scratch is post-MVP, because a spec drives dispatch
  * and authoring one is therefore an execution surface with its own threat

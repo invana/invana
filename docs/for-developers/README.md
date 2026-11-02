@@ -1,132 +1,265 @@
-# Invana — how it works, feature by feature
+# for-developers — what stayed, for review
 
-**Invana is an agent orchestrator over a curated knowledge graph.** A Graph is a bounded domain a team
-curates; agents work inside it; a person accepts what they produce.
+Every product, feature, story, journey and the system design now live in [`specs/`](../../specs/README.md). This
+folder holds only what did not move. Each row below says what stayed, why, and where it would go — for Ravi to keep,
+move or delete. Nothing here governs a product decision; where a file here and `specs/` disagree, `specs/` is right.
 
-It orchestrates the **agents** — which one takes a Todo, what it may run, what it is offered, in what
-order, and who checks the result. It also **runs them itself**: one in-process runtime, an asyncio task
-per run, no external infrastructure. That runtime sits behind a protocol so a deployment could
-swap in a job scheduler it already operates; none has been written, and the default is the only one.
+| Why it stayed | Means | The review |
+|---|---|---|
+| engine detail | Code layout, tables, routes, shapes, engine-only decision rows | Keep for the coder, or move into `specs/system-design/` once the shape settles |
+| plan | A build order, a migration, build status, a test practice | Keep until the work lands, then delete |
+| debate | An open question or an RFC still argued | Settle it; the answer goes to the feature it governs |
+| retired | Contradicts the live model (`specs/design-language.md`, `specs/system-design/orchestration.md`) | Delete |
+| not true yet | Planned but not decided | Specify it, or delete |
+| moved, not cut | Its content is in `specs/`; the source was never cut | Delete |
 
-Every answer is grounded in the Graph and traceable to the records behind it; when the Graph cannot
-answer, it says so. Anything from beyond it — the internet, another connected third-party source, or the model's own
-knowledge — comes only where a world allows it, and is badged **third-party** with the reference it
-came from.
+## The pattern every module file follows
 
-**This folder is for people building Invana.** It is the whole record of what the product does: one
-row per feature below, with the detail in [`modules/`](modules/) — a folder per module holding
-`spec.md` (what the module owns, its vocabulary, its cross-feature decisions) and one file per feature
-beside it. The words are pinned in [`terminology.md`](terminology.md).
+| File | What stays | Why | Where it would go |
+|---|---|---|---|
+| `modules/<module>/features/*.md` | *Surfaces* (components, params, regions) · *Engine* (tables, routes, events, shapes) · the Decisions rows that are mechanism only · *Where the code lives* — under a *Product spec:* or *System design:* line naming where the rest went | engine detail | `specs/system-design/modules/<module>.md` |
+| `modules/<module>/spec.md` | *Vocabulary* — the domain terms code keeps (screen words are in `specs/glossary.md`) · *What this module owns* (tables) · the cross-feature decisions that are mechanism only | engine detail | `specs/system-design/modules/<module>.md` |
+| Pointer stubs | `modules/graph-connectors/` (spec and four features) · `platform/features/admin-and-health.md` · `command-line.md` · `logging.md` | fully moved — one *System design:* line each | Delete once nothing links to them |
 
-It states what is true **now**, in present tense, and cites nothing outside itself. There is no
-separate design record and no history of what was tried before — a decision lives with the feature it
-governs.
+The tables per module below list only what differs from that pattern: retired, debated, planned or unplaced rows.
+Where a feature moved is each product's *Features* table in `specs/products/*/product.md`.
 
-| | |
-|---|---|
-| Scope | Everything below is in scope. Anything not listed is [not built](#not-building). |
-| Order | The `Slice` column is the build order — see [Delivery](#delivery). |
-| Sides | A feature ships when every column it needs is ✅. |
-| API | The engine HTTP surface Studio and external agents call. |
-| CLI | `invana …` — the entry point for anything a person runs at a terminal. Most features need none. |
-| Words | Pinned in [terminology.md](terminology.md). Nothing outside it is ours. |
-| **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → Flow → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **Flow** (generated, packaged or promoted, and reused when it matches) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
-| **The migration** | [building-engine/task-model-migration.md](building-engine/task-model-migration.md) — eight tables → the records above, column by column, with the route changes, the slices M1–M8 and what Studio ships in lockstep. **Read this before touching anything task-shaped** |
-| **Module structure** | [module-structure.md](module-structure.md) — **decided, not started.** One name per module, shared by docs, Studio and the engine, in seven groups; feature numbers kept; the component suffix convention; the target file trees; phases R0–R6 |
-| **The runtime package** | [building-engine/the-runtime-package.md](building-engine/the-runtime-package.md) — one package walks every plan; apps reach it through protocols, never imports. The file-by-file plan, and the ~900 LOC of consolidation it pays for |
-| **The lens** | [building-engine/lens-migration.md](building-engine/lens-migration.md) — **S16's build order**, P0–P6. What already exists (`task_runs.lens_id` and `lens_snapshot` are dead columns from migration 39), what gates what, and why the connector contract is first. No decisions — those are [govern/spec.md](modules/govern/spec.md) |
-| **Governance** | [governance.md](governance.md) — **RFC, concluded.** D1–D19 settled; dispersing into [modules/govern/](modules/govern/spec.md) and the files it names. The **Lens** generalises from *which graph data* to *which participants of any layer*, addressed `layer/sublayer/name`: graph data · llm · third party · cache · human — five governed layers and one spine, plus the touch record that proves the lens held |
-| **Architecture** | [architecture.svg](architecture.svg) — the services docker-compose runs, then the modules inside Studio (design-kit, canvas) and the engine's bands (runtime, apps, graph, core); designed-but-unbuilt pieces are dashed. Update it when a service, a band or a package changes |
-| Databases | openCypher — Neo4j · Memgraph · ArcadeDB. Gremlin — JanusGraph · Neptune · TinkerGraph · ArcadeDB. Adding one: [12.1](modules/graph-connectors/features/the-connector-contract.md) |
-| Engine | [building-engine/](building-engine/migration-plan.md) — the bands, the file shape inside a package, the import rule, and the migration to them. Code shape, not product scope. The **record** migration is [task-model-migration.md](building-engine/task-model-migration.md), and the two are orthogonal |
-| Screens | [the-screens.md](the-screens.md) — the 42 hi-fi artboards, one row each, with whether the screen is built and whether it is on the kit. How Studio is built to hold them: [building-studio/](building-studio/) |
-| **The sequence** | [the-sequence.md](the-sequence.md) — the **build order** of everything still open, block by block, with what gates what. This file is the scope and the `Slice` column is the ship gate; that one is the order the remaining blocks are worked in |
-| Status | ✅ done · 🟡 in progress · 🖼 screen built, wired to nothing ([DS15](modules/platform/features/design-system.md)) · 🔵 designed, not started · — not applicable |
-| **Open calls** | [Open calls](#open-calls) — the decisions blocking finished code, each with two defensible answers. Read it before starting anything in §5, §14 or §10.5: a call settled there is one you do not have to make at a call site |
+## Root files
 
-### The modules
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| [README.md](README.md) | This index · the old index's build status, open calls, retiring code, delivery slices and build rules (*Kept from the old index* below) | plan · debate (Open calls) | Open calls → the feature each governs, once settled; the rest is deleted as it lands |
+| [orchestration.md](orchestration.md) | §1–§15 — the earlier two-noun model (Task · TaskRun), worked examples, bounds, what is built · *Not building* rows *a plugin-registerable catalogue* and *distributed workers* | retired (§1–§3 and both rows contradict [the live model](../../specs/system-design/orchestration.md)) · plan (§12) · engine detail | Delete §1–§3 and both rows; the rest → `specs/system-design/orchestration.md` where still true |
+| [governance.md](governance.md) | The RFC: §1 the loop · §4 sub-worlds · §8 cost · §9–§11 the run and step drawings · §12–§14 where each decision lands and D1–D22 | debate (§9–§11, §13 drawing rows, D5 · D6 · D13–D16 · D20–D22) · retired (§0 *the agent binds the provider*, §3 Worlds' place and the settings tabs, D18) · plan (the dispersal paragraph) | Drawing decisions → AG-F03 and MO-F05; delete the retired rows; the file once dispersed |
+| [module-structure.md](module-structure.md) | One name per module across docs, Studio and the engine; the seven groups; suffix conventions; target trees; phases R0–R6 | plan — decided, R1–R6 not started | Delete once R6 lands; naming rules → the build skills |
+| [terminology.md](terminology.md) | §1–§8, all — the domain terms code and docs keep | engine detail — screen words are in [`specs/glossary.md`](../../specs/glossary.md); its SU1 · SU7 citations now point at SH-F02 | `specs/system-design/` beside the glossary |
+| [the-screens.md](the-screens.md) | The 42 hi-fi artboards and every later canvas, one row each — built? on the kit? | plan — screen build status | Delete as each story's `## Screens` and the audits take it over |
+| [the-sequence.md](the-sequence.md) | The build order of everything open, block by block, with what gates what | plan | Delete once its blocks land |
+| [architecture.svg](architecture.svg) | The services, Studio's packages and the engine's bands | engine detail | [`specs/system-design/architecture.md`](../../specs/system-design/architecture.md) |
 
-Seven groups, 26 modules — one name each, shared by `docs/for-developers/modules/`, Studio
-`features/` and the engine's `apps/` and `server/` ([module-structure.md](module-structure.md)).
-**The sections below are still filed under the fourteen modules they had before; R1 moves them to
-this map.** Feature numbers do not change.
+## building-engine/
 
-| Group | Modules (the feature numbers they hold) |
-|---|---|
-| Data | `graphs` 1.1 · `models` 1.2–1.8 · `imports` 2.x · `graph-connectors` 12.x |
-| Exploration | `explorer` 4.1 · 4.3 · 4.6 · 4.8 · `queries` 3.1 · 4.4 · `boards` 4.2 |
-| Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
-| Work | `projects` 9.1 · 9.2 · 9.4 · 9.5 · 9.6 · 9.7 · 9.8 |
-| Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 · `notifications` 10.7 · 10.8 |
-| Governance | `lenses` 14.x · `events` 10.2 |
-| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 13.11 · 13.12 · 13.13 · 13.14 · 13.15 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
+Every file is a **plan** — a pass, a migration or a code-shape target. None holds a product rule.
 
----
+| File | What it plans | Where it would go |
+|---|---|---|
+| [migration-plan.md](building-engine/migration-plan.md) | The engine's bands, the import rule, package shape, and the measured distance to it | `specs/system-design/architecture.md` for the rules; delete the plan once done |
+| [refactor-plan.md](building-engine/refactor-plan.md) | How migration-plan's moves are made safely, per commit | Delete once done |
+| [task-model-migration.md](building-engine/task-model-migration.md) | Eight tables → Todo · Flow · Task · TaskRun, column by column, slices M1–M8 | Delete once done; the target is `specs/system-design/orchestration.md` |
+| [the-runtime-package.md](building-engine/the-runtime-package.md) | One package walks every plan; the file-by-file move | Delete once done; the target is `specs/system-design/runtime.md` |
+| [lens-migration.md](building-engine/lens-migration.md) | Slice S16's build order, P0–P6 | Delete once done |
+| [govern-and-agents-data-model.md](building-engine/govern-and-agents-data-model.md) | `lenses`, `run_touches` and the agent changes; four signed-off decisions | Settled shapes → `specs/system-design/modules/govern.md` · `agents.md` |
+| [boards-migration.md](building-engine/boards-migration.md) | `canvases` → `boards` with a declared kind | Settled shapes → `specs/system-design/modules/explore.md` |
+| [graph-ops-as-tasks.md](building-engine/graph-ops-as-tasks.md) | Every graph read and write as a catalogue callable | Delete once done |
+| [skills-pass.md](building-engine/skills-pass.md) · [skills-draw-as-plans.md](building-engine/skills-draw-as-plans.md) · [a-skill-uses-a-plan.md](building-engine/a-skill-uses-a-plan.md) | The three Skills passes | Delete — the first is closed; the other two once built |
+| [workers-and-orchestration.md](building-engine/workers-and-orchestration.md) | The executor options and the benchmark that chose one | Delete — the choice is in `specs/system-design/runtime.md` |
 
-## 1 · [Connect and model](modules/connect-and-model/spec.md)
+## building-studio/
 
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 1.1 | [Connect a database](modules/connect-and-model/features/connect-a-database.md) | One Graph ↔ one graph database; test before save | ✅ | — | ✅ | S2 |
-| 1.2 | [Introspect a database](modules/connect-and-model/features/introspect-a-database.md) | Seed a draft model from what is already there | ✅ | — | ✅ | S2 |
-| 1.3 | [Author a model](modules/connect-and-model/features/domain-models.md) | One model per domain, authored on its own | ✅ | — | ✅ | S3 |
-| 1.4 | [Model editor](modules/connect-and-model/features/model-editor.md) | Draw the model on a canvas; staged commit | ✅ | — | ✅ | S3 |
-| 1.5 | [Share a model](modules/connect-and-model/features/share-a-model.md) | Export, import, upgrade; files and git are the registry | ✅ | ✅ | ✅ | S7 |
-| 1.6 | [Stitch models](modules/connect-and-model/features/stitch-models.md) | Anchors and relationships; the global model is derived and drawn on its own page; the Stitches page lists active and removed stitches, each inspected on the canvas | ✅ | ✅ | 🟡 | S7 |
-| 1.7 | [Starter models](modules/connect-and-model/features/starter-models.md) | Importable models to begin from — memory, provenance — renamed on arrival | ✅ | ✅ | ✅ | S7 |
-| 1.8 | [The model page](modules/connect-and-model/features/the-model-page.md) | One page, five tabs — Overview · Database · Usage · Performance · Growth — with the model as a filter; one model's schema canvas and type pages; is it used, is it slow, how has it grown | ✅ | — | 🟡 | S-TBD |
-| 1.9 | [Publish review](modules/connect-and-model/features/publish-review.md) | Additive publishes now; breaking is previewed as a migration run and published after another owner approves | ✅ | ✅ | ✅ | B10 |
-| 1.10 | [Import an ontology](modules/connect-and-model/features/ontology-import.md) | RDFS / OWL subset, schema.org included — JSON-LD, Turtle, RDF/XML — into a draft model; flattened, source IRIs kept, an import report of what was skipped | ✅ | ✅ | ✅ | B12 · C08 |
-| 1.11 | [Constraints on properties](modules/connect-and-model/features/property-constraints.md) | A range with a unit or a standard's values on one property of a type; Reject or Flag for review; checked at record write, bind and validation, naming the constraint; what breaks it today counted before saving | ✅ | — | ✅ | M04 |
-| 1.12 | [Graph settings](modules/connect-and-model/features/graph-settings.md) | One page, three tabs — Basic · Database · Members — the Graph's name and instructions, its connection always editable behind a passing test, and who is on it | ✅ | — | ✅ | M07 |
+Every file is a **plan** or a build rule for Studio's code. None holds a product rule; the boards and the design
+language do.
 
-## 2 · [Bring data in](modules/bring-data-in/spec.md)
+| File | What it plans | Where it would go |
+|---|---|---|
+| [code-shape.md](building-studio/code-shape.md) · [refactor-plan.md](building-studio/refactor-plan.md) · [cleanup.md](building-studio/cleanup.md) | Today's Studio → feature modules on the kit, and how each move is made | Delete once done |
+| [design-kit-coverage.md](building-studio/design-kit-coverage.md) · [canvas-ui-coverage.md](building-studio/canvas-ui-coverage.md) · [components-todo.md](building-studio/components-todo.md) | What each screen composes from, and what the kits still lack | Keep while the kits grow; component requests go to the designer's queue |
+| [the-shell.md](building-studio/the-shell.md) · [graph-detail-page.md](building-studio/graph-detail-page.md) | The shell's regions and the one graph page | retired where [`specs/design-language.md`](../../specs/design-language.md) §2 replaces the regions; delete then |
+| [govern-and-agents-panels.md](building-studio/govern-and-agents-panels.md) · [skills-boards.md](building-studio/skills-boards.md) · [drawing-repetition-and-gates.md](building-studio/drawing-repetition-and-gates.md) | Panels and boards for Govern, Agents, Skills and the plan canvas | retired where the Agent-version boards replace them; delete then |
+| [graph-model-canvas.md](building-studio/graph-model-canvas.md) · [task-flow-canvas.md](building-studio/task-flow-canvas.md) | Two canvas components and their callers | engine detail — keep for the coder |
 
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 2.1 | [Bring data in](modules/bring-data-in/features/load-data.md) | `invana records import`, `invana loader` and `invana records check` — records into a model | ✅ | ✅ | ✅ | S6 |
-| 2.2 | [Inspect what landed](modules/bring-data-in/features/inspect-what-landed.md) | Imports — the journal filtered to `kind in (import, bulk)`; log, report, provenance — read-only | ✅ | — | ✅ | S6 |
-| 2.3 | [Load a bundle](modules/bring-data-in/features/load-a-bundle.md) | Every dataset a manifest names, in one run; stitched once, a Task raised for a broken source | 🔵 | 🔵 | 🔵 | S15 |
-| 2.4 | [Datasets](modules/bring-data-in/features/datasets.md) | Install-wide `publisher/name` records — origin, author chain, licence, sensitivity, sharing; immutable hashed versions; a record's change log | ✅ | 🟡 | ✅ | B03 |
-| 2.5 | [Retract and refresh](modules/bring-data-in/features/retract-and-refresh.md) | A version retracted with a reason and everything citing it flagged; a refresh schedule mints new versions while consumers stay pinned | ✅ | 🟡 | 🟡 | B03 |
-| 2.6 | [Bind a dataset](modules/bring-data-in/features/bind-a-dataset.md) | A Graph binds one dataset version into a model as an ordinary load run; told when a newer one exists | 🟡 | 🟡 | ✅ | B03 |
-| 2.7 | [Standards and conformance](modules/bring-data-in/features/standards.md) | Install-wide versioned standards — terms, types, allowed values; a dataset claims one pinned version and is scored against it, enforced block · warn · report | ✅ | ✅ | ✅ | B04 |
-| 2.8 | [Import a SKOS vocabulary](modules/bring-data-in/features/skos-import.md) | A concept scheme becomes a standard — concepts → terms and values, notation → code, broader → hierarchy, source IRIs kept; an import report | ✅ | ✅ | ✅ | B12 · C08 |
+## modules/
 
-## 3 · [Ask](modules/ask/spec.md)
+### agents
 
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 3.1 | [Write queries](modules/ask/features/write-queries.md) | Cypher / Gremlin editor with the schema in scope | ✅ | — | ✅ | S9a |
-| 3.2 | [Ask in natural language](modules/ask/features/ask-in-natural-language.md) | A question becomes a run, run by an agent | ✅ | — | ✅ | S9b |
-| 3.3 | [What an answer is made of](modules/ask/features/the-answer-surface.md) | Subgraph · table · metric · chart · prose, in one answer | ✅ | — | ✅ | S9b |
-| 3.4 | [Projections](modules/ask/features/projections.md) | Closed questions in, table · chart · html out — from templates | ✅ | — | ✅ | S9b→S9d |
-| 3.5 | [Streaming and the workflow](modules/ask/features/streaming-and-the-workflow.md) | Steps and results paint as they arrive | ✅ | — | ✅ | S9b→S9d |
-| 3.6 | [Clarifying questions](modules/ask/features/clarifying-questions.md) | Understand asks back instead of guessing | ✅ | — | ✅ | S9c |
-| 3.7 | [Reasoning trace](modules/ask/features/reasoning-trace.md) | Prompt → query → records → timings, per step | ✅ | — | ✅ | S9c |
-| 3.8 | [When it cannot answer](modules/ask/features/when-it-cannot-answer.md) | Retry · repair · cannot-answer · diagnosis — four distinct outcomes | ✅ | — | ✅ | S9b→S9f |
-| 3.9 | [The runtime](modules/ask/features/runtime-and-adapters.md) | One asyncio task per run, in-process; a protocol so it can be swapped | ✅ | — | — | S9b |
-| 3.10 | [The assistant](modules/ask/features/the-assistant.md) | One assistant on the right of every panel, with the selection in hand | ✅ | — | ✅ | S12 |
-| 3.11 | [Act as](modules/ask/features/act-as.md) | A stance — a method and its declared assumptions — and the ledger of what the answer rests on | 🔵 | — | 🔵 | S-TBD |
-| 3.12 | [The answer, in words](modules/ask/features/the-answer-in-words.md) | A few cited sentences over the records, in the agent's voice — words first, records after | 🔵 | — | 🔵 | S-TBD |
-| 3.13 | [Beyond the graph](modules/ask/features/beyond-the-graph.md) | The internet — the first third-party source — and the model's own knowledge, where a world allows; badged third-party, with the reference | 🔵 | — | 🔵 | S-TBD |
-| 3.14 | [Fork a session](modules/ask/features/fork-a-session.md) | Branch a thread at a reply — its turns and its board copied, its parent named, its forks listed | 🔵 | — | 🔵 | S-TBD |
-| 3.15 | [The assistant opens boards](modules/ask/features/the-assistant-opens-boards.md) | Ask for a list and the assistant opens it with the filters set, marked *set by the assistant*, its reply carrying the link | 🟡 | — | 🟡 | F05 |
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 5 Surfaces · 5a The drawn states | retired — the Agent Builder, Fleet and Activity surfaces, an older canvas | — |
+| `spec.md` | 3a — `envelope` *stored as workflow_spec today* | not true yet — build status | — |
+| `features/the-agents-shell.md` | The whole file | retired — the rail-and-workbook shell, launcher groups, Fleet, Activity; the design language replaces them | — |
+| `features/author-an-agent.md` | Decisions AG12 · AG23 · AG34 · AG36–AG38 · Not building *Cross-Graph agents* | retired — the drawer and the eleven-tab page; an agent is a sheet and install-wide (AG-F02) | — |
+| `features/author-an-agent.md` | Decisions AG5 | not placed — *work that names no view runs in Everything* | MO-F05 Rules |
+| `features/soul.md` | Decisions SO7 | retired — a Soul tab; the voice sits on Setup | — |
+| `features/pinned-model-versions.md` | Decisions PV1 · PV5 · PV7–PV10 · PV12–PV15 | plan — re-running on recorded versions belongs to a run | AG-F03 |
+| `features/pinned-model-versions.md` | Decisions PV16 | retired — *Settings › LLM providers* and the Agent Builder as places | — |
+| `features/the-agent-page.md` | Decisions AP1 · AP7 · AP30 · Not building *Soul's How it speaks* · *Deploy's resource → pool mapping* · *An event trigger and pool labels* · *At 02:00 forecast* | retired — the eleven-tab page · engine detail — pools are ST-F06's | ST-F06 |
+| `features/the-agent-page.md` | Not building *Assistant proposals marked on the builder* · *Effort as low · medium · high* | debate — AG-26 specifies the proposals; the boards draw effort (AG-F01 › Open questions) | AG-F01 once settled |
+| `features/install-wide-agents-and-skills.md` | Preamble · Two places · Journeys *Moving between the two places* · Seams *A platform product opened from a Graph* · Decisions WD13 · WD18 · Not building *An Agents product in a Graph* | retired — the platform / Graph split and product names as places | — |
+| `features/install-wide-agents-and-skills.md` | Capabilities C9 · C11 · Seams *A Graph near its monthly tokens* · Journeys *A run goes badly* · Decisions WD14 · WD16 · WD19 · Not building *Workers owned by a Graph* · *Rendering as a skill* | plan — each graph's limits, models and workers; versions across graphs | ST-F05 · ST-F06 · AG-F03 · AG-F04 |
+| `features/install-wide-agents-and-skills.md` | The core agents · Decisions WD3 | debate — the shipped assistants are named after retired products | AG-F02 Rules once named |
+| `features/install-wide-agents-and-skills.md` | Decisions WD6 · Not building *Per-agent budgets* · *Building without an install Admin* | debate — only an Admin builds and spend is per graph, against *Can build agents* and each agent's budget (AG-F01 · AG-F02 › Open questions) | AG-F01 · AG-F02 once settled |
+| `features/fleet-performance.md` | Capabilities C9 · Surfaces (LLMs) · Decisions FP12 · FP16 | plan — who pins a model | ST-F05 |
+| `features/fleet-performance.md` | Decisions FP13 · FP15 · FP17 | retired — the Agent Builder's pages and rail | — |
+| `features/providers-and-models.md` · `concurrency-and-contention.md` · `workers.md` | Decisions PM6–PM8 · the ceiling in Graph settings · Fleet and Agents › Workers | retired — Settings › AI and connections and Settings › Workers replace them | — |
 
-## 4 · [Explore](modules/explore/spec.md)
+### ask
 
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 4.1 | [Graph canvas](modules/explore/features/graph-canvas.md) | Pan · zoom · select · style; 100K nodes | ✅ | — | ✅ | S9b |
-| 4.2 | [Boards](modules/explore/features/boards.md) | Named, saved, versioned working surfaces — drawn or declared | ✅ | — | ✅ | S9 |
-| 4.3 | [Selection and the panel](modules/explore/features/selection-and-the-panel.md) | The canvas selects; the panel states the fact | ✅ | — | ✅ | S12 |
-| 4.4 | [The console](modules/explore/features/the-console.md) | The rows and the query under the canvas that drew them | ✅ | — | ✅ | S12f |
-| 4.5 | [Share an answer](modules/explore/features/share-an-answer.md) | A live link or a frozen snapshot for members; PNG · CSV · Markdown for anyone else | ✅ | 🔵 | ✅ | C09 |
-| 4.6 | [Walk through an answer](modules/explore/features/walkthrough.md) | A session's answers replayed step by step on the board — stepper in the toolbar, a read-only presenting mode, each step tied to its reply | 🔵 | — | 🔵 | — |
-| 4.7 | [Edit the graph's data](modules/explore/features/edit-the-graphs-data.md) | Add, change and delete nodes and relationships on the board in Edit mode, with the model's types and keys; unsaved until saved as one run | 🔵 | — | 🔵 | — |
-| 4.8 | [Annotate the data](modules/explore/features/annotations.md) | Annotations on records — a node, a relationship, a value, a path or a group — kept with the graph, shown on every board that loads them; hidden and shown from the Legend | 🔵 | — | 🔵 | — |
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 5 What this module owns · 7 Cross-feature decisions · 7a The drawn states · 7b A session executes through plans · 8 Deliberately absent | engine detail — kept by choice beside the [system design](../../specs/system-design/modules/ask.md); the product halves are in the Explore product | `specs/system-design/modules/ask.md` |
+| `spec.md` | 6 *Not one dispatch per step* · *Step granularity is reported* · *No external infrastructure* · *One runtime exists* | retired — steps travel as envelopes to in-process or remote workers | — |
+| `features/the-assistant.md` | Decisions AD14 *The panel is called Ask Assistant* | retired — the header reads *Assistant* (EX-F03) | — |
+| `features/the-answer-surface.md` | The half-built re-run note | plan — the re-run gap, cited to EX-02.9 | — |
+| `features/clarifying-questions.md` · `streaming-and-the-workflow.md` · `reasoning-trace.md` | The ⚠ orchestration banner | plan — the task-model migration note | — |
+| `features/runtime-and-adapters.md` | *Today* · *Retired* (queues, brokers, backfills, fair-share) | plan · retired — pools are fair-share; procrastinate is the queue | — |
+| `features/act-as.md` · `beyond-the-graph.md` · `fork-a-session.md` · `when-it-cannot-answer.md` | Every section | moved, not cut — the stories are EX-24 · EX-26 · EX-27 · EX-05 · EX-06 in EX-F05; *Engine* is engine detail | Cut all but *Engine* |
 
-## 5 · [Agents](modules/agents/spec.md)
+### bring-data-in
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 2 *Studio does not write* · 4 What this module owns · 5 the *Studio* row · 7 BD6 · BD9 · 7a The drawn states · 8 *Import from Studio* | retired — Upload in the browser mints versions (DA-16); datasets are install-wide; old artboards | — |
+| `features/datasets.md` | Decisions DT17 | not placed — drafts pushed by a narrowed token | ST-F02 |
+| `features/retract-and-refresh.md` | Decisions DR3 | plan — flags on findings and Inbox items land later | — |
+| `features/bind-a-dataset.md` | Decisions BV3 | retired — any member binds; DA-F03 says *Can shape the model* | — |
+| `features/load-data.md` | Decisions LD5 · Not building *Import from Studio* | retired — Data › Upload (DA-16) | — |
+| `features/load-a-bundle.md` | *The problem this closes* · *It is a workflow, not a new concept* | plan — the defect the bundle closes (DA-18's *so that*) | — |
+| `features/inspect-what-landed.md` | Decisions IW7 · Not building *A journal across Graphs* | retired — imports live in Data › Upload | — |
+| `features/inspect-what-landed.md` | Not building *A data browser over the whole graph* | not placed — Explore's job | EX-F01 Not building |
+| `features/standards.md` | Not building *Validation queue items from violations* | retired — the queue exists (DA-07) | — |
+
+### connect-and-model
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 1 Vocabulary · 3 What this module owns · 6 CM7–CM11 · 6a The drawn states | engine detail · retired (CM11 the Models page layout · 6a old wireframes) | `specs/system-design/modules/connect-and-model.md` · — |
+| `features/model-editor.md` | Decisions ME6 · ME8 · ME10 · ME13–ME19 · ME21 · *Deprecated surfaces* | retired — the old panel, form and banner; the kind peek and draft bar replace them | — |
+| `features/stitch-models.md` | Decisions ST9 · ST12 · ST22 · ST24 | retired — rail items and the Stitches drawer and page | — |
+| `features/the-model-page.md` | Decisions MP4–MP6 · MP18 · MP24 · MP42 · MP45–MP48 · MP50 | retired — the Models board and panel layout; binary membership | — |
+| `features/connect-a-database.md` | Capabilities C9 · Journey · Surfaces `/graphs/new` · Decisions CD11–CD13 | plan — the create-a-graph flow | SH-F02 |
+| `features/connect-a-database.md` · `graph-settings.md` | Surfaces (the Graph settings product and its boards) · Decisions CD8 · CD10 · GS1 · GS3 · GS4 · GS10 | retired — Settings › This graph replaces it · engine detail | — |
+
+### explore
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | Preamble · 6 E5 · 6a The drawn states | retired — *one rail*; the assistant is Explore's (EX-F03); old wireframes | — |
+| `features/graph-canvas.md` | Not building *Editing data from the canvas* | retired — data edits are EX-F06 | — |
+| `features/boards.md` | Decisions CV6 · Not building *Sharing a board with a link* · *A row for every board opened* | retired — toolbar cards; a live link exists (EX-15) | — |
+| `features/selection-and-the-panel.md` | *What the panel shows, per kind* | not placed — the `model · plan · workflow · envelope · lineage` rows | MO-F02 · PJ-F01 · AG-F06 · AG-F05 |
+| `features/selection-and-the-panel.md` | Surfaces (the Explorer panel) · Decisions SP2 · SP6–SP12 · Not building *Context menus* · *Editing data rows from the panel* | retired — the rail's Legend, right-click menus and Edit mode exist | — |
+| `features/share-an-answer.md` | Not building *Export from the CLI* | engine detail — CLI | `specs/system-design/api-and-cli.md` |
+| `features/walkthrough.md` | Surfaces · Decisions WT1 · WT7 | retired — Present is a mode, not a toolbar button | — |
+
+### govern
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 4 Decisions GV17 · GV18 · GV25 · GV37 | retired — the Govern leftNav item, its drawers and the locked strip; `model.rules` replaces them | — |
+| `features/worlds.md` | Decisions WO8 · WO15 · WO16 · WO25 | retired — the drawer drill-in and drawer-versus-board split | — |
+| `features/guardrails.md` | Decisions GR22 | plan — migrating layered Graph guardrails to rules on properties | — |
+
+### identity-and-access
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `features/accounts.md` | Surfaces (`/profile`) · Decision AC6 | retired — Settings › You replaces the profile page | — |
+| `features/tokens.md` · `policies.md` | Surfaces (Profile › Access tokens, `iam.*` pages) · Not building *Worker-seconds and pools enforced* | retired Studio surfaces · plan | ST-F02 · ST-F06 |
+| `features/policies.md` | Not building *The assistant's proposal card in the conversation* | retired — the draft is drawn in the access sheet | — |
+| `features/roles.md` | Decision RO17 | plan — the members surface | ST-F01 |
+| `features/roles.md` | Not building *Request access on a read-only surface* | debate — the board links *Ask the owner* to the Inbox (ST-F02 › Open questions) | ST-F02 once settled |
+| `features/roles.md` | Not building *Agents in the Members table* | retired — agents are members | — |
+| `features/effective-access.md` | Not building *An access ask raised by a refusal* · *The token layer at dispatch* · *Projects as resources* | plan | ST-F02 · PJ-F01 |
+| `features/the-iam-product.md` | Surfaces (`/iam/*`) · Decisions IP1–IP4 · IP6 | retired — IAM is *Settings › People and access*, a sheet | — |
+| `features/membership.md` | Decision MB5 | retired — agents are members | — |
+
+### memory
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 1 Vocabulary · 5 What this module owns · 6 Flows · 7 Cross-feature decisions · 8 Deliberately absent | engine detail — kept by choice beside the [system design](../../specs/system-design/modules/memory.md); 6 is moved, not cut (EX-F07's journey) | Cut 6 |
+| `features/evidence.md` · `recall-by-query.md` · `proposals.md` · `consolidation.md` | Every section | moved, not cut — the stories are EX-29–EX-32 in EX-F07; *Engine*, *Shape* and proposals' *Open* are engine detail and debate | Cut all but *Engine*, *Shape* and *Open* |
+
+### operate
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 7 O9 (the Activity page and its seven tabs) | retired — the Inbox modal and Agents › Runs replace it | — |
+| `features/observability.md` | Capabilities C1 · C2 · Decisions OB4 | debate — latency by step kind is not specified; spend contradicts *tokens, never currency* | AG-F03, if wanted |
+| `features/approvals.md` · `notifications.md` | Surfaces (pages, the bell, tray, toast, Activity tabs) · Decisions NT11 · NT12 · Not building *A plan node's approval gate* | retired — the Inbox answers in the row | — |
+| `features/approvals.md` | Decision AP13 (*For you · All · Answered*) | debate — whether answered asks stay in the Inbox (IN-F01 › Open questions) | IN-F01 once settled |
+| `features/the-ledger.md` | Decisions LG17 · LG18 (preset chips) | plan — chips the History board does not draw | — |
+| `features/external-agent-api.md` | Capabilities C6–C8 · Seams · Decisions EA6 | plan — key limits and revocation · retired (tokens in Settings › Graph) | ST-F02 |
+
+### platform
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 2 Studio builds from the kit · 2a The drawn states · 6a Studio end-to-end tests | plan — build rules and test practice the build skills own | — |
+| `spec.md` | 2b The app shell · 3 radius and density rows · 6 *decorated service methods* | retired — the work-panel shell; telemetry dropped the decorators | — |
+| `features/design-system.md` · `telemetry-cleanup.md` | The whole files | plan — a build rule and a clean-up list | — |
+| `features/setup.md` | 5 Surfaces (the island, the cap, the band) · Decisions SU5 · SU7 · SU8 · SU10 · SU16 · SU18–SU21 · SU27 · Not building | retired — Create a graph is a modal; the setup timeline sits in Settings › This graph | — |
+| `features/setup.md` | Decisions SU23 · SU25 · Not building *A watch it step* · the index lineage | debate · plan | `specs/system-design/modules/platform.md` |
+| `features/runtime.md` | 3.1 every kind · 21 How this lands · the *Today* columns | plan — build status | — |
+| `features/runtime.md` | *Retired* — kind on the todo · membership as permission · approval columns · `run_logs` · `idem_key` on todos · *does not distribute* | retired — superseded by the live task model | — |
+| `features/distributed-execution.md` | The benchmark · Engine paths · Plan | plan — the results that chose the executor | — |
+| `features/tool-plugins.md` · `this-graphs-mcp-server.md` | Decisions TP18 · Surfaces `agents.connections` | retired — Settings › AI and connections replaces them | — |
+| `features/telemetry.md` · `list-contract.md` · `metrics-are-stored.md` | *Stayed* · *Not building — plan* · *Phases* | plan | — |
+
+### skills
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 3 the `rules` · `rule_versions` rows · 5a The drawn states · Decisions S2 · S4–S7 · Not building *Rules that execute* · *Cross-Graph skill sharing* | retired — MO-F06's three scopes and checked rules; skills are built once for the install | — |
+| `features/authoring-a-skill.md` | Journey *The skill's page* · Surfaces · *Surfaces, as drawn* · Decisions SK4 · SK16 · SK27 · SK36 · SK37 | retired — the drawer, five-tab page and left-to-right Flow | — |
+| `features/authoring-a-skill.md` | Decisions SK12 (a redraw shown as a diff) | debate — the skill sheet draws no diff | AG-19, once Ravi settles it |
+| `features/evals.md` | Decisions EL15 · EL7 | debate (evals as a mode of Instructions) · plan (an eval set on a schedule) | AG-F04 · AG-F07 |
+| `features/instructions-publish-rollback.md` | Surfaces *Agent page › Instructions* · *History* · *Revisions in runs* · *Library › Plans* | plan — AG-36 and AG-F06 hold them | — |
+| `features/the-skill-page.md` | Not building *Records of which handler fired* · *Ask an owner on a locked skill* · *A skill that writes needs a Graph owner* | debate (AG-F04 › Open questions) · plan | AG-F04 · ST-F02 |
+| `features/usage.md` | Surfaces *Evidence page* · *The Usage board* · *The migration* | plan (Evidence is EX-29) · retired (the Usage board) | EX-F07 |
+
+### work
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 3 the retired status machine | retired — status is derived from the latest run | — |
+| `features/recurring-tasks-and-conditions.md` | *Not moved — recurring task templates* | debate — contradicts AG-F07's one kind of schedule (PJ-F01 › Open questions) | AG-F07, if wanted |
+| `features/objectives-and-criteria.md` | *Constraints this puts on the engine* · Open Q3 | engine detail · debate (rule priority) | MO-F06 |
+| `features/review.md` | *Approvals in the queue* C4c (amend the gated call) | debate — IN-F01 decides an ask as shown (IN-F01 › Open questions) | IN-F01, if wanted |
+| `features/projects-and-tasks.md` | The ⚠ rewrite banner | plan — the task-model migration note | — |
+
+### workflows
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| `spec.md` | 3 *There are no plan versions* · Decisions F3 · F6 · Not building *Cross-Graph workflow sharing* | debate — AG-F06 reads versions; plans per graph against agents built once for the install (AG-F06 › Open questions) | AG-F06 once settled |
+| `features/the-catalogue.md` | Decisions CA4 · CA9 | retired — the catalogue drawer of the Tasks stack | — |
+| `features/the-library.md` | Decisions LB37 · LB39 | engine detail — how the plan page is drawn | AG-18 |
+
+## docs/products/
+
+The product plan Studio was redesigned from. Its stories, boards and decisions now live in `specs/products/`; what is
+left is the superseded plan, build status and engine notes.
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| [README.md](../products/README.md) | Header · The products · Two places · Prerequisites P-01–P-22 · Terms · Conflicts · Open registry · Not building | retired (products as places, the launcher, the five-product ceiling) · plan (prerequisites, the registry phases) · not placed (*Author chain* · *Constraint*) | *Author chain* → DA-F01 · *Constraint* → MO-F02; delete the rest |
+| [explorer.md](../products/explorer.md) | Header · CLI build status · *Drawn, not built yet* · Not building | retired (*no product rail*) · plan | Delete; the gaps are designer and coder work on EX-F01–EX-F06 |
+| [modeller.md](../products/modeller.md) | Header · CLI · Decisions (the rail, its pages, *Graph settings tabs*) · *Studio today, mapped* · Not building | retired — the rail and its pages; Settings › This graph replaces Graph settings · plan · engine detail (stitch counts) | Delete |
+| [datasets.md](../products/datasets.md) | Header · CLI build status · Decisions *Paths carry the publisher* · *Imports tiles are the engine's* · *Launcher position* | plan · engine detail · retired (the launcher) · not true yet (`datasets pack · unpack`) | `specs/system-design/modules/bring-data-in.md` · api-and-cli.md |
+| [projects.md](../products/projects.md) | CLI · Decisions (the rail-and-stack layout, *Staffing people*, *Assignees*) | retired · debate — Studio cannot staff others yet (PJ-F01 › Open questions) | PJ-F01 once settled |
+| [shell.md](../products/shell.md) | Header · Layout · Activity · CLI · Decisions (the tray, page heads, schedules naming a plan, Activity) | retired — `specs/design-language.md` §2 holds the live frame · engine detail (one host, the CLI) | `specs/system-design/architecture.md` · api-and-cli.md |
+| [agent-builder.md](../products/agent-builder.md) · [platform.md](../products/platform.md) · [iam.md](../products/iam.md) | Header · decisions on runs, skills, install settings, Fleet, the IAM rail | retired — the Agent Builder, Fleet and IAM as places · plan — owned by AG-F03 · AG-F04 · ST-F02 · ST-F06 | Delete |
+| [agents.md](../products/agents.md) · [agent-fabric.md](../products/agent-fabric.md) | The superseded Agents product and Agent Fabric: features, stories, decisions, the function library | retired — superseded twice (the two places, then the design language) · plan — each subsection with its feature | Delete once AG-F01–AG-F07 and ST-F04–ST-F06 are reviewed |
+| [plugins.md](../products/plugins.md) | Words · the manifests · how a flow runs across workers · where it is administered | debate · engine detail · retired surface | `specs/system-design/modules/` (platform) |
+| [scale-out.md](../products/scale-out.md) | The proposal: durable runs, envelopes, leases, queues, pools, scale-down | engine detail · debate — *Pools* by policy and KEDA contradict Settings › Workers, scaled by hand | `specs/system-design/runtime.md` once settled |
+| [migration-plan.md](../products/migration-plan.md) | Studio's move to products in two places, phases and session rules | plan — superseded by the design language | Delete |
+| [onboarding.md](../products/onboarding.md) | A pointer to SH-F02 | fully moved | Delete once nothing links to it |
+
+## docs/system-design.md and docs/system-design/
+
+| File | What stayed | Why | Where it would go |
+|---|---|---|---|
+| [system-design.md](../system-design.md) | §1 the *Bounded* row and the in-process runtime · §1.1 · §1.2 the simulation sentence · §2 the retired terms · §5 five behaviours | retired — binary membership, the Thought/Thinking model, *derived, never stored*, in-process only | Delete; §5's true half → `specs/system-design/architecture.md` once restated |
+| [system-design.md](../system-design.md) | §4.1 Bootstrap · 4.2 Sign in · 4.4 Author a model · 4.7 Ask · 4.8 How a run assembles · 4.13 Serving the Graph to an external agent | engine detail | `specs/system-design/api-and-cli.md` · runtime.md · orchestration.md · `modules/connect-and-model.md` |
+| [system-design/system-design.md](../system-design/system-design.md) | An earlier whole-system design: goals, layers, entities, access, connectors, evaluation, personas, conflicts, open questions | debate — nothing in it is marked built; `specs/system-design/` is the current shape | Delete once reviewed against `specs/system-design/` |
+| [system-design/migration-plan.md](../system-design/migration-plan.md) | How the engine's code would move to that design | plan — nothing has moved | Delete with it |
+
+## Kept from the old index
+
+Build status, open calls, retiring code and the delivery slices, as the old index left them. **plan** — each part
+is deleted as its work lands; an open call, once settled, becomes a decision in the feature it governs.
+
+### 5 · Agents — build status
 
 **Reopened by S16.** An agent binds no provider: it carries an envelope, a budget and a **lens**,
 and the lens's cast names the model ([A1](modules/agents/spec.md) · [PM1](modules/agents/features/providers-and-models.md)).
@@ -134,143 +267,11 @@ That drops `agents.llm_config_id` and `llm_providers.is_default`, splits `llm_pr
 provider row and its models, and reopens four rows below. The shapes:
 [building-engine/govern-and-agents-data-model.md](building-engine/govern-and-agents-data-model.md).
 
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 5.1 | [Providers and models](modules/agents/features/providers-and-models.md) | A provider row per Graph, holding its models; ping it. **No default — the cast picks** | 🟡 | — | 🟡 | S5 · **S16** |
-| 5.2 | [Author an agent](modules/agents/features/author-an-agent.md) | Author an agent; give it skills and the callables they need, standing limits, a way of thinking and a voice. The world comes with the work | 🟡 | — | 🟡 | S12c · **S16** |
-| 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, and its token budgets — a run and a month | 🟡 | — | 🟡 | S12c · **S16** |
-| 5.4 | [Delegation](modules/agents/features/delegation.md) | Agents that spawn agents, bounded by the parent — escrow, four ceilings, exit reasons, may delegate to | 🟡 | — | ✅ | S12d · F05 |
-| 5.5 | [Pause, resume, retire](modules/agents/features/lifecycle.md) | Pause · resume · retire; the row stays so lineage resolves | ✅ | — | 🟡 | S12c |
-| 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |
-| 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
-| 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🟡 | — | ✅ | S-TBD |
-| 5.9 | [Pin a model version](modules/agents/features/pinned-model-versions.md) | Agents, skill versions and judges pin an exact model version; every run records the one it called; re-run on the same versions | 🟡 | 🟡 | 🟡 | B02 |
-| 5.10 | [Watch the fleet](modules/agents/features/fleet-performance.md) | What broke, waits, slowed or changed; speed, success and tokens per agent, skill, plan and model against a baseline; degradations named; who pins each model | ✅ | — | ✅ | C10 |
-| 5.11 | [Remote agents](modules/agents/features/remote-agents.md) | Hand a task to an agent outside the Graph over A2A — asked each time, only allowed fields sent, its PR returned for a person. **Implement later** | 🔵 | 🔵 | 🔵 | Later |
-| 5.12 | [The Agents shell](modules/agents/features/the-agents-shell.md) | A rail and a workbook, no leftSection: Home, Fleet, Performance, Agents, Skills, Functions, Connections › MCP servers, LLMs and Settings as pages, each a tab | — | — | ✅ | F03 |
-| 5.13 | [The agent page](modules/agents/features/the-agent-page.md) | Build an agent on its page — a draft until *Create agent* — and read it in eleven tabs: Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History | 🟡 | — | 🟡 | F04 |
-| 5.14 | [Runs and the run page](modules/agents/features/the-run-page.md) | One runs list; a run read in six tabs at any size — Overview · Agents · Stages · Assets · Data touched · Ledger; rerun as it was, on today's versions, or retuned | 🟡 | — | 🟡 | F05 |
-| 5.15 | [Workers and pools](modules/agents/features/workers.md) | Pools by label, every worker and the step it runs, Capacity, join tokens; Add workers (Docker · Python · Kubernetes manifest); a worker dials out, joining with a service-account token | ✅ | ✅ | ✅ | F06 |
-
-## 6 · [Skills](modules/skills/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 6.1 | [Authoring a skill](modules/skills/features/authoring-a-skill.md) | Four fields, drawn as a plan — the Playbook and Flow tabs | ✅ | — | ✅ | S5 · M8 |
-| 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | ✅ | S12c |
-| 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | ✅ | S12c |
-| 6.4 | [Rules](modules/skills/features/rules.md) | Install rules, Graph invariants and project working rules, offered as statements; a rule with a check is enforced block · warn · report at the acts it names; one Rules page by scope, with what a rule would have broken in 30 days | ✅ | ✅ | ✅ | S12b · B04 |
-| 6.5 | [Instructions, publish and roll back](modules/skills/features/instructions-publish-rollback.md) | `instructions.md` drafts on skills and agents; publish regenerates the plan; one-act rollback; plans generated or packaged | 🟡 | 🟡 | ✅ | B02 |
-| 6.6 | [Evals](modules/skills/features/evals.md) | Eval sets with rule checks and a labelled judge; the publish gate; drift re-runs; an eval token budget | ✅ | 🟡 | ✅ | B02 |
-| 6.7 | [The skill page](modules/skills/features/the-skill-page.md) | A skill as a document: Instructions with the functions it needs and a plan preview; Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History | 🟡 | — | 🟡 | F04 |
-
-## 7 · [Workflows](modules/workflows/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 7.1 | [Save a plan for reuse](modules/workflows/features/the-library.md) | Named, versioned flows (the `Flow` record) — Invana's packaged flows among them; diff against the previous version | 🟡 | — | 🟡 | S12c · F02 |
-| 7.2 | [Pick a plan, or write one](modules/workflows/features/plan-selection.md) | A template by intent; generation only when none fits | 🟡 | — | 🟡 | S9d |
-| 7.3 | [Check a plan against the bound](modules/workflows/features/envelope-validation.md) | A plan is checked before dispatch, refused with the bound named | 🟡 | — | 🔵 | S9d |
-| 7.4 | [Promote a plan](modules/workflows/features/promote-a-plan.md) | A plan that served becomes a template | 🟡 | — | 🟡 | S12c |
-| 7.5 | [Run a workflow](modules/workflows/features/run-a-workflow.md) | Start a plan from the library with its arguments — the front door | 🔵 | 🔵 | 🔵 | S15 |
-| 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of functions (`namespace.verb`) a flow may name — bound · args · outputs · requires | 🟡 | — | 🟡 | S12c · F02 |
-
-## 8 · [Memory](modules/memory/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 8.1 | [Evidence](modules/memory/features/evidence.md) | Offered vs applied · plan served · criteria met | 🔵 | — | 🔵 | S12c |
-| 8.2 | [Recall by query](modules/memory/features/recall-by-query.md) | A planned step reads prior records and cites them | 🔵 | — | 🔵 | S9d |
-| 8.3 | [Proposals](modules/memory/features/proposals.md) | The system proposes a versioned change, citing its evidence | 🔵 | — | 🔵 | S12c |
-| 8.4 | [Consolidation](modules/memory/features/consolidation.md) | Accept, edit or reject in Review; the effect is measured | 🔵 | — | 🔵 | S12c |
-
-## 9 · [Work](modules/work/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 9.1 | [Projects and tasks](modules/work/features/projects-and-tasks.md) | Write a task, assign it to a person or an agent | 🟡 | — | 🟡 | S12b |
-| 9.2 | [Objectives and criteria](modules/work/features/objectives-and-criteria.md) | Goals and "done" as nodes, not paragraphs | 🔵 | — | 🔵 | S12b |
-| 9.3 | [Review](modules/work/features/review.md) | One queue: questions, approvals and verdicts block; results and proposals wait | 🔵 | — | 🔵 | S12b |
-| 9.4 | [Recurring tasks and conditions](modules/work/features/recurring-tasks-and-conditions.md) | A template on a cron; failure branches that say why | 🔵 | — | 🔵 | S12e |
-| 9.5 | [Branches, findings and decisions](modules/work/features/branches-and-decisions.md) | A project of a type forks into branches; findings for and against; a verdict and a decision the rules check, superseded never edited; agents propose | ✅ | ✅ | ✅ | B05 |
-| 9.6 | [Project reports](modules/work/features/project-reports.md) | A report drafted from the records, edited, published as frozen versions that cite their datasets | ✅ | ✅ | ✅ | B05 |
-| 9.7 | [Private projects](modules/work/features/private-projects.md) | A project only its people and agents can see | ✅ | ✅ | ✅ | B05 |
-| 9.8 | [Simulation](modules/work/features/simulation.md) | A branch runs a simulator plugin over pinned dataset versions; the result is ranked, reproducible from its seed and labelled derived | ✅ | ✅ | ✅ | B09 · C06 |
-| 9.9 | [Impact](modules/work/features/impact.md) | What a branch's option reaches over the graph, hop by hop from the records its evidence cites | — | — | ✅ | C06 |
-
-## 10 · [Operate](modules/operate/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 10.1 | [Schedules](modules/operate/features/schedules.md) | An agent and instructions on a cron in a zone; every firing recorded; a missed-firing and an overlap policy; the result delivered to the inbox and channels | ✅ | ✅ | ✅ | B08 |
-| 10.2 | [Audit and activity](modules/operate/features/audit-and-activity.md) | Every write is an event; every actor is a principal; retention lives here | 🟡 | — | 🟡 | S5.5 · S12a |
-| 10.3 | [Observability](modules/operate/features/observability.md) | Query and LLM metrics, cost and latency | 🔵 | — | 🔵 | S11 |
-| 10.4 | [External-agent API](modules/operate/features/external-agent-api.md) | Retrieval with provenance for outside callers; their credential is a narrowed [token](modules/identity-and-access/features/tokens.md) | 🔵 | — | 🔵 | S10 |
-| 10.5 | [See what ran](modules/operate/features/see-what-ran.md) | **Runs** — every run in the Graph, children nested; Imports is a filter of it | 🟡 | — | 🟡 | S14 |
-| 10.6 | [Change log](modules/operate/features/change-log.md) | Every version of a versioned record — who, when, why, the diff, the effect after; any two compared | ✅ | 🔵 | ✅ | B01 |
-| 10.7 | [Notifications](modules/operate/features/notifications.md) | Rules that say which events reach whom; email · Slack · webhook channels; one inbox per person; every send recorded | ✅ | ✅ | 🟡 | B08 |
-| 10.8 | [Approvals](modules/operate/features/approvals.md) | Every ask — access, budget, delegation, send, question — in one queue routed to its owner; alert rules over the ledger; a reminder at half-time; at the deadline *expired, not sent* | 🟡 | ✅ | 🟡 | B08 · F05 |
-| 10.9 | [The ledger](modules/operate/features/the-ledger.md) | Every act by a person or an agent — who, through which agents, what it touched, allowed or refused — append-only, hash-chained, by row · actor · record · refusal, exportable | 🟡 | — | 🟡 | F05 |
-
-
-## 11 · [Identity and access](modules/identity-and-access/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 11.1 | [Accounts](modules/identity-and-access/features/accounts.md) | Sign up, sign in, profile; email is the login identity | 🟡 | 🟡 | 🟡 | S1 |
-| 11.2 | [Usernames](modules/identity-and-access/features/usernames.md) | The URL identity — mutable, rate-limited, never aliased | ✅ | — | ✅ | S1 |
-| 11.3 | [Sessions](modules/identity-and-access/features/sessions.md) | Short access token, revocable rotating refresh | ✅ | — | 🟡 | S1 |
-| 11.4 | [Membership](modules/identity-and-access/features/membership.md) | Who may open a Graph; add, re-role and remove members | ✅ | ✅ | ✅ | S1 |
-| 11.5 | [Tokens](modules/identity-and-access/features/tokens.md) | A long-lived credential that acts as its holder; shown once, expiring, revocable; in IAM narrowed by an inline policy and bound to the Graph | ✅ | — | ✅ | S1 · I01 |
-| 11.6 | [Roles](modules/identity-and-access/features/roles.md) | Graph roles viewer · contributor · builder · modeller · owner · iam-admin — the managed policies — enforced on every graph route; install Admin; a refusal names who can | ✅ | ✅ | ✅ | B11 · I01 |
-| 11.7 | [Policies](modules/identity-and-access/features/policies.md) | Statements by layer with conditions, limits, drafts, impact before saving, Test access, held by, history; `invana iam` | ✅ | ✅ | ✅ | I01 |
-| 11.8 | [Effective access](modules/identity-and-access/features/effective-access.md) | Skill needs ∩ its policies ∩ started by ∩ world ∩ boundary, refused before dispatch naming the policy; an agent's access in IAM and on its Access tab | ✅ | — | ✅ | I01 |
-| 11.9 | [People and groups](modules/identity-and-access/features/people-and-groups.md) | Members, service accounts and groups with the policies each holds | ✅ | — | ✅ | I01 |
-| 11.10 | [The IAM product](modules/identity-and-access/features/the-iam-product.md) | A sixth product on the Agents shell: Home · People, Groups, Agents · Policies, Tokens | ✅ | — | ✅ | I01 |
-
-## 12 · [Graph connectors](modules/graph-connectors/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 12.1 | [The connector contract](modules/graph-connectors/features/the-connector-contract.md) | Four methods and a driver; everything else is inherited | ✅ | — | — | S2 |
-| 12.2 | [Languages](modules/graph-connectors/features/languages.md) | openCypher and Gremlin, each written once | ✅ | — | 🟡 | S2 |
-| 12.3 | [Capabilities](modules/graph-connectors/features/capabilities.md) | What this server version can hold, enforced at authoring | 🟡 | — | 🔵 | S3 |
-| 12.4 | [Vector search](modules/graph-connectors/features/vector-search.md) | The database's own index, where it has one | 🔵 | — | 🔵 | S7 |
-
-## 13 · [Platform](modules/platform/spec.md)
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 13.1 | [Design system](modules/platform/features/design-system.md) | Studio builds from `@invana/design-kit`, never beside it | — | — | 🟡 | — |
-| 13.2 | [Theming](modules/platform/features/theming.md) | Light · dark · theme variants, everywhere | — | — | ✅ | — |
-| 13.3 | [Command line](modules/platform/features/command-line.md) | `invana users · start · migrate · version · datasets · standards · rules · members · search · models · loader · schedules · approvals · notifications · simulate · simulations · plugins · tasks · worker` | — | 🟡 | — | — |
-| 13.4 | [Logging](modules/platform/features/logging.md) | One call at startup; plain or JSON; every line carries its trace; lifecycle, not chatter | ✅ | ✅ | — | S1 |
-| 13.5 | [Telemetry](modules/platform/features/telemetry.md) | Traces, metrics and logs for everything a person or the system does — one trace per action from the Studio click through runs, queries and model calls, metrics that open it, logs that carry it; optional | ✅ | ✅ | ✅ | S1 |
-| 13.6 | [Admin and health](modules/platform/features/admin-and-health.md) | A generated browser over app state, and a readiness probe | ✅ | — | — | S1 |
-| 13.7 | [Setup](modules/platform/features/setup.md) | Four required steps in four features — the onboarding wizard, created to answering | ✅ | — | 🟡 | S13 |
-| 13.8 | [The runtime](modules/platform/features/runtime.md) | The workhorse: plan graph · frontier · signals · pools · approvals · what it emits | 🟡 | — | — | S15 |
-| 13.9 | [Plugins](modules/platform/features/plugins.md) | Every task type in a plugin — `plugin.toml`, a manifest beside each task's code, packaged flows; keys named `namespace.verb`; one frozen registry; each Task records its task version | — | — | — | B06a · F02 |
-| 13.10 | [Search](modules/platform/features/search.md) | One name search over every Graph and dataset you may open, filtered by access, exact → prefix → contains | ✅ | ✅ | — | B11 |
-| 13.11 | [Distributed execution](modules/platform/features/distributed-execution.md) | Every step as a `TaskEnvelope`, called by one `run_envelope()` that rebuilds its context from ids; procrastinate chosen as the distributed executor by benchmark | — | — | — | B14 |
-| 13.12 | [Tool plugins](modules/platform/features/tool-plugins.md) | `tools/web` · `tools/mail` · `tools/science` as optional extras, Admin-enabled, run in workers; `send` waits for an approval; the plugin registry over API and CLI | ✅ | ✅ | ✅ | B06b |
-| 13.13 | [MCP plugins](modules/platform/features/mcp-plugins.md) | An MCP server's tools as task types in an `mcp` plugin, frozen when an Admin adds the server; refreshed by hand, loaded at start-up, switched like a tool plugin | ✅ | ✅ | 🔵 | B07 |
-| 13.14 | [Metrics are stored](modules/platform/features/metrics-are-stored.md) | Every number Studio shows is computed and stored by the engine; Studio formats it — durations, totals, rates and shares | 🟡 | — | 🟡 | — |
-| 13.15 | [One list contract](modules/platform/features/list-contract.md) | Every list searched, filtered, sorted and keyset-paged by one engine helper, answering `{items, total, unfiltered_total, next_cursor, applied}`; filters in the URL and shown as chips | ✅ | — | 🟡 | F01 |
-| 13.16 | [This Graph's MCP server](modules/platform/features/this-graphs-mcp-server.md) | One MCP endpoint per Graph serving the agents and functions a builder marks served; callers connect with IAM tokens, each call a run in the ledger; Claude Code pushes draft dataset versions a person publishes | ✅ | — | ✅ | I02 |
-
----
-
-## 14 · [Govern](modules/govern/spec.md)
+### 14 · Govern — build status
 
 **What a run may *see*, *use* and *send*.** [Operate](modules/operate/spec.md) answers *what
 happened*; this answers *what was allowed to happen*. One `Lens` record, five governed layers, and a
 touch record that makes the declaration checkable. Decisions: [governance.md](governance.md).
-
-| # | Feature | What it does | API | CLI | Studio | Slice |
-|---|---|---|---|---|---|---|
-| 14.1 | [Worlds](modules/govern/features/worlds.md) | Named narrowings picked per question, read on the lens canvas; name it to share it, compare two | ✅ | ✅ | ✅ | S16 · M05 |
-| 14.2 | [Guardrails](modules/govern/features/guardrails.md) | One property rule each — read · counts only · never, may leave or stays — in force on every run, impact counted before saving | ✅ | ✅ | ✅ | S16 · M05 |
-| 14.3 | [Requests](modules/govern/features/requests.md) | One inbox of guardrail refusals, unanswered asks and asks for a change; Decline · Allow in a world · Model it | ✅ | ✅ | ✅ | M05 |
 
 **A lens is authored, enforced, and recorded — and the record is checkable.**
 `lenses` and `run_touches` exist, the rule grammar and its three laws are enforced, the ladder and
@@ -302,7 +303,7 @@ the components and the build order are
 [building-studio/govern-and-agents-panels.md](building-studio/govern-and-agents-panels.md). S16 also
 reopens §5 above, because a lens on an agent is what replaces the provider on it.
 
-## Where the work sits
+### Where the work sits
 
 | | ✅ | 🟡 | 🔵 | — |
 |---|---|---|---|---|
@@ -318,7 +319,7 @@ than no summary.
 - **Bring data in reopened at 2.3 and grew 2.4–2.8**, the dataset record above Graphs (B03), the standards it is scored against (B04) and the SKOS import that makes one (B12, drawn in Studio by C08). **Rules (6.4) reopened in Studio**: B04 added install scope and checked rules, which Studio does not draw yet. Its two shipped features are done; the bundle load is new scope, and it is the flow the runtime's deferred frontier, lanes and `uses` were waiting for ([13.8 §21](modules/platform/features/runtime.md)).
 - Studio is no longer the lagging side for the closed four; the remaining 🟡 and 🔵 sit in Skills, Workflows, Memory, Work and Operate.
 
-## Shipped
+### Shipped
 
 What has actually landed, newest first. A slice is here only when it runs from a clean checkout.
 
@@ -342,7 +343,7 @@ What has actually landed, newest first. A slice is here only when it runs from a
 | S2 · S3 | earlier | Connection with test-before-save and introspection · model authoring and the canvas |
 | S1 | earlier | Accounts · usernames · sessions · binary membership |
 
-## Partly built
+### Partly built
 
 Where a 🟡 stops, so nobody re-derives it from the code.
 
@@ -357,7 +358,7 @@ Where a 🟡 stops, so nobody re-derives it from the code.
 | 13.7 | Setup | The six derived steps, the three gates as route dependencies, the provider's remembered ping, the board on the graph page, the Info panel's timeline, and the Assistant's lock | Locks on the other gated surfaces (Explorer, Model, Imports), and the four artboards |
 
 
-## Open calls
+### Open calls
 
 Not features, and not tasks. Each is a **decision somebody has to make** before the code around it
 can be finished, and each has two defensible answers — which is why none of them has been taken
@@ -386,7 +387,7 @@ it governs ([Rules § 1](../../CLAUDE.md)).
 call site, and each lands with whatever first engages it.
 
 
-## Retiring
+### Retiring
 
 Shipped code that is on its way out. Listed so nobody mistakes it for scope, or deletes it before its
 replacement lands.
@@ -398,15 +399,13 @@ replacement lands.
 | `?drawer=` in a graph page URL | `?section=` ([G35](building-studio/graph-detail-page.md)) | The next minor release. Until then it is read as `?section=`, so a link from before the rename still opens its section; nothing writes it |
 
 
-## Not building
+### Not building
 
-- Write-back to a source · fuzzy entity resolution · node merge on an anchor
-- Source connectors, cursors and a mapping grammar — Invana is a destination, not an extractor
-- Roles beyond membership · invitations · soft deletes · undo
-- Parameter sweeps · game theory (post-1.0, `../../system-design.md`). Simulation is [9.8](modules/work/features/simulation.md): a simulator plugin run on a branch
-- Per-element canvas styling · workflow authoring UI · criterion weights and waivers
+The settled items are [`specs/vision.md` › Not building](../../specs/vision.md#not-building). What is left waits for review:
 
-## Delivery
+- Roles beyond membership · invitations
+
+### Delivery
 
 | Slice | Lands | Done when |
 |---|---|---|
@@ -434,9 +433,9 @@ replacement lands.
 | I02 | 13.16 · 10.4 · 11.5 | Claude Code, with a narrowed token, pushes a draft dataset version over this Graph's MCP server and a person publishes it |
 | F06 | 5.15 · 13.11 | A worker on a second machine joins with a service-account token and runs a tool step |
 
-F01–F06 and I01–I02 build the Agents design ([agent-fabric](../products/agent-fabric.md)) and then IAM ([iam](../products/iam.md)) on one branch, one commit a phase, run by [agents-build-sessions](../products/agents-build-sessions.md).
+F01–F06 and I01–I02 build the Agents design ([agent-fabric](../products/agent-fabric.md)) and then IAM ([iam](../products/iam.md)) on one branch, one commit a phase, run as the agents-build project.
 
-#### S16 is ordered inside itself, and two of its steps are not in Govern
+##### S16 is ordered inside itself, and two of its steps are not in Govern
 
 The Lens is a Studio surface over engine work that lives in **other modules' shipped features**.
 Those come first, in this order:
@@ -454,7 +453,7 @@ world that narrows but does not enforce is the exact failure
 [§4](governance.md#4-sub-worlds--narrowing-what-a-decision-may-rest-on) calls *a display filter
 wearing a bound's name*.
 
-### Sequencing rules
+#### Sequencing rules
 
 - Don't start a slice until the previous one is reproducible from a clean checkout.
 - Build Engine and Studio together — a feature is not done on one side.
@@ -465,7 +464,7 @@ wearing a bound's name*.
   ([DS15](modules/platform/features/design-system.md)). The slice still owns the *wiring*: 🖼 → ✅ is the
   slice's work, and a feature ships only when every column it needs is ✅.
 
-### How a module gets built
+#### How a module gets built
 
 A slice is still the ship gate — the order above does not change. A **module pass** is how the work
 inside one is done: one module at a time, its whole hi-fi reconciled into its documents before any
@@ -486,7 +485,7 @@ code.
 | A drawing that contradicts a decision | The document wins or the document changes — in the same turn, before the screen is built |
 | The kit comes first | [13.1](modules/platform/features/design-system.md) blocks most Studio columns; a module pass that needs a missing component adds it upstream, it does not work around it |
 
-### The screen-first pass
+#### The screen-first pass
 
 The forty-two artboards are the Studio backlog, built together rather than one per slice
 ([DS14](modules/platform/features/design-system.md)). The reason the old rule flipped: `@invana/design-kit`
@@ -509,7 +508,7 @@ and every screen's own status is [the-screens.md](the-screens.md). What the code
 | 🖼 is not ✅ | A screen wired to nothing renders `EmptyState` naming its endpoint. It fabricates no rows, counts or timings ([DS15](modules/platform/features/design-system.md)) |
 | The risk, named | A screen built against an unwritten API encodes a guess about its shape. The guess is cheap to correct while the screen is `EmptyState` + layout, and expensive once it has forms and tables bound to it — so a 🖼 screen stops at the layout and the empty state, and the data-shaped parts of it wait for the engine |
 
-### The hi-fi
+#### The hi-fi
 
 | | |
 |---|---|

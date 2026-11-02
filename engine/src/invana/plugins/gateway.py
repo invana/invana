@@ -1,7 +1,7 @@
 """The engine side of a worker's dial-out loop, over procrastinate.
 
 docs/for-developers/modules/agents/features/workers.md ·
-docs/for-developers/modules/platform/features/distributed-execution.md.
+specs/system-design/runtime.md § Executor and workers.
 
 A worker holds no database credential. It joins a pool over HTTPS, heartbeats
 every 2 s, leases envelopes and posts outcomes; this module is what answers.

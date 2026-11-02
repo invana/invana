@@ -47,14 +47,13 @@ import {
 	type LayeredNode,
 } from "@invana-studio/canvases";
 import { useUpdateSearchParams } from "@invana-studio/core";
+import { PAGE, ReadState } from "@invana-studio/shell";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { Agent } from "../agents/types";
 import { namespaceOf } from "../functions/shared";
-import { PAGE } from "../lists";
 import { useAgentsOpen } from "../open";
-import { FleetReadState } from "../overview/fleetParts";
 import { useSkillPlaybooksQuery, useSkillsQuery } from "../skills/queries";
 import type { Skill, SkillPlaybookRead } from "../skills/types";
 import { BudgetCell, StatusCell } from "./agentCells";
@@ -141,7 +140,7 @@ export function FleetMap({
 	if (agents.loading || skills.isLoading || error)
 		return (
 			<div className="p-3">
-				<FleetReadState
+				<ReadState
 					loading={agents.loading || skills.isLoading}
 					error={error}
 					what="the fleet"

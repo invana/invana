@@ -4,11 +4,11 @@ import {
 	ItemGroup,
 	SectionHeader,
 	Separator,
-	Skeleton,
 } from "@invana/ui";
 import type { GraphRef } from "@invana-studio/core";
 import { ArrowLeft, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ReadState } from "../../lists/listParts";
 import { activityPath, runPagePath } from "../activityPath";
 import { useMarkRead } from "../notifications/queries";
 import type { Approval } from "../notifications/types";
@@ -145,10 +145,8 @@ function TrayList({
 
 			<div className="overflow-auto">
 				{isLoading ? (
-					<div className="flex flex-col gap-2 p-3">
-						{["a", "b", "c"].map((k) => (
-							<Skeleton key={k} className="h-10 w-full" />
-						))}
+					<div className="p-3">
+						<ReadState loading error={null} what="your notifications" />
 					</div>
 				) : isError ? (
 					<EmptyState

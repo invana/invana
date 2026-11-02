@@ -4,7 +4,7 @@ A reusable plan **offers** arguments — ``args_schema`` — and its own rows bi
 them as ``${args.<name>}``. Nobody ever runs one of those markers: it is
 resolved before the plan is validated, either against a caller's tuned values
 when a skill inlines the plan
-([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)) or
+([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)) or
 against the declared defaults when the plan is selected directly, because a
 plan run on its own is a plan run on what it declares
 ([LB20](docs/for-developers/modules/workflows/features/the-library.md)).

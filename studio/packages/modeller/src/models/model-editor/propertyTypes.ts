@@ -6,7 +6,7 @@
 // Fallback property types — used ONLY when the bound backend reports no
 // supported types (no connection attached yet, or an unknown connector). Normally
 // the modeller renders the connection's backend+version-resolved
-// `supported_property_types` (docs/for-developers/modules/graph-connectors/features/capabilities.md). This is the always-safe universal +
+// `supported_property_types` (specs/system-design/modules/graph-connectors.md § Capabilities). This is the always-safe universal +
 // semantic-overlay subset that every backend can store.
 const FALLBACK_PROPERTY_TYPE_OPTIONS = [
 	"string",
@@ -21,7 +21,7 @@ const FALLBACK_PROPERTY_TYPE_OPTIONS = [
 
 /**
  * Resolve the property-type options for a dropdown: the bound backend's
- * supported set when known, else the safe fallback (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+ * supported set when known, else the safe fallback (specs/system-design/modules/graph-connectors.md § Capabilities).
  */
 export function propertyTypeOptions(
 	supported: string[] | undefined,

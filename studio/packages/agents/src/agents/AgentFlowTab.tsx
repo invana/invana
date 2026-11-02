@@ -41,11 +41,10 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@invana-studio/canvases";
-import { useSchedulesQuery } from "@invana-studio/shell";
+import { EVERY, useSchedulesQuery } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { Pencil } from "lucide-react";
 import { useMemo } from "react";
-import { EVERY } from "../lists";
 import { useSkillsQuery } from "../skills/queries";
 import type { Skill } from "../skills/types";
 import { versionName } from "./agentParts";

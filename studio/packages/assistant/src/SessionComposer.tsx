@@ -221,7 +221,7 @@ export interface SessionComposerProps {
 	 *  NL-only (it authors a model): the mode switch is hidden and QL is
 	 *  unreachable. Defaults to "explorer" (the full NL/QL composer). */
 	surface?: "explorer" | "modeller";
-	/** The agent this session thinks through (docs/for-developers/modules/agents/spec.md) — the composer names
+	/** The agent this session thinks through (specs/system-design/modules/agents.md) — the composer names
 	 *  it where the LLM picker used to be. */
 	agentName?: string | null;
 	/** `paused` / `retired` blocks the ask and points at the Agents panel. */
@@ -574,7 +574,7 @@ export function SessionComposer({
 	// hint is the status bar's, via `onAskKindChange`). The kind stays fixed;
 	// the world and the agent absorb the leftover width.
 	//
-	// **There is no LLM picker here** (docs/for-developers/modules/agents/spec.md). The session names an
+	// **There is no LLM picker here** (specs/system-design/modules/agents.md). The session names an
 	// *agent*, and the agent carries the provider and the model — so the one
 	// question the composer asks is what *kind* of ask this is (NL or QL), which
 	// is a fact about what the user typed rather than a choice of machinery. The

@@ -2,7 +2,7 @@
 
 The validator proved the reference is legal — it names an **earlier** step and
 a field that step's catalogue entry **declares**
-(docs/for-developers/orchestration.md §0.6). This turns that proven reference
+(specs/system-design/orchestration.md § The catalogue). This turns that proven reference
 into the value, so an entry reads a literal and never a path.
 
 **One grammar, one surface.** The pattern here is the validator's pattern, and

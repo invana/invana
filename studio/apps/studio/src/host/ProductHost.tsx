@@ -58,6 +58,7 @@ import { layeredCanvasBody } from "@/host/layeredCanvasBody";
 import { leftSection } from "@/host/leftSectionContent";
 import { rightSection } from "@/host/rightSections";
 import { setupSlots } from "@/host/setupSlots";
+import { useActivitySections } from "@/host/useActivitySections";
 import { useAgentsSections } from "@/host/useAgentsSections";
 import { useBoardPageTrail } from "@/host/useBoardPageTrail";
 import { useDataBoards } from "@/host/useDataBoards";
@@ -370,10 +371,12 @@ export function ProductHost() {
 	const explorerOpen = activeProductId === "explorer";
 	const agentsOpen = activeProductId === "agents";
 	const iamOpen = activeProductId === "iam";
+	const activityOpen = activeProductId === "activity";
 	const { pathname } = useLocation();
 	const modellerCrumb = useModellerCrumb(username, graphSlug, pathname);
-	// The products on the Agents shell: sections as tabs, Home, no leftSection.
-	const sectionsOpen = agentsOpen || iamOpen;
+	// The products on the Agents shell: sections as tabs, no leftSection —
+	// and Home, for Agents and IAM.
+	const sectionsOpen = agentsOpen || iamOpen || activityOpen;
 	const { user } = useAuth();
 	const agents = useAgentsQuery(username, graphSlug, { limit: 200 });
 	const defaultAgent = agents.data?.items.find(
@@ -401,8 +404,23 @@ export function ProductHost() {
 		activeCanvasId: dataBoards.activeCanvasId,
 		workPageId: workCanvas ? layered.workPageId : null,
 	});
-	// The open product's sections; off both, Agents' — which then draw none.
-	const sections = iamOpen ? iamSections : agentsSections;
+	// Activity's sections, the same way.
+	const activitySections = useActivitySections({
+		username,
+		graphSlug,
+		enabled: activityOpen,
+		openBoard,
+		boardPage,
+		setActiveBoardId,
+		activeCanvasId: dataBoards.activeCanvasId,
+		workPageId: workCanvas ? layered.workPageId : null,
+	});
+	// The open product's sections; off all three, Agents' — which then draw none.
+	const sections = iamOpen
+		? iamSections
+		: activityOpen
+			? activitySections
+			: agentsSections;
 	const graphName = graphContainer?.name ?? graphSlug ?? "";
 
 	// With the assistant docked there is one question box already: Home keeps
@@ -496,7 +514,10 @@ export function ProductHost() {
 	// The pages open in `mainSection`, the active one, and the strip's actions.
 	const strip = useOpenPages({
 		username,
-		agentsOpeners: agentsSections.openers,
+		// In Activity a run's page links within Activity.
+		agentsOpeners: activityOpen
+			? activitySections.openers
+			: agentsSections.openers,
 		iamOpeners: iamSections.openers,
 		graphSlug,
 		onboardingOpen,

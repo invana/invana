@@ -1,5 +1,5 @@
 """Bound: ``graph_write`` — the entries that write to the bound graph database
-(docs/for-developers/orchestration.md §0.6).
+(specs/system-design/orchestration.md § The catalogue).
 
 **This is the bound that matters most to ceiling**: an agent allowed `graph_read`
 and not this one cannot change the graph, whatever plan it runs.

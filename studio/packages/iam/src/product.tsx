@@ -51,7 +51,7 @@ const rail = (id: IamSectionKey) => ({
 export const iam: ProductDefinition = {
 	id: "iam",
 	name: "IAM",
-	tagline: "Who may do what",
+	tagline: "Who may do what, here",
 	icon: Fingerprint,
 	scope: "graph",
 	landing: "home",

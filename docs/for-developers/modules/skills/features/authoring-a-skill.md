@@ -10,81 +10,9 @@ offered to a step, never forced on one.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [bindings](bindings.md) · [usage](usage.md) · [proposals](../../memory/features/proposals.md) |
 
-> **As** someone who knows how this work should be done, **I want** to write it down once, **so that**
-> every agent doing it is offered the same approach.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Name, description, content, when-to-use | Four fields; the last is what makes it selectable |
-| C2 | Unique name per Graph | A duplicate is refused, naming the existing one |
-| C3 | Versioned | Publishing a drawn draft makes the next version; the previous keeps resolving. Editing prose — the draft or `PATCH …/skills/{id}` — writes the draft and publishes nothing. A publish is refused until the plan was drawn from the exact text ([IS4](instructions-publish-rollback.md#decisions)); seeds, fixtures and imports publish what they ship through `create(publish=True)`, which no route reaches |
-| C4 | A step is offered a **version** | Traces record which, so evidence is per version |
-| C5 | Markdown body | Written for a model to read and a person to review |
-| C6 | Usage is visible from the skill | Where it was offered, and where it was applied |
-| C7 | A published version is immutable | A trace that named one keeps resolving. There is no deactivation — the act that keeps a skill out of a run is **not publishing it** ([SK21](#decisions) · [BN14](bindings.md#decisions)) |
-| C8 | **The playbook is drawn as a flow** | While the draft is edited, a `role=plan` run redraws it. The picture is a comprehension check on the prose — if the flow reads wrong, the prose is ambiguous |
-| C9 | **One version, exactly one plan** | `plan_id` is `NOT NULL` — never *may have a flow*. The draft plan exists from the first draw and publishes with the version, as one act |
-| C10 | **An ambiguous sentence stops and asks** | `draft_plan` never guesses a reading. It raises a `TaskPrompt kind=clarification` quoting the sentence and offering the readings — no plan is written until it is answered |
-| C11 | **Every step traces to its sentence** | `Task.source_span`. Click a step, the prose highlights; a sentence that produced no step is shown as unmapped |
+Product spec: [AG-F04 · Skills](../../../../../specs/products/agents/features/AG-F04-skills/feature.md) — AG-37 · AG-19; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Journey
-
-### When the flow reads wrong
-
-The plan is never edited by hand ([IS3](instructions-publish-rollback.md#decisions)). A flow that reads
-wrong means the prose is ambiguous; the fix is the prose, or the answer to the question it raised.
-
-```mermaid
-flowchart LR
-    D[Draft · flow drawn] --> E{The flow is wrong}
-    E -->|the sentence is wrong| P[Rewrite the prose]
-    E -->|"the prose is right,<br/>the reading is not"| P
-    E -->|"dead end — no entry matches"| K[Cut the sentence ·<br/>or keep it as a person's step]
-    E -->|it should reuse a library plan| N["Name the library plan<br/>in the prose"]
-    P --> R[Redraw — the whole plan is replaced]
-    K --> R
-    N --> R
-    R -->|"it does not hold together —<br/>a requires, a binding"| X[/"Settles, naming the step<br/>and what it wanted"/]
-    R -->|"a tuned argument the<br/>plan does not declare"| X
-    X --> P
-    R -->|drawn| B2[Publish — text, answers and plan as one act]
-    B2 --> C2{Bind it}
-    C2 -->|the agent's envelope<br/>forbids a step| F[/"Refused at bind time —<br/>naming the step and its bound"/]
-    C2 -->|allowed| G2[Offered to its steps]
-```
-
-```mermaid
-flowchart TD
-    A[New skill] --> B[Name · description]
-    B --> C[Content: how to approach this]
-    C --> D[When to use: the trigger, in the domain's words]
-    D --> P0[Draw this]
-    P0 --> P1[["draft_plan reads the prose"]]
-    P1 --> Q{Every sentence maps to<br/>exactly one catalogue entry?}
-    Q -->|"more than one reading"| CL[/"Ask: quote the sentence,<br/>offer the readings"/]
-    Q -->|"no entry can express it"| DE[/"Dead end, named"/]
-    CL --> CA{Author picks}
-    CA -->|a reading| AR[Answer recorded on the version<br/>· a prose edit proposed]
-    CA -->|none of these| DE
-    AR --> P1
-    Q -->|yes| P2{Does the drawn flow<br/>match what you meant?}
-    P2 -->|"no — click the step,<br/>the sentence highlights"| C
-    P2 -->|"no, but the prose is right —<br/>the reading is not"| C
-    P2 -->|yes| E
-    DE -->|cut the sentence| C
-    DE -->|keep it| P3[A person does this step · form: human]
-    P3 --> E
-    E[Publish v1 — text, answers and plan together]
-    E --> F[Bind it to agents]
-    F --> G[Offered to their steps]
-    G --> H[Usage accumulates against v1]
-    H --> I{Reads badly?}
-    I -->|rewrite| J[Publish v2 · evidence starts fresh<br/>v1 keeps its plan, forever]
-    I -->|wrong agents| K[Change bindings, not the text]
-    I -->|"the flow was never run"| L[The gap is in the plan, not the prose]
-```
 
 ### The skill's page
 
@@ -115,42 +43,13 @@ flowchart LR
 | Flow on a draft | the version has no published plan | the Flow tab draws the draft's own plan |
 | Bind | the check refuses | the refusal card under that agent's row ([BN8](bindings.md)) |
 
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Duplicate name | Refused, with a link to the existing skill |
-| Empty when-to-use | Refused — a skill that never says when is never selected well |
-| Editing while runs are in flight | Those runs keep v1; the next one is offered v2 |
-| A skill nothing applies | Usage shows the gap, and a proposal may follow |
-| The draft is being redrawn | The flow is shown dimmed with the previous drawing beneath it — never an empty canvas |
-| The library plan it inlined has a newer version | Said on the rows — *nl-single@2 exists* — and nothing moves. The copy is what this version publishes ([SK32](#decisions)); a redraw reads the newest version and replaces the whole plan |
-| A tuned argument is not one the plan declares | The draw settles having written nothing, naming the argument — an argument nothing declares is a typo ([IS11](instructions-publish-rollback.md#decisions)) |
-| Nothing in the catalogue fits a sentence | It becomes a `form: human` step — a person does it. **A catalogue gap never blocks publishing**, which is what makes *every version has a plan* safe |
-| The playbook has no steps at all | It is not a skill. The draft says so and offers to move it to [rules](rules.md) — *prefer supplier names over ids* was always a rule |
-| The prose changed after the last draw | Redrawing is **offered, not automatic**; publish is refused until it is drawn from the exact text ([IS4](instructions-publish-rollback.md#decisions)) |
-| The planner is waiting on an answer | The question sits **against the sentence in the editor**, not in a separate queue. The flow area says what it is waiting for |
-| The author answers a question | The next draw opens on the answer — the flow area stays in *Drawing…* rather than handing the act back ([SK30](#decisions)) |
-| Nothing has been drawn yet | The action reads *Draw this*. It reads *Redraw* once a node carries a `source_span` ([SK29](#decisions)). Neither asks for a confirmation: every row was drawn, so a redraw discards nobody's work |
-| A plan row written `authored` before | Read as it is; the next draw replaces it with a `generated` plan ([IS2](instructions-publish-rollback.md#decisions)) |
-| Nothing in the catalogue can express a sentence | Named as a dead end — *no entry matches this*. Rewriting is **not** offered, because rewriting cannot work; cutting the sentence, filing the gap and keeping it as a person's step are |
-| The planner has asked its third question | The cap is reached; a sentence still with two readings becomes a person's step (`form: human`) instead of a fourth question |
-| The drawn plan does not hold together | The draw **settles** having written nothing, and says why against the flow area — the step, and what it wanted ([SK31](#decisions)). The plan that was there is untouched. *Run it against the graph* with no sentence that checks it first is the common one: `execute_graph_query` requires `validate_query`, and the catalogue is where that is declared |
-| A sentence produced no step | Shown unmapped in the prose — the diagnosis, without the author hunting for it |
-| The plan names a step the binding agent may not call | Refused **at bind time**, with the bound named ([agents/spec.md](../../agents/spec.md)) |
-
 ## Surfaces
 
 | Surface | Shape |
 |---|---|
 | Skills list | One per Graph; `+` in the header |
 | Skill panel | The four fields; version bar with what changed |
-| Usage tab | Agents offered it, steps that applied it, the gap |
 | Flow tab | The drawn plan, read-only — **reuses the plan canvas** (`WorkflowStepHiFi`, screen 34), not a new screen |
-| Clarification | Asked inline against the highlighted sentence — readings as options, each naming the step it would produce. Never a free-text box |
-| Prose ↔ flow selection | Two-way: select a step, the span highlights; select a span, the step does |
-| **Redraw** | *Draw this* becomes **Redraw** once the plan has been drawn; one click replaces the whole plan, with no confirmation — there are no hand-written rows to discard ([SK7](#decisions)) |
-| **A refused bind** | Drawn against the agent's row on the Bindings tab, never as a toast above the list: it names the check, the step, its bound, and the grounds it did **not** read ([BN5 · BN7](bindings.md)) |
 | **The skill's page** | `Open` on the selected row opens `skill:<id>` in `mainSection`: a record header — name · `vN` or `draft` · origin — over five tabs, `Playbook · Flow · Bindings · Usage · Versions`. The drawer stays beside it ([SK17](#decisions) · [SK36](#decisions)) |
 
 ## Engine
@@ -165,7 +64,7 @@ flowchart LR
 
 ## Surfaces, as drawn
 
-On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — reconciled into this file before any of it is built.
+On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — the rows not yet settled into AG-F04.
 
 | Surface | Shape | Artboard |
 |---|---|---|
@@ -173,64 +72,33 @@ On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc
 | The detail | The **page** `skill:<id>` in `mainSection` ([SK17](#decisions)) — `RecordHeader` over `TabbedPanel`, five tabs. Not drawn yet; built on the agent page's shape ([AG38](../../agents/features/author-an-agent.md#decisions)) | — |
 | **Playbook** tab | The prose, one sentence per line, each showing the step it produced; a sentence with no step is marked | `SkillAuthor` |
 | **Flow** tab | The plan on [`TaskFlowCanvas`](../../../building-studio/task-flow-canvas.md): its tasks and `depends_on` edges, ELK left to right, **Circles** or **Cards** ([SK16](#decisions)). A one-line header above it says the step count and how many of the six layers the plan declares, which is the bind check read in advance. A step inlined from a library plan is an ordinary node; its hover card says *from nl-single@1*. **Composed** under the canvas names each plan once — its step count, what this skill tuned, and *vN exists* when the library has published past it ([SK34](#decisions)) | `SkillFlow` · `SkillUsesPlan` |
-| Composition ✅ (engine) | **Drawn** ([IS11](instructions-publish-rollback.md#decisions)): a sentence names a library plan, `draft_plan` reads it as `plan:<key>@<v>` beside the catalogue, and a picked plan is inlined **at the draw**, flat, each row naming the plan and step it came from, with the arguments the sentence tunes ([SK18](#decisions) · [SK32](#decisions) · [SK33](#decisions)). `flows.uses` records it. No picker; the Flow tab only reads it | `SkillUsesPlan` |
 | **Versions** tab | The version list, and the prose diff against the one before ([SK38](#decisions)) | `SkillVersions` |
-| The clarification | A card on the draft canvas quoting the sentence and offering the readings; the node it would write is a ghost until answered | `SkillAuthor` |
 
 ## Decisions
 
+Engine rows, and rows that stay until they are settled; the product decisions are AG-F04's.
+
 | # | Decision |
 |---|---|
-| SK1 | A skill must state when to use it. |
-| SK2 | Skills are versioned; a published version is immutable. |
-| SK3 | A step records the version it was offered. |
 | SK19 | **Every existing skill becomes its own immutable v1, and the steps that were offered it are rewritten to name it.** `published_at` is the skill's `created_at`; `task_runs.skills_offered` and `.skills_applied` are migrated from bare skill ids to that v1's id, so one id shape means one thing everywhere and no reader carries a *before versions* branch. The claim v1 makes is narrow and stated on the usage surface: *this is the text as it stands, and these steps were offered this skill* — not that the wording never changed before versions existed. |
 | SK4 | Deactivate rather than delete. |
 | SK5 | **A skill's plan hangs off the version, not the skill.** A version is immutable, so a plan can never be stale against the prose it was drawn from — there is no `stale` flag and no reconciliation job. |
-| SK6 | **It is drafted automatically and published deliberately.** The same principle as *Not building → auto-generated skills*: it proposes, a person publishes. Editing prose never silently changes what executes. |
-| SK7 | **A draw is the only writer of a skill's plan.** No route and no surface writes plan rows ([IS3](instructions-publish-rollback.md#decisions)); a plan that reads wrong is fixed in the prose or the clarification answer, and the next draw replaces the whole plan. Every row a draw writes is `generated`; a row written `authored` before reads as it is ([IS2](instructions-publish-rollback.md#decisions)). Redrawing is offered, never automatic. |
 | SK13 | **A skill version is drawn as exactly one `Flow`** — `plan_id` is `NOT NULL`. No surface branches on *does this skill have a flow*, and the Flow tab is always there. |
-| SK14 | **If it cannot be drawn as a flow, it is not a skill — it is a rule.** The 1:1 turns the Skill/Rule boundary from the author's judgement into something the product holds. |
 | SK16 | **The Flow tab draws the plan as a graph on `TaskFlowCanvas`, and that is the only flow view a skill has.** The question a reader brings to the tab is the plan's *shape*: what runs first, what waits on what, where two readings branch and join. A layer strip cannot draw that, and pointing the reader to the Library for it sent them away from the skill they were reading. The canvas is the same one the run page's Flow tab uses ([task-flow-canvas.md](../../../building-studio/task-flow-canvas.md) TF1), so a skill's plan and a run of it are drawn the same way. *What will this playbook engage?* is answered by the tab's one-line header — steps, and how many of the six layers the plan declares — and by the node colours. The Layers tab of a run keeps the six-band strip ([SR49](../../operate/features/see-what-ran.md#decisions)). The data is the current version's `SkillPlanRead`, turned into `TaskFlowData` by `taskflow/taskFlowFromPlan.ts`, with the plan's own edges (`binding` stays `binding`, `order` becomes `require`). |
-| SK17 | **The skill's detail is a page in `mainSection` with nine tabs** — Instructions · Flow · Functions · Agents · Usage · Exceptions · Evals · Tests · History — laid out in [the skill page](the-skill-page.md). |
-| SK18 | **The Flow tab reads; the prose composes.** The Flow tab draws the plan and writes nothing. Everything that shapes the plan is in the prose: the steps, a standalone plan to inline with `uses` ([LB18](../../workflows/features/the-library.md)) — named in a sentence and picked by the draw ([IS11](instructions-publish-rollback.md#decisions)) — and **the arguments that make it fit this skill** ([LB19](../../workflows/features/the-library.md)). A skill never authors a library plan: a skill is written for one job, a library plan for every job that resembles it, and library plans are generated, packaged or promoted ([IS2](instructions-publish-rollback.md#decisions)). Keeping the Flow tab a reading is what stops it growing into a plan editor. |
 | SK15 | **`form: human` is the universal fallback**, which is what makes SK13 safe: anything the catalogue cannot express, a person can, so a catalogue gap never blocks publishing a playbook. **A plan every row of which is a person's is one of those plans, not an empty one.** Such a plan reaches the envelope with nothing to validate, and the validator reads an empty step list as *the plan has no steps* — so the draw skips that check rather than passing it a list the check would misread. The genuinely empty plan is already refused a line earlier, in its own sentence ([SK14](#decisions)), and it is the plan a draft is born with ([SK22](#decisions)) that makes this the ordinary case rather than a corner. |
-| SK9 | **The planner asks rather than guesses.** An ambiguous span raises a clarification and writes no plan. Drawing a guess moves a question the planner could ask into a picture a person has to decode. |
-| SK10 | **Ambiguity is a declared condition, not a feeling** — a span matching more than one catalogue entry, or none. Both are checkable, so this never becomes a planner that asks whenever it is unsure. |
-| SK11 | **An answer repairs the playbook.** It is recorded on the version so a redraw never re-asks, **and** it proposes the prose edit that would have avoided the question. Otherwise every future version re-asks and the prose never learns. |
 | SK12 | **A redraw is a revision, not a fresh draft.** The previous plan goes back to `draft_plan` and the result is shown as a diff, so a moved box is the author's edit and not the model's sampling. |
 | SK8 | **It is a `Flow`, not a `SkillPlan`.** Same record, same Runtime, same `plan_snapshot`. The skill is provenance — `source_skill_version_ids[]` — and provenance is a column, not a type ([orchestration § 0.8](../../../orchestration.md#08-a-skill-drawn-as-a-flow)). |
 | SK20 | **A draft is a `skill_versions` row with `published_at IS NULL`** — the only mutable version row there will ever be. Publishing stamps `published_at` and moves `skills.current_version_id`; from then on it is immutable ([SK2](#decisions)). A skill has at most one draft, and its `version` number is assigned when the draft is created, so the plan, the clarifications and the answers hang off the id the published version keeps. *Text, answers and plan publish as one act* is then one `UPDATE`, not a copy. |
 | SK21 | **`skills.current_version_id` is null while a skill has only a draft**, and the read says `is_draft`. Nothing is ever offered a draft — assembly reads the current version, which does not exist yet — and the drawer draws it as what it is. |
 | SK22 | **The plan exists from the first draw, never before it.** `plan_id` is `NOT NULL`, so a draft is written together with a plan: one `form: human` node carrying the skill's name ([SK15](#decisions)). A catalogue gap, an unrun planner and a half-written playbook are then the same shape — *a person does this step* — instead of three empty states. |
-| SK23 | **Drawing is a `role=plan` TaskRun** ([C8](#capabilities)), and it is the first thing in the product to open one. The exchange is recorded, the clarification is an ordinary `TaskPrompt`, answering resumes from the cursor, and what the planner did opens in Runs like any other run — none of which is worth reimplementing inside a skill. |
+| SK23 | **Drawing is a `role=plan` TaskRun** ([AG-19.14](../../../../../specs/products/agents/features/AG-F04-skills/stories/AG-19-write-a-skill-as-a-document-and-see-the-plan-it-becomes/story.md)), and it is the first thing in the product to open one. The exchange is recorded, the clarification is an ordinary `TaskPrompt`, answering resumes from the cursor, and what the planner did opens in Runs like any other run — none of which is worth reimplementing inside a skill. |
 | SK24 | **The three ambiguity cases are counted, not judged** ([SK10](#decisions)). `draft_plan` asks the model for **candidates per sentence**: exactly one → a `callable` task; **two or more → a clarification** quoting the sentence and offering the readings, each naming the step it would write; none → a `form: human` task. A sentence the model marks as not an instruction produces no task and is shown unmapped. |
-| SK25 | **The product's own playbook is a seeded skill, and it stays editable.** *Answer in natural language* is written into every Graph with `origin = builtin` — the four tasks the runtime has always walked, with a `source_span` on each — re-seeded idempotently by name, never deleted, and a person may publish v2 over it. A capability the product ships and a capability a person writes are then the same record, which is the only way the surface can be honest about either. |
 | SK26 | **The draft's question is a row on the version, not a prompt on the run.** `draft_plan` records the clarification against the sentence and the run **settles** having written nothing — it does not suspend. Three reasons, and they agree: the question belongs *against the sentence in the editor* rather than in a queue (Seams); a run with no reply row is unattended, and the runtime turns an unattended question into *cannot answer* rather than leaving a run waiting on nobody; and an answer is part of what publishes, so it has to outlive the run that asked. Drawing again after an answer is another draw, which is also what makes a redraw a revision ([SK12](#decisions)). |
 | SK28 | **A skill's plan is checked for whether it holds together when it is drawn, and for who may run it when it is bound.** A skill belongs to no agent — it is offered to whichever are bound to it — so *may **this** agent call **this** step* is checked where the agent is known: at bind time ([BN5](bindings.md)). The draw validates in the drawing envelope: a duplicate key, a binding to a step that does not run first, a binding to an output its source does not declare, a `requires` the catalogue declares, and a step the catalogue does not declare — each refused by name ([SK31](#decisions)). A step a person does is always allowed ([SK15](#decisions)). |
 | SK27 | **The act a drawer is for sits on its header's right, and a drill-in is the header's title.** A stack gives each drawer one header with one action area ([G33](../../../building-studio/graph-detail-page.md)), so `+ New skill` is the Skills drawer's header action rather than a button floating above the list. The Skills drawer does not drill in — its detail is the page ([SK17](#decisions)). The Rules drawer does: `RULES / <statement>` is its header's title and `‹ Back to rules` takes the action area. **The trail is text.** A `PanelStack` header *is* its collapse control, so a crumb that could be clicked would be a `<button>` inside a `<button>` — invalid, and it would steal the collapse click. [`StackSection`](../../../building-studio/the-shell.md) drills in the same way. |
 | SK29 | **`origin` names what wrote the rows, so the plan a draft is born with is `generated`.** The fallback plan is one `form: human` node nobody wrote ([SK22](#decisions)), and a draw leaves the plan `generated` ([SK7](#decisions)). *Redraw* is read off the rows: a node with a `source_span` was drawn. |
 | SK30 | **Answering a question continues the drawing, and the surface is what opens the next draw.** The run that asked has already settled ([SK26](#decisions)) — resuming it would be a run waiting on nobody — so the loop the journey draws (*answer → `draft_plan` again*) is closed one band up: recording the answer returns the draft, and Studio opens the next draw with it. An answer is only ever given to get the flow drawn, so making the author press *Draw this* a second time is a step that asks them to restate what they just said. The engine's route records and nothing else, which is what keeps a redraw a revision ([SK12](#decisions)) and keeps the cap (`max_clarifications`) the only thing that ends the loop. |
 | SK31 | **A draw that cannot write the plan settles, exactly as one that must ask does.** `resolve_plan` refuses a drawn plan for four reasons — a step outside the envelope, a duplicate key, a binding to a step that does not run first, and a `requires` the catalogue declares and the prose never named. All four are the *author's* to answer, so the draw records them on its result and settles with `steps: 0`; it does not raise. Raising put the reasons in a failure payload no surface reads, left the draft silently undrawn, and named the agent's envelope for a refusal that was usually about a missing prerequisite — a refusal on grounds it did not check, which is the one thing a refusal may never be ([BN7](bindings.md)). The reasons are read back off that run, in the validator's words, and shown where the flow would have been; the next draw that writes rows is a newer run, so the refusal clears itself and needs no column. |
-| SK32 | **A `uses` is an act, not a link — it expands when the plan is drawn, and the copy is the skill's.** [LB18](../../workflows/features/the-library.md#decisions) says a skill *inlines* a library plan rather than sharing its row; this settles **when**. Resolving `uses` at run time, as [13.8 § 4](../../platform/features/runtime.md) sketches, would mean a library edit silently changes what every skill that named it does — and it would break [SK5](#decisions) outright, because the prose is frozen at publish and the steps would not be. So the rows are copied into the calling plan at the draw that picks it ([IS11](instructions-publish-rollback.md#decisions)), validated as one graph there, and the runtime learns nothing: it sees the steps it has always seen. *A newer version of that plan exists* is then something to **say** on the row, and acting on it is a redraw somebody asks for. |
 | SK33 | **The inlined steps are flat siblings, each naming the plan version it came from.** A `composite` parent would need an interpreter that walks one — which nothing has ever written — and it would buy a drawing, which `tasks.source_plan_key` gives for free: the Flow tab groups five rows under *nl-single@1* without a node that hides them. Each copy also records the step it was copied from in `tasks.source_step_key`, so the library plan's page can count a skill's runs step by step without reading its prefix ([LB36](../../workflows/features/the-library.md#decisions)). Both are recomputed on every draw, because a draw copies the plan afresh. Flat also keeps one promise that nesting would quietly weaken — the envelope validates **every** step, because every step is a row at the same depth, so a composed plan cannot smuggle one past a bound ([LB18](../../workflows/features/the-library.md#decisions)). |
-| SK34 | **A composed step is marked on its hover card, and the composition is named once under the canvas.** [SK33](#decisions) makes an inlined row an ordinary row, so the Flow tab draws it as an ordinary node — clustering five of them into one place would be the composite [SK33](#decisions) refused. So the node's hover card carries *from nl-single@1* ([TF8](../../../building-studio/task-flow-canvas.md#decisions)), and a **Composed** block under the canvas lists each plan version once, with the rows it wrote counted off `source_plan_key` rather than off the record, so the two can never disagree. The block is also where *a newer version exists* is said ([SK32](#decisions)): the plan read returns each composition's `latest_version` beside the one it inlined, and the surface states it and stops — a redraw is an act somebody asks for, because the copy is what makes a published skill do tomorrow what it did today. |
-| SK35 | **A skill is addressed by its name and its version; only a library plan carries a `key@version`.** `skills` has no `key` column and never gains one: a skill is written for one job in one Graph, and the thing that needs a stable address across installs is the *reusable plan* a skill inlines ([LB1](../../workflows/features/the-library.md#decisions)). So a surface says *Answer in natural language · v7*, and reserves `nl-single@2` for the plan — which is exactly the pair a composed row holds, `source_plan_key` naming the plan and nothing naming the skill, because the skill is the row's owner rather than its source ([SK33](#decisions)). A `skill:` namespace would make the two look interchangeable in every drawing, and they are not: one is identity inside a Graph, the other is a version anybody may inline. |
 | SK36 | **`skill:<id>` is the skill's page, and it authors.** The `skill` board kind renders the page ([SK17](#decisions)) rather than a `BoardSpec`: one full-width surface per skill, because a read-only board beside an editable drawer was two drawings of one skill to keep in step. The page carries the writes — edit and publish on Playbook ([SK6](#decisions)), bind and unbind on Bindings ([BN8](bindings.md)) — the way the agent page carries an agent's ([AG34](../../agents/features/author-an-agent.md#decisions)). `skill_usage:<id>` stays a board — a reading of what happened, opened from the Usage tab's `More` ([skills-boards.md](../../../building-studio/skills-boards.md) SD2). |
 | SK37 | **Selecting a row gives a quick look under the list; Open gives the page.** The same gesture as the Agents drawer ([AG36](../../agents/features/author-an-agent.md#decisions)), so the two list drawers work one way. The quick look answers *which one is this, and is it used*: name · `vN` or `draft`, the `when_to_use` sentence, offered and applied on the current version, and how many agents carry it. **Open** is its only act. `+ New skill` creates the draft and opens its page on Playbook, editing — a draft has nothing else to show. |
-| SK38 | **History is a tab** — every version, newest first, with the engine's diff and one-act rollback ([the skill page](the-skill-page.md)). |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Skill categories or tags | the Graph's set is small enough to read |
-| Auto-generated skills from traces | consolidation proposes; a person writes |
-| Priority between skills | offering is not ranking |
-| A plan that auto-publishes when the prose changes | editing a playbook would silently change what runs |
-| A bespoke flow editor for skills | the plan canvas already draws a `Flow`; a second editor would drift |
-| A free-text answer to a clarification | it is a second way to write the playbook, in a box that is not the playbook |
-| Redrawing on every keystroke | half a sentence is not an instruction; a flow drawn from one is misleading feedback |
-| Generating prose from a flow | two generators pointing at each other is a drift machine |
-| Hand-edited plans — *Edit by hand*, a route that writes plan rows | plans come from instructions ([IS3](instructions-publish-rollback.md#decisions)) |
-| A picker that inlines a library plan | composition is named in the prose and drawn ([IS11](instructions-publish-rollback.md#decisions)) |

@@ -1,6 +1,6 @@
 """The rules about a lens — creating, naming, deleting, and composing the guardrails.
 
-One record, two kinds ([GV1](docs/for-developers/modules/govern/spec.md)). A
+One record, two kinds ([Model product § Decisions](specs/products/model/product.md#decisions)). A
 world starts unnamed and private; naming it is the write that publishes it. A
 guardrail pinned on an agent is a layered lens authored here too. A Graph's
 guardrail is one property rule and is written by
@@ -9,7 +9,7 @@ manager refuses to create or edit one, so its ``rules`` are only ever compiled.
 
 Every write is an ordinary audited event, so *who loosened what, when, and what
 it was before* is answerable from ``core/events`` like everything else
-([GR7](docs/for-developers/modules/govern/features/guardrails.md)).
+(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
 """
 
 from __future__ import annotations
@@ -43,7 +43,8 @@ def slugify(name: str) -> str:
 
     Derived once, at the first naming, and then frozen: a rename changes the
     display text alone, because only the *first* naming publishes
-    ([WO1](docs/for-developers/modules/govern/features/worlds.md)) and a slug
+    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
+    and a slug
     that moved would break every schedule that pinned one
     ([GV19](docs/for-developers/modules/govern/spec.md)).
     """
@@ -76,7 +77,7 @@ def rule_counts(rules: list[dict] | None) -> tuple[int, int]:
 
 def bound_label(lens: Lens) -> str:
     """Which side a lens bounds from, as a refusal says it
-    ([AG6](docs/for-developers/modules/agents/features/author-an-agent.md))."""
+    ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions))."""
     if lens.kind == LensKind.guardrail.value:
         owner = "the agent's own guardrail" if lens.agent_scope_id else "the Graph's guardrail"
         return f"{owner} '{lens.display_name}'"

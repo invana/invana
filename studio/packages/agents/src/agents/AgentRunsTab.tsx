@@ -42,9 +42,9 @@ import {
 	type TaskRunSummary,
 	useMembersQuery,
 } from "@invana-studio/core";
+import { FilteredEmpty } from "@invana-studio/shell";
 import { FilterSelect } from "@invana-studio/ui";
 import { useContext, useMemo, useState } from "react";
-import { FilteredEmpty } from "../lists";
 import { AgentsOpenContext } from "../open";
 import { ms, tokens } from "../overview/fleetParts";
 import {

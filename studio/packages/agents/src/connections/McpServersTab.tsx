@@ -28,24 +28,25 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { useAuth } from "@invana-studio/core";
+import {
+	type McpServerRead,
+	type PluginSummary,
+	useAuth,
+	usePluginQuery,
+	usePluginsQuery,
+	useRefreshMcpServerMutation,
+} from "@invana-studio/core";
+import {
+	NEEDS_INSTALL_ADMIN,
+	PAGE,
+	PluginStateChip,
+	PluginToggle,
+} from "@invana-studio/shell";
 import { DetailStatus, FormError, PanelSection } from "@invana-studio/ui";
 import { Plug, RefreshCw, SquareFunction } from "lucide-react";
 import type { ReactNode } from "react";
 import { RowsFailed, RowsLoading } from "../functions/shared";
-import { PAGE } from "../lists";
 import { useAgentsOpen } from "../open";
-import {
-	NEEDS_INSTALL_ADMIN,
-	PluginStateChip,
-	PluginToggle,
-} from "../plugins/PluginToggle";
-import {
-	usePluginQuery,
-	usePluginsQuery,
-	useRefreshMcpServerMutation,
-} from "../plugins/queries";
-import type { McpServerRead, PluginSummary } from "../plugins/types";
 import { credentialOf } from "./AddMcpServerDialog";
 
 export const MCP_SERVERS = { filters: { kind: ["mcp"] }, limit: PAGE };

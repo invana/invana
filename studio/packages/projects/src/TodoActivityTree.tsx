@@ -1,5 +1,5 @@
 /**
- * The activity tree for one task (docs/for-developers/modules/work/spec.md).
+ * The activity tree for one task (specs/system-design/modules/work.md).
  *
  * *Who did what, for whom, caused by what.* Two things make this readable
  * rather than a log dump:
@@ -9,7 +9,7 @@
  *   thing in the tree a prompt cannot influence.
  * - **Skills and rules are labelled by certainty.** *offered* is a fact about
  *   the prompt; *reported* / *cited* is the model's own claim, and the badge
- *   says so. Nothing here says "used" (docs/for-developers/modules/work/spec.md).
+ *   says so. Nothing here says "used" (specs/system-design/modules/work.md).
  *   A rule is drawn as its statement and opens its board.
  */
 

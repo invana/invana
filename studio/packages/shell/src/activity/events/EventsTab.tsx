@@ -4,7 +4,6 @@ import {
 	EmptyState,
 	FilterBar,
 	SearchInput,
-	Skeleton,
 	StatusDot,
 	type StatusDotProps,
 	TimelineEntry,
@@ -31,6 +30,7 @@ import {
 } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ReadState } from "../../lists/listParts";
 import { ChangesList } from "../changes/ChangesList";
 import { TraceIdValue } from "../runs/TraceIdValue";
 import { EventTypeFilter } from "./EventTypeFilter";
@@ -424,12 +424,5 @@ function RelTime({ iso }: { iso: string }) {
 // ── States ────────────────────────────────────────────────────────────────────
 
 function EventsSkeleton() {
-	return (
-		<div className="space-y-1.5">
-			{Array.from({ length: 6 }).map((_, i) => (
-				// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
-				<Skeleton key={i} className="h-12 w-full" />
-			))}
-		</div>
-	);
+	return <ReadState loading error={null} what="the events" />;
 }

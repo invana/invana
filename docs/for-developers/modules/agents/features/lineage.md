@@ -10,50 +10,7 @@ structural: *where did this agent come from, and what did it do on whose behalf?
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [delegation](delegation.md) · [audit-and-activity](../../operate/features/audit-and-activity.md) |
 
-> **As** someone auditing a recommendation, **I want** to see which agent produced it and who created
-> that agent, **so that** accountability has a chain rather than a name.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Authored edges | Person → agent, with when |
-| C2 | Spawned edges | Agent → agent, with the run it happened in |
-| C3 | Delegation edges | Which run handed work to which child |
-| C4 | On-behalf-of is shown | An agent acting for a person is drawn as such |
-| C5 | Retired agents stay drawn | Marked retired, never removed |
-| C6 | Time-boxed | Last 7 days, 30 days, or all — lineage grows |
-| C7 | Selecting a node states the fact | The panel: what it is, its bounds, what it ran |
-
-## Journey
-
-```mermaid
-flowchart TD
-    R[Ravi] -->|authored| MS[Market Scout · default]
-    R -->|authored| IA[Intraday Analyst]
-    IA -->|spawned in run 7e21| RC[Risk Checker · ephemeral · retired]
-    MS -->|delegated · trade day| IA
-    IA -->|delegated · risk check| RC
-    RC -->|verdict| IA
-    IA -->|result on behalf of| R
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| A very old graph | Time-boxed by default, with a control to widen |
-| A retired agent | Drawn, marked, still selectable |
-| An agent with no lineage | Authored directly — a root, drawn as one |
-| Many ephemeral children | Collapsed under the parent with a count, expandable |
-
-## Surfaces
-
-| Surface | Shape |
-|---|---|
-| Lineage canvas | `kind = lineage`; the Agents drawer's main area |
-| Panel | The selected agent: bounds, status, what it ran |
-| Agent row | "spawned by X" as context on the row |
+Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-24; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 
@@ -62,22 +19,3 @@ flowchart TD
 | Edges | `parent_agent_id`, `spawned_in_run_id`, and delegation events |
 | On-behalf-of | from the event record, not from the agent |
 | Routes | `GET …/agents/lineage` with a window |
-
-## Decisions
-
-| # | Decision |
-|---|---|
-| LN1 | Lineage is drawn, not listed — the question is structural. |
-| LN2 | Retirement keeps the node; lineage must always resolve. |
-| LN3 | Spawn edges carry the run they happened in. |
-| LN4 | On-behalf-of comes from the record, so it cannot be restated wrongly. |
-| LN5 | **Lineage is drawn as the run nesting, with the depth marked on every node** — `depth 1`, `depth 2 — the floor` — and the refusal at the floor is drawn in place: *refused — a fourth level · `max_depth` 2 named, not silent*. A bound you only meet by hitting it is a bound nobody designed around. |
-| LN6 | **A child's inheritance is drawn as a table of parent ⊆ child**, bound by bound: lens, third party, envelope, budget, pools. A child cannot call a system its parent could not, nor widen a slice its parent narrowed — if inheritance were re-declaration, delegation would be the hole every other bound is drilled around. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Editing lineage | it is derived from what happened |
-| Cross-Graph lineage | agents do not cross the boundary |
-| An org-chart view | lineage is causal, not hierarchical |

@@ -21,14 +21,14 @@ import { createContext, useContext } from "react";
 export type SetupTarget =
 	| "settings"
 	| "model"
-	| "runs"
+	| "activity-runs"
 	| "agents"
 	| "llms"
 	| "skills"
 	| "sessions"
 	| "functions"
 	| "projects"
-	| "events";
+	| "activity-events";
 
 export interface SetupSlots {
 	/** Skips an optional step, or takes the skip back. */

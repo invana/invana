@@ -303,7 +303,7 @@ def mount_admin(app: FastAPI) -> None:
         ),
     )
 
-    # ── Govern (docs/for-developers/modules/govern/spec.md — the lens, and what a run touched)
+    # ── Govern (specs/system-design/modules/govern.md — the lens, and what a run touched)
     # ─────────────────────
     admin.add_view(
         DropDown(
@@ -386,7 +386,7 @@ def mount_admin(app: FastAPI) -> None:
         ),
     )
 
-    # ── Agents at work (docs/for-developers/modules/work/spec.md) ─────────────────────────────────────────────
+    # ── Agents at work (specs/system-design/modules/work.md) ─────────────────────────────────────────────
     admin.add_view(
         DropDown(
             label="Agents at work",

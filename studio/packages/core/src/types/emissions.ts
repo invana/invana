@@ -121,7 +121,7 @@ export interface LinkEmission {
 	label: string;
 	/** What one row is called, singular then plural. */
 	noun: [string, string];
-	/** Where the list lives under the Graph — `/agents/runs`. */
+	/** Where the list lives under the Graph — `/activity/runs`. */
 	path: string;
 	/** `f.<field>` → value, exactly what a person would set. */
 	params: Record<string, string>;

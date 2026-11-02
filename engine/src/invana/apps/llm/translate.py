@@ -68,7 +68,7 @@ SUBMIT_QUERY_TOOL = {
             ),
         },
         # A **self-report**, and rendered as one: the step row badges it
-        # *reported*, never *used* (docs/for-developers/modules/work/spec.md). Nothing downstream trusts
+        # *reported*, never *used* (specs/system-design/modules/work.md). Nothing downstream trusts
         # it — it is a signal for the person reading the trace.
         "skills_applied": {
             "type": "array",
@@ -133,7 +133,7 @@ class GeneratedQuery:
     #: band (SR42). Not a declared output: a plan cannot bind a raw prompt.
     exchange: Exchange = field(default_factory=Exchange)
     # Wall-clock of the LLM translation step, surfaced so the sessions endpoint
-    # can report LLM time next to query time (docs/for-developers/modules/platform/features/telemetry.md ·
+    # can report LLM time next to query time (specs/system-design/observability.md ·
     # docs/for-developers/modules/ask/features/ask-in-natural-language.md).
     duration_ms: float = 0.0
     # Whole-node twin of a scalar-column ``query``, run only when the reply is drawn; "" when none.

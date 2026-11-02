@@ -147,7 +147,7 @@ async def export_flow(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
-    """The surface form (docs/for-developers/modules/agents/spec.md, *one schema, two encodings*)."""
+    """The surface form (specs/system-design/modules/agents.md, *one schema, two encodings*)."""
     flow = await library.get(session, graph_id=graph.id, key=key, version=version)
     return Response(
         content=to_yaml(flow, await library.flows_qs.tasks_for(session, plan_id=flow.id)),

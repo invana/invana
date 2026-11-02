@@ -1,5 +1,5 @@
 """How the interpreter renders a step row and a message for the reader
-(docs/for-developers/modules/platform/features/runtime.md §15).
+(specs/system-design/observability.md § Traces).
 
 Shaping only: no decisions, no IO. Kept beside the loop rather than inside it
 so the loop module is the control flow and nothing else.

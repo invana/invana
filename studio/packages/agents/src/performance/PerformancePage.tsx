@@ -40,7 +40,7 @@ import {
 	TypographyInlineCode,
 } from "@invana/ui";
 import { formatGrouped } from "@invana-studio/core";
-import { comparePath } from "@invana-studio/shell";
+import { comparePath, ReadState } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -58,7 +58,6 @@ import {
 	changeText,
 	changeTone,
 	day,
-	FleetReadState,
 	measureCaption,
 	ms,
 	pct,
@@ -158,7 +157,7 @@ export function PerformancePage({
 						graph={{ username, graphSlug }}
 					/>
 				) : (
-					<FleetReadState
+					<ReadState
 						loading={query.isLoading}
 						error={query.error}
 						what="performance"

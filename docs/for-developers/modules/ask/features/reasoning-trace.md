@@ -15,49 +15,7 @@ records it read, what it cost, and which skills and rules it was offered.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [streaming-and-the-workflow](streaming-and-the-workflow.md) (while it runs) · [evidence](../../memory/features/evidence.md) |
 
-> **As** someone deciding whether to act on an answer, **I want** to see how it was reached, **so
-> that** I am trusting a chain I can check rather than a tone of voice.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Every step, in order | With state, duration, tokens and cost |
-| C2 | The prompt and the rationale | What was sent, and what the model said about its choice |
-| C3 | The generated query | Exactly as executed, copyable |
-| C4 | The records read | Counts, and the rows themselves |
-| C5 | Skills offered and reported applied | The gap is visible per step |
-| C6 | Rules cited | Which statement the step says it followed |
-| C7 | The plan's origin | Selected template and version, or generated |
-| C8 | Nested runs | A delegated child's trace nests under the step that spawned it |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[An answer] --> B[Open the trace]
-    B --> C[Steps, in order]
-    C --> D{Which one?}
-    D --> E[understand: prompt · rationale · what it settled]
-    D --> F[plan: template chosen, or generated · why]
-    D --> G[translate: the query, copyable]
-    D --> H[execute: rows read · timings]
-    D --> I[project: template used]
-    D --> J[verify: served or not]
-    E --> K[Skills offered / applied · rules cited]
-    G --> L[Run it yourself in the QL editor]
-    H --> M[A row → its provenance → its dataset record]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| A repaired step | Both attempts, with the validation error between them |
-| A refused plan | The bound that refused it, in place of a dispatch |
-| A purged window | The step rows remain with counts; payloads say they were purged |
-| A nested delegation | Collapsed by default, expandable, with the child agent named |
-| A very long prompt | Truncated with a full view on demand |
+Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -78,20 +36,5 @@ flowchart TD
 
 ## Decisions
 
-| # | Decision |
-|---|---|
-| RT1 | The trace is part of the answer, not an admin view. |
-| RT2 | The generated query is shown verbatim and can be re-run by hand. |
-| RT3 | Offered and applied are recorded separately, always. |
-| RT4 | A delegated run nests under the step that spawned it. |
-| RT5 | Purging removes payloads, never the shape of what happened. |
-| RT6 | The trace opens from an emission's own citation. "Where did this number come from" is a question about that number, so the answer opens from its header rather than from a menu elsewhere. |
-| RT7 | Offered and applied are shown as two counts with what each one means beside it. One number would be a claim we cannot make. |
+In [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) › Decisions.
 
-## Not building
-
-| Not building | Because |
-|---|---|
-| Editing a trace | it is a record |
-| Hiding prompts from members | if you can see the answer you can see how it was reached |
-| Model-internal reasoning tokens | we record what the step reported, not what we cannot verify |

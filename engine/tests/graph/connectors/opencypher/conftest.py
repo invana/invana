@@ -4,7 +4,7 @@ Every test in this package runs against **each** live openCypher backend —
 Neo4j through its published `invana-neo4j` connector, Memgraph through the core
 language connector it overrides nothing of. A backend nothing is listening on
 skips, naming the compose command
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md CC5).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 """
 
 from __future__ import annotations

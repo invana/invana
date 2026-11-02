@@ -6,12 +6,9 @@ import {
 	PlanBoardPage,
 	PlanExportPage,
 	PlanVersionsPage,
-	PluginPage,
 	RunPage,
 	SkillBoardPage,
 	TemplatePage,
-	WorkerPage,
-	WorkerPoolPage,
 } from "@invana-studio/agents";
 import type { CanvasBackend } from "@invana-studio/canvases";
 import { GroupPage, IamAgentPage, PolicyPage } from "@invana-studio/iam";
@@ -37,7 +34,6 @@ import {
 	BOARD_KINDS,
 	boardPageId,
 	type OpenBoard,
-	RunsBoardPage,
 	runAddress,
 } from "@invana-studio/shell";
 import type { Dispatch, SetStateAction } from "react";
@@ -260,19 +256,6 @@ export function declaredBoardContent(
 		);
 	}
 
-	// The agent's page — the one declared page that edits. It
-	// reads no trace, so it takes no `board.runId`.
-	// The journal drawn wide. It binds to the Graph, not to a run,
-	// so it takes no `board.runId`.
-	if (board.kind === "runs") {
-		return (
-			<RunsBoardPage
-				username={username as string}
-				graphSlug={graphSlug as string}
-			/>
-		);
-	}
-
 	if (board.kind === "models") {
 		return (
 			<ModelsPage
@@ -343,40 +326,8 @@ export function declaredBoardContent(
 		);
 	}
 
-	// The plugin registry's pages are install-level; a function's page also
-	// reads the Graph's catalogue for who uses it and how it fans out. A
-	// function on a plugin opens beside it, and back.
-	// Worker pools and workers are install-wide; a pool opens its workers beside it.
-	if (board.kind === "worker_pool") {
-		return (
-			<WorkerPoolPage
-				pool={board.subjectId}
-				onOpenWorker={(name) => openBoard({ kind: "worker", subjectId: name })}
-			/>
-		);
-	}
-
-	if (board.kind === "worker") {
-		return (
-			<WorkerPage
-				worker={board.subjectId}
-				onOpenPool={(name) =>
-					openBoard({ kind: "worker_pool", subjectId: name })
-				}
-			/>
-		);
-	}
-
-	if (board.kind === "plugin") {
-		return (
-			<PluginPage
-				name={board.subjectId}
-				onOpenFunction={(key) =>
-					openBoard({ kind: "function", subjectId: key })
-				}
-			/>
-		);
-	}
+	// A function's page reads the Graph's catalogue for who uses it and how it
+	// fans out; its plugin opens in Settings, off the Graph.
 
 	if (board.kind === "function") {
 		return (
@@ -384,7 +335,6 @@ export function declaredBoardContent(
 				taskKey={board.subjectId}
 				username={username as string}
 				graphSlug={graphSlug as string}
-				onOpenPlugin={(name) => openBoard({ kind: "plugin", subjectId: name })}
 				onOpenFunction={(key) =>
 					openBoard({ kind: "function", subjectId: key })
 				}
@@ -534,10 +484,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 							BOARD_KINDS[board.kind].label)
 						: board.kind === "project"
 							? (projectNameByKey.get(board.subjectId) ?? board.subjectId)
-							: board.kind === "plugin" ||
-									board.kind === "worker_pool" ||
-									board.kind === "worker" ||
-									board.kind === "function" ||
+							: board.kind === "function" ||
 									board.kind === "policy" ||
 									board.kind === "iam_group"
 								? board.subjectId

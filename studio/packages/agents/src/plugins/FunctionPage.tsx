@@ -29,11 +29,11 @@ import {
 	TabbedPanel,
 } from "@invana/ui";
 import { useUpdateSearchParams } from "@invana-studio/core";
+import { ReadState } from "@invana-studio/shell";
 import { DetailStatus } from "@invana-studio/ui";
 import { useContext } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AgentsOpenContext } from "../open";
-import { FleetReadState } from "../overview/fleetParts";
 import { SECTIONS } from "../sections/spec";
 import { CallsTab } from "./function/CallsTab";
 import { ContractTab } from "./function/ContractTab";
@@ -109,11 +109,7 @@ export function FunctionPage({
 			/>
 		) : (
 			<div className="p-3.5">
-				<FleetReadState
-					loading={false}
-					error={query.error}
-					what="this function"
-				/>
+				<ReadState loading={false} error={query.error} what="this function" />
 			</div>
 		);
 	}

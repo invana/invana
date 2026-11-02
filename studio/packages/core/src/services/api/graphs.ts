@@ -99,14 +99,14 @@ export const graphsApi = {
 			},
 		),
 
-	// docs/for-developers/modules/graph-connectors/features/capabilities.md — accept the risk of an UNTESTED backend version (lifts read-only).
+	// specs/system-design/modules/graph-connectors.md § Capabilities — accept the risk of an UNTESTED backend version (lifts read-only).
 	acknowledgeConnectionVersion: (username: string, graphSlug: string) =>
 		request<GraphConnectionRead>(
 			`/api/v1/u/${username}/${graphSlug}/connection/acknowledge-version`,
 			{ method: "POST" },
 		),
 
-	// docs/for-developers/modules/graph-connectors/features/capabilities.md — declare a server version when auto-detection is unavailable.
+	// specs/system-design/modules/graph-connectors.md § Capabilities — declare a server version when auto-detection is unavailable.
 	declareConnectionVersion: (
 		username: string,
 		graphSlug: string,

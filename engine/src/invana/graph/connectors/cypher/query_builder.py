@@ -133,7 +133,7 @@ class OpenCypherQueryBuilder:
     #: and is what "standard openCypher" means in this core — but it is not
     #: universal: Memgraph has ``id()`` and no ``elementId`` at all. A vendor whose
     #: id function differs subclasses this builder and sets this one name
-    #: (docs/for-developers/modules/graph-connectors/features/languages.md LG10).
+    #: (specs/system-design/modules/graph-connectors.md § A query, either way).
     ELEMENT_ID = "elementId"
 
     @classmethod

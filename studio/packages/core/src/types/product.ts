@@ -19,11 +19,21 @@ import type { SetupGate } from "./graphs";
 /** A product's path segment and launcher key. */
 export type ProductId =
 	| "datasets"
+	| "fleet"
+	| "settings"
 	| "modeller"
 	| "explorer"
 	| "projects"
+	| "activity"
 	| "agents"
 	| "iam";
+
+/**
+ * Where a product lives. `platform` routes off any Graph (`/<id>/…`) and the
+ * header draws no Graph picker; `graph` routes under the open Graph
+ * (`/u/:user/:graph/<id>/…`) and draws it. The launcher groups by it.
+ */
+export type ProductScope = "graph" | "platform";
 
 /** An icon component — a lucide icon fits. */
 export type ProductIcon = ComponentType<{ className?: string }>;
@@ -108,9 +118,21 @@ export interface ProductDefinition {
 	/** The launcher row and the wordmark: `Invana <name>`. */
 	name: string;
 	tagline: string;
+	/** Listed with the Experimental badge: shown, labelled, never hidden. */
+	experimental?: boolean;
 	icon: ProductIcon;
-	/** `install` hides the Graph picker. */
-	scope: "graph" | "install";
+	scope: ProductScope;
+	/**
+	 * The launcher group it is listed in, when that differs from its scope —
+	 * the Agents product, whose routes are a Graph's, is listed with the
+	 * platform until the Agent Builder takes its row.
+	 */
+	group?: ProductScope;
+	/**
+	 * Who the launcher lists it for. `builders` is an install Admin only — a
+	 * member who cannot build sees no Agent Builder. Absent is everyone.
+	 */
+	audience?: "builders";
 	/** The product's routes; each route's `handle.crumb` feeds the breadcrumbs. */
 	routes: RouteObject[];
 	/** The product's `leftNav` icons; `null` draws none. */

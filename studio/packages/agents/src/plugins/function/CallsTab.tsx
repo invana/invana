@@ -19,9 +19,10 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { formatGrouped, formatShortDateTime } from "@invana-studio/core";
+import { ReadState } from "@invana-studio/shell";
 import { humanStatus, PanelSection, stepTone } from "@invana-studio/ui";
 import { useState } from "react";
-import { FleetReadState, ms, tokens } from "../../overview/fleetParts";
+import { ms, tokens } from "../../overview/fleetParts";
 import { useFunctionCallsQuery } from "../queries";
 
 const SHOWING = [
@@ -75,7 +76,7 @@ export function CallsTab({
 				) : null}
 			</div>
 			{calls.isLoading || calls.error ? (
-				<FleetReadState
+				<ReadState
 					loading={calls.isLoading}
 					error={calls.error}
 					what="its calls"

@@ -1,4 +1,4 @@
-"""The derived plan (docs/for-developers/modules/work/spec.mda) — pure functions, no database.
+"""The derived plan (specs/system-design/modules/work.md) — pure functions, no database.
 
 Order is derived, so the thing worth testing is the derivation: waves, the
 critical path, what counts as blocked, and that a cycle is caught *before* it

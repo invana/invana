@@ -10,12 +10,9 @@ and a terminal read the same thing.
 | Index | [13.12](../../../README.md#13--platform) · Slice **B06b** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [plugins](plugins.md) · [distributed execution](distributed-execution.md) · [approvals](../../operate/features/approvals.md) · [products › plugins §4, §9](../../../../products/plugins.md#4-what-a-plugin-contributes) · [products › agents AG-13](../../../../products/agents.md) |
+| Related | [plugins](plugins.md) · [distributed execution](distributed-execution.md) · [approvals](../../operate/features/approvals.md) · [products › plugins §9](../../../../products/plugins.md#9-where-it-is-administered) · [products › agents AG-13](../../../../products/agents.md) |
 
-> **As** an install Admin, **I want** to see every plugin the engine carries — its task types, their
-> manifests and versions, its skills and flows — and enable a tool plugin deliberately,
-> **so that** agents reach the web, mail or a science source only when I have said they may, and that
-> code never runs inside the API process.
+Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 
@@ -26,37 +23,12 @@ and a terminal read the same thing.
 | C3 | Task types | `web.search` · `web.fetch` · `web.download_and_extract` · `mail.read` · `mail.send` · `pubmed.search` · `uniprot.get` · `pubchem.get` — all bound `network` |
 | C4 | A composite task type | `web.download_and_extract`: download → unzip → parse, one task type, one envelope, one step on the run page |
 | C5 | A skill in a plugin | `plugins/tools/web/skills/collect-dataset/` — `skill.toml` + `instructions.md`; seeded into every Graph like the built-in playbook, `origin = builtin` |
-| C6 | Enable · disable | An install Admin enables or disables a tool plugin; disabled is the default. Core and simulator plugins are always on |
 | C7 | The registry API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's read is Graph-scoped, `GET …/catalogue/{step_key}` ([the-catalogue](../../workflows/features/the-catalogue.md)) |
 | C8 | The CLI | `invana plugins list · show · enable · disable` · `invana worker` |
 | C9 | Tools run in workers | Under `executor = "procrastinate"`, every tool step is deferred as a `TaskEnvelope` to the `tools.<labels>` queue its resources name and leased by an `invana worker` through the engine's worker gateway ([workers](../../agents/features/workers.md)); the API process waits for its outcome |
-| C10 | `send` waits for an approval | A step whose task type is `side_effect = "send"` (`mail.send`) holds the run on an approval in the inbox; approve resumes it, decline fails the step as *not sent* |
-| C11 | Secrets stay in the worker | A task type reads only the secrets its plugin declares, from the worker's environment (`INVANA_SECRET_<NAME>`); nothing rides an envelope |
 | C12 | Wire forms | `Out`, `TaskFailure`, `NeedsInput`, `CannotAnswer` and `Converse` cross the queue as JSON and are raised again in the API process |
 
 ## Journey
-
-```mermaid
-flowchart TD
-    A[Admin: invana plugins list / GET /plugins] --> B{tool plugin installed?}
-    B -->|no · extra missing| B1[Listed as not installed · names its extra]
-    B -->|yes| C[Admin enables it]
-    C -->|not an install Admin| C1[403 · only an install Admin enables a plugin]
-    C --> D[Agent's envelope allows web.fetch]
-    D --> E[Plan names web.fetch]
-    E --> F{plugin enabled?}
-    F -->|no| F1[Step fails · blocked · plugin_disabled · names the CLI to enable it]
-    F -->|yes| G{side_effect send?}
-    G -->|yes, no decision yet| G1[Approval requested · run awaits input]
-    G1 -->|approved| H
-    G1 -->|declined| G2[Step fails · blocked · send_declined · not sent]
-    G -->|no| H{executor}
-    H -->|inline| I[run_envelope in this process]
-    H -->|procrastinate| J[defer envelope to the tools.<labels> queue]
-    J --> K[invana worker leases it over HTTPS · run_envelope · outcome]
-    K --> L[API process reads the outcome · settles the step]
-    I --> L
-```
 
 ```mermaid
 sequenceDiagram
@@ -80,17 +52,11 @@ sequenceDiagram
 
 | Seam | What happens |
 |---|---|
-| Extra not installed | The plugin is listed `installed: false` with the extra that installs it; its task types are not in the registry, so a plan naming one is refused by the validator |
-| Plugin disabled | Its task types stay in the registry (the frozen set is what the process *can* run); a step naming one fails `blocked · plugin_disabled` before any context opens |
-| Enable while runs are in flight | Takes effect for the next step dispatched — no restart; enablement is a gate, not a load |
-| No worker running | The envelope waits in the queue; the step stays `running` until its `timeout_s` (300 s when the manifest declares none) plus 120 s of queue wait — one reaper cycle and the stall window — then fails `transient · worker_unavailable` |
 | Approved from the CLI | `invana approvals approve` records the decision but does not resume the run; the API's approve does. The run resumes on its next `submit` |
 | A worker dies mid-step | Its heartbeat stops; the engine's gateway sweep marks it lost after 30 s and retries its jobs; the redelivered envelope keeps its idempotency key, and a recorded outcome is returned rather than re-run |
 | Redelivered `mail.send` | Its `Message-ID` is derived from the idempotency key, so a resend after a crash between send and record is the same message to the receiving server |
 | Approval expires | The run stays awaiting input; the expiry is in the inbox, and the run is cancelled by hand |
 | An unattended run reaches `mail.send` | The approval is requested from the run's actor (the agent's or schedule's owner) like any other — an approval is not a clarification, so it does not end the run as *cannot answer* |
-| Secret missing | `blocked · secret_missing`, naming `INVANA_SECRET_<NAME>` — the worker's environment, not the API's |
-| robots.txt disallows | `web.fetch` fails `blocked · robots_disallowed` with the URL; nothing is read |
 | SQLite install | `executor = "procrastinate"` needs Postgres; on SQLite the engine refuses to start with that setting |
 
 ## Engine
@@ -153,8 +119,6 @@ sequenceDiagram
 
 | # | Decision |
 |---|---|
-| TP1 | **Enablement is a gate, not a load.** Every *installed* tool plugin is in the frozen registry; whether it is *enabled* is checked when a step is dispatched, so an Admin's switch takes effect without a restart while the set of what the process can run stays closed. Disabled is the default. |
-| TP2 | **Only tool plugins switch.** Core plugins are the product; a simulator is run on purpose from a project (9.8) and stays on whenever installed. |
 | TP3 | **"Installed" is read from the engine's own metadata.** A tool plugin's extra lists its requirements; the plugin loads when each is importable. An extra with no third-party requirement — all three today, stdlib plus `httpx` — is always installed, the same rule as `sim-genomic`. |
 | TP4 | **Tools run in workers; `procrastinate` is the default executor.** It sends tool steps — and only tool steps (13.11 DE8) — to the `tools` queue, and the user starts the `invana worker` that leases them; the engine runs none itself. With no worker carrying the label, a tool step fails `transient · worker_unavailable` after its allowance. `inline` calls `run_envelope` in the API process for every step and is what the engine test suite runs. |
 | TP5 | **procrastinate is the `workers` extra**, not a core dependency: `psycopg` and procrastinate are Postgres-only and a SQLite dev install never needs them. `all` includes it, so every image has it. |
@@ -164,7 +128,6 @@ sequenceDiagram
 | TP9 | **`send` is gated by the interpreter, through the approvals inbox.** Before a `send` step dispatches, the run holds on an `Approval` (`subject_kind = "step"`, the args frozen as its payload, approver = the run's actor, else the Graph's owner, 24 h deadline). Approving or declining resumes the run; the task type itself never asks. |
 | TP10 | **Secrets live in the worker's environment** as `INVANA_SECRET_<NAME>`, read through `ctx.secret(name)`, which refuses a name the plugin's `plugin.toml` does not declare. No secrets table this slice. |
 | TP11 | **`web.search` speaks SearXNG.** The `web_search` secret is a SearXNG base URL; an open, self-hostable search keeps a vendor key out of the product. |
-| TP12 | **The web tools honour robots.txt and cite.** Every fetch checks robots.txt for the `Invana` user agent first, and every row a web or science tool returns carries its source URL. Downloads stop at `max_mb`. |
 | TP13 | **A plugin skill is a folder, seeded like the playbook.** `skills/<slug>/skill.toml` (`name · when_to_use · description · version`) + `instructions.md`; seeded into each Graph with `origin = builtin`, idempotent by name. Its plan is generated, never shipped (products › plugins §4). |
 | TP15 | **The runtime names only the gate's shape.** `SendGate` (request · decision) is declared in the interpreter; `ApprovalSendGate` over the inbox lives with the approvals manager, and each front-end that builds a runtime installs it (the API at start-up, the CLI in `with_runtime`). With none installed a `send` step fails `blocked · approvals_unavailable` — nothing is sent. The approval's subject is the step row, which a resumed run re-runs. |
 | TP16 | **A plugin skill is seeded as a published v1 whose plan is the one-step `human` placeholder, marked `generated`,** so the first draw replaces it — a skill version always has a plan, and the instructions are what the plugin ships. |
@@ -178,11 +141,9 @@ sequenceDiagram
 |---|---|
 | MCP plugins and `invana plugins mcp add` | [13.13 MCP plugins](mcp-plugins.md) — they switch and run like tool plugins |
 | Genebank tools | no single genebank API to target yet; the science plugin starts with PubMed, UniProt and PubChem |
-| A secrets store in the app DB | env in the worker is enough for three secrets; a store is its own feature |
 | Per-agent "who may call it" on the registry | worlds and guardrails already decide it per Graph; the install-level registry does not repeat it |
 | Routing envelopes to resource pools | one `tools` queue until a plugin declares `gpu` (13.11) |
 | Core steps on workers | they hand over through `RunVars` (13.11 DE8) |
 | Idempotency checks in the core `*_write` task types | they run inline only; the worker-level outcome check covers every remote step |
 | Resuming a run whose approval expired | the run waits; cancelling it is a person's act |
 | Resuming a run from `invana approvals approve` | the CLI decides only; resume is the API's (seam above) |
-| Disabling simulator plugins | TP2 |

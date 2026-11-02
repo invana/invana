@@ -1,0 +1,33 @@
+{
+  "about": "Who may edit what. The one source: .claude/hooks/edit_rights.py enforces it on every Edit, Write and Bash call of a team agent, and writes the matrix in TEAM.md §1 from it (--write). Paths are globs from the repo root; ~ is the home folder; {role} is the agent's name.",
+  "areas": [
+    {"key": "code", "label": "Product code", "paths": ["engine/**", "studio/**", "integrations/**", "scripts/**", "demos/**", "datasets/**", "docker/**", ".github/**", "Makefile", "pyproject.toml", "uv.lock", "biome.json", "skills-lock.json", "docker-compose*.yml", ".gitignore", ".pre-commit-config.yaml"]},
+    {"key": "tests", "label": "Tests · evals", "paths": ["engine/**/tests/**", "integrations/**/tests/**", "studio/**/e2e/**", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/evals/**"]},
+    {"key": "kit", "label": "Kit · canvas code", "paths": ["~/Projects/invana/design-kit/**", "~/Projects/invana/canvas/**"]},
+    {"key": "changesets", "label": "Changesets", "paths": [".changeset/**"]},
+    {"key": "specs", "label": "Specs", "paths": ["specs/**"]},
+    {"key": "tasks", "label": "Story tasks", "paths": ["specs/products/*/features/*/stories/*/task.md"]},
+    {"key": "docs", "label": "Other docs", "paths": ["docs/**", "README.md", "CONTRIBUTING.md", "CHANGELOG.md"]},
+    {"key": "boards", "label": "Boards (canvas)", "paths": [".design/**"]},
+    {"key": "project", "label": "Project file", "paths": [".claude/team/projects/*/project.md"]},
+    {"key": "team", "label": "Team rules", "paths": ["CLAUDE.md", ".claude/**"]},
+    {"key": "reports", "label": "Own reports", "paths": [".agent-reports/{role}/**"]},
+    {"key": "reviews", "label": "Project reviews", "paths": [".claude/team/projects/*/reviews/**"]},
+    {"key": "raise", "label": "Raise a recommendation", "paths": []},
+    {"key": "take", "label": "Take one up", "paths": []},
+    {"key": "commit", "label": "Commit", "paths": []}
+  ],
+  "always": {
+    "label": "Every role, always",
+    "paths": [".handoffs/**", "/tmp/**", "/private/tmp/**", ".claude/team/.live/**"]
+  },
+  "roles": [
+    {"key": "ravi", "label": "Ravi — or a session he asks directly", "all": true},
+    {"key": "product-manager", "label": "Product manager", "rights": {"specs": true, "tasks": "creates it, empty", "docs": true, "project": true, "reports": true, "raise": true, "take": true, "commit": "under /run-project"}},
+    {"key": "project-lead", "label": "Project lead", "rights": {"project": "Questions for Ravi", "reports": true, "raise": true}},
+    {"key": "designer", "label": "Designer", "rights": {"tasks": "own rows", "boards": true, "reports": true, "raise": true}},
+    {"key": "coder", "label": "Coder", "rights": {"code": true, "tests": true, "kit": "approved components", "changesets": true, "tasks": "own rows", "project": "own Log row · hand-off note", "reports": true, "raise": true, "commit": "when the brief says"}},
+    {"key": "qa", "label": "QA", "rights": {"tasks": "own rows", "project": "own Log row (under /run-project)", "reports": true, "reviews": true, "raise": true}},
+    {"key": "security", "label": "Security", "rights": {"reports": true, "raise": true}}
+  ]
+}

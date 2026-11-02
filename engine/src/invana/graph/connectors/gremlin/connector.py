@@ -50,7 +50,7 @@ from invana.graph.types.capabilities import (
 )
 from invana.graph.types.constants import Capability, PropertyType, QueryLanguage
 
-# TinkerPop/Gremlin baseline capability profile (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+# TinkerPop/Gremlin baseline capability profile (specs/system-design/modules/graph-connectors.md § Capabilities).
 # Gremlin has no native
 # temporal/spatial property values, but `uuid` is native and properties carry a
 # cardinality (single/list/set). Vendor connectors (JanusGraph, Neptune, …) override
@@ -158,7 +158,7 @@ class GremlinConnector(BaseConnector):
 
     async def detect_version(self) -> Version | None:
         """Best-effort TinkerPop version via the ``Gremlin.version()`` script
-        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+        (specs/system-design/modules/graph-connectors.md § Capabilities).
 
         Works on any Gremlin Server that permits Groovy script evaluation —
         TinkerGraph, JanusGraph, and most self-hosted servers (this is the TinkerPop
@@ -203,7 +203,7 @@ class GremlinConnector(BaseConnector):
         a primitive. A vendor whose ids are its **own** types has to say so here:
         gremlinpython can only decode the GraphBinary types it knows, and an
         unknown one fails the whole response rather than one field
-        (docs/for-developers/modules/graph-connectors/features/languages.md LG9).
+        (specs/system-design/modules/graph-connectors.md § A query, either way).
         GraphSON carries an unknown ``@type`` through as a plain dict, which a
         serializer can then read.
         """
@@ -256,7 +256,7 @@ class GremlinConnector(BaseConnector):
         """The script-submission client, created once and closed with the driver.
 
         Separate from ``DriverRemoteConnection``: that one carries bytecode, this
-        one carries text (docs/for-developers/modules/graph-connectors/features/languages.md
+        one carries text (specs/system-design/modules/graph-connectors.md § A query, either way
         LG6). A client per query would pay a WebSocket handshake for every
         question asked.
         """
@@ -285,7 +285,7 @@ class GremlinConnector(BaseConnector):
 
         ``parameters`` ride as Gremlin **bindings**, so a value is never spliced
         into the script text — the same guarantee ``$p0`` gives on the Cypher side
-        ([CN7](docs/for-developers/modules/graph-connectors/spec.md)).
+        ([graph-connectors](specs/system-design/modules/graph-connectors.md)).
 
         A server that will not evaluate scripts — Amazon Neptune accepts bytecode
         and its own HTTP API, not Groovy — refuses here with the vendor named,

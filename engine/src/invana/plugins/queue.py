@@ -1,7 +1,7 @@
 """The tool queue — tool steps wait on ``tools.<labels>``, outcomes are read back from a row.
 
 docs/for-developers/modules/platform/features/tool-plugins.md ·
-docs/for-developers/modules/platform/features/distributed-execution.md ·
+specs/system-design/runtime.md § Executor and workers ·
 docs/for-developers/modules/agents/features/workers.md.
 
 Under ``INVANA_EXECUTOR=procrastinate`` a tool step leaves the interpreter as a

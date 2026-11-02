@@ -13,8 +13,11 @@
  * a record tab named by `?page=` first, then the section, unless a canvas was
  * brought forward since the section last was.
  *
- * A product hands its sections table in; `useAgentsSections` and
- * `useIamSections` add the openers and the bodies.
+ * A product with no Home (Activity) names none: it lands on a section, and
+ * its last open section tab cannot close.
+ *
+ * A product hands its sections table in; `useAgentsSections`,
+ * `useIamSections` and `useActivitySections` add the openers and the bodies.
  */
 
 import type { WorkbookPage } from "@invana/ui";
@@ -36,8 +39,8 @@ export interface SectionTabsSpec<K extends string> {
 	prefix: string;
 	/** The page id Home stands for: no tab is lit while it shows. */
 	homeId: string;
-	/** The section that is Home. */
-	home: K;
+	/** The section that is Home; absent for a product that has none. */
+	home?: K;
 	/** The section a `panel` key names, or null when it is not this product's. */
 	sectionOfPanel: (panel: string | null) => K | null;
 	/** The `panel` key a section writes. */
@@ -182,7 +185,7 @@ export function useSectionTabs<K extends string>(
 						id: `${prefix}${key}`,
 						title: label,
 						icon,
-						closable: true,
+						closable: home !== undefined || open.length > 1,
 						content: body(key, { tab: here ? pathTab : tab, here }),
 					};
 				})
@@ -208,7 +211,7 @@ export function useSectionTabs<K extends string>(
 				if (key !== current) return;
 				const next = rest.at(-1);
 				if (next) goTo(next.key, next.tab);
-				else goTo(home);
+				else if (home !== undefined) goTo(home);
 			},
 			stepBack: () => setInFront(false),
 		}),

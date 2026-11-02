@@ -4,7 +4,7 @@
  * Engine response shapes stay in `@/types/models` and `@/types/schemas`. What
  * collects here is what the Model screen invents to talk to itself: which model
  * and draft an edit targets, and what is selected — on the canvas, and in the
- * panel ([code-shape.md](docs/for-developers/building-studio/code-shape.md) §4.1d).
+ * panel ([code-shape.md](docs/for-developers/building-studio/code-shape.md) §4.1).
  */
 
 /**

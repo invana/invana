@@ -36,10 +36,10 @@ import {
 	type GraphContention,
 	graphsApi,
 } from "@invana-studio/core";
+import { ReadState } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useAgentsOpen } from "../open";
-import { FleetReadState } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { ConcurrencyFields } from "./ConcurrencyFields";
@@ -93,7 +93,7 @@ export function SettingsSectionPage({
 								</PanelSection>
 							</>
 						) : (
-							<FleetReadState
+							<ReadState
 								loading={contention.isLoading}
 								error={contention.error}
 								what="what runs now"

@@ -52,6 +52,20 @@ repos:
   # Each runs only when the pushed commits touch its area.
   - repo: local
     hooks:
+      - id: specs-check
+        name: product specs follow the standard format (specs)
+        entry: python3 scripts/specs/check.py
+        language: system
+        pass_filenames: false
+        files: ^(specs/|scripts/specs/)
+
+      - id: edit-rights-matrix
+        name: TEAM.md's edit-rights matrix matches edit-rights.json
+        entry: python3 .claude/hooks/edit_rights.py --check
+        language: system
+        pass_filenames: false
+        files: ^\.claude/(team/edit-rights\.json|team/TEAM\.md|hooks/edit_rights\.py)$
+
       - id: python-ruff-all
         name: ruff check and format (engine + integrations)
         entry: bash -c 'cd engine && uv run ruff check . ../integrations && uv run ruff format --check . ../integrations'

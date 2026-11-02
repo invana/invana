@@ -29,12 +29,12 @@ import {
 	MetricGrid,
 	MetricTile,
 	RecordHeader,
-	Skeleton,
 } from "@invana/ui";
 import { PanelSection } from "@invana-studio/ui";
 import { ArrowRight, History } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ReadState } from "../../lists/listParts";
 import { useProducts } from "../../products";
 import {
 	type ChangeCompare,
@@ -114,9 +114,8 @@ export function ComparePage({
 
 	if (history.isLoading) {
 		return (
-			<div className="space-y-3 p-4">
-				<Skeleton className="h-12 w-full" />
-				<Skeleton className="h-48 w-full" />
+			<div className="p-4">
+				<ReadState loading error={null} what="the versions" />
 			</div>
 		);
 	}
@@ -187,7 +186,7 @@ export function ComparePage({
 						description={`${history.data.name} has not changed since it was made, so there is nothing to compare yet.`}
 					/>
 				) : compare.isLoading ? (
-					<Skeleton className="h-48 w-full" />
+					<ReadState loading error={null} what="the comparison" />
 				) : compare.data ? (
 					<CompareBody compare={compare.data} entryA={entryA} entryB={entryB} />
 				) : (

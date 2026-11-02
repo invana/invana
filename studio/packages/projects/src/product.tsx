@@ -48,7 +48,8 @@ function level(
 export const projects: ProductDefinition = {
 	id: "projects",
 	name: "Projects",
-	tagline: "Pursue and decide",
+	tagline: "Pursue a question",
+	experimental: true,
 	icon: FolderOpen,
 	scope: "graph",
 	landing: "",

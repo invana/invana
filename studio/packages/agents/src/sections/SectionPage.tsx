@@ -15,12 +15,12 @@
 
 import { SectionFrame } from "@invana-studio/ui";
 import type { ReactNode } from "react";
-import { type AgentsSectionKey, SECTIONS } from "./spec";
+import { type AgentsSectionKey, type RunSectionKey, sectionSpec } from "./spec";
 
 export { SectionBody } from "@invana-studio/ui";
 
 interface SectionPageProps {
-	section: AgentsSectionKey;
+	section: AgentsSectionKey | RunSectionKey;
 	/** The open tab; ignored by a section with none. */
 	tab?: string;
 	onTab?: (tab: string) => void;
@@ -32,5 +32,5 @@ interface SectionPageProps {
 }
 
 export function SectionPage({ section, ...props }: SectionPageProps) {
-	return <SectionFrame {...SECTIONS[section]} {...props} />;
+	return <SectionFrame {...sectionSpec(section)} {...props} />;
 }

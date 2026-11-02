@@ -8,6 +8,7 @@ export * from "./BindRefusalCard";
 export * from "./BoardGround";
 export * from "./boardIcons";
 export * from "./DetailRows";
+export * from "./ExperimentalBadge";
 export * from "./FilterSelect";
 export * from "./forms/FormError";
 export * from "./ListPanel";

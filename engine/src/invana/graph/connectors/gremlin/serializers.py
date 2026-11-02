@@ -113,7 +113,7 @@ class GremlinSerializer(BaseSerializer):
         edges, paths, maps, counts, strings.
 
         Anything that is not a vertex or an edge becomes a **record**
-        (docs/for-developers/modules/graph-connectors/features/languages.md LG8).
+        (specs/system-design/modules/graph-connectors.md § A query, either way).
         Dropping what this serializer did not recognise reported an empty answer
         for a query that returned rows, and an empty answer is the one wrong
         answer that reads like a right one.

@@ -236,7 +236,7 @@ async def acknowledge_connection_version(
     session: AsyncSession = Depends(get_session),
 ) -> GraphConnectionRead:
     """Accept the risk of an UNTESTED backend version — lifts the version read-only
-    (docs/for-developers/modules/graph-connectors/features/capabilities.md)."""
+    (specs/system-design/modules/graph-connectors.md § Capabilities)."""
     connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
@@ -267,7 +267,7 @@ async def declare_connection_version(
     session: AsyncSession = Depends(get_session),
 ) -> GraphConnectionRead:
     """Declare a server version when auto-detection is unavailable (e.g. Gremlin)
-    (docs/for-developers/modules/graph-connectors/features/capabilities.md)."""
+    (specs/system-design/modules/graph-connectors.md § Capabilities)."""
     connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")

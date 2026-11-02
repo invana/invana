@@ -233,7 +233,7 @@ class ConnectionPool:
         self._spawn(self._connect_graph(graph))
 
     # -----------------------------------------------------------------------
-    # Version compatibility (docs/for-developers/modules/graph-connectors/features/capabilities.md)
+    # Version compatibility (specs/system-design/modules/graph-connectors.md § Capabilities)
     # -----------------------------------------------------------------------
 
     async def _persist_version(

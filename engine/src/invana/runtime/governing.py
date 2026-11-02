@@ -1,6 +1,6 @@
 """Enforcing the lens a run froze, and recording what it engaged.
 
-[Govern](docs/for-developers/modules/govern/spec.md) is declared in ``apps`` and
+[Govern](specs/system-design/modules/govern.md) is declared in ``apps`` and
 *happens* here: the interpreter checks an address before it dispatches, and
 writes one touch whichever way the check went. The freeze itself happened at run
 open (``runtime.services.freeze_lens``, [GV26]), so nothing in this module

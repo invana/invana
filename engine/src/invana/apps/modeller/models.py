@@ -134,7 +134,7 @@ class GraphVersion(Base):
     content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     # Which property carries valid time, which carries geography, and which named
     # properties are selectable dimensions
-    # (docs/for-developers/modules/connect-and-model/features/domain-models.md DM6):
+    # (specs/products/model/features/MO-F01-start-a-model/feature.md § Decisions):
     #
     #     {"time": {"property": "observed_at"},
     #      "geo":  {"property": "country_iso", "vocab": "iso2"},

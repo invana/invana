@@ -1,5 +1,5 @@
 """The plan library — reusable **Flows**, referenced by agents
-(docs/for-developers/modules/workflows/spec.md).
+(specs/system-design/modules/workflows.md).
 
 Three words that are easy to confuse, kept apart here and everywhere
 (docs/for-developers/terminology.md §8):

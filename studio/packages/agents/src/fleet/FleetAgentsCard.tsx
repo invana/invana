@@ -9,10 +9,11 @@
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";
+import { ReadState } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useMemo } from "react";
 import { useAgentsOpen } from "../open";
-import { FleetReadState, ms, pct } from "../overview/fleetParts";
+import { ms, pct } from "../overview/fleetParts";
 import { AgainstCell, BudgetCell, StatusCell } from "./agentCells";
 import type { FleetAgentRow } from "./agentRows";
 
@@ -30,7 +31,7 @@ export function FleetAgentsCard({
 	return (
 		<PanelSection card title="Agents">
 			{loading || error ? (
-				<FleetReadState loading={loading} error={error} what="the agents" />
+				<ReadState loading={loading} error={error} what="the agents" />
 			) : (
 				<DataTable
 					columns={columns}

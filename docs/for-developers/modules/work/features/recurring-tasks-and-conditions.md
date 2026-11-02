@@ -16,67 +16,40 @@ so.
 | API / CLI / Studio | 🔵 / — / 🔵 |
 | Related | [projects-and-tasks](projects-and-tasks.md) · [schedules](../../operate/features/schedules.md) |
 
-> **As** someone whose day starts the same way every day, **I want** the Todo to be waiting for me,
-> **so that** the routine part is not a thing I have to remember to type.
+Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-18 (dependencies with conditions); the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the recurring-task templates the product spec does not take, because they contradict the one kind of schedule ([AG-F07](../../../../../specs/products/agents/features/AG-F07-schedules/feature.md)).
 
-## Capabilities
+## Not moved — recurring task templates
+
+A task template on a cron that creates a new task each firing. It stays here, unmoved: the product spec has one kind of
+schedule, an agent and instructions, and whether a run creates work is the run's business. Open question for Ravi in
+PJ-F01. If it is taken up, it becomes a story in the schedules feature.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | A Todo template plus a cron | Title pattern, body, project, assignee, criteria |
-| C2 | Each firing creates a **new** Todo | Not a reopened one — history stays per occurrence |
+| C1 | A task template plus a cron | Title pattern, body, project, assignee, criteria |
+| C2 | Each firing creates a **new** task | Not a reopened one — history stays per occurrence |
 | C3 | A person still accepts | Recurrence automates the creating, never the accepting |
 | C4 | Overlap policy | `skip · queue · allow`, stated on the schedule |
 | C5 | A skipped firing is recorded | With its reason; nothing vanishes |
 | C6 | Placeholders in the title | `Trade day {date}` — resolved at firing |
-| C7 | Conditional dependencies | `on: success · failure · any_outcome` |
-| C8 | Failure edges do not inflate the critical path | They are contingency, not sequence |
-| C9 | A dependent of a failed Todo gets a reason | Instead of sitting silently blocked |
-
-## Journeys
-
-### Recurrence
-
-```mermaid
-flowchart TD
-    A[A Todo that repeats] --> B[Make it a recurrence]
-    B --> C[Template · cron · assignee · overlap policy]
-    C --> D[Fires at 08:00 Mon–Fri]
-    D --> E{Previous instance still open?}
-    E -->|policy = skip| F[Firing recorded · skipped · reason shown]
-    E -->|policy = queue| G[Created when the previous closes]
-    E -->|policy = allow| H[Created alongside]
-    H --> I[Assigned · one run opens]
-    I --> J[Result → review → a person accepts]
-```
-
-### Conditions
-
-```mermaid
-flowchart LR
-    A[Setup check BPCL] -->|success| B[Close the day]
-    A -->|failure| C[Diagnose a failed setup]
-    A -->|any_outcome| D[Journal the day]
-    C -.dashed on the plan.-> E[Not part of the critical path]
-```
-
-## Seams
 
 | Seam | What the user sees |
 |---|---|
 | Instance still open at the next firing | The policy decides, and the firing is listed either way |
 | A recurrence paused | Firings stop; existing instances are untouched |
 | Template edited | Future instances use it; open ones keep what they were created with |
-| A failure branch that never runs | Shown as never triggered, not as blocked |
 | Cron that would fire in the past | Refused at save, with the next valid time shown |
 
-## Surfaces
-
-| Surface | Shape |
+| Decision | |
 |---|---|
-| Schedules | Recurrences beside question and workflow schedules, `kind` distinguishing the three ([10.1 C1](../../operate/features/schedules.md)) |
-| Instances list | Every firing: created · skipped · its Todo |
-| Plan canvas | Failure edges dashed; the critical path ignores them |
+| RC1 | Each firing creates a new task; instances are never reopened. |
+| RC2 | Recurrence automates creation, never acceptance. |
+| RC3 | A skipped firing is recorded with its reason. |
+
+| Not building | Because |
+|---|---|
+| Recurring *questions* creating tasks | question schedules stack answers; that separation is deliberate |
+| Complex calendars — holidays, business days | a cron plus a skip policy covers the need without a calendar engine |
 
 ## Engine
 
@@ -90,18 +63,8 @@ flowchart LR
 
 ## Decisions
 
+Engine rows; the product decisions are PJ-F01's.
+
 | # | Decision |
 |---|---|
-| RC1 | Each firing creates a new Todo; instances are never reopened. |
-| RC2 | Recurrence automates creation, never acceptance. |
-| RC3 | A skipped firing is recorded with its reason. |
-| RC4 | Failure edges are contingency and never inflate the critical path. |
-| RC5 | A dependent of a failed Todo states why it will not run. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Recurring *questions* creating Todos | question schedules stack answers; that separation is deliberate |
-| Complex calendars — holidays, business days | a cron plus a skip policy covers the need without a calendar engine |
-| Auto-retry of a failed instance | the next firing is the retry, and a failure branch is the escalation |
+| RC4 | Failure edges are contingency and never inflate the critical path: `critical_path` excludes `todo_dependencies.on = failure`. |

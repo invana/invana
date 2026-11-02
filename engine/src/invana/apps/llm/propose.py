@@ -22,7 +22,7 @@ from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
 
 # Universal property types — available on every backend regardless of version
-# (docs/for-developers/modules/graph-connectors/features/capabilities.md ``PropertyType`` universal tier +
+# (specs/system-design/modules/graph-connectors.md § Capabilities ``PropertyType`` universal tier +
 # always-available temporal). Keeping
 # generation to this safe subset means a generated draft activates on any bound
 # DB; richer/native types stay a hand-authoring choice.

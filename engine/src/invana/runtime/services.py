@@ -88,7 +88,7 @@ def _queue_opening(db: AsyncSession, th: TaskRun, message_id: str | None, openin
 
     For a static agent that is the whole flow, before any LLM call. For a
     planning one it is *Understand* and *Plan* alone — the rest appear when the
-    plan lands, which is the difference the user actually sees (docs/for-developers/modules/agents/spec.md).
+    plan lands, which is the difference the user actually sees (specs/system-design/modules/agents.md).
     """
     for i, step in enumerate(opening.steps):
         db.add(
@@ -160,7 +160,7 @@ async def open_turn(
             detail="Modeller sessions author a model — query mode isn't available here.",
         )
 
-    # **The agent decides the provider** (docs/for-developers/modules/agents/spec.md). The composer no longer
+    # **The agent decides the provider** (specs/system-design/modules/agents.md). The composer no longer
     # sends one; a session bound before agents existed falls back to its
     # surface's seeded agent rather than failing.
     agent = await _session_agent(db, sess=sess, graph=graph)
@@ -289,20 +289,20 @@ async def freeze_lens(
     """Resolve the lens this run is dispatched under, and **freeze it**.
 
     ``effective = agent ∩ plan ∩ todo``
-    ([GV6](docs/for-developers/modules/govern/spec.md)), composed once at run
+    ([Model product § Decisions](specs/products/model/product.md#decisions)), composed once at run
     open and never recomputed
-    ([GV8](docs/for-developers/modules/govern/spec.md)) — which is what makes
+    ([Model product § Decisions](specs/products/model/product.md#decisions)) — which is what makes
     ``lens_snapshot`` reconstructible rather than a pointer at rows that have
     since moved. A guardrail tightened tomorrow does not rewrite what this run
     was allowed to rest on
-    ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
+    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
 
     The Graph's guardrails and the agent's go in whether or not a world was
     picked, because they are in force on every run whatever world it is asked
     under. The agent carries no world of its own — its narrowing *is* its
     guardrail ([AG26](docs/for-developers/modules/agents/features/author-an-agent.md)) —
     so the only world here is the one the work brought. **No world is the
-    widest**, not the narrowest ([GV7](docs/for-developers/modules/govern/spec.md)):
+    widest**, not the narrowest ([Model product § Decisions](specs/products/model/product.md#decisions)):
     a Graph with nothing set freezes an empty lens, which permits everything.
 
     ``within`` is the run a delegated child opens inside: its frozen lens
@@ -371,7 +371,7 @@ async def _session_agent(db: AsyncSession, *, sess: Session, graph: Graph) -> Ag
 
     A paused or retired agent is a 409, not a silent fallback: running the ask
     through a different mind than the header names would be the worst possible
-    resolution of the conflict (docs/for-developers/modules/agents/spec.md).
+    resolution of the conflict (specs/system-design/modules/agents.md).
     """
     surface = sess.surface.value if isinstance(sess.surface, SessionSurface) else str(sess.surface)
     if sess.agent_id:
@@ -476,7 +476,7 @@ async def open_todo_run(
     (R1, R3).
 
     A task-triggered run starts at **Plan**: the task body already *is* an
-    intent, so there is nothing for *Understand* to settle (docs/for-developers/modules/agents/spec.md).
+    intent, so there is nothing for *Understand* to settle (specs/system-design/modules/agents.md).
     """
     triggered = TriggeredBy.delegation.value if parent_run_id else TriggeredBy.task.value
     th = TaskRun(
@@ -1043,7 +1043,7 @@ async def worlds_for_messages(db: AsyncSession, messages: list[SessionMessage]) 
 
     The name is read from the snapshot's contributors, not the live row, so a
     rename or a delete since never changes what a past turn says it ran in
-    ([AD17](docs/for-developers/modules/ask/features/the-assistant.md)). A
+    ([EX-F03 § Decisions](specs/products/explore/features/EX-F03-ask-a-question/feature.md#decisions)). A
     reply that ran in *Everything* is absent.
     """
     wanted = {m.run_id: m.id for m in messages if m.run_id}

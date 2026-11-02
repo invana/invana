@@ -10,47 +10,7 @@ read from the records that already hold the versions and the events that minted 
 | API / CLI / Studio | ✅ / 🔵 / ✅ |
 | Related | [audit-and-activity](audit-and-activity.md) · [see-what-ran](see-what-ran.md) · products: [shell.md](../../../../products/shell.md) SH-14 · [agents.md](../../../../products/agents.md) AG-06 · AG-09 · [modeller.md](../../../../products/modeller.md) MO-09 |
 
-> **As** an auditor, **I want** every change to anything versioned, with its effect after, and any two
-> versions compared, **so that** every change is accountable.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | The change log | The Graph's events, narrowed to the ones that mint a version — `GET …/events?changes=true` |
-| C2 | A record's history | Every version of one record, newest first: version · who · when · why · a one-line summary · the effect after |
-| C3 | Compare any two versions | One shape for every kind: field changes, the plan diff when there is one, the schema diff for a model |
-| C4 | Effect after | Runs, failed runs and tokens that ran on a version — tokens only, never currency |
-| C5 | Why | An optional reason on the write that mints a version, carried on its event |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Activity › Events] --> B{Changes filter}
-    B -->|on| C[The change log: version-minting events only]
-    C --> D[Open a change]
-    D --> E[The record's history]
-    E --> F{Pick}
-    F -->|one version| G[Who · when · why · summary · effect after]
-    F -->|two versions| H[Compare: fields · plan diff · schema diff]
-    E --> I[Record page in its product: same history]
-    D -->|unknown kind or id| X[Not found — the record reads as absent]
-    E -->|one version only| Y[History of one; compare offers nothing to compare]
-    G -->|no runs yet| Z[Effect: 0 runs, labelled with its basis]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| A version written before reasons existed | `why` is empty — never invented |
-| An agent version from before diffs were recorded | The field is named, before and after are empty: *not recorded* |
-| A model version | Its `change_summary` is its why; its effect is the Graph's runs while it was the published one, labelled `window` |
-| A version nothing ran on | Effect reads 0 runs, not blank |
-| A record in another Graph, or a kind that is not versioned | 404 — absent, not forbidden |
-| Comparing a version with itself | Empty change, `summary` says so |
-| A draft | Not a version: drafts never appear in a history or a compare |
+Product spec: [IN-F03 · History](../../../../../specs/products/inbox/features/IN-F03-history/feature.md) — IN-03; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
 
 ## Surfaces
 
@@ -103,25 +63,6 @@ flowchart TD
 | CL1 | **The change log is events, not a table.** A change is the event that minted a version; the versions stay in the tables that already hold them. One more kind of event, as the shell decided — no second record to keep in step. |
 | CL2 | **`?changes=true` on the events list is the change log.** It narrows to `CHANGE_ACTIONS` in `core/events/actions.py`, which lists each kind's minting actions; it composes with the existing filters. |
 | CL3 | **History and compare live under `…/history/{record_kind}/{record_id}`**, one route for every kind, read by `ChangeLogManager` in the `activity` band — the only band that may read events, every app and runs at once. |
-| CL4 | **Six kinds: `skill` · `rule` · `plan` · `agent` · `model` · `dataset`.** A dataset belongs to no Graph, so its history is read with `graph_id` null under its own routes ([DT12](../../bring-data-in/features/datasets.md)). Boards are not here: a board version is a frozen reading (a report), not a change to a definition. |
 | CL5 | **`version` is a string on the wire** — skills, rules, plans and agents count, models use SemVer. `version_id` is the version row's id where one exists, null for an agent. |
-| CL6 | **Effect after is counted, never estimated.** `pinned` counts what a run recorded it used; a model is not pinned on runs, so its effect is the Graph's roots while that version was published, labelled `window` so nobody reads it as attribution. Tokens are a run's root row plus its own steps. |
-| CL7 | **Why is optional and never inferred.** It rides on the minting event as `details.why` (500 characters at most); a model's is its `change_summary`. |
 | CL8 | **An agent update records `details.diff`** — `{field: {before, after}}` for every changed field — beside the field names it already recorded, because an agent has no version table and its event is the only place an earlier version still exists. |
-| CL9 | **Compare `a` omitted is "against the one before"**; `a` older than `b` is not required — the diff reads from `a` to `b`. Drafts are never versions. |
-| CL10 | **Restore is not here.** Restoring makes a new version through the record's own write (shell.md); the change log only reads. |
 | CL11 | **The agent and skill pages read their own history; the shared surfaces are C04.** Their History tabs read `history/<kind>/<id>`, and the skill's Plan tab reads its compare against the version before; Activity › Changes and the compare board stay with the shell ([agents.md › Decisions](../../../../products/agents.md#decisions) *Agent history* · *Skill history*). |
-| CL12 | **Studio draws one change log and one compare for every product.** The change log is the Events tab's *Changes* filter, a change's compare is a path under Activity, and a model's History and a dataset record's change log open the same compare; the rules are in [shell.md › Decisions](../../../../products/shell.md#decisions) *The Changes filter* · *The compare page* · *One compare for every product*. |
-| CL13 | **A compare carries the change in tokens per run.** `GET …/history/compare` returns `tokens_per_run_change` — `b`'s tokens per run against `a`'s, as a `Change` (how much, which way, better or worse), each read over the span its version was current. Null when either side ran nothing. The compare page's *Tokens per run* tile formats it (`1.4×`, toned by the change) and divides nothing. |
-| CL14 | **A model version's effect also names the datasets it touched.** The publish stores them on the version ([MP49](../../connect-and-model/features/the-model-page.md#decisions)); the history returns them on `effect.datasets` with the engine's two counts, beside the `window` runs, and returns `[]` for a version published before anything was bound. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| A change table or snapshot store | the versions already exist; a copy drifts (CL1) |
-| Currency in effect after | tokens only |
-| Restore from the change log | a restore is the record's own write, which mints a new version |
-| Per-cell provenance | record level plus the change log covers it (datasets.md) |
-| Backfilling `why` or agent diffs for old events | an empty field is honest; an inferred one is not |
-| Board and report versions | a frozen reading, not a definition change (CL4) |

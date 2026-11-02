@@ -139,7 +139,7 @@ class GraphConnectionCreate(BaseModel):
     database: str | None = Field(default=None, max_length=255)
     auth: dict = Field(default_factory=dict)
     read_only: bool = False
-    # Optional manually-declared DB version (docs/for-developers/modules/graph-connectors/features/capabilities.md) —
+    # Optional manually-declared DB version (specs/system-design/modules/graph-connectors.md § Capabilities) —
     # used as a fallback when
     # the backend can't be auto-detected (e.g. Gremlin). A successful auto-detect
     # on connect overrides it; leave blank to rely on detection.
@@ -197,7 +197,7 @@ class GraphConnectionRead(BaseModel):
     query_languages: list[str] = Field(default_factory=list)
 
     # Backend property-type capabilities + version compatibility
-    # (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+    # (specs/system-design/modules/graph-connectors.md § Capabilities).
     # `supported_property_types` drives the modeller's property-type dropdowns;
     # the version/compatibility fields drive the read-only safety valve + banner.
     supported_property_types: list[str] = Field(default_factory=list)
@@ -252,7 +252,7 @@ class ContentionRead(BaseModel):
     """What is running in this Graph and what is waiting behind it.
 
     Contention has to be **visible**
-    (docs/for-developers/modules/agents/features/concurrency-and-contention.md C8):
+    (specs/products/settings/features/ST-F06-workers-and-limits/feature.md):
     what is running, what is queued, and why. Without it, one agent starving the
     Graph looks exactly like the Graph being slow.
     """

@@ -31,8 +31,11 @@ const OLD_PANEL_LINKS: [string, string][] = [
 	["?panel=fleet&section=map", "/agents/fleet/map"],
 	["?panel=functions&section=templates", "/agents/functions/templates"],
 	["?panel=connections", "/agents/connections/server"],
-	["?panel=runs", "/agents/runs"],
+	["?panel=runs", "/activity/runs"],
+	["?panel=approvals&section=alerts", "/activity/approvals/alerts"],
+	["?panel=ledger", "/activity/ledger"],
 	["?panel=events", "/activity/events"],
+	["?panel=activity&section=inbox", "/activity/inbox"],
 	["?panel=projects&project=p1", "/projects/p1"],
 	["?panel=projects&section=todos&todo=t1", "/projects/todos/t1"],
 	["?panel=govern&section=worlds&world=w1", "/modeller/worlds/w1"],
@@ -90,13 +93,14 @@ test("a product's root opens its first section", async ({ page }) => {
 test("the breadcrumbs are the path's levels, each a link up", async ({
 	page,
 }) => {
-	await page.goto(`${GRAPH}/activity/events`);
+	// A change's compare sits under Changes; that level is the change log.
+	await page.goto(`${GRAPH}/activity/changes/agent/a1`);
 	const crumbs = page.getByLabel("Breadcrumb");
-	await expect(crumbs.getByText("Events", { exact: true })).toBeVisible({
+	await expect(crumbs.getByText("agent:a1", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
-	await crumbs.getByRole("link", { name: "Activity" }).click();
-	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
+	await crumbs.getByRole("link", { name: "Changes" }).click();
+	await expect(page).toHaveURL(`${GRAPH}/activity/events?filter=changes`);
 });
 
 test("an Agents trail names the section, never its tab", async ({ page }) => {

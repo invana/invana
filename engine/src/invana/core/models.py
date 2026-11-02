@@ -1,5 +1,5 @@
 """The SQLAlchemy declarative base — and nothing else
-(docs/for-developers/building-engine/code-shape.md §3.1).
+(docs/for-developers/building-engine/migration-plan.md §3.1).
 
 Every table in the engine is declared against this ``Base``, in the package
 that owns it. It lives in ``core`` because everything needs it and it needs

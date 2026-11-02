@@ -37,11 +37,6 @@ import {
 	StatusDot,
 } from "@invana/ui";
 import { useListParams } from "@invana-studio/core";
-import { agentTone, FilterSelect } from "@invana-studio/ui";
-import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useFleetPerformanceQuery } from "../fleet/queries";
-import type { PerformanceRow } from "../fleet/types";
 import {
 	chipsOf,
 	FilteredEmpty,
@@ -49,10 +44,16 @@ import {
 	ListStrip,
 	matchCount,
 	PAGE,
+	ReadState,
 	setOne,
-} from "../lists";
+} from "@invana-studio/shell";
+import { agentTone, FilterSelect } from "@invana-studio/ui";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useFleetPerformanceQuery } from "../fleet/queries";
+import type { PerformanceRow } from "../fleet/types";
 import { useAgentsOpen } from "../open";
-import { FleetReadState, pct, tokens } from "../overview/fleetParts";
+import { pct, tokens } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { useSkillsQuery } from "../skills/queries";
@@ -197,11 +198,7 @@ export function AgentsListPage({ username, graphSlug }: SectionPageProps) {
 				{query.isLoading ? (
 					<Spinner />
 				) : query.error ? (
-					<FleetReadState
-						loading={false}
-						error={query.error}
-						what="the agents"
-					/>
+					<ReadState loading={false} error={query.error} what="the agents" />
 				) : rows.length === 0 ? (
 					chips.length ? (
 						<FilteredEmpty noun="agent" filters={chips} onClear={list.clear} />

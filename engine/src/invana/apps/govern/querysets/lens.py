@@ -30,7 +30,7 @@ class LensQuerySet:
         ``include_unnamed`` is off by default because an unnamed lens is private
         to the run it was made for — it is in nobody's list, and there is no
         share action to find
-        ([WO1](docs/for-developers/modules/govern/features/worlds.md)).
+        (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
         """
         stmt = select(Lens).where(Lens.graph_id == graph_id)
         if kind is not None:

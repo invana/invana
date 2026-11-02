@@ -519,7 +519,7 @@ export interface ProjectSummary {
 	critical_path: number;
 }
 
-/** One row of the activity tree (docs/for-developers/modules/work/spec.md). */
+/** One row of the activity tree (specs/system-design/modules/work.md). */
 export interface ActivityNode {
 	id: string;
 	kind: "event" | "step";

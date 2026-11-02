@@ -9,73 +9,13 @@ inbox to send to; a **notification** is one inbox row; a **delivery** is one sen
 | Index | [10.7](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / 🟡 |
-| Related | [approvals](approvals.md) · [schedules](schedules.md) · [audit-and-activity](audit-and-activity.md) · [roles](../../identity-and-access/features/roles.md) · products [shell.md › Activity](../../../../products/shell.md#activity) SH-15 · SH-16 |
+| Related | [approvals](approvals.md) · [schedules](schedules.md) · [audit-and-activity](audit-and-activity.md) · [roles](../../identity-and-access/features/roles.md) |
 
-> **As** anyone on a Graph, **I want** one inbox of what needs me and rules that say which events
-> reach whom on which channel, **so that** failures and slowdowns find the right person and I act on
-> what matters first.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Channels | `email` · `slack` · `webhook`. In-app is not a channel row: every rule and schedule may deliver to the inbox |
-| C2 | A channel holds its credential encrypted | A Slack incoming-webhook URL or a webhook URL + signing secret, Fernet-encrypted; the read shows only a masked target |
-| C3 | Rules | Event action patterns (`run.finish`, `approval.*`), an optional `match` on the event's details (`{"status": "failed"}`), recipients, `in_app`, channels, enabled |
-| C4 | Recipients | Named members · holders of named Graph roles · `requester` — the person a run or act was on behalf of |
-| C5 | The inbox | My notifications on this Graph, newest first, with an unread count; mark some or all read |
-| C6 | Deliveries are recorded | One row per send: what was sent, to which channel, `pending · held · sent · failed · declined · expired`, attempts and the error |
-| C7 | A failed send retries | Up to three attempts, then `failed` with the error; the inbox row is never lost to a channel failure |
-| C8 | Approvals, reminders and expiries always reach the inbox | Not rule-driven: an approver is told without anyone writing a rule ([10.8](approvals.md)) |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[An owner opens Activity › Rules] --> B{Any channels?}
-    B -->|no| C[Activity › Channels · add email · Slack · webhook]
-    C --> D[Channel saved · target masked]
-    B -->|yes| E[New rule · events · match · recipients · channels]
-    D --> E
-    E --> F{Valid?}
-    F -->|unknown channel · empty recipients · notification event| G[Refused · 422 names the field]
-    F -->|yes| H[Rule saved · enabled]
-    H --> I[An event is written · run.finish failed]
-    I --> J[The clock matches it within a tick]
-    J --> K[Inbox row per recipient]
-    J --> L[Delivery per channel · sent]
-    L -->|channel down| M[Retried · then failed with the error]
-    K --> N[Bell count]
-    N --> T[Bell opens the tray over the page]
-    T --> U{Row kind}
-    U -->|update| O[Go to its target · marked read]
-    U -->|approval| R[Review in the tray · exactly what will be sent]
-    R --> V{Approver and still pending?}
-    V -->|no · not named| V1[Reads · acts disabled · names the approvers]
-    V -->|no · decided or expired| V2[Says who decided · or expired, nothing sent]
-    V -->|yes| W[Approve · Decline with a note · the run resumes]
-    U -->|question| Q[Answer in the tray · the run resumes]
-    T --> X[Open inbox · Activity › Inbox]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Inbox empty | *Nothing needs you* — good news, not a blank page |
-| Tray empty | *Nothing needs you*, with *New rule* — failures reach a person only through a rule |
-| Tray loading | The tray opens at once with skeleton rows; the bell's count is the last one read |
-| An approval decided elsewhere while the tray is open | *Review* shows who decided and when in place of the acts (409) |
-| A new approval or question while Studio is open | A toast with *Review*, which opens it in the tray; updates never toast |
-| A viewer opens Rules | The list reads; *New rule* is disabled naming the owners (rules and channels are the `settings` area) |
-| Email with no SMTP on the install | The channel saves; its read says *email is not configured on this install*; each delivery fails with that reason |
-| A channel deleted while a rule names it | Refused (409) naming the rules that use it |
-| A rule matching its own deliveries | Refused: `notification.*`, `delivery.*` and `approval.remind` are never matched, so a rule cannot feed itself |
-| A recipient removed from the Graph | Skipped at match time; the rule still saves |
-| The engine was down | Events written meanwhile are matched on recovery — the cursor is a row, not process memory |
-| A private project's events | Reach only the people staffed on it ([9.7](../../work/features/private-projects.md)) |
+Product spec: [IN-F01 · Needs you](../../../../../specs/products/inbox/features/IN-F01-needs-you/feature.md) — IN-04 · IN-05; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
+
+The Studio surfaces as built today; the Inbox modal and Settings › Notifications in IN-F01 replace them.
 
 | Surface | Shape |
 |---|---|
@@ -102,30 +42,14 @@ flowchart TD
 
 ## Decisions
 
+Engine rows, and the tray rows the Inbox modal supersedes; the product decisions are IN-F01's.
+
 | # | Decision |
 |---|---|
 | NT1 | **One clock.** A single loop in the engine process matches new events, fires schedules, reminds and expires approvals, and sends pending deliveries — one `tick(now)` each interval (default 30 s). Every step is idempotent on unique keys, and the cursor row is taken `FOR UPDATE SKIP LOCKED`, so two engine processes never double-send. |
 | NT2 | **Rules read the event record; they never hook a write.** Matching runs after commit, from `events`, through a persisted cursor. A write is never slowed or failed by a notification. |
-| NT3 | Rules and channels are the `settings` area (owner): a channel holds a credential, and a rule decides who is paged. Reading them, and one's own inbox, is open to every member. |
-| NT4 | In-app is not a channel. A rule's `in_app` and a schedule's `deliver_in_app` write inbox rows; channels are only what leaves Invana. |
 | NT5 | A channel's credential is write-only: stored Fernet-encrypted under `INVANA_ENCRYPTION_KEY`, never read back; the read shows a masked `target`. |
 | NT6 | A webhook delivery is a JSON `POST` signed with `X-Invana-Signature: sha256=<hmac of the body>` when the channel has a secret. A Slack delivery posts `{"text": …}` to the incoming-webhook URL. Email goes through the install's SMTP. |
-| NT7 | A rule never matches `notification.*`, `delivery.*` or `approval.remind`, so no rule can feed itself. |
-| NT8 | Recipients resolve at match time: named members still on the Graph, holders of the named roles, and `requester` (the event's `on_behalf_of_user_id`, else its user actor). An event on a private project reaches only its staffed people. |
-| NT9 | A send is tried three times, one per tick, then left `failed` with the error. The inbox row is written first and never depends on a channel. |
 | NT10 | Read state is per notification (`read_at`); the bell counts unread notifications plus the approvals and runs waiting on the reader, which stay rows of their own until decided or answered. |
 | NT11 | **The bell opens the tray; the Inbox is the history.** The tray reads the same three lists as the Inbox and carries the same count. What needs a person is decided in place — reviewed and approved, or answered — without leaving the page. |
 | NT12 | **Nothing is approved from a list row.** *Approve* · *Decline* appear only after *Review* has shown the payload exactly as it will be sent and what each choice does. |
-| NT13 | Only what needs a person toasts — a new approval or question. Updates wait in the tray. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Microsoft Teams | listed as *not connected*; no work planned (products shell.md) |
-| Per-product notification centres | one inbox, filtered by product |
-| Digest batching or quiet hours | a schedule is how routine reading recurs |
-| Rules on an answer's value | that is a monitoring product |
-| Escalation chains and on-call rotations | a rule names its people; paging policy is another product's job |
-| One-click approve from the tray or a toast | an approval is decided from what it will send (NT12) |
-| Per-user channel preferences | a rule owns its channels; a person reads the inbox |

@@ -10,7 +10,7 @@ for the event, which must still read after the agent is gone
 (docs/for-developers/modules/operate/features/audit-and-activity.md).
 
 That is also why the bind-time checks arrive as a **callable**
-([BN5](docs/for-developers/modules/skills/features/bindings.md)): the envelope
+([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)): the envelope
 half reads the plan a skill version draws, and `apps/flows` sits above this
 package. So the check is composed one band up
 (`runtime/managers/skill_bind.py`) and handed in by whoever binds — the same
@@ -76,7 +76,7 @@ class SkillBindingManager:
         no-op: the caller believes it is changing the bindings, and it is not.
 
         ``check`` runs **before the row is written** and raises to refuse
-        ([BN5](docs/for-developers/modules/skills/features/bindings.md)) — so a
+        ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)) — so a
         skill this agent could never run fails here, in front of the person
         binding it, rather than inside a run at 3am.
         """
@@ -110,7 +110,7 @@ class SkillBindingManager:
         actor_id: str,
     ) -> None:
         """Take a skill back. The next run is not offered it; a run in flight
-        already has its prompt ([BN3](docs/for-developers/modules/skills/features/bindings.md))."""
+        already has its prompt (specs/products/agents/features/AG-F04-skills/feature.md § Decisions)."""
         binding = await self.skill_bindings_qs.get(session, skill_id=skill.id, agent_id=agent_id)
         if binding is None:
             raise NotFoundError(f"'{skill.name}' is not offered to {agent_name}.")

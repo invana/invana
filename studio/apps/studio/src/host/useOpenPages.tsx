@@ -77,7 +77,7 @@ export interface OpenPagesDeps {
 	workCanvas: ReactNode;
 	dataBoards: ReturnType<typeof useDataBoards>;
 	runStep: string | null;
-	/** The open product's sections as tabs — Agents' or IAM's; none elsewhere. */
+	/** The open product's sections as tabs — Agents', IAM's or Activity's; none elsewhere. */
 	sections: SectionTabs;
 	openAgentPage: DeclaredBoardDeps["openAgentPage"];
 	showAgentCanvas: DeclaredBoardDeps["showAgentCanvas"];
@@ -218,8 +218,9 @@ export function useOpenPages(deps: OpenPagesDeps) {
 	const boardPageRef = useRef<BoardPageHandle>(null);
 	const productId = useActiveProduct()?.id;
 	const explorerOpen = productId === "explorer";
-	// Agents and IAM: sections as tabs, and Home when nothing is open.
-	const sectionsOpen = productId === "agents" || productId === "iam";
+	// Agents, IAM and Activity: sections as tabs, and Home when nothing is open.
+	const sectionsOpen =
+		productId === "agents" || productId === "iam" || productId === "activity";
 	const openPalette = useOpenPalette();
 	const [assistantShown] = useAssistantShown();
 
@@ -253,7 +254,7 @@ export function useOpenPages(deps: OpenPagesDeps) {
 			onAskAboutRecord={
 				assistantShown ? () => right.open("assistant") : undefined
 			}
-			onOpenModel={() => settingsPanel.setSection("runs")}
+			onOpenModel={() => settingsPanel.setSection("activity-runs")}
 			interactionRef={runRef}
 			expand={expandHandlers}
 			expandSchema={expandSchema}

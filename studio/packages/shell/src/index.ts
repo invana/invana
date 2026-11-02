@@ -4,12 +4,13 @@
  * registry and action registry, sign-in, profile settings, the error page
  * and the theme bridges. It never imports a product; the app hands it the list.
  *
- * Activity and setup live here too: the Activity page (its seven tabs, the
- * journal and a run's page), the events log (a Graph's and
- * the platform's), the header's bell, and setup's board, lesson,
- * timeline and lock. What they borrow from the products arrives through
- * `ActivitySlotsContext` and `SetupSlotsContext`. The Graph's own URL and
- * Activity are the shell's routes (`graphRoutes`).
+ * Activity's shared parts and setup live here too: the Activity product's
+ * sections table, its Schedules, Events, Inbox, Rules and Channels pages, a
+ * run's boards, the events log (a Graph's and the platform's), the header's
+ * bell, and setup's board, lesson, timeline and lock. What they borrow from
+ * the products arrives through `ActivitySlotsContext` and
+ * `SetupSlotsContext`. The Graph's own URL is the shell's route
+ * (`graphRoutes`); Activity is a product of its own (`@invana-studio/activity`).
  *
  * So do the Graph list and the regions every graph-scoped product reads: the
  * open `leftSection` panel and its stack keys, who holds `rightSection`, and
@@ -22,24 +23,50 @@ export * from "./actions";
 export type { ActivitySlots } from "./activity/ActivitySlots";
 export { ActivitySlotsContext } from "./activity/ActivitySlots";
 export {
+	activityOf,
 	activityPath,
 	approvalsPath,
 	comparePath,
 	runPagePath,
 } from "./activity/activityPath";
-export type { ChangeEntry } from "./activity/changes/history";
-export { effectLine, useRecordHistories } from "./activity/changes/history";
+export { ComparePage } from "./activity/changes/ComparePage";
+export type {
+	ChangeEntry,
+	RecordHistory,
+	RecordKind,
+} from "./activity/changes/history";
+export {
+	effectLine,
+	historyKey,
+	useRecordHistories,
+} from "./activity/changes/history";
+export { EventsTab } from "./activity/events/EventsTab";
 export type { EventListResponse } from "./activity/events/types";
+export { InboxTab } from "./activity/inbox/InboxTab";
+export { useInbox } from "./activity/inbox/useInbox";
 export { approvalsApi } from "./activity/notifications/api";
+export { ChannelsTab } from "./activity/notifications/channels/ChannelsTab";
+export { RulesTab } from "./activity/notifications/rules/RulesTab";
 export type { Approval } from "./activity/notifications/types";
 export { QueryStepBoard } from "./activity/runs/boards/QueryStepBoard";
 export { runAddress } from "./activity/runs/boards/runBoards";
 export { useRunStep } from "./activity/runs/boards/useRunStep";
 export { useRunsQuery } from "./activity/runs/queries";
-export { RunsBoardPage } from "./activity/runs/RunsBoardPage";
 export { StepTouchWidget } from "./activity/runs/touches/StepTouchWidget";
-export { useSchedulesQuery } from "./activity/schedules/queries";
+export {
+	scheduleKeys,
+	useSchedulesQuery,
+} from "./activity/schedules/queries";
 export { ScheduleDialog } from "./activity/schedules/ScheduleDialog";
+export { SchedulePage } from "./activity/schedules/SchedulePage";
+export { SchedulesTab } from "./activity/schedules/SchedulesTab";
+export type { Schedule } from "./activity/schedules/types";
+export {
+	ACTIVITY_SECTIONS,
+	type ActivitySectionKey,
+	activityPanelOf,
+	activitySectionOfPanel,
+} from "./activity/sections";
 // The board record and its versions and reports — what a canvas tab saves.
 export { boardsApi } from "./boards/api";
 export type { CanvasKind, DeclaredKind, OpenBoard } from "./boards/boardKinds";
@@ -91,6 +118,17 @@ export * from "./components/ProtectedRoute";
 export * from "./components/SaturationBridge";
 export * from "./components/ThemeSyncBridge";
 export { CanonicalRoute, graphRoutes } from "./graphRoutes";
+export {
+	chipsOf,
+	EVERY,
+	FilteredEmpty,
+	filterValue,
+	ListStrip,
+	matchCount,
+	PAGE,
+	ReadState,
+	setOne,
+} from "./lists/listParts";
 export * from "./pages/auth/LoginPage";
 export * from "./pages/ErrorPage";
 export { GraphConnectPage } from "./pages/graphs/GraphConnectPage";
@@ -98,6 +136,15 @@ export { GraphsListPage } from "./pages/graphs/GraphsListPage";
 export { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 export * from "./pages/settings/ProfileSettingsPage";
 export { useOpenPalette } from "./palette/CommandPalette";
+export {
+	PlatformWorkbook,
+	useOpenPlatformRecord,
+} from "./platform/PlatformWorkbook";
+export {
+	NEEDS_INSTALL_ADMIN,
+	PluginStateChip,
+	PluginToggle,
+} from "./plugins/PluginToggle";
 export { useAssistantShown } from "./preferences";
 export * from "./products";
 export {

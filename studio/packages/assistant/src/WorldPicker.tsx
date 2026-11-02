@@ -11,7 +11,7 @@
  * — the trigger wears a tag until that ask is sent.
  *
  * **It reads `Everything` when nothing is picked**, which is a real world and
- * the default one ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md))
+ * the default one ([govern.md](../../../../../../specs/system-design/modules/govern.md))
  * — and when the thread's world was deleted, it says so rather than reading as
  * though nobody had picked one.
  *

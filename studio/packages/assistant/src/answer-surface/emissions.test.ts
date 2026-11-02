@@ -49,14 +49,14 @@ describe("linkHref", () => {
 		expect(
 			linkHref(
 				{
-					path: "/agents/runs",
+					path: "/activity/runs",
 					params: { "f.status": "failed", "f.since": "30d" },
 				},
 				"admin",
 				"airways",
 			),
 		).toBe(
-			"/u/admin/airways/agents/runs?f.status=failed&f.since=30d&via=assistant",
+			"/u/admin/airways/activity/runs?f.status=failed&f.since=30d&via=assistant",
 		);
 	});
 });

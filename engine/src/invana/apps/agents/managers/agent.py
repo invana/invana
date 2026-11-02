@@ -254,7 +254,7 @@ class AgentManager:
             agent.workflow_spec = spec
 
     async def default_agent_for_surface(self, session: AsyncSession, *, graph: Graph, surface: str) -> Agent | None:
-        """Which agent a new session on this surface binds (docs/for-developers/modules/agents/spec.md).
+        """Which agent a new session on this surface binds (specs/system-design/modules/agents.md).
 
         Explorer takes the graph's default so an owner can re-point it; Modeller
         always takes the seeded modeller, because a modeller session that plans
@@ -310,7 +310,7 @@ class AgentManager:
 
         A paused or retired agent is not an error in the abstract — it is a state
         the user can fix — so the 409 says which one it is and the composer offers
-        the picker (docs/for-developers/modules/agents/spec.md, docs/for-developers/modules/work/spec.md J1's *blocked*
+        the picker (specs/system-design/modules/agents.md, specs/system-design/modules/work.md J1's *blocked*
         seam).
         """
         agent = await self.get_or_404(session, agent_id=agent_id, graph_id=graph_id)
@@ -670,7 +670,7 @@ class AgentManager:
         why: str | None = None,
     ) -> Agent:
         """Retire, not delete. **The row stays** so lineage and every trace row
-        still resolve to a name (docs/for-developers/modules/work/spec.md)."""
+        still resolve to a name (specs/system-design/modules/work.md)."""
         agent.status = AgentStatus.retired.value
         tasks = await self._open_tasks(session, agent=agent)
         for task in tasks:

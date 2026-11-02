@@ -1,6 +1,6 @@
 # Migration runner
 
-Runs [docs/products/migration-sessions.md](../../docs/products/migration-sessions.md) unattended, one session after another.
+Runs [.claude/team/projects/_archived/migration/project.md](../../.claude/team/projects/_archived/migration/project.md) unattended, one session after another.
 
 | Step | Who | What |
 |---|---|---|
@@ -17,7 +17,7 @@ Runs [docs/products/migration-sessions.md](../../docs/products/migration-session
 
 ```bash
 docker compose up -d                                   # Studio on :8300 for the design review
-python3 scripts/migration/screen_map.py                # board → route map (re-run after docs change)
+python3 .claude/skills/design-qa/screen_map.py                # board → route map (re-run after docs change)
 python3 scripts/migration/run.py --baseline            # once, on untouched studio/: what already fails
 python3 scripts/migration/run.py --dry-run             # what runs next
 python3 scripts/migration/run.py --track A             # overnight: the Studio restructure
@@ -63,7 +63,7 @@ Run it again. A session left `in progress` or `partial` on its branch resumes fr
 
 | Path | What |
 |---|---|
-| `docs/products/migration-sessions.md` | the log and hand-off notes — the run's only state; resumable |
+| `.claude/team/projects/_archived/migration/project.md` | the log and hand-off notes — the run's only state; resumable |
 | `scripts/migration/reviews/<ID>.md` | each session's design review (committed) |
 | `.migration-cache/<ID>/` | full event streams of every build, fix and review session; before/after screenshots (ignored by git) |
 

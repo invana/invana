@@ -12,26 +12,7 @@ model, derived at read time.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [the-model-page](the-model-page.md) · [domain-models](domain-models.md) · [load-data](../../bring-data-in/features/load-data.md) |
 
-> **As** someone with several domains in one Graph, **I want** to say how they relate, **so that** a
-> question can cross them without anyone guessing which `Stock` is which.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Declare an **anchor** | `NewsArticles.Company.ticker ≡ MarketData.Stock.nse_symbol` — one key on each side |
-| C2 | Declare a **relationship link** | `Order -[PLACED_BY]-> Person`, its endpoints found by a key on each side **or** supplied by a dataset |
-| C3 | Join rules are explicit | Which property on each side, matched how — never a similarity score |
-| C4 | An anchor links, never merges | Both nodes stay; queries traverse the link |
-| C5 | The global model is derived | Union of published models plus links, computed on read |
-| C6 | A stitch is its own kind of run | `Todo(kind = stitch)` — it writes edges with no dataset in the picture |
-| C7 | Links only bind published versions | A draft cannot be stitched |
-| C8 | A stitch stages before it counts | Declared rows exist and are visible; the union takes active ones only (ST21) |
-| C9 | A bundle's stitches apply from one command | `invana stitches apply --file <bundle>/stitches.json` declares every rule the manifest states, staged (ST39) |
-| C10 | Committing a stitch **writes its edges** | A keyed relationship writes its edge type, an anchor writes `SAME_AS`; both are MERGEd, so committing twice writes nothing twice (ST44, ST49) |
-| C11 | An active stitch is **standing**, not a one-off | Every later import solves the Graph's active stitches over the records it just wrote, so data arriving after the stitch is stitched as it lands (ST47) |
-| C12 | A stitch-made edge says it is one | `_inv_origin = "stitch"` with the stitch id, the rule and when it was solved — nobody loaded these, and the graph says so (ST46) |
-| C13 | A declared stitch can be re-counted | `invana stitches resolve` counts what each one matches against the live database, and writes nothing (ST43) |
+Product spec: [MO-F03 · Link and share models](../../../../../specs/products/model/features/MO-F03-link-and-share-models/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Three worked stitches
 
@@ -83,38 +64,6 @@ not the airline, so those are relationship links. Anchoring them collapsed `Acco
 `Airline` in the derived union and cost `Publisher` its Twitter side — the union is where a
 type-level over-claim shows up, because that is the one place an anchor is read as a claim
 about every node rather than about the rows that happen to match.
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Two published models] --> B{What kind of link?}
-    B -->|same entity| C[Anchor: pick both types,<br/>then the key on each side]
-    B -->|an edge between them| D[Relationship: name the edge type]
-    C --> E[Preview: how many resolve, how many do not]
-    D --> K{Where do the endpoints come from?}
-    K -->|a key already on the records| L[Pick the key on each side]
-    K -->|their own rows| F[Which dataset supplies the records]
-    L --> E
-    E --> G[Declare]
-    F --> G
-    G --> H[Global model now spans both]
-    H --> I[Questions cross the boundary, citing both sources]
-    E -->|nothing resolves| J[Stated plainly — the rule is wrong,<br/>not the data]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Join rule matches nothing | A count of zero before the link is declared, not after, and *Stage this stitch* goes dead until the rule changes |
-| Neither side holds any rows yet | **Not** a refusal — *No records to count*, and the stitch stages anyway (ST38) |
-| A key that is not a property of its side | Refused, naming the side and the type that lacks it. A type that carries **no** properties says so in place of the picker, rather than offering an empty dropdown |
-| Duplicate anchors on the same pair | Refused, naming the existing one |
-| A model version republished | Links point at versions; a new version needs its links reviewed |
-| Endpoint missing at import | The edge record is rejected with both endpoints named |
-| A stitch declared but not committed | It is listed, drawn and counted — and no answer changes, which the declare message says out loud (ST21) |
-| Committing with nothing staged | Refused, saying there is nothing to commit — never a silent success |
 
 ## Surfaces
 
@@ -171,17 +120,10 @@ Declaring, committing and discarding are the engine's three writes; removing is 
 
 | # | Decision |
 |---|---|
-| ST1 | Every link is declared. Nothing is inferred, ever. |
-| ST2 | An anchor links; it never merges two nodes. |
-| ST3 | The global model is derived at read time and never stored. |
-| ST4 | A relationship link's records come from a dataset, like any other data. |
 | ST5 | A stitch is its own Todo kind. |
 | ST6 | The global model is **stated, not drawn**: counts that name what they were derived from, then every node and edge type with the models contributing it. `GlobalType` carries no endpoints, so there is no graph to lay out — drawing it needs `source`/`target` on the payload first. |
 | ST7 | The physical mirror's label count sits beside the derived counts and is never added into them. |
-| ST8 | A link binds published versions only. A draft has nothing immutable to point at, so it is absent from the pickers and the Stitches section says so. |
 | ST9 | Stitching has two rail items, Global model and Stitches. The canvas is where a stitch is seen and declared by a drag; the list is where every stitch of the Graph is read in words, including the removed ones. |
-| ST10 | A model's Stitches section lists every link touching it, from **either** side. `Article ≡ Stock` is one fact, not two. |
-| ST11 | Both kinds are declared from the same place. The `add` control offers anchor and relationship, and the dialog opens with the selected type as the source either way — a relationship link is not a second surface. |
 | ST12 | **Stitches** is a **drawer in the Model panel's stack** (model-editor.md ME13), so stitch hands the model a section rather than rendering one. `useStitchesSection()` returns the section and the declare dialog; the model places the first in its stack and the second beside it. The `add` control is the drawer header's own menu — anchor or relationship — which is what ST11 always described and now is natively. |
 | ST13 | **The surface is called Stitches.** A person stitches two models together; `model_links` is what the engine stores once they have. The drawer, the section header, the crumb and the status line all read *Stitches*; the nouns inside it stay **anchor** and **relationship link**, and the word *link* stays in the engine — `model_links`, `…/model-links`, `model_link.declared`. *Links* as a surface name collided with the everyday hyperlink and named the record rather than the act. |
 
@@ -189,27 +131,18 @@ Declaring, committing and discarding are the engine's three writes; removing is 
 | ST15 | **Detail is the altitude, not zoom.** The landscape is read at one of three levels — circles, cards or schema cards — chosen in the canvas header ([GM4](../../../building-studio/graph-model-canvas.md#decisions)). The landscape opens on circles; a single model's canvas opens on cards ([MP19](the-model-page.md#decisions)). Zoom only moves the camera; frames stay open, because a zoom that also reshapes the drawing is a control nobody can predict. |
 | ST16 | **It reads versions, never the union.** *All models* fans out over the models list and each model's **active version**, plus `…/model-links` — every endpoint it needs is on those payloads already. It never calls `…/global-model`, whose `GlobalType` carries no endpoints, so **ST6 stands unchanged**: the union list is still stated, not drawn. Two surfaces, two questions, two payloads. |
 | ST17 | **A model and each of its types wear their own hue, from the data palette.** A frame's wash and border wear the `--color-data-N` slot the model's name hashes to; on the global model every node type inside it — the ring, the icon, the card's header — wears the **model's** slot too, so the frames read as models at a glance, as the board draws them. On one model's canvas, where the page is already the model, a type wears the slot its own name hashes to, the colour the Explorer paints it ([GM7](../../../building-studio/graph-model-canvas.md#decisions)). Names, not list positions, so a hue survives reordering ([GM8](../../../building-studio/graph-model-canvas.md#decisions)). A stitch wears the edge token and never a model's hue, because it belongs to neither of them. |
-| ST18 | **A model with nothing published still draws.** The canvas spans published versions only (ST8), so a model whose draft has never been committed appears as an **empty frame that says so**, not as an absence. A model you cannot see is a model nobody remembers to publish. |
-| ST19 | **Declaring starts from the canvas here too.** **Shift**-dragging a node type onto a type in another model (or dragging it with the **Stitch mode** toggle on) opens the same declare card the Stitches drawer opens (ST11), with both sides pre-filled — the gesture and the drawer are two affordances onto one path, exactly as ME8 has it for adding a type. A drag inside one model is refused in the message bar: that edge is the model's own edge type, authored on its draft. So is a drag onto a model with nothing published (ST8). |
 | ST20 | **ELK lays the frames out, and it is the only layout.** `ElkLayout`'s compound-group mode packs a group's members *inside* its box, sized from the group's own padding and header band. There is no Layout switch and no d3-force: force only pulls a model's types together, so its frames overlap ([GM3](../../../building-studio/graph-model-canvas.md#decisions)). ELK solves in the worker its layout package ships. |
 | ST21 | **A stitch stages on its own row, not on a draft.** `model_links.status` is `staged` or `active`. Declaring writes a **staged** row; `Commit` flips every staged row in the Graph to active in one action, `Discard` deletes them. The derived global model unions **active links only**, so a staged stitch changes no answer until it is committed. This is deliberately *not* the model's staged set: that one is the live diff between a draft and the version it replaces and records nothing (`staging.py`), and a stitch belongs to no version, so it has no draft to diff. What the two share is the property that matters — the staged set lives on the server, so it survives a reload and anyone opening the Graph sees it (ME4). |
 | ST22 | **The global model has no leftSection.** The canvas is full-bleed; the union list and the stitch inspector are its right column. A model is reached from the canvas, never from a list beside it. |
 | ST23 | **Zoom and fit are the header's own controls.** `GraphControlsToolbar` zooms, fits and locks; the page adds no altitude track and no camera logic of its own. |
 | ST24 | **The global model is its own board, `global_model`, and the Modeller's landing.** Its chrome floats over the canvas: the horizontal toolbar top-left, the info bar beside it (`Global model` · counts · *Show* all models or one · *Lens* · *Detail*), the minimap with zoom bottom-left. A type clicked opens its type page on its model ([the-model-page](the-model-page.md#decisions)). |
 | ST25 | **Every solve frames the drawing.** A run glides the camera with the nodes (`fitCamera`), so a Detail switch reframes what it redrew; between runs the camera is the reader's. |
-| ST26 | **A link carries a key on each side, not one key between them.** `source_property` and `target_property`, with `identity_match` saying how they compare. One property name assumed to exist on both sides is a rule that only holds when the two models were authored together, which is the one case stitching is not for — W1 is the ordinary case, not the exotic one. The pair means *same entity* on an anchor and *where the edge attaches* on a relationship; one field pair, read two ways, because it is the same question both times: which value on this side equals which value on that one. |
-| ST27 | **A relationship gets its endpoints from a join or from its source model's own rows — never both.** Keys (W2) are for an edge that is implied by a property the records already carry; a source model (W3) is for an edge that is its own fact with its own rows. Declaring both would give one edge type two sources of truth and no rule for which wins, so the dialog offers them as a choice — *These keys* or *Its own rows* — and the engine refuses the pair. |
-| ST28 | **The dialog says Source and Target.** They are the payload's own words (`source_version_id`, `target_type`) and the doc's; *From* and *To* read as direction, which is right for a relationship and meaningless for an anchor. One pair of words for both kinds, matching what is stored. |
 | ST29 | **A frame is drawn at the size the solver reserved for it.** A model with **nothing published** is not a group — ELK sizes a group from its members and reserves nothing for one with none — so it is a `model.empty` node: the same tabbed frame at 220×80, with no `group`. A frame with members is sized by `autoFit` alone. |
 | ST30 | **The fit frames the graph layer, not every layer.** `fitView` unions every world layer, and the dot pattern behind the frames is one — framing that union is how the landscape ended up in a corner of its own canvas. The camera fits `GraphLayer.getBounds()`, and only on a **settled** solve (model-editor.md ME24): a stopped run leaves every frame on the origin, and fitting that frames a point. |
 | ST31 | **The drawing rebuilds only when its data does.** `<GraphLayer data>` replaces the drawing when its reference flips, so `GraphModelCanvas` keys its data on content, and `useAllModels` reads its versions through `combine`, whose result is structurally shared — `useQueries` hands back a new array on every render. |
 | ST32 | **A frame is the story's `modelFrame`, in its model's hue.** A `tabbed-rect` with the model's name on its tab, a 10% wash and a 60% border in the model's hue; its collapse toggle is hidden (`showToggle: false`), so a frame is always open. |
 | ST33 | **A frame follows the theme.** Its title is the theme's `heading` role, and its hue and the members' hues are read live from `--color-data-N` whenever the theme changes, then put back over the layer's own theme pass ([GM7 · GM8](../../../building-studio/graph-model-canvas.md#decisions)). |
 | ST34 | **The declare card is docked beside the canvas, not modal.** The gesture that opens it on *All models* is a drag between two frames, and a scrim over those frames hides the two types the stitch is about — so it docks in the canvas's right panel, beside Settings ([GM12](../../../building-studio/graph-model-canvas.md#decisions)). From the Stitches drawer there is nothing behind it worth keeping in view, so there it is a dialog — the same card. |
-| ST35 | **The count fires itself.** Naming both keys completes the rule, and the rule is the question; a button that has to be pressed to answer it is a count most people never see, and the whole value of the preview is that it arrives *before* the stitch exists. A zero disables *Stage this stitch* and the secondary reads **Try another key**, because the rule is what needs changing. |
-| ST36 | **A refusal names what it refused.** `link_already_declared` carries the existing stitch's id and its rule, and the card states them: a pair is anchored once, so the useful action is to change *that* stitch, not to be told no and left to find it. |
-| ST37 | **Counts live on the page's Overview and on drawer headers, never on the canvas.** `5 models`, `6 stitches`, `2 staged` are Overview tiles, and each drawer's own count rides its header so it is legible while the drawer is closed (ME13). A count in two places is a count that can disagree with itself. The canvas is the drawing alone; the staged stitches and the stitches bound to an older version sit on bars above it, because each is something to act on. |
-| ST38 | **A zero against no rows is not a verdict.** The preview refuses a rule only when there were rows to judge it against: `countable` is false when either side holds no value for its key, and the card reads *No records to count* and stages anyway. A model is authored before its data lands — that is the ordinary order of work, and a stitch that could not be declared until the records arrived would invert it. |
 | ST39 | **A bundle's stitches declare from the CLI.** `invana stitches apply --graph <username>/<slug> --file <bundle>/stitches.json` reads the manifest `invana records check` already validates (load-data.md LD12) and declares each rule against the Graph — **staged**, exactly where the declare card leaves one (ST21), with `--commit` to flip the set in the same run. A bundle that states eleven rules in a file and then asks a person to retype them into a card is a bundle whose rules exist twice, and the two copies disagree the first time one of them is edited. Nothing is inferred on the way in (ST1): the CLI declares what the manifest says, so both paths write the same rows. |
 | ST40 | **The manifest names folders; a stitch binds versions, so the CLI resolves one to the other.** A rule says `news-articles:City.code` and a link needs a published version id. `<bundle>/<folder>/graph-model.json` carries the artefact's `package_id`, which is the model's identity wherever it landed (share-a-model.md SM2), so a folder resolves to its model by package, then by name for a model authored rather than imported. **A folder declares its own model and nothing else has to remember the binding** (load-data.md LD23). Whatever it resolves to must carry a **published version**, and a model with only a draft is skipped naming the model (ST8) — that is a step somebody forgot, and saying which one is the whole difference between a message and an error. |
 | ST41 | **Applying twice declares nothing twice.** A rule whose pair is already stitched comes back `link_already_declared` (ST36) and the CLI reports it as *already declared*, not as a failure: a manifest is applied again after every edit to it, and re-running is the ordinary case, not the exceptional one. The exit code is non-zero only for a rule that could not be declared at all — no published version, a type the version does not carry, a rule the engine refuses — so a pipeline can branch on it exactly as it branches on `records check`. |
@@ -221,7 +154,6 @@ Declaring, committing and discarding are the engine's three writes; removing is 
 | ST47 | **An active stitch is standing, so every import solves it.** The import run's third step is already called `stitch` (load-data.md LD6): besides resolving the edges the dataset deferred, it now solves the Graph's **active** stitches over the records that import just wrote, scoped by the job's own provenance stamp. A rule solved once is a rule that is wrong by the next load — the tweet that arrives tomorrow has to reach the airport it names without anybody re-running anything. Staged stitches are not solved: nothing that is not in the union may write to the graph. |
 | ST48 | **Removing a stitch removes what it wrote.** `MATCH ()-[r]->() WHERE r._inv_stitch_id = $id DELETE r` — withdrawing the fact withdraws the edges derived from it, because an edge whose rule no longer exists is one nobody can explain. Discarding a **staged** stitch deletes nothing: it never wrote anything. |
 | ST49 | **Solving is a MERGE, so it is idempotent.** Committing twice, solving twice, importing the same dataset twice — none of them writes a second edge, and that is precisely what makes ST47 safe to run at the end of every load. It also means a solve can be interrupted and re-run rather than needing to be undone. |
-| ST50 | **A stitch says where it came from.** `description` is written by whoever declared it — `invana stitches apply` writes *from the airways bundle (R1)* — and the Stitches row states it after the rule and the status. A stitch declared from a file on somebody's laptop is otherwise an anonymous row in a drawer three people share, and the first question anyone asks about a rule they did not write is where it came from. |
 | ST51 | **A model-sourced stitch is run by loading its rows.** Committing a keyed rule joins two keys; committing a rule whose endpoints are rows reads `stitches/<EDGE_TYPE>.json` out of the folder those records were loaded from and writes those rows. **Where the files are is a fact about a load, not about the model**, so it is read back from the run that loaded them rather than stored a second time ([task-model-migration § 6.7](../../../building-engine/task-model-migration.md)). Every later import of those records writes them again, and the MERGE makes both no-ops after the first (ST49). Without this a W3 stitch is a rule pointing at data nobody ever loads: declared, and never true. |
 | ST52 | **A loaded stitch edge is marked exactly like a derived one.** It carries `_inv_origin = "stitch"`, the stitch id and the rule, *and* the record provenance an import stamps (`_inv_model_id`, `_inv_record_id`, `_inv_file`, `_inv_run_id`). It is both: a record somebody loaded and an edge that exists because a stitch says so — so a withdrawal takes it (ST48), and the journal can still say which file and which row it came from. |
 | ST53 | **A stitch touches the model version on each side of it.** Solving writes edges between two models, so the step that solves (an import's `stitch` — ST47 — or `commit_stitches` — ST44) engages both sides' published versions, `graph_data/model/<Name>@<version>`, and records one touch per model with the edges written into it ([GV35](../../govern/spec.md#4-cross-feature-decisions)). An import that loads Tweets and solves `tweet_article@about` touches `Tweets@1.0.0` and `Articles@1.0.0`, and the board's *What each step engaged* shows both on the `stitch` row. A model the step checked but wrote nothing into gets no touch: a load's `stitch` checks every active stitch, and one scoped to records this load did not write merges nothing. A side a guardrail refuses skips that stitch — struck in place, the others still solved — because the records the load already wrote are not wrong for it. |
@@ -229,33 +161,5 @@ Declaring, committing and discarding are the engine's three writes; removing is 
 | ST55 | **Removing an active stitch is a run, and a refusal keeps the rule.** Its edges are withdrawn by `stitch-withdraw@1` — one step, `withdraw_stitch` — under the Graph's guardrails, and the rule row goes only once they are gone. A guardrail denying either model refuses the whole removal, naming the rule: withdrawing the rule while keeping its edges would leave edges that name a stitch nobody can see, which is the one outcome ST48 exists to prevent. A connection that is missing, read-only or unreachable refuses or fails the same way — the rule stays until its edges can go. A **staged** stitch never wrote an edge, so removing it deletes the row and opens no run. |
 | ST56 | **Previewing a rule is a run, because counting reads the graph.** The declare card's count and `invana stitches resolve` open `stitch-preview@1` under the Graph's guardrails; `preview_stitches` (`graph_read`) sends the preview and written-edge counts through the run's lens like any other read. A rule naming a type or key the guardrails deny comes back **refused, with the reason** — `409 preview_refused` in the drawer, `refused — …` in the terminal — never counted around. |
 | ST57 | ***All models* is the global model canvas, and every stitch on it is dashed.** The page passes `buildAllModelsData`'s `ModelGraphData` to [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md) and adds no behaviour, layer or overlay of its own — the canvas is the canvas Storybook's GlobalModel story, and so is the model canvas (ME26). It switches on the canvas's own stitch gesture (ST19). A stitch — anchor or relationship — is dashed, and a model's own edge type is solid, so the one kind of edge that crosses a frame never reads as one the model declares ([GM9](../../../building-studio/graph-model-canvas.md#decisions)). |
-| ST58 | **A stitch is counted and listed on its models' active versions.** A republish carries a model's stitches onto the new version; the links on the version it replaced stay as history and are left out of `GET …/model-links`, `invana stitches list` and the All models chip, which would otherwise show every stitch twice. Readers that solve or load (imports, contracts, the global model) keep reading every active link. While the links are loading, the chip reads `— stitches`, never `0`. |
-| ST59 | **The Stitches page lists every stitch of the Graph.** Active (staged ones among them, marked, with *Commit* · *Discard* above) and Removed, searchable by any type or model in the rule. A row's counts are stored: `edges` (ST62) and the 30-day crossings from Usage's per-stitch aggregate. |
-| ST60 | **The stitch inspector is the global model's right column.** `?stitch=<id>` selects it, from a click on a dashed edge, an anchored row of the union list or *Open* on the Stitches page. Stitch: each end's type with its records (the latest count snapshot), the rule with *N joined* or *N edges*, the 30-day crossings, who declared it and when. Crossed by: queries · share · last crossed. History: its declare and commit events. *Open in a draft* opens the source model's schema canvas on a draft; *Remove stitch* is the existing removal (ST55), behind a confirm. |
-| ST61 | **A removed stitch is read from its removal event.** Deletes are hard, so `model_link.remove` carries the rule — kind, both models and types, both keys, the edge type — beside the edges withdrawn; `GET …/model-links/removed` reads those events, newest first, with who removed each and when. |
 | ST62 | **A stitch's edge count is counted, not summed.** `model_links.edges` is set from `written_query` after every solve that writes — the commit's and each import's stitch step — because a MERGE counts what it matched as well as what it created. `null` until the stitch first solves. |
 | ST63 | **One stitch is read whole.** `GET …/model-links/{id}` answers the stitch with `declared_by` · `declared_at` and `history[]` (its declare and commit events) and each end's `records`; the list answers `edges` without the history. |
-
-## Not building
-
-| Not this | Why |
-|---|---|
-| Inferred links | ST1. Nothing here guesses that two types are the same |
-| Merging anchored nodes | ST2. Both nodes stay; queries traverse the link |
-| A stored global model | ST3. Derived on read, so there is nothing to keep in sync |
-| Linking drafts | ST8. Links bind published versions |
-| Editing a model from *All models* | ST14 draws published versions. Authoring is the model canvas, on a draft — one surface writes a model, and it is not this one |
-| A saved layout for *All models* | the arrangement is a view, as it is for the model canvas. The frames lay out on open and fit once |
-| A landscape that reopens itself | ST24. The X closes it for good while the list stays open — a page that came back would be a page you cannot close |
-| Zoom-driven collapse, an altitude track, a legend on the canvas | ST15 · ST23 · ST57. The canvas is the story's, and Detail is how the landscape changes altitude |
-| A minimum size for a frame | ST29. A floor the solver cannot see is a frame that overlaps its neighbour |
-| Composite keys | One property per side. A rule you cannot read out loud in one line is a rule nobody audits |
-| A transform on a key — trim, strip a prefix, regex | `identity_match` is `exact` or `case_insensitive` and stops there. Data that needs reshaping is reshaped on the way in, in the dataset, where the change is visible to everyone |
-| Guessing the key from the property name | ST1. `person_id` looking like `id` is a coincidence the reader has to confirm anyway |
-| An edge with both keys and a source model | ST27. Two sources of truth for one edge type |
-| A *remove a stitch* tool on the canvas | `@invana/canvas` emits `input:node:click` and no edge equivalent, so a crossing cannot be picked. Removing is the Stitches row's own control, where the stitch is named in words rather than aimed at |
-| A soft-deleted stitch row | Deletes are hard (engine rule); the removal event carries the rule (ST61) |
-| Removing a stitch from the CLI | A withdrawal is a fact somebody's answers already depend on, and the Stitches row withdraws it where it is named in words. `discard` drops the **staged** set, which nothing has read yet |
-| Solving a model-sourced relationship | ST45. Its rows are its own fact; inventing those edges from a key pair it does not have is guessing (ST1) |
-| A stitch that rewrites history | A solve writes edges forward — it never edits or deletes a record somebody loaded. The only thing it deletes is its own (ST48) |
-| A resolve preview for a model-sourced relationship | There is no rule to count. The endpoints are rows; what they resolve against is decided at import, so the card names the model that ships them instead |

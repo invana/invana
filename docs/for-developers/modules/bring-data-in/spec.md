@@ -16,6 +16,10 @@ failure vocabulary — and everything it writes carries the record it came from.
 | Depends on | [Connect and model](../connect-and-model/spec.md) (a dataset binds to a model) · [Platform](../platform/features/runtime.md) (an import is a run the runtime walks) · [Workflows](../workflows/spec.md) (its plans are builtin library versions) |
 | Depended on by | everything that answers from data |
 
+Product spec: [Data](../../../../specs/products/data/product.md) — the product, its features DA-F01–F04, and the module-wide product rules and decisions live there. This file keeps the vocabulary and the engine shape.
+
+System design: [bring-data-in.md](../../../../specs/system-design/modules/bring-data-in.md) — the contract, the import run, the entry points and when it goes wrong (§§ 2 · 3 · 5 · 6). This file keeps the vocabulary, what the module owns, its decisions, the drawn states and the retired Studio rows of §§ 2 · 5.
+
 ## 1. Vocabulary
 
 Product-wide words: [terminology.md](../../terminology.md). What this module adds:
@@ -30,39 +34,11 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 
 ## 2. The contract
 
-```mermaid
-flowchart LR
-    X[Your extractor<br/>Airflow · a script · a notebook] --> D[Dataset<br/>records + the model it binds to]
-    D --> CLI["invana records import --model &lt;name&gt;"]
-    CLI --> T[Todo · kind = import]
-    T --> V{Validate each record<br/>against the model}
-    V -->|accepted| W[Written · provenance attached]
-    V -->|rejected| R[Report: which record, which field, why]
-    W --> G[(The graph)]
-    R --> I[Inspect what landed]
-```
+Stays here, retired — Upload in the browser mints dataset versions too:
 
 | Rule | Detail |
 |---|---|
-| `model_id` is required | A dataset states what it conforms to. There is no inference path |
-| Validation is per record | One bad row does not fail a load, and is never silently dropped |
-| Every written element carries its source record | Provenance is what makes an answer traceable to a dataset |
-| An import is a run — **and is dispatched like one** | It inherits the runtime: streamed steps, retries, timeouts, cancellation, signals and approvals. It does not write its own step rows (BD12) |
 | Studio does not write | Import is CLI and API only; Studio reads |
-
-## 3. The import run, step by step
-
-| # | Step | What it does |
-|---|---|---|
-| 1 | **Register** | The dataset's records and the model it declares are accepted; a run row opens |
-| 2 | **Validate** | Every record is checked against that model's active version; the report is structured, per record |
-| 3 | **Ingest** | Validated records are written, each stamped with its dataset, record and run |
-| 4 | **Stitch** | Declared links are resolved — identities against what is already there, and edges to other models' types |
-| 5 | **Snapshot** | The model version validated against is stored with the run, so a person can see exactly what their data was checked against |
-| 6 | **Result** | The written subgraph, and provenance from every element back to its record |
-
-Nothing here authors a model. The model is authored first; the dataset conforms to it or is rejected.
-
 
 ## 4. What this module owns
 
@@ -75,32 +51,17 @@ Nothing here authors a model. The model is authored first; the dataset conforms 
 
 ## 5. Entry points
 
+Stays here, retired — imports are read in Data › Upload:
+
 | Surface | Shape |
 |---|---|
-| CLI | `invana records import --model <name> <path>` — one dataset, the primary path, scriptable, exit codes that a scheduler can read · `invana records import <bundle>` — every dataset the manifest names, stitched, as one run ([2.3](features/load-a-bundle.md)) · `invana loader <path> --graph <ref>` — the bulk fast path, journaled but unaudited |
-| Python | `import_dataset(...)` — for an orchestrator that already holds the data in memory; returns a run id to wait on |
-| API | run status and the validation report, with provenance — what an external agent polls |
 | Studio | read-only: the **Imports** journal — every run with its log, its report and who ran it; the dataset and its provenance are reached from a run |
-
-## 6. When it goes wrong
-
-| Case | What the user sees |
-|---|---|
-| Unknown type or property | The record is rejected, naming the field and the model it was checked against |
-| Model version changed mid-stream | The run states which version it validated against; it does not switch |
-| A relationship link's endpoint is missing | The edge is rejected with both endpoints named — never a dangling edge |
-| The database rejects a write | Diagnosis with the next step, never a stack trace |
-| The run is cancelled | Accepted records stay, the run is marked cancelled, and the report says where it stopped |
 
 ## 7. Cross-feature decisions
 
 | # | Decision |
 |---|---|
-| BD1 | Invana does not extract. Source connectors and a mapping grammar are not built. |
-| BD2 | A dataset binds to exactly one model, and `model_id` is required. |
 | BD3 | An import run is a Todo — one runtime, one trace vocabulary, one failure story. |
-| BD4 | Rejections are reported per record with a reason. Silence is never an outcome. |
-| BD5 | Every written element carries provenance to its dataset record. |
 | BD6 | Import is CLI and API; Studio reads what landed. |
 | BD7 | An import opens `Todo(kind = import)` and a `Run(plan_origin = builtin:dataset-import@1)` whose four steps are `validate_records · write_graph · stitch · snapshot_model`. **The plan is fixed — nothing generates it**, because there is nothing for a model to decide about a load. Fixed means *not planned*; it never meant *not dispatched* (BD12). |
 | BD8 | Studio grows no second run UI. An import's trace is the same step card an answer uses, because an import is a run. |
@@ -111,9 +72,6 @@ Nothing here authors a model. The model is authored first; the dataset conforms 
 | BD13 | **A bulk run is a one-step plan, not an exception.** `bulk-load@1` runs `bulk_write`. No per-record validation and no provenance are properties of that step; they are not a reason for the run to live outside the runtime (BD11 · [13.8 RP29a](../platform/features/runtime.md)). |
 | BD14 | `dataset-import@1`, `bundle-import@1` and `bulk-load@1` are **builtin workflow versions in the library**, not constants in this package — so `plan_origin` resolves and the trace can show the plan that ran. [§7 F9](../workflows/spec.md) |
 | BD15 | **A bundle load is an ordinary workflow.** `bundle-import@1` maps over the datasets `stitches.json` already names, inlines `dataset-import@1` per lane, stitches once, and branches to `create_task` on a failed lane. No stage is a Task: nobody accepts a load. [2.3](features/load-a-bundle.md) · [13.8 §3.2](../platform/features/runtime.md) |
-| BD16 | **Records are imported into a model, and the model is what holds them.** There is no Dataset record. A model is authored, a load hands it records, and the model is the container they belong to — one noun where there were two, and the one a person already thinks in. What a "dataset" carried splits cleanly: the *shape* was always the model's; the *source path* is a fact about one load, so it rides that run's `params`; the *counts* are what the runs already report. Nothing needed a third record to hold those three things together. |
-| BD17 | **Provenance is `model · record · file · run`.** Every written element carries `_inv_model_id`, `_inv_record_id`, `_inv_file` and `_inv_run_id` — *what it conforms to*, *which record it was*, *which file it came in*, and *which load wrote it*. `_inv_model_id` is the namespace `_inv_record_id` lives in: records are externally produced, so their ids are whatever the source chose, and a pair is needed for the identity to mean anything. The model is the right half of that pair because a record's id is only ever promised unique within the thing it conforms to. |
-| BD18 | **Two loads into one model are one body of data, and `MERGE` is the point.** Re-importing `airports.json`, or importing `airports-2025.json` over `airports-2024.json`, updates the model's records rather than accumulating a second copy — identity-keyed writes already guarantee it (C8). Records that must *not* merge are records of a different thing, and a different thing is a different model. This is what makes the model a sufficient container: the question *is this the same entity* is answered by the model's identity keys, which is where it was always answered. |
 | BD19 | **The fast path names a model too; what it skips is validation, not the container.** `invana loader` writes records without checking them against anything, and it used to record that honestly by attaching them to a source with no model. With the model as the container ([BD16](#7-cross-feature-decisions)) that leaves the records nowhere: `_inv_model_id` is half the provenance key, and data that belongs to nothing cannot be traced, stitched or re-loaded. So `--model` says **where the records go** and is required on every path; validation is the thing the fast path opts out of, and the run says which of the two happened. A model that has never been validated against is still the thing the records conform to — or the load is the first evidence that it does not. |
 
 ## 7a. The drawn states
@@ -133,8 +91,4 @@ behind it.
 
 | Not built | Because |
 |---|---|
-| Source connections, cursors, a mapping grammar | designed and dropped — whatever already extracts your data is better at it |
 | Import from Studio | a load is a scripted, repeatable act, not a click |
-| Automatic model inference from a file | the dataset states its model; guessing produces a schema nobody chose |
-| Streaming ingest | batch runs with a report are what a person can audit |
-| Deduplication or upsert heuristics | identity comes from the model's keys, not from a strategy setting |

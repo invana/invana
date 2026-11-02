@@ -16,48 +16,7 @@ everything at once.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [reasoning-trace](reasoning-trace.md) (after the fact) · [plan-selection](../../workflows/features/plan-selection.md) |
 
-> **As** someone waiting on an answer, **I want** to see what it is doing and stop it if it is going
-> the wrong way, **so that** I am not staring at a spinner deciding whether to reload.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Steps appear as they start | With their state: running · done · failed · retrying · repairing |
-| C2 | Emissions stream into the thread | A table paints while the next step runs |
-| C3 | Retries are visible | `retrying 2/3` — never a silent pause |
-| C4 | Cancel at any point | Completed steps stay; nothing partial is presented as an answer |
-| C5 | Resume after a reload | The stream reattaches; the thread is not lost |
-| C6 | The plan is shown once chosen | Which template, or that it was generated |
-| C7 | Timings and cost per step | Visible while running, kept afterwards |
-
-## Journey
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant E as Engine
-    U->>E: ask
-    E-->>U: step understand · running
-    E-->>U: step understand · done (0.4s)
-    E-->>U: step plan · selected "setup-check@2"
-    E-->>U: step translate · done
-    E-->>U: step validate · repairing (1 of 1)
-    E-->>U: step execute · running
-    E-->>U: emission: table (streams)
-    E-->>U: step verify · served
-    Note over U,E: reload mid-run → stream reattaches, thread intact
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Connection drops | Reattaches on its own; if it cannot, it says so and offers reload |
-| A very slow step | Elapsed time and cancel, not a frozen row |
-| Cancelled | The run is marked cancelled at the step it reached |
-| Failure mid-stream | The step turns failed and the diagnosis appears in place |
-| Two tabs open | Both stream the same run; neither drives it |
+Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -80,16 +39,6 @@ sequenceDiagram
 
 | # | Decision |
 |---|---|
-| SW1 | Steps stream. Nothing waits for the end of the run to appear. |
-| SW2 | A retry is shown, with its attempt number. |
-| SW3 | Cancel keeps what completed and presents nothing partial as an answer. |
 | SW4 | The stream resumes after a reload from the last sequence delivered. |
 | SW5 | **A finished step carries its run's spend so far.** Every `step.finished` frame has `run_tokens` — the root's own tokens plus its nodes' to that moment, summed by the engine — so the assistant's live strip shows `↑ 12k tokens` without adding anything. |
 
-## Not building
-
-| Not building | Because |
-|---|---|
-| Token-by-token text streaming | emissions are structured; a half-rendered table is not useful |
-| Pausing and resuming a run | cancel and re-ask is honest; a paused agent holding state is not |
-| Editing a step mid-run | the plan is validated before dispatch, deliberately |

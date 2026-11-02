@@ -21,11 +21,15 @@ import {
 	TableRow,
 } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
-import { ActButton, ReadOnlyNotice, useAccess } from "@invana-studio/shell";
+import {
+	ActButton,
+	ReadOnlyNotice,
+	ReadState,
+	useAccess,
+} from "@invana-studio/shell";
 import { FormError } from "@invana-studio/ui";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { FleetReadState } from "../overview/fleetParts";
 import { AlertRuleDialog } from "./AlertRuleDialog";
 import { useAlertRuleMutations, useAlertRulesQuery } from "./queries";
 import type { AlertRule } from "./types";
@@ -63,7 +67,7 @@ export function AlertRulesTab({
 			{items.length > 0 && <div className="flex justify-end">{newAlert}</div>}
 			<FormError error={update.error} />
 			{!rules.data ? (
-				<FleetReadState
+				<ReadState
 					loading={rules.isLoading}
 					error={rules.error}
 					what="the alert rules"

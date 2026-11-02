@@ -4,8 +4,8 @@ The two rules that shape everything here:
 
 1. **An agent never marks its own task done.** It posts a result → ``review``;
    a ``user`` principal accepts. That is the governance seam, and the capture
-   signal the learning loop reads (docs/for-developers/modules/work/spec.md,
-   docs/for-developers/modules/agents/spec.md).
+   signal the learning loop reads (specs/system-design/modules/work.md,
+   specs/system-design/modules/agents.md).
 2. **Assignment opens exactly one run.** A Task is worked *through*
    runs, never run — so there is no second execution path to keep in step
    with the session one (R1).

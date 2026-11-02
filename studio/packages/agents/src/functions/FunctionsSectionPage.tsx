@@ -10,6 +10,7 @@
  * library entry, and opens the plan it made.
  */
 
+import { usePluginsQuery } from "@invana-studio/core";
 import { ActButton } from "@invana-studio/shell";
 import { DetailStatus } from "@invana-studio/ui";
 import { GitBranchPlus } from "lucide-react";
@@ -17,12 +18,10 @@ import { useState } from "react";
 import { useAgentsOpen } from "../open";
 import { PromoteDialog } from "../plans/PromoteDialog";
 import { useCatalogueQuery, useFlowsQuery } from "../plans/queries";
-import { usePluginsQuery } from "../plugins/queries";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { CatalogueTab } from "./CatalogueTab";
 import { PlansTab } from "./PlansTab";
-import { PluginsTab } from "./PluginsTab";
 import { TemplatesTab } from "./TemplatesTab";
 
 /** The smallest page a total is read from. */
@@ -64,8 +63,6 @@ export function FunctionsSectionPage({
 					/>
 				) : tab === "templates" ? (
 					<TemplatesTab username={username} graphSlug={graphSlug} />
-				) : tab === "plugins" ? (
-					<PluginsTab />
 				) : (
 					<CatalogueTab username={username} graphSlug={graphSlug} />
 				)}

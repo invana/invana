@@ -1,5 +1,5 @@
 """SQLAlchemy model for ``agents`` (docs/for-developers/modules/ask/spec.md data model, extended by
-docs/for-developers/modules/work/spec.md).
+specs/system-design/modules/work.md).
 
 One row = one named actor in a graph. The columns split into four groups:
 
@@ -9,11 +9,11 @@ prints; *bindings* (``skill_ids`` · ``workflow_spec``) — how it thinks;
 exists; *standing limits* (``workflow_spec`` · ``effort`` · ``budget``) — what it
 may do, how hard it tries and what it may spend, whoever asks; and *voice*
 (``soul`` · ``soul_traits``) — how it speaks, and nothing else
-(docs/for-developers/modules/agents/features/soul.md SO2).
+(specs/products/agents/features/AG-F01-build-an-agent/feature.md § Decisions).
 
 There is no world column: what a run may see comes with the work that opens it,
 and an agent's own narrowing is a guardrail scoped ``agent:<id>``
-(docs/for-developers/modules/agents/features/author-an-agent.md AG24 · AG26).
+(specs/products/agents/features/AG-F01-build-an-agent/feature.md § Decisions).
 
 Every JSON column is ``sqlalchemy.JSON`` (never JSONB) so SQLite dev keeps
 working; ids are ``String(36)`` UUIDs like every other table.
@@ -46,7 +46,7 @@ class AgentKind(enum.StrEnum):
     seeded = "seeded"
     # A user made it.
     authored = "authored"
-    # An agent made it, under its parent's envelope (docs/for-developers/modules/work/spec.md).
+    # An agent made it, under its parent's envelope (specs/system-design/modules/work.md).
     spawned = "spawned"
 
 
@@ -90,7 +90,7 @@ DEFAULT_BUDGET: dict[str, int | float] = {
     "max_fanout": 200,
     # Across every run this agent is working. The **Graph's** ceiling is a
     # different bound with a different policy
-    # ([CC1](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+    # ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
     "max_concurrent_runs": 3,
 }
 
@@ -153,7 +153,7 @@ class Agent(Base):
     status: Mapped[str] = mapped_column(String(16), default=AgentStatus.active.value, nullable=False, index=True)
 
     # ── bindings ─────────────────────────────────────────────────────────────
-    # The envelope (docs/for-developers/modules/agents/spec.md): allow-list · pinned args · require ·
+    # The envelope (specs/system-design/modules/agents.md): allow-list · pinned args · require ·
     # budgets · which reusable flows a Plan step may select. Not a table —
     # it is versioned with its agent.
     workflow_spec: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
@@ -162,7 +162,7 @@ class Agent(Base):
     # A plan names a role, the run's frozen cast maps the role to an address,
     # and the address names the configured row whose credential it is.
     # The agent's brief, layered on top of ``graph.instructions``. For a spawned
-    # agent this is what its parent told it (docs/for-developers/modules/work/spec.md — the brief is all a
+    # agent this is what its parent told it (specs/system-design/modules/work.md — the brief is all a
     # child receives; never the parent's step history).
     instructions: Mapped[str] = mapped_column(Text, default="", nullable=False)
     #: Unpublished instructions; null is no draft open.

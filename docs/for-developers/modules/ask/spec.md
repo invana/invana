@@ -17,6 +17,8 @@ nothing.
 | Depended on by | [Work](../work/spec.md) (a task runs as a run) · Explore · Operate |
 | Owns the surface | [the-assistant](features/the-assistant.md) — the one place a question is asked, on every left panel of the graph page. It is Ask's surface, not Explore's |
 
+System design: [ask.md](../../../../specs/system-design/modules/ask.md) — the pipeline, how a run comes together, grounding in the engine and the runtime shape (§§ 2 · 3 · 4 · 6). This file keeps the vocabulary, what the module owns, its decisions, the drawn states and the retired single-runtime rows of § 6.
+
 ## 1. Vocabulary
 
 Product-wide words: [terminology.md](../../terminology.md). What this module adds:
@@ -26,63 +28,6 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | **Ask-kind** | how the question was posed: `NL` or `QL` | a mode the user configures per session |
 | **Emission** | one thing a step produced, of a declared kind | the answer |
 | **Projection** | the declared mapping from a shape to a surface — in either direction | styling |
-
-## 2. The pipeline
-
-```
-understand → plan → translate → validate → execute → project → verify
-```
-
-| Step | Does | Can end the run |
-|---|---|---|
-| `understand` | settles what is being asked; asks back when it cannot | yes — cannot answer |
-| `plan` | selects a template by intent, or generates a plan inside the envelope | yes — refused by the envelope |
-| `translate` | intent → query, against the global model | |
-| `validate` | the query parses and only names things the model has | yes — repair once, then stop |
-| `execute` | runs it on the graph database | yes — failure with a diagnosis |
-| `project` | records → emissions, through a projection | |
-| `verify` | did this serve the intent? | records the verdict |
-
-Every step streams: the user sees the step, its state and its emissions as they arrive, never a spinner
-followed by everything at once.
-
-## 3. How a run assembles
-
-Three separately authored things meet here for the first time: the **agent** that runs, the **skills
-and rules** it is offered, and the **workflow** it plans from.
-
-```mermaid
-flowchart TD
-    A[Agent<br/>provider · model] -->|binds| S[Skills]
-    A -->|carries| E[Envelope<br/>allowed steps · pinned args · ceilings]
-    G[Graph rules] --> CTX[Context for this run]
-    P[Project rules] --> CTX
-    C[Criteria in scope] --> CTX
-    S --> CTX
-    T[Task or question] --> PLAN[Plan step]
-    L[(Workflow library)] -->|selected by intent| PLAN
-    PLAN -->|nothing fits| GEN[Generate a plan]
-    PLAN --> V{Validate against<br/>the envelope}
-    GEN --> V
-    V -->|inside bounds| RUN[Dispatch steps]
-    V -->|outside| REFUSE[Refused, naming the bound]
-    CTX --> RUN
-    RUN --> VER[Verify]
-    VER -->|served the intent| PROMOTE[Candidate for the library]
-```
-
-**The agent decides what is possible, the library decides what is tried, the rules and skills decide
-what it knows, and the envelope is checked before anything runs.**
-
-## 4. Grounding rules
-
-| Rule | Detail |
-|---|---|
-| An answer states only what the records hold | No summarising beyond them, no filling gaps from the model's own knowledge |
-| Empty is an answer | Zero rows is "the graph does not hold this", not a guess |
-| Every emission cites its source | The query that produced it, and the records behind it |
-| Cannot-answer is not answer-shaped | It looks different, so it is never mistaken for a result |
-| A failure is not a cannot-answer | One is "something broke", the other is "the graph does not know" |
 
 ## 5. What this module owns
 
@@ -99,14 +44,12 @@ Ask owns these tables; it does not own the journal over them. Every run in the G
 
 ## 6. The runtime shape
 
+Stays here, retired — steps now travel as `TaskEnvelope`s from the coordinator to in-process or remote workers:
+
 | Rule | Detail |
 |---|---|
-| One run is one flow | The interpreter runs inside it and drives the whole loop, reporting step transitions as it goes |
 | Not one dispatch per step | Driving task-by-task from the engine would multiply latency by the step count and put loop state on the wire |
 | Step granularity is reported, not orchestrated | The worker says what happened; the orchestrator sees one unit of work |
-| Composition stays in data | A plan is data validated against an envelope, never a hand-authored graph of jobs |
-| Connections are long-lived | The connection manager is a stateful service, not a per-call open |
-| The runtime is Invana's | It runs the work in process, one asyncio task per run, and is swappable in principle rather than swapped in practice |
 
 **No external infrastructure, at all.** The in-process runtime is what ships and the only one that
 exists. The protocol around it is the seam where a deployment could put a scheduler it already
@@ -114,20 +57,7 @@ operates — that has not been written, and nothing waits on it.
 
 | Rule | Detail |
 |---|---|
-| Invana owns the contract, not the scheduling | What a run is, what it produces, and how it reports — never retries, queues or backfills |
 | One runtime exists | In-process, persisting to the app database; zero external dependencies |
-| Another would be a package | It would bring its own retries and concurrency; today those are Invana's |
-| Cancellation is defined by the contract | An adapter must honour it; a run that cannot be cancelled is a failed adapter, not a feature |
-| The protocol is versioned | An adapter states which version it speaks |
-
-Every step receives one context, and what goes where is fixed:
-
-| Kind of argument | Where it goes |
-|---|---|
-| Genuine inputs — a query, a prompt, a page size | the step's typed input |
-| Ambient dependencies — database, connector, model, provider | `resources` |
-| Identity of the work — run, todo, graph, actor | `task_run` |
-| Anything a person should see | `emit` |
 
 
 ## 7. Cross-feature decisions
@@ -166,7 +96,7 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 | `settings.search_providers.list` | [beyond-the-graph](features/beyond-the-graph.md) | Settings › Search providers: rows with ping state, the provider's address, and the rules that name it |
 | `settings.search_providers.list.empty` | [beyond-the-graph](features/beyond-the-graph.md) | no provider: the empty state and the add form, pinged before it saves |
 
-### 7b. A session executes through plans, always
+## 7b. A session executes through plans, always
 
 | # | Decision |
 |---|---|

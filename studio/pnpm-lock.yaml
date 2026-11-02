@@ -41,6 +41,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.41.0
         version: 6.41.0
+      '@invana-studio/activity':
+        specifier: workspace:*
+        version: link:../../packages/activity
       '@invana-studio/agents':
         specifier: workspace:*
         version: link:../../packages/agents
@@ -65,6 +68,9 @@ importers:
       '@invana-studio/modeller':
         specifier: workspace:*
         version: link:../../packages/modeller
+      '@invana-studio/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@invana-studio/projects':
         specifier: workspace:*
         version: link:../../packages/projects
@@ -240,6 +246,76 @@ importers:
       vitest:
         specifier: ^5.0.2
         version: 5.0.2(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/coverage-v8@5.0.2)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.9.1))
+
+  packages/activity:
+    dependencies:
+      '@invana-studio/core':
+        specifier: workspace:*
+        version: link:../core
+      '@invana-studio/shell':
+        specifier: workspace:*
+        version: link:../shell
+      '@invana-studio/ui':
+        specifier: workspace:*
+        version: link:../ui
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.5.14
+        version: 2.5.14
+      '@invana/blocks':
+        specifier: ^0.0.36
+        version: 0.0.36(720d31a5fdcd4537e27bcbe0e20111d4)
+      '@invana/charts':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/tables@0.0.36(@invana/forms@0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/forms':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/styling':
+        specifier: ^0.0.36
+        version: 0.0.36(tailwindcss@4.2.2)
+      '@invana/tables':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/forms@0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/ui':
+        specifier: ^0.0.36
+        version: 0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.98.0(react@19.2.5)
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.14)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.5)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.5
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.5(react@19.2.5)
+      react-hook-form:
+        specifier: 7.72.1
+        version: 7.72.1(react@19.2.5)
+      react-router-dom:
+        specifier: ^7.0.0
+        version: 7.14.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      typescript:
+        specifier: ^6.0.0
+        version: 6.0.2
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1)
+      vitest:
+        specifier: ^5.0.2
+        version: 5.0.2(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/coverage-v8@5.0.2)(vite@7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1))
 
   packages/agents:
     dependencies:
@@ -779,6 +855,82 @@ importers:
       '@invana/charts':
         specifier: ^0.0.36
         version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/tables@0.0.36(@invana/forms@0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/forms':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/styling':
+        specifier: ^0.0.36
+        version: 0.0.36(tailwindcss@4.2.2)
+      '@invana/tables':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/forms@0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/ui':
+        specifier: ^0.0.36
+        version: 0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.98.0(react@19.2.5)
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.14)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.5)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.5
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.5(react@19.2.5)
+      react-hook-form:
+        specifier: 7.72.1
+        version: 7.72.1(react@19.2.5)
+      react-router-dom:
+        specifier: ^7.0.0
+        version: 7.14.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      typescript:
+        specifier: ^6.0.0
+        version: 6.0.2
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1)
+      vitest:
+        specifier: ^5.0.2
+        version: 5.0.2(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/coverage-v8@5.0.2)(vite@7.3.2(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.1))
+
+  packages/platform:
+    dependencies:
+      '@invana-studio/core':
+        specifier: workspace:*
+        version: link:../core
+      '@invana-studio/shell':
+        specifier: workspace:*
+        version: link:../shell
+      '@invana-studio/ui':
+        specifier: workspace:*
+        version: link:../ui
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.5.14
+        version: 2.5.14
+      '@invana/blocks':
+        specifier: ^0.0.36
+        version: 0.0.36(720d31a5fdcd4537e27bcbe0e20111d4)
+      '@invana/boards':
+        specifier: ^0.0.36
+        version: 0.0.36(bc7330510a62d92f5f4e9f3ea27f66dc)
+      '@invana/charts':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/tables@0.0.36(@invana/forms@0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/editor':
+        specifier: ^0.0.36
+        version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@invana/forms':
         specifier: ^0.0.36
         version: 0.0.36(@invana/styling@0.0.36(tailwindcss@4.2.2))(@invana/ui@0.0.36(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
@@ -2620,144 +2772,6 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
-
-  '@rollup/rollup-android-arm-eabi@4.65.1':
-    resolution: {integrity: sha512-5coxNSjqOI2J3NkVhlp3u+zGcyjnowQFsU9sg7MMz4UPXY4Dv63kFGLt7ConXz9CNq2i0yuOJZAF/2RMrgI2OA==}
-    cpu: [arm]
-    os: [android]
-
-  '@rollup/rollup-android-arm64@4.65.1':
-    resolution: {integrity: sha512-K0HFf6XMB3IYs+jDZ1/RRhZaVOwxNXrl0n4MDEyGDjuK7+B6K/nDJp8DCBitO3S1sK/fzNxAf9QZAny4AIUPtg==}
-    cpu: [arm64]
-    os: [android]
-
-  '@rollup/rollup-darwin-arm64@4.65.1':
-    resolution: {integrity: sha512-zkZrXYwNlIcSUmcwY2DpsaDHr0XjVUeQHCuSunG3eQD7/5Wn/DvI7OMUE8NRRweK87yG8ebJ1xGOzmwpMsbZQA==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@rollup/rollup-darwin-x64@4.65.1':
-    resolution: {integrity: sha512-Zaed+R3cpkkA3aiNd7NO0GV5KFh/LVf8j6bGcoRdpoXkSm/mWH8M0oX2/3u/nyGcx/bHEovD9CzX+w9/gcpI4A==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@rollup/rollup-freebsd-arm64@4.65.1':
-    resolution: {integrity: sha512-h12p3WJWhyJ9kir0zqAPr0rKNmBzOWIjoaOMT9OULs9KZQZCeOMKd+mGSvERjd9VxJYShd3zIxtrVxkYz6BEVA==}
-    cpu: [arm64]
-    os: [freebsd]
-
-  '@rollup/rollup-freebsd-x64@4.65.1':
-    resolution: {integrity: sha512-yRBwh/5imKY4DydDulVtrjy8Jf7h7NQJUqZbgmZ3zFsCD9QqlnWvZ7RtEF+ecO1b+IukKjXlu5Bb9fehV3tIbg==}
-    cpu: [x64]
-    os: [freebsd]
-
-  '@rollup/rollup-linux-arm-gnueabihf@4.65.1':
-    resolution: {integrity: sha512-1XuPiWYYaLE1UDOqhbKVOfsqxvfmFS/lYPSk92U1hEX1qRfSYH0hNeAlbxFIgjp4d6+YQmL95EPRgdvjbZEddA==}
-    cpu: [arm]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-arm-musleabihf@4.65.1':
-    resolution: {integrity: sha512-Y3C5e55Yrf6p2r5rBcc4P9hFWVNi6oqWy/53I/AyCJJGlp3KRSpTP8eoUmVntchTbEnhgBgAgLO9flj9AvOdUw==}
-    cpu: [arm]
-    os: [linux]
-    libc: [musl]
-
-  '@rollup/rollup-linux-arm64-gnu@4.65.1':
-    resolution: {integrity: sha512-Itj6coSswkYPIcVLczObXmwdplHNQQxyfnK1ppBg4czDaX8RiEzLKqU7EMc64BiBuiDZEUS+M93ktM18rv5llw==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-arm64-musl@4.65.1':
-    resolution: {integrity: sha512-KeO8jTEqdrnhvcahufbimyMoI44vedRUp1bVz2QUnRX2vDm/hxzCPt5F8fERVD5fsHyTW/vXmCElT054VOSVOA==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@rollup/rollup-linux-loong64-gnu@4.65.1':
-    resolution: {integrity: sha512-dDOz5VZZ+ZGnglpmET6VJefamWXFsgaVtuhSClf2/URZBp048jprD6z1hddsIMN6n1w+oUzGZEBp9u6Mlszsfg==}
-    cpu: [loong64]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-loong64-musl@4.65.1':
-    resolution: {integrity: sha512-JbfRKz8nJCuo8gn1Dqx8lQWEHw4qhZ3uRaHphw5vrSjnSptJTKTRC/bLKHh8QQMsEnhL4uq+bdg3tkiXbJ2q/A==}
-    cpu: [loong64]
-    os: [linux]
-    libc: [musl]
-
-  '@rollup/rollup-linux-ppc64-gnu@4.65.1':
-    resolution: {integrity: sha512-3oQpe1q0emSeCAssVHMQdOz5fz3PBH5my/Fr0ZekV2UMNL4ZiRa1ciikYlGQXyDkeqseYYv1InwOY8YPqY7RIQ==}
-    cpu: [ppc64]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-ppc64-musl@4.65.1':
-    resolution: {integrity: sha512-nNV3HHi23o1LtpGGwH+Bav4hqnc4+klQtC96tSvCfvql8bLlNFTnTFiGl/jai2nve3eEr/vT2ocuyf+h+eMnYQ==}
-    cpu: [ppc64]
-    os: [linux]
-    libc: [musl]
-
-  '@rollup/rollup-linux-riscv64-gnu@4.65.1':
-    resolution: {integrity: sha512-b5zab0FryBxuocuDeqOsYGAg2EzjKw4mKA6LjQXCyewXjGv/BXqACBsY2cO45xM4hV2weYtdjGThP2VB2ByAYg==}
-    cpu: [riscv64]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-riscv64-musl@4.65.1':
-    resolution: {integrity: sha512-Rh08xZakiUxKNgI3hbgH9mivlx478lSqckS9s+Oc3/TX1VrAH3W8z/5wpJXR/v5VjqcJ/jJNVBg64PU1+iQsTQ==}
-    cpu: [riscv64]
-    os: [linux]
-    libc: [musl]
-
-  '@rollup/rollup-linux-s390x-gnu@4.65.1':
-    resolution: {integrity: sha512-qDgtS6juN3/k97y4kcD6XLFpXEo4f6CnG8lTOGYwlhrUYTrMyhN0WHdZCPAW5rqS0MqQG7qI7dxnjugt6QB39Q==}
-    cpu: [s390x]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-x64-gnu@4.65.1':
-    resolution: {integrity: sha512-44IKzBPqXXVm0kt1O+F5eW4juR5FyIxGNlFkpP8qwIDzucBsjM1HCbdYUQrQw8rU/g6HRl/tfBm0+Qq4H4Ro3w==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@rollup/rollup-linux-x64-musl@4.65.1':
-    resolution: {integrity: sha512-tvYWZ/h2PCHs558Xu7B6LptuRCV8lXV2xI75ONMcldII1m2zlFwuI4BJZi9M6rSMkYqcPLLtPUPrjyqfbzLOdg==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@rollup/rollup-openbsd-x64@4.65.1':
-    resolution: {integrity: sha512-gdyeucgZCnei3pXwadKVTEAOgRx0B+c847DUPR/PdOMmp3olhfkYo6r0J4PzRFZB5ZICZQTxntyvgmWH5xT7rg==}
-    cpu: [x64]
-    os: [openbsd]
-
-  '@rollup/rollup-openharmony-arm64@4.65.1':
-    resolution: {integrity: sha512-Wf/NEKdn2SAL4Nvt8HyDtdkseWTwiLbZEOoNYnEaHkbso0B9eHO42vKnZh+OYsn+IMhAMcWcuIwPlBOgOXsUzg==}
-    cpu: [arm64]
-    os: [openharmony]
-
-  '@rollup/rollup-win32-arm64-msvc@4.65.1':
-    resolution: {integrity: sha512-x9VSsDmsMsEWy4cr/mFeaEsXnVJ6Kc4NCAU/lCnwml3s7LQbZoa9+/qwc9etWHbuuDT5mYxdyyKUwo76njtjZw==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@rollup/rollup-win32-ia32-msvc@4.65.1':
-    resolution: {integrity: sha512-RIDbiVvvLkN45mOFpbo6eYMgnuiBEB62BGR/0s4QJgGg2AvVxucDDNn67kpAcUoYyfmY8iX8/RifMcmxmmnejA==}
-    cpu: [ia32]
-    os: [win32]
-
-  '@rollup/rollup-win32-x64-gnu@4.65.1':
-    resolution: {integrity: sha512-+KN8HIr88vN59JNxlrM2fMimzY43Y0lQB7+0xdVsFbvFCAA74CLKCdfzIHzzvndJryBc94Pm+MvwtukKjaS2ug==}
-    cpu: [x64]
-    os: [win32]
-
-  '@rollup/rollup-win32-x64-msvc@4.65.1':
-    resolution: {integrity: sha512-+Y1Sd49cSDq60UOl8/U2HI0ebUvnSl/hDhMHQn+ouw17yb8fYwMWIazzJ4JFpSkjPE7sj5NTNSX9IoyEqcFfyQ==}
-    cpu: [x64]
-    os: [win32]
 
   '@shadcn/react@0.3.1':
     resolution: {integrity: sha512-2gOR0HDMtWeRsCZfNDaU0YDFdgH3zsDQ6lz67Fv/y/qjY9y+R8kJqAn6q56phqv7/zHi0wqURjntrNO9zL7vnQ==}
@@ -5624,81 +5638,6 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
-  '@rollup/rollup-android-arm-eabi@4.65.1':
-    optional: true
-
-  '@rollup/rollup-android-arm64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-darwin-arm64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-darwin-x64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-freebsd-arm64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-freebsd-x64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-arm-gnueabihf@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-arm-musleabihf@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-arm64-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-arm64-musl@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-loong64-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-loong64-musl@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-ppc64-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-ppc64-musl@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-riscv64-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-riscv64-musl@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-s390x-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-x64-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-linux-x64-musl@4.65.1':
-    optional: true
-
-  '@rollup/rollup-openbsd-x64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-openharmony-arm64@4.65.1':
-    optional: true
-
-  '@rollup/rollup-win32-arm64-msvc@4.65.1':
-    optional: true
-
-  '@rollup/rollup-win32-ia32-msvc@4.65.1':
-    optional: true
-
-  '@rollup/rollup-win32-x64-gnu@4.65.1':
-    optional: true
-
-  '@rollup/rollup-win32-x64-msvc@4.65.1':
-    optional: true
-
   '@shadcn/react@0.3.1(@types/react@19.2.14)(react@19.2.5)':
     optionalDependencies:
       '@types/react': 19.2.14
@@ -6601,31 +6540,6 @@ snapshots:
       '@types/estree': 1.0.9
     optionalDependencies:
       '@napi-rs/lzma-linux-x64-gnu': 1.5.1
-      '@rollup/rollup-android-arm-eabi': 4.65.1
-      '@rollup/rollup-android-arm64': 4.65.1
-      '@rollup/rollup-darwin-arm64': 4.65.1
-      '@rollup/rollup-darwin-x64': 4.65.1
-      '@rollup/rollup-freebsd-arm64': 4.65.1
-      '@rollup/rollup-freebsd-x64': 4.65.1
-      '@rollup/rollup-linux-arm-gnueabihf': 4.65.1
-      '@rollup/rollup-linux-arm-musleabihf': 4.65.1
-      '@rollup/rollup-linux-arm64-gnu': 4.65.1
-      '@rollup/rollup-linux-arm64-musl': 4.65.1
-      '@rollup/rollup-linux-loong64-gnu': 4.65.1
-      '@rollup/rollup-linux-loong64-musl': 4.65.1
-      '@rollup/rollup-linux-ppc64-gnu': 4.65.1
-      '@rollup/rollup-linux-ppc64-musl': 4.65.1
-      '@rollup/rollup-linux-riscv64-gnu': 4.65.1
-      '@rollup/rollup-linux-riscv64-musl': 4.65.1
-      '@rollup/rollup-linux-s390x-gnu': 4.65.1
-      '@rollup/rollup-linux-x64-gnu': 4.65.1
-      '@rollup/rollup-linux-x64-musl': 4.65.1
-      '@rollup/rollup-openbsd-x64': 4.65.1
-      '@rollup/rollup-openharmony-arm64': 4.65.1
-      '@rollup/rollup-win32-arm64-msvc': 4.65.1
-      '@rollup/rollup-win32-ia32-msvc': 4.65.1
-      '@rollup/rollup-win32-x64-gnu': 4.65.1
-      '@rollup/rollup-win32-x64-msvc': 4.65.1
       fsevents: 2.3.3
 
   rw@1.3.3: {}

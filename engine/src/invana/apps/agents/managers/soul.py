@@ -1,5 +1,5 @@
 """The soul preview — one ask, answered in the current voice and in the draft
-([soul.md C5 · SO7](docs/for-developers/modules/agents/features/soul.md)).
+([AG-F01](specs/products/agents/features/AG-F01-build-an-agent/feature.md)).
 
 Not a run. Nothing is planned, no query is written and nothing is recorded:
 the preview judges how the agent sounds, so it reads no graph data and is told

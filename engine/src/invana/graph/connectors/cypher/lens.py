@@ -1,5 +1,5 @@
 """Compiling a lens into openCypher
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 
 Three things in one pass over one reading of the query (CC7):
 
@@ -231,7 +231,7 @@ class CypherLensCompiler(LensCompiler):
     Constructed with the builder whose dialect this connection speaks, so the
     projection it writes uses the same identity function every other query on
     this connection uses — ``elementId()`` on Neo4j, ``id()`` on Memgraph
-    (docs/for-developers/modules/graph-connectors/features/languages.md LG10).
+    (specs/system-design/modules/graph-connectors.md § A query, either way).
     A compiler that hardcoded one of them would emit invalid Cypher on the other,
     which is a bound that fails **open** on exactly one vendor.
     """

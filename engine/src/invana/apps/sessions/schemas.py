@@ -23,26 +23,26 @@ class SendMessage(BaseModel):
     mode: Literal["ql", "nl"] = "ql"
     language: QueryLanguage | None = None
     parameters: dict | None = None
-    #: **Deprecated** (docs/for-developers/modules/agents/spec.md): the composer
+    #: **Deprecated** (specs/system-design/modules/agents.md): the composer
     #: does not pick a model. The lens ``cast`` resolves it
     #: ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)),
     #: and this is ignored. Kept for one release so an older client still parses.
     llm_provider_id: str | None = None
     #: An explicit model for this one ask — an ``llm_models`` id. It still has
     #: to be one this Graph offers and it does **not** bypass the lens: a pick
-    #: is a resolution, not a widening ([GV6](docs/for-developers/modules/govern/spec.md)).
+    #: is a resolution, not a widening ([Model product § Decisions](specs/products/model/product.md#decisions)).
     llm_model_id: str | None = None
     # How long (seconds) to budget this ask: the LLM translation (nl) and the
     # query execution (nl + ql). Lets slow models/queries be granted more time.
     # Falls back to the translate/driver defaults when omitted.
     timeout_s: float | None = Field(default=None, gt=0, le=600)
     #: The world this one ask runs in — *Next ask only*
-    #: ([AD16](docs/for-developers/modules/ask/features/the-assistant.md)).
+    #: ([EX-F03 § Decisions](specs/products/explore/features/EX-F03-ask-a-question/feature.md#decisions)).
     #: **Omitted and null mean different things**: omitted is the session's
     #: world ([AS5](docs/for-developers/modules/ask/spec.md)); null is
     #: *Everything, inside the guardrails*, for this ask only. The run freezes
     #: what it resolves to; the id alone would be a pointer at a row that can
-    #: move ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
+    #: move (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
     lens_id: str | None = Field(default=None, max_length=36)
     #: ``load`` when the system asks on the person's behalf to draw a reply —
     #: a table's whole-node twin. The turn is a canvas operation, not a
@@ -55,7 +55,7 @@ class SessionCreate(BaseModel):
     # Which Studio surface this session lives on (docs/for-developers/modules/ask/spec.md). ``modeller`` sessions
     # author a model draft; ``explorer`` (default) query the graph.
     surface: Literal["explorer", "modeller"] = "explorer"
-    # The agent this thread thinks through (docs/for-developers/modules/agents/spec.md). Omitted means the
+    # The agent this thread thinks through (specs/system-design/modules/agents.md). Omitted means the
     # surface's default: Explorer → the graph's default agent, Modeller → the
     # seeded modeller.
     agent_id: str | None = None
@@ -108,7 +108,7 @@ class SessionUpdate(BaseModel):
     pinned: bool | None = None
     archived: bool | None = None
     # Takes effect on the **next** run_ask; earlier runs keep the agent
-    # they ran under, because the run row is the record (docs/for-developers/modules/agents/spec.md).
+    # they ran under, because the run row is the record (specs/system-design/modules/agents.md).
     agent_id: str | None = None
     #: The world every ask in the thread starts in
     #: ([AS5](docs/for-developers/modules/ask/spec.md)). **Omitted and null
@@ -168,7 +168,7 @@ class SessionMessageRead(BaseModel):
     steps: list[RunNodeRead] = []
     #: The world this turn's run was frozen with, and its name as frozen — so a
     #: rename or a delete since never changes what a past turn says
-    #: ([AD17](docs/for-developers/modules/ask/features/the-assistant.md)).
+    #: ([EX-F03 § Decisions](specs/products/explore/features/EX-F03-ask-a-question/feature.md#decisions)).
     #: Both null is *Everything*.
     lens_id: str | None = None
     lens_name: str | None = None
@@ -200,7 +200,7 @@ class SessionSummary(BaseModel):
     # the FE can filter Explorer/Modeller lists and sync the canvas to the draft.
     surface: Literal["explorer", "modeller"] = "explorer"
     # The agent this thread thinks through. The header shows the name; the
-    # card names it on every reply (docs/for-developers/modules/agents/spec.md).
+    # card names it on every reply (specs/system-design/modules/agents.md).
     agent_id: str | None = None
     agent_name: str | None = None
     # Set when the bound agent is paused or retired: the composer blocks and

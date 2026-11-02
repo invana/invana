@@ -1,7 +1,7 @@
 """Integration tests for raw Gremlin script execution.
 
 `execute()` is the one door an arbitrary query comes through, in both families
-(docs/for-developers/modules/graph-connectors/features/languages.md LG5). Until
+(specs/system-design/modules/graph-connectors.md § A query, either way). Until
 this path existed, asking a Gremlin-backed Graph a question reached
 ``NotImplementedError`` at the last step.
 

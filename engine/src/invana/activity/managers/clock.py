@@ -1,6 +1,6 @@
 """The clock — everything that happens later, in one tick.
 
-docs/for-developers/modules/operate/spec.md · features/notifications.md.
+specs/system-design/modules/operate.md · features/notifications.md.
 One ``tick(now)`` does, in order: fire due and queued schedules, deliver the
 scheduled runs that settled, match new events against the rules, remind and
 expire approvals, move publish reviews along (a settled preview asks for its

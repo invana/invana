@@ -50,7 +50,7 @@ class PlanCallerRead(BaseModel):
     skill_id: str | None = None
     #: The version of *this* plan the caller inlined. Below the current one
     #: means the library has moved on since — which a surface **says** and
-    #: never acts on ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    #: never acts on ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
     version: int
     args: dict = {}
 
@@ -65,7 +65,7 @@ class FlowRead(BaseModel):
     description: str
     kind: str
     # `builtin · authored · promoted` are the library's badge; `generated` is
-    # the fourth and is never listed ([LB5](docs/for-developers/modules/workflows/features/the-library.md) · LB6).
+    # the fourth and is never listed (specs/products/agents/features/AG-F06-plans-and-functions/feature.md § Decisions).
     origin: str
     intent: list[str]
     reusable: bool
@@ -75,7 +75,7 @@ class FlowRead(BaseModel):
     step_count: int = 0
     # Runs, and of those the ones a *Verify* step called served. A rate with no
     # verified run behind it is `null`, never 0% — "never asked" and "asked and
-    # failed" are different facts (docs/for-developers/modules/agents/spec.md).
+    # failed" are different facts (specs/system-design/modules/agents.md).
     runs: int = 0
     served_rate: float | None = None
     last_run_at: str | None = None

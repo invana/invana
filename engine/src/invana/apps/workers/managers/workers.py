@@ -80,7 +80,9 @@ class WorkerManager:
         gone = worker.state in (WorkerState.lost.value, WorkerState.stopped.value)
         note = None
         if worker.state == WorkerState.lost.value:
-            note = f"{worker.redelivered} steps redelivered"
+            # Only a loss that handed steps on has a count to say.
+            if worker.redelivered > 0:
+                note = f"{worker.redelivered} steps redelivered"
         elif worker.state == WorkerState.starting.value:
             note = "waiting for its first heartbeat"
         elif worker.state == WorkerState.draining.value:

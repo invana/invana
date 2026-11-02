@@ -100,11 +100,11 @@ class Graph(Base):
     # and a provider for it to instruct (setup.md SU5).
     instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Skips, per section. Everything else about setup is derived at serialize
-    # time (docs/for-developers/modules/platform/features/setup.md SU1).
+    # time (specs/products/shell/features/SH-F02-create-a-graph/feature.md § Decisions).
     # Shape: {graph_info: {completed_at?, skipped_at?}, instructions: {...}, skills: {...}, datasets: {...}}.
     setup_state: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     status: Mapped[GraphStatus] = mapped_column(_graph_status_enum, nullable=False, default=GraphStatus.active)
-    # The agent a new session starts with (docs/for-developers/modules/agents/spec.md). No FK: agents cascade
+    # The agent a new session starts with (specs/system-design/modules/agents.md). No FK: agents cascade
     # from the graph, so a real FK here would be a cycle at delete time.
     default_agent_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     # How many runs may run at once in this Graph, and what happens at the
@@ -192,7 +192,7 @@ class GraphConnection(Base):
     last_health_check_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    # Backend version compatibility (docs/for-developers/modules/graph-connectors/features/capabilities.md). Populated
+    # Backend version compatibility (specs/system-design/modules/graph-connectors.md § Capabilities). Populated
     # at connect/health-check.
     # server_version: detected (or user-declared) DB version, e.g. "5.20.0".
     # server_version_source: "detected" | "declared".

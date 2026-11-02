@@ -1,5 +1,5 @@
 /**
- * Agents › Approvals and Agents › Ledger (approvals.md · the-ledger.md): the
+ * Activity › Approvals and Activity › Ledger (approvals.md · the-ledger.md): the
  * Waiting view rides `?f.view=`; an alert rule is made in its dialog, turned
  * off in its row and refused without anyone to tell; the ledger's head states
  * its integrity, its verdict filter rides the URL, and a record with no acts
@@ -12,8 +12,8 @@ import { expect, type Page, test } from "@playwright/test";
 import { graphApi } from "./api";
 import { GRAPH } from "./explorer";
 
-const APPROVALS = `${GRAPH}/agents/approvals`;
-const LEDGER = `${GRAPH}/agents/ledger`;
+const APPROVALS = `${GRAPH}/activity/approvals`;
+const LEDGER = `${GRAPH}/activity/ledger`;
 
 interface Rule {
 	id: string;
@@ -108,4 +108,16 @@ test("A record with no acts says so", async ({ page }) => {
 	await expect(
 		page.getByText("No act on this record in the window"),
 	).toBeVisible({ timeout: 30_000 });
+});
+
+test("A ledger row opens its drawer and the row rides the URL", async ({
+	page,
+}) => {
+	await page.goto(LEDGER);
+	await expect(page.getByText("append-only", { exact: true })).toBeVisible({
+		timeout: 30_000,
+	});
+	await page.locator("tbody tr").first().click();
+	await expect(page).toHaveURL(/[?&]row=/);
+	await expect(page.getByLabel(/^Ledger row/)).toBeVisible();
 });

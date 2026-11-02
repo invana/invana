@@ -1,5 +1,5 @@
 """Tests for the canonical version-aware capability model
-(docs/for-developers/modules/graph-connectors/features/capabilities.md)."""
+(specs/system-design/modules/graph-connectors.md § Capabilities)."""
 
 from types import SimpleNamespace
 

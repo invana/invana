@@ -18,7 +18,8 @@ const EMPTY_HINTS: Partial<Record<LeftNavKey, string>> = {
 	projects:
 		"Pick a project to draw its plan — todos as cards, dependencies left to right.",
 	decisions: "Opens with engine support.",
-	runs: "Pick a run to read it — what it cost, what it touched and what was refused. `Compare with the plan` draws the plan it ran here.",
+	"activity-runs":
+		"Pick a run to read it — what it cost, what it touched and what was refused. `Compare with the plan` draws the plan it ran here.",
 	govern:
 		"A world has no canvas of its own — it is the bound whatever you open next runs inside.",
 	rules:

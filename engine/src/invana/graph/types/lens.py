@@ -1,8 +1,8 @@
 """The lens, as the connector sees it
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 
 A **lens** bounds what a run may see, use and send across five layers
-(docs/for-developers/modules/govern/spec.md). Only one of those layers reaches a
+(specs/system-design/modules/govern.md). Only one of those layers reaches a
 graph database, and only part of that layer survives the trip: a connector does
 not know about addresses, worlds, guardrails or `graph_data/model/Observations@v2`.
 It is handed its own vocabulary — a **type**, the properties that type declares,
@@ -10,7 +10,7 @@ the ones this world does not carry, and a structured predicate over the rest
 (CC6).
 
 Three grains, and this module enforces two of them
-(docs/for-developers/orchestration.md § 0.9):
+(specs/system-design/orchestration.md § The lens on a run):
 
 ===============  ==========================  ==================================
 Grain            Removes                     Enforced by

@@ -265,7 +265,7 @@ was read off the rendered artboards, not off the source.
 | Artboard | Record it draws | What changes |
 |---|---|---|
 | `RunDash` (34k) | the root **TaskRun** | six tiles, the flow with status painted on, Performance + Reported, Input + `result.json`, Log |
-| `StepImport` · `StepQuery` · `StepLlm` (34l–n) | a **child TaskRun** — one Task's execution ([§0](../../orchestration.md), no separate step table) | **only the Output panel.** Tiles, Input, `result.json`, Artifacts, Where it sits and Log are identical |
+| `StepImport` · `StepQuery` · `StepLlm` (34l–n) | a **child TaskRun** — one Task's execution ([§0](../orchestration.md), no separate step table) | **only the Output panel.** Tiles, Input, `result.json`, Artifacts, Where it sits and Log are identical |
 | `PlanDash` (34o) | a published **Flow** version | the same flow, painted with per-task medians instead of status; Arguments + Runs of this plan replace Input + `result.json` |
 | `PlanStepParams` (34p) | one **Task** inside a draft | the flow with one node selected, then Parameters + its contract + Validation |
 
@@ -284,7 +284,7 @@ Legend: ✅ use as-is · 🟡 exists but needs extending · ❌ build it.
 | 76 | Tile — label · big mono value · caption, tinted value, 4px meter | `MetricTile` | ✅ | add `tone` (the value ink — `running` is `--info`, `ok` is `--success`) and `meter` (`value`/`max`, the 4px bar under the caption). `MetricGrid` already lays the strip out | — **shipped**: `tone` and `meter` are on `MetricTile`, with the `WithMeter` story drawing a run's six tiles.
 | 77 | **The flow** — grid ground, task nodes, orthogonal edges with arrowheads, a dashed *when* edge, a dimmed never-ran node, a gate ring, selection handles | `@invana/canvas` + `TaskFlowCanvas` (canvas-ui) | ❌ | Track B. elkjs layered layout already ships (`@invana/graph-layout-elkjs`); what is missing is the **view**: a read-only, non-panning flow scaled to its band. Three renderings of one component — a run paints status, a plan paints medians, a draft paints handles ([G34](graph-detail-page.md)) |
 | 78 | **Task node** — status dot · mono `step_key` · bound swatch + name · tag chips (`3 lanes`, `attempt 2`) · meta line | `TaskNode` (`@invana/ui`) | ✅ | **shipped**, `ui-extended/task-node`. Lives in `@invana/ui`, **not canvas-ui**: nothing about the card is bound to canvas state — no position, no camera, no store — so it belongs in the lowest layer that can own it, and whatever lays a flow out places these. Ring tones: selected `--primary` · gate `--warning` · failed `--destructive`; `selected` also draws the four corner handles |
-| 79 | **Bound chip** — coloured square + mono bound name (`ingest` · `network` · `none` · `work_write` · `llm` · `graph_read`) | `BoundChip` (`ui-extended`) | ✅ | a closed six-value vocabulary with a colour each ([orchestration §0.6](../../orchestration.md)); it appears in the node, in the record strip and in the catalogue. Not a `Badge` variant — the swatch is the point | — **shipped**, `ui-extended/bound-chip`, with the `Default` story listing all nine.
+| 79 | **Bound chip** — coloured square + mono bound name (`ingest` · `network` · `none` · `work_write` · `llm` · `graph_read`) | `BoundChip` (`ui-extended`) | ✅ | a closed six-value vocabulary with a colour each ([orchestration §0.6](../orchestration.md)); it appears in the node, in the record strip and in the catalogue. Not a `Badge` variant — the swatch is the point | — **shipped**, `ui-extended/bound-chip`, with the `Default` story listing all nine.
 | 80 | Key/value rows (Input, Where it sits, Arguments, Reported, the contract) | `PropertyList` + `PropertyRow` | ✅ | `labelWidth` — the artboards use 108px |
 | 81 | `result.json` block — syntax-coloured, scrollable, height-capped | `CodeBlock` (`@invana/editor`) | ✅ | add `json` to `CodeLanguage`, and a `maxHeight`. It is read-only rendering, not an editor | — **shipped**: `json` is in `CodeLanguage` and `maxHeight` caps the block, the scroller inside CodeMirror rather than on the wrapper. `ResultJson` story.
 | 82 | Log lines — `time · LEVEL · task · message`, level-coloured, truncating | `Terminal` + `TerminalLine` | ✅ | `columns` + `columnTemplate` already carry the four columns; add a **level tone** (`INFO`/`WARN`/`ERROR`) next to `kind`. Same component the drawer's Log band uses ([§3b](graph-detail-page.md)) — one log, three widths | — **shipped**: `level` tints one cell, named by `levelColumn` (default `1`, because a log reads `time · LEVEL · source · message`). Setting it drops the `kind` marker. `RunLog` story.
@@ -333,6 +333,67 @@ This is what closes 34l–34n: a step board is a document, and the three differ 
 all three from documents. 34k, 34o and 34p need `TaskFlowCanvas`, which is Track B
 ([canvas-ui-coverage §5](canvas-ui-coverage.md)) and reaches Studio only on the next canvas release;
 until it does, those three render with the flow panel absent rather than not at all.
+
+---
+
+### 2.9 Two places — the platform and a Graph
+
+The platform and Graph products of [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) v67
+([the-screens › Two places](../the-screens.md#beyond-the-42--two-places), [products › Two places](../../products/README.md#two-places)).
+Most boards are `agents.*` boards already built in `@invana-studio/agents`, re-homed under a new rail and
+wordmark; the rest are new compositions. Legend: **move** — same screen, new product, rail and route ·
+**recompose** — existing kit parts, new layout · **new** — no Studio screen yet.
+
+#### Board group → kit components
+
+| Boards | Kind | Studio today | Kit components |
+|---|---|---|---|
+| `shell.launcher.open` · `shell.launcher.platform` | recompose | `shell/components/header/Launcher.tsx` | `DropdownMenu` · `DropdownMenuLabel` (*Invana* · *This Graph · name*: Modeller · Explorer · Projects · Activity · IAM · Graph settings) · `DropdownMenuSeparator` · `DropdownMenuItem` + `DropdownMenuItemDescription`. The product registry carries each product's place (platform · Graph); the launcher groups by it |
+| Header on a platform vs a Graph board | move | `useAppHeader` + `GraphSwitcher` (already only in a Graph) | `AppLayoutV2` header · `Breadcrumb`. The wordmark names the product |
+| `builder.overview*` · `builder.home*` | move | `agents/fleet` · `agents/home` | `MetricGrid`/`MetricTile` · `@invana/charts` · `DataTable` · `FleetMap` (Studio) · `AppliedFilters` |
+| `builder.agents` | recompose | `agents/AgentsListPage` | `DataTable` (agent · origin · product · latest · skills · Graphs · lifecycle) · `OriginBadge` · `StatusDot` (lifecycle) · `FilterBar` + `SearchInput` · `Alert` |
+| `builder.agents.filtered` | recompose | `AgentsListPage` | `AppliedFilters` (*set by the assistant*) · `DataTable` with `builder.agents`' columns — no per-Graph runtime, runs or budget |
+| `builder.agent` (Build · Versions · Graphs) | recompose | `agents/AgentDetail` | `RecordHeader variant="page"` · `Tabs` · `Field` + `Input` · `MarkdownEditorBlock` · `Textarea` · `PanelBox` · `ItemGroup` · `PropertyList` · `OriginBadge` |
+| `builder.agent.{new,soul,model,flow,deploy,retire}` | move | `AgentBuilder` · `Agent*Tab` · `LifecycleDialog` | as built: `Dialog` · forms · `Slider` · `TaskFlowCanvas` (`@invana-studio/canvases`). Tabs are `builder.agent`'s: new · soul · model · flow · deploy are parts of **Build**; retire opens over **Graphs** (the open work it names is per Graph) |
+| `builder.skill` · `builder.skill.from_run` | recompose | `agents/skills/SkillDetail` | `RecordHeader` · `Tabs` · `MarkdownEditorBlock` (SKILL.md, frontmatter as text) · `TreeView` (the folder) · `ItemGroup` + `Badge` (the plan) · `Alert` + `Link` (*Back to airways*) |
+| `builder.skill.{new,draft,flow*,functions,unmapped,test,exceptions,evals,agents,usage,locked}` · `builder.skills` | move | `agents/skills/*` | as built: `TaskFlowCanvas` · `Command` picker · `EmptyStateLock` · `DataTable`. Tabs are `builder.skill`'s (Build · Versions · Agents): agents · usage are **Agents**, every other part is **Build** |
+| `builder.functions*` · `builder.function` · `builder.templates*` · `builder.library*` | move | `agents/functions` · `plugins/FunctionPage` · `plans/*` · `PromoteDialog` | as built: `DataTable` · `BoundChip` · `PropertyList` · `Dialog` |
+| `builder.performance*` | move | `agents/performance/PerformancePage` | `@invana/charts` · `DataTable` |
+| `fleet.*` | move | `agents/workers/*` | as built: `DataTable` · `InlineMeter` · `Terminal` · `Dialog` · `SegmentedControl` |
+| `settings.llms*` · `settings.llm` · `settings.plugins` · `settings.plugin` · `settings.mcp*` · `settings.connections` | move | `agents/llms` · `agents/plugins` · `agents/connections` | as built |
+| `settings.graph_limits` | new | — (`agents/settings` holds one Graph's lanes) | `DataTable` · `InlineMeter` per row · `Badge` · `Alert` · `Dialog` + `Input` (Edit) |
+| `settings.remote_agents*` · `settings.remote_agent` | new | — (unscheduled, A2A) | `DataTable` · `Dialog` · `Field` · `PropertyList` · `StatusDot` |
+| `graph.settings.general` · `graph.settings.connection` | move | `modeller/settings/BasicTab` · `DatabaseTab` | as built |
+| `graph.settings.members` · `.members.update` | recompose | `modeller/settings/MembersTab` (people only) | `DataTable` · `Avatar` / bot icon · `Badge` (kind) · origin lock · `StatusDot` · `SegmentedControl` (All · People · Agents) · `SearchInput` · `Alert` (update offered) · `Button` |
+| `graph.settings.members.invite` | new | — | `Dialog` · `SearchInput` · `ItemGroup` + `Checkbox` (a member row disabled with *member*) |
+| `graph.settings.usage` | new | — | `MetricGrid`/`MetricTile` (`of 10M` caption) · `DataTable` · `Badge` (*read-only*) |
+| `graph.settings.agent*` (Overview · Runs · Access) | move | `agents/AgentDetail` tab subset · `AgentAccessTab` · `AgentRunsTab` | as built; header acts *Edit in Agent Builder* · *Remove* |
+| `shell.graph.new.team` · `shell.graph.new.review` | new | — (`GraphConnectPage` asks only for the connection) | step list (gap) · `Field` + `Input` + `Select` (invite a person) · `ItemGroup` + `Checkbox` + origin lock · `PropertyList` (review sections with *Edit*) · `Button` |
+| `activity.*` | move | `agents/runs` · `agents/approvals` · `agents/ledger` | as built; `activity.run` adds `Button` *Improve skill* |
+| `activity.run.remote*` | new | — (unscheduled, A2A) | as `activity.run` + `RefusalCard` |
+
+#### Gaps
+
+Built on design-kit `feat/two-places-kit` (four commits, not yet on its `main`), each with its story and a changeset. They
+reach Studio in **`@invana/ui` 0.0.37** — the next release after 0.0.36; until Ravi releases it, Studio links the local kit.
+
+| Gap | Boards | Home | Story | Status |
+|---|---|---|---|---|
+| `OriginBadge` — `core` · `install` · `graph` · `fork`; `core` carries a lock with the accessible name *core · cannot be removed* | `builder.agents` · `builder.agent` · `builder.skill*` · `graph.settings.members*` · `shell.graph.new.team` | `ui-extended/origin-badge` | `UI/UI Extended/OriginBadge` | **built** · 0.0.37 |
+| `StepList` — a wizard's vertical steps: number · done ✓ · current · failed !, done steps link back (`onPick`) | `shell.graph.new.*` | `ui-extended/step-list` | `UI/UI Extended/StepList` | **built** · 0.0.37 |
+| `DropdownMenuItemDescription` — icon · name · one muted line under the name, part of the item's accessible name | `shell.launcher.*` · the Graph picker | `ui/dropdown-menu` | `UI/UI/DropdownMenuItemDescription` | **built** · 0.0.37 |
+| `TreeView` trailing slot — `trailing?: ReactNode` on `TreeItem`, a badge or state at a row's end (*needs approval*) | `builder.skill` · `builder.import` | `ui-extended/tree-view` | `UI/UI Extended/TreeView` › *Trailing* | **built** · 0.0.37. `TreeView` is still `w-[240px]` unless a `className` widens it: Studio passes one where a trailing badge must not truncate the name |
+| `FileField` — pick a file or archive, show its name, clear it | `builder.import` · `builder.functions.library` | `@invana/forms` (promoted from `@invana-studio/ui` `RdfSourceField` and `NewModelDialog`) | yes | open — T06 |
+| `MemberRow` cells — person or agent, sub line, version offer (*5.1.0 available · Take update*) | `graph.settings.members*` | `@invana-studio/ui` (Studio-only, column cells over `DataTable`) | no (not a kit component) | open — T04 |
+
+#### Changes to existing components
+
+| Component | Change | Call sites |
+|---|---|---|
+| `Launcher` (`@invana-studio/shell`) | group by place; drop `className="h-7 w-7"` for the density token; rows use the description part | `useAppHeader.tsx` (the only caller) |
+| `ProductDefinition` (`@invana-studio/core`) | carries `place: platform \| graph`; Agents splits into Agent Builder · Fleet · Settings · Activity; Graph settings leaves the Modeller | `shell/products.tsx` · every `product.tsx` (agents · modeller · iam · explorer · projects · datasets) |
+| `TreeView` | `trailing` on `TreeItem`; a row's icon is wrapped so it never shrinks | `canvas-ui/view-panels/layers/LayersViewPanel.tsx` · the kit's TreeView story — additive, no change at either |
+| `MembersTab` (`@invana-studio/modeller`) | moves to Graph settings and lists agents beside people | its page only |
 
 ---
 

@@ -82,7 +82,7 @@ LAYER_ORDER: tuple[str, ...] = tuple(
 )
 
 #: The five a rule may govern, in the strip's order. The spine is not one of
-#: them ([governance §2](docs/for-developers/governance.md)): a plan does not
+#: them (specs/system-design/governance-and-lens.md § Layers and the spine): a plan does not
 #: *declare* the runtime, it is dispatched by it.
 GOVERNED_ORDER: tuple[str, ...] = tuple(label for label in LAYER_ORDER if label != LAYER_LABEL[Layer.agent])
 

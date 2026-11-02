@@ -1,5 +1,5 @@
 """Backend version-compatibility resolution for graph connections
-(docs/for-developers/modules/graph-connectors/features/capabilities.md).
+(specs/system-design/modules/graph-connectors.md § Capabilities).
 
 Two concerns live here, both pure (no I/O):
 
@@ -65,7 +65,7 @@ def compatibility_status_for(connector_class: str, server_version: str | None) -
     """Compatibility status for a (connector, version) without a live connection.
 
     Used when persisting a manually-declared version
-    (docs/for-developers/modules/graph-connectors/features/capabilities.md). Returns ``"unknown"``
+    (specs/system-design/modules/graph-connectors.md § Capabilities). Returns ``"unknown"``
     when the connector profile can't be loaded or the version doesn't parse.
     """
     profile = load_profile(connector_class)

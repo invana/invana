@@ -3,6 +3,8 @@
 How the product is built, styled, installed and run. Nothing here is a user-facing capability on its
 own; everything here is why the rest can be built quickly and look like one thing.
 
+System design: [runtime.md](../../../../specs/system-design/runtime.md) — install and run (§ 4) · [api-and-cli.md](../../../../specs/system-design/api-and-cli.md) — API conventions (§ 5) · [observability.md](../../../../specs/system-design/observability.md) — logs and traces (§ 6). This file keeps its vocabulary, the build rules, the drawn states, theming, Studio end-to-end tests, cross-feature decisions and what is deliberately absent.
+
 | | |
 |---|---|
 | Index | [§11 · Platform](../../README.md#11--platform) |
@@ -89,84 +91,17 @@ Inside a work panel, the bands are the same five everywhere:
 | Rule | Detail |
 |---|---|
 | A selection opens a canvas | Picking a row draws its plan, its lineage, its DAG. Closing stays the tab's X |
-| Nothing autosaves in an editor | An editing panel buffers, says `unsaved changes` in its status line, and commits on one Save |
-| A pulsing dot means running | A static amber dot means stuck and waiting on a person. One glyph for both hides who acts next |
+
+*Nothing autosaves in an editor* and *a pulsing dot means running* are in the [Shell product spec](../../../../specs/products/shell/product.md).
 
 ## 3. Theming
 
 | Rule | Detail |
 |---|---|
-| Light and dark are equal | Neither is an aftertodo; both are checked before a component ships |
 | Structure is square, controls are slightly round | One radius token for controls, zero elsewhere |
 | Density is a theme concern | A dense inspector and an airy form use the same components at different sizes |
-| Colour carries meaning once | Status colour is defined in one place and reused, never re-picked per screen |
 
-## 4. Install and run
-
-| Command | Does |
-|---|---|
-| `invana start` | Runs the engine, and Studio when bundled |
-| `invana migrate` | Applies database migrations |
-| `invana version` | Reports the engine version and its connector packages |
-| `invana records import` | The import path — [Bring data in](../bring-data-in/spec.md) |
-
-| Rule | Detail |
-|---|---|
-| Core plus connectors | The engine installs on its own; each database connector is its own package |
-| One image or two | Engine and Studio ship together or separately, from the same build |
-| Cross-platform by default | A contributor on any OS runs the same commands |
-| Migrations are explicit | Nothing migrates itself on boot |
-
-## 5. API conventions
-
-One shape across every route, so a new endpoint needs no new rules.
-
-| Convention | Detail |
-|---|---|
-| Versioned prefix | `/api/v1/…` |
-| Graph scoping | everything about a Graph hangs off `/u/{username}/{graphSlug}/…`; user-level routes live under `/auth/…` |
-| Lists are keyset-paginated | a cursor, not an offset — stable under writes |
-| One list contract | [list-contract](features/list-contract.md) — every list takes `q` · named filters (`status`, `agent_id`, …, repeatable) · `sort` · `cursor` + `limit`, and answers `{ items, total, unfiltered_total, next_cursor, applied }`. `total` and `unfiltered_total` are real counts, never `len(items)`; `applied` echoes the filters the engine used, so Studio and the assistant show the same ones |
-| Filters run on the server | a list never narrows rows only in the browser; Studio carries them in the URL as `?q=` and `?f.<field>=` |
-| Streams are server-sent events | with a `?token=` fallback where a header cannot be set |
-| `PUT` is full replace | `PATCH` is partial; a blank secret on `PUT` means "keep the stored one" |
-| Deletes are hard, and cascade downward | there is no trash tier |
-| `409` for a conflict | duplicate name, editing a published version, deleting something still referenced |
-| `422` for a shape the model forbids | a property type the schema cannot hold, a cycle in dependencies |
-| Errors name the thing | the field, the step, the bound — never a bare code |
-| A mutation answers with `{ message, data }` | the engine writes the success sentence; Studio shows it and never composes its own |
-| One gesture, one message | a gesture that fans out into several requests reports once, not once per request |
-| The generated client is the contract | Studio types come from the schema; nothing is hand-typed |
-
-
-## 6. Logs and traces
-
-Two separate things, configured once each at startup.
-
-| | Logging | Telemetry |
-|---|---|---|
-| What | Human- and machine-readable lines from the engine's own modules | Traces, metrics and log correlation, exported by OTLP |
-| Turned on by | One call at startup, with sensible defaults | One idempotent bootstrap; off unless an endpoint is configured |
-| Formats | A plain formatter for a terminal, and one JSON object per line for a collector | OTLP over gRPC |
-| Overridable | A full configuration dictionary, for an integration or a deployment that needs its own | Endpoint, sampling and resource attributes |
-| Dependency stance | Standard library only — no logging framework replaces `getLogger(__name__)` | Optional; the engine runs with telemetry absent |
-
-Instrumentation sits in three layers, so nothing has to be wired per route:
-
-| Layer | Covers |
-|---|---|
-| HTTP | every route: latency, status, request id |
-| Database | app-state queries, with the statement tagged back to the call that made it |
-| Business logic | decorated service methods — one for a span, one for a metric |
-
-| Rule | Detail |
-|---|---|
-| Configure once | Not per module, and never at import time |
-| Logs carry the request | A request id ties a log line to the trace and to the event record |
-| Metrics are namespaced by domain | API, graph query, app-state query, model operations, generic methods |
-| Telemetry is optional | With no collector configured, the engine behaves identically |
-| Product metrics are not these | Latency, cost and failure rates a user reads come from the record — see the Operate module |
-
+Light and dark as equals, and colour carrying meaning once, are in [SH-F03](../../../../specs/products/shell/features/SH-F03-find-your-way/feature.md).
 
 ## 6a. Studio end-to-end tests
 

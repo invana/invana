@@ -1,4 +1,4 @@
-"""Understand — what the ask *means* inside this graph (docs/for-developers/modules/agents/spec.md).
+"""Understand — what the ask *means* inside this graph (specs/system-design/modules/agents.md).
 
 This is the cheap classifier that runs before anything writes a query. It
 answers three questions and nothing else:

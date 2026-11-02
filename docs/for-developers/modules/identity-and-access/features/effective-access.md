@@ -10,75 +10,7 @@ each step before it dispatches it, and a refusal names the layer and the policy.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [policies](policies.md) · [people and groups](people-and-groups.md) · [the agent page](../../agents/features/the-agent-page.md) · [delegation](../../agents/features/delegation.md) · [the ledger](../../operate/features/the-ledger.md) · [govern](../../govern/spec.md) · products: [iam.md](../../../../products/iam.md) IAM-07 · [agent-fabric.md](../../../../products/agent-fabric.md) › Agents *Access* |
 
-> **As** an owner, **I want** every agent's policies and effective access, read-only, with why each
-> function is allowed or refused, **so that** I see why an agent can or can't.
->
-> **As** a builder, **I want** the agent's Access tab to list its policies and every function its
-> skills need against them, **so that** a refusal never surprises me in a run.
-
-## The layers
-
-```mermaid
-flowchart LR
-    N[Skill needs] --> P[Its policies]
-    P --> S[Started by]
-    S --> W[World]
-    W --> B[Boundary]
-    B --> E{All allow?}
-    E -->|yes| A[Allowed · dispatched]
-    E -->|no| R[Refused before dispatch · names the first layer that refuses]
-```
-
-| Layer | Reads | Applies when |
-|---|---|---|
-| Skill needs | the functions the agent's bound skills' plans name | read views only — a step is in the plan because something needs it |
-| Its policies | the agent's attachments, direct and through its groups; a spawned agent reads its root agent's | the run has an agent |
-| Started by | the person's managed policies (their Graph roles, direct and through groups) and attachments | the run has a person who started it |
-| World | the run's frozen lens, which carries the Graph's guardrails | always — enforced by the lens as each step touches a participant |
-| Boundary | every saved boundary policy | there is one |
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Refused before dispatch | Each step's function and resource are checked against the policy layers before the step runs; a refusal fails the step `refused` and names the policy |
-| C2 | Spawned agents narrow | A spawned agent holds its parent's access, never attachments of its own; a delegated (authored) agent holds its own |
-| C3 | An agent never does more than its starter | The starter layer bounds every step of a run a person started |
-| C4 | IAM › Agents | Every agent, read-only: kind · policies · functions allowed · refused in 7 days · owner, kind tabs `All · Authored · Seeded` (*seeded* is the product's word for an agent that ships with Invana) |
-| C5 | An agent's effective access | Tabs **Effective access** · Policies · Refusals. The matrix — action · resource · skill needs · its policies · started by · world · boundary · effective · why not — as started by a chosen person (or a run) in a chosen world |
-| C6 | Who it may delegate to | Each agent it may delegate to, the policy that allows it, and *always* · *asks its owner* · *never* |
-| C7 | The agent's Access tab | Policies it holds (*Attach a policy*, the same act as in IAM) · the function matrix · May delegate to |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[IAM › Agents] --> B[Row → agent page in IAM]
-    B --> C[Effective access: As started by · in world]
-    C --> D{A refused row}
-    D --> E[Why not names the layer: policy · person · boundary · no skill needs it]
-    B --> F[Policies tab: what it holds · Open in Agents]
-    B --> G[Refusals tab: ledger rows refused for it]
-    H[Agents › agent › Access] --> I[Policies it holds · Attach a policy]
-    I -->|iam-admin| J[Attach modal → held at once]
-    I -->|not iam-admin| K[Disabled · names who holds iam-admin]
-    H --> L[Function matrix · May delegate to]
-    M[A run's step] --> N{Policy layers allow?}
-    N -->|yes| O[Dispatch]
-    N -->|no| P[Step refused · ledger row refused by grant · the policy named]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| An agent holding no policy | Every function needing a statement reads *refused · holds no policy*; Access leads with *Attach a policy* |
-| No person started the run (a schedule's clock, a seed) | Started by reads `—` and does not refuse |
-| Starter's role narrower than the agent's | *Refused by the person who started it — priya holds viewer* |
-| A boundary refuses | *boundary no-pii-out* |
-| A function no skill needs | Listed when a policy allows it, *no skill needs it* |
-| A world chosen | The world column reads the lens for the row's layer; the dispatch check leaves the lens to the run |
-| Member without iam-admin | Reads every agent's access; *Attach a policy* is disabled with the reason |
+Product spec: [ST-F02 · People and access](../../../../../specs/products/settings/features/ST-F02-people-and-access/feature.md) — ST-07 · ST-11; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 
@@ -105,13 +37,8 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| EA1 | **Effective access = skill needs ∩ its policies ∩ started by ∩ world ∩ boundary.** A policy layer allows when at least one policy the principal holds allows the action on the resource with its conditions met. |
 | EA2 | The dispatch check runs the policy layers — its policies, started by, boundary — before every step whose function has a bound. The world is the run's lens and keeps enforcing as each step touches a participant. Skill needs are the plan: a step is in a plan because a skill, a packaged plan or a replan within the skill's allowlist put it there. |
 | EA3 | When a step's resource is not known before it runs — a query names no type — the check is at the layer: a statement allows when its action matches and one of its resources is in the step's layer. A resource the args name is checked exactly. |
-| EA4 | A refusal fails the step `refused` with the message *`<policies>` do(es) not allow `<function>` on `<resource>`* (policies), *`<person>`, who started run #N, holds `<roles>`* (started by), or *boundary `<name>`* (boundary); the ledger row's `refused_by` is `grant` and its rule is that message. |
-| EA5 | A spawned agent holds its parent's access — the root authored agent's policies — never its own attachments. A delegated agent holds its own. The run's starter is the root run's. |
-| EA6 | An agent's groups pass their policies to it, as a person's groups do. |
-| EA7 | A run no person started (the clock with no schedule author, a seed) has no starter layer. |
 | EA8 | The envelope's allow-list stays the planner's list of functions an agent may plan with; the matrix's *Why not* says *not in its envelope* when the envelope is what refuses. |
 | EA9 | Existing agents keep what they could do: the migration attaches `viewer` to every agent, `contributor` to one whose envelope allows a `work_write` function, and `modeller` to one whose envelope allows a graph-write, schema-write or ingest function. A new agent is created holding `viewer`. |
 | EA10 | *May delegate to* keeps the agent's own setting (always · ask · never) under its policies: `always` runs only when a policy allows `work.delegate` on `agent/<name>`; without one it asks the owner; `never` refuses. |
@@ -126,5 +53,3 @@ flowchart TD
 | An access ask raised by a refusal | a refused step names the policy; asks for access arrive with Approvals' budget and access kinds later |
 | The token layer at dispatch | runs are started by a person's session in I01; calls over a Graph's MCP server carry the token's policy (I02) |
 | Projects as resources gating todo pick-up | private projects are [9.7](../../work/features/private-projects.md) |
-| Policies on workers | workers run any agent's steps; access belongs to the agent |
-| Explicit deny or precedence | default deny plus boundaries |

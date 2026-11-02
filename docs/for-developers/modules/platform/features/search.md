@@ -8,11 +8,10 @@ above them — filtered by access before it is ranked. ⌘K and `invana search` 
 | Index | [13.10](../../../README.md#13--platform) · Slice **B11** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / — |
-| Product | [shell.md › Decisions](../../../../products/shell.md#decisions) — *Search (⌘K)* · *Search ranking* · *⌘K and access* · P-18 |
+| Product | [SH-F03 · Find your way](../../../../../specs/products/shell/features/SH-F03-find-your-way/feature.md) · P-18 |
 | Related | [roles](../../identity-and-access/features/roles.md) · [membership](../../identity-and-access/features/membership.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
-> **As** a member, **I want** to type a name and reach the record, wherever it lives,
-> **so that** I never need the nav to find something I know exists — and never see what I may not open.
+Product spec: [SH-06 · Do, open or ask anything from ⌘K](../../../../../specs/products/shell/features/SH-F03-find-your-way/stories/SH-06-do-open-or-ask-anything-from-k/story.md) — what ⌘K finds, its ranking, its access rule and why it reads the products' own lists live in SH-F03. This file keeps the engine's `/search` route, which `invana search` reads.
 
 ## Capabilities
 
@@ -24,24 +23,6 @@ above them — filtered by access before it is ranked. ⌘K and `invana search` 
 | SE4 | One Graph or all | `graph=<user>/<slug>` narrows to one; omitted, every Graph the caller is in |
 | SE5 | Each hit names its product and Graph | So ⌘K groups by product and opens the right page |
 | SE6 | From the terminal | `invana search "<text>" --user <u> [--graph <user>/<slug>] [--json]` |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[⌘K or invana search] --> B{Text typed?}
-    B -->|no| C[Nothing to search · 422 from the API]
-    B -->|yes| D[Graphs I am a member of · datasets I may read]
-    D --> E{graph= given?}
-    E -->|yes, a member| F[That Graph only]
-    E -->|yes, not a member| G[404 · reads as absent]
-    E -->|no| H[Every Graph I am in]
-    F --> I[Match names · exact → prefix → contains]
-    H --> I
-    I --> J{Any hits?}
-    J -->|yes| K[Hits, grouped by product in ⌘K]
-    J -->|no| L[Empty list · ⌘K offers Ask the assistant]
-```
 
 ## Seams
 
@@ -76,18 +57,10 @@ flowchart TD
 |---|---|
 | SE1 | Search lives in `activity`, the band that may read every app, because it joins Graphs, models, agents, skills, projects, lenses and datasets. |
 | SE2 | Access is applied in the query, never after it: the queryset is handed the Graph ids the reader is a member of, and datasets are read through the dataset reading rule (install-visible, own, or every one for an install Admin). |
-| SE3 | Every member reads every record in their Graph, so a Graph role narrows nothing here. A private project is a hit only for the people staffed on it ([9.7](../../work/features/private-projects.md)) — filtered in `SearchManager`, the one place search decides access. |
-| SE4 | Ranking is name-only: exact, prefix, contains, then the name. Meaning-based *related* hits wait for a vector index ([12.4](../../graph-connectors/features/vector-search.md)). |
 | SE5 | `graph=` naming a Graph the reader is not in is 404, as every Graph route reads a scoping refusal. |
-| SE6 | The Graph's own records (an airport, a gene) are not searched; that is the graph database's, through Explorer. |
-| SE7 | Studio's ⌘K does not read this route. It matches names over the lists each product already reads, and every one is scoped by the engine: the Graphs list to memberships, the projects and todos lists to the private projects the reader is staffed on. A hit here carries a row id, while Studio opens a project by its key and a skill by its slug, so wiring it would cost a second read per hit. If ⌘K ever reads it, the hit grows the key or slug its page opens by. |
 
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Meaning-based (*related*) hits | waits on a vector index |
 | Runs, schedules, findings, branches | runs are found by their Graph's journal; schedules and project records arrive with B08 and B05, which add their kinds |
-| Searching node and edge data | the graph database's job, through Explorer |
-| Search history or saved searches | not asked for |
-| Studio ⌘K reading this route | SE7 — a hit carries a row id, and Studio opens a project by key and a skill by slug |

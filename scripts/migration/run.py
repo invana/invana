@@ -2,7 +2,7 @@
 """Run the products migration unattended — build, gates, design review, fix, commit — session after session.
 
 The plan is ``docs/products/migration-plan.md``; the runbook and its log are
-``docs/products/migration-sessions.md``. This driver never decides *what* to
+``.claude/team/projects/_archived/migration/project.md``. This driver never decides *what* to
 build: it reads the log, picks the next session whose dependencies are done,
 and hands that one runbook entry to a fresh headless Claude session. Everything
 that decides whether the session counts as done happens here, outside the
@@ -33,7 +33,7 @@ The same driver runs any runbook laid out like it. Point it elsewhere with
 ``INVANA_RUNBOOK`` (the runbook), ``INVANA_RUNNER_PROMPTS`` (its prompts),
 ``INVANA_RUNNER_REVIEWS`` (where reviews land), ``INVANA_RUNNER_SCOPE`` (the
 commit scope), ``INVANA_RUNNER_GATES=full`` (engine and Studio gates for every
-row) and ``INVANA_RUNNER_MAX_HANDOFFS``. ``docs/products/agents-build-sessions.md``
+row) and ``INVANA_RUNNER_MAX_HANDOFFS``. ``.claude/team/projects/_archived/agents-build/project.md``
 is run that way.
 
 Usage::
@@ -58,7 +58,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = ROOT / "scripts" / "migration"
-SESSIONS = ROOT / os.environ.get("INVANA_RUNBOOK", "docs/products/migration-sessions.md")
+SESSIONS = ROOT / os.environ.get("INVANA_RUNBOOK", ".claude/team/projects/two-places/project.md")
 PROMPTS = ROOT / os.environ.get("INVANA_RUNNER_PROMPTS", "scripts/migration/prompts")
 REVIEWS = ROOT / os.environ.get("INVANA_RUNNER_REVIEWS", "scripts/migration/reviews")
 SCOPE = os.environ.get("INVANA_RUNNER_SCOPE", "migration")
@@ -402,6 +402,7 @@ def build_until_handoffs_end(sid: str, phase: str, first_prompt: str, label: str
 
 def prompt(name: str, **values: str) -> str:
     text = (PROMPTS / f"{name}.md").read_text()
+    values = {"RUNBOOK": str(SESSIONS.relative_to(ROOT)), "REVIEWS": str(REVIEWS.relative_to(ROOT)), **values}
     for k, v in values.items():
         text = text.replace("{{" + k + "}}", v)
     return text
@@ -572,7 +573,7 @@ def phase_boards(sid: str) -> list[str]:
     line = re.search(r"^\| Boards \|(.*)$", text[head.end():], re.M) if head else None
     if not line:
         return []
-    names = list(json.loads((HERE / "screen-map.json").read_text())["boards"])
+    names = list(json.loads((ROOT / ".claude" / "skills" / "design-qa" / "screen-map.json").read_text())["boards"])
     drop = " ".join(re.findall(r"\(not ([^)]*)\)", line.group(1)))
     keep = re.sub(r"\(not [^)]*\)", "", line.group(1))
     # An exclusion may be a partial name (`run.remote*` inside `agents.run.*`), so it matches anywhere.
@@ -584,7 +585,7 @@ def phase_boards(sid: str) -> list[str]:
 
 def reseed() -> None:
     """Re-seed the boards whose data is relative to now, when the runbook's scope ships a re-seed."""
-    script = PROMPTS.parent / "reseed.py"
+    script = ROOT / "demos" / "agents" / "reseed.py"
     if script.exists():
         sh([sys.executable, str(script)])
 
@@ -602,8 +603,8 @@ def regression(sid: str) -> str:
     out = CACHE / sid / "regression"
     shutil.rmtree(out, ignore_errors=True)
     reseed()
-    sh(["node", "scripts/migration/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(out)])
-    sh(["node", "scripts/migration/shoot.mjs", "--diff", str(SHOTS), "--out", str(out)])
+    sh(["node", ".claude/skills/design-qa/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(out)])
+    sh(["node", ".claude/skills/design-qa/shoot.mjs", "--diff", str(SHOTS), "--out", str(out)])
     diff = json.loads((out / "diff.json").read_text()) if (out / "diff.json").exists() else {}
     changed = [b for b, v in diff.items() if v == "new" or v > SHOT_THRESHOLD]
     rel = lambda d: d.relative_to(ROOT)
@@ -624,7 +625,7 @@ def accept_shots(sid: str) -> None:
         shutil.copy2(png, SHOTS / png.name)
     if boards := phase_boards(sid):
         reseed()
-        sh(["node", "scripts/migration/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(SHOTS)])
+        sh(["node", ".claude/skills/design-qa/shoot.mjs", "--live", "--boards", ",".join(boards), "--out", str(SHOTS)])
 
 
 def review(row: dict) -> tuple[bool, str]:
@@ -654,7 +655,7 @@ def run_session(row: dict, max_fix: int) -> bool:
         checkpoint(sid, row["phase"], "work left by an interrupted run")
     set_status(sid, "in progress")
     if not resuming and sid.startswith(("A", "C")) and row["kind"].startswith("move"):
-        sh(["node", "scripts/migration/shoot.mjs", "--live", "--smoke", "--out", f".migration-cache/{sid}/before"])
+        sh(["node", ".claude/skills/design-qa/shoot.mjs", "--live", "--smoke", "--out", f".migration-cache/{sid}/before"])
     try:
         # An interrupted run picks up where it stopped, from the work on disk and the hand-off notes.
         first, label = (prompt("continue", ID=sid), "resume") if resuming else (prompt("build", ID=sid), "build")

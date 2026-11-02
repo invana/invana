@@ -40,7 +40,7 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { formatCompact } from "@invana-studio/core";
-import { ActButton, useAccess } from "@invana-studio/shell";
+import { ActButton, EVERY, useAccess } from "@invana-studio/shell";
 import {
 	asBindRefusal,
 	BindRefusalCard,
@@ -49,7 +49,6 @@ import {
 } from "@invana-studio/ui";
 import { ArrowRight, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
-import { EVERY } from "../lists";
 import { useSkillsQuery } from "../skills/queries";
 import { type AgentDraft, effortSummary, voiceSummary } from "./agentDraft";
 import { type AgentTab, useOfferedVersions, versionName } from "./agentParts";

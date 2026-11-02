@@ -1,4 +1,4 @@
-"""The DAG the plan canvas draws (docs/for-developers/modules/workflows/spec.md).
+"""The DAG the plan canvas draws (specs/system-design/modules/workflows.md).
 
 The claim under test is a narrow one: the picture is the **partial order**, not
 the authored list. A plan is written as a list because it has to be written in

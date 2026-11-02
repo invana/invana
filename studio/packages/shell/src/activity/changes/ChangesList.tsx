@@ -22,7 +22,6 @@ import {
 	FilterBar,
 	MultiFilterChip,
 	SearchInput,
-	Skeleton,
 	Table,
 	TableBody,
 	TableCell,
@@ -33,6 +32,7 @@ import { PanelSection } from "@invana-studio/ui";
 import { History } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ReadState } from "../../lists/listParts";
 import { useProducts } from "../../products";
 import { comparePath } from "../activityPath";
 import { useGraphEventsQuery } from "../events/queries";
@@ -189,11 +189,7 @@ export function ChangesList({
 				className="w-full"
 			/>
 			{query.isLoading ? (
-				<div className="space-y-1.5">
-					{[0, 1, 2, 3].map((i) => (
-						<Skeleton key={i} className="h-10 w-full" />
-					))}
-				</div>
+				<ReadState loading error={null} what="the changes" />
 			) : rows.length === 0 ? (
 				<EmptyState
 					icon={<History className="size-6" />}

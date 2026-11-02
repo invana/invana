@@ -32,7 +32,7 @@ async def test_words_open_runs_with_the_lists_own_filters_and_count(
 
     link = await BoardOpenManager().open(session, graph=graph, actor_id=user.id, list_key="runs", words=words)
 
-    assert link.path == "/agents/runs"
+    assert link.path == "/activity/runs"
     assert link.params == {"f.agent_id": agent.id, "f.status": "failed", "f.since": "30d"}
     assert link.total == 2
     assert {c["field"]: c["label"] for c in link.chips} == {

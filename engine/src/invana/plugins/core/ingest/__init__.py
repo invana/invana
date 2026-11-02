@@ -1,5 +1,5 @@
 """Bound: ``ingest`` — the entries that read a source and decide what may land
-(docs/for-developers/orchestration.md §0.6).
+(specs/system-design/orchestration.md § The catalogue).
 
 **The keys are the ones already stored** on every load's nodes —
 `data.records.validate` is not renamed to `import_dataset` (§6.4).

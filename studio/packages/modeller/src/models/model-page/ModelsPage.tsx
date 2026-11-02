@@ -315,7 +315,7 @@ export function ModelsPage({
 		growth: {
 			canWrite,
 			// A load is a run, so it lands on the Runs journal.
-			onBringDataIn: () => set({}, { panel: "runs" }),
+			onBringDataIn: () => set({}, { panel: "activity-runs" }),
 			onSeeTypes: () => set({ open: true }),
 			onOpenRun: (runId) => onOpenRun?.(runId),
 		},
@@ -332,7 +332,7 @@ export function ModelsPage({
 				description={
 					firstDraft
 						? `${firstDraft.name} is a draft. Publish it, or bring a model in, and this page starts to count: records, queries, and how fast they run.`
-						: "Author a model, import one, or start from a starter. Once one is published this page starts to count: records, queries, and how fast they run."
+						: "Start from an ontology, a starter or blank. Every way in is a draft you review; once one is published this page starts to count: records, queries, and how fast they run."
 				}
 				actions={
 					canWrite ? (
@@ -345,24 +345,21 @@ export function ModelsPage({
 								>
 									Open the draft
 								</Button>
-							) : (
-								<ActButton area="model" onClick={() => setCreating(true)}>
-									<Plus /> New model
-								</ActButton>
-							)}
+							) : null}
+							<ActButton
+								area="model"
+								variant={firstDraft ? "outline" : "default"}
+								onClick={() => setFromOntology(true)}
+							>
+								<BookOpen /> From an ontology
+							</ActButton>
+							{/* New model holds blank, import and the starter models. */}
 							<ActButton
 								area="model"
 								variant="outline"
 								onClick={() => setCreating(true)}
 							>
-								<Upload /> Import
-							</ActButton>
-							<ActButton
-								area="model"
-								variant="ghost"
-								onClick={() => setCreating(true)}
-							>
-								<BookOpen /> Starter models
+								<Plus /> New model
 							</ActButton>
 						</>
 					) : null

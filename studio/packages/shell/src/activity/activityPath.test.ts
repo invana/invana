@@ -17,6 +17,7 @@ describe("activityOf", () => {
 		expect(activityOf("/u/admin/airways/activity/nope")).toBeNull();
 		expect(activityOf("/u/admin/airways/activity/events/x")).toBeNull();
 		expect(activityOf("/u/admin/airways/activity/runs/r1")).toBeNull();
+		expect(activityOf("/u/admin/airways/activity/ledger/actor")).toBeNull();
 	});
 
 	it("reads a change's compare as Events, and refuses a kind that is not versioned", () => {
@@ -32,9 +33,9 @@ describe("activityOf", () => {
 		expect(activityOf("/u/admin/airways/activity/changes/board/x")).toBeNull();
 	});
 
-	it("opens a run on its Agents page", () => {
+	it("opens a run on its page in Activity", () => {
 		expect(
 			runPagePath({ username: "admin", graphSlug: "airways" }, "r 1"),
-		).toBe("/u/admin/airways/agents/runs?page=run%3Ar%201");
+		).toBe("/u/admin/airways/activity/runs?page=run%3Ar%201");
 	});
 });

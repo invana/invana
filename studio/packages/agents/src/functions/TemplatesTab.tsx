@@ -46,17 +46,17 @@ import {
 	TableRow,
 	TypographyInlineCode,
 } from "@invana/ui";
-import { ActButton } from "@invana-studio/shell";
-import { DetailStatus, FormError } from "@invana-studio/ui";
-import { Plus } from "lucide-react";
-import { useState } from "react";
 import {
+	ActButton,
 	FilteredEmpty,
 	filterValue,
 	ListStrip,
 	matchCount,
 	setOne,
-} from "../lists";
+} from "@invana-studio/shell";
+import { DetailStatus, FormError } from "@invana-studio/ui";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import { useAgentsOpen } from "../open";
 import { RowsFailed, RowsLoading, useTabList } from "./shared";
 import {

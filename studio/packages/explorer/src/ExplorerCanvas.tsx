@@ -64,7 +64,7 @@ interface ExplorerCanvasProps {
 	onViewTargetChange: (id: string | null) => void;
 	/** On → hover lights up the node's 1st-degree neighbours; off → node only. */
 	magnet: boolean;
-	/** Telemetry root for the in-flight query run (docs/for-developers/modules/platform/features/telemetry.md). */
+	/** Telemetry root for the in-flight query run (specs/system-design/observability.md). */
 	interactionRef?: InteractionRef;
 	/** Render backend. Switching it remounts the board. */
 	backend: CanvasBackend;

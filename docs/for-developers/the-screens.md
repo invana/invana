@@ -237,6 +237,8 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | Canvas | Draws | Pages | State |
 |---|---|---|---|
 | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) | [14 Govern](modules/govern/spec.md) · [5 Agents](modules/agents/spec.md) · [6 Skills](modules/skills/spec.md) · [7 Workflows](modules/workflows/spec.md) · [10.5 Runs](modules/operate/features/see-what-ran.md) · [4.2 Boards](modules/explore/features/boards.md) — 90 artboards | Worlds · Guardrails · the run · the agents · LLMs · Skills · Bindings · Usage · Rules · Plans · Boards · **Runs** | **current.** Supersedes the governance canvas, and the skills canvas for 6.1–6.4 |
+| [Install-wide Agents and Skills](https://claude.ai/artifact/T9Wv5kmRig2mxohax9FGv7) | [5.16 The Agent Builder](modules/agents/features/install-wide-agents-and-skills.md) — staging rounds | Install-wide agents and skills · Invana home | **superseded** by Invana Products: `builder.*`, `shell.install.limits`, `shell.home`, `shell.graph.new.team`, `agents.agents` |
+| [Invana Spaces](https://claude.ai/artifact/WnzjmRH8tNUGz8cGqfNHFv) | [5.16](modules/agents/features/install-wide-agents-and-skills.md) — the two places: the platform and a Graph; the launcher; agents as members | Navigation designs · Platform · A Graph · Crossing over | **superseded** by Invana Products v66 (`builder.*` · `fleet.*` · `settings.*` · `graph.settings.*` · `activity.*`) — staging record only |
 | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 18 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
 | [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab, and [3.10](modules/ask/features/the-assistant.md)'s session world — 10 artboards | Agents › Agent · Ask › The session’s world | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
 | [The Run Page](https://claude.ai/artifact/QRDPZ2GHR7KKwS68vbScWR) | [10.5 See what ran](modules/operate/features/see-what-ran.md) — the run page as a report header over tabs, and a step inside its run — 8 artboards (a waterfall on the Overview and in the left panel; In order and Lens folded away) | Operate › Runs › The run page | **current.** Reframes `operate.runs.detail.*` and `operate.runs.step.*` on Govern, Agents and Skills; the bodies are theirs, captured, not redrawn |
@@ -306,14 +308,14 @@ drawn before the screen is built the way every other module pass runs (README §
 built*).
 
 `SetupWizardHiFi` (#16 above) is **not** one of them: despite its name it draws Graph settings, and
-setup owns no forms of its own (SU2). The name is the canvas's, and it stays.
+setup owns no forms of its own ([SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md)). The name is the canvas's, and it stays.
 
 | # | Artboard | What it draws | Surface | Feature | API | Studio | Shell |
 |---|---|---|---|---|---|---|---|
-| U1 | `SetupPageHiFi` | mid-setup — the island, the four-group stepper, and *Bring data in*'s lesson with its concept card and terminal line ([5](modules/platform/features/setup.md#5-surfaces)) | the graph page | [13.7](modules/platform/features/setup.md) SU3 · SU6 · SU7 · SU16 · SU17 · SU22 | ✅ | ✅ | ❌ |
-| U2 | `SetupBlockedHiFi` | *Bring data in* blocked by *Author a model*, and a provider pinging red | the graph page | SU12 · the `broken` state | ✅ | ✅ | ❌ |
-| U3 | `SetupReadyHiFi` | every gate open, **What next** carrying the offers, the cap still in `header.right` | the graph page | SU4 · SU15 · SU19 | ✅ | ✅ | ❌ |
-| U4 | `SetupLocksHiFi` | the Assistant, with the gate that opens it | every gated surface | SU13 · `EmptyState locks` | ✅ | 🟡 | ❌ |
+| U1 | `SetupPageHiFi` | mid-setup — the island, the four-group stepper, and *Bring data in*'s lesson with its concept card and terminal line ([5](modules/platform/features/setup.md#5-surfaces)) | the graph page | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · [13.7](modules/platform/features/setup.md) SU7 · SU16 | ✅ | ✅ | ❌ |
+| U2 | `SetupBlockedHiFi` | *Bring data in* blocked by *Author a model*, and a provider pinging red | the graph page | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · the `broken` state | ✅ | ✅ | ❌ |
+| U3 | `SetupReadyHiFi` | every gate open, **What next** carrying the offers, the cap still in `header.right` | the graph page | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · SU19 | ✅ | ✅ | ❌ |
+| U4 | `SetupLocksHiFi` | the Assistant, with the gate that opens it | every gated surface | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · `EmptyState locks` | ✅ | 🟡 | ❌ |
 
 **The screens are built; the artboards are not.** Studio ships `SetupBoard`, `SetupTimeline` and
 `SetupLock` composed from the kit — the drawings above are still owed, and are what a board pass
@@ -430,8 +432,8 @@ title, character for character** — the canvas and this table are one string, n
 | Govern › Worlds | [14.1](modules/govern/features/worlds.md) | `Main` (the drawer, and what a world did to the question) · `GovWorld` (five layer sections, the slice, the cast) · `WorldEdit` (authoring, and the two refusals) · `WorldLadder` (naming publishes, promoting binds, the six seams) |
 | Govern › Guardrails | [14.2](modules/govern/features/guardrails.md) | `GovGuardrails` (the sibling drawer, what a save would cost, what an auditor is handed) · `GuardrailEdit` (an address, allow or deny, egress per destination) |
 | Govern › what a world did | [10.5](modules/operate/features/see-what-ran.md) · [14.1](modules/govern/features/worlds.md) | `RunLens` (six bands, what each step touched, refusals struck, *This run's lens* + Retune) · `RunLensStep` (generated vs executed, and what egress cut) · `GovCompare` (the one participant that differed) · `Cast` (innermost wins, then it is checked) |
-| Agents › Agents | [5.2](modules/agents/features/author-an-agent.md)–[5.7](modules/agents/features/concurrency-and-contention.md) | `AgentsList` · `AgentEnvelope` · `AgentLineage` · `AgentLifecycle` · `AgentConcurrency` |
-| Agents › LLMs | [5.1](modules/agents/features/providers-and-models.md) | `AgentsLlms` |
+| Agent Builder › Agents | [5.2](modules/agents/features/author-an-agent.md)–[5.7](modules/agents/features/concurrency-and-contention.md) | `AgentsList` · `AgentEnvelope` · `AgentLineage` · `AgentLifecycle` · `AgentConcurrency` |
+| Settings › LLM providers | [5.1](modules/agents/features/providers-and-models.md) | `AgentsLlms` |
 | Library › Plans | [7.1](modules/workflows/features/the-library.md) · [7.6](modules/workflows/features/the-catalogue.md) · [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) (the retired draft boards) | **22 artboards** — named `module.feature.surface.variant`, one row per name prefix, no annotation cards. Listed one by one in [the table below](#library--plans--the-22-artboards) |
 | Skills › Skills | [6.1](modules/skills/features/authoring-a-skill.md) | `SkillsViewPanel` (the panel, and the skill/rule line) · `SkillAuthor` (four fields, and the sentence `draft_plan` stops and asks about) · `SkillFlow` (**the plan in its six layers** — the only flow view, [SK16](modules/skills/features/authoring-a-skill.md)) · `SkillUsesPlan` (inlining a library plan with `uses`, and tuning what it declares — named in the prose and inlined at the draw, [6.5](modules/skills/features/instructions-publish-rollback.md#decisions) IS11; no picker is built) · `SkillVersions` (seven versions, immutable, the v4→v5 diff; the hand-edit it draws is not built, IS3) |
 | Skills › Bindings | [6.2](modules/skills/features/bindings.md) | `SkillBindings` (bound, refused, and the world that changes which model decides) · `BindRefusals` (both halves run; the plan's declared bands with the shut one struck, and the three readings that shut one [BN13](modules/skills/features/bindings.md)) · `BindFromAgent` (the agent's side — it binds as you click, the refusal under the chip, the draft chip, and what the bindings cost in characters [BN11](modules/skills/features/bindings.md) · [BN14](modules/skills/features/bindings.md) · [BN15](modules/skills/features/bindings.md)) · `SkillOffer` (the fixed assembly order, discrete items with ids, what the record holds after) · `BindSeams` (a draft · unbound · in flight · refused · read-only) · `BindStanding` (the row's world as context, and the writer it does not have yet [BN12](modules/skills/features/bindings.md)) |
@@ -467,12 +469,12 @@ reads a run's ledger from a terminal.
 | R2 | `RunLensStep` | one step, generated vs executed | `run_touches.query` from the connector · `sent` from the cut | `EgressList` · `SliceSummary` | ✅ | ✅ |
 | R3 | `GovCompare` | two runs, one question | compare over `run_touches` | `DiffList` · `RecordHeader` | ✅ | ✅ a page kind, `compare:<a>:<b>` |
 | R4 | `Cast` | innermost wins, then checked | `LensRead.cast_resolved` | `CastTable` · `CannotAnswerCard` | ✅ | ✅ |
-| A1 | `AgentsList` | Agents › Agents | `agents.lens_id` read **and** written, and composed at run open · `llm_config_id` gone · `tokens_this_month` | `LensChip` · `CastTable` · `MetricTile` | ✅ | ✅ the lens chip and the run budget in tokens |
+| A1 | `AgentsList` | Agent Builder › Agents | `agents.lens_id` read **and** written, and composed at run open · `llm_config_id` gone · `tokens_this_month` | `LensChip` · `CastTable` · `MetricTile` | ✅ | ✅ the lens chip and the run budget in tokens |
 | A2 | `AgentEnvelope` | the envelope | all ten `budget` keys | `BoundChip` (exists) · `DataTable` | ✅ | ✅ the ceilings are a table with an **Enforced** column (EB7) |
 | A3 | `AgentLineage` | delegation and lineage | — | `TreeView` (exists) | ✅ | ✅ |
 | A4 | `AgentLifecycle` | pause, resume, retire | one preview, two acts — the same open work, the effects differ ([LC8](modules/agents/features/lifecycle.md)) | `AlertDialog` · `DataTable` | ✅ | ✅ |
 | A5 | `AgentConcurrency` | the ceiling belongs to the Graph | `graphs.pools` · `GET …/contention` | `DataTable` (exists) | ✅ | ✅ in Settings › Agents, where the ceiling is set (C8) |
-| A6 | `AgentsLlms` | Agents › LLMs | `llm_models` · `is_default` gone · ranks derived at add (PM17) | `AddressChip` | ✅ | ✅ a drawer of the Agents stack; an endpoint is a group over its models |
+| A6 | `AgentsLlms` | Settings › LLM providers | `llm_models` · `is_default` gone · ranks derived at add (PM17) | `AddressChip` | ✅ | ✅ a drawer of the Agents stack; an endpoint is a group over its models |
 
 **Where the work is written down.** The engine column of every row is
 [building-engine/govern-and-agents-data-model.md](building-engine/govern-and-agents-data-model.md);
@@ -494,8 +496,8 @@ Three more on it keep the D1 option comparison and are not screens.
 | `GovWorlds` | Govern › Worlds — the drawer and the world chip | 🔵 | 🔵 | ✅ |
 | `GovWorld` | a world — five layer sections, the slice box | 🔵 | 🔵 | ✅ |
 | `GovGuardrails` | Govern › Guardrails, and what a save would cost ([GR2](modules/govern/features/guardrails.md)) | 🔵 | 🔵 | ✅ |
-| `AgentsList` | Agents › Agents — an agent carries a lens, not a provider ([D2](modules/govern/spec.md)) | 🟡 | 🟡 | ✅ |
-| `AgentsLlms` | Agents › LLMs — no default, the cast picks ([D19](modules/govern/spec.md)) | ✅ | 🟡 | ✅ |
+| `AgentsList` | Agent Builder › Agents — an agent carries a lens, not a provider ([D2](modules/govern/spec.md)) | 🟡 | 🟡 | ✅ |
+| `AgentsLlms` | Settings › LLM providers — no default, the cast picks ([D19](modules/govern/spec.md)) | ✅ | 🟡 | ✅ |
 | `GovCompare` | Compare — one question, two worlds, the touch diff | 🔵 | 🔵 | ✅ |
 | `Main` · `OneSurface` · `TwoRecords` | — the D1 option comparison, kept as the record. **Not screens** | — | — | — |
 
@@ -678,6 +680,7 @@ builds them in `@invana-studio/datasets` (migration session C01). Decisions are 
 | Artboard | Story | Studio route | Studio |
 |---|---|---|---|
 | `datasets.catalogue` | DS-01 | `/datasets/catalogue` | ✅ |
+| `datasets.catalogue.empty` | DS-01 | the same, no dataset — the `invana datasets import` command; *Collect with an agent* tagged experimental | ✅ |
 | `datasets.dataset` · `.provenance` · `.versions` · `.used` · `.conformance` | DS-02 · DS-03 · DS-09 | `/datasets/catalogue/<publisher>/<name>[/<tab>]` | ✅ |
 | `datasets.dataset.retracted` | DS-14 | the Overview banner and the Versions tab | ✅ |
 | `datasets.record` | DS-04 | `…/records/<key>` | ✅ |
@@ -691,6 +694,7 @@ builds them in `@invana-studio/datasets` (migration session C01). Decisions are 
 | `datasets.bind` | DS-11 | *Bind to a Graph* on the dataset header | ✅ |
 | `datasets.share` | DS-12 | *Share* on the dataset header — only me · the install | ✅ |
 | `datasets.imports` · `datasets.imports.run` | DS-13 | `/datasets/imports` | ✅ |
+| `datasets.imports.first` | DS-13 | the same, nothing imported — the command, run where the engine runs. Studio shows it above the journal, not as numbered steps for one Graph | 🟡 |
 
 ---
 
@@ -723,6 +727,7 @@ are in [products/projects.md](../products/projects.md#decisions) and the work fe
 | Artboard | Story | Studio route | Studio |
 |---|---|---|---|
 | `projects.list` | PJ-01 | `/projects` — the Projects stack | ✅ |
+| `projects.list.empty` | PJ-01 | the same, no project — the Graph's question offered as the first. Projects is experimental; not started | 🔵 |
 | `projects.new` | PJ-02 | *New project* on the stack's Projects header | ✅ |
 | `projects.project` | PJ-03 | `/projects/<key>` → page `project:<key>` | ✅ |
 | `projects.project.branches` | PJ-04 | `…?view=branches` | ✅ |
@@ -867,7 +872,7 @@ Drawn first on Explorer Chrome, now on [Invana Products](https://claude.ai/artif
 
 ## Beyond the 42 · The Modeller
 
-The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) that no section above lists, built in phases M01–M07 of [agents-build-sessions.md](../products/agents-build-sessions.md). What each differs by, and what its move deletes, is [modeller.md › Studio today, mapped](../products/modeller.md#studio-today-mapped).
+The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) that no section above lists, built in phases M01–M07 of the agents build. What each differs by, and what its move deletes, is [modeller.md › Studio today, mapped](../products/modeller.md#studio-today-mapped).
 
 | Artboard | Story | Studio route | Studio |
 |---|---|---|---|
@@ -878,10 +883,11 @@ The `modeller.*` boards of [Invana Products](https://claude.ai/artifact/HcPfkMUY
 | `modeller.model.airroutes` | MO-02 | `/modeller/models?model=<id>&model_open=1` — one model's page with its outline in the leftSection | ✅ |
 | `modeller.model.type` | MO-02 | the same › a type — Properties · Indexes · Constraints · Mappings | ✅ |
 | `modeller.model.type.constraint` | MO-08 | the same › Constraints › a property — a range or a standard's values | ✅ |
-| `modeller.connect` | MO-04 | `/graphs/new` — connect a database and draft a model | 🟡 |
+| `shell.graph.new.*` | SH-21 | `/graphs/new` — New Graph: about · database · starting point · people · review. Studio today asks only for the connection | 🟡 |
 | `modeller.draft` | MO-04 | `/modeller/models?model=<id>` on a draft — the drafted model on the canvas, staged and published from its bar | 🟡 |
 | `modeller.models.new` | MO-06 | `/modeller/models` › *New model* — describe it · a file · a starter | 🟡 |
 | `modeller.models.overview` | MO-07 | `/modeller/models?models_tab=overview` — every model's health | ✅ |
+| `modeller.models.overview.empty` | MO-07 | the same, no model published — *From an ontology* · *New model* | ✅ |
 | `modeller.models.database` | MO-07 | `?models_tab=database` — the model against the database | ✅ |
 | `modeller.models.usage` | MO-07 | `?models_tab=usage` — queries by model and stitches crossed | ✅ |
 | `modeller.models.performance` | MO-07 | `?models_tab=performance` — p95 and query shapes | ✅ |
@@ -990,3 +996,17 @@ So a feature file can be opened next to the drawing that shows it.
 | 13.4 | Logging | ✅ | — |
 | 13.5 | Telemetry | ✅ | — |
 | 13.6 | Admin and health | ✅ | — |
+
+## Beyond the 42 · Two places
+
+The platform and Graph products of [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) v67 ([5.16](modules/agents/features/install-wide-agents-and-skills.md) WD13, WD18). Every `agents.*` board moved to one of these; none is built in this shape yet.
+
+| Product | Place | Boards | Features | Built |
+|---|---|---|---|---|
+| Agent Builder | platform | `builder.overview*` · `builder.home*` · `builder.agents*` · `builder.agent*` · `builder.skills` · `builder.skill*` · `builder.functions*` · `builder.function` · `builder.library*` · `builder.templates*` · `builder.performance*` · `builder.import` | 5.2 · 5.8 · 5.10 · 5.13 · 5.16 · 5.17 · 6.1 | 🔵 |
+| Fleet | platform | `fleet.pools` · `fleet.pool` · `fleet.worker` · `fleet.capacity` · `fleet.tokens` · `fleet.add*` | 5.15 | ✅ at `/fleet` — no assistant on the right |
+| Settings | platform | `settings.graph_limits` · `settings.llm*` · `settings.plugin*` · `settings.mcp*` · `settings.connections` · `settings.remote_agent*` | 5.1 · 5.7 · 5.11 · 13.12 · 13.13 | 🟡 `settings.plugin*` at `/settings/plugins`; the rest under Agents |
+| Graph settings | a Graph | `graph.settings.general` · `.connection` · `.members` · `.members.invite` · `.members.update` · `.usage` · `graph.settings.agent*` | 1.12 · 5.13 · 5.16 | 🟡 built as a Modeller page |
+| Activity | a Graph | `activity.runs*` · `activity.run*` · `activity.approvals*` · `activity.ledger*` | 5.14 · 10.5 | ✅ at `/u/:user/:graph/activity` — Runs · Approvals · Ledger │ Schedules · Events · Inbox · Rules · Channels |
+| Launcher | both | `shell.launcher.open` · `shell.launcher.platform` | 5.12 · 5.16 | ✅ — Agents stands in the Agent Builder's row; icon tiles wait for the kit's item description |
+

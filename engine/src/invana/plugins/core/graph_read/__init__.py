@@ -1,5 +1,5 @@
 """Bound: ``graph_read`` — the entries that read the bound graph database
-(docs/for-developers/orchestration.md §0.6).
+(specs/system-design/orchestration.md § The catalogue).
 
 Five entries: a query somebody wrote, a neighbourhood the canvas asked for,
 the types a world holds, whether a canvas's elements are still in view, and
@@ -13,5 +13,5 @@ a crossing *is* so that an entry stays a view over one app. The version is
 checked before the query is sent, the narrowing is handed to the connector as a
 ``QueryLens``, and one touch is recorded carrying both digests. **Nothing is
 enforced by filtering afterwards**
-([govern § 2](docs/for-developers/modules/govern/spec.md)).
+([govern § The one record](specs/system-design/modules/govern.md#the-one-record)).
 """

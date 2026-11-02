@@ -18,10 +18,10 @@ class OfferedRule(BaseModel):
     ``statement`` is the **version's** wording, resolved from the
     ``rule_version_id`` the step recorded, so rewording or deactivating the rule
     never rewrites what a past step was given
-    ([RU4 · RU12](docs/for-developers/modules/skills/features/rules.md)).
+    ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
     ``rule_id`` rides beside it because a board is bound to the rule, not to one
     of its versions — a step row shows the statement and opens the rule
-    ([RU11](docs/for-developers/modules/skills/features/rules.md)).
+    ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
 
     It lives here rather than beside the step schemas that carry it: a step is a
     ``runtime`` row and a rule is this app's record, and **an app may not import
@@ -174,7 +174,7 @@ class PlanUseRead(BaseModel):
     ``latest_version`` is the newest version of that key the Graph holds, which
     is the one fact the caller cannot work out from its own rows. It is said,
     never acted on: the copy is the point, and re-inlining is something somebody
-    asks for ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    asks for ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
     """
 
     key: str
@@ -406,7 +406,7 @@ class SkillRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     #: ``builtin`` ships with Invana and is re-seeded by name; it is editable
-    #: and cannot be deleted ([SK25](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    #: and cannot be deleted ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
     origin: str = "authored"
     #: Never published — the drawer draws it as a draft, and nothing is offered
     #: it ([SK21](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
@@ -460,7 +460,7 @@ class RuleUpdate(BaseModel):
 
     Changing the statement publishes the next version; ``order`` and ``active``
     are properties of the rule and are edited in place
-    ([RU4](docs/for-developers/modules/skills/features/rules.md)).
+    ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
     """
 
     statement: str | None = Field(default=None, min_length=1)
@@ -575,7 +575,7 @@ class RuleCitationsResponse(BaseModel):
     ``offered`` is a fact written by assembly; ``total`` is the model's own
     claim, and the difference between them is *never cited* — which cannot be
     told from *never offered* unless both are sent
-    ([RU7](docs/for-developers/modules/skills/features/rules.md) ·
+    ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions) ·
     [RU9](docs/for-developers/modules/skills/features/rules.md)). Both are over
     **every** version; each row says which wording it read, so deactivating or
     rewording never rewrites it.

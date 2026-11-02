@@ -456,7 +456,7 @@ class TaskRuntime:
 
         ``max_concurrent_runs`` on the budget bounds how many runs one agent is
         working at once, which is a different bound from the Graph's ceiling
-        ([CC1](docs/for-developers/modules/agents/features/concurrency-and-contention.md)):
+        ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
         one bounds an actor, the other bounds the machine. Checked first so an
         agent at its own bound is told *that*, rather than queued behind a
         Graph ceiling it was never going to reach.
@@ -464,7 +464,7 @@ class TaskRuntime:
         It **refuses and does not queue** — an agent has no policy column, and a
         second queue with its own precedence would make *why am I waiting* two
         answers instead of one. The refusal names the ceiling
-        ([EB3](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+        ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
 
         A run with no agent has no such bound, which is the widest reading and
         the honest one.
@@ -560,7 +560,7 @@ class TaskRuntime:
     async def cancel(self, run_id: str, *, stopped_by: str | None = None) -> bool:
         """Stop a running run, and everything it delegated to.
 
-        The cascade walks ``parent_run_id`` **down** (docs/for-developers/modules/work/spec.md):
+        The cascade walks ``parent_run_id`` **down** (specs/system-design/modules/work.md):
         cancelling a parent while its children keep spending budget would make
         the stop button a lie. The run named here ends ``stopped`` — a
         ``run.stop`` event by ``stopped_by`` (else the person it ran for) — and
@@ -850,7 +850,7 @@ class TaskRuntime:
             # recomposed ([GV8]). It is built once, here, so every step of
             # the run is checked against the same document, and a guardrail
             # tightened mid-run cannot change what this one was allowed to
-            # rest on (docs/for-developers/modules/govern/spec.md).
+            # rest on (specs/system-design/modules/govern.md).
             governor=Governor.for_run(th),
             # The Graph's pools, so a crossing can take a slot in one
             # ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
@@ -896,7 +896,7 @@ class TaskRuntime:
 
         An agent with no explicit binding gets every skill in the graph — the
         behaviour before agents existed, and what the seeded Explorer wants
-        (docs/for-developers/modules/work/spec.md). An authored agent's empty list means *no skills*, and
+        (specs/system-design/modules/work.md). An authored agent's empty list means *no skills*, and
         is distinguishable because seeded agents ship with none set.
 
         An eval replay that names ``skill_version_id`` offers that version of
@@ -1037,7 +1037,7 @@ class TaskRuntime:
                     await self._finish_conversed(db, emitter, th, v, assistant, conv.reply)
                     return "conversed"
                 except NeedsInput as ni:
-                    # Rounds are bounded (docs/for-developers/modules/agents/spec.md): past `max_clarifications`
+                    # Rounds are bounded (specs/system-design/modules/agents.md): past `max_clarifications`
                     # the step must decide rather than ask again. Never a
                     # silent loop, and never an unattended run asking a
                     # question nobody is there to answer.
@@ -1694,7 +1694,7 @@ class TaskRuntime:
         The run is finished — it said what it could not settle. The task
         goes ``needs_input`` so *the assignee's human* sees the question and
         can answer it, which is the only place an answer can come from
-        (docs/for-developers/modules/work/spec.md, unattended).
+        (specs/system-design/modules/work.md, unattended).
         """
         if not th.todo_id:
             return

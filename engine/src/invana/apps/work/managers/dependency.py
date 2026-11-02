@@ -1,4 +1,4 @@
-"""Dependency edges between tasks (docs/for-developers/modules/work/spec.md).
+"""Dependency edges between tasks (specs/system-design/modules/work.md).
 
 An edge can cross projects, so a cycle can too — which is why the acyclicity
 check runs over every edge in the Graph rather than one project's.

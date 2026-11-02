@@ -133,7 +133,7 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
         # version that lost them would silently stop being sliceable, and every
         # world narrowing it would start refusing — the failure would look like
         # a governance bug rather than a lost column
-        # (docs/for-developers/modules/connect-and-model/features/domain-models.md DM6).
+        # (specs/products/model/features/MO-F01-start-a-model/feature.md § Decisions).
         target.axes = dict(source.axes or {})
 
         # Clone property keys first (types and mappings depend on them)

@@ -1,5 +1,5 @@
 """The lens seam — one compiler per query language
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 
 A lens is compiled **per language, never per vendor** (CC9), so it lives beside
 the query builder in ``cypher/`` and ``gremlin/`` and an integration inherits

@@ -11,62 +11,7 @@ do; the soul is why it does not sound like a robot while doing it.
 | API / CLI / Studio | 🟡 / — / ✅ |
 | Related | [author-an-agent](author-an-agent.md) · [the answer, in words](../../ask/features/the-answer-in-words.md) · [ask in natural language](../../ask/features/ask-in-natural-language.md) · [act as](../../ask/features/act-as.md) |
 
-> **As** someone who works with an agent every day, **I want** it to have a character — warm, curious,
-> a little funny if I want it to be — **so that** asking it things feels like talking to a colleague
-> who knows the graph, not reading a diagnostic.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Write an agent's soul | Markdown on the agent: character, tone, what it enjoys, how it greets |
-| C2 | A soul by default | An agent with no soul speaks in Invana's **default voice** — warm, plain, brief — never in a flat register |
-| C3 | Voice, never power | The soul reaches only the steps whose output a person reads. It cannot change a query, a plan, a lens or a refusal |
-| C4 | Versioned with the agent | Editing the soul is an agent edit: a new version, in the audit |
-| C5 | Preview before saving | One sample reply in the draft voice, to the same ask, beside the current one |
-| C6 | Instructions stay separate | `instructions` say *what* to do and reach Understand and Translate; the soul says *who* and never reaches Translate |
-| C7 | Voice dials | Humour · formality · emoji · greeting as structured `soul_traits`, read before the Markdown — [author-an-agent § Voice dials](author-an-agent.md#voice-dials) |
-
-## What reads the soul
-
-| Step | Reads the soul | Why |
-|---|---|---|
-| Understand — its `question`, `reason` and `converse` reply | ✅ | a person reads each |
-| Answer ([3.12](../../ask/features/the-answer-in-words.md)) | ✅ | the prose emission is the reply |
-| Plan | ✗ | what runs is not a matter of character |
-| Translate · Validate · Execute | ✗ | a persona that can shape a query is a permission boundary with a personality ([AA3](../../ask/features/act-as.md#decisions)) |
-| Verify · Project | ✗ | no model prose |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[The agent's page] --> B[Soul tab]
-    B --> C{Has a soul?}
-    C -->|no| D[Editor shows the default voice as placeholder]
-    C -->|yes| E[Editor shows the soul]
-    D --> F[Write or edit Markdown]
-    E --> F
-    F --> G[Preview: one ask, current voice vs draft voice]
-    G --> H{Save?}
-    H -->|yes| I[New agent version · agent.soul_set]
-    H -->|no| J[Discard draft]
-    I --> K[Next run reads the new soul]
-    B --> L{May edit the agent?}
-    L -->|no| M[Read-only, the soul shown as written]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| No soul written | The default voice, named as such on the tab: *Speaking in Invana's default voice* |
-| A soul asking for what governance forbids ("always search the web") | Saved — a soul is words, not permissions. The run still refuses what the lens refuses, in the soul's voice |
-| A soul that would soften a refusal ("never say you can't") | The refusal still happens and still names what is missing ([CA3](../../ask/features/when-it-cannot-answer.md#decisions)); only its wording is the soul's |
-| A very long soul | Allowed; the tab says what it costs in characters in every ask, like bindings do ([BN15](../../skills/features/bindings.md#decisions)) |
-| A spawned child | Inherits its parent's soul unless the spawn names another |
-| A run already in flight when the soul changes | Keeps the soul it opened with; the next run reads the new one |
-| Member without edit rights | Reads the soul; no editor |
+Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -95,21 +40,4 @@ flowchart TD
 | # | Decision |
 |---|---|
 | SO1 | **A soul is a Markdown field on the agent, not a skill and not a stance.** A skill is offered where it is bound and reported as applied — character is neither optional nor a claim to cite. A stance is a method whose value is its declared assumptions ([AA5](../../ask/features/act-as.md#decisions)). The soul is who the agent is, so it lives on the agent. |
-| SO2 | **The soul is structurally absent from Plan, Translate, Validate and Execute.** Not ignored there — not passed there. Governance bounds what runs; the soul only shapes the words a person reads, so no soul can reach a record the ask did not ask for. |
-| SO3 | **An empty soul is the default voice, never no voice.** The default is warm, plain, brief, first person, and ends with something the reader can do next. *Nothing set* reads as Invana, not as a diagnostic. |
-| SO4 | **A soul never changes what is true.** A refusal still refuses and names what is missing, a citation still cites, a third-party fact is still badged ([BG3](../../ask/features/beyond-the-graph.md#decisions)). The soul chooses the words around them. |
-| SO5 | **`instructions` and `soul` are two fields because they reach different steps.** Instructions say what to do and reach Understand and Translate, layered after the Graph's own; the soul says who is speaking and reaches only prose. One field would carry a character into query writing. |
-| SO6 | **A run speaks with the soul it opened with.** The soul is read at run open, like the lens ([GV26](../../govern/spec.md#4-cross-feature-decisions)); `agent_version` on the run says which. |
 | SO7 | **The soul is a tab on the agent's page, not a field on its form.** It sits beside Overview · Skills & callables · Thinking · Activity because it is authored and versioned on its own, and a paragraph of Markdown does not fit a form row. The preview answers a sample ask the author can change, since a voice is judged on the questions this agent actually gets. |
-
-| SO9 | **The empty editor shows the default voice, and never stores it.** The placeholder is Studio's copy of `DEFAULT_VOICE` in `apps/llm/voice.py`, the two changed together; the engine's is the one a run reads. Saving an empty soul saves `""`, so a later change to the default voice reaches every agent that never wrote its own. |
-| SO8 | **The preview is not a run, and it reads no graph.** It is two model calls to the same ask, one per voice, told to state no fact from the data — a voice is being judged, not an answer, and a preview that invented a number would be the hallucination the product promises against. It calls the model the agent's guardrails — the Graph's and its own — would cast, so a preview cannot reach a model a guardrail denies. Nothing is recorded and nothing is drawn against the agent's month. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Avatars, names-as-characters, voice audio | the soul is how the agent writes; a face adds nothing a reader can check |
-| A soul marketplace or shared soul library | a soul is part of one agent; copy the Markdown if two should sound alike |
-| Per-user souls | the agent is the same colleague for everyone who asks it |
-| A soul that grants or asks for permissions | permissions are the lens's, and only the lens's |

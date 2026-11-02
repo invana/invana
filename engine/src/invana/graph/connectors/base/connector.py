@@ -29,8 +29,8 @@ from invana.graph.types.data_elements import GraphResponse
 from invana.graph.types.lens import ComposedQuery, QueryLens
 from invana.graph.types.plan import ExplainedPlan
 
-# OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
-# docs/for-developers/modules/platform/features/telemetry.md). Core
+# OpenTelemetry lives in the optional ``telemetry`` extra (specs/system-design/observability.md ·
+# specs/system-design/observability.md). Core
 # connector code must import cleanly without it, so resolve a tracer lazily and
 # fall back to no-op ``nullcontext`` spans when it isn't installed.
 try:
@@ -90,7 +90,7 @@ class BaseConnector(ABC):
     vector: BaseVectorQuerySet | None
 
     # The canonical, version-aware capability model for this connector
-    # (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+    # (specs/system-design/modules/graph-connectors.md § Capabilities).
     # Family connectors set a baseline; vendors override via ``.merge()``. ``None``
     # means "no profile declared" → no capabilities/property types reported.
     _capability_profile: ClassVar[CapabilityProfile | None] = None
@@ -112,7 +112,7 @@ class BaseConnector(ABC):
     @property
     def detected_version(self) -> Version | None:
         """The server version cached at ``connect()`` time, if detected
-        (docs/for-developers/modules/graph-connectors/features/capabilities.md)."""
+        (specs/system-design/modules/graph-connectors.md § Capabilities)."""
         return self._detected_version
 
     @abstractmethod
@@ -180,7 +180,7 @@ class BaseConnector(ABC):
         rewrite is visible rather than silent. ``None`` is the widest, and the
         query executes byte-identical (GV7).
 
-        Split into two child spans (docs/for-developers/modules/platform/features/telemetry.md) so the trace separates
+        Split into two child spans (specs/system-design/observability.md) so the trace separates
         the raw
         driver round-trip (``graph.query.db_execute``) from result
         deserialisation (``graph.query.serialize``) — the same FE→BE→FE trace
@@ -192,7 +192,7 @@ class BaseConnector(ABC):
         # Time the driver round-trip so the result carries a real duration. The
         # serializers don't populate it (the vendor result summary isn't uniform
         # across drivers), so without this metadata.duration_ms stays 0.0 and the
-        # studio shows "0ms" (docs/for-developers/modules/platform/features/telemetry.md). Measure the raw execute only
+        # studio shows "0ms" (specs/system-design/observability.md). Measure the raw execute only
         # — serialise
         # is our own work and traced separately by the spans below.
         # Refused here, before the wire and before anything is counted: a lens
@@ -284,7 +284,7 @@ class BaseConnector(ABC):
 
     async def detect_version(self) -> Version | None:
         """Best-effort detection of the live server version
-        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+        (specs/system-design/modules/graph-connectors.md § Capabilities).
 
         Family connectors override this (Cypher: ``dbms.components()``; Gremlin:
         best-effort). The default returns ``None`` → the connection is treated as
@@ -294,7 +294,7 @@ class BaseConnector(ABC):
 
     def resolve_capabilities(self, version: Version | None = None) -> ResolvedCapabilities:
         """Resolve this connector's capabilities for a server version
-        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+        (specs/system-design/modules/graph-connectors.md § Capabilities).
 
         Uses the explicit ``version`` if given, else the cached detected version.
         Pure — no I/O — so callers can resolve offline from the class profile.

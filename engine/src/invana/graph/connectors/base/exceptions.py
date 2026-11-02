@@ -51,7 +51,7 @@ class NotSupportedError(ConnectorError):
 
 class LensViolationError(ConnectorError):
     """A query was refused by the lens, before the wire
-    (docs/for-developers/modules/graph-connectors/features/the-connector-contract.md).
+    (specs/system-design/modules/graph-connectors.md § The connector contract).
 
     Not a ``QueryExecutionError``: nothing was executed and nothing failed. The
     query named something this world does not hold, or had a shape the compiler

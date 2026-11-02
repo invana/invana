@@ -21,9 +21,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { ReadState } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
 import { useEffect, useState } from "react";
-import { FleetReadState } from "../overview/fleetParts";
 import {
 	Act,
 	ActorChain,
@@ -87,7 +87,7 @@ export function LedgerRecordTab({
 					description="A type or one record — graph/Fare, graph/Airport:LHR — and press Enter."
 				/>
 			) : !d ? (
-				<FleetReadState
+				<ReadState
 					loading={read.isLoading}
 					error={read.error}
 					what="the record"

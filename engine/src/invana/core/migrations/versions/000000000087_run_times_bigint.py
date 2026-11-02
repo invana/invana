@@ -1,6 +1,6 @@
 """A run's stored times are 64-bit.
 
-docs/for-developers/modules/platform/features/metrics-are-stored.md.
+specs/system-design/architecture.md § Metrics are stored.
 
 ``task_runs.duration_ms`` · ``queue_ms`` · ``work_ms`` · ``ask_ms`` ·
 ``wait_ms`` become ``BIGINT``. As 32-bit integers they held at most 24.8 days,

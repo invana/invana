@@ -136,7 +136,7 @@ export interface Session {
 	/** docs/for-developers/modules/ask/spec.md — the model a modeller session authors (bound on first generation
 	 *  when absent). Lets the Model panel sync its canvas to the bound draft. */
 	modelId?: string;
-	/** docs/for-developers/modules/agents/spec.md — the agent this thread thinks through. The composer names it
+	/** specs/system-design/modules/agents.md — the agent this thread thinks through. The composer names it
 	 *  where the LLM picker used to be; the agent carries provider *and* model. */
 	agentId?: string;
 	agentName?: string;

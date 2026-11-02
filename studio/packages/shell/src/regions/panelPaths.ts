@@ -91,7 +91,6 @@ const PANEL_PATHS: readonly PanelPath[] = [
 		panel: "functions",
 		section: "templates",
 	},
-	{ path: "agents/functions/plugins", panel: "functions", section: "plugins" },
 	{
 		path: "agents/connections/server",
 		panel: "connections",
@@ -99,18 +98,6 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	},
 	{ path: "agents/connections/mcp", panel: "connections", section: "mcp" },
 	{ path: "agents/llms", panel: "llms", detail: "provider" },
-	{ path: "agents/runs", panel: "runs" },
-	{ path: "agents/workers", panel: "workers", section: "pools" },
-	{ path: "agents/workers/workers", panel: "workers", section: "workers" },
-	{ path: "agents/workers/capacity", panel: "workers", section: "capacity" },
-	{ path: "agents/workers/tokens", panel: "workers", section: "tokens" },
-	{ path: "agents/approvals", panel: "approvals", section: "waiting" },
-	{ path: "agents/approvals/alerts", panel: "approvals", section: "alerts" },
-	{ path: "agents/ledger", panel: "ledger", section: "rows" },
-	{ path: "agents/ledger/actor", panel: "ledger", section: "actor" },
-	{ path: "agents/ledger/record", panel: "ledger", section: "record" },
-	{ path: "agents/ledger/refusals", panel: "ledger", section: "refusals" },
-	{ path: "agents/ledger/export", panel: "ledger", section: "export" },
 	{ path: "agents/settings", panel: "concurrency" },
 	// The IAM rail. Every section is a page with no tabs; its panel key is
 	// prefixed so none collides with an Agents section of the same name.
@@ -121,19 +108,46 @@ const PANEL_PATHS: readonly PanelPath[] = [
 	{ path: "iam/policies", panel: "iam-policies" },
 	{ path: "iam/tokens", panel: "iam-tokens" },
 	{ path: "iam/settings", panel: "iam-settings" },
-	// Activity's tabs (the shell's page). Events keeps the panel key its rail
-	// icon writes; the other tabs share one key. `runs` is Agents › Runs.
-	{ path: "activity/inbox", panel: "activity", section: "inbox" },
-	{ path: "activity/runs", panel: "activity", section: "runs" },
+	// The Activity rail. Every section is a page; Approvals and Ledger give
+	// each tab a path under them. Panel keys are prefixed so none collides
+	// with another product's section of the same name.
+	{ path: "activity/runs", panel: "activity-runs" },
+	{
+		path: "activity/approvals",
+		panel: "activity-approvals",
+		section: "waiting",
+	},
+	{
+		path: "activity/approvals/alerts",
+		panel: "activity-approvals",
+		section: "alerts",
+	},
+	{ path: "activity/ledger", panel: "activity-ledger", section: "rows" },
+	{ path: "activity/ledger/actor", panel: "activity-ledger", section: "actor" },
+	{
+		path: "activity/ledger/record",
+		panel: "activity-ledger",
+		section: "record",
+	},
+	{
+		path: "activity/ledger/refusals",
+		panel: "activity-ledger",
+		section: "refusals",
+	},
+	{
+		path: "activity/ledger/export",
+		panel: "activity-ledger",
+		section: "export",
+	},
 	{
 		path: "activity/schedules",
-		panel: "activity",
-		section: "schedules",
+		panel: "activity-schedules",
 		detail: "schedule",
 	},
-	{ path: "activity/events", panel: "events" },
-	{ path: "activity/rules", panel: "activity", section: "rules" },
-	{ path: "activity/channels", panel: "activity", section: "channels" },
+	{ path: "activity/events", panel: "activity-events" },
+	{ path: "activity/inbox", panel: "activity-inbox" },
+	{ path: "activity/rules", panel: "activity-rules" },
+	{ path: "activity/channels", panel: "activity-channels" },
 	// The Projects rail. Projects and My todos are two sections of one stack;
 	// a project's key sits right under the product's root.
 	{
@@ -162,6 +176,8 @@ const LEVEL_LANDINGS: Record<string, string> = {
 };
 
 // Retired and duplicate keys, onto the panel that holds what they named.
+// Runs, Approvals, Ledger and Events were Agents' and the shell's before they
+// were Activity's.
 const ALIASES: Record<string, string> = {
 	schema: "model",
 	links: "model",
@@ -169,11 +185,22 @@ const ALIASES: Record<string, string> = {
 	canvases: "explorer",
 	connection: "settings",
 	info: "settings",
+	runs: "activity-runs",
+	approvals: "activity-approvals",
+	ledger: "activity-ledger",
+	events: "activity-events",
 };
 
-// Pages of Activity with no panel behind them — the change log and a change's
-// compare. Their path is already canonical; the Activity route reads it.
-const OWN_PAGES = /^activity\/changes(?:\/|$)/;
+// The shell's Activity page took one key, its tab in `?section=`.
+const OLD_ACTIVITY = "activity";
+
+// A change's compare sits under Events: `/activity/changes/<kind>/<record>`
+// reads as Events with `change=<kind>/<record>`, and writes back the same. The
+// bare `/activity/changes` is the change log — Events with its Changes filter.
+const EVENTS = "activity-events";
+const CHANGE = "change";
+const CHANGE_PATH = /^activity\/changes\/([^/]+)\/([^/]+)$/;
+const CHANGE_LOG = "activity/changes";
 
 // Sessions live in the assistant: the link opens Explorer with it on the right.
 const ASSISTANT_PANELS = new Set(["sessions", "messages"]);
@@ -214,6 +241,20 @@ export function pageParamsOf(tail: string, search: string): URLSearchParams {
 	const params = new URLSearchParams(search);
 	if (params.has(PANEL) || params.has(LEGACY_PANEL)) return params;
 	const trimmed = tail.replace(/^\/+|\/+$/g, "");
+	const change = trimmed.match(CHANGE_PATH);
+	if (change) {
+		params.set(PANEL, EVENTS);
+		params.set(
+			CHANGE,
+			`${decodeURIComponent(change[1])}/${decodeURIComponent(change[2])}`,
+		);
+		return params;
+	}
+	if (trimmed === CHANGE_LOG) {
+		params.set(PANEL, EVENTS);
+		params.set("filter", "changes");
+		return params;
+	}
 	const matched = matchTail(LEVEL_LANDINGS[trimmed] ?? trimmed);
 	if (!matched) return params;
 
@@ -246,7 +287,22 @@ export function pageUrlOf(params: URLSearchParams): {
 		return { tail: "explorer", search };
 	}
 
-	const panel = ALIASES[raw] ?? raw;
+	if (raw === EVENTS && search.has(CHANGE)) {
+		const [kind, ...record] = (search.get(CHANGE) ?? "").split("/");
+		search.delete(CHANGE);
+		search.delete(SECTION);
+		return {
+			tail: `${CHANGE_LOG}/${encodeURIComponent(kind)}/${encodeURIComponent(record.join("/"))}`,
+			search,
+		};
+	}
+
+	const oldTab = raw === OLD_ACTIVITY ? search.get(SECTION) : null;
+	if (raw === OLD_ACTIVITY) search.delete(SECTION);
+	const panel =
+		raw === OLD_ACTIVITY
+			? `activity-${oldTab ?? "runs"}`
+			: (ALIASES[raw] ?? raw);
 	const entries = PANEL_PATHS.filter((e) => e.panel === panel);
 	if (entries.length === 0) return { tail: "", search };
 
@@ -293,7 +349,6 @@ export function canonicalRedirect(
 ): string | null {
 	const split = splitGraphPath(pathname);
 	if (!split) return null;
-	if (OWN_PAGES.test(split.tail)) return null;
 	const target = pageUrlOf(pageParamsOf(split.tail, search));
 	const targetPath = target.tail ? `${split.root}/${target.tail}` : split.root;
 	const samePath =

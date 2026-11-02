@@ -10,40 +10,7 @@ assistant on the right. Access spans every product and belongs to none.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [policies](policies.md) · [effective access](effective-access.md) · [people and groups](people-and-groups.md) · [tokens](tokens.md) · [the Agents shell](../../agents/features/the-agents-shell.md) · products: [iam.md](../../../../products/iam.md) · [shell.md](../../../../products/shell.md) |
 
-> **As** an owner of a Graph, **I want** who may do what read in one place, one click from each
-> principal and each policy, **so that** access is proven, not guessed.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | The rail | Home · People, Groups, Agents · Policies, Tokens · Settings (the gear at its foot). Lit for the section in the path |
-| C2 | Home | *Who may do what in airways?* — the composer centred with `IAM · <Graph>` chips, four suggestions, and a tile per section with the engine's counts |
-| C3 | Sections are tabs | A rail item opens its section as a workbook tab; a policy, an agent or a group opens as a tab of its own |
-| C4 | Settings | The Graph's settings — its Members tab is where People also lands |
-
-## Journey
-
-```mermaid
-flowchart TD
-    L[Launcher › IAM] --> H[Home: composer · suggestions · tiles]
-    H -->|tile| S[Section tab]
-    R[Rail] --> S
-    S --> P[People · Groups · Agents · Policies · Tokens]
-    P -->|row| D[Detail tab: policy · agent · group]
-    H -->|ask| A[Assistant docks right]
-    P --> X{iam-admin?}
-    X -->|no| RO[Pages read; acts disabled naming who holds iam-admin]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Loading | Each page's table shows the kit's loading rows; Home's tiles show `—` until counts arrive |
-| A count the engine cannot give | `—`, never a number made in the browser |
-| Not a member | The Graph's routes refuse as everywhere else |
-| Reload | The open tabs and the active one survive, as in every product |
+Product spec: [ST-F02 · People and access](../../../../../specs/products/settings/features/ST-F02-people-and-access/feature.md) — ST-01 · ST-06; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 
@@ -62,14 +29,5 @@ flowchart TD
 | IP2 | The rail is Home · People, Groups, Agents · Policies, Tokens, with Settings at its foot opening the Graph's settings. |
 | IP3 | Home's tiles print the engine's overview lines: *N people · N service accounts*, *N groups*, *N agents — built in Agents*, *N managed · N custom · N boundary*, *N live · N expires this week*. |
 | IP4 | A detail opens as a tab of its own: a policy, an IAM agent page, a group. A row selects and *Open* or a click on the name opens it, as Agents' lists do. |
-| IP5 | Every IAM write is gated by `iam-admin` through `ActButton area="iam"`; reads are every member's. |
 | IP6 | The composer on IAM pages carries `IAM · <page>` chips; asking goes to the shared assistant. |
 
-## Not building
-
-| Not building | Because |
-|---|---|
-| Connections — stored OAuth or API keys | Invana pulls from and pushes to no source in v1 ([iam.md](../../../../products/iam.md)) |
-| Requests as their own page | an ask is a kind in Approvals |
-| Check access as a section | it is the Test access modal |
-| Building agents in IAM | Agents builds them; IAM reads them |

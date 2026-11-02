@@ -1,3 +1,4 @@
+import { ActivityProductSlotsContext } from "@invana-studio/activity";
 import { AgentsSlotsContext, useAgentsQuery } from "@invana-studio/agents";
 import { ExplorerSlotsContext } from "@invana-studio/explorer";
 import { AgentAccessPanel, IamSlotsContext } from "@invana-studio/iam";
@@ -20,10 +21,11 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { activitySlots } from "@/host/activitySlots";
 import { ProductHostRoute } from "@/host/ProductHostRoute";
 import { products } from "@/products";
+import { activityProductSlots } from "@/products/activitySlots";
 import { modellerSlots } from "@/products/modellerSlots";
 
-// The Explorer's, the Modeller's, the Projects, the Agents and the IAM
-// product's routes draw the product host, which composes all five. Projects reads the agents a
+// The Explorer's, the Modeller's, the Projects, the Agents, the IAM and the
+// Activity product's routes draw the product host, which composes all six. Projects reads the agents a
 // Todo can be handed to from the Agents product, through its slot.
 const explorerSlots = { Page: ProductHostRoute };
 // An agent's Access tab draws IAM's reading of it, handed in through the slot.
@@ -48,11 +50,15 @@ export const router = createBrowserRouter([
 						<AgentsSlotsContext.Provider value={agentsSlots}>
 							<IamSlotsContext.Provider value={iamSlots}>
 								<ProjectsSlotsContext.Provider value={projectsSlots}>
-									{/* Activity is the shell's route, and a run's page in it
-									    names agents and govern records the shell may not import. */}
-									<ActivitySlotsContext.Provider value={activitySlots}>
-										<StudioShell products={products} />
-									</ActivitySlotsContext.Provider>
+									<ActivityProductSlotsContext.Provider
+										value={activityProductSlots}
+									>
+										{/* A run's page names agents and govern records the shell
+										    may not import. */}
+										<ActivitySlotsContext.Provider value={activitySlots}>
+											<StudioShell products={products} />
+										</ActivitySlotsContext.Provider>
+									</ActivityProductSlotsContext.Provider>
 								</ProjectsSlotsContext.Provider>
 							</IamSlotsContext.Provider>
 						</AgentsSlotsContext.Provider>
@@ -65,7 +71,7 @@ export const router = createBrowserRouter([
 			{ index: true, element: <Navigate to="/graphs" replace /> },
 			{ path: "graphs", element: <GraphsListPage /> },
 			{ path: "graphs/new", element: <GraphConnectPage /> },
-			{ path: "settings/profile", element: <ProfileSettingsPage /> },
+			{ path: "profile", element: <ProfileSettingsPage /> },
 			// Platform-admin surfaces (superuser-only — gated inside the page
 			// component via a direct user.is_superuser check). Lives under
 			// /platform/* to avoid the /admin namespace collision with starlette-admin.

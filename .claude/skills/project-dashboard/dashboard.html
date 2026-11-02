@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project dashboard</title>
+<style>
+:root { --bg:#fafafa; --card:#fff; --fg:#1a1a1a; --mut:#6b6b6b; --line:#e6e6e6; --work:#2563eb; --you:#d97706; --ok:#16a34a; --bad:#dc2626; --idle:#9ca3af; }
+@media (prefers-color-scheme: dark) { :root { --bg:#111; --card:#1a1a1a; --fg:#eee; --mut:#999; --line:#2c2c2c; } }
+* { box-sizing:border-box; }
+body { margin:0; font:13px/1.45 -apple-system, system-ui, sans-serif; background:var(--bg); color:var(--fg); display:flex; height:100vh; }
+main { flex:1; overflow:auto; padding:16px 20px; }
+aside { width:50vw; flex:none; border-left:1px solid var(--line); background:var(--card); overflow:auto; padding:12px 16px; display:none; }
+aside .head { position:sticky; top:0; background:var(--card); padding-bottom:8px; border-bottom:1px solid var(--line); }
+aside.open { display:block; }
+header { display:flex; align-items:baseline; gap:14px; margin-bottom:12px; }
+h1 { font-size:16px; margin:0; } h2 { font-size:13px; margin:18px 0 8px; text-transform:uppercase; letter-spacing:.04em; color:var(--mut); }
+.mut { color:var(--mut); } .mono { font-family:ui-monospace, Menlo, monospace; font-size:12px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:8px; cursor:pointer; }
+.card:hover, .sub:hover { border-color:var(--work); }
+.row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.title { font-weight:600; flex:1; min-width:200px; }
+.pill { border-radius:10px; padding:1px 8px; font-size:11px; color:#fff; background:var(--idle); white-space:nowrap; }
+.s-working,.s-active,.s-started { background:var(--work); } .s-needs-you,.s-waiting-on-you { background:var(--you); }
+.s-finished { background:var(--ok); } .s-quiet { background:var(--bad); } .s-ended,.s-idle { background:var(--idle); }
+.tag { border:1px solid var(--line); border-radius:4px; padding:0 6px; font-size:11px; color:var(--mut); }
+.bar { width:120px; height:6px; background:var(--line); border-radius:3px; overflow:hidden; display:inline-block; vertical-align:middle; }
+.bar i { display:block; height:100%; background:var(--work); } .bar i.hot { background:var(--bad); }
+.doing { margin-top:4px; color:var(--mut); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.subs { margin:6px 0 0 14px; }
+.sub { border:1px solid var(--line); border-radius:6px; padding:5px 8px; margin-top:4px; }
+ul.todos { margin:4px 0 0; padding-left:18px; } .t-completed { text-decoration:line-through; color:var(--mut); } .t-in_progress { font-weight:600; }
+.ev { border-bottom:1px solid var(--line); padding:5px 0; white-space:pre-wrap; word-break:break-word; }
+.k-prompt { color:var(--you); } .k-tool { color:var(--work); } .k-error { color:var(--bad); } .k-result { color:var(--mut); }
+label { color:var(--mut); }
+.proj { background:var(--card); border:1px solid var(--line); border-radius:8px; margin-bottom:10px; }
+.proj > summary { padding:10px 12px; cursor:pointer; list-style:none; }
+.phase { border-top:1px solid var(--line); border-left:2px solid var(--line); margin-left:28px; padding:6px 12px; }  /* project → phase */
+.phase > summary { cursor:pointer; list-style:none; }
+.steps { margin:6px 0 4px 28px; padding-left:10px; border-left:2px solid var(--line); }  /* phase → session */
+.step { margin:4px 0; } .step > b { display:inline-block; width:70px; color:var(--mut); font-weight:500; }
+.part { border:1px solid var(--line); border-radius:6px; padding:4px 8px; margin:3px 0 3px 70px; cursor:pointer; }
+.part:hover { border-color:var(--work); }
+.prog { width:160px; height:8px; background:var(--line); border-radius:4px; overflow:hidden; display:inline-block; vertical-align:middle; }
+.prog i { display:block; height:100%; background:var(--ok); }
+.p-done { background:var(--ok); } .p-blocked,.p-failed { background:var(--bad); } .p-pending { background:var(--idle); }
+.p-in-progress,.p-gates,.p-review,.p-qa,.p-fixing,.p-partial,.p-running { background:var(--work); } .p-paused,.p-draft,.p-ready { background:var(--you); }
+.note { color:var(--mut); margin:3px 0 3px 22px; }
+.spill { cursor:pointer; border-radius:10px; padding:1px 8px; font-size:11px; color:#fff; background:var(--idle); white-space:nowrap; }
+.spill.sel { outline:2px solid var(--fg); }
+.sessions { display:flex; gap:4px; flex-wrap:wrap; margin:4px 0 0 28px; }
+.q { border-left:3px solid var(--you); padding:3px 8px; margin:4px 12px; }
+.lbl { opacity:.75; margin-right:3px; }  /* "status ·" / "runner ·" inside a pill */
+.runner { border:1px solid var(--line); border-radius:10px; padding:0 8px; font-size:11px; color:var(--mut); white-space:nowrap; }
+.runner.on { border-color:var(--work); color:var(--work); }
+.tasks { margin:6px 0 4px 28px; padding-left:10px; border-left:2px solid var(--line); }  /* phase → task */
+.task { display:flex; gap:8px; align-items:baseline; padding:2px 0; }
+.task > .n { color:var(--mut); width:18px; flex:none; text-align:right; }
+.task > .t { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.task.done > .t { color:var(--mut); }
+.who { display:flex; gap:6px; align-items:center; margin:4px 0 0 28px; color:var(--mut); }
+.sec { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin:8px 0 2px 28px; }
+</style>
+</head>
+<body>
+<main>
+  <header><h1>Project dashboard</h1><span class="mut mono" id="meta"></span>
+    <label><input type="checkbox" id="all"> show ended and idle sessions</label></header>
+  <div id="root"></div>
+</main>
+<aside id="feed"></aside>
+<script>
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const k = n => n >= 1000 ? `${Math.round(n / 1000)}k` : String(n || 0);
+const ago = (t, now) => { const s = Math.max(0, now - t); return s < 60 ? `${Math.round(s)}s` : s < 3600 ? `${Math.round(s / 60)}m` : `${Math.round(s / 3600)}h`; };
+const ORDER = {'needs you':0, 'working':1, 'started':1, 'active':1, 'quiet':2, 'waiting on you':3, 'idle':4, 'ended':5};
+const pill = s => `<span class="pill s-${s.replace(/ /g, '-')}">${esc(s)}</span>`;
+let sel = null, selLabel = '', st = null;
+
+function ctx(n, peak, limit) {
+  const pct = Math.min(100, Math.round(100 * n / limit));
+  return `<span class="bar" title="context ${k(n)} · peak ${k(peak)} of ${k(limit)}"><i class="${pct > 80 ? 'hot' : ''}" style="width:${pct}%"></i></span> <span class="mono">${k(n)}</span>`;
+}
+const opened = new Set(JSON.parse(localStorage.getItem('pd.open') || '[]'));
+function keep(el, dflt) {
+  const key = el.dataset.k;
+  if (el.open) { opened.add(key); opened.delete('!' + key); } else { opened.delete(key); if (dflt) opened.add('!' + key); }
+  localStorage.setItem('pd.open', JSON.stringify([...opened]));
+}
+const det = (key, dflt) => `data-k="${esc(key)}" ontoggle="keep(this, ${dflt ? 1 : 0})" ${opened.has(key) || (dflt && !opened.has('!' + key)) ? 'open' : ''}`;
+const ppill = (s, lbl = '') => `<span class="pill p-${String(s || 'pending').split(' ')[0].replace(/ /g, '-')}${s && s.startsWith('in progress') ? ' p-in-progress' : ''}">${lbl ? `<span class="lbl">${lbl} ·</span>` : ''}${esc(s || 'pending')}</span>`;
+function tasks(ph) {
+  if (!ph.tasks?.length) return '';
+  const done = ph.status === 'done';
+  return `<div class="sec">tasks ${ph.tasks.length}</div><div class="tasks">${ph.tasks.map((t, i) => `<div class="task${done ? ' done' : ''}" title="${esc(t)}">
+    <span class="n">${done ? '✓' : i + 1 + '.'}</span><span class="t">${esc(t)}</span><span class="tag" title="the phase's agent builds every task">${esc(ph.agent)}</span></div>`).join('')}</div>`;
+}
+function todos(list, key) {
+  if (!list?.length) return '';
+  const done = list.filter(t => t.status === 'completed').length;
+  return `<details ${det('todo:' + key)} onclick="event.stopPropagation()"><summary class="mut">todos ${done}/${list.length}</summary><ul class="todos">${list.map(t => `<li class="t-${t.status}">${esc(t.text)}</li>`).join('')}</ul></details>`;
+}
+function sub(s, a, now, limit) {
+  return `<div class="sub" onclick="event.stopPropagation(); show('${s.id}', '${a.id}')">
+    <div class="row">${pill(a.state)}<b>${esc(a.name || a.id)}</b><span class="tag">${esc(a.type)}</span>${a.background ? '<span class="tag">background</span>' : ''}
+    <span class="mut">${esc(a.model)}</span>${ctx(a.context, a.peak, limit)}<span class="mut">${ago(a.at, now)} ago</span></div>
+    ${a.state === 'working' ? `<div class="doing mono">${esc(a.doing)}</div>` : ''}${todos(a.todos, a.id)}</div>`;
+}
+function card(s, now, limit) {
+  const subs = s.subagents.filter(a => a.state !== 'finished' || document.getElementById('all').checked || s.state !== 'ended');
+  return `<div class="card" onclick="show('${s.id}', '', '')">
+    <div class="row">${pill(s.state)}<span class="title">${esc(s.title)}</span>
+      ${s.agent ? `<span class="tag">${esc(s.agent)}</span>` : ''}
+      <span class="mut">${esc(s.model)}</span>${ctx(s.context, s.peak, limit)}
+      <span class="mut" title="tokens drawn: every turn's context plus output">spend ${k(s.spend)}</span>
+      <span class="mut mono">${esc(s.branch)}</span><span class="mut">${ago(s.at, now)} ago</span>
+      ${s.hooked ? '' : '<span class="tag" title="no hook has seen this session — state is guessed from the transcript">no hook</span>'}</div>
+    ${s.doing && s.state !== 'ended' ? `<div class="doing mono">${esc(s.doing)}</div>` : ''}
+    ${todos(s.todos, s.id)}
+    ${subs.length ? `<div class="subs">${subs.map(a => sub(s, a, now, limit)).join('')}</div>` : ''}</div>`;
+}
+function part(pt, byId, now, limit) {
+  const s = byId[pt.session] || {};
+  const live = !['finished', 'ended', 'unknown', 'idle'].includes(pt.state);
+  const subs = (s.subagents || []).filter(a => live || a.state !== 'finished');
+  return `<div class="part" onclick="show('${pt.session}')">
+    <div class="row">${pill(pt.state)}<b>part ${pt.part}</b><span class="tag">${esc(pt.agent || s.agent || '')}</span>
+      ${live ? ctx(s.context || pt.context, pt.peak, limit) : `<span class="mut">peak ${k(pt.peak)}</span>`}
+      ${pt.handed_off ? '<span class="tag" title="passed the context limit and handed off to the next part">→ handed off</span>' : ''}
+      ${pt.result && pt.result !== 'ok' ? `<span class="tag">${esc(pt.result)}</span>` : ''}
+      <span class="mut">${ago(pt.ended || s.at || pt.started, now)} ago</span></div>
+    ${live && (s.doing || pt.doing) ? `<div class="doing mono">${esc(s.doing || pt.doing)}</div>` : ''}
+    ${live ? todos(s.todos || pt.todos, pt.session) : ''}
+    ${subs.length ? `<div class="subs">${subs.map(a => sub({id: pt.session}, a, now, limit)).join('')}</div>` : ''}</div>`;
+}
+function phase(pr, ph, byId, now, limit) {
+  const steps = Object.entries(ph.steps);
+  const active = ph.status !== 'done';
+  return `<details class="phase" ${det(pr.name + ':' + ph.id, active)}>
+    <summary class="row">${ppill(ph.status)}<b>${esc(ph.id)}</b><span class="title">${esc(ph.title)}</span>
+      <span class="tag" title="builds the phase">build · ${esc(ph.agent)}</span>${ph.reviewer ? `<span class="tag" title="reviews the phase">review · ${esc(ph.reviewer)}</span>` : ''}
+      ${ph.tasks?.length ? `<span class="mut">${ph.tasks.length} task(s)</span>` : ''}
+      ${ph.reviews.map(r => `<span class="pill ${r.result === 'PASS' ? 's-finished' : 's-quiet'}" title="${esc(r.path)}">${esc(r.kind)} ${esc(r.result)}</span>`).join('')}
+      ${steps.length ? `<span class="mut">${steps.reduce((n, [, ps]) => n + ps.length, 0)} session(s)</span>${steps.flatMap(([name, ps]) => ps).filter(pt => !['finished', 'ended', 'unknown', 'idle'].includes(pt.state)).map(pt => `<span class="spill s-working" onclick="event.preventDefault(); event.stopPropagation(); show('${pt.session}', '', '${esc(ph.id)} · live')">live</span>`).join('')}` : ''}
+      ${ph.commits.length ? `<span class="mut">${ph.commits.length} commit(s)</span>` : ''}
+      ${ph.needs.length ? `<span class="mut">needs ${esc(ph.needs.join(', '))}</span>` : ''}<span class="mut">${esc(ph.date)}</span></summary>
+    ${ph.notes ? `<div class="note">${esc(ph.notes)}</div>` : ''}
+    ${tasks(ph)}
+    <div class="sec">sessions ${steps.reduce((n, [, ps]) => n + ps.length, 0) || '— none yet'}</div>
+    ${steps.length ? `<div class="sessions">${steps.flatMap(([name, ps]) => ps.map(pt => `<span class="spill s-${pt.state.replace(/ /g, '-')}${sel?.session === pt.session ? ' sel' : ''}" title="${esc(pt.agent)} · ${esc(pt.state)} · peak ${k(pt.peak)} — click for its live activity" onclick="event.preventDefault(); event.stopPropagation(); show('${pt.session}', '', '${esc(ph.id + ' · ' + name + ' · part ' + pt.part)}')">${esc(name)} · ${pt.part}</span>`)).join('')}</div>` : ''}
+    ${steps.length ? `<div class="steps">${steps.map(([name, ps]) => `<div class="step"><b>${esc(name)}</b>${ps.map(pt => part(pt, byId, now, limit)).join('')}</div>`).join('')}</div>` : ''}
+    ${ph.handoffs.length ? `<details ${det('notes:' + pr.name + ph.id)} class="note"><summary>hand-off notes ${ph.handoffs.length}</summary>${ph.handoffs.map(n => `<div class="note">${esc(n)}</div>`).join('')}</details>` : ''}
+    ${ph.commits.length ? `<details ${det('commits:' + pr.name + ph.id)} class="note"><summary>commits</summary><div class="mono">${ph.commits.map(esc).join('<br>')}</div></details>` : ''}
+  </details>`;
+}
+function proj(pr, byId, now, limit) {
+  if (pr.error) return `<div class="card"><b>${esc(pr.name)}</b> <span class="k-error">cannot read project.md — ${esc(pr.error)}</span></div>`;
+  const pct = pr.total ? Math.round(100 * pr.done / pr.total) : 0;
+  const cur = pr.phases.find(p => p.id === pr.current);
+  const step = cur && Object.keys(cur.steps).slice(-1)[0];
+  return `<details class="proj" ${det('proj:' + pr.name, true)}>
+    <summary class="row">${ppill(pr.status, 'status')}<span class="title">${esc(pr.title)} <span class="mut mono">${esc(pr.name)}</span></span>
+      <span class="prog" title="${pr.done} of ${pr.total} phases done"><i style="width:${pct}%"></i></span><span class="mono">${pr.done}/${pr.total}</span>
+      ${cur ? `<span>▸ ${esc(cur.id)} ${esc(step || cur.status)}</span>` : ''}
+      <span class="runner${pr.runner ? ' on' : ''}">runner · ${pr.runner ? 'running' : 'stopped'}</span>
+      ${pr.open ? `<span class="pill s-needs-you">${pr.open} question(s)</span>` : ''}
+      <span class="mut mono">${esc(pr.branch)}</span></summary>
+    ${pr.questions.filter(q => !q.answer).map(q => `<div class="q"><b>${esc(q.phase)}</b> ${esc(q.question)} <span class="mut">— recommend: ${esc(q.recommend)}</span></div>`).join('')}
+    ${pr.phases.map(ph => phase(pr, ph, byId, now, limit)).join('')}
+  </details>`;
+}
+function render() {
+  if (!st) return;
+  const all = document.getElementById('all').checked;
+  const byId = Object.fromEntries(st.sessions.map(s => [s.id, s]));
+  const owned = new Set(st.owned);
+  const list = st.sessions.filter(s => !owned.has(s.id) && (all || !['ended', 'idle'].includes(s.state)))
+    .sort((a, b) => (ORDER[a.state] ?? 9) - (ORDER[b.state] ?? 9) || b.at - a.at);
+  const live = st.sessions.filter(s => !['ended', 'idle'].includes(s.state)).length;
+  const agents = st.sessions.flatMap(s => s.subagents).filter(a => a.state === 'working').length;
+  const running = st.projects.filter(p => p.runner).length;
+  document.getElementById('meta').textContent = `${st.projects.length} project(s), ${running} running · ${live} live session(s) · ${agents} sub-agent(s) working · last ${st.hours}h`;
+  document.getElementById('root').innerHTML =
+    `<h2>Projects <span class="mut">${st.projects.length}</span></h2>${st.projects.map(p => proj(p, byId, st.now, st.limit)).join('') || '<div class="mut">no projects in .claude/team/projects/</div>'}
+     <h2>Other sessions <span class="mut">${list.length}</span></h2>${list.map(s => card(s, st.now, st.limit)).join('') || '<div class="mut">nothing running</div>'}`;
+}
+async function poll() {
+  try { st = await (await fetch('/api/state')).json(); render(); } catch (e) {}
+  if (sel) feed();
+}
+function show(session, agent = '', label = '') { sel = {session, agent}; selLabel = label; document.getElementById('feed').classList.add('open'); document.getElementById('feed').scrollTop = 0; render(); feed(); }
+const clock = at => at ? new Date(at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}) : '';
+async function feed() {
+  const q = new URLSearchParams(sel);
+  const r = await (await fetch(`/api/feed?${q}`)).json();
+  const s = st?.sessions.find(x => x.id === sel.session);
+  const name = sel.agent ? (s?.subagents.find(a => a.id === sel.agent)?.name || sel.agent) : (s?.title || sel.session);
+  const el = document.getElementById('feed');
+  const top = el.scrollTop;
+  el.innerHTML = `<div class="head"><div class="row"><b style="flex:1">${esc(name)}</b>${s ? pill(s.state) : ''}
+    <a href="#" onclick="sel=null; document.getElementById('feed').classList.remove('open'); render(); return false">close</a></div>
+    <div class="row mut">${selLabel ? `<span>${esc(selLabel)}</span>` : ''}<span class="mono">claude -r ${esc(sel.session)}</span><span>newest first</span></div></div>
+    ${r.events.slice().reverse().map(e => `<div class="ev"><span class="mut mono">${esc(clock(e.at))}</span> <span class="k-${e.kind}">${esc(e.text)}</span></div>`).join('') || '<p class="mut">nothing yet</p>'}`;
+  el.scrollTop = top;
+}
+document.getElementById('all').onchange = render;
+poll(); setInterval(poll, 3000);
+</script>
+</body>
+</html>

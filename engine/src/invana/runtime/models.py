@@ -55,15 +55,15 @@ def _current_trace_id() -> str | None:
 
 
 class TriggeredBy(enum.StrEnum):
-    """What opened this run (docs/for-developers/modules/agents/spec.md Q1's enum, +
-    docs/for-developers/modules/work/spec.md's task trigger)."""
+    """What opened this run (specs/system-design/modules/agents.md Q1's enum, +
+    specs/system-design/modules/work.md's task trigger)."""
 
     user = "user"
     schedule = "schedule"
     # An assignment, or the last dependency closing. Either way the trace reads
     # the same, which is the point of using one trigger for both.
     task = "task"
-    # A parent node's `delegate` (docs/for-developers/modules/work/spec.md).
+    # A parent node's `delegate` (specs/system-design/modules/work.md).
     delegation = "delegation"
     # A person acting on a canvas — an expansion — who is waiting on the
     # answer (RP31). Kept out of the journal's default view (GC7).

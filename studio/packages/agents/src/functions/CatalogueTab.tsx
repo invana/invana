@@ -23,8 +23,13 @@ import {
 	TableRow,
 	TypographyInlineCode,
 } from "@invana/ui";
+import {
+	FilteredEmpty,
+	filterValue,
+	ListStrip,
+	setOne,
+} from "@invana-studio/shell";
 import { Fragment } from "react";
-import { FilteredEmpty, filterValue, ListStrip, setOne } from "../lists";
 import { useAgentsOpen } from "../open";
 import { useCatalogueQuery } from "../plans/queries";
 import type { CatalogueEntry } from "../plans/types";

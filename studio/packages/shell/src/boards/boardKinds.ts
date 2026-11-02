@@ -48,11 +48,8 @@ import {
 	Orbit,
 	Pencil,
 	Play,
-	Plug,
 	Quote,
 	ScrollText,
-	Server,
-	ServerCog,
 	Settings,
 	ShieldCheck,
 	SlidersHorizontal,
@@ -119,7 +116,7 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		icon: ListTree,
 		nodes: "tasks",
 		edges: "dependencies (finish → start)",
-		// Drag card → card adds a dependency (docs/for-developers/modules/work/spec.mda).
+		// Drag card → card adds a dependency (specs/system-design/modules/work.md).
 		writesFromGesture: true,
 		panel: "projects",
 		hasLayers: false,
@@ -172,7 +169,6 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
  * as six fields nobody fills in.
  */
 export type DeclaredKind =
-	| "runs"
 	| "run"
 	| "task_run"
 	| "plan_runs"
@@ -194,14 +190,11 @@ export type DeclaredKind =
 	| "stitches"
 	| "project"
 	| "decisions"
-	| "plugin"
 	| "function"
 	| "template"
 	| "policy"
 	| "iam_agent"
-	| "iam_group"
-	| "worker_pool"
-	| "worker";
+	| "iam_group";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -217,24 +210,13 @@ export interface DeclaredKindSpec {
 }
 
 export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
-	// The journal drawn wide. Studio-only, like `agent`: it binds to
-	// the Graph rather than to a record, so it offers no `Save report`.
-	runs: {
-		kind: "runs",
-		renders: "declared",
-		label: "Runs",
-		icon: LayoutDashboard,
-		// `Board` on the Runs panel's header.
-		panel: "runs",
-		subject: "the graph's slug",
-	},
 	run: {
 		kind: "run",
 		renders: "declared",
 		label: "Run",
 		icon: Play,
-		// `More` on a run in the Runs panel.
-		panel: "runs",
+		// A row of Activity › Runs.
+		panel: "activity-runs",
 		subject: "a root task_runs.id",
 	},
 	plan_runs: {
@@ -247,7 +229,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		subject: "a flows.id",
 	},
 	// `⋯` on the plan page — records, not readings over a window, so
-	// Studio-only like `runs`: none offers `Save report`.
+	// Studio-only like `agent`: none offers `Save report`.
 	plan_versions: {
 		kind: "plan_versions",
 		renders: "declared",
@@ -278,7 +260,7 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Step",
 		icon: SquareActivity,
 		// A task on the run board's flow — never a list row of its own.
-		panel: "runs",
+		panel: "activity-runs",
 		subject: "one attempt of a task — a child task_runs.id",
 	},
 	// the same question under two worlds, and what B touched that A did not
@@ -449,17 +431,6 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		panel: "decisions",
 		subject: "the graph's slug",
 	},
-	// A plugin's page — its functions, skills and plans. Studio-only and
-	// install-level, like the registry it reads; titled with the plugin's name.
-	plugin: {
-		kind: "plugin",
-		renders: "declared",
-		label: "Plugin",
-		icon: Plug,
-		// A row in Functions › Plugins.
-		panel: "functions",
-		subject: "a plugin name",
-	},
 	// A function's manifest. Studio-only; titled with its key.
 	function: {
 		kind: "function",
@@ -469,25 +440,6 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// A row in Functions › Functions, or a function on a plugin's page.
 		panel: "functions",
 		subject: "a function key",
-	},
-	// A worker pool and one worker — install-wide, titled with the name.
-	worker_pool: {
-		kind: "worker_pool",
-		renders: "declared",
-		label: "Pool",
-		icon: ServerCog,
-		// A row in Workers › Pools.
-		panel: "workers",
-		subject: "a worker pool name",
-	},
-	worker: {
-		kind: "worker",
-		renders: "declared",
-		label: "Worker",
-		icon: Server,
-		// A row in a pool, or in Workers › Workers.
-		panel: "workers",
-		subject: "a worker name",
 	},
 	// An answer template — the surface it draws, the intents it accepts, and
 	// which answers cite it. Studio-only; titled with its key.

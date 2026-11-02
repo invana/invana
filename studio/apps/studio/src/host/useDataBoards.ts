@@ -143,7 +143,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// whole dataset here would call the destructive `setData`, wiping every position
 	// and re-laying the graph out from the origin on each expand.
 
-	// Root span for the in-flight query run (docs/for-developers/modules/platform/features/telemetry.md). Held in a ref so the
+	// Root span for the in-flight query run (specs/system-design/observability.md). Held in a ref so the
 	// transform / adapt / layout / render stages — which span several async
 	// renders — all attach to the same trace. Set in `handleRun`, closed by the
 	// canvas's layout bridge after the first painted frame.
@@ -282,7 +282,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		(result: QueryResponse | null) => {
 			if (result?.result_type !== "graph" || !result.data) return;
 			const data = result.data;
-			// `explorer.transform` span (docs/for-developers/modules/platform/features/telemetry.md) — time the dedupe of query results
+			// `explorer.transform` span (specs/system-design/observability.md) — time the dedupe of query results
 			// before they're handed to the canvas. No-ops when there's no active run.
 			measureSync(runRef.current, "explorer.transform", (span) => {
 				// Path queries (e.g. `MATCH path = (n)-[r]->() RETURN path`) repeat shared
@@ -305,7 +305,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 				setCanvasData(items);
 				setSelectedId(null);
 				// Replace the canvas seed (full repaint → destructive setData + relayout).
-				// `explorer.adapt` span (docs/for-developers/modules/platform/features/telemetry.md) — time mapping results to GraphData.
+				// `explorer.adapt` span (specs/system-design/observability.md) — time mapping results to GraphData.
 				setSeedData(
 					measureSync(runRef.current, "explorer.adapt", (adaptSpan) => {
 						const seed = adaptItems(items);

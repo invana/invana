@@ -174,7 +174,7 @@ class TestTaskRunRoutes:
         assert reply["status"] == "error"
         assert reply["run_id"] == run_id
         # A QL ask through a planning agent is Plan (a template match, no LLM)
-        # then the seeded tail — docs/for-developers/modules/agents/spec.md's table for `kind = ql`.
+        # then the seeded tail — specs/system-design/modules/agents.md's table for `kind = ql`.
         assert [s["label"] for s in reply["steps"]] == ["Plan", "Validate", "Execute", "Project", "Verify"]
 
         kinds: list[str] = []

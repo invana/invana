@@ -276,7 +276,7 @@ async def skill_version_plan(
     Each node carries the **band** it sits in and the sentence it was drawn
     from, so the Flow tab draws the six layers and the Playbook tab can show
     each sentence beside the step it produced
-    ([SK16 · C11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    ([AG-F04](specs/products/agents/features/AG-F04-skills/feature.md)).
     """
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     row = await skills.get_version(session, skill=skill, version=version)
@@ -338,7 +338,7 @@ async def skill_usage(
 ) -> SkillUsageResponse:
     """Where this skill is carried, and where it was offered or reported.
 
-    Two levels, labelled honestly (docs/for-developers/modules/work/spec.md): *offered* is a fact written
+    Two levels, labelled honestly (specs/system-design/modules/work.md): *offered* is a fact written
     by prompt assembly; *reported* is the model saying it followed the prose.
     ``reported`` on a row is the difference, and the badge says so.
     """

@@ -1,5 +1,5 @@
 """The interpreter — what happens next
-(docs/for-developers/modules/platform/features/runtime.md §2).
+(specs/system-design/runtime.md § The parts).
 
 The cursor, the control signals, suspend and resume. `TaskRuntime` is the
 loop: it claims a slot, lands a plan, walks it step by step, and settles the

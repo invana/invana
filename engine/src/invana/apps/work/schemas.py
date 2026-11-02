@@ -1,4 +1,4 @@
-"""Pydantic request/response models for the Tasks API (docs/for-developers/modules/work/spec.md)."""
+"""Pydantic request/response models for the Tasks API (specs/system-design/modules/work.md)."""
 
 from __future__ import annotations
 
@@ -236,7 +236,7 @@ class PlanTaskRead(BaseModel):
     blocked_by: list[str]
     critical: bool
     # A cross-project dependency is allowed within a graph and drawn greyed
-    # with the other project's key (docs/for-developers/modules/work/spec.mda).
+    # with the other project's key (specs/system-design/modules/work.md).
     project_key: str | None = None
 
 

@@ -15,9 +15,7 @@ system doing, and what did it do last night" has one answer instead of four pane
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [the runtime](../../platform/features/runtime.md) (what produces every row here) · [inspect-what-landed](../../bring-data-in/features/inspect-what-landed.md) · [audit-and-activity](audit-and-activity.md) · [reasoning-trace](../../ask/features/reasoning-trace.md) · [delegation](../../agents/features/delegation.md) · [projects-and-tasks](../../work/features/projects-and-tasks.md) |
 
-> **As** someone operating a Graph, **I want** every run the system has made in one journal, with its
-> children under it, **so that** I can see what is running and what happened without first knowing
-> which feature produced it.
+Product spec: [IN-F02 · Running](../../../../../specs/products/inbox/features/IN-F02-running/feature.md) — IN-06; the story, its criteria, journey, states and product decisions live there; the run page is [AG-F03](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md). This file keeps the vocabulary, the Studio layout and the engine shape.
 
 ## The four words this feature keeps apart
 
@@ -48,120 +46,6 @@ is what this surface *filters* and what C7 renders differently — it is never a
 and a person accepts. A run acquires child runs two ways — a composite's children, and
 [delegation](../../agents/features/delegation.md) — and both children are TaskRuns with
 `parent_run_id`. Neither is a Todo.
-
-## Runs is not Activity
-
-Both are trees, and they read the same Graph. They answer different questions.
-
-| | **Runs** · this feature | [Activity](audit-and-activity.md) · 10.2 |
-|---|---|---|
-| A row is | one **TaskRun** | one **event** — a write |
-| The tree is | root run → child runs → delegated runs | event → caused events |
-| Answers | *what ran, how did it end, what did it cost* | *who changed what, on whose behalf* |
-| Scope | the Graph, filterable | a subject — a Todo, an agent, the Graph |
-| Reads | `todos` · `flows` · `task_runs` | `events` |
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | The journal — every TaskRun in the Graph, newest first | Across every kind, not one surface per kind |
-| C2 | Children nest under their parent | A child run sits under the Task that spawned it, indented, never as a sibling row |
-| C3 | Filters: kind · **role** · status · outcome · trigger · agent · lens · time |
-| C3a | **Interactive runs are off by default** | `trigger in (canvas, system)` — canvas expansions and provider pings — are runs like any other and hidden until *Show interactive runs* ([orchestration § 4.1b](../../../orchestration.md#41b-interactive-runs)). The journal answers *what has this system been doing*, and a thousand expands is not that | Each is a column on `task_runs`; none is derived at read time. `awaiting_input` and `awaiting_approval` are distinct statuses ([13.8 §10](../../platform/features/runtime.md)) |
-| C4 | **Imports is this journal with `kind in (import, bulk)` preselected** | One surface, one filter — not a second implementation. There is no `import_jobs` behind it: a load is a TaskRun the interpreter dispatched ([BD12](../../bring-data-in/spec.md)) |
-| C5 | A run in flight is live | Tasks paint and counts climb from the run's own `TaskStream`, resumed by `seq` |
-| C6 | Run detail is the same Task view everywhere | The trace an answer opens and the trace an import opens are one component |
-| C7 | Kind-specific blocks appear only for their kind | An import run has **Reported** and **What landed**; an ask has **Emissions**; the rest of the detail is shared |
-| C8 | The chain, both ways | From a child up to the root, and from the root down through every descendant |
-| C9 | Where it came from | The Todo, the schedule firing, the session message or the CLI invocation that opened it |
-| C13 | **Which world it ran against** | The run's `lens_snapshot` — the model versions and stitches it was grounded in ([orchestration § 0.9](../../../orchestration.md#09-grounding-a-run--the-lens)) |
-| C10 | Cost and duration per run, rolled up over the chain | A parent's cost includes what it delegated |
-| C11 | Cancel, where the runtime allows it | The one write on this surface, and it is gated on the run being non-terminal |
-| C12 | Read-only otherwise | Nothing here retries, edits or re-runs |
-
-## Journey
-
-**The flow** — the list, a filter, a run in flight and a run that finished are one column and four
-states, not four surfaces.
-
-```mermaid
-flowchart LR
-    L["Runs · the list<br/>newest first, children indented"] -->|filter kind = import| L2["The import journal<br/>— all the Imports icon ever was"]
-    L --> R1["A run in flight<br/>five sections, elapsed so far · Follow the run"]
-    L2 --> R2["A run that finished<br/>The run · What it used · What it touched · Bounds reached · Refused"]
-    R1 -->|it ends| R2
-    R2 -->|Open the answer| P["The run page<br/>In order · Layers · Flow · Lens"]
-    R2 -->|Compare with the plan| F["The Library plan drawn in mainSection<br/>the run still open in leftSection"]
-    R2 -->|a generated plan| N["No Compare button<br/>— it has no Library entry"]
-    R1 -->|row action Cancel| R2
-```
-
-```mermaid
-flowchart TD
-    A[Something is running, or ran] --> B["leftNav › Tasks › Runs"]
-    B --> C[The journal · every run, newest first]
-    C --> D{Narrow it?}
-    D -->|by kind| E["ask · import · bulk · stitch · enrich"]
-    D -->|by outcome| F["answered · cannot_answer · failed · cancelled"]
-    D -->|by trigger| G["user · task · schedule · delegation"]
-    D -->|by role| RL["execute · plan · evaluate"]
-    RL --> H
-    E --> H
-    F --> H
-    G --> H
-    D -->|no| H[Pick a run]
-    H --> I[Run detail]
-    I --> J["Outcome · who · what opened it · duration · cost"]
-    J --> K[Tasks · the plan snapshot that ran]
-    K --> L{Follow what?}
-    L -->|a delegated Task| M["Child run · its own plan snapshot,<br/>its own Tasks, its own trace"]
-    M --> K
-    L -->|what it produced| N["Emissions · or, for an import,<br/>Reported and What landed"]
-    L -->|who changed what| O["Activity · 10.2"]
-    L -->|the work it serves| P["The Task · 9.1"]
-    C -->|nothing has run| Q["Empty: what a run is,<br/>and the two ways to open one"]
-```
-
-
-### Run and step, inside one page
-
-```mermaid
-flowchart TD
-  A[Runs panel · the journal] -->|click a run| B[Drawer · run:7d3184f1<br/>the run · tokens · waterfall · touched]
-  B -->|Open the answer| C[Run page · Overview tab]
-  C --> T{tab}
-  T -->|Layers| L[Layers]
-  T -->|Flow| F[Flow]
-  T -->|Touched| X[Touched]
-  C -->|click a waterfall row| S[Step inside the run<br/>run:… › step:… name ⌄]
-  B -->|click a drawer waterfall row| S
-  F -->|click a node| S
-  L -->|click a bar| S
-  S -->|‹ ›| S
-  S -->|crumb ⌄ · Jump to a step| S
-  S -->|run: crumb| C
-  S --> ST{step tab}
-  ST --> SO[Overview] & SX[Touched] & SL[Log]
-  C -. pruned trace .-> E[Empty · the trace has been pruned]
-  S -. step not in trace .-> E2[Empty · this task is not in the run's trace]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Nothing has run | What a run is, and the two ways one opens — ask a question, or import a dataset. Empty because nothing ran, not because something broke |
-| A run in flight | Its row is live; steps paint as they arrive, and the row keeps its place rather than jumping to the top again |
-| A deep delegation chain | Nested to the envelope's depth bound, collapsed past the second level, with the descendant count on the collapsed row |
-| A very busy Graph | Keyset paging, filters applied server-side; the live tail is paced and never reorders rows already read |
-| A run whose agent was retired | The agent is named with its version as it ran — a retired row still resolves ([5.5](../../agents/features/lifecycle.md)) |
-| A run purged by retention | The row stays with its counts and outcome; its steps and emissions say they were purged ([O6](../spec.md)) |
-| A parent still running, a child already failed | The parent's row shows the chain's worst outcome alongside its own status; neither is hidden behind the other |
-| A member without access to the Task | The run is listed; the Task link is absent, not broken |
-| A step board opened cold — a reload, or a link | The step resolves its own run before it reads a trace ([SR44](#decisions)); while it does, the page is loading, not refusing |
-| A step whose run was deleted | *This task is not in the run's trace* — the step names a run that no longer answers, which is the same empty state a pruned attempt gives |
-| A run link reloaded, or shared | `/agents/runs?page=run:<run>` reopens the same run page on the tab it names; `&step=` the same step |
 
 ## Surfaces
 
@@ -214,8 +98,6 @@ is a second vocabulary to maintain for a route whose only caller ships from this
 
 | # | Decision |
 |---|---|
-| SR1 | There is one journal of runs in a Graph. **Runs** is it, and every kind-specific surface is a filter of it. |
-| SR2 | The product has no *job*. A run is a **TaskRun**, its parts are child runs of **Tasks**, and the word `job` names nothing ([terminology §8](../../../terminology.md)). |
 | SR3 | A **Todo** is work; a **TaskRun** is a run. Assigning a Todo opens exactly one root run ([W2](../../work/spec.md)), joined by `task_runs.todo_id`. Neither is the other. |
 | SR4 | A **Task** is never a Todo. It gets a child-run row, never a top-level one — a composite's children and delegation are the two ways a run acquires children, and both children are TaskRuns.
 | SR10 | **`role` is a first-class filter.** A planner run and an evaluator run appear in this journal like any other, under the Todo they serve — which is how *why did it plan that* and *why was it rejected* stay answerable. |
@@ -225,17 +107,13 @@ is a second vocabulary to maintain for a route whose only caller ships from this
 | SR7 | **Imports loses its `leftNav` item as well as its implementation.** It is this journal with `kind in (import, bulk)` preselected and the import columns swapped in — the two kinds a load produces ([BD11](../../bring-data-in/spec.md)) — reached by the kind filter, from a Todo, or from a saved filter, never by an icon. An icon per kind is how one journal became four panels; the fix is not to keep one of them ([G30](../../../building-studio/graph-detail-page.md)). |
 | SR12 | **Runs is its own `leftNav` panel, and it holds the journal alone.** The definitions a run is composed from — plans, the catalogue, templates — live in **Library** ([G41](../../../building-studio/graph-detail-page.md)). Following *this run → the plan it ran → the callable that failed* happens in `mainSection`, not by drawer adjacency: a run's detail is a page ([SR36](#decisions)), a plan's is a canvas page, and `keepMounted` keeps the run open beside it. A run's detail replaces the panel body, not the panel |
 | SR44 | **Runs is a list, so it carries `&run=` and no `?section=`** ([G31](../../../building-studio/graph-detail-page.md) · [G33](../../../building-studio/graph-detail-page.md)). `RunsViewPanel` is the one-header `ListPanelChrome` grammar every other list uses — label, the `24 · 2 running` count, refresh, the status filter — and a drill-in replaces the body, turning the header into `‹ Runs / orders.csv`. `?panel=tasks` is **deleted, not redirected**: the three-drawer Tasks stack is gone, `PanelStack` with it, and a stale link lands on the graph page. |
-| SR8 | This surface is read-only except for **cancel**. Retry and re-run belong where the run was started. |
-| SR9 | Runs lists runs; Activity lists writes. Neither is derived from the other, and neither is a feed. |
 | SR13 | **The drawer is an overview; the run page is the detail.** A 420px column answers *what ran, what it cost, what it touched, which bounds it reached and what was refused* ([SR67](#decisions)). Where the time went — the Gantt, the flow, the log, the reported breakdown, what landed — is the run page, a **board canvas** ([CV12](../../explore/features/boards.md)) that `Open the answer` opens, not a longer panel. [SR14](#decisions), [SR15](#decisions) and [SR26](#decisions) govern the Gantt where it is drawn: on that page. |
 | SR17 | **Every task run writes `result.json`, and that is the whole contract.** `status`, `outputs` (the declared ones — [§0.6](../../../orchestration.md#06-the-catalogue--what-a-plan-may-name)), `artifacts`, `timing`, plus whatever its kind adds. The board renders that document; it never reaches into a task's internals, so a new `kind` ships a surface by writing a document, not by shipping a panel. A run's own `result.json` is the merge of its tasks'. |
 | SR18 | **One step board for every `kind`; only the Output panel differs.** Breadcrumb, tiles, Input, Output, Log, `result.json`, Artifacts, where it sits — identical for `import_dataset`, `execute_graph_query` and `understand_intent`. What changes is the one panel: graph data written · rows · the prompt and completion. Everything else the runtime already records identically, so rendering it differently per kind would be a second vocabulary for one record. |
 | SR19 | **Input is shown wherever result is.** At run level the input is what opened it (trigger, question, plan, agent, lens, budget); at task level it is the args **after `${…}` binding**, so the trace answers *what was it actually asked to do* and not only *what did it produce*. A result with no request beside it cannot be audited. |
-| SR23 | **Everything that executes is in this journal — and the journal is filtered, not selective.** An import, a chat ask, a stitch commit, a provider ping and a canvas expansion are all TaskRuns, because nothing executes outside the runtime ([§ 4.1a](../../../orchestration.md#41a-nothing-executes-outside-the-runtime)). What keeps it readable is a **default filter and separate retention**, never a second write path: the moment one act is allowed to skip the runtime, *what ran* has two answers. |
 | SR27 | **The journal reads two endpoints until M3 gives it one table, and the merge is the drawer's job.** [SR23](#decisions) is the end state; today `thinkings` and `import_jobs` are separate, and reading only the second is what made a question answered end to end leave no row anywhere a reader could find it. So the drawer lists both, newest first. **An import's own thinking is excluded**, because a load already opens one and the run detail reads its steps for the Gantt — listing both unfiltered shows every load twice, once by its dataset and once by its plan. The de-duplication lives here and dies with M3: when a run is one row, there is one list and nothing to merge. |
 | SR29 | **A run records the plan it ran, and the record is `plan_snapshot`.** `plan_origin` says *where the flow came from* (`template:nl-single@1`, `generated`); `plan_snapshot` is *the flow itself*, frozen, and they are not interchangeable — a replay reads the second, and promotion copies it into a library entry. A run carrying only the first is a trace that names a document it does not have, which is why [promote-a-plan](../../workflows/features/promote-a-plan.md) filters candidates on the snapshot and not on the origin. The word **`plan` is never the column**: it names the record, the role, a catalogue key and the document, so the frozen flow is `plan_snapshot` and nothing else ([task-model-migration § 2.4](../../../building-engine/task-model-migration.md)). |
 | SR28 | **An ask's detail is a load's, minus the two bands a load owns.** No `Written`/`Reported` tile, because an ask writes no records; no Log band, because a thinking's lines go to the stream rather than to a stored log. The Gantt is unchanged — it already reads `ThinkingStep`, so an ask and a load draw from the same component and the same fields ([SR21](#decisions)). The Log band arrives with `result.json` in S4, not with a second detail surface. |
-| SR24 | **`trigger` is the axis that separates deliberate work from interaction.** `user · task · schedule · delegation` are deliberate and shown; `canvas · system` are interactive and hidden by default. An audit turns them on; a person reading last night's load does not. |
 | SR20 | **Budget is drawn as a ceiling, not a total.** Tokens read `8.2k of 40k` with a meter, and usage is read in tokens only, never currency — usage without its ceiling is a number nobody can act on, and the ceiling is the thing that pauses the run ([§0.10](../../../orchestration.md#010-budget--the-ceiling-that-pauses-instead-of-failing)). |
 | SR16 | **A run in flight and a run that finished are the same five sections.** Elapsed reads `so far`, the trace polls and the touch list and bounds climb with it, and the primary action reads `Follow the run` until the run settles; `Cancel` is the row action while the run is non-terminal ([C11](#capabilities)). There is no separate live view to build or to keep honest. |
 | SR15 | **Picking a Task filters the log to it.** A Gantt row and a log line are the same Task seen twice — clicking the bar narrows the log to that `task` with a removable chip, which is the debugging loop (*which one was slow → what did it say*) without leaving the column. |
@@ -259,7 +137,6 @@ is a second vocabulary to maintain for a route whose only caller ships from this
 | SR42 | **An LLM step records its exchange on `output`, undeclared — and that is what makes it undeclared.** The step board picks the `exchange` panel from the shape the step recorded ([SR31](#decisions)), so `prompt` and `completion` are top-level keys on `output`; they are deliberately **not** in the entry's `outputs`, because a declared output is a bindable API ([§0.6](../../../orchestration.md#06-the-catalogue--what-a-plan-may-name)) and a plan that binds a raw prompt has reached into a step's internals. Declaration governs binding, so an undeclared key is visible to a reader and invisible to the grammar — which is exactly the split this needs. Both sides are **truncated on write**, with the cut stated in the text: a trace row is not where a megabyte of prompt belongs. |
 | SR43 | **The journal lists roots, and the filter is `parent_run_id IS NULL` rather than a side effect of another one.** *Per-step rows in the journal* is a [non-goal](#not-building) — a step belongs to its run, and is reached through the run's trace and its own board ([SR36](#decisions)). `list_runs` enforced it only by accident: `ask_kind` is null on a child, so **naming a kind** narrowed to roots, and the journal names none. The drawer's own list is therefore the one caller that got every step row in the Graph — 43 of its first 50. The roots filter is now stated in the query rather than inferred from a column that happens to correlate, because a rule that holds only while an unrelated filter is applied is not being enforced. A run's children stay reachable where they were always drawn: underneath it, on drill-in. |
 | SR44 | **A step board's run is read from the step, never carried in its page id.** `task_run:<step_id>` is the whole address ([SR36](#decisions)), and the run a step belongs to is a column on the step's own row — so a **cold** open resolves it with one `GET …/runs/{step_id}`, which answers `parent_run_id` beside the rest of the row, and only then reads the trace. Growing the id to `task_run:<run_id>:<step_id>` would put a *fetched* fact inside an *identity* — the split [B15](../../../building-engine/boards-migration.md#9-decisions) draws between the subject and the reading — and would key a step's reports on a string half of which is derivable from the other half. Leaving it refused is worse than either: the host writes `?page=task_run:<id>` itself the moment a step board is focused, so the link that refuses is a **reload**, not something somebody assembled by hand. The warm path pays nothing — opening a task from the run's flow already holds the run and passes it ([SR18](#decisions)), so the read happens once, on the one open that has no run to pass. |
-| SR45 | **A journal row leads with what was asked, then addresses and measures it.** Line one is **what the run was about**, in the words it was opened with: the question as the person typed it, the query text (monospace) for a `ql-*` run, the dataset and its target for a load. A plan name on line one reads the same for fifty rows, and the prompt is what a reader scans the journal for. Line two starts with the run's **short id** — the last eight characters of its uuid, monospace, quoted the way a commit is — then the **plan and version**, then what it spent: **elapsed · tokens · tasks · when**. The id stays on the row because a run is the noun every other surface names — a log line, a support thread, `GET …/runs/{id}` — and a list nobody can quote from forces a drill-in just to copy one. **Elapsed is the run's own clock** (`started_at` → `finished_at`, ticking while it runs), **tokens** is `tokens_in + tokens_out` summed over the run's tasks, and **tasks** is `done/total` — a position, never a percentage: a plan can replan. Which step it is on is what the drill-in answers. Each fact is absent when nobody recorded it ([SR34](#decisions)): a load spends no tokens and draws none, a queued run has no elapsed. |
 | SR46 | **A run has one record and four tabs, and a tab is a reading, not a page.** `Overview` (the default) · `Layers` · `Flow` · `Touched` sit in a tab strip under the report header ([SR71](#decisions)) over one `GET …/runs/{id}/trace`. Four pages would be four fetches, four URLs and four places for the same fact to drift. |
 | SR47 | **The order a run happened in is the waterfall's, and a row is a task.** Time is what a reader opens a run with, and the waterfall answers *what ran when, and for how long* in one drawing — order down the page, the clock across it ([SR73](#decisions)). **The layer a task spent is the bar's colour, never an axis of its own**: a task touches exactly one layer, so a six-band matrix was 1/6 full by construction. What the six bands answer — *what did this touch at all* — is a **summary question**: the touch strip on the Overview, and the Touched tab. |
 | SR48 | **A bounded repetition contains its rows; a gate lies between them.** A loop is drawn as a box **around** the rounds it holds, so a list nests for free and a second round is simply a further row inside it. A gate is dispatched by nobody, holds no slot and spends no participant — so it is not a row: it is a full-width rule **between** two rows, with its chip on the side the cost falls on. *Above it, nothing has been spent* is then something the drawing says rather than something a legend claims. |
@@ -275,7 +152,6 @@ is a second vocabulary to maintain for a route whose only caller ships from this
 | SR59 | **A step page is drawn in every state its record can put it in, and each one is a different fact.** *In flight* — the clock ticks, `Cancel this step` is live and there is **no** `result.json` panel, because the interpreter writes that document when the row settles. *Failed on a spent bound* — three attempts struck in place, no Output and no Files; the bound is the stop, and a fourth attempt is a change to the plan, not a button ([non-goal](#not-building)). *Cancelled mid-attempt* — what it had read is **not** written, so no count is left behind. *Recorded nothing* — a step that declares no outputs draws no Output panel at all, because an empty table would claim it returned an empty result ([SR34](#decisions)). *Purged by retention* — counts and outcome stay and the three documents say **purged**, never *empty* ([O6](../spec.md)). *A member who can only read* — `Cancel` is absent and nothing else is: a file is part of the record, and reading the record is not a grant. |
 | SR60 | **A reading rides in the URL, and one param carries every page's.** `?read=` names the active page's reading — `in_order` · `layers` · `flow` · `lens` on a run ([SR46](#decisions)), `overview` · `touched` · `log` on a step ([SR55](#decisions)) — and **absent is the default**, `in_order` on a run and `overview` on a step, so the plain link a person pastes is the one a reader wants. One param rather than one per page kind, because only one page is active at a time and the vocabulary belongs to the page that reads it ([G37](../../../building-studio/graph-detail-page.md#decisions)); it is dropped the moment `?page=` moves, so a reading never outlives the record it was a reading of. `Board ¦ spec.json` ([SR37](#decisions)) stays out of the URL: it swaps a document for its source, which is one reading seen twice rather than a second reading. |
 | SR61 | **The journal pages by keyset on `queued_at`, and `total` is a first-page fact.** `GET …/runs` orders by `queued_at desc` and takes `?cursor=` — opaque base64 over `queued_at` **and** `id`, the id being in it because two runs queued in the same millisecond otherwise drop or repeat a row exactly on the page boundary. The response carries `next_cursor`, absent on the last page. An offset would renumber every row behind a run that starts while a reader is on page three, which is precisely what a live journal does to itself ([SR62](#decisions)). `total` is computed **only when the cursor is absent**: it is the count the status bar reads when the journal opens, and a `COUNT(*)` on every page of a busy Graph buys a number nobody reads twice. |
-| SR62 | **The live tail is paced, and it never moves a row a reader has already read.** Stream events coalesce into **one repaint per 250 ms** — a run whose steps arrive in a burst repaints once, not eleven times, and a reader's scroll position survives it. A run that starts while the journal is open is inserted at the top **only on the first page**; below it the reader sees the count change and the list hold still, which is the same promise the row in flight makes — it stays where it is rather than jumping to the top again. Pacing is the client's, not the stream's: the engine emits what happened when it happened, and a surface that needs every event unbatched (the log) subscribes to the same stream without it. |
 | SR63 | **A forecast is an aggregate the engine computes, never one Studio derives.** `GET …/flows/{id}/stats` answers `p50` and `p95` per `step_key` over that plan's own earlier runs, and `Layers · forecast` draws what it returns ([SR51](#decisions)). A median over the runs a page happens to have fetched is a different number from the median over the plan's history, and two surfaces that each compute one will disagree in front of a reader who has no way to tell which is wrong. **Approval latency is excluded at the source** — the stats route omits gate steps entirely rather than returning a number the board then has to refuse to draw. |
 | SR64 | **`invana runs` is the CLI verb, and it is the same journal read from a terminal.** `invana runs list` (`--kind · --status · --since · --limit`, paging with the same cursor) and `invana runs show <id>` (`--read in_order|layers|lens`, defaulting to `in_order`) — the two readings a terminal can honestly draw, and `flow` is not one of them. `GET …/imports` is deleted rather than aliased, so `invana imports` is `invana runs list --kind import` ([SR7](#decisions)) and the CLI gains no second vocabulary for a filter. |
 | SR65 | **A journal row's status is a glyph, and there is no status word on the row.** The kit's `StatusIcon`, drawn by `RunRow` in the row's leading slot, coloured by token, so the shape carries the status for a reader who cannot tell the colours apart: `succeeded` circle-check `--success` · `failed` circle-x `--destructive` · `running` loader-circle `--info`, spinning · `queued` clock `--muted-foreground` · `awaiting_approval` and `awaiting_input` circle-pause `--warning` · `cannot_answer` circle-help `--warning` · served partial circle-alert `--warning` · `cancelled` circle-slash `--muted-foreground`. The status name is the glyph's accessible name and tooltip. The run page's header and the `mainSection` table keep the word; they have the room, and a table column is sorted on it. |
@@ -288,7 +164,6 @@ is a second vocabulary to maintain for a route whose only caller ships from this
 | SR72 | **A step opens inside its run.** Its address is `?page=run:<run_id>&step=<step_id>` — one tab in `mainSection`, reading `run:<short id>`, and a reload lands on the step. The run's header stays and the step joins its crumb; the crumb is a picker of every task (status · layer · time); `‹ ›` walk the tasks; the `run:` crumb returns to the run on the tab it was left on. While a step is open the tab strip is the step's own (SR55), and moving between steps keeps the tab. A task is opened from the Overview's waterfall, the drawer's waterfall, a Flow node or a Layers bar — one click each. A cold `?page=task_run:<step_id>` link resolves its run (SR44) and becomes the run address; a saved step report still opens frozen as `task_run:<id>@<version>`. |
 | SR73 | **Where the time went is a waterfall, on the Overview and in the drawer.** `Gantt` (the `gantt` block on the board), one row per task: the bar is the task's window on the run's clock, coloured by its status; an earlier attempt is struck before the one that stuck; a bounded repetition is a **bracket** over its rounds and a gate is a **seam** across the time it held (`Gantt` `brackets` · `seams`). The drawer carries the compact form between *What it used* and *What it touched*. **Nothing on the run page has a fixed width** — every panel, table and label column takes the width it is given, `Layers` included (SR69). **The trace does not yet say which steps are one round of a loop, or where a gate held** — so Studio passes no bracket and no seam until it does, the same reason SR67 draws no *gated*; the component draws both the moment a run records them. |
 | SR75 | **The journal lives in Activity › Runs; a run opens on the Agents run page.** `/u/:user/:graph/activity/runs` draws the journal page (SR70) full width as the Activity page's `Runs` tab ([O9](../spec.md#7-cross-feature-decisions)). A row opens `/agents/runs?page=run:<id>` — the run page of [the-run-page](../../agents/features/the-run-page.md), whose tabs are Overview · Agents · Stages · Assets · Data touched · Ledger, and whose Stages tab opens a step with this feature's Overview · Touched · Log. There is no run page under Activity. The `Runs` icon in `leftNav` opens this tab and pressing it again closes it. `?page=run:<id>` opens a run as a Workbook tab wherever it is written |
-| SR76 | **Runs read in tokens, never currency.** The journal's tile is *Tokens today* and its table has no cost column. The run page, its drawer, a step and a step's touch show tokens: against the run's token ceiling (`max_tokens`) on the run, and as a share of the run's tokens on a step. The engine's `cost_usd` fields stay on the wire and Studio draws none of them. |
 | SR77 | **The journal's tiles are the engine's.** *In flight*, *Today*, *Tokens today* and *Slowest* — and the Imports page's counts, median time and imports a day — come from `runs/stats`, counted over every root run the journal would list in the window, never over the page Studio loaded. The window is the reader's days: Studio sends its time zone and the engine draws midnight in it. *Live* and *waiting* are counted now, whatever the window. A run's time is its stored `duration_ms`, a run still going is timed to now, and a run waiting on a person is never the slowest — an unanswered question is not a slow run; its title follows the journal row's rule — the body, else the task it carries out, else its plan. |
 | SR78 | **The journal's `total` is a count.** `GET …/runs` returns the number of root runs its filters match, not the length of the page, so *11 of 240 shown* is true past the first fifty. |
 | SR79 | **A run read carries its progress.** `GET …/runs/{id}` returns `steps_done` and `steps_total` with the same rule as the journal row, so the Todos thread reads *2 of 5 steps* rather than counting the steps it was sent. |
@@ -298,10 +173,5 @@ is a second vocabulary to maintain for a route whose only caller ships from this
 
 | Not built | Because |
 |---|---|
-| A word for "job" | the vocabulary already has TaskRun and Task; a third word would name the same row twice |
-| Retry / re-run from the journal | a run is re-opened where it was started, with its own inputs — a blind re-run of an import is how a graph gets written twice |
 | A DAG editor over steps | a plan is data validated against an envelope, never a hand-authored graph ([Ask §6](../../ask/spec.md)) |
 | A second grouping on the layer strip | the strip is read by participant; regrouping the same bars by what dispatched what is an outline with a clock, and the outline is what `In order` already draws |
-| Per-step rows in the journal | steps belong to their run; a flat list of every step in a Graph answers no question anyone has |
-| Cross-Graph journal | a Graph is the reasoning boundary; nothing reads across one |
-| Alerting on a failed run | this is a product surface, not a monitoring platform ([Operate §8](../spec.md)) |

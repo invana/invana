@@ -2,6 +2,9 @@
  * The Agents product's sections as workbook tabs (the-agents-shell.md) — the
  * shared `useSectionTabs`, with Agents' openers and section bodies. LLMs
  * drills into an endpoint in a modal, named by `?provider=`.
+ *
+ * A run is read in Activity, the Graph product every run page lives in: a
+ * run, and a link to Runs, Approvals or Ledger, go there.
  */
 
 import {
@@ -12,8 +15,13 @@ import {
 	firstTab,
 	SECTIONS,
 } from "@invana-studio/agents";
-import type { OpenBoard } from "@invana-studio/shell";
+import {
+	activityPath,
+	type OpenBoard,
+	runPagePath,
+} from "@invana-studio/shell";
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import type { useBoardPage } from "@/host/useBoardPage";
 import {
 	type SectionTabs,
@@ -61,22 +69,34 @@ export function useAgentsSections({
 } {
 	const tabs = useSectionTabs(AGENTS_TABS, deps);
 	const { goTo } = tabs;
+	const navigate = useNavigate();
 
 	const openers = useMemo<AgentsOpen>(
 		() => ({
 			agent: (id) => openBoard({ kind: "agent", subjectId: id }),
 			skill: (id) => openBoard({ kind: "skill", subjectId: id }),
 			func: (key) => openBoard({ kind: "function", subjectId: key }),
-			plugin: (name) => openBoard({ kind: "plugin", subjectId: name }),
+			// A plugin is the install's: its page is in Settings, off the Graph.
+			plugin: (name) =>
+				navigate(
+					`/settings/plugins?page=${encodeURIComponent(`plugin:${name}`)}`,
+				),
 			plan: (id) => openBoard({ kind: "plan_runs", subjectId: id }),
 			template: (id) => openBoard({ kind: "template", subjectId: id }),
-			pool: (name) => openBoard({ kind: "worker_pool", subjectId: name }),
-			worker: (name) => openBoard({ kind: "worker", subjectId: name }),
-			run: (id, stepId) =>
-				openBoard({ kind: "run", subjectId: id, runId: id, stepId }),
-			section: (key, tab) => goTo(key, tab),
+			run: (id, stepId) => {
+				if (!username || !graphSlug) return;
+				const path = runPagePath({ username, graphSlug }, id);
+				navigate(stepId ? `${path}&step=${encodeURIComponent(stepId)}` : path);
+			},
+			section: (key, tab) => {
+				if (key === "runs" || key === "approvals" || key === "ledger") {
+					if (!username || !graphSlug) return;
+					const path = activityPath({ username, graphSlug }, key);
+					navigate(tab ? `${path}/${tab}` : path);
+				} else goTo(key, tab);
+			},
 		}),
-		[openBoard, goTo],
+		[openBoard, goTo, navigate, username, graphSlug],
 	);
 
 	const pages =

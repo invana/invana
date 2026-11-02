@@ -216,7 +216,7 @@ async def draft_skill_plan(
     ``plans`` are the library plans the sentence may name instead of a task —
     ``ref``, ``description`` and ``args_schema`` each. ``answered`` carries the
     clarifications this version has already settled, so a redraw never re-asks
-    ([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
     """
     result = await complete_tool(
         provider=provider,

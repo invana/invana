@@ -1,6 +1,6 @@
 /**
  * **Ledger** — every act by a person or an agent in this Graph, at
- * `/agents/ledger` (the-ledger.md).
+ * `/activity/ledger` (the-ledger.md).
  *
  * *As a reviewer, I want the full log — by row, actor, record, refusal —
  * exportable and provably unedited, so that access is proven, not assumed.*

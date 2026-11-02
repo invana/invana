@@ -6,7 +6,7 @@ from invana.plugins.sdk.context import Out, RunVars, TaskContext
 
 
 async def plan_verify(ctx: TaskContext, v: RunVars) -> Out:
-    """Did the plan serve the intent? **Deterministic first** (docs/for-developers/modules/agents/spec.md).
+    """Did the plan serve the intent? **Deterministic first** (specs/system-design/modules/agents.md).
 
     The intent carries an expected shape and the types it is about; the result
     either matches or it does not. No LLM judge — a self-report about whether

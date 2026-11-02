@@ -1,4 +1,4 @@
-"""Built-in workflows as data (docs/for-developers/modules/agents/spec.md).
+"""Built-in workflows as data (specs/system-design/modules/agents.md).
 
 A workflow is the ordered list of tasks that turns an ask into an answer. Each
 step names itself (``label`` — what the step row shows) and carries its retry

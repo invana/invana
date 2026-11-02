@@ -273,7 +273,7 @@ def render_skills(skills: list[Skill]) -> str:
     Each skill contributes *when to use it* and *how* — the two halves it was
     authored as. The names are what ``run_nodes.skills_offered`` records:
     "this prose was in the prompt" is a fact, and it is the only level of skill
-    attribution that is one (docs/for-developers/modules/work/spec.md).
+    attribution that is one (specs/system-design/modules/work.md).
     """
     if not skills:
         return ""

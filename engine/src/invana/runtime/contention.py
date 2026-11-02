@@ -15,7 +15,7 @@ Four rules it keeps, and each one is a promise about what a person sees:
 | A refusal names the bound (CC6) | "something went wrong" where "the ceiling is 4" was the truth |
 
 The queue lives in this process, because the runtime does
-(docs/for-developers/modules/ask/features/runtime-and-adapters.md). A restart
+(specs/system-design/runtime.md § Executor and workers). A restart
 fails whatever was mid-flight and drops whatever was waiting — the same story the
 in-flight runs already have, rather than a second, quieter one.
 
@@ -74,7 +74,7 @@ class AgentAtCeiling(Exception):
     """This **agent** is already working as many runs as its budget allows.
 
     A different bound from :class:`Refused`, which is the Graph's
-    ([CC1](docs/for-developers/modules/agents/features/concurrency-and-contention.md)):
+    ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
     a budget bounds one agent's simultaneity, the Graph's ceiling bounds the
     machine's. They are checked in that order, so an agent at its own ceiling is
     told about *its* ceiling rather than queued behind the Graph's.
@@ -83,7 +83,7 @@ class AgentAtCeiling(Exception):
     the Graph about the Graph's ceiling (CC2); an agent has no such column, and
     inventing a second queue with its own precedence would make *why am I
     waiting* two answers instead of one. A refusal names the bound
-    ([EB3](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+    ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
     """
 
     def __init__(self, *, agent_id: str, ceiling: int, running: int) -> None:
@@ -108,7 +108,7 @@ class AgentSlots:
 
         ``ceiling <= 0`` is *unbounded*, the same reading the Graph's ceiling
         gives it — a number nobody set does not bound anything
-        ([GV7](docs/for-developers/modules/govern/spec.md), one family over).
+        ([Model product § Decisions](specs/products/model/product.md#decisions), one family over).
         """
         running = self._running.setdefault(agent_id, set())
         if run_id in running or ceiling <= 0:
@@ -257,7 +257,7 @@ class PoolExhausted(Exception):
     could not get a database connection did not ask a bad question, and telling
     it so sends the reader to fix the query. The pool and its size are the
     actionable facts, so they ride on the exception
-    ([CC6](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+    ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
     """
 
     def __init__(self, *, graph_id: str, pool: str, size: int) -> None:

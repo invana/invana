@@ -61,7 +61,7 @@ class RuleVersionQuerySet:
         One query for a whole tree or trace, rather than one per row. The
         version's wording, and the rule beside it: a step row shows the
         statement it was given and opens the rule
-        ([RU12](docs/for-developers/modules/skills/features/rules.md)).
+        ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
         """
         if not version_ids:
             return {}

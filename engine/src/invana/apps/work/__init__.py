@@ -1,6 +1,6 @@
-"""Tasks — the assignable unit of work (docs/for-developers/modules/work/spec.md).
+"""Tasks — the assignable unit of work (specs/system-design/modules/work.md).
 
-Named ``work`` rather than ``tasks`` on purpose. docs/for-developers/modules/work/spec.md **D1** keeps two words
+Named ``work`` rather than ``tasks`` on purpose. specs/system-design/modules/work.md **D1** keeps two words
 that would otherwise collide: a **Task** is what a person writes down and hands
 to someone, and a *step* is one attempt of one runtime callable (``task_key``
 in code, because docs/for-developers/modules/ask/spec.md keeps the Prefect 1:1 mapping). The user-facing noun

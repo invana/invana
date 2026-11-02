@@ -10,10 +10,14 @@
 
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
-import { routedAction, TaskFlowWidget, useReport } from "@invana-studio/shell";
+import {
+	EVERY,
+	routedAction,
+	TaskFlowWidget,
+	useReport,
+} from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { useContext, useMemo, useState } from "react";
-import { EVERY } from "../../lists";
 import { AgentsOpenContext } from "../../open";
 import {
 	useFlowsQuery,

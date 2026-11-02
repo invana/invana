@@ -310,5 +310,5 @@ async def _count_agents(db: AsyncSession, graph: Graph, _actor_id: str, params: 
     return info.total
 
 
-register_board(Board("runs", "Runs", "/agents/runs", ("run", "runs"), RUN_LIST, _count_runs))
+register_board(Board("runs", "Runs", "/activity/runs", ("run", "runs"), RUN_LIST, _count_runs))
 register_board(Board("agents", "Agents", "/agents/agents", ("agent", "agents"), AGENT_LIST, _count_agents))

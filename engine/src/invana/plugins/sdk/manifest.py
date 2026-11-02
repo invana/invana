@@ -2,7 +2,7 @@
 
 A task type is declared by its ``manifest.toml`` beside its ``run.py``; the
 loader in :mod:`invana.plugins.registry` reads it into a :class:`TaskManifest`.
-One artifact, four readers (docs/for-developers/orchestration.md §0.6):
+One artifact, four readers (specs/system-design/orchestration.md § The catalogue):
 
 | Read by | For |
 |---|---|

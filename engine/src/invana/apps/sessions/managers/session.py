@@ -152,7 +152,7 @@ class SessionManager:
             if model.origin == "introspected":
                 model_id = None
 
-        # Every session names an agent (docs/for-developers/modules/agents/spec.md). The picker's default comes
+        # Every session names an agent (specs/system-design/modules/agents.md). The picker's default comes
         # from the surface, so a user who picks nothing still gets one — and the
         # header can always say which mind is answering.
         from invana.apps.agents.managers import AgentManager
@@ -208,7 +208,7 @@ class SessionManager:
 
         Changing the agent takes effect on the **next** run_ask — earlier runs
         keep the agent they ran under, because ``runs.agent_id`` is the record
-        and the session is only configuration (docs/for-developers/modules/agents/spec.md).
+        and the session is only configuration (specs/system-design/modules/agents.md).
         """
         if title is not None:
             sess.title = title

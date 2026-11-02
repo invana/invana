@@ -14,7 +14,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { router } from "@/router";
-// Side-effect import: register OpenTelemetry-Web (docs/for-developers/modules/platform/features/telemetry.md) before the app
+// Side-effect import: register OpenTelemetry-Web (specs/system-design/observability.md) before the app
 // renders, so the query→render pipeline is traced from the first interaction.
 import "@invana-studio/core/telemetry-setup";
 import "./index.css";

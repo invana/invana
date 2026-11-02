@@ -20,10 +20,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@invana/ui";
+import {
+	type McpServerRead,
+	useAddMcpServerMutation,
+} from "@invana-studio/core";
 import { FormError } from "@invana-studio/ui";
 import { useState } from "react";
-import { useAddMcpServerMutation } from "../plugins/queries";
-import type { McpServerRead } from "../plugins/types";
 
 /** The variable a server's bearer token is read from — the documented convention. */
 export const credentialOf = (server: string): string =>

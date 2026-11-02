@@ -211,7 +211,7 @@ export function ImportsPage() {
 					<EmptyState
 						icon={<Upload className="size-6" />}
 						title="Nothing has been imported yet"
-						description="An import loads a folder of records into a Graph's model from the CLI or the API. Run the command above; the load shows here as it runs."
+						description="An import loads a folder of records into a Graph's model from the CLI or the API. Run the command above where the engine runs — the CLI talks to its database directly and has no sign-in. The load shows here as it runs."
 					/>
 				) : (
 					<Table bordered={false} density="compact">

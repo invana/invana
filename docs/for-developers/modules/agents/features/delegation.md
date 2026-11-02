@@ -15,58 +15,7 @@ subset of its own. The child's run nests inside the parent's.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [lineage](lineage.md) · [lifecycle](lifecycle.md) |
 
-> **As** an analyst agent about to recommend something, **I want** a second agent to check it under
-> its own skills, **so that** the recommendation carries a verdict rather than my own confidence.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | `spawn_agent` as an envelope-gated step | Not a background capability — a step in the plan |
-| C2 | `delegate` and `await_delegations` | Hand over work, then wait for the verdicts |
-| C3 | Bounded three ways | Depth, fan-out, and budget ⊆ the parent's |
-| C4 | Ephemeral by default | The child retires when the work closes; the row stays |
-| C5 | The child's steps nest | On the card and in the trace, under the step that spawned it |
-| C6 | The verdict returns as an emission | Not as prose in the parent's answer |
-| C7 | Cancellation cascades | Cancelling the parent cancels the children |
-| C8 | `create_task` is separate | Delegation is within a run; creating a task is work for later |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Parent mid-run] --> B[spawn_agent]
-    B --> C{Within depth · fan-out ·<br/>budget ⊆ parent?}
-    C -->|no| D[Refused, naming the bound]
-    C -->|yes| E[Child agent · ephemeral · skills bound at spawn]
-    E --> F[delegate: the question or the check]
-    F --> G[Child run opens · nests on the card]
-    G --> H[await_delegations]
-    H --> I[Verdict returns as an emission]
-    I --> J[Parent continues, citing it]
-    J --> K[Work closes → child retires]
-    A -.cancel.-> L[Cascades to every child]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Fan-out exceeded | Refused at the third spawn, naming the bound and the count |
-| Child fails | Its failure is the parent's evidence, not a silent gap |
-| Child asks a clarification | It surfaces on the parent's task, attributed to the child |
-| Parent finishes first | `await_delegations` is what prevents it; without that step the plan is refused |
-| Budget exhausted in a child | The child stops `budget_declined`; its escrow is spent, the parent sees the reason |
-| Too many live at once | The child waits `queued` until a sibling ends; the run's Agents tab draws it waiting |
-| Delegating to an agent that asks each time | An approval in Approvals › Waiting, routed to that agent's owner; the step waits on it |
-
-## Surfaces
-
-| Surface | Shape |
-|---|---|
-| Task card | Child steps nested under the spawning step, collapsed by default |
-| Trace | The child's full trace, expandable in place |
-| Lineage canvas | Who spawned whom, on which run |
+Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-24; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 
@@ -83,29 +32,10 @@ flowchart TD
 
 ## Decisions
 
+Engine rows; the product decisions are AG-F05's.
+
 | # | Decision |
 |---|---|
-| DG1 | Spawning and delegating are steps, gated by the envelope. |
-| DG2 | Depth, fan-out and budget bound every delegation; a child's budget is a subset. |
-| DG3 | Children are ephemeral by default and retire with the work. |
-| DG4 | A verdict returns as an emission, and the parent cites it. |
-| DG5 | Cancellation cascades. |
-| DG6 | Exactly one seeded agent may delegate — **Coordinator** — and it is not the Graph default. Delegation is the expensive shape (one question becoming four), so allowing it is a choice somebody makes, not the state everything starts in. |
-| DG7 | Its bounds ship with it: depth 2, three children per run, and every child's allow-list, skills, budget and LLM ⊆ its parent's. Enforced by the interpreter, never by the prompt. |
-| DG8 | A child's trace nests **inside the parent's**, under the step that spawned it, collapsed and loaded on open. The parent's run is the subject; the child is a detail of one of its steps. |
 | DG9 | **A child run inherits its parent run's frozen lens**, and that is how *LLM ⊆ its parent's* ([DG7](#decisions)) holds: an agent binds neither a provider nor a world, so what the parent thinks with is what its run's lens casts, and the child opens inside that same effective lens, narrowed by its own agent's guardrail if it has one ([AG25](author-an-agent.md#decisions)). A child can never be wider than the run that spawned it, in any dimension. |
 | DG11 | **May spawn is `spawn_agent` in the envelope, and nothing else.** There is no `can_spawn` policy beside it — two switches for one permission is how an agent ends up allowed the step and refused the act. A spawned child is ephemeral unless the parent's pin on `spawn_agent` allows `lifetime: persistent`; with no pin, persistent is refused naming the pin. A child's own envelope drops `spawn_agent` unless the spawn names it and the parent holds it. |
-| DG12 | **Budget escrow.** Spawning or delegating moves tokens from the parent run's remaining budget into the child run's escrow (`task_runs.escrow_tokens`) — the child's run budget is its escrow. A parent's remaining is its run budget less its own tokens less every open escrow, so a parent never promises the same tokens twice. When the child ends, its unspent escrow returns (`escrow_returned`) and a ledger row says so. A spawn asking for more than remains is refused before dispatch, naming the remainder. |
-| DG13 | **Four ceilings per run, on the agent's budget.** `max_depth` (depth below the root), `max_children` (children per agent in the run), `max_descendants` (helpers in all, the whole tree) and `max_live` (child runs live at once). A spawn past the first three is refused before dispatch, naming the ceiling and the count, and is a `refused · ceiling` ledger row. A spawn past `max_live` **queues**: the child is created and waits as `queued` until a sibling ends. |
-| DG14 | **Every agent ends for one recorded reason** — `served · cannot_answer · budget_declined · time_limit · step_limit · no_progress · loop · parent_ended · stopped · failed` on `task_runs.exit_reason`, written when the run settles. *No progress* is the same call with the same arguments three times in a row with no new output; *loop* is a delegation back into an agent already in the chain. Cancelling a parent ends each child `parent_ended`. |
-| DG15 | **May delegate to.** An agent's policy holds `may_delegate {agent_id: always · ask · never}` for authored agents. `work.delegate` to an `always` agent runs; to an `ask` agent — and to any agent not listed — it raises a `delegation` approval routed to the target agent's owner and the step waits; to a `never` agent it is refused before dispatch. *Allow always* on that approval writes `always` into the caller's list. |
-| DG16 | **A delegated agent runs with its own grants**, sees the intersection of both worlds, is paid from the caller's escrow, and cannot be one already in the run's chain (refused as `loop`). |
 | DG10 | **`can_rebind_llm` is retired.** It named a column that no longer exists. Giving a child a different model is giving it a different lens, which is the same act as every other narrowing and goes through the child's own guardrail ([AG26](author-an-agent.md#decisions)) — one mechanism, and one place a reviewer reads to learn what a child may think with. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Agents spawning across Graphs | the Graph is the reasoning boundary |
-| Persistent children by default | an agent that outlives its reason accumulates silently |
-| Peer-to-peer messaging between agents | delegation is a step with a verdict, not a chat |

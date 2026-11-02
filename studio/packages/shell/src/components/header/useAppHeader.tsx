@@ -270,7 +270,7 @@ function computeTrail(
 			levels: override ? [{ label: override }] : [...routeCrumbs],
 		};
 
-	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...).
+	// Non-graph routes (/graphs, /graphs/new, /profile, /login, ...).
 	// An install-wide product's routes name their own levels (`Imports`).
 	const lead = username ? [{ label: `@${username}`, to: "/graphs" }] : [];
 	if (!override && routeCrumbs.length)
@@ -282,6 +282,6 @@ function computeTrail(
 function labelFromPlainPath(pathname: string): string | undefined {
 	if (pathname === "/" || pathname === "/graphs") return "Graphs";
 	if (pathname === "/graphs/new") return "New graph";
-	if (pathname.startsWith("/settings/profile")) return "Profile";
+	if (pathname.startsWith("/profile")) return "Profile";
 	return undefined;
 }

@@ -1,4 +1,4 @@
-"""Who is on a project (docs/for-developers/modules/work/spec.md).
+"""Who is on a project (specs/system-design/modules/work.md).
 
 **Staffing is not a permission** — it does not grant access, and membership
 already does that. But it still cannot name a stranger, which is the one check

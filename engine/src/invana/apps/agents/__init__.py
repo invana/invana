@@ -1,4 +1,4 @@
-"""Agents — the graph's named actors (docs/for-developers/modules/work/spec.md).
+"""Agents — the graph's named actors (specs/system-design/modules/work.md).
 
 An agent is not only a configuration you pick: it is a **principal**. It can be
 bound to a session, assigned a task, spawn other agents, and it appears by name

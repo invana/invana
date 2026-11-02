@@ -10,49 +10,7 @@ anything is dispatched — so a plan outside the bounds costs nothing.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [envelope-validation](../../workflows/features/envelope-validation.md) (the check) · [delegation](delegation.md) |
 
-> **As** someone letting an agent act, **I want** hard limits it cannot argue with, **so that** I can
-> let it run without watching it.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Allowed steps | An explicit set; anything else is refused |
-| C2 | Pinned arguments | A step may be allowed only with certain arguments fixed |
-| C3 | Token budget | Per run, and per calendar month — in tokens, never currency ([EB14](#decisions)) |
-| C3a | **Effort** | How hard it tries before it stops — steps, replans, clarifications. A bound of its own, not money and not character ([EB9](#decisions)) |
-| C4 | Depth and fan-out | How deep delegation may go and how wide |
-| C5 | Policy at the ceiling | Stop · ask · block — stated, not implicit |
-| C6 | Envelopes come from templates | Authoring picks one; editing is deliberate |
-| C7 | Drawn as a canvas | `kind = envelope` — the bounds are readable, not a JSON blob |
-| C8 | Tightening is proposable, loosening is not | An agent may propose narrowing its own bounds only |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Author an agent] --> B[Template's envelope]
-    B --> C[Review the bounds on the envelope canvas]
-    C --> D{Adjust?}
-    D -->|tighten| E[Fewer steps · lower ceiling]
-    D -->|loosen| F[A person's decision, always]
-    E --> G[Saved with the agent]
-    F --> G
-    G --> H[Every plan is checked against it before dispatch]
-    H --> I{Inside?}
-    I -->|yes| J[Runs]
-    I -->|no| K[Refused · the bound named · nothing spent]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Budget approaching | Shown on the agent before it is reached, not after |
-| Budget exhausted mid-run | Policy decides: stop with a diagnosis, or ask a person |
-| A step removed from the envelope | Plans that used it refuse from the next run; running ones finish |
-| A spawned child | Its budget is a subset of the parent's, computed at spawn |
-| Empty allowed set | Refused at save — an agent that may run nothing is a mistake, not a config |
+Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-21; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -118,11 +76,6 @@ opening a row.
 
 | # | Decision |
 |---|---|
-| EB1 | There is no unbounded agent. |
-| EB2 | The envelope is static and checked before dispatch, never during. |
-| EB3 | A refusal names the bound: the step, the argument, or the ceiling. |
-| EB4 | A child's budget is a subset of its parent's. |
-| EB5 | An agent may propose tightening its own bounds, never loosening them. |
 | EB6 | **A ceiling the wire does not carry is one no screen can draw.** Every key of `effective_budget` rides `GET …/runs/{id}/trace`, not the two the first board happened to need. |
 | EB7 | **Declared is not the same as enforced, and the table says which.** `max_concurrent_runs` is enforced at admission and refuses naming the agent ([CC11](concurrency-and-contention.md)). `max_tokens_run` and `max_tokens_month` are declared and drawn against — stopping on a token budget is EB2's *never during* and [orchestration § 0.10](../../../orchestration.md)'s budget approval. `max_fanout` is declared and unread until something dispatches a `map_over`. |
 | EB10 | **The column is `envelope`, and its plan list is `plans`.** `workflow_spec` named a workflow where the thing is a bound, and `templates` named library plans with a word the product uses for projection templates. Both old names are read for one release, and the API answers both, so a reader that has not moved keeps working. |
@@ -131,13 +84,4 @@ opening a row.
 | EB12 | **An empty effort cell shows what a run reads.** Its placeholder is `effective_effort` — the default, or a number still carried on `workflow_spec` or `budget` (EB11) — never a dash, so an agent that inherits `max_clarifications 3` does not read as unbounded and one that never asks reads `0`. |
 | EB13 | **A run is drawn against the per-run budget it froze, and nothing stops it there.** `max_tokens_run` is the most the work may set: a session's tokens per run are clamped to it and frozen on the run as `params.max_tokens_run` (AD21), and the run board reads that frozen number — never the agent's budget as it reads today. Reaching it pauses nothing mid-run (EB2); it is declared and drawn against (EB7), and a run's list row carries its tokens beside it. |
 | EB8 | **Two token budgets, each named by its window, and the old names are read for one release.** `max_tokens` is read as `max_tokens_run` and answered back under both names; when a row carries both, the smaller binds, because a ceiling read two ways must never widen. The money keys `max_cost_usd`, `max_cost_usd_month` and `max_cost_usd_run` stay on a row that carries them and on `sessions.max_cost_usd_run`, are answered back as stored, and bound nothing — no default carries them and no meter reads them. The release after this one drops every one of these reads. |
-| EB14 | **Budgets are in tokens, never currency.** What a token costs depends on each customer's subscription, so a money ceiling would mean something different on every install; a token count means the same everywhere. No default, meter, refusal or prompt names a currency. |
 | EB15 | **The month meter is tokens used, summed on read.** `tokens_this_month` is `tokens_in + tokens_out` over the agent's root runs that **started** this calendar month, and their own steps — the window `max_tokens_month` names, on `ix_task_runs_agent_started`. Eval runs are left out: they draw on the Graph's eval budget, shown apart. Tokens are always counted, so an agent with no run reads `0` — unlike a price, there is no *unknown*. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Runtime negotiation of bounds | a bound that can be argued with is not one |
-| Per-task envelopes | the agent carries the bounds; the task carries the goal |
-| Soft warnings instead of refusals | a warning at dispatch time has already spent the money |

@@ -104,7 +104,7 @@ def _build_cache(version: GraphVersion, validation_mode: str = "strict") -> _Cac
 # ---------------------------------------------------------------------------
 
 # Keyed by canonical ``PropertyType`` values so the validator and the vocabulary
-# advertised by connectors (docs/for-developers/modules/graph-connectors/features/capabilities.md) never drift.
+# advertised by connectors (specs/system-design/modules/graph-connectors.md § Capabilities) never drift.
 # Temporal/spatial + semantic-overlay
 # values are accepted as ISO strings / json; container cardinality is handled below.
 _TYPE_VALIDATORS: dict[str, type | tuple[type, ...]] = {

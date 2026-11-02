@@ -28,7 +28,6 @@ import {
 	ItemGroup,
 	ItemTitle,
 	RecordHeader,
-	Skeleton,
 	Table,
 	TableBody,
 	TableCell,
@@ -42,6 +41,7 @@ import { CalendarClock, Pause, Pencil, Play, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { ActButton } from "../../access/ActButton";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { ReadState } from "../../lists/listParts";
 import { refusalOf } from "../notifications/api";
 import { CHANNEL_KIND_LABEL } from "../notifications/DeliveryPicker";
 import { cronWords, nextIn } from "./cron";
@@ -86,9 +86,8 @@ export function SchedulePage({
 
 	if (query.isLoading) {
 		return (
-			<div className="flex flex-col gap-3 p-4">
-				<Skeleton className="h-10 w-full" />
-				<Skeleton className="h-48 w-full" />
+			<div className="p-4">
+				<ReadState loading error={null} what="the schedule" />
 			</div>
 		);
 	}
@@ -298,7 +297,7 @@ function FiringsList({
 	next: string | null;
 	onOpenRun: (runId: string) => void;
 }) {
-	if (loading) return <Skeleton className="h-24 w-full" />;
+	if (loading) return <ReadState loading error={null} what="the schedule" />;
 	if (!firings?.length) {
 		return (
 			<p className="text-muted-foreground">

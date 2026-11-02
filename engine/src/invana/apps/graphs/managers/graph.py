@@ -68,7 +68,7 @@ class GraphManager:
         await session.flush()
 
         # Every graph is born with its agents — Explorer (the default), Query and
-        # Modeller (docs/for-developers/modules/agents/spec.md). A session that names none still has one, so the
+        # Modeller (specs/system-design/modules/agents.md). A session that names none still has one, so the
         # header can always say which mind is answering.
         from invana.apps.agents.managers import AgentManager  # noqa: PLC0415
 
@@ -425,7 +425,7 @@ async def test_connection_credentials(
         await asyncio.wait_for(connector.connect(), timeout=timeout_s)
         latency_ms = int((time.monotonic() - t0) * 1000)
         # connect() already auto-detected the server version
-        # (docs/for-developers/modules/graph-connectors/features/capabilities.md). Capture it
+        # (specs/system-design/modules/graph-connectors.md § Capabilities). Capture it
         # here so the version is sourced from the database itself, not user input.
         resolved = connector.resolve_capabilities()
     except TimeoutError:

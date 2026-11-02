@@ -1,0 +1,68 @@
+/**
+ * Fleet — Pools with its tiles (or the empty state on an install with none),
+ * off any Graph, with no Graph picker; Add workers walking Where → Pool → Join
+ * token with the secret shown once (and not after a reload), and a pool row
+ * opening its pool tab.
+ */
+import { expect, test } from "@playwright/test";
+
+test("Fleet opens on Pools with its tiles and no Graph picker", async ({
+	page,
+}) => {
+	await page.goto("/fleet");
+	await expect(page).toHaveURL(/\/fleet\/pools/, { timeout: 30_000 });
+	await expect(
+		page.getByText("Slots busy").first().or(page.getByText("No workers yet")),
+	).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByRole("tab", { name: "Join tokens" })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Switch graph" })).toHaveCount(
+		0,
+	);
+});
+
+test("Add workers walks to a join token and shows the secret once", async ({
+	page,
+}) => {
+	await page.goto("/fleet/pools");
+	const add = page.getByRole("button", { name: "Add workers" }).first();
+	await expect(add).toBeVisible({ timeout: 30_000 });
+	test.skip(await add.isDisabled(), "Adding workers is an install admin's act");
+
+	await add.click();
+	await expect(page).toHaveURL(/add=where/);
+	await page.getByRole("button", { name: /Docker/ }).click();
+	await page.getByRole("button", { name: "Next" }).click();
+	await expect(page).toHaveURL(/add=pool/);
+
+	// An install with no pool makes one; otherwise the first existing pool is used.
+	const name = page.getByLabel("Name");
+	if (await name.isVisible()) await name.fill(`e2e-${Date.now() % 100000}`);
+	else await page.getByRole("combobox", { name: "Pool" }).click();
+	if (!(await name.isVisible())) await page.getByRole("option").first().click();
+	await page.getByRole("button", { name: "Next" }).click();
+	await expect(page).toHaveURL(/add=token/);
+
+	await page.getByRole("button", { name: "Make token" }).click();
+	const secret = page.getByLabel("Join token · shown once");
+	await expect(secret).toHaveValue(/^invana_join_/, { timeout: 30_000 });
+
+	// Reload: the modal keeps its step and never shows the secret again.
+	await page.reload();
+	await expect(page.getByLabel("Join token · shown once")).toHaveValue("", {
+		timeout: 30_000,
+	});
+});
+
+test("a pool row opens its pool tab", async ({ page }) => {
+	await page.goto("/fleet/pools");
+	await expect(
+		page.getByText("Slots busy").first().or(page.getByText("No workers yet")),
+	).toBeVisible({ timeout: 30_000 });
+	const rows = page.getByRole("row", {
+		name: /keeping up|short|no workers|healthy/,
+	});
+	test.skip((await rows.count()) === 0, "No pool on this install");
+	await rows.first().click();
+	await expect(page).toHaveURL(/worker_pool(:|%3A)/);
+	await expect(page.getByRole("button", { name: "Drain" })).toBeVisible();
+});

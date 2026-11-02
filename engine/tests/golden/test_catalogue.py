@@ -1,6 +1,6 @@
 """The catalogue is closed, declared, and one bound per entry.
 
-`docs/for-developers/orchestration.md` § 0.6 makes three claims this file holds
+`specs/system-design/orchestration.md` § *The catalogue* makes three claims this file holds
 to: the set is countable, every entry declares what four readers need, and no
 entry spends two bounds — because the envelope ceilings *per bound*, and an
 entry spanning two cannot be ceilinged.

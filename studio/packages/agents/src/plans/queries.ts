@@ -167,7 +167,7 @@ export function usePlanRunsQuery(
 }
 
 /**
- * **Promote a plan** — the workflow library's only write (docs/for-developers/modules/agents/spec.md).
+ * **Promote a plan** — the workflow library's only write (specs/system-design/modules/agents.md).
  *
  * Invalidates workflows *and* runs: the promoted plan leaves the
  * candidates list the moment a library entry claims it as its origin, and a

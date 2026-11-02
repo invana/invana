@@ -8,10 +8,9 @@
 
 import { Board, type BoardSpec } from "@invana/boards";
 import { EmptyState, Spinner } from "@invana/ui";
-import { routedAction } from "@invana-studio/shell";
+import { EVERY, routedAction } from "@invana-studio/shell";
 import { BOARD_ICONS } from "@invana-studio/ui";
 import { type ReactNode, useMemo, useState } from "react";
-import { EVERY } from "../../lists";
 import {
 	useFlowsQuery,
 	usePlanDiffsQuery,

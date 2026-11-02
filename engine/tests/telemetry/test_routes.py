@@ -1,4 +1,4 @@
-"""Browser-span proxy tests (docs/for-developers/modules/platform/features/telemetry.md TE6).
+"""Browser-span proxy tests (specs/system-design/observability.md).
 
 The studio exports its spans, metrics and error logs on its own gate, so the proxy is
 always mounted: with the engine's telemetry off it takes the batch and drops it

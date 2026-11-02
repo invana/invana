@@ -4,7 +4,7 @@ Parse, call one manager, serialise (migration-plan §4.1). A Graph's list is its
 invariants, with the install's rules alongside as ``inherited``; a Project's is
 its working rules, with the install's rules and the Graph's invariants as
 ``inherited`` — read-only, in assembly order, so the panel can grey them
-(docs/for-developers/modules/skills/features/rules.md, C3).
+(specs/products/model/features/MO-F06-rules-agents-work-by/feature.md).
 
 The install's own rules have no Graph and no citations read here: their
 routes read and write the rule, and writing is an install Admin's.

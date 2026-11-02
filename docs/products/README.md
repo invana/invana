@@ -1,16 +1,16 @@
 # Invana products
 
-**Think it through. Decide with evidence.** — Invana is a toolkit for thinkers: gather the data, give it meaning, ask, pursue a question, and decide with a trail anyone can follow.
+What Invana is for, its products and their scope now live in [`specs/vision.md`](../../specs/vision.md) and `specs/products/*/product.md`; what is left here waits for review.
 
 | | |
 |---|---|
-| What this is | The plan for splitting Studio into five products under one shell |
+| What this is | The plan for Studio's products in two places — the platform and a Graph — under one shell |
 | Prototype | [Invana Products](https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg) — 149 boards, one canvas page per product, **one row per user story** |
 | Rule | Every board belongs to exactly one story; every story names its boards. The IDs here are the IDs on the frames |
-| Status | Proposal. Nothing here is built; [`../for-developers/`](../for-developers/README.md) still governs code until it is reconciled ([Conflicts](#conflicts-with-for-developers)) |
+| Status | Superseded. What is decided is in [`specs/`](../../specs/README.md); what is left here is listed for review in [the for-developers index](../for-developers/README.md) |
 | Plugins | [plugins.md](plugins.md) — every task type lives in a plugin, declared by a task manifest; versioned; runnable on any of N workers |
 | CLI | Each product doc ends with its `invana` commands; conventions in [shell.md › CLI](shell.md#cli) |
-| Migration | [migration-plan.md](migration-plan.md) — target packages, rules, phases · [migration-sessions.md](migration-sessions.md) — one runbook entry per session, and the log |
+| Migration | [migration-plan.md](migration-plan.md) — target packages, rules, phases · the session runbook and its log are kept with the team's finished projects |
 | Rebuild the prototype | `cd .design/canvas-products && python3 products.py` — refuses to write if a board has no story or a story names a missing board |
 
 ## The products
@@ -20,50 +20,43 @@
 | 1 | **Datasets** | researchers, curators, labs | Gather the data — reusable, labelled by origin, checked against standards | [datasets.md](datasets.md) | 14 · 22 |
 | 2 | **Modeller** | modellers, compliance leads | Give it meaning — models, stitches, worlds, guardrails, rules | [modeller.md](modeller.md) | 14 · 29 |
 | 3 | **Explorer** | analysts | Ask and look — the simplest product | [explorer.md](explorer.md) | 15 · 22 |
-| 4 | **Projects** | thinkers: scientists, policy makers, investors, marketers, investigators | Pursue a question — fork, gather evidence for and against, decide, keep the lineage; a project type sets the words | [projects.md](projects.md) | 14 · 17 |
-| 5 | **Agents** | builders | Build, tune and watch the agents that do the legwork | [agents.md](agents.md) | 16 · 30 |
-| 6 | **IAM** (proposal) | owners, admins | Who may do what — people, groups, agents, tokens and connections hold policies; limits and quotas | [iam.md](iam.md) | 13 · 21 |
+| 5 | **Agent Builder** · platform | install Admins | Build agents and skills once; every Graph invites them | [agent-builder.md](agent-builder.md) | 15 · 47 |
+| — | **Fleet** · **Settings** · platform | install Admins | Worker pools; LLM providers, plugins, MCP, each Graph's limits | [platform.md](platform.md) | 7 · 23 |
+| 6 | **IAM** · a Graph | owners, admins | Who may do what — people, groups, agents, tokens and connections hold policies; limits and quotas | [iam.md](iam.md) | 13 · 21 |
+| 7 | **Projects** · *experimental* | thinkers: scientists, policy makers, investors, marketers, investigators | Pursue a question — fork, gather evidence for and against, decide, keep the lineage; a project type sets the words | [projects.md](projects.md) | 14 · 17 |
+| — | **Onboarding** (not a product) | whoever creates or joins a Graph | From a new Graph to a first answer, by persona: existing graph database · CSV files · trying it out · invited | [onboarding.md](onboarding.md) | 2 · 5 |
 | — | **Shell** (not a product) | everyone | What every product shares: header, breadcrumbs, Assistant, Activity, Schedules, Notifications, ⌘K | [shell.md](shell.md) | 17 · 29 |
 
-- Launcher order is the thinker’s path: gather → give meaning → ask → pursue → delegate.
-- The split is by persona: an analyst never sees agent tuning; a builder never sees project branches.
-- Five is the ceiling, with one proposed exception: IAM, because access spans every product and belongs to none ([iam.md](iam.md)).
+- Launcher order: *Invana* — Home · Datasets · Agent Builder · Fleet · Settings; then, while a Graph is open, *This Graph · name* — Modeller · Explorer · Projects (experimental) · Activity · IAM · Graph settings.
 
-## What lives where
+## Two places
 
-| Concern | Product | Not in |
+Prototype: the *Invana Spaces* staging canvas (<https://claude.ai/artifact/WnzjmRH8tNUGz8cGqfNHFv>), ported into Invana Products.
+
+| Place | Products | Header |
 |---|---|---|
-| Datasets, provenance, versions, standards, validation, imports | Datasets | Modeller |
-| Models, stitches, constraints, worlds, guardrails, rules, Graph settings | Modeller | — |
-| Asking, answers, manual board tools, sessions | Explorer | — |
-| Projects, branches, todos, findings, verdicts, decisions, reports, simulation, lineage | Projects | Agents |
-| Agents, skills, instructions → plans, plugins and their task types, LLMs, performance | Agents | — |
-| Schedules, runs, events, changes, approvals, notifications | Shell | Agents |
+| **Platform** | Home · Datasets · Agent Builder · Fleet · Settings | the product, no Graph picker |
+| **A Graph** | Explorer · Modeller · Projects (experimental) · Imports (as today, open) · IAM · Graph settings · Activity | the product, then the Graph picker |
 
-## Scope
-
-| Scope | Holds | Header shows |
-|---|---|---|
-| Install | the dataset catalogue, standards, install-wide rules | no Graph (Datasets) |
-| Graph | models, worlds, guardrails, agents, projects, runs | the Graph picker, then breadcrumbs |
-| Project | branches, todos, findings, decisions, project rules | Graph › Projects › project › … |
-
-- One install = one organisation. **No multi-tenancy, no Organisation record.** “Install-wide” is the widest scope.
-- Hosted later = one instance per customer (managed single-tenant), never shared tenancy.
+- **The launcher** lists *Invana* first, then *This Graph · name* when a Graph is open; with no Graph open it lists the platform's products only (SH-04, SH-24). Each product keeps its own rail.
+- **Activity** holds the open Graph's runs, approvals and ledger. A run page opens in the Graph it ran in; *Improve skill* opens the skill in the Agent Builder with the run as an eval case and a way back (AC-01).
+- **Graph settings** is its own Graph product (General · Connection · Members · Usage); it left the Modeller.
+- **URLs**: platform products `/builder/…` · `/fleet/…` · `/settings/…` · `/datasets/…`, a person's own settings `/profile`; Graph products `/u/:user/:graph/<product>/…`, Graph settings `…/settings/<section>` ([AG-F02](../../specs/products/agents/features/AG-F02-the-agents-catalogue/feature.md)).
+- **Build**: run as a project of its own, *two-places*.
 
 ## Prerequisites
 
-Capabilities that do not exist and block stories. Each needs a feature row in `for-developers/README.md` before code.
+Capabilities that do not exist and block stories. Each needs a feature in `specs/` before code.
 
 | ID | Capability | Blocks | Note |
 |---|---|---|---|
-| P-01 | Tool plugin runtime | AG-13 · DS-06 · SH-13 · PJ-09 | ✅ B06b (engine) · ✅ C03 (Studio: Agents › Plugins, a plugin's page, a task type's page) — [13.12 Tool plugins](../for-developers/modules/platform/features/tool-plugins.md): one extra each, Admin-enabled, run in workers under procrastinate. Plugins live in the engine (`invana/plugins/tools/`), dependencies as optional extras; each method registers a catalogue entry in the third-party layer |
-| P-02 | MCP client | AG-13 | ✅ B07 (engine) — [13.13 MCP plugins](../for-developers/modules/platform/features/mcp-plugins.md): connect an MCP server; its tools become task types in an `mcp` plugin, frozen when added, loaded at start-up, Admin-enabled |
+| P-01 | Tool plugin runtime | AG-13 · DS-06 · SH-13 · PJ-09 | ✅ B06b (engine) · ✅ C03 (Studio: Agents › Plugins, a plugin's page, a task type's page) — [ST-F04 · Plugins and outside tools](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md): one extra each, Admin-enabled, run in workers under procrastinate. Plugins live in the engine (`invana/plugins/tools/`), dependencies as optional extras; each method registers a catalogue entry in the third-party layer |
+| P-02 | MCP client | AG-13 | ✅ B07 (engine) — [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md): connect an MCP server; its tools become task types in an `mcp` plugin, frozen when added, loaded at start-up, Admin-enabled |
 | P-03 | Web search and fetch tools | DS-06 · SH-13 | ✅ B06b (engine) — `web.search` (SearXNG) · `web.fetch` · `web.download_and_extract`. Honour robots.txt; every row cites its URL |
 | P-04 | Mail tools (read, send) | SH-13 | ✅ B06b (engine) — `mail.read` · `mail.send`, held on an approval in the inbox. `mail.send` always asks for approval |
 | P-05 | Science-source tools (PubMed, UniProt, PubChem, genebanks) | DS-06 · DS-10 | ✅ B06b (engine) — `pubmed.search` · `uniprot.get` · `pubchem.get`; genebanks not yet. Official origin where the source is the author |
-| P-06 | Simulation runtime | PJ-09 · PJ-10 (what-if values) | ✅ B09 — [9.8 Simulation](../for-developers/modules/work/features/simulation.md). Reach-by-hops in PJ-10 is plain traversal: Studio C06 ([9.9 Impact](../for-developers/modules/work/features/impact.md)). Studio draws PJ-09 in C06 |
-| P-07 | Domain simulator plugins (e.g. genomic prediction) | PJ-09 | ✅ B09 — the simulator contract ([13.9](../for-developers/modules/platform/features/plugins.md) PL11–PL15) and `sim.genomic_prediction`. The plugin does the science; Invana runs it, pins inputs, labels output derived |
+| P-06 | Simulation runtime | PJ-09 · PJ-10 (what-if values) | ✅ B09 — [PJ-F04 · Simulation and impact](../../specs/products/projects/features/PJ-F04-simulation-and-impact/feature.md). Reach-by-hops in PJ-10 is plain traversal: Studio C06 ([PJ-F04](../../specs/products/projects/features/PJ-F04-simulation-and-impact/feature.md)). Studio draws PJ-09 in C06 |
+| P-07 | Domain simulator plugins (e.g. genomic prediction) | PJ-09 | ✅ B09 — the simulator contract ([ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) and `sim.genomic_prediction`. The plugin does the science; Invana runs it, pins inputs, labels output derived |
 | P-08 | Dataset record: origin, author chain, licence, versions, hash | all of Datasets | Revives the retired term *Dataset* |
 | P-09 | Change log over every versioned record | SH-14 · AG-06 · AG-09 · MO-09 · DS-04 | ✅ B01 · C04 (Studio: the Events tab's Changes filter, the compare page, a model's History, a record's change log naming who) — Who, when, why, diff, effect after |
 | P-10 | Project records: type, Branch, Finding (with stance), Verdict, Decision (supersede), Proposal, Report, merge | all of Projects | Projects stay flat; branches live inside |
@@ -74,10 +67,11 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 | P-15 | Evals and draft/publish for skills and agents | AG-08 · AG-15 | ✅ C03 (Studio: drafts and publish on agents and skills, the eval set and runs, the gate's refusal, restore from History; AG-15 Performance ✅ C10) — Eval sets with rule checks + labelled LLM judge; hard checks gate publish; drift re-runs on triggers and nightly; a separate eval budget; drafts; one-click rollback |
 | P-17 | Pinned model versions | AG-14 · SH-18 | ✅ C03 · C09 · C10 (Studio: an agent's and a skill's pin; the LLMs page with who pins each version — agents, skills, judges ✅ C10; re-run on the run page ✅ C09) — Model versions by provider version name; agents, skills and judges pin one; every run records its versions; re-run on the same versions |
 | P-18 | Roles and access | SH search filtering · PJ-02 · MO-05 · DS retraction | Graph roles Viewer · Contributor · Builder · Modeller · Owner; install Admin; read-only views with disabled acts |
-| P-19 | Semantic imports | DS-F17 · MO-F14 | ✅ B12 (engine) — [2.8 SKOS import](../for-developers/modules/bring-data-in/features/skos-import.md) · [1.10 Ontology import](../for-developers/modules/connect-and-model/features/ontology-import.md). SKOS → standards; RDFS/OWL subset (incl. schema.org) → draft models; JSON-LD · Turtle · RDF/XML; import reports list what was skipped. ✅ Studio C08 |
-| P-20 | Intent-ranked templates | EX answers · AG-12 | ✅ B13 (engine) — [3.4 Projections](../for-developers/modules/ask/features/projections.md) P13–P14. The intent classifier returns `prefer: chart \| table \| graph`; `select_template` ranks by it instead of substring-matching the raw question. Small |
+| P-19 | Semantic imports | DS-F17 · MO-F14 | ✅ B12 (engine) — [DA-F04 · Standards and checks](../../specs/products/data/features/DA-F04-standards-and-checks/feature.md) · [MO-F01 · Start a model](../../specs/products/model/features/MO-F01-start-a-model/feature.md). SKOS → standards; RDFS/OWL subset (incl. schema.org) → draft models; JSON-LD · Turtle · RDF/XML; import reports list what was skipped. ✅ Studio C08 |
+| P-20 | Intent-ranked templates | EX answers · AG-12 | ✅ B13 (engine) — [EX-F04 · The answer](../../specs/products/explore/features/EX-F04-the-answer/feature.md). The intent classifier returns `prefer: chart \| table \| graph`; `select_template` ranks by it instead of substring-matching the raw question. Small |
 | P-21 | Distributed execution | thousands of tasks, failover, Kubernetes | **Required:** N workers scale runs and tasks per second; a worker can die without losing work. Tasks travel as serialisable envelopes ([plugins.md](plugins.md#7-ready-for-n-workers)). The executor (procrastinate · Dramatiq · Prefect) is chosen by benchmark; `inline` stays the single-machine default |
-| P-16 | Breaking-publish review and migration runs | MO-05 | ✅ B10 · C04 (Studio: the Publish confirm asks the engine, names who reads the model, and a breaking draft requests approval) — [1.9 Publish review](../for-developers/modules/connect-and-model/features/publish-review.md). Additive publishes go straight through; breaking ones preview a migration run and need another owner’s approval |
+| P-22 | The CLI as an API client | `invana login` · every CLI import from a laptop (ON-02, DS-13) | **Required:** today every command opens the app database directly, so it only runs beside the engine. Signed in with an access token, the same commands call the engine's API, so an analyst runs them on their own machine |
+| P-16 | Breaking-publish review and migration runs | MO-05 | ✅ B10 · C04 (Studio: the Publish confirm asks the engine, names who reads the model, and a breaking draft requests approval) — [MO-F02 · Change and publish a model](../../specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md). Additive publishes go straight through; breaking ones preview a migration run and need another owner’s approval |
 
 ## Terms this plan adds or changes
 
@@ -85,31 +79,9 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 |---|---|---|
 | Product | One of Datasets · Modeller · Explorer · Projects · Agents | New |
 | Shell | The layout every product sits in; not a product | Narrowed |
-| Dataset | Tables or documents from one source under one authorship; install-wide; versioned | **Revived** (terminology.md retires it) |
-| Origin | `official · collected · generated · observed · derived` — set per dataset, inherited by records | New |
 | Author chain | original authors → collected by → modified by → validated by | New |
-| Standard | A versioned, shared set of terms, allowed values and required fields; a pack or org-authored | New |
 | Constraint | A range or rule on one model property | Named |
-| Conformance | A dataset’s score against a standard it claims, with violations | New |
-| Rule | A statement always true, scoped install · Graph · project, checked block · warn · report | Scope widened |
-| Branch | A line of inquiry in a project; forks, merges, parks, drops | New |
-| Finding | A claim a branch learned, with its evidence | New |
-| Decision | pursue · park · drop · merge on a branch, with rationale, checked by rules | New |
-| Lineage | Decision → findings → runs → datasets → original authors | New |
-| Project type | Research · Investment · Policy · Market · Investigation · General — sets a project’s words and first panel | New |
-| Verdict | Whether a branch’s hypothesis held up, separate from the decision | New |
-| Stance | A finding supports, contradicts or gives context to its branch | New |
-| Proposal | An agent’s suggested fork or decision, accepted or rejected by a person | New |
-| Report | A project write-up drafted from its records, published as a frozen version | New |
-| Sensitivity | public · internal · confidential · personal — on a dataset or column, read by guardrails | New |
-| Retracted | A dataset version withdrawn by its source; kept, and everything citing it is flagged | New |
 | Role | Viewer · Contributor · Builder · Modeller · Owner per Graph; Admin per install. Membership stops being binary | Changed |
-| Task type | One callable the runtime can run, declared by a task manifest in a plugin; a plan's Task uses one | Replaces *catalogue entry* |
-| Plugin | A versioned folder of task types, skills and flows with a `plugin.yaml` | New |
-| Eval set | Fixed questions with checks, replayed before a skill or agent version is published | New |
-| Token budget | The tokens an agent, schedule or eval set may spend in a period. Budgets are never in currency | Changed (terminology.md says *cost ceiling*) |
-| Model version | A provider’s exact model name (`claude-opus-5-5`); pinned by agents, recorded on every run | New |
-| Change log | Every version of every versioned record, with its effect after | New |
 | Flow origin `authored` | — | **Retired** for users: a plan is `generated` from instructions.md or `packaged` in a plugin pack |
 
 ## Conflicts with for-developers
@@ -153,8 +125,5 @@ Capabilities that do not exist and block stories. Each needs a feature row in `f
 
 | Item | Why |
 |---|---|
-| Multi-tenancy, an Organisation record | One install = one organisation |
-| Proprietary datasets, pricing, marketplace | Not decided; datasets are reusable knowledge first |
 | An import UI (bulk upload, mapping) | Bulk loads stay on the CLI and API; small observation entry is the only UI write |
 | A sixth product | Five is the ceiling |
-| Provenance on every cell | Dataset + record level; property changes live in the record’s change log |

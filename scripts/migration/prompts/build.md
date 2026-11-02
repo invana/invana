@@ -1,6 +1,6 @@
-Execute migration session {{ID}} from docs/products/migration-sessions.md. You are running unattended; nobody will answer questions.
+Execute migration session {{ID}} from {{RUNBOOK}}. You are running unattended; nobody will answer questions.
 
-1. Read docs/products/migration-sessions.md: "Rules for every session", the entry for {{ID}}, and the log row and hand-off notes of every session {{ID}} needs. Read docs/products/migration-plan.md only for the sections the entry links.
+1. Read {{RUNBOOK}}: "Rules for every session", the entry for {{ID}}, and the log row and hand-off notes of every session {{ID}} needs. Read docs/products/migration-plan.md only for the sections the entry links.
 2. Read only the files the entry lists under "Read". Skim others only when a step needs it.
 3. Read scripts/migration/prompts/team.md and work as its lead: decisions and the shared contract first, alone; then split the surfaces across up to 3 sub-agents with no file in two parts, if the session is big enough to split. Do the steps in order. Do not start any other session's work. Never push, never open a PR, never commit — the driver commits.
 4. Run the entry's exit checks yourself; fix what you can inside this session's scope.

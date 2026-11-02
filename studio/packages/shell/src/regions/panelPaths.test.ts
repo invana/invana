@@ -13,7 +13,7 @@ describe("panelPaths", () => {
 
 	it("sends every old ?panel= link to its path, keeping the rest", () => {
 		expect(canonicalRedirect(G, "?panel=runs&right=assistant")).toBe(
-			`${G}/agents/runs?right=assistant`,
+			`${G}/activity/runs?right=assistant`,
 		);
 		expect(canonicalRedirect(G, "?settings=functions&drawer=templates")).toBe(
 			`${G}/agents/functions/templates`,
@@ -78,6 +78,36 @@ describe("panelPaths", () => {
 		).toBeNull();
 		expect(canonicalRedirect(G, "?panel=iam-settings")).toBe(
 			`${G}/iam/settings`,
+		);
+	});
+
+	it("gives each Activity section, and each of its tabs, its own path", () => {
+		expect(canonicalRedirect(`${G}/activity`, "")).toBe(`${G}/activity/runs`);
+		expect(pageParamsOf("activity/runs", "").get("panel")).toBe(
+			"activity-runs",
+		);
+		const actor = pageParamsOf("activity/ledger/actor", "");
+		expect(actor.get("panel")).toBe("activity-ledger");
+		expect(actor.get("section")).toBe("actor");
+		expect(pageParamsOf("activity/schedules/s1", "").get("schedule")).toBe(
+			"s1",
+		);
+		expect(canonicalRedirect(`${G}/activity/approvals/alerts`, "")).toBeNull();
+		expect(canonicalRedirect(G, "?panel=approvals&section=alerts")).toBe(
+			`${G}/activity/approvals/alerts`,
+		);
+		expect(canonicalRedirect(G, "?panel=activity&section=inbox")).toBe(
+			`${G}/activity/inbox`,
+		);
+		expect(canonicalRedirect(`${G}/agents/runs`, "")).toBe(G);
+	});
+
+	it("reads a change's compare as Events, and the bare change log as its filter", () => {
+		const change = pageParamsOf("activity/changes/plan/answer%20nl", "a=1");
+		expect(change.get("panel")).toBe("activity-events");
+		expect(change.get("change")).toBe("plan/answer nl");
+		expect(canonicalRedirect(`${G}/activity/changes`, "")).toBe(
+			`${G}/activity/events?filter=changes`,
 		);
 	});
 

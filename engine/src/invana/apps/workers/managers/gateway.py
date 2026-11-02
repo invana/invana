@@ -1,6 +1,6 @@
 """The rules of a worker dialling out — join, authenticate, heartbeat, lose.
 
-docs/for-developers/modules/agents/features/workers.md C8 · C9. These are the
+specs/products/settings/features/ST-F06-workers-and-limits/feature.md. These are the
 database half of the gateway; the queue half (registering with procrastinate,
 leasing, finishing jobs) is :mod:`invana.plugins.gateway`, which calls these.
 

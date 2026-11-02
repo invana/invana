@@ -13,17 +13,15 @@ import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 // draws none.
 //
 // A write names a key, and the path it lands on may belong to another place:
-// `runs` and `events` are Activity's tabs, and `sessions` is Explorer with the
-// assistant on the right.
+// an `activity-*` key is the Activity product's section, and `sessions` is
+// Explorer with the assistant on the right.
 export type LeftNavKey =
 	| "explorer"
 	| "skills"
 	| "settings"
-	| "events"
 	| "sessions"
 	| "model"
 	| "projects"
-	| "runs"
 	| "govern"
 	| "agents"
 	// The Modeller's requests and rules.
@@ -32,9 +30,6 @@ export type LeftNavKey =
 	// The Agents rail's sections, each a page.
 	| "home"
 	| "fleet"
-	| "workers"
-	| "approvals"
-	| "ledger"
 	| "functions"
 	| "connections"
 	| "llms"
@@ -50,8 +45,15 @@ export type LeftNavKey =
 	| "iam-settings"
 	// The Projects rail's Decisions, a panel of its own.
 	| "decisions"
-	// Activity's tabs that no rail icon writes; `?section=` names the tab.
-	| "activity";
+	// The Activity rail's sections, each a page.
+	| "activity-runs"
+	| "activity-approvals"
+	| "activity-ledger"
+	| "activity-schedules"
+	| "activity-events"
+	| "activity-inbox"
+	| "activity-rules"
+	| "activity-channels";
 
 const DEFAULT_SECTION: LeftNavKey = "settings";
 
@@ -71,14 +73,14 @@ export const LEGACY_PANEL_PARAM = "settings";
 
 // A stacked panel's own keys (useStackSections): which section holds the height,
 // and what is drilled into inside it. **Projects** (Projects · Todos) and
-// **Govern** (Worlds · Guardrails) are stacks;
-// **Runs** is a list, so it carries `run` and no `sectionKey`. These are
-// dropped whenever the section changes, exactly as `?tab=` is — a run left in
-// the URL under a different rail icon names a body that is not on screen.
+// **Govern** (Worlds · Guardrails) are stacks. These are dropped whenever the
+// section changes, exactly as `?tab=` is — a drill-in left in the URL under a
+// different rail icon names a body that is not on screen.
 export const STACK_PARAMS = [
 	SECTION_PARAM,
 	LEGACY_SECTION_PARAM,
-	"run",
+	"schedule",
+	"change",
 	"project",
 	"todo",
 	"world",
@@ -90,8 +92,6 @@ export const STACK_PARAMS = [
 // key that is not that section's is dropped — switching from Runs to Projects
 // must not leave `&run=` behind, and `?section=plans` is not a Projects section.
 const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
-	// Runs takes no `?section=` — one list, so there is nothing to choose between.
-	runs: ["run"],
 	projects: [SECTION_PARAM, "project", "todo"],
 	// **Govern** is the third stack — Worlds over Guardrails. Both keys
 	// name a `Lens` id, because a guardrail and a world are one record separated
@@ -108,7 +108,12 @@ const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 	// **Model** keeps `?section=` for which Modeller rail item reads it —
 	// Global model, Models or Stitches — so a write never moves the path.
 	model: [SECTION_PARAM],
-	activity: [SECTION_PARAM],
+	// Activity's Approvals and Ledger say which tab through `?section=`;
+	// Schedules drills into a schedule, Events into a change's compare.
+	"activity-approvals": [SECTION_PARAM],
+	"activity-ledger": [SECTION_PARAM],
+	"activity-schedules": ["schedule"],
+	"activity-events": ["change"],
 };
 
 // A panel whose content is itself tabbed says which tab through `?tab=`. Only
@@ -126,20 +131,15 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"explorer",
 	"skills",
 	"settings",
-	"events",
 	"sessions",
 	"model",
 	"projects",
-	"runs",
 	"govern",
 	"agents",
 	"requests",
 	"rules",
 	"home",
 	"fleet",
-	"workers",
-	"approvals",
-	"ledger",
 	"functions",
 	"connections",
 	"llms",
@@ -153,7 +153,14 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 	"iam-tokens",
 	"iam-settings",
 	"decisions",
-	"activity",
+	"activity-runs",
+	"activity-approvals",
+	"activity-ledger",
+	"activity-schedules",
+	"activity-events",
+	"activity-inbox",
+	"activity-rules",
+	"activity-channels",
 ];
 
 /**

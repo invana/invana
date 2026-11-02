@@ -1,94 +1,94 @@
-# The Agents shell
+# The rail-and-workbook shell
 
-Agents is a rail and a workbook — no leftSection. Every section opens as a page in a tab of its own:
-Home, Fleet, Performance, Agents, Skills, Functions, Connections, LLMs and Settings.
+The platform's **Agent Builder**, **Fleet** and **Settings**, and a Graph's **Activity**, are each a rail and a
+workbook — no leftSection. Every rail item opens its section as a page in a tab of its own; a row opens its
+record's page as a tab beside it. The launcher lists the platform's products under *Invana* and, while a
+Graph is open, the Graph's under *This Graph · name*.
 
 | | |
 |---|---|
-| Index | [5.12](../../../README.md#5--agents) · Slice **F03** |
+| Index | [5.12](../../../README.md#5--agents) · Slice **F03 · S-TBD** |
 | Module | [Agents](../spec.md) |
-| API / CLI / Studio | — / — / ✅ |
-| Related | [fleet-performance](fleet-performance.md) · [providers-and-models](providers-and-models.md) · [concurrency-and-contention](concurrency-and-contention.md) · [the-catalogue](../../workflows/features/the-catalogue.md) · [mcp-plugins](../../platform/features/mcp-plugins.md) · [list-contract](../../platform/features/list-contract.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) AF-01 · AF-02 · AF-17 · AF-19 · AF-20 · AF-23 · AF-25 · [shell.md](../../../../products/shell.md) |
+| API / CLI / Studio | — / — / 🟡 |
+| Related | [5.16](install-wide-agents-and-skills.md) · [workers](workers.md) · [fleet-performance](fleet-performance.md) · [providers-and-models](providers-and-models.md) · [concurrency-and-contention](concurrency-and-contention.md) · [the-catalogue](../../workflows/features/the-catalogue.md) · [mcp-plugins](../../platform/features/mcp-plugins.md) · [list-contract](../../platform/features/list-contract.md) · products: [agent-builder.md](../../../../products/agent-builder.md) · [platform.md](../../../../products/platform.md) · [shell.md](../../../../products/shell.md) |
 
-> **As** a builder, **I want** every Agents section one click away on a rail, each a full-width page
-> I can keep open beside the others, **so that** catalogues, numbers and forms read as pages, and
-> nothing is squeezed into a side column.
+> **As** a builder or an install Admin, **I want** every section of the Agent Builder, Fleet and Settings one
+> click away on a rail, each a full-width page I can keep open beside the others, **so that** catalogues,
+> numbers and forms read as pages, and nothing is squeezed into a side column.
+
+> **As** a member of a Graph, **I want** the Graph's runs, approvals and ledger in one product beside its
+> schedules, events and inbox, **so that** everything that ran or waits in this Graph is in one place.
 
 ## Capabilities
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | The rail | Home · Fleet, Performance · Agents, Skills, Functions, Connections, LLMs · Settings (the gear at its foot). Lit for the section in the path |
-| C2 | Sections are tabs | A rail item opens its section as a tab of the workbook, or brings its tab to the front; a tab closes with ×. With no tab open the workbook shows Home |
-| C3 | Home | The composer centred — *What should your agents do?* — the person's recent asks, and a tile for every section with its count |
-| C4 | Fleet | Tabs Overview · Map · Table. Overview is the fleet dashboard ([5.10](fleet-performance.md)); Map draws agents → skills → function namespaces; Table is every agent's numbers over 7 days |
-| C5 | Performance | Tabs Agents · Skills · Plans · LLMs, over 7, 30 or 90 days ([5.10](fleet-performance.md) C5–C8) |
-| C6 | Agents | One table of the authored agents — `All · Live · Drafts`, search, kind and status — on the [list contract](../../platform/features/list-contract.md); a row opens the agent's page |
-| C7 | Skills | One table of skills — `All · Published · Drafts`, search; a row opens the skill's page |
-| C8 | Functions | Tabs Functions · Packaged plans · Promoted plans · Templates · Plugins. Functions groups the catalogue by namespace with a bound filter; a row opens the function's page; a plan opens as its flow; *Promote a plan* opens the promote dialog |
-| C9 | Connections › MCP servers | Every MCP server an install admin added: URL, its tools (reads and sends), the credential's variable name, when the list froze, enabled or disabled, *Refresh tools*; the selected server's tools as functions. *Add MCP server* is a modal |
-| C10 | LLMs | Endpoints as cards and every model version with who pins it; a pinned version no endpoint offers is a warning naming the agents. An endpoint's details and adding one are modals |
-| C11 | Settings | The Graph's runs-at-once ceiling, queue or refuse at it, what runs now and every queued run with why it waits; the pools until Workers holds them |
+| C1 | Products declare their place | `scope: "platform"` routes off any Graph (`/<product>/…`) and draws no Graph picker; `scope: "graph"` routes under `/u/:user/:graph/<product>/…` and draws it |
+| C2 | The launcher | *Invana* — Home · Datasets · Agent Builder · Fleet · Settings — then, while a Graph is open, *This Graph · name* — Modeller · Explorer · Projects · Activity · IAM · Graph settings. A member who cannot build (not an install Admin) sees no Agent Builder. The open product is ticked |
+| C3 | The rail | The open product's sections, grouped, lit for the section in the path |
+| C4 | Sections are tabs | A rail item opens its section as a tab of the workbook, or brings its tab to the front; a tab closes with ×. Fleet and Settings always show their section; the Builder shows Overview with no tab open |
+| C5 | Fleet | Rail Pools · Workers · Capacity · Join tokens; one *Workers* page whose tabs are those four; *Add workers*; a pool and a worker open as tabs ([5.15](workers.md)) |
+| C6 | Settings | Rail Graph limits │ LLM providers · Plugins · MCP servers · Remote agents — only what is built is drawn; Plugins lists every plugin and switches a tool plugin; a plugin opens as a tab |
+| C7 | Activity | Rail Runs · Approvals · Ledger │ Schedules · Events · Inbox · Rules · Channels, in a Graph; a run opens as a tab; a change's compare opens inside Events |
+| C8 | Agent Builder | Rail Overview │ Agents · Skills · Functions · Library │ Performance · Import and export ([5.16](install-wide-agents-and-skills.md)) |
 
-## Journey
+## Journeys
 
 ```mermaid
 flowchart TD
-    A[Open Agents] --> H[Home: composer + tiles]
-    H -->|ask| AS[Assistant docks right; the answer's canvas opens as a tab]
-    H -->|tile| S
-    R[Rail item] --> S{Section tab open?}
+    L[Launcher] --> G{A Graph open?}
+    G -->|no| P[Invana: Home · Datasets · Agent Builder · Fleet · Settings]
+    G -->|yes| B[Invana, then This Graph · name]
+    P -->|not an install Admin| PN[No Agent Builder row]
+    B -->|a platform product| X[It opens off the Graph: no picker; This Graph goes from the launcher]
+    B -->|a Graph product| Y[It opens in the Graph: picker kept]
+```
+
+```mermaid
+flowchart TD
+    A[Open a product] --> R[Rail item] --> S{Section tab open?}
     S -->|no| O[Open it as a tab, in front]
     S -->|yes| F[Bring it to the front]
     O --> P[Section page]
     F --> P
-    P -->|tab| T[Fleet · Performance · Functions · Connections tabs — the path's last segment]
-    P -->|row| D[The record's page opens as a tab beside it]
-    P -->|LLMs endpoint| M1[Endpoint modal — path /llms/:provider]
-    P -->|Add endpoint · Add MCP server| M2[Modal over the page]
+    P -->|tab| T[The path's last segment: /fleet/capacity, /activity/ledger/actor]
+    P -->|row| D[The record's page opens as a tab beside it — ?page=kind:id]
     D -->|× on the record tab| P
-    P -->|× on the section tab| N{Another tab open?}
-    N -->|yes| X[The next tab comes to the front]
-    N -->|no| H
-    P -->|loading| L[/The kit's spinner in the body; header and acts drawn at once/]
+    P -->|loading| LD[/The kit's spinner in the body; header and acts drawn at once/]
     P -->|engine error| E[/The page says what it could not read, in the engine's words/]
     P -->|no rows| Z[/The section's empty state, with the act that fills it/]
-    P -->|filtered to nothing| ZF[/N of M match · Clear all/]
     P -->|member without the role| RO[/Acts drawn disabled, naming the role and who holds it/]
 ```
 
 ## Surfaces
 
-| Rail | Path | Tabs (path) | Body | Reads |
-|---|---|---|---|---|
-| Home | `/agents/home` (the product's root lands here) | — | `AgentsHome` under the assistant's start | agents, skills, catalogue, plugins (`kind=mcp`), LLM providers — each list's `total`; fleet performance `tiles.degraded`; concurrency |
-| Fleet | `/agents/fleet` | Overview · `map` · `table` | `FleetPage` | `GET …/agents/overview` · `…/agents` · `…/skills` · `…/agents/performance?window=7d` |
-| Performance | `/agents/performance` | Agents · `skills` · `plans` · `llms` | `PerformancePage` | `GET …/agents/performance?window=` |
-| Agents | `/agents/agents` | — | `AgentsListPage` | `GET …/agents` (list contract), `…/agents/performance?window=7d` |
-| Skills | `/agents/skills` | — | `SkillsListPage` | `GET …/skills` (list contract) |
-| Functions | `/agents/functions` | Functions · `plans` · `promoted` · `templates` · `plugins` | `FunctionsPage` | `GET …/catalogue` · `…/flows` · `…/templates` · `/api/v1/plugins` |
-| Connections | `/agents/connections/server` (`/agents/connections` lands here) · `/agents/connections/mcp` | This Graph's server · MCP servers | `ConnectionsPage` | `GET /api/v1/plugins?kind=mcp` · `GET /api/v1/plugins/:name` · `POST /api/v1/plugins/mcp` · `…/mcp/:name/refresh` · `…/:name/enable·disable` |
-| LLMs | `/agents/llms[/:provider]` | — | `LlmsPage` + `EndpointDialog` · `AddEndpointDialog` | `GET …/llm/providers` · `…/llm/pins` |
-| Settings | `/agents/settings` | — | `AgentsSettingsPage` | `GET/PUT …/agents/concurrency` · pools |
+| Product | Rail | Path | Tabs (path) | Body | Reads |
+|---|---|---|---|---|---|
+| Fleet | Pools · Workers · Capacity · Join tokens | `/fleet/pools` (`/fleet` lands here) · `/fleet/workers` · `/fleet/capacity` · `/fleet/tokens` | the rail's four | `WorkersSectionPage` | `GET /api/v1/workers/…` |
+| Settings | Plugins | `/settings/plugins` (`/settings` lands here) | — | `PluginsPage` | `GET /api/v1/plugins` · `POST …/:name/enable·disable` |
+| Activity | Runs · Approvals · Ledger │ Schedules · Events · Inbox · Rules · Channels | `/u/:user/:graph/activity/runs` (`…/activity` lands here) · `…/approvals[/alerts]` · `…/ledger[/actor·record·refusals·export]` · `…/schedules[/:schedule]` · `…/events` · `…/changes/:kind/:record` · `…/inbox` · `…/rules` · `…/channels` | Approvals: Waiting · `alerts`; Ledger: Rows · `actor` · `record` · `refusals` · `export` | `RunsListPage` · `ApprovalsPage` · `LedgerPage` · `SchedulesTab` · `EventsTab` · `ComparePage` · `InboxTab` · `RulesTab` · `ChannelsTab` | each section's list endpoint on the Graph |
+| Agent Builder | Overview │ Agents · Skills · Functions · Library │ Performance · Import and export | `/builder/<section>` | per [5.16](install-wide-agents-and-skills.md) | — | the catalogue endpoints |
+| Profile | — | `/profile` | Profile · Access tokens | `ProfileSettingsPage` | `GET /api/v1/auth/me` |
 
-| Record page | Opens from | Board kind |
-|---|---|---|
-| An agent | Agents, Fleet, Performance | `agent` |
-| A skill | Skills, Performance | `skill` |
-| A function | Functions › Functions, a plugin's page | `task_type` |
-| A plugin | Functions › Plugins | `plugin` |
-| A plan | Functions › Packaged plans · Promoted plans | `plan_runs` |
-| A template | Functions › Templates | `template` |
+| Record page | Opens from | Board kind | In |
+|---|---|---|---|
+| A worker pool | Fleet › Pools, a worker's page | `worker_pool` | Fleet |
+| A worker | Fleet › Workers, a pool's page | `worker` | Fleet |
+| A plugin | Settings › Plugins | `plugin` | Settings |
+| A run | Activity › Runs, a schedule's firing, the Inbox, the bell | `run` | Activity |
+| An agent · a skill · a function · a plan · a template | the Builder's lists | `agent` · `skill` · `function` · `plan_runs` · `template` | Agent Builder |
 
 ## Seams
 
 | Seam | What the user sees |
 |---|---|
 | While loading | The page's title, its tabs and its acts at once; the kit's spinner where the rows will be |
-| Reload | The path names the section, its tab and an open endpoint; `?page=` names a record tab in front. Other open tabs are this browser session's and do not survive a reload |
+| Reload | The path names the section and its tab; `?page=` names a record tab in front. Other open tabs are this browser session's and do not survive a reload |
 | A rail move | Brings the section's tab to the front; a record tab in front steps back behind it |
-| No rows | Agents: *No agents yet*; Skills: *No skills yet*; Connections: *No MCP servers* with *Add MCP server*; LLMs: *No endpoints* with *Add endpoint* |
-| Filtered to nothing | *N of M match* and *Clear all* ([list-contract](../../platform/features/list-contract.md)) |
+| A platform product opened from a Graph | The Graph picker leaves the header; the launcher's *This Graph* group goes until a Graph is opened again |
+| No Graph open | The launcher lists only *Invana*, with *Open a Graph to see its products* under it |
+| A member who cannot build | No Agent Builder in the launcher |
+| No rows | Pools: *No pools yet* with *Add workers*; Plugins: *No plugins*; each Activity section its own empty state |
 | Member without the role | Every act drawn disabled with *Needs the `<role>` role — ask `<holders>`*; reading stays open |
 | The engine fails | The page names what it could not read in the engine's words, in place of the rows |
 
@@ -96,7 +96,15 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| AS1 | **No leftSection in Agents.** Every section is a page in `mainSection`; the host draws no left column for any Agents path |
+| AS40 | **The rail and workbook serve the platform's products and a Graph's Activity, not one Agents product.** The same shell — rail, workbook, no leftSection — carries the Agent Builder (Overview · Agents · Skills · Functions · Library · Performance · Import and export), Fleet (Pools · Workers · Capacity · Join tokens), Settings (Graph limits · LLM providers · Plugins · MCP servers · Remote agents) and, in a Graph, Activity (Runs · Approvals · Ledger). Routes follow the product: `/builder/…` · `/fleet/…` · `/settings/…` off any Graph, `/u/:user/:graph/activity/…` in one ([5.16](install-wide-agents-and-skills.md) WD13, WD18) |
+| AS41 | **The launcher has two groups.** *Invana* lists Home (the shell's Graphs page, `/graphs`) and every `scope: "platform"` product; *This Graph · name* lists every `scope: "graph"` product, only while a Graph is open. With none open the menu ends *Open a Graph to see its products*; in a Graph, *A platform product leaves the Graph · its picker goes*. A product with `audience: "builders"` is listed only for an install Admin |
+| AS42 | **Until the Agent Builder ships, the Agents product stands in its row.** Its routes stay a Graph's; it is listed under *Invana* with `audience: "builders"`, and opens in the open Graph, or the Graphs list when none is |
+| AS43 | **A platform product draws its workbook in the shell's `mainSection`**, with the product's rail as `leftNav`. Its section is the first tab and cannot close; a record opens as a closable tab named by `?page=`. No assistant docks on a platform product: the assistant's sessions are a Graph's |
+| AS44 | **Activity is drawn by the product host**, like IAM: its sections are workbook tabs, a run is the `run` record page beside them, and a section's panel key is prefixed `activity-` so none collides with another product's |
+| AS45 | **A person's own settings are at `/profile`**, off any Graph, from the user menu |
+| AS46 | **Activity has no Home.** `…/activity` lands on Runs; its last open section tab carries no ×, so the workbook is never empty. An old `?panel=runs`, `approvals`, `ledger`, `events` or `activity&section=<tab>` link lands on its Activity path |
+| AS47 | **A run is read only in Activity.** From Agents, a run and a link to Runs, Approvals or Ledger go to the Activity of the same Graph; from an Activity run page, an agent, skill, function, plan or template opens in Agents. Activity's sections table is the shell's, so the Runs, Approvals and Ledger pages and Activity's rail name a section the same way |
+| AS1 | **No leftSection.** Every section is a page in `mainSection`; no rail-and-workbook product draws a left column |
 | AS2 | **A section is a tab.** A rail move opens the section as a workbook tab or brings its tab to the front, and steps any record tab in front behind it. The tab carries × |
 | AS3 | **Home is the workbook with nothing open.** It is not a tab; closing the last tab returns to it. It never offers invented suggestions (AS17) |
 | AS4 | **A section's tabs are the path's last segment** — `/agents/fleet/map`, `/agents/functions/templates` — and are not a breadcrumb level |
@@ -106,8 +114,8 @@ flowchart TD
 | AS8 | **LLMs: an endpoint's details and adding one are modals.** The endpoint modal is in the path (`/agents/llms/:provider`), so a link opens it; adding one is not |
 | AS9 | **Connections has two tabs: *This Graph's server* (the landing tab, [13.16](../../platform/features/this-graphs-mcp-server.md)) and *MCP servers*.** *Remote agents* arrives with 5.11 and is not drawn before it works |
 | AS10 | **A tile's count is a list's `total` or an engine field**, never a count Studio makes; a tile with no such number names the section in words |
-| AS11 | **Settings keeps the pools** until Workers holds them; the ceiling is the page's first card |
-| AS12 | **The rail holds only built sections.** Runs, Approvals and Ledger sit between LLMs and Settings with a divider before them; Workers joins with its phase. Runs and Approvals carry a badge — live runs (the Runs tiles' `live`), asks for you (the asks page's `for_you`) — counted by the engine. A product hands the shell its counts through `useNavBadges`, keyed by rail item; a count of 0 draws no badge |
+| AS11 | **Pools are Fleet's.** Fleet holds every pool and worker; a Graph's at-once ceiling is its own setting, never a pool |
+| AS12 | **The rail holds only built sections.** Settings draws Plugins alone until Graph limits, LLM providers, MCP servers and Remote agents move in; Activity's Runs and Approvals carry a badge — live runs (the Runs tiles' `live`), asks for you (the asks page's `for_you`) — counted by the engine. A product hands the shell its counts through `useNavBadges`, keyed by rail item; a count of 0 draws no badge |
 | AS13 | **`+` on the strip opens ⌘K**, which lists the sections, the agents and skills, and the recent runs — the one way to open anything, not a second menu. With nothing typed it shows the product's sections, its first records and the Graph's newest runs as *Recent*; sections carry no counts (the palette reads no totals) |
 | AS14 | **Packaged plans are `origin=packaged`; Promoted plans are `origin=promoted · authored`.** A one-off `generated` plan belongs to its Todo and is never listed ([LB6](../../workflows/features/the-library.md)), so no tab is named for it. Each tab sends its own origin filter to `/flows`; neither filters in the browser. The path is `/agents/functions/promoted` |
 | AS15 | **Functions' tabs share one URL search (`?q=`) and each sends only its own filters.** Switching tabs keeps the search and drops filters the next tab does not know |

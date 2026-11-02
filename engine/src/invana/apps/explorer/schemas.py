@@ -69,7 +69,7 @@ class ResolveElementsRequest(BaseModel):
 
     A canvas reopens from its own snapshot, and the graph may have moved on. An
     element that is gone is **kept and marked missing**
-    (docs/for-developers/modules/explore/features/graph-canvas.md GC5) rather than
+    (specs/products/explore/features/EX-F01-the-board-and-its-canvas/feature.md § Decisions) rather than
     dropped: a drawing that quietly loses a node is a drawing that lies about what
     was explored. One the world excludes is in neither list (GC14).
     """

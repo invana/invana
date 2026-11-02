@@ -10,20 +10,7 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [graph-canvas](graph-canvas.md) · [the-assistant](../../ask/features/the-assistant.md) · [model-editor](../../connect-and-model/features/model-editor.md) |
 
-> **As** someone who clicked on something, **I want** the panel to tell me what it is and where it
-> came from, **so that** I can decide what to do without hunting for its detail somewhere else.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | One selection concept | The same object whatever the canvas draws |
-| C2 | Inspect is the default | Properties, provenance, relationships — stated, not editable |
-| C3 | Three kinds write from a gesture | `model` (add · connect · delete), `plan` (drag card → card) and `data` in Edit mode (add · connect · delete, [4.7](edit-the-graphs-data.md)) — each gesture places a node or draws an **edge**, which is the only thing a drawing says better than a form ([SP2](#decisions)) |
-| C4 | Everything else selects | The panel states the fact and offers actions; on `data` it edits only in Edit mode |
-| C5 | Provenance is one click | Element → record → dataset → import run |
-| C6 | Multi-select summarises | Counts by type, and the actions that apply to all of them |
-| C7 | The selection travels | Opening the assistant carries it |
+Product spec: [EX-F01 · The board and its canvas](../../../../../specs/products/explore/features/EX-F01-the-board-and-its-canvas/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## What the panel shows, per kind
 
@@ -35,28 +22,6 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 | `workflow` | the task: arguments, what it calls, the contract it came from | no — nobody edits a plan by hand ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3) |
 | `envelope` | the bound: allowed steps, pinned arguments, ceilings | no |
 | `lineage` | the agent: who authored or spawned it, on what run | no |
-
-## Journey
-
-```mermaid
-flowchart LR
-    A[Click on the canvas] --> B[Selection]
-    B --> C[Panel states what it is]
-    C --> D{This kind edits?}
-    D -->|model, plan, data in Edit| E[Edit in the panel · staged]
-    D -->|otherwise| F[Actions only: open, expand, hide, ask about it]
-    C --> G[Provenance → record → dataset]
-    B --> H[Open the assistant · selection attached]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Nothing selected | What a selection would show, not an error or a blank |
-| Multi-select across types | Counts by type, and only the actions valid for all |
-| A missing element | Marked missing, with when it was last seen |
-| Read-only version | Inspect only, and the panel says why |
 
 ## Surfaces
 
@@ -106,24 +71,18 @@ section a legend as well as a list.
 
 | # | Decision |
 |---|---|
-| SP1 | The canvas selects; the panel states or edits. Never the reverse. |
 | SP2 | **Three** kinds write from a gesture — `model`, `plan`, and `data` in Edit mode, argued in [4.7](edit-the-graphs-data.md) DE1. A fourth is argued the same way. The gesture writes where the **geometry is the datum**; every field is still a form. `workflow` writes nothing: plans are generated or packaged, never edited by hand ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3). |
-| SP3 | Inspect is the default; editing is opt-in and kind-specific. |
-| SP4 | Provenance is always one click from the element. |
-| SP5 | The selection is what the assistant receives. |
 | SP6 | The panel counts the **graph**, the status bar counts the **canvas**. `24,477 nodes` in the panel footer and `26 nodes` in the status bar are both true and answer different questions — what this graph holds, and what I am looking at. |
 | SP7 | The eye on a type row is a canvas control, not a query. It hides that type on the open canvas; nothing re-runs, and every count stays graph-wide — the row's and the footer's. |
 | SP8 | Counts come from one call, served by the connector's schema reader. A vendor that cannot count says so and the panel lists the types without numbers — a type list with no numbers is still the legend, and blocking on a count nobody can produce is worse. |
 | SP10 | The Explorer panel is a `?panel` key, not the left column's resting state. No key means no left column: the canvas keeps the width, and the rail lights nothing. A panel that cannot be closed is a panel whose close control lies. |
 | SP11 | **Type counts are a run under the lens.** The panel's counts come from `count_types` (`graph_read`, trigger `canvas`): a type the lens denies is absent from the list, and every count is taken inside the slice. SP8's one-call rule holds — it is one step, not one call per label. |
 | SP9 | `SELECTED` is a section of the same stack, collapsible like the others — not a fixed detail area under them. It states the element short (id · summary · chips · provenance); the full property table is `InspectorViewPanel`, the right side's other occupant, which is where a reader who wants every field already is. |
-| SP10 | **A third-party element's provenance is its reference link.** Where a loaded element's provenance runs record → dataset → import run (SP4), a third-party one reads `third-party · <source>` → its reference — for the internet the link, title, source kind and when it was fetched; for any other source its locator; for the model the model and the run ([BG3](../../ask/features/beyond-the-graph.md#decisions)). Still one click. |
 | SP12 | **The footer's node total is the engine's `total_nodes`, never a sum Studio builds.** The type-counts run returns it beside the lists, summed once over every type it counted inside the lens. Hiding types is canvas state, so it is said where the eye is — the NODE TYPES header's `6 shown · 1 hidden` — and never subtracted from the graph's total. A vendor that cannot count, or a list with any uncounted type, has no total, and the footer drops the nodes figure rather than print a partial sum as the graph's. |
 
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Inline editing on the canvas | a drawing is not a form |
 | Context menus with the full action set | actions belong where their target lives |
 | Editing data rows from the panel | data arrives by import |

@@ -18,11 +18,16 @@
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { Badge, EmptyState, SearchInput, SegmentedControl } from "@invana/ui";
 import { useListParams, useUpdateSearchParams } from "@invana-studio/core";
+import {
+	chipsOf,
+	FilteredEmpty,
+	ListStrip,
+	ReadState,
+} from "@invana-studio/shell";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { chipsOf, FilteredEmpty, ListStrip } from "../lists";
 import { useAgentsOpen } from "../open";
-import { FleetReadState, pct, tokens } from "../overview/fleetParts";
+import { pct, tokens } from "../overview/fleetParts";
 import { P95Cell } from "./agentCells";
 import { type FleetAgentRow, useFleetAgentRows } from "./agentRows";
 import { useFleetPerformanceQuery } from "./queries";
@@ -108,11 +113,7 @@ function AgentRows({
 		<>
 			<ListStrip page={page} list={list} />
 			{loading || error ? (
-				<FleetReadState
-					loading={loading}
-					error={error}
-					what="the fleet's numbers"
-				/>
+				<ReadState loading={loading} error={error} what="the fleet's numbers" />
 			) : rows.length === 0 ? (
 				chips.length ? (
 					<FilteredEmpty noun="agent" filters={chips} onClear={list.clear} />
@@ -148,7 +149,7 @@ function SkillRows({
 
 	if (perf.isLoading || perf.error)
 		return (
-			<FleetReadState
+			<ReadState
 				loading={perf.isLoading}
 				error={perf.error}
 				what="the skills' numbers"

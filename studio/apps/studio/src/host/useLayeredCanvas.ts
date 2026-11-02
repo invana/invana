@@ -33,7 +33,7 @@ export function useLayeredCanvas(
 	// Explorer has always shown; the rest are opened from their panel.
 	const [workKind, setWorkKind] = useState<CanvasKind | null>(null);
 	// A dependency that would close a loop comes back as a 422 naming it; the
-	// canvas shows that rather than drawing anything (docs/for-developers/modules/work/spec.mda).
+	// canvas shows that rather than drawing anything (specs/system-design/modules/work.md).
 	const [planError, setPlanError] = useState<string | null>(null);
 	const taskMutations = useTodoMutations(username ?? "", graphSlug ?? "");
 

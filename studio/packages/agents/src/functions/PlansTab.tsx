@@ -32,10 +32,9 @@ import {
 	TypographyInlineCode,
 } from "@invana/ui";
 import { formatRelativeTime } from "@invana-studio/core";
-import { ActButton } from "@invana-studio/shell";
+import { ActButton, FilteredEmpty } from "@invana-studio/shell";
 import { LAYER_PALETTE, layerSlug } from "@invana-studio/ui";
 import { GitBranch, GitBranchPlus } from "lucide-react";
-import { FilteredEmpty } from "../lists";
 import { useAgentsOpen } from "../open";
 import { useFlowsQuery } from "../plans/queries";
 import type { FlowSummary } from "../plans/types";

@@ -16,6 +16,8 @@ of what happened. This module owns both paths, and the evidence that drives them
 | Depends on | [Ask](../ask/spec.md) (runs produce the record) · [Skills](../skills/spec.md) · [Workflows](../workflows/spec.md) · [Work](../work/spec.md) (criterion outcomes) |
 | Depended on by | every module that improves with use |
 
+System design: [memory.md](../../../../specs/system-design/modules/memory.md) — the two paths, the mechanism-versus-domain split and where memory lives (§§ 2 · 3 · 4). This file keeps the vocabulary, what the module owns, the flows, its decisions and what is absent.
+
 ## 1. Vocabulary
 
 Product-wide words: [terminology.md](../../terminology.md). What this module adds:
@@ -28,64 +30,6 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | **Proposal** | a suggested new version of an artefact, carrying its evidence and a diff | an automatic change |
 | **Consolidation** | a person accepting, editing or rejecting a proposal | training |
 | **Hypothesis** | what accepting a proposal predicts, so it can be judged later | a promise |
-
-## 2. The two paths, and the one that does not exist
-
-```mermaid
-flowchart TD
-    R[A run happens] --> REC[The record<br/>steps · emissions · answers · outcomes]
-    REC --> EV[Evidence<br/>offered vs applied · plan served · criteria met]
-    REC --> G[(Records in the graph<br/>the domain's own node types)]
-    G -->|a planned query step| RC[Recall: the next run reads them]
-    EV --> C{A person reads it}
-    C -->|rewrite| SK[A skill]
-    C -->|add| RU[A rule]
-    C -->|add| CR[A criterion]
-    C -->|promote| WF[A workflow template]
-    SK --> N[The next run is offered the change]
-    RU --> N
-    CR --> N
-    WF --> N
-    X[Implicit memory:<br/>the agent silently carries context forward] -.->|not built| N
-```
-
-| Path | How it works | Why it is this way |
-|---|---|---|
-| **Recall by query** | The domain models its own memory as node types; an agent reads them with a planned query step | Provenance: what the agent "remembers" is a record with a source, not a claim in a prompt |
-| **Consolidation** | Evidence reaches a person, who edits a skill, rule, criterion or template | Auditable: the change has an author, a time and a reason |
-| **Implicit memory** | — | Not built. An agent that silently carries context forward cannot be audited, and its recall cannot be cited |
-
-## 3. Domain memory is modelled, not built in
-
-The product supplies the mechanism; the use case names the types.
-
-| Layer | Owns |
-|---|---|
-| Product | the record · evidence · a query step that reads prior records · the consolidation loop |
-| Domain model | whatever the domain calls its memory — the finance example uses `Pattern`, `Observation` and `Learning` |
-| Skill | the playbook that says *when* to recall — the finance example's `learn-from-record` |
-
-So "remember what worked" is a **modelling pattern**, reachable by any domain, not a feature with
-finance's nouns in it. A medical Graph models `Finding` and `Guideline`; the mechanism is identical.
-
-## 4. Where memory lives
-
-One test decides it: **would you ever query it in the same breath as your domain data?**
-
-| Data | Lives in | Because |
-|---|---|---|
-| Runs · steps · timings · tokens · emissions | Invana's store | About the run, not the subject. It must survive swapping the graph database, and writing it would break a read-only connection |
-| Evidence — offered vs applied, plan served, criteria met | Invana's store, derived from the record | About the machine's behaviour |
-| Objectives · criteria · rules | Invana's store | About the work |
-| "BPCL gapped 2.1% and the setup was taken" | **the graph** | Joins to the domain's own types, cited in answers |
-| "this pattern fares better on high-liquidity names" | **the graph** | Queried mid-run, cited by id |
-
-The two sides join without duplicating: a memory node in the graph carries the `run_id` that
-produced it, so provenance crosses the boundary in one direction only.
-
-Domain memory is authored as a domain model like any other. [Starter models](../connect-and-model/features/starter-models.md)
-ship an importable shape — an observation, a claim derived from observations, and how that claim
-fared — which a Graph renames to its own vocabulary on arrival.
 
 ## 5. What this module owns
 

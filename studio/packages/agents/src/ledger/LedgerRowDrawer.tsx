@@ -21,6 +21,7 @@ import {
 	PropertyRow,
 	TypographyInlineCode,
 } from "@invana/ui";
+import { ReadState } from "@invana-studio/shell";
 import {
 	Bot,
 	Copy,
@@ -32,7 +33,6 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useAgentsOpen } from "../open";
-import { FleetReadState } from "../overview/fleetParts";
 import {
 	Act,
 	clock,
@@ -99,7 +99,7 @@ export function LedgerRowDrawer({
 			onClose={() => onRow(null)}
 		>
 			{!d || !row ? (
-				<FleetReadState
+				<ReadState
 					loading={detail.isLoading}
 					error={detail.error}
 					what="the row"

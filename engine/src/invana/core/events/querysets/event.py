@@ -26,7 +26,7 @@ _DEFAULT_PAGE_SIZE = 50
 class EventFilter:
     """Filters accepted by the read API. All optional, all combinable.
 
-    The five added for the work surfaces (docs/for-developers/modules/work/spec.md) each read one dimension of the
+    The five added for the work surfaces (specs/system-design/modules/work.md) each read one dimension of the
     trace:
     *who kind of thing acted*, *for whom*, and the three scopes.
     """

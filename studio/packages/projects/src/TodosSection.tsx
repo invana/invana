@@ -1,5 +1,5 @@
 /**
- * The graph-wide task list and the task detail (docs/for-developers/modules/work/spec.md).
+ * The graph-wide task list and the task detail (specs/system-design/modules/work.md).
  *
  * The detail is where the governance seam is visible: an agent posts a result
  * and the task sits in **review** until a person accepts it. Accept is offered

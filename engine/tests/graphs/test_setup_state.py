@@ -1,6 +1,6 @@
 """Setup progress is read off the facts, not off a stored checklist.
 
-docs/for-developers/modules/platform/features/setup.md (SU1 · SU11 · SU12) and
+specs/products/shell/features/SH-F02-create-a-graph/feature.md § Decisions and
 connect-and-model/spec.md CM8 / CM9. Real Postgres, no mocks — the whole point of
 the feature is which rows exist.
 """

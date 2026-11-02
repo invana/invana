@@ -1,16 +1,16 @@
 /**
  * **Approvals** — the one queue of asks an agent or a run makes of a person,
- * at `/agents/approvals` (approvals.md).
+ * at `/activity/approvals` (approvals.md).
  *
  * *As an approver, I want to see exactly what a run will send before it goes,
  * so that nothing leaves without a person.*
  *
  * Two tabs, each the path's last segment:
  *
- * - **Waiting** (`/agents/approvals`) — access, budget, delegation, send and
+ * - **Waiting** (`/activity/approvals`) — access, budget, delegation, send and
  *   question asks, each routed to whoever owns the thing asked for
  *   ({@link WaitingTab}).
- * - **Alert rules** (`/agents/approvals/alerts`) — rules over the ledger that
+ * - **Alert rules** (`/activity/approvals/alerts`) — rules over the ledger that
  *   tell members in the inbox ({@link AlertRulesTab}).
  *
  * The bell's tray reads the same asks, so a decision here clears it there.

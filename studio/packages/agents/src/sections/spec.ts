@@ -10,17 +10,17 @@
 
 import type { ProductIcon } from "@invana-studio/core";
 import {
+	ACTIVITY_SECTIONS,
+	type ActivitySectionKey,
+} from "@invana-studio/shell";
+import {
 	Bot,
 	BrainCircuit,
-	ClipboardList,
 	Gauge,
 	House,
-	Inbox,
 	Network,
 	Pencil,
-	Play,
 	Plug,
-	ServerCog,
 	Settings,
 	SquareFunction,
 } from "lucide-react";
@@ -34,11 +34,18 @@ export type AgentsSectionKey =
 	| "functions"
 	| "connections"
 	| "llms"
-	| "runs"
-	| "workers"
-	| "approvals"
-	| "ledger"
 	| "concurrency";
+
+/**
+ * The sections this package draws for the Activity product — a run's journal,
+ * the asks waiting on a person, the ledger. Activity's rail lists them, from
+ * the shell's `ACTIVITY_SECTIONS`; their pages live here beside the agents
+ * they read.
+ */
+export type RunSectionKey = Extract<
+	ActivitySectionKey,
+	"runs" | "approvals" | "ledger"
+>;
 
 interface SectionTab {
 	key: string;
@@ -107,7 +114,6 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 			{ key: "plans", label: "Packaged plans" },
 			{ key: "promoted", label: "Promoted plans" },
 			{ key: "templates", label: "Templates" },
-			{ key: "plugins", label: "Plugins" },
 		],
 	},
 	connections: {
@@ -127,48 +133,6 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 			"Every model by its exact version name — a run records the version it used; moving an agent is a change, with evals",
 		tabs: [],
 	},
-	runs: {
-		label: "Runs",
-		icon: Play,
-		description:
-			"Every run in this Graph — the numbers are the engine's, stored when each run settles",
-		tabs: [],
-	},
-	workers: {
-		label: "Workers",
-		icon: ServerCog,
-		description:
-			"Pools of workers run every agent’s steps — on Docker, Python or Kubernetes; you add them, and you scale them",
-		tabs: [
-			{ key: "pools", label: "Pools" },
-			{ key: "workers", label: "Workers" },
-			{ key: "capacity", label: "Capacity" },
-			{ key: "tokens", label: "Join tokens" },
-		],
-	},
-	approvals: {
-		label: "Approvals",
-		icon: Inbox,
-		description:
-			"Every ask waiting on a person — access, budget, delegation, sends, questions — routed to whoever owns the thing asked for. Access granted shows in IAM",
-		tabs: [
-			{ key: "waiting", label: "Waiting" },
-			{ key: "alerts", label: "Alert rules" },
-		],
-	},
-	ledger: {
-		label: "Ledger",
-		icon: ClipboardList,
-		description:
-			"Every act by a person or an agent — who, through which agents, what it touched, allowed or refused",
-		tabs: [
-			{ key: "rows", label: "Rows" },
-			{ key: "actor", label: "By actor" },
-			{ key: "record", label: "By record" },
-			{ key: "refusals", label: "Refusals" },
-			{ key: "export", label: "Export" },
-		],
-	},
 	concurrency: {
 		label: "Settings",
 		icon: Settings,
@@ -178,9 +142,18 @@ export const SECTIONS: Record<AgentsSectionKey, SectionSpec> = {
 	},
 };
 
+/** A section's spec — Agents' own, or Activity's for Runs · Approvals · Ledger. */
+export const sectionSpec = (
+	key: AgentsSectionKey | RunSectionKey,
+): SectionSpec =>
+	key in SECTIONS
+		? SECTIONS[key as AgentsSectionKey]
+		: ACTIVITY_SECTIONS[key as RunSectionKey];
+
 /** The tab a section opens on when the path names none. */
-export const firstTab = (key: AgentsSectionKey): string | null =>
-	SECTIONS[key].tabs[0]?.key ?? null;
+export const firstTab = (
+	key: AgentsSectionKey | RunSectionKey,
+): string | null => sectionSpec(key).tabs[0]?.key ?? null;
 
 /** What every section page takes from the host. */
 export interface SectionPageProps {

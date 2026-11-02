@@ -566,7 +566,7 @@ class TaskRunQuerySet:
         alternative is a round trip per row of a list surface. ``column`` is a
         ``task_runs`` JSON array of ``rule_version_id``s — ``rules_offered``,
         written by assembly, or ``rules_cited``, the model's own claim
-        ([RU7](docs/for-developers/modules/skills/features/rules.md)). One body,
+        (specs/products/model/features/MO-F06-rules-agents-work-by/feature.md § Decisions). One body,
         because two copies of this query would be two chances to count *offered*
         and *cited* over different rows.
         """

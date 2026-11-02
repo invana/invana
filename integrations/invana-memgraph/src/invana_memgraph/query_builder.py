@@ -4,7 +4,7 @@ Memgraph speaks Bolt and openCypher, so it shares ~80% of its query logic with
 Neo4j and rides the same driver. What it does not share is **identity**:
 ``elementId()`` is Neo4j 5's, and Memgraph does not have it at all. It has
 ``id()``, which returns an **integer** rather than a string
-(docs/for-developers/modules/graph-connectors/features/languages.md LG10).
+(specs/system-design/modules/graph-connectors.md § A query, either way).
 """
 
 from __future__ import annotations

@@ -102,7 +102,7 @@ class Flow(Base):
     key: Mapped[str | None] = mapped_column(String(64), nullable=True)
     # Versions are immutable: promoting a changed shape mints `key@n+1` rather
     # than editing `key@n`, so a promoted plan is diffable against the one it
-    # came from (docs/for-developers/modules/agents/spec.md V3).
+    # came from (specs/system-design/modules/agents.md V3).
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     name: Mapped[str] = mapped_column(String(255), default="", nullable=False)
     description: Mapped[str] = mapped_column(Text, default="", nullable=False)
@@ -122,7 +122,7 @@ class Flow(Base):
     args_schema: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     #: `[{key, version, args}]` — what this plan **spent**: the library plans it
     #: inlined, and the arguments it tuned on each. The rows themselves are a
-    #: copy taken at composition ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
+    #: copy taken at composition (specs/products/agents/features/AG-F04-skills/feature.md § Decisions),
     #: so this records the act rather than pointing at a plan that could move.
     uses: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     #: Provenance, N:M — the skill versions this plan was drawn from.

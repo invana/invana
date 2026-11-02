@@ -8,7 +8,7 @@ stitches, its configured providers, the cache kinds and the roles — so a store
 copy would go stale the moment a model publishes.
 
 That is also what makes *narrowing is picking, not writing*
-([WO7](docs/for-developers/modules/govern/features/worlds.md)) enforceable:
+(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions) enforceable:
 every control offers what is here, so nothing can name something that is not.
 """
 

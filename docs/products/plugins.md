@@ -1,11 +1,11 @@
 # Plugins — the engine's task types, versioned and runnable on any worker
 
-How the catalogue (today's built-in steps) and the new tools become one versioned system of **plugins**, laid out so that any number of workers can run any task. Execution is not decided here: the executor is picked by the benchmark in [migration-sessions › B14](migration-sessions.md#track-b--engine).
+How the catalogue (today's built-in steps) and the new tools become one versioned system of **plugins**, laid out so that any number of workers can run any task. Execution is not decided here: the executor is picked by the benchmark of migration session B14.
 
 | | |
 |---|---|
 | Today | `engine/src/invana/runtime/catalogue/` — ~30 catalogue entries in 7 modules (one per bound), a closed set built at import, dispatched in-process by `runtime/executor.py` |
-| Proposal | `engine/src/invana/plugins/` — every task type lives in a **plugin**; core plugins always load, tool plugins load when their extra is installed and run only while an Admin has enabled them (a gate checked at dispatch, so no restart — [13.12 TP1](../for-developers/modules/platform/features/tool-plugins.md#decisions)). The registry of everything available builds itself from the manifests |
+| Proposal | `engine/src/invana/plugins/` — every task type lives in a **plugin**; core plugins always load, tool plugins load when their extra is installed and run only while an Admin has enabled them (a gate checked at dispatch, so no restart — [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)). The registry of everything available builds itself from the manifests |
 | Requirement | **Distributed**: deploy N workers and get more runs and tasks per second; a worker can die without losing work |
 | Not decided here | Which executor (procrastinate · Dramatiq · Prefect) — B14 measures |
 
@@ -116,7 +116,7 @@ links = "list"
 fetched_at = "str"
 ```
 
-Manifests are TOML, read with the standard library's `tomllib` — no parser dependency, and comments survive ([13.9 PL7](../for-developers/modules/platform/features/plugins.md#decisions)). A core plugin's `plugin.toml` carries no `version`: it is the engine's.
+Manifests are TOML, read with the standard library's `tomllib` — no parser dependency, and comments survive ([runtime](../../specs/system-design/runtime.md)). A core plugin's `plugin.toml` carries no `version`: it is the engine's.
 
 | Task manifest field | New? | Why |
 |---|---|---|
@@ -126,23 +126,6 @@ Manifests are TOML, read with the standard library's `tomllib` — no parser dep
 | `timeout_s` · `retries` | **new** | defaults the executor applies; a plan may tighten, never loosen |
 | `resources` | **new** | `llm` (token use) · `cpu` · `gpu` — lets a worker pool advertise what it can run |
 | Validation | — | Manifests are checked at start-up against `run.py`'s signature; a mismatch stops the process with the file named |
-
-## 4. What a plugin contributes
-
-| Contribution | Is | Runs as | Example |
-|---|---|---|---|
-| **Task type** | one callable — `run(ctx, vars) -> Out` | one envelope on one worker | `web.fetch` |
-| **Composite task type** | a fixed, deterministic sequence in code, exposed as **one** task type | one envelope on one worker — no per-step dispatch | `web.download_and_extract` (download → unzip → parse) |
-| **Skill** | `instructions.md` + an eval set; its plan is **generated** | a flow: each step its own envelope | *Collect a dataset from the web* |
-| **Flow** | a fixed multi-step Flow written in the plugin | a flow: each step its own envelope | `model-import@1` · `bundle-import@1` (today's built-ins) |
-
-| Rule | Detail |
-|---|---|
-| Who writes flows | Plugin authors, in code review — never users in Studio. Users write instructions; their plans are generated |
-| Plan origins | `generated` (from instructions) · `packaged` (shipped in a plugin). User-authored plans stay retired |
-| Versioning | Flows and skills carry versions like task types; a run records `flow@version` or the generated plan's revision |
-| Composite or flow? | Composite when steps are tight, deterministic and share local state (files on disk) — dispatch overhead would dominate. Flow when steps need lanes, approvals, replanning or per-step visibility |
-| Visibility | A flow's steps appear on the run page one by one; a composite task appears as one step with its own log |
 
 ## 5. How a flow runs across workers
 
@@ -155,18 +138,6 @@ Manifests are TOML, read with the standard library's `tomllib` — no parser dep
 | Replan mid-run | orchestrator — appends a revision; settled steps never change |
 
 - A fan-out of 200 lanes is 200 envelopes: with 9 workers they run 9-wide (or more, per worker concurrency) — this is where N workers pay off.
-
-## 6. Versioning
-
-| Rule | Detail |
-|---|---|
-| Two versions | A **plugin** version (what is installed) and a **task type** version (what a plan ran) |
-| Semver per task type | Patch: behaviour fix · Minor: new optional arg or output · Major: an arg or output removed or changed |
-| Runs record the version | A Task stores `task_key` **and** `task_version` — the same rule as pinned model versions |
-| Plans resolve, then pin | A generated plan names keys; the run's plan snapshot records the resolved `key@version` |
-| Majors live side by side | After a major release the previous major keeps serving for a deprecation window, so re-runs on the same versions still work |
-| Core plugins | Versioned with the engine release; a core task type's major bump is called out in the changeset |
-| Closed per process | The registry is built once at start-up from installed and enabled plugins, then frozen. Nothing registers while plans run — the envelope stays enforceable |
 
 ## 7. Ready for N workers
 
@@ -208,8 +179,8 @@ flowchart LR
 | Surface | What |
 |---|---|
 | Studio | **Agents › Plugins** — the registry: every plugin (core, tool, simulator, MCP), its task types with their manifests and versions, its skills and flows, enabled or not, who may call them, how often they run |
-| CLI | `invana plugins list` · `show <plugin>` · `enable <plugin>` · `disable <plugin>` · `invana worker` · `invana plugins mcp add <url> --name <name>` · `mcp refresh <name>` ([13.13](../for-developers/modules/platform/features/mcp-plugins.md)) |
-| API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's page reads `GET …/catalogue/{step_key}` ([the-catalogue](../for-developers/modules/workflows/features/the-catalogue.md)) · [13.12](../for-developers/modules/platform/features/tool-plugins.md) · `POST /plugins/mcp` · `/plugins/mcp/{name}/refresh` — [13.13](../for-developers/modules/platform/features/mcp-plugins.md) |
+| CLI | `invana plugins list` · `show <plugin>` · `enable <plugin>` · `disable <plugin>` · `invana worker` · `invana plugins mcp add <url> --name <name>` · `mcp refresh <name>` ([ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) |
+| API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's page reads `GET …/catalogue/{step_key}` ([AG-F06](../../specs/products/agents/features/AG-F06-plans-and-functions/feature.md)) · [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) · `POST /plugins/mcp` · `/plugins/mcp/{name}/refresh` — [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) |
 | Access | Only an install Admin enables a plugin; worlds and guardrails decide which agents may call its task types |
 
 ## 10. Changes to existing docs, applied when B06 lands
@@ -225,6 +196,4 @@ flowchart LR
 
 | Item | Where |
 |---|---|
-| procrastinate vs Dramatiq vs Prefect | Decided by the B14 benchmark: procrastinate — [13.11 Distributed execution](../for-developers/modules/platform/features/distributed-execution.md) |
-| Third-party plugin packages outside the engine | Later — plugins live in-engine for now |
-| Hot-loading plugins without a restart | Not building — the registry is frozen per process |
+| procrastinate vs Dramatiq vs Prefect | Decided by the B14 benchmark: procrastinate — [runtime](../../specs/system-design/runtime.md) |

@@ -1,5 +1,5 @@
 /**
- * The one list contract (docs/for-developers/modules/platform/features/list-contract.md).
+ * The one list contract (specs/system-design/api-and-cli.md § One list contract).
  * Every list endpoint answers a `Page`; `total` and `unfiltered_total` are the
  * engine's counts — Studio shows them and never counts `items`.
  */

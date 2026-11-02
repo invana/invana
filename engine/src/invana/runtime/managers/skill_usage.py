@@ -11,7 +11,7 @@ badge in Studio distinguishes.
 
 **Everything here is per version.** A step records the version it was offered
 (SK3), so a count belongs to one published text: *offered 40, applied 31* is a
-claim about v3, and v4 starts its own ([US3](docs/for-developers/modules/skills/features/usage.md)).
+claim about v3, and v4 starts its own (specs/products/agents/features/AG-F04-skills/feature.md § Decisions).
 Nothing is accumulated in a counter — the numbers are derived from the record on
 every read (US2).
 """

@@ -52,6 +52,14 @@
 		"packages/projects": {
 			"project": ["src/**/*.{ts,tsx}"],
 			"includeEntryExports": true
+		},
+		"packages/platform": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
+		},
+		"packages/activity": {
+			"project": ["src/**/*.{ts,tsx}"],
+			"includeEntryExports": true
 		}
 	}
 }

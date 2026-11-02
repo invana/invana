@@ -349,6 +349,7 @@ const PATH_MODULES: Record<string, string> = {
 	"agents/performance": "agents",
 	"agents/settings": "agents",
 	"activity/runs": "runs",
+	activity: "activity",
 	projects: "projects",
 	iam: "iam",
 };

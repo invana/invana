@@ -1,5 +1,5 @@
 /**
- * Agents › Runs and the run page (the-run-page.md): the list's tiles and its
+ * Activity › Runs and the run page (the-run-page.md): the list's tiles and its
  * state tab ride `?f.state=`, a filter matching nothing offers *Clear all*, a
  * run opens on its page with its tab in `?tab=`, and a run nobody can open
  * reads *not found*.
@@ -11,7 +11,7 @@ import { expect, test } from "@playwright/test";
 import { graphApi } from "./api";
 import { GRAPH } from "./explorer";
 
-const RUNS = `${GRAPH}/agents/runs`;
+const RUNS = `${GRAPH}/activity/runs`;
 
 test("Runs shows its tiles and the Live tab filters through the URL", async ({
 	page,

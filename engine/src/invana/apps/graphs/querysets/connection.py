@@ -43,7 +43,7 @@ class GraphConnectionQuerySet:
         encryption_key: str,
     ) -> GraphConnection:
         auth_encrypted = encrypt_credentials(data.auth, encryption_key) if data.auth else None
-        # A manually-declared version (docs/for-developers/modules/graph-connectors/features/capabilities.md) is stored
+        # A manually-declared version (specs/system-design/modules/graph-connectors.md § Capabilities) is stored
         # as a fallback; a successful
         # auto-detect on connect overrides it (see GraphConnectionManager._persist_version).
         declared = (data.server_version or "").strip() or None
@@ -195,7 +195,7 @@ class GraphConnectionQuerySet:
         compatibility_status: str,
     ) -> bool:
         """Persist the detected/declared server version + compatibility
-        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+        (specs/system-design/modules/graph-connectors.md § Capabilities).
 
         Resets ``version_acknowledged`` whenever the version actually changes — a new
         version must be re-acknowledged. Returns ``True`` when the version changed.

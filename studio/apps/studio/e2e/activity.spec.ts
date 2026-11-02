@@ -3,12 +3,16 @@ import { askForRun } from "./api";
 import { GRAPH } from "./explorer";
 
 /**
- * Activity is the shell's page on a Graph: six tabs, each a path, the bell in
- * the header as the way in. A row of its Runs journal opens the run's page in
- * Agents › Runs, where every run is read.
+ * Activity is a Graph product: its rail is Runs · Approvals · Ledger │
+ * Schedules · Events · Inbox · Rules · Channels, each a path and a workbook
+ * tab, and the bell in the header is a way in. A row of Runs opens the run's
+ * page as a tab beside it.
  */
 
-test("the bell opens the tray, the tray opens the Inbox, and each tab is a path", async ({
+const rail = (page: import("@playwright/test").Page, item: string) =>
+	page.locator(`button[aria-label="${item}"]`);
+
+test("the bell opens the tray, the tray opens the Inbox, and each rail item is a path", async ({
 	page,
 }) => {
 	await page.goto(GRAPH);
@@ -25,19 +29,22 @@ test("the bell opens the tray, the tray opens the Inbox, and each tab is a path"
 		page.getByText(/^(Nothing needs you|\d+ needs? you)$/).first(),
 	).toBeVisible({ timeout: 30_000 });
 
-	await page.getByRole("tab", { name: "Channels" }).click();
+	await rail(page, "Channels").click();
 	await expect(page).toHaveURL(`${GRAPH}/activity/channels`);
-
-	await page.getByRole("tab", { name: "Events" }).click();
+	await rail(page, "Events").click();
 	await expect(page).toHaveURL(`${GRAPH}/activity/events`);
-	await page.getByRole("tab", { name: "Runs" }).click();
+	await rail(page, "Runs").click();
 	await expect(page).toHaveURL(`${GRAPH}/activity/runs`);
 	await expect(
 		page.getByLabel("Breadcrumb").getByText("Runs", { exact: true }),
 	).toBeVisible();
+	// Each section the rail opened is a workbook tab; closing one moves to the last.
+	await expect(page.getByRole("tab", { name: "Channels" })).toBeVisible();
+	await page.getByRole("button", { name: "Close Runs" }).click();
+	await expect(page).toHaveURL(`${GRAPH}/activity/events`);
 });
 
-test("a journal row opens its run's page in Agents, and it survives a reload", async ({
+test("a Runs row opens its run's page in Activity, and it survives a reload", async ({
 	page,
 }) => {
 	// A query of its own, so its row is this test's and nobody else's.
@@ -50,15 +57,14 @@ test("a journal row opens its run's page in Agents, and it survives a reload", a
 		.first()
 		.click({ timeout: 30_000 });
 	await expect(page).toHaveURL(
-		new RegExp(`${GRAPH}/agents/runs\\?page=run%3A[^&]+`),
+		new RegExp(`${GRAPH}/activity/runs\\?page=run%3A[^&]+`),
 	);
 	const url = page.url();
 	await expect(page.getByRole("tab", { name: "Overview" })).toBeVisible({
 		timeout: 30_000,
 	});
-	// The run page's own tabs; Activity's strip is not there.
+	// The run page's own tabs, beside the Runs section's tab.
 	await expect(page.getByRole("tab", { name: "Ledger" })).toBeVisible();
-	await expect(page.getByRole("tab", { name: "Inbox" })).toHaveCount(0);
 
 	await page.reload();
 	await expect(page).toHaveURL(url);

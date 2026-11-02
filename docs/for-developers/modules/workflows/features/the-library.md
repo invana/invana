@@ -15,62 +15,7 @@ published version is immutable, so the runs that used it stay readable.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [plan-selection](plan-selection.md) · [promote-a-plan](promote-a-plan.md) · [run-a-workflow](run-a-workflow.md) |
 
-> **As** someone whose agents keep doing the same job, **I want** the good version of that job saved
-> and named, **so that** it is selected rather than reinvented every run.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Workflows listed with their intent | The intent is what selection matches on |
-| C2 | Versions per workflow | Published · retired |
-| C3 | Immutable published versions | Changing publishes a new one |
-| C4 | Diff against the previous version | Steps added, removed, reordered; argument changes |
-| C5 | Usage | Which agents selected it, and which task_runs ran it |
-| C6 | Retire a version | Not selected again; existing runs still resolve |
-| C7 | Export as YAML | For review in a pull request, not as a second source of truth |
-| C8 | Where it came from | Generated, packaged, or promoted from a run — never drafted ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS2 · IS3) |
-| C9 | Origin is shown | `packaged` · `generated` · `promoted`; `authored` on older rows reads as it is. Invana's own plans are listed here too ([F9](../spec.md)) |
-| C10 | A published version is startable from its row | `Run` — the doorway is [7.5](run-a-workflow.md); this feature owns the list it sits on |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Library] --> B[A workflow · intent · current version]
-    B --> C{What do you want?}
-    C -->|read it| D[Steps and their arguments]
-    C -->|what changed| E[Diff v1 → v2]
-    C -->|who uses it| F[Agents · task_runs · last served]
-    C -->|stop using it| G[Retire the version]
-    G --> H[Not selected again · past runs resolve]
-    D --> I[Export YAML for review]
-```
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| A version in flight | Retiring it does not stop running task_runs |
-| No usage | Listed as never selected, which is itself a signal |
-| Two workflows with the same intent | Both listed; selection picks by closeness and records which |
-| Retired everything | The intent falls back to generation, and the plan says so |
-
-## Surfaces
-
-| Surface | Shape |
-|---|---|
-| **Plans** drawer | The second drawer of the **Tasks** stack ([G33](../../../building-studio/graph-detail-page.md)), with its own search and filter. Name · intent · origin badge · version · used by · last served · `Run`. Filters: origin · kind |
-| Plan detail | Behind the Plans drawer's breadcrumb, it says what the plan **is**, and the page says how it behaves ([LB22](#decisions)). A `RecordHeader` naming the version — `nl-query@5` · `v5` · `published` — then four bands in this order: **The plan** (`key` · `origin` · `tasks` as `9 · 8 callables, 1 human` · what it `matches` · the bands it `engages`, as chips · `owner` · the agents that **may run** it) · **How it has behaved** (a 30-day runs sparkline, then `runs` · `served` · `p50` · `last run`, which links to that run) · **Used by** (the callers that inline it, each with what it tuned) · **Versions** (each version, what it changed, and its served rate). The footer holds `Run…` · `Retire…`. Drawn on every board of [The Plan Page](https://claude.ai/artifact/Pt7EHjT74GcDxpiQ3LDwy3) |
-| Library row | `key@version` · the origin badge · what it is for · **the bands it will engage** · then *used by N callers*, or how often it ran where nothing inlines it. The spine is not chipped: every plan is dispatched by the runtime |
-| **The plan page** | One `mainSection` page, `board.kind = plan_runs` ([CV12](../../explore/features/boards.md)). Under the pagehead: a tab strip, **Overview · Layers · Flow · Activity** ([LB24](#decisions)), with the `7 days ¦ 30 days ¦ 90 days` window on the right of the strip. Every number on the page is read over that window |
-|  — **Overview** | The default ([LB33](#decisions)). Six tiles: runs · served · elapsed p50 · work p50 · cost per run · failed. Then **Runs a day** (served and failed, stacked), **Work p50, a day** (with each version's publish marked), **Each step, across N runs** (one row per step, and one per gate once the runtime has one: layer · ran in · p50 · p95 · failed · retried · cost/run · share of work), **Where it fails** and **Bounds it reaches**. Picking a step opens a card with its p50 · p95 · failed, where it is slow, and its slowest runs (`…overview.step`). A plan that has never run shows an empty state and the steps with nothing measured (`…overview.never_run`) |
-|  — **Layers** | The `gantt` block on `scale: "seq"`: all five governed layers as rows, open, each step a dashed bar carrying its p50. Bounds are brackets and gates are seams ([LB17](#decisions) · [LB31](#decisions)) |
-|  — **Flow** | [`TaskFlowCanvas`](../../../building-studio/task-flow-canvas.md), read-only. Each node carries its **medians, not a status**, because nothing ran *here* ([LB35](#decisions)). A node whose p95 is 4× its p50 or more is ringed; a step that runs in fewer than a quarter of runs is dim. Picking a node opens a card with its contract and how it has performed (`…flow.step`) |
-|  — **Activity** | Every run that used this plan, newest first ([LB34](#decisions)): run · asked · called by · agent · status · elapsed · cost · when. Tiles above the table: running now · at a gate · called by · agents. Filters: status · called by · agent · version. A failed row names the step it failed at and why (`…activity.failed`). A row opens [the run page](../../operate/features/see-what-ran.md) |
-| The acts, and the artboard each opens | Tabs → `…detail.overview` · `…detail.layers` · `…detail.flow` · `…detail.activity` on [The Plan Page](https://claude.ai/artifact/Pt7EHjT74GcDxpiQ3LDwy3) · `Run…` → [7.5](run-a-workflow.md). `⋯` on the plan page's header carries `Versions` → `…detail.versions` · `Arguments` → `…detail.arguments` · `Export YAML` → `…detail.export`, each opening its own page beside the plan's ([LB38](#decisions)). `Ceilings` → `…detail.ceilings` and the drawer's `Run…` · `Retire…` → `…detail.retire` are not drawn yet ([LB38](#decisions) · [LB25](#decisions)) |
-| Main area | The steps drawn (`kind = workflow`), with the diff beside them |
-| Version bar | Versions with what changed and how each fared |
+Product spec: [AG-F06 · Plans and functions](../../../../../specs/products/agents/features/AG-F06-plans-and-functions/feature.md) — AG-18 · AG-31; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 
@@ -121,17 +66,10 @@ flowchart TD
 
 ## Decisions
 
+Engine and drawing rows; the product decisions are AG-F06's.
+
 | # | Decision |
 |---|---|
-| LB1 | A published version is immutable. |
-| LB2 | Retiring stops future selection, never a running run. |
-| LB3 | Every version records its origin: **packaged**, generated, or promoted from a run ([F9](../spec.md)). |
-| LB4 | YAML export is for review, not for round-tripping edits. |
-| LB5 | **The library is the reusable plans, and origin is a badge on the row.** `packaged` · `generated` · `promoted` are three ways a row got here, not three lists — filtering by origin is one chip. |
-| LB6 | **A generated one-off plan is not listed.** It belongs to its Todo (`flows.todo_id`), and it is read from the run that ran it — browsing plans that can never be selected again would make the library a log. Promotion ([7.4](promote-a-plan.md)) is how one enters this list, and that is the only door. |
-| LB8 | **Nobody edits a library plan.** There is no *New plan*, no draft and no plan editor ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3). A published version is immutable; a new version arrives packaged or promoted, and the old one stays readable. |
-| LB10 | **A plan's board answers *how has it behaved*, not *what is it*.** What it is, is the flow; how it has behaved is the aggregate over its runs — succeeded 12 of 14, p50 4.9s against p95 31s, the median minute spent held on `announce`. Both live on one board because choosing to run a plan needs both. |
-| LB9 | **Retire is a version-level act with a plan-level shortcut.** Retiring a version stops it being selected and startable; retiring every version takes the plan out. Neither stops a run in flight, and both leave existing traces resolvable. |
 | LB11 | **Seeded means populated, not present.** A plan *is* its rows, so a library row with no Tasks is not a plan anybody can read or run. `ensure_seeded` therefore matches on identity *and* on having nodes: a row carrying a builtin's key and version but no Tasks is re-exploded from the registry rather than skipped. This is what makes migration `000000000038` safe — it carries the library across and drops `spec`, and the rebuild it relies on can only happen if *exists* and *exists and is populated* are told apart. |
 | LB12 | **The registry seeds; the rows execute.** `resolve_plan` reads `flows` + `tasks` for the Graph — it never calls `template_for`. The registry is the *seed source* for builtins and nothing else, and `ensure_seeded` ([LB11](#decisions)) is the only bridge between the two. This is what makes *a plan is its rows* one sentence instead of two: before it, the library was true for reading and false for running, `TaskRun.task_id` could not be populated from the runtime, and a `plan_snapshot` froze a copy of a dict rather than a copy of the plan anybody could open. |
 | LB13 | **A builtin's rows are read-only because they are live.** Once rows execute ([LB12](#decisions)), editing a builtin row would edit execution, so the library renders `origin = builtin` versions as read-only and nothing writes them ([LB8](#decisions)). What a builtin does changes when Invana ships its next version. Re-seeding overwrites a builtin's rows on a version bump and never merges. A packaged version's **description** is the package's text: every seed rewrites it on an existing row, so an edited description reaches Graphs seeded before the edit without a version bump. |
@@ -160,24 +98,12 @@ flowchart TD
 | LB38 | **`⋯` opens the readings that are not tabs, each as its own page.** The plan page keeps its four tabs ([LB24](#decisions)) because they are one question — *how does it behave* — read four ways. Versions, Arguments and Export YAML answer other questions — *what changed*, *what a caller may tune*, *what the engine holds* — so they sit behind `⋯` on the page's header and each opens a page tab beside the plan's (`plan_versions` · `plan_arguments` · `plan_export`, titled `nl-single@2 · versions`), the way a run row opens its run page. A page is a link and survives a reload; a fifth tab or a board inside the 420px drawer would be neither. **Versions** lists every version with what changed ([LB37](#decisions)) and how it fared, and picking one shows its diff against the one before, field by field. **Arguments** lists what the plan declares (name · type · default · what it decides) and who has tuned each, beside the plan's default and *a plan run on its own*, which reads the defaults ([LB19](#decisions)). **Export YAML** shows the version as `GET …/export` returns it, read-only, with `Copy` and `Download .yml`. The document carries the plan's declared arguments as a top-level `args` beside its `steps`, because a step's `${args.read_only}` names that declaration and an export without it is a different plan. None offers `Save report`: each is a record, not a reading over a window. **Not drawn yet**, rather than drawn disabled: `Run…` is [7.5](run-a-workflow.md), in slice S15, and a plan has no retired state for `Retire…` to write. `Ceilings` waits on a read that gathers them, and on the runtime honouring the ones it would list — `loop` and approvals are stored and not executed ([LB31](#decisions)). |
 | LB39 | **A plan's page is a report; its `⋯` pages are not.** The plan page reads a changing subject over a window — runs arrive, the window slides, a version is published — so *how `nl-single@2` behaved in the thirty days before v3* is a reading nobody can rebuild later, which is what a report keeps ([B6 · B11](../../../building-engine/boards-migration.md)). Its header carries `Save report` and `Reports` like the run, skill-usage, rule and lens pages, and a kept reading freezes the version, the window and the tab it was read on: the frozen document holds every tab's rows, and it opens on the tab that was showing, because a frozen page answers no action ([B22](../../../building-engine/boards-migration.md)). Its two charts are registered with the panels every frozen report draws from, so a kept plan reading draws them. Versions, Arguments and Export YAML ([LB38](#decisions)) are records of an immutable version, so keeping one would copy a document that is always there. |
 | LB26 | **An artboard draws only what a user would see.** No annotation cards, no rationale panels, no decision ids on the drawing — a reviewer reads the artboard beside this file, and the argument lives here. Copy a user really reads is UI and stays: an empty state's instruction, a refusal's reason, a confirm card's consequences. So a **state is drawn as the UI shows it** — a struck row, a dimmed act, a task marked `unknown` — never as a table explaining the state. This replaced nine explainer cards on this page with four list rows and two panels, which is also the honest test: if removing the notes leaves an artboard empty, it was never drawing a screen. |
-| LB16 | **The library lists `reusable: true` and nothing else, because a Flow has exactly one owner** — see the table below. A library is a set of things you can *select*; a skill's plan is *granted by binding* and a Todo's is *drafted for one question*, so listing either would make *what can I run* unanswerable. A row does name the skill that owns it when one does, which is how the two stay legible without being merged. |
+| LB40 | **The packaged count is the engine's.** `GET …/workflows` returns `packaged` beside `total` — the listed plans whose `origin` is `packaged` — and the section header's `6 · 3 packaged` is those two numbers. |
+
+Which plan rows the library lists — a Flow has exactly one owner:
 
 | Owner | How you tell | Reached from |
 |---|---|---|
 | **The library** | `reusable: true`, `key` set, no `todo_id` | the **Library › Plans** drawer |
 | **A Todo** | `todo_id` set, `origin: generated` | the run that ran it — never browsable |
-| **A skill version** | `skill_versions.plan_id` points at it | the skill's **Flow** tab ([LB7](#decisions)) |
-
-| # | Decision |
-|---|---|
-| LB7 | **A skill's drawing is not listed here either.** Every published skill version *is* a Flow ([orchestration § 0.8](../../../orchestration.md#08-a-skill-drawn-as-a-flow)), but it is edited, versioned and published as a skill — it is read under **Skills**, and this list would show the same row under a second name. |
-| LB40 | **The packaged count is the engine's.** `GET …/workflows` returns `packaged` beside `total` — the listed plans whose `origin` is `packaged` — and the section header's `6 · 3 packaged` is those two numbers. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Importing a workflow from YAML | promotion from a run that served is the authoring path |
-| A *New plan*, drafting a plan, or a plan editor | plans are generated, packaged or promoted ([6.5](../../skills/features/instructions-publish-rollback.md#decisions) IS3) |
-| Cross-Graph sharing | the Graph is the reasoning boundary |
-| Branching versions | one line of versions per workflow is enough to reason about |
+| **A skill version** | `skill_versions.plan_id` points at it | the skill's **Flow** tab |

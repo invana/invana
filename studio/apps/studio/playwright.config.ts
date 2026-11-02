@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * End-to-end tests for Studio (docs/for-developers/modules/platform/spec.md §7a).
+ * End-to-end tests for Studio (docs/for-developers/modules/platform/spec.md §6a).
  *
  * These run against a Studio that is already up, talking to an engine and a
  * real graph database — nothing is mocked (CLAUDE.md rule 7). Start the stack

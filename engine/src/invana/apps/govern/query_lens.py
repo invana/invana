@@ -3,7 +3,7 @@
 A connector knows nothing of addresses, worlds, guardrails or layers. It is
 handed the types it may read, the properties each one keeps, and a predicate
 over the rest
-([the connector contract](docs/for-developers/modules/graph-connectors/features/the-connector-contract.md)).
+([the connector contract](specs/system-design/modules/graph-connectors.md#the-connector-contract)).
 This module is the only place that turns the one into the other
 ([GV32](docs/for-developers/modules/govern/spec.md)).
 
@@ -12,7 +12,7 @@ other two homes works: in the connector, every integration would reimplement the
 grammar and each would be a place enforcement could fail **open**; in the
 runtime, the grammar would sit two bands from the rules it implements.
 
-Two of the three grains of [govern § 2](docs/for-developers/modules/govern/spec.md)
+Two of the three grains of [govern § The one record](specs/system-design/modules/govern.md#the-one-record)
 are carried out here — **property**, as the exclusion a projection is rewritten
 to, and **records**, as the predicate composed into the query. The third,
 **type**, is the allow-list. Nothing is a filter over what came back.
@@ -233,8 +233,8 @@ def _first(decided: Verdict, binding: ModelBinding) -> _Governed:
 def _merge(current: _Governed, decided: Verdict, binding: ModelBinding) -> _Governed:
     """Two models declaring one type — narrowing accumulates, and deny wins.
 
-    The same reading [GV5](docs/for-developers/modules/govern/spec.md) and
-    [GV6](docs/for-developers/modules/govern/spec.md) already give a rule list.
+    The same reading [Model product § Decisions](specs/products/model/product.md#decisions) and
+    [Model product § Decisions](specs/products/model/product.md#decisions) already give a rule list.
     Picking a winner between two bounds is the one resolution that could widen,
     so there is no precedence here: the exclusions union, the selects merge, and
     a denial on either side denies the type.
@@ -284,7 +284,7 @@ def _predicates(select: dict[str, Any], *, axes: dict[str, Any]) -> list[tuple[s
     """The slice, as conditions on the properties the **model** declared.
 
     The model states which property carries valid time and which carries
-    geography ([DM6](docs/for-developers/modules/connect-and-model/features/domain-models.md)),
+    geography ([MO-F01 § Decisions](specs/products/model/features/MO-F01-start-a-model/feature.md#decisions)),
     so that declaration is what a slice compiles against. A rule restating the
     axis is read as documentation, never as a second source of truth — a slice
     that could name its own property would be a query, and the product has one

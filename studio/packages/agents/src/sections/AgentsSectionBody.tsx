@@ -5,17 +5,13 @@
  */
 
 import { AgentsListPage } from "../agents/AgentsListPage";
-import { ApprovalsPage } from "../approvals/ApprovalsPage";
 import { ConnectionsSectionPage } from "../connections/ConnectionsSectionPage";
 import { FleetSectionPage } from "../fleet/FleetSectionPage";
 import { FunctionsSectionPage } from "../functions/FunctionsSectionPage";
-import { LedgerPage } from "../ledger/LedgerPage";
 import { LlmsPage } from "../llms/LlmsPage";
 import { PerformancePage } from "../performance/PerformancePage";
-import { RunsListPage } from "../runs/RunsListPage";
 import { SettingsSectionPage } from "../settings/SettingsSectionPage";
 import { SkillsListPage } from "../skills/SkillsListPage";
-import { WorkersSectionPage } from "../workers/WorkersSectionPage";
 import type { AgentsSectionKey, SectionPageProps } from "./spec";
 
 const PAGES = {
@@ -26,10 +22,6 @@ const PAGES = {
 	functions: FunctionsSectionPage,
 	connections: ConnectionsSectionPage,
 	llms: LlmsPage,
-	runs: RunsListPage,
-	workers: WorkersSectionPage,
-	approvals: ApprovalsPage,
-	ledger: LedgerPage,
 	concurrency: SettingsSectionPage,
 } satisfies Record<
 	Exclude<AgentsSectionKey, "home">,

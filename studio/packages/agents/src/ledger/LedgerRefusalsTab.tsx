@@ -17,8 +17,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
+import { ReadState } from "@invana-studio/shell";
 import { PanelSection } from "@invana-studio/ui";
-import { day, FleetReadState } from "../overview/fleetParts";
+import { day } from "../overview/fleetParts";
 import { CountTable } from "./CountTable";
 import { Act, n } from "./ledgerParts";
 import { useLedgerRefusalsQuery } from "./queries";
@@ -54,7 +55,7 @@ export function LedgerRefusalsTab({
 	const d = read.data;
 	if (!d)
 		return (
-			<FleetReadState
+			<ReadState
 				loading={read.isLoading}
 				error={read.error}
 				what="the refusals"

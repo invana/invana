@@ -262,7 +262,7 @@ export interface GraphConnectionRead {
 	// Explorer's language picker.
 	capabilities: string[];
 	query_languages: QueryLanguage[];
-	// Backend property-type capabilities + version compatibility (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+	// Backend property-type capabilities + version compatibility (specs/system-design/modules/graph-connectors.md § Capabilities).
 	// `supported_property_types` drives the modeller's property-type dropdowns;
 	// the version/compatibility fields drive the read-only safety valve + banner.
 	supported_property_types: string[];
@@ -309,7 +309,7 @@ export interface GraphConnectionCreate {
 	// falsy auth as no-op). On create, send {username, password}.
 	auth: { username: string; password: string } | Record<string, never>;
 	read_only: boolean;
-	// Optional manually-declared DB version (docs/for-developers/modules/graph-connectors/features/capabilities.md) — fallback when the backend
+	// Optional manually-declared DB version (specs/system-design/modules/graph-connectors.md § Capabilities) — fallback when the backend
 	// can't be auto-detected. Auto-detection on connect overrides it; omit/blank
 	// to rely on detection.
 	server_version?: string | null;

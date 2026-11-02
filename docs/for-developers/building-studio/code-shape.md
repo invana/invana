@@ -302,6 +302,10 @@ Project plan, which paint on nothing and simply *are* screens. The costs compoun
 component, one chunk, no per-screen code splitting, a back button that does not work, and a URL that
 cannot be linked to a colleague.
 
+### 5.1a Why the platform workbook is separate
+
+`PlatformWorkbook` (`shell/src/platform`) and the app host's `useSectionTabs` / `useOpenPages` both read `?page=<kind>:<id>`, but they do not share state. The host's tabs sit beside a Graph's canvases and boards and decide what is in front from the path's `panel`, the board page and the canvas last brought forward. A platform product (Fleet, Settings) routes off any Graph: it has no canvases, no board page and no `panel`, only its section and the records opened from it. Folding the two would give the host hook a mode that switches off everything it exists for, so the contract (the `page` param and its `kind:id` value) is the one thing written twice.
+
 ### 5.2 The route map
 
 ```

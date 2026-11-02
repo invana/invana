@@ -1,8 +1,6 @@
 /**
  * What the fleet's pages — Fleet and Performance — draw the same way.
  *
- * - The read's two seams: the kit's spinner line while the fleet is read, and
- *   the engine's own words in an `EmptyState` when it refuses.
  * - The formatters: run time as an elapsed figure, success as a percentage,
  *   tokens as a magnitude, and a change against a prior as an arrow and a
  *   percentage, with the tone the change carries.
@@ -10,38 +8,8 @@
  * Composed from `@invana/ui` and tokens only. Tokens, never currency.
  */
 
-import { EmptyState, Spinner } from "@invana/ui";
 import { formatCompact, formatElapsed } from "@invana-studio/core";
-import { CircleAlert } from "lucide-react";
 import type { Change, FleetMeasure } from "../fleet/types";
-
-/** Loading, or the read's refusal as the engine worded it; null once read. */
-export function FleetReadState({
-	loading,
-	error,
-	what,
-}: {
-	loading: boolean;
-	error: Error | null;
-	/** What is being read — `the fleet`, `performance`. */
-	what: string;
-}) {
-	if (loading)
-		return (
-			<div className="flex items-center gap-2 text-muted-foreground">
-				<Spinner />
-				Reading {what}…
-			</div>
-		);
-	if (!error) return null;
-	return (
-		<EmptyState
-			icon={<CircleAlert className="size-6" />}
-			title={`Could not read ${what}`}
-			description={error.message}
-		/>
-	);
-}
 
 /** A run time in ms, or `—` when nothing settled. */
 export const ms = (v: number | null | undefined) =>

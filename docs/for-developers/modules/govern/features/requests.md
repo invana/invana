@@ -11,51 +11,7 @@ world* or *Model it*.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [guardrails](guardrails.md) (what files most of them) · [worlds](worlds.md) (where *Allow* lands) · [the-model-page](../../connect-and-model/features/the-model-page.md) (where *Model it* lands) |
 
-> **As** a modeller, **I want** one inbox of what people and agents asked to be modelled or allowed,
-> **so that** gaps get fixed, not lost.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| RQ-C1 | Filed where the ask fails | A guardrail refusal, an ask that ends *cannot answer · outside this graph*, and `POST …/requests` (Explorer's *Ask for a change*, the CLI) |
-| RQ-C2 | Repeated asks are one request | The same open ask by the same person or agent adds to `asks`, never a second row |
-| RQ-C3 | Three resolutions | *Decline* · *Allow in a world* (a guardrail request) · *Model it* (any other) |
-| RQ-C4 | Open count on the rail | The Requests icon carries the engine's open count |
-
----
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[Modeller clicks Requests on the rail · badge N] --> B{Any requests?}
-    B -- none --> E[Empty: Nothing asked yet — refusals and unanswered asks land here]
-    B -- yes --> C[Open group · Done group folded]
-    C --> D{Request kind}
-    D -- guardrail --> F[Decline · Allow in a world]
-    D -- unanswered / change --> G[Decline · Model it]
-    F -- Allow in a world --> H[Pick a world in a dialog] --> I[Guardrail allowed_in += world · request done]
-    G -- Model it --> J[New model dialog, described by the ask] --> K[Draft created · request done, modelled]
-    F -- Decline --> L[Request done, declined]
-    C -. no modeller role .-> M[Rows read-only · no acts]
-    C -. a guardrail row's blocker .-> N[Opens the guardrail with the request bar]
-```
-
----
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| Loading | The page head and two group skeletons |
-| Nothing asked yet | *Nothing asked yet — refusals and asks the Graph could not answer land here* |
-| No modeller role | Rows without *Decline* · *Allow* · *Model it* |
-| Allow on a request whose guardrail was deleted | Refused: *its guardrail is gone* — decline it instead |
-| The world picked was deleted meanwhile | Refused naming the world |
-| Resolved by someone else first | 409 *already resolved*; the list re-reads |
-
----
+Product spec: [MO-F05 · Views of the graph and what must always hold](../../../../../specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -95,22 +51,4 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| RQ1 | **A request is filed by the engine where the ask fails**, never by Studio deriving it from a run: a guardrail refusal in `graph.read.query`, a *cannot answer · outside this graph* when the run was asked by a person or an agent (not an eval or a test). |
-| RQ2 | **The same open ask is one request.** Matched on Graph, kind, the asker (person or agent) and the ask's text; `asks` counts, `last_asked_at` moves. |
-| RQ3 | **Allow in a world edits the guardrail**, not the world: a world narrows within the guardrails and cannot widen one, so the exception lives on the guardrail ([GR21](guardrails.md#decisions)). |
-| RQ4 | **Model it opens New model described by the ask**; creating the draft resolves the request as *modelled* with the model. |
-| RQ5 | **Resolving needs the `modeller` role**; every member reads the inbox. |
-| RQ6 | **The open count is the engine's** — `RequestPage.open` — never a count of the listed rows. |
-| RQ7 | **Done rows say what was done** — `declined`, `allowed in EU · H1 2026`, `modelled in Fares` — from `resolution_note`, written by the engine at resolve. |
 | RQ8 | **The run loop files, not the task.** `graph.read.query` raises *cannot answer* carrying the connector's refusal (code · type · property); the loop names the Graph guardrail that holds the property — the one whose access makes that refusal (*never* for an excluded property, *counts* for counts only), the most specific target first, so `Deal.price` outranks `*.price` — and files a `guardrail` request naming it, or an `unanswered` one when no guardrail holds it. The query service lets a lens refusal through unwrapped, so it never reads as a failed query. |
-
----
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Explorer's *Ask for a change* button | Explorer's surface (`explorer.answer.guardrail`); the route is here and the button lands with Explorer's phase |
-| Assigning a request to a person | one inbox for the Graph's modellers; the event names who resolved it |
-| Reopening a done request | asking again files a new one |
-| Notifications per request | the rail badge carries the count |

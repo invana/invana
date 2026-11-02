@@ -1,4 +1,4 @@
-"""The task status machine and dependencies (docs/for-developers/modules/work/spec.md), against a real Postgres.
+"""The task status machine and dependencies (specs/system-design/modules/work.md), against a real Postgres.
 
 What is worth testing here is the governance, not the CRUD: an agent posts a
 result and a human accepts; a dependency blocks and then releases with the

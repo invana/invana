@@ -4,12 +4,6 @@ Every agent in the Graph, what it carries, and what it is doing right now. Autho
 template, offering it skills, setting its standing limits, and — if anyone wants to — its thinking
 and its voice.
 
-**An agent binds no provider and no world.** It carries **standing limits** — an **envelope** (what it
-may run), **effort**, a **budget** and **reach** — and optionally a **guardrail** of its own. The world
-— what a piece of work may see, use and send, whose `cast` names the model — comes with the work: the
-session, the Todo, the schedule ([AG24](#decisions) · [PM1](providers-and-models.md) ·
-[GV10](../../govern/spec.md)).
-
 | | |
 |---|---|
 | Index | [5.2](../../../README.md#5--agents) · Slice **S12c** |
@@ -17,145 +11,7 @@ session, the Todo, the schedule ([AG24](#decisions) · [PM1](providers-and-model
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [lifecycle](lifecycle.md) · [bindings](../../skills/features/bindings.md) |
 
-> **As** someone running work through agents, **I want** to see them all with what each can do, **so
-> that** assigning a task is a choice and not a guess.
-
-## Capabilities
-
-| # | Capability | Notes |
-|---|---|---|
-| C1 | Author an agent from a template | The template brings an envelope; there is no unbounded agent |
-| C2 | Give it a guardrail of its own | Optional. A restriction that holds whoever asks — *nothing leaves*. A guardrail scoped `agent:<id>` ([AG10](#decisions)) |
-| C3 | Offer it skills | From the Graph's set, by binding |
-| C4 | Set budget and policy | What it may spend, and what happens at the ceiling |
-| C5 | One Graph default | The agent a session or a task uses when none is named |
-| C6 | Kinds are visible | Authored · seeded · spawned, each with its own row treatment |
-| C7 | Current state at a glance | Active · paused · retired, with what it is running |
-| C8 | Filter by kind, status, ephemeral | The list stays readable as it grows |
-| C9 | Read the cast a run would use | `role → model address → why this one`, resolved from the work's world, the guardrails' casts and the shipped default — never stored on the agent |
-| C10 | Spend against its ceiling, on the row | `$1.84 of $40.00 this month` — before the ceiling is reached, not after |
-| C11 | See how the bounds nest | `effective = agent ∩ plan ∩ todo`, stated on the panel so a refusal is predictable |
-| C12 | **What this agent can do, as two linked tables** | Its **skills** (how it approaches work) and its **callables** (what its envelope lets it run), each row naming the other — [below](#what-this-agent-can-do) |
-| C14 | **How it thinks: effort and a default stance** | Two settings, not one — *how much* it tries and *which way*. Neither is the soul — [below](#how-it-thinks) |
-| C13 | **Voice dials** | Humour · formality · emoji · greeting, picked from a list rather than written out. Part of the [soul](soul.md): they reach the same steps and no others — [below](#voice-dials) |
-
-## Journey
-
-```mermaid
-flowchart TD
-    A[New agent] --> B[Pick a template]
-    B --> C[Envelope comes with it]
-    C --> D[Guardrail of its own · optional]
-    D --> E{Any models configured?}
-    E -->|no models configured| F[Says so, links to Agents › LLMs]
-    E -->|yes| G[Bind skills]
-    G --> H[Budget · policy]
-    H --> TH[Thinking: effort · default stance · optional]
-    TH --> V[Voice dials · optional]
-    V --> I[Active · appears in assignee pickers]
-    I --> J{First agent in the Graph?}
-    J -->|yes| K[Offered as the Graph default]
-```
-
-## What this agent can do
-
-An agent is customised for a purpose by four levers, and none of them is a new object: a **template**
-(the starting envelope), the **skills** bound to it, the **callables** its envelope allows, and the
-**world** it works in. The agent panel draws the middle two as one section, because they depend on
-each other — a skill's plan names callables, and a skill whose plan needs a callable the envelope
-lacks cannot do its job ([BN5](../../skills/features/bindings.md#decisions)).
-
-**Skills — how it approaches work**
-
-| Column | Holds |
-|---|---|
-| Skill | name, linked to the skill |
-| Version | the current one — a binding does not pin ([BN6](../../skills/features/bindings.md#decisions)) |
-| When to use | the skill's trigger, as written |
-| Needs | the callables the current version's plan names, `uses` inlined — derived, never typed ([AG15](#decisions)) |
-| Offered / applied | from [usage](../../skills/features/usage.md), per version; *too few to read* below the threshold |
-
-**Callables — what it may run (the envelope)**
-
-| Column | Holds |
-|---|---|
-| Callable | `step_key` from the catalogue — `run_query` · `search_web` · `fetch_source` · `delegate` … |
-| Bound | the one bound it spends, as a `BoundChip` |
-| Pinned arguments | the arguments fixed for this agent, or `—` ([envelope § A pinned argument](envelope-and-budget.md#a-pinned-argument)) |
-| Needed by | the bound skills whose plan names it, and the base plans the Graph runs asks with |
-
-| Reading | What the user sees |
-|---|---|
-| A skill needs a callable the envelope lacks | The **Needs** cell marks it, naming the callable — before any run is refused |
-| A callable nothing needs | **Needed by** reads *nothing bound* — allowed, and a candidate for tightening ([EB5](envelope-and-budget.md#decisions)) |
-| No skills bound | The skills table says the agent runs on the Graph's base plans alone |
-
-## How it thinks
-
-Two settings shape how an agent works a question, and they vary independently: **effort** is how
-much it does ([EB9](envelope-and-budget.md#decisions)), a **stance** is which way it goes about it
-([act as](../../ask/features/act-as.md)). A low / medium / high knob can say *tries harder*; it
-cannot say *questions its premises* against *acts on the likely reading* ([AG21](#decisions)).
-
-| | **Low effort** — `max_clarifications 1` · `max_replans 0` | **High effort** — `max_clarifications 5` · `max_replans 3` |
-|---|---|---|
-| **First-principles stance** | breaks the ask into its claims and questions the premises, but gets one question and one pass — the rest become declared assumptions | breaks it down, asks until each premise is settled, replans when evidence contradicts one |
-| **Decisive stance** | takes the likely reading and answers in one pass | still acts without asking, but replans and verifies more before it commits |
-
-| Setting | Decides | Where it bites |
-|---|---|---|
-| `effort.max_clarifications` | the **ceiling** — how many questions it *may* ask | `understand`, enforced |
-| The stance | **whether an ambiguity is worth a question at all** — and the method, stated as assumptions | `understand` · `plan` · `project` · the ledger in `verify` ([act as § 2](../../ask/features/act-as.md#2-where-a-stance-bites--and-where-it-must-be-inert)) |
-
-A stance is needed only when the **method** differs. Two agents that differ only in *asks a lot* and
-*never asks* differ in effort alone.
-
-### A worked pair
-
-| Layer | **Questioner** | **Decider** |
-|---|---|---|
-| Effort | `max_clarifications 5` · `max_replans 3` · `max_steps 32` | `max_clarifications 0` · `max_replans 1` · `max_steps 12` |
-| Default stance | *First principles* — reduce the ask to the claims it rests on; question each premise; ask when two readings reach different records | *Decisive* — take the most likely reading, declare it as an assumption, act; ask only when a wrong reading would change the records |
-| Soul · dials | curious, probing · `humour: off` | crisp, confident · `formality: casual` |
-| Instructions | the domain it works in — the same for both | |
-
-The Decider never guesses silently: with `max_clarifications 0`, every reading it picks is a declared
-assumption in the ledger, shown before the answer ([AA4](../../ask/features/act-as.md#decisions)).
-
-## Voice dials
-
-Four settings a person picks rather than writes. They are the [soul](soul.md) in structured form:
-they reach only the steps whose words a person reads, and they cannot change a query, a plan, a lens or
-a refusal ([SO2](soul.md#decisions)).
-
-| Dial | Values | Default — Invana's voice |
-|---|---|---|
-| `humour` | `off` · `light` · `playful` | `light` |
-| `formality` | `casual` · `neutral` · `formal` | `neutral` |
-| `emoji` | `off` · `on` | `off` |
-| `greeting` | `off` · `on` | `off` |
-
-Anything the dials cannot say — *end with a crop pun*, *call the reader "farmer friend"* — is written in
-the soul's Markdown, which is read after the dials and wins where they disagree ([AG16](#decisions)).
-
-## Seams
-
-| Seam | What the user sees |
-|---|---|
-| No provider configured at all | Named, with the link to `Agents › LLMs`; the agent saves and says its cast resolves to nothing |
-| A run's cast names a deleted model | Blocked **before the run starts**, naming the model and the world or guardrail that cast it |
-| Its guardrail is deleted | The restriction lifts from the next run; deleting a guardrail needs the guardrail permission ([GR5](../../govern/features/guardrails.md)) |
-| A bound skill deleted | The binding drops; the agent keeps working |
-| Retiring the Graph default | Refused until another is made default |
-| A spawned agent in the list | Nested under its parent, marked ephemeral |
-| Name already used | Refused, naming the existing agent |
-| Budget approaching its ceiling | The meter on the row, before it is reached |
-| A bound skill needs a callable the envelope lacks | Marked on the skill's row, naming the callable, with *Edit envelope* |
-| A refusal, an error, a budget pause | Spoken with `humour` at `off`, whatever the dial says ([AG17](#decisions)) |
-| No dial touched | The defaults — Invana's voice; the tab says so, like an empty soul does |
-| No default stance | *No stance* on the page — the un-stanced path, exactly as today ([AA7](../../ask/features/act-as.md#decisions)) |
-| The asker picks another stance, or none | That run uses it; the agent's default is untouched ([AA9](../../ask/features/act-as.md#decisions)) |
-| Its default stance is deleted | Refused — `agents.stance_id` is `ON DELETE RESTRICT`, naming the agents, like a lens ([AG20](#decisions)) |
+Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-21 and AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -200,29 +56,11 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 
 | # | Decision |
 |---|---|
-| AG1 | Every agent is authored from a template, and every template carries an envelope. |
-| AG2 | **An agent binds no provider and no world.** It carries **standing limits** — an envelope, effort, a budget, reach — and optionally a guardrail of its own. What a run may see, use and send, and the `cast` that names its models, come with the work that starts it ([AG24](#decisions) · [PM1](providers-and-models.md) · [GV10](../../govern/spec.md)). |
-| AG3 | **One default agent per Graph, always set, and it answers asks.** The default is what every Explorer session that names no agent binds, so it must be an agent whose envelope allows `execute_graph_query`; making the Modeller the default is refused with a 409. A default that cannot answer, however it was stored, is passed over for the seeded Explorer ([WQ5](../../ask/features/write-queries.md#decisions)). |
-| AG4 | Skills reach an agent only through a binding. |
 | AG5 | **Work that names no world runs in *Everything*, never in a blank.** *Nothing set* and *nothing permitted* must never look alike ([GR6](../../govern/features/guardrails.md)), and the widest state is still inside the guardrails — the Graph's and the agent's own. |
-| AG6 | **A refusal names which side bound it** — the agent's standing limits, the work's world, or a guardrail. Effective bounds are the three intersected, so a refusal that named only the result would not say whom to ask. |
-| AG7 | **A standing restriction is composed into every run the agent opens, whoever starts it.** The agent's guardrail joins the Graph's in `freeze_lens` on a session's ask, a Todo, a schedule and a delegated child alike — a restriction that held only when somebody remembered it would restrict nothing. |
-| AG11 | **The meter is tokens, against the month budget.** An agent's row and its Activity strip read the tokens its runs used this calendar month against `max_tokens_month`, never a currency amount ([EB14](envelope-and-budget.md#decisions)). Tokens are always counted, so an agent with no run reads `0`. The window is the calendar month, because that is the one `max_tokens_month` names — a rolling thirty days would draw a different number from the budget beside it. |
-| AG10 | **An agent's own restriction is a guardrail scoped to it, never a world.** `lenses.kind = guardrail`, `scope = agent:<id>`, edited on the agent's Overview by a member who may edit guardrails ([GR5](../../govern/features/guardrails.md)). A world is picked by the work, and binding one to an agent would make the same Analyst unable to look at the US for the next question. |
 | AG12 | **The word is *agents*, and *roster* is retired.** A drawer is named for the rows it holds, and the rows are agents — the same rule that makes `Projects` › `Projects` and `Skills` › `Skills` read straight ([G33](../../../building-studio/graph-detail-page.md)). *Roster* named the table an agent lands in, and a table's name is not what a person reads, so it is gone from the label, from the drawer id (`?section=agents`), from this file's own slug, and from the engine and Studio comments that carried it. An old `?section=roster` link still lands here: an unknown drawer falls to the first one, and this is the first one. Where *roster* meant the skills an agent carries, the word is **bindings** ([BN8](../../skills/features/bindings.md)) — one word was doing two jobs. |
-| AG13 | **An agent's `instructions` reach its prompts, after the Graph's.** Understand and Translate read `graphs.instructions` and then the agent's own, so one agent can be told *EU carriers only* without the Graph being told. Who the agent *is* is its [soul](soul.md), a separate field that never reaches Translate ([SO5](soul.md#decisions)). |
 
 | AG14 | **What an agent may run is a callable, and the word is *callable*.** The envelope's allowed set is callables from the catalogue ([terminology](../../../terminology.md)); *capability* stays the name of a feature file's section, so one word does not do two jobs. |
-| AG15 | **A skill's needs are derived from its plan, never declared beside it.** Every skill version has exactly one plan ([SK13](../../skills/features/authoring-a-skill.md#decisions)), and that plan already names its callables; a hand-typed list would drift from it on the next publish. |
-| AG16 | **Voice dials are the soul in structured form, stored beside it.** `soul_traits` reaches exactly the steps `soul` reaches, is versioned with the agent, and is read before the Markdown so a sentence can override a dial. They are not a second persona and not a stance — a dial changes wording only. |
-| AG17 | **Humour is off wherever something went wrong.** A refusal, a cannot-answer, an error and a budget pause are spoken with `humour: off`, whatever the dial says — a joke next to *I can't answer that* reads as not taking the reader seriously ([SO4](soul.md#decisions)). |
-| AG18 | **No length dial.** How long an answer runs is the answer's shape ([3.12](../../ask/features/the-answer-in-words.md)), not the agent's character. |
-| AG19 | **A template brings an envelope and suggests skills; it binds none.** A template that bound skills would have to track their versions and would bind them without the bind-time check. Its suggested skills are offered in the bind picker, first. |
-| AG20 | **An agent may carry a default stance.** Its author picks it; the asker can swap it or clear it for one run. The stance stays a method with declared assumptions — carried by an agent, it acquires none of the agent's bounds ([AA1](../../ask/features/act-as.md#decisions)). |
-| AG21 | **Effort and stance are two settings, because they vary independently.** Effort is how much, enforced; a stance is which way, visible in the plan and the ledger. Collapsing them into one low / medium / high knob would lose the four cells of the table above. |
 | AG23 | **The agent is one page with eleven tabs** — Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History — laid out in [the agent page](the-agent-page.md), which owns its tabs, head and builder. |
-| AG24 | **Bounds come in two kinds: standing, on the agent, and situational, on the work.** Standing limits answer *what may this agent ever do, whoever asks* — callables, effort, spend per month, runs at once, delegation, its own guardrail. Situational bounds answer *what may this piece of work see and spend* — the world and the spend per run — and come from what opens the run: a session, a Todo, a schedule, a parent run. Standing limits stay on the agent because much of the work has no person in it; a schedule at 02:00 and a Coordinator's child still run inside them ([EB1](envelope-and-budget.md#decisions)). |
-| AG25 | **The run freezes the bounds, and its tasks read the frozen copy.** At open, `freeze_lens` composes the work's world, the agent's standing limits and every guardrail into one effective lens and budget on the run; each task reads that, never the session live, and a delegated child inherits it and may only narrow. Changing a session's world mid-run changes the next run, not this one. |
 | AG26 | **An agent has no world column; its narrowing is its guardrail.** The migration gives each agent that carried a world an agent-scoped guardrail with that world's rules and cast, so nothing an agent could reach widens on the way. |
 | AG27 | **The default stance ships after the stance itself.** Until stances are rows with an author and a version, the Thinking tab carries focus and effort only, and `agents.stance_id` is not added — a foreign key to a table that does not exist yet would be scaffolding. AG20 and AG21 stand; the stance lands with [act as](../../ask/features/act-as.md). |
 | AG28 | **A voice edit is `agent.soul_set`; every other edit is `agent.update`; one edit is one version.** `soul` and `soul_traits` change how the agent speaks and nothing it may do, so the audit names them apart — the dials in full, the soul by its length, since the version holds the text. Saving a soul and an effort together moves the version once and emits both events. |
@@ -230,7 +68,6 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | AG30 | **What this agent can do is read, never stored.** A skill's `needs` are the distinct callables of its current version's plan in plan order — `uses` is already inlined into those rows, and is listed beside them as `key@version`; `missing` is the needs its envelope does not allow; offered and applied are **this agent's** runs of the current version, with the Graph-wide floor for *too few to read*. The read also carries the totals the Overview tab prints — `offered` and `applied` summed across the bound skills, and `prompt_chars` ([BN15](../../skills/features/bindings.md#decisions)) — so Studio sums nothing. A callable's `needed_by` is the same reading turned round, plus the base plans in the envelope's `templates`, each at its newest version. |
 | AG31 | **The meters are derived on every read, and the sessions meter is a count.** Spend is the calendar month's priced runs, absent when none was priced ([AG11](#decisions)); running and queued are the agent's in-flight roots; runs are roots queued this month; spawned is agents it created this month, and depth is its own place in the lineage. `sessions` counts every session bound to the agent, whoever opened it — a number names no thread — while the list behind it stays each person's own. |
 | AG32 | **Activity's sessions are a count and the reader's own list.** The tab draws `meters.sessions` — every session bound to the agent, whoever opened it — as one number, and under it only the reader's own sessions with the agent (`GET …/sessions?agent_id=`). Another member's sessions are neither listed nor counted per person: a session is private to whoever opened it, and a per-person count would say whose threads exist. |
-| AG33 | **The page keeps one edit buffer across its tabs, and Save sends only what moved.** A focus typed on Thinking and a dial set on Soul are one Save, one version (AG28); the `PATCH` carries only the fields that differ from the saved agent, so saving an effort never re-sends the soul and never emits an `agent.soul_set` nobody made. Binding a skill stays its own write, so a refusal names the one skill ([BN11](../../skills/features/bindings.md#decisions)). |
 | AG34 | **The agent's page is a page in `mainSection`, not a drill-in of the drawer.** It is the declared board `agent:<id>`, titled with the agent's name; **Open** on the Agents list opens it, and the list stays in `leftSection` with the agent selected, so moving from one agent to the next is a click and not a back-and-forth. Its envelope and lineage are canvases opened from it (*Draw it* · *Open lineage*), each a page of its own beside it. `?page=agent:<id>` survives a reload; an old `&agent=<id>` link opens the same page and drops the key. The page reads no trace and keeps no reports — it is a record being edited, not a reading being kept. |
 | AG35 | **An ask a guardrail refuses before it runs is drawn as *This ask was not run*, from the refusal's own facts.** The send answers `422` with `error: cast_refused` and, beside the sentence, the world the ask was in, the role, the address that world cast, the rule's pattern and whose rule it is (AG6); the reply draws them in a `RefusalCard` naming the bound's side. Nothing is written — no run opened, so there is no step to retry and no row to reload — and the card is the reply's until the thread is reopened. Only the role the ask opens with (`decide`) is checked at the send; a role a later step casts is refused when that step resolves it. |
 | AG36 | **Selecting a row gives a quick look under the list; Open gives the page.** The Agents drawer is its list — each row its name, its `kind`, a shield and the guardrail's name (or *Graph guardrails only*), and its spend this month against its cap — and the selected row's quick look below it: name · kind · *Graph default*, its description on one line, guardrail, a spend meter, runs at once against the ceiling, and skills bound with how many need attention. The quick look answers *which one is this, and is it healthy*; everything else is on the page, and **Open** is its only act. The list keeps at least five rows above it. Search sits in the drawer header beside `+`, and kind, status and *show ephemeral* are behind its filter button. |
@@ -243,8 +80,4 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 
 | Not building | Because |
 |---|---|
-| Agent avatars | an agent's character is its [soul](soul.md) — how it writes, not a face |
-| Cloning an agent with its history | authoring from the same template is the honest path |
-| Per-user voice dials | the agent is the same colleague for everyone who asks it ([soul § Not building](soul.md#not-building)) |
-| Free-form dials | a dial that takes any value is the soul's Markdown with a worse editor |
 | Cross-Graph agents | the Graph is the reasoning boundary |

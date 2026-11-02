@@ -1,4 +1,4 @@
-"""Canonical, version-aware capability model (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+"""Canonical, version-aware capability model (specs/system-design/modules/graph-connectors.md § Capabilities).
 
 Capability is **data**, not branching code. Each connector class declares one
 :class:`CapabilityProfile` carrying two axes — supported property types and feature

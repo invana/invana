@@ -12,8 +12,8 @@ import {
 	type ListUrl,
 	useListParams,
 } from "@invana-studio/core";
+import { PAGE } from "@invana-studio/shell";
 import { useSearchParams } from "react-router-dom";
-import { PAGE } from "../lists";
 
 /** Namespaces two segments deep: `graph.read` · `graph.stitch` · `mcp.<server>`. */
 const TWO_SEGMENT = new Set(["graph", "mcp"]);

@@ -116,7 +116,7 @@ export function UserMenu() {
 						Graph setup
 					</DropdownMenuItem>
 				)}
-				<DropdownMenuItem onClick={() => navigate("/settings/profile")}>
+				<DropdownMenuItem onClick={() => navigate("/profile")}>
 					<UserCircle className="mr-2 size-4" />
 					Profile
 				</DropdownMenuItem>

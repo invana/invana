@@ -1,5 +1,4 @@
-"""Action vocabulary for audit events (docs/for-developers/modules/operate/features/audit-and-activity.md § Action
-vocabulary).
+"""Action vocabulary for audit events (docs/for-developers/modules/operate/features/audit-and-activity.md § Engine).
 
 Hierarchical dotted-path strings keyed by feature area. Callers should
 reference these constants rather than passing strings so the vocabulary stays
@@ -26,7 +25,7 @@ CONNECTION_DELETE = "connection.delete"
 CONNECTION_TEST = "connection.test"
 CONNECTION_PING = "connection.ping"
 CONNECTION_INTROSPECT = "connection.introspect"
-# Backend version compatibility (docs/for-developers/modules/graph-connectors/features/capabilities.md)
+# Backend version compatibility (specs/system-design/modules/graph-connectors.md § Capabilities)
 CONNECTION_VERSION_DETECTED = "connection.version_detected"
 CONNECTION_COMPATIBILITY_DOWNGRADE = "connection.compatibility_downgrade"
 CONNECTION_VERSION_ACKNOWLEDGE = "connection.version_acknowledge"
@@ -51,7 +50,7 @@ LLM_MODEL_REMOVE = "llm_model.remove"
 # NL → query mapping (docs/for-developers/modules/ask/features/ask-in-natural-language.md); target = session
 LLM_TRANSLATE = "llm.translate"
 
-# ── Govern — the lens (docs/for-developers/modules/govern/spec.md) ───────────
+# ── Govern — the lens (specs/system-design/modules/govern.md) ───────────
 #
 # A guardrail edit is an **ordinary audited write**, here with every other one:
 # there is no separate governance log to keep in step with the real one (GR7).
@@ -80,7 +79,7 @@ SKILL_DELETE = "skill.delete"
 # exists and is still being resolved by the steps it was offered to.
 SKILL_PUBLISH = "skill.publish"
 # Who was offered what, and when the bindings changed
-# (docs/for-developers/modules/skills/features/bindings.md C5). The target is the
+# (specs/products/agents/features/AG-F04-skills/feature.md). The target is the
 # agent, because the binding is a fact about the agent's context; ``details``
 # names the skill.
 AGENT_SKILL_BOUND = "agent.skill_bound"
@@ -94,7 +93,7 @@ RULE_PUBLISH = "rule.publish"
 RULE_ACTIVATE = "rule.activate"
 RULE_DEACTIVATE = "rule.deactivate"
 RULE_CHECK = "rule.check"
-# The model reported following the skill on a step (docs/for-developers/modules/work/spec.md — a
+# The model reported following the skill on a step (specs/system-design/modules/work.md — a
 # self-report, labelled as one; ``skill.invoke`` needs executable skills).
 SKILL_APPLY = "skill.apply"
 
@@ -104,13 +103,13 @@ MODEL_CREATE = "model.create"
 MODEL_UPDATE = "model.update"
 MODEL_DELETE = "model.delete"
 MODEL_ACTIVATE = "model.activate"
-# Archive and restore (docs/for-developers/modules/connect-and-model/features/the-model-page.md MP7)
+# Archive and restore (specs/products/model/features/MO-F04-model-health-and-history/feature.md § Decisions)
 MODEL_ARCHIVED = "model.archived"
 MODEL_RESTORED = "model.restored"
 # NL → proposed model written to a draft (docs/for-developers/modules/ask/spec.md); target = session
 MODEL_GENERATE = "model.generate"
 # The staged set turned into a published version in one action
-# (docs/for-developers/modules/connect-and-model/features/model-editor.md ME5)
+# (specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md § Decisions)
 MODEL_COMMIT = "model.commit"
 MODEL_DISCARD = "model.discard"
 # Portability (docs/for-developers/modules/connect-and-model/features/share-a-model.md)
@@ -138,7 +137,7 @@ MODEL_LINK_DISCARD = "model_link.discard"
 THINKING_OPEN = "run.open"  # a run started, under which agent, for whom
 THINKING_FINISH = "run.finish"  # succeeded | failed, with duration
 THINKING_CANCEL = "run.cancel"  # stopped by the user; cascades to children
-THINKING_DELEGATE = "run.delegate"  # a step opened a child run (docs/for-developers/modules/work/spec.md)
+THINKING_DELEGATE = "run.delegate"  # a step opened a child run (specs/system-design/modules/work.md)
 THINKING_RESUME = "run.resume"  # a clarification was answered
 # A person stopped a run (the-run-page.md); the run ends `stopped`, its children `parent_ended`.
 RUN_STOP = "run.stop"
@@ -154,7 +153,7 @@ EVAL_RUN = "eval.run"  # an eval run settled, with its gate verdict
 EVAL_DEGRADED = "eval.degraded"  # a drift run fell behind the last live run
 EVAL_BUDGET_UPDATE = "eval_budget.update"
 
-# ── Projects (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────────────────
+# ── Projects (specs/system-design/modules/work.md) ────────────────────────────────────────────────────
 PROJECT_CREATE = "project.create"
 PROJECT_UPDATE = "project.update"
 PROJECT_ARCHIVE = "project.archive"
@@ -174,7 +173,7 @@ REPORT_GENERATE = "report.generate"
 REPORT_PUBLISH = "report.publish"
 SIMULATION_RUN = "simulation.run"  # a simulator run opened on a branch (modules/work/features/simulation.md)
 
-# ── Tasks — the assignable unit of work (docs/for-developers/modules/work/spec.md) ─────────────────────────
+# ── Tasks — the assignable unit of work (specs/system-design/modules/work.md) ─────────────────────────
 TASK_CREATE = "task.create"
 TASK_UPDATE = "task.update"
 TASK_ASSIGN = "task.assign"
@@ -191,7 +190,7 @@ TASK_REJECT = "task.reject"  # the note becomes a new run_ask on the same task
 TASK_CANCEL = "task.cancel"
 TASK_DELETE = "task.delete"
 
-# ── Agents as principals (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────
+# ── Agents as principals (specs/system-design/modules/work.md) ────────────────────────────────────────
 AGENT_CREATE = "agent.create"
 AGENT_UPDATE = "agent.update"
 AGENT_SOUL_SET = "agent.soul_set"  # the soul or its voice dials (SO C4 · AG16)
@@ -203,7 +202,7 @@ AGENT_DELETE = "agent.delete"
 AGENT_SPAWN = "agent.spawn"  # an agent created an agent; actor_kind = agent
 AGENT_SET_DEFAULT = "agent.set_default"  # the graph's default agent
 
-# ── Flow library (docs/for-developers/modules/agents/spec.md) ────────────────────────────────────────
+# ── Flow library (specs/system-design/modules/agents.md) ────────────────────────────────────────
 FLOW_PROMOTE = "flow.promote"  # a served plan became a library entry
 
 # ── Datasets / ingestion (docs/for-developers/modules/bring-data-in/features/load-data.md)
@@ -254,7 +253,7 @@ GRAPH_EXPAND = "graph.expand"
 
 # ── Query sessions (docs/for-developers/modules/ask/spec.md) ──────────────────────────────────────────────────
 SESSION_CREATE = "session.create"
-SESSION_UPDATE = "session.update"  # agent change, with the diff (docs/for-developers/modules/agents/spec.md)
+SESSION_UPDATE = "session.update"  # agent change, with the diff (specs/system-design/modules/agents.md)
 SESSION_DELETE = "session.delete"
 
 # ── Boards (docs/for-developers/building-engine/boards-migration.md)

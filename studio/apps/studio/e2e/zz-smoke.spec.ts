@@ -13,14 +13,22 @@ const PATHS = [
 	"agents/functions",
 	"agents/functions/plans",
 	"agents/functions/templates",
-	"agents/functions/plugins",
 	"agents/connections/server",
 	"agents/connections/mcp",
 	"agents/llms",
 	"agents/settings",
+	"activity/runs",
+	"activity/approvals",
+	"activity/approvals/alerts",
+	"activity/ledger",
+	"activity/ledger/refusals",
+	"activity/schedules",
+	"activity/inbox",
+	"activity/rules",
+	"activity/channels",
 ];
 
-test("every panel and Agents page renders with no module or runtime error", async ({
+test("every panel, Agents and Activity page renders with no module or runtime error", async ({
 	page,
 }) => {
 	test.setTimeout(PATHS.length * 15_000);

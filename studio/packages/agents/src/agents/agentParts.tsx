@@ -7,9 +7,9 @@
 
 import type { StatusDotProps } from "@invana/ui";
 import { Button, EmptyState, Spinner } from "@invana/ui";
+import { EVERY } from "@invana-studio/shell";
 import { CircleAlert } from "lucide-react";
 import { useMemo } from "react";
-import { EVERY } from "../lists";
 import { useLLMProvidersQuery } from "../llms/queries";
 
 /** The eleven tabs, in order; the value is what `?tab=` holds. */

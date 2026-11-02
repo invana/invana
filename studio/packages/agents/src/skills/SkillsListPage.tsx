@@ -29,13 +29,8 @@ import {
 	Spinner,
 } from "@invana/ui";
 import { formatRelativeTime, useListParams } from "@invana-studio/core";
-import { ActButton } from "@invana-studio/shell";
-import { Plus } from "lucide-react";
-import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useFleetPerformanceQuery } from "../fleet/queries";
-import type { PerformanceRow } from "../fleet/types";
 import {
+	ActButton,
 	chipsOf,
 	EVERY,
 	FilteredEmpty,
@@ -43,10 +38,15 @@ import {
 	ListStrip,
 	matchCount,
 	PAGE,
+	ReadState,
 	setOne,
-} from "../lists";
+} from "@invana-studio/shell";
+import { Plus } from "lucide-react";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useFleetPerformanceQuery } from "../fleet/queries";
+import type { PerformanceRow } from "../fleet/types";
 import { useAgentsOpen } from "../open";
-import { FleetReadState } from "../overview/fleetParts";
 import { SectionBody, SectionPage } from "../sections/SectionPage";
 import type { SectionPageProps } from "../sections/spec";
 import { newSkillContent } from "./instructionsText";
@@ -136,11 +136,7 @@ export function SkillsListPage({ username, graphSlug }: SectionPageProps) {
 				{query.isLoading ? (
 					<Spinner />
 				) : query.error ? (
-					<FleetReadState
-						loading={false}
-						error={query.error}
-						what="the skills"
-					/>
+					<ReadState loading={false} error={query.error} what="the skills" />
 				) : rows.length === 0 ? (
 					chips.length ? (
 						<FilteredEmpty noun="skill" filters={chips} onClear={list.clear} />

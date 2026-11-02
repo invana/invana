@@ -1,5 +1,5 @@
 """A lens, in Gremlin — declared unsupported rather than quietly absent
-(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md CC12).
+(specs/system-design/modules/graph-connectors.md § The connector contract).
 
 A raw Gremlin query is a **script**. There is no reliable way to read which
 variable is bound to which type out of one, so there is nothing to compose a

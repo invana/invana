@@ -261,7 +261,7 @@ function formatErrorDetail(error: AxiosError): string {
 apiClient.interceptors.response.use(
 	(res) => {
 		endRequestSpan(res.config as TracedConfig, res.status);
-		// docs/for-developers/modules/platform/spec.md § 5: the backend owns the toast copy. Any mutation (non-GET) that
+		// specs/system-design/api-and-cli.md § API conventions: the backend owns the toast copy. Any mutation (non-GET) that
 		// returns an `ActionResponse` envelope is toasted here, centrally, so call
 		// sites never hardcode a success string. Suppressed inside a multi-request
 		// gesture (see `suppressActionToast`).
