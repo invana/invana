@@ -2,27 +2,37 @@
 
 **An ontology-governed operating system for humans and AI agents.**
 
-Invana is open source. People and agents work on the same knowledge graph, and
-the ontology governs both of them.
+Invana is open source. People and agents work on the same knowledge graph, the
+ontology governs both of them, and what they do there is decide — with evidence
+anyone can follow.
+
+## Two layers
+
+| Layer | What it is | What you get |
+|---|---|---|
+| **Operating system** | Where people and agents work under one ontology | Models and the links between them, rules, datasets with provenance, agents and plugins, runs and schedules, roles and approvals |
+| **Decision intelligence** | What they use it for | Boards and an assistant to ask in plain words, grounded answers that cite their records, projects that keep the evidence for and against, simulation on a branch, decisions with a trail |
 
 ## Core features
 
 Invana is in **beta**. ✅ available · 🟡 usable, with parts still being built.
 
-| Feature | What you get | Status |
-|---|---|---|
-| **Self-hosted** | One Docker Compose stack on your own machines. Your graph and your keys stay with you, and with Ollama the LLM can run on your network too | ✅ |
-| **Ontology-governed** | Models give the data its meaning, and stitches join models from different sources | ✅ |
-| **Guardrails, worlds and rules** | Guardrails bound what any run may read, use or send; worlds narrow them per question; rules block, warn or report | 🟡 |
-| **Roles and access** | Graph roles are enforced on every route, and search shows only what you can open | ✅ |
-| **Grounded answers** | Every answer traces from the LLM to the query, the record and the dataset. When the graph can't answer, Invana says so | ✅ |
-| **Decisions with a trail** | Projects keep the evidence for and against, and decisions are append-only | ✅ |
-| **Simulation** | Run a simulator on a project branch over pinned dataset versions, reproducible from its seed | ✅ |
-| **Datasets and provenance** | Origin, versions, licence and sensitivity on every dataset; a retraction flags everything that cites it | 🟡 |
-| **Agents** | Plans generated from each agent's instructions, checked by evals before they publish, and bounded by token budgets | 🟡 |
-| **Plugins** | Every task comes from a plugin. Core plugins are always on; tool, MCP and simulator plugins extend what agents can do ([below](#plugins)) | 🟡 |
-| **Runs, schedules and approvals** | One journal of every run, schedules with delivery, and a person's approval before anything leaves | 🟡 |
-| **Change log** | Every versioned thing has a history; compare any two versions and see the effect after | 🟡 |
+| Feature | What you get | Layer | Status |
+|---|---|---|---|
+| **Self-hosted** | One Docker Compose stack on your own machines. Your graph and your keys stay with you, and with Ollama the LLM can run on your network too | — | ✅ |
+| **Ontology-governed** | Models give the data its meaning, and links between models join models from different sources | Operating system | ✅ |
+| **Rules and views of the graph** | Rules block, warn or report on what must always hold; a view of the graph bounds what agents may see, per question | Operating system | 🟡 |
+| **Roles and access** | Graph roles are enforced on every route, and search shows only what you can open | Operating system | ✅ |
+| **Datasets and provenance** | Origin, versions, licence and sensitivity on every dataset; a retraction flags everything that cites it | Operating system | 🟡 |
+| **Agents** | Plans generated from each agent's instructions, checked by evals before they publish, and bounded by token budgets | Operating system | 🟡 |
+| **Plugins** | Every task comes from a plugin. Core plugins are always on; tool, MCP and simulator plugins extend what agents can do ([below](#plugins)) | Operating system | 🟡 |
+| **Runs, schedules and approvals** | One journal of every run, schedules with delivery, and a person's approval before anything leaves | Operating system | 🟡 |
+| **Change log** | Every versioned thing has a history; compare any two versions and see the effect after | Operating system | 🟡 |
+| **Boards and the assistant** | Ask in plain words beside a saved board; the answer arrives on the canvas, and conversations pick up where they left off | Decision intelligence | 🟡 |
+| **Grounded answers** | Every answer traces from the LLM to the query, the record and the dataset. When the graph can't answer, Invana says so | Decision intelligence | ✅ |
+| **Annotations** | Note what you found on the records themselves, for the next person to read | Decision intelligence | 🟡 |
+| **Decisions with a trail** | Projects keep the evidence for and against, and decisions are append-only | Decision intelligence | ✅ |
+| **Simulation** | Run a simulator on a project branch over pinned dataset versions, reproducible from its seed | Decision intelligence | ✅ |
 
 ## Deploy
 
