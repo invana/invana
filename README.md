@@ -77,7 +77,7 @@ No user exists until you create one.
 | Studio | <http://localhost:8300> |
 | Engine API | <http://localhost:8200> |
 | Graph database | Neo4j starts by default. Memgraph, JanusGraph and ArcadeDB are Compose profiles, for example `docker compose --profile memgraph up -d` |
-| Sample data | [The airways demo](demos/airways/README.md): models, records, stitches and guardrails, step by step |
+| Sample data | [The airways demo](demos/airways/README.md): models, records, links between models and rules, step by step |
 
 > **This is the development stack.** Before anyone else can reach it, set `INVANA_SECRET_KEY` and
 > `INVANA_ENCRYPTION_KEY` ([CONTRIBUTING.md › Environment variables](CONTRIBUTING.md#environment-variables))
@@ -127,8 +127,8 @@ plugins are always on.
 
 | Plugin | Type | What it does | Status |
 |---|---|---|---|
-| Graph read | core | Run queries, count types, resolve and expand records, preview stitches | ✅ |
-| Graph write | core | Write and bulk-load records; apply, commit and withdraw stitches | ✅ |
+| Graph read | core | Run queries, count types, resolve and expand records, preview links between models | ✅ |
+| Graph write | core | Write and bulk-load records; apply, commit and withdraw links between models | ✅ |
 | Ingest | core | Check a bundle, snapshot its model, validate records before they land | ✅ |
 | LLM | core | Understand a question, plan the work, turn a thought into a query, draft plans and models | ✅ |
 | Schema write | core | Propose, validate and migrate model changes | ✅ |
@@ -143,13 +143,13 @@ plugins are always on.
 
 ## The products
 
-| Product | For | Job |
-|---|---|---|
-| **Datasets** | researchers, curators | Gather the data: reusable, labelled by origin, checked against standards |
-| **Modeller** | modellers, compliance leads | Give it meaning: models, stitches, worlds, guardrails, rules |
-| **Explorer** | analysts | Ask and look: answers drawn on a board, each claim citing its record |
-| **Projects** | anyone deciding something | Pursue a question: gather evidence for and against, decide, keep the trail |
-| **Agents** | builders | Build, tune and watch the agents that do the legwork |
+| Product | Layer | For | Job |
+|---|---|---|---|
+| **Data** | Operating system | researchers, curators | Gather the data: reusable, labelled by origin, checked against standards |
+| **Model** | Operating system | modellers, compliance leads | Give it meaning: models, links between models, views of the graph, rules |
+| **Agents** | Operating system | builders | Build, tune and watch the agents that do the legwork |
+| **Explore** | Decision intelligence | analysts | Ask and look: answers drawn on a board, each claim citing its record |
+| **Projects** | Decision intelligence | anyone deciding something | Pursue a question: gather evidence for and against, decide, keep the trail |
 
 ## Contributing
 

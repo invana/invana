@@ -7,8 +7,8 @@ follows it too. `CLAUDE.md` is the law; this file is how the team works under it
 
 ## 0. What Invana is — every role builds to this
 
-**Invana is a decision intelligence platform: it exists to help a person make better decisions.** Agents do the work;
-the person decides. Everything the team specifies, draws, builds and tests serves that.
+**Invana is an ontology-governed operating system for humans and AI agents, built so a person makes better
+decisions** ([vision](../../specs/vision.md)). Agents do the work; the person decides. Everything the team specifies, draws, builds and tests serves that.
 
 | Principle | What it means | Example |
 |---|---|---|

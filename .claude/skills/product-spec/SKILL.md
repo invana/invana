@@ -14,7 +14,7 @@ The procedure the **product manager** follows — only the product manager (or R
 | `templates/product.md` · `feature.md` · `story.md` · `task.md` · `journey.md` (this skill) | The only starting points. Copy one; never write a spec from a blank page. A story is a folder: `story.md` and an empty `task.md` |
 | `specs/glossary.md` · `personas.md` | The words a person reads on screen; who the stories are for |
 | `specs/design-language.md` | How surfaces behave: modes, peek · modal · sheet, the assistant |
-| `.claude/team/TEAM.md` §0 · §7 | What Invana is (decision intelligence); the access model — Admin and Operator |
+| `specs/vision.md` · `.claude/team/TEAM.md` §0 · §7 | What Invana is; how every role builds to it; the access model — Admin and Operator |
 | `specs/migrations.md` | Agreed changes not yet made |
 
 ## 0. Journey first

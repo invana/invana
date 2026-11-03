@@ -22,7 +22,7 @@ that work and go away again.
 | 4 | **Say less** | A surface shows the next decision, not every fact. Detail is one click deeper (peek → sheet), never on the first screen |
 | 5 | **Plain words** | Roles, limits and states are sentences. No internal nouns on screen (see §6) |
 | 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explorer, Modeller and Projects are modes of one workspace, named in the wordmark; everything else is summoned |
-| 7 | **The agent proposes, the person decides** | Invana is a decision intelligence platform. An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
+| 7 | **The agent proposes, the person decides** | Invana is built for decisions ([vision](vision.md)). An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
 | 8 | **Traceable on demand** | Every answer, proposal and act can show how it got there — steps, sources, assumptions, who did what — through *Why?*, *How it got here* and the full run. Never on the first screen; always one click away |
 
 ## 2. The layout
