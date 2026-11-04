@@ -233,9 +233,6 @@ export function GraphsListPage() {
 				{/* Title block */}
 				<div className="mb-14 select-none">
 					<h1 className="text-5xl font-black tracking-tight">Invana Studio</h1>
-					<p className="text-muted-foreground mt-2 text-xl">
-						Pick a graph. Get the thinking flowing.
-					</p>
 				</div>
 
 				{/* Two-column layout */}

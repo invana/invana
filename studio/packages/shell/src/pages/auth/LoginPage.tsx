@@ -176,8 +176,8 @@ export function LoginPage() {
 					{/* Hero title + subtitle — brand-forward */}
 					<h1 className="text-4xl font-bold tracking-tight">Invana</h1>
 					<p className="mt-1 text-xl font-medium text-primary">
-						One knowledge graph, one set of rules, for every thinker — human or
-						AI
+						One knowledge graph, one set of rules, for every thinker and the
+						systems they build
 					</p>
 
 					<p className="mt-6 max-w-3xl text-xl text-muted-foreground">
