@@ -1,5 +1,5 @@
 """
-Invana — Graph Intelligence Platform.
+Invana — An ontology-governed operating system for humans and AI agents.
 
 Importing this package bootstraps two cross-cutting concerns automatically:
 
