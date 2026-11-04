@@ -1,8 +1,30 @@
 # Vision
 
-**An ontology-governed operating system for humans and AI agents.** People and agents work on the same curated
-knowledge graph, and its ontology governs both. What they do there is decide: *think it through, decide with
-evidence* — agents do the work; the person decides.
+**An ontology-governed operating system for humans and AI agents.**
+
+One knowledge graph, one set of rules, for every thinker — human or AI.
+
+People and agents work on the same curated knowledge graph, and its ontology governs both. What they do there is
+decide — agents do the work; the person decides.
+
+## How Invana names itself
+
+| Line | Role | Text |
+|---|---|---|
+| **Positioning** | What Invana is — its category | An ontology-governed operating system for humans and AI agents |
+| **Tagline** | What it means for the person using it | One knowledge graph, one set of rules, for every thinker — human or AI |
+| **Motto** | A closing line only, never the description | Think it through. Decide with evidence. |
+
+| Surface | Headline | Sub-line |
+|---|---|---|
+| README · docs home · this vision | Positioning | Tagline; this vision ends with the motto |
+| PyPI · `invana --help` · the API description | Positioning | — |
+| Studio sign-in | *Invana* | Tagline |
+| Studio Graphs list | *Invana Studio* | — |
+| Website hero | Tagline | Positioning; the motto on the closing call to action |
+
+Studio never shows the positioning statement: *ontology* is not a Studio word ([The ontology](#the-ontology)), and the
+tagline does not need it.
 
 ## What Invana is
 
@@ -136,3 +158,7 @@ The same records host different kinds of work; none is a special case.
 | Authoring a plan by hand | Plans are generated from instructions or packaged with a plugin |
 | Criterion weights and waivers | A criterion is met, unmet or needs a person |
 | Styling a single element on the canvas | Not planned |
+
+---
+
+**Think it through. Decide with evidence.**

@@ -1,6 +1,6 @@
-# Invana — Graph Intelligence Platform
+# Invana
 
-Structured knowledge graphs into interactive decision simulation environments.
+An ontology-governed operating system for humans and AI agents, built so a person makes better decisions ([vision](specs/vision.md)).
 
 ## Talk is not a request to write
 
