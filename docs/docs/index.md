@@ -8,7 +8,7 @@ hide:
 
 **An ontology-governed operating system for humans and AI agents.**
 
-One knowledge graph, one set of rules, for every thinker — human or AI.
+One knowledge graph, one set of rules, for every thinker and the systems they build.
 
 Invana is open source. People and agents work on the same knowledge graph, the ontology governs both of them, and what they do there is decide — with evidence anyone can follow.
 
