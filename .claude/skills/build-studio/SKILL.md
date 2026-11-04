@@ -13,6 +13,7 @@ that can be drawn can be built, and a screen that cannot be built cannot be draw
 
 | Rule | Detail |
 |---|---|
+| Decide and trace | Build every surface to `design-story` §4's standards as drawn — *The agent proposes, the person decides* (a recommendation and one primary act), *Asks before it acts*, *Traceable on demand* |
 | Compose, don't draw | A hi-fi screen is `@invana/ui` + `@invana/forms` + `@invana/tables` + `@invana/themes` + `@invana/canvas` components. No hand-written HTML with inline styles, no one-off CSS, no ad-hoc colours. |
 | Tokens only | Colour, spacing, radius and control heights come from `@invana/styling` tokens (`--primary`, `--muted-foreground`, `--border`, `--success`, …). Never a literal `hsl()`/hex in a design or in Studio. |
 | Missing component → build it in the kit first | If a design needs something the kit does not have, add it to `~/Projects/invana/design-kit` **with a story**, then use it. Never inline it into the design and never reimplement it in Studio. The one exception: a composition built **exclusively for Studio** from `@invana/*` and tokens may live in `@invana-studio/ui`, under the rules of [migration-plan §4](../../../docs/products/migration-plan.md#4-the-studio-ui-package). Primitives still go to `design-kit` with a story. |

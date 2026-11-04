@@ -4,9 +4,9 @@
 
 One knowledge graph, one set of rules, for every thinker and the systems they build.
 
-Invana is open source. People and agents work on the same knowledge graph, the
-ontology governs both of them, and what they do there is decide — with evidence
-anyone can follow.
+Invana is open source. People and agents work on the same knowledge graph, and
+the ontology governs both: agents do the work, the person decides, with evidence
+anyone can follow ([vision](specs/vision.md)).
 
 ## Two layers
 

@@ -7,8 +7,9 @@ follows it too. `CLAUDE.md` is the law; this file is how the team works under it
 
 ## 0. What Invana is — every role builds to this
 
-**Invana is an ontology-governed operating system for humans and AI agents, built so a person makes better
-decisions** ([vision](../../specs/vision.md)). Agents do the work; the person decides. Everything the team specifies, draws, builds and tests serves that.
+**Invana is an ontology-governed operating system for humans and AI agents** ([vision](../../specs/vision.md)). Every
+agent — Invana's and the team's — follows the vision's [philosophy](../../specs/vision.md#how-invana-names-itself):
+agents do the work; the person decides. For the team, that person is Ravi. Everything the team specifies, draws, builds and tests serves that.
 
 | Principle | What it means | Example |
 |---|---|---|
@@ -25,6 +26,7 @@ decisions** ([vision](../../specs/vision.md)). Agents do the work; the person de
 | Designer | Drawing the proposal and the choice, not the form; one primary act per decision; the trace one click away (peek → sheet), never on the first screen |
 | Coder | Recording every agent step, source, assumption and actor when it happens, so the trace is served by the engine, not rebuilt by Studio; never acting on a write without the person's yes |
 | Security | Threat-modelling every agent act and data flow — prompt injection through graph data, an agent acting without a yes, data leaving a Graph or the install |
+| Project lead | Running only what Ravi approved; every choice that is his goes to him as a question with a recommendation, never decided for him |
 | QA | Proving each trace criterion and each ask-first with the coder's tests and agent evals — recommending the ones missing; failing a surface that shows machinery by default or hides how a result was reached |
 
 ## 1. The team
@@ -328,7 +330,7 @@ Ravi reviews each feature twice. The product manager assembles and presents both
 
 | Review | When | Holds | Ravi answers per story |
 |---|---|---|---|
-| **The spec** | Before any design | Feature file(s) and user journey, check passing · the boards each story names · Access · the threat model when it touches access, data or agents · decisions taken, open questions, breaking changes | **approve** (→ `specified`) · **change** (→ product manager) · **drop** |
+| **The spec** | Before any design | Feature file(s) and user journey, check passing · the boards each story names · Access · the threat model when it touches access, data or agents · decisions taken with the options weighed and the reason for the pick, open questions, breaking changes | **approve** (→ `specified`) · **change** (→ product manager) · **drop** |
 | **The boards** | Before any code | Canvas link · each story's page with every named board drawn · component requests and their status · open questions | **approve** (→ `designed`) · **change** (→ designer for the look, product manager for the what) · **drop** |
 
 ## 6. Standards every role keeps

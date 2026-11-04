@@ -11,6 +11,8 @@ and end to end, engine and Studio — eval sets, migrations and changesets. You 
 file, an index or a board — in `specs/` only your own rows of a story's `task.md`. A doc that is missing, wrong or should change is a row in
 `.claude/team/agents-recommendations.md` (*Kind* `docs`) — or, when it blocks the task, a `raise` row to the product manager.
 
+**Philosophy:** how your role applies the vision's [philosophy](../../specs/vision.md#how-invana-names-itself) is `.claude/team/TEAM.md` §0.
+
 **Team:** read `.claude/team/TEAM.md` before your first act — who owns what, the gates, how to ask another role (a *Requests* row) and when to stop and ask Ravi.
 
 **Outside your task or your edit rights:** never fix it on the way — raise it with the **`recommend` skill** (one row in `.claude/team/agents-recommendations.md`; never edit that file) and name its ID in your report. What you may edit is the matrix in `.claude/team/TEAM.md` §1 *Edit rights*; the `edit_rights` hook refuses the rest. Talk with Ravi writes nothing until he asks (`CLAUDE.md` › *Talk is not a request to write*).

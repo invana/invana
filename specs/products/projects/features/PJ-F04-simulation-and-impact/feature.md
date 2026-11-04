@@ -105,10 +105,10 @@ sequenceDiagram
 | A record, never edited | A simulation is kept as it ran; to change it, simulate again. A simulator removed since still reads, with the version it ran |
 | Reach starts from the evidence | Impact starts from the graph records the option's findings cite, every stance, and walks 1, 2 or 3 hops (2 by default); each hop is what the one before reached, less what was already reached |
 | Bounded, and says so | At most 12 records expanded per hop, each to 50 neighbours, the most-reached first; a cut reach reads *More lies beyond* |
-| Under the view | Every impact read is the Explorer's expand, under the Graph's view, so a type the view hides is never reached |
+| Under the view | Every impact read is Explore's expand, under the Graph's view, so a type the view hides is never reached |
 | How sure is the evidence's | How many of the findings it starts from a person reviewed, and the origins of the datasets they cite — never a score |
 | Reach only | No what-if values and no figure in any currency |
-| Leans on | Branches and findings (PJ-F03) · datasets and their versions (DA-F01) · runs (AG-F03) · the Explorer's expand (EX-F01) · plugins (ST-F04) |
+| Leans on | Branches and findings (PJ-F03) · datasets and their versions (DA-F01) · runs (AG-F03) · Explore's expand (EX-F01) · plugins (ST-F04) |
 
 ## Data touched
 
@@ -118,7 +118,7 @@ sequenceDiagram
 | The simulation's run and its result (AG-F03) | Write · read |
 | Dataset versions it reads, and the derived dataset it may save (DA-F01) | Read · write |
 | Findings citing a simulation's run (PJ-F03) | Write |
-| The graph, through the Explorer's expand, for impact | Read |
+| The graph, through Explore's expand, for impact | Read |
 
 ## Decisions
 

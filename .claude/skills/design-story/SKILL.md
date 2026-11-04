@@ -88,7 +88,7 @@ The kit rules — compose, tokens, density, the type ladder, where a component g
 | **Traceable on demand** | Every agent answer, proposal and act has *Why?* / *How it got here* one click away (peek), and the full run one more (sheet) |
 | **Asks before it acts** | An act that writes, sends, spends or changes access shows exactly what will happen before the person agrees |
 | **Every state, both lenses** | All seven states as the UI shows them — first use says why it is empty and offers the one act that starts it; failed says what failed and the next act. The Operator lens shows each act as its *Who can* row says |
-| **The shell** | One `AppLayoutV2`: header (wordmark *Invana Explorer · Modeller · Projects*, Graph picker, ⌘K, Inbox, assistant), leftNav, collapsible leftSection, mainSection `Workbook`, the assistant on the right, the footer. A surface fills its regions; it never builds a layout |
+| **The shell** | One `AppLayoutV2`: header (wordmark *Invana Explore · Model · Projects*, Graph picker, ⌘K, Inbox, assistant), leftNav, collapsible leftSection, mainSection `Workbook`, the assistant on the right, the footer. A surface fills its regions; it never builds a layout |
 | **Overlays** | Peek for one fact · modal for one task or decision · sheet for heavy authoring; never a modal on a modal; Esc returns to the work |
 | **Plain words** | Glossary words only; roles as sentences (*Operator*, *Can shape the model*); no internal nouns |
 | **Only what a user sees** | No notes, rationale or annotations on a board. Copy a person would read — an empty state's instruction, a refusal's reason — is UI and stays |
