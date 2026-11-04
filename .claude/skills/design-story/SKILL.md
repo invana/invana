@@ -10,6 +10,24 @@ spec approved by Ravi — are drawn. The designer draws; it never edits a spec a
 of the story's `task.md`. How the team works around a design is `.claude/team/TEAM.md`; §0 says what Invana is — every board serves a person
 making a decision.
 
+## 0. Pick the model
+
+This section is the only place the designer's model split is defined. The agent's default is Opus. Use Sonnet only where a pattern already exists and the job is to follow it.
+
+| Work | Model |
+|---|---|
+| A story's boards drawn for the first time: layout, flow, every state, both lenses, mapping to the kit | **Opus** |
+| A new shell, mode or design language, or a canvas staged for a proposal | **Opus** |
+| Porting approved boards or chrome into another canvas through an existing generator | Sonnet |
+| A fix round on review or design-QA comments, or one missing state on a board that already exists | Sonnet |
+| Regenerating, seeding, screenshotting or republishing a canvas | Sonnet |
+
+| Who | How |
+|---|---|
+| Whoever delegates to the designer | Leave the model unset for Opus work. For Sonnet work, pass `model: sonnet` and name the pass in the brief |
+| A top-level designer session on Opus (`claude --agent designer`, or a runner session) | Spawn a Sonnet sub-agent for the Sonnet rows. Do the §5 check yourself before you hand back. A designer that was delegated is a sub-agent and can't spawn one: it runs on the model it was given |
+| A `/run-project` run | Already applies this split: builds use the agent's model, and fix rounds and sub-agents use Sonnet (`run-project` › *Every session*, settings table) |
+
 ## 1. Read the brief
 
 The story's `story.md` (`specs/products/<product>/features/<CODE>-F<nn>-*/stories/<STORY-ID>-*/story.md`) is the
