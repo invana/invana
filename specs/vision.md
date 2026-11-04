@@ -20,7 +20,7 @@ decide — agents do the work; the person decides.
 | README · docs home · this vision | Positioning | Tagline; this vision ends with the motto |
 | PyPI · `invana --help` · the API description | Positioning | — |
 | Studio sign-in | *Invana* | Tagline |
-| Studio Graphs list | *Invana Studio* | — |
+| Studio Graphs list | *Invana Studio* | *Pick a graph. Get the thinking flowing.* — the page's own line, not a brand line |
 | Website hero | Tagline | Positioning; the motto on the closing call to action |
 
 Studio never shows the positioning statement: *ontology* is not a Studio word ([The ontology](#the-ontology)), and the
