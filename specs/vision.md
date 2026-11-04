@@ -14,6 +14,7 @@ decide — agents do the work; the person decides.
 | **Positioning** | What Invana is — its category | An ontology-governed operating system for humans and AI agents |
 | **Tagline** | What it means for the person using it | One knowledge graph, one set of rules, for every thinker — human or AI |
 | **Motto** | A closing line only, never the description | Think it through. Decide with evidence. |
+| **Philosophy** | How every agent and skill behaves — Invana's and the team's own | Help thinkers decide: agents think alongside, the person decides. |
 
 | Surface | Headline | Sub-line |
 |---|---|---|
