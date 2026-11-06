@@ -47,6 +47,7 @@ flowchart LR
 | DA-06.6 | Proposed rows | the person picks *Not now* | nothing is saved |
 | DA-06.7 | A saved collection | the person opens *How it got here* | it shows the agent's sources, the steps it took and the citation behind each row |
 | DA-06.8 | A collection that fails | it ends | it says why, and nothing is saved |
+| DA-06.9 | Rows an agent proposes for a dataset | they are shown | the agent marks the rows it recommends keeping and why; the person decides |
 
 ## Screens
 

@@ -49,7 +49,7 @@ export const CAPABILITIES: Capability[] = [
 	},
 	{
 		icon: Workflow,
-		title: "Run complex logic",
+		title: "Follow up and refine",
 		body: "Chain queries and refine with follow-ups — each session keeps its own thread and its own canvas you can return to.",
 		short: "Chain queries and refine with follow-ups.",
 	},

@@ -30,11 +30,12 @@ export function CastRefusalCard({ refusal }: { refusal: CastRefusal }) {
 	return (
 		<RefusalCard
 			label={`refused · ${boundSide(refusal.denied_in)}`}
-			remedy="Ask in a world whose models this guardrail allows, or ask an agent without it."
+			remedy="Ask in a view of the graph whose models this rule allows, or ask an agent without it."
 		>
-			<b>This ask was not run.</b> In <b>{refusal.world ?? "this world"}</b>,{" "}
+			<b>This ask was not run.</b> In{" "}
+			<b>{refusal.world ?? "this view of the graph"}</b>,{" "}
 			<code>{refusal.role}</code> is cast to <code>{refusal.address}</code>, and{" "}
-			{refusal.denied_in ?? "a rule of this world"}
+			{refusal.denied_in ?? "a rule of this view"}
 			{refusal.rule ? (
 				<>
 					{" "}

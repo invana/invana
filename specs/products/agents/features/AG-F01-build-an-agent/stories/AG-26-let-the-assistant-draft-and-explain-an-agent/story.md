@@ -53,6 +53,7 @@ flowchart LR
 | AG-26.9 | A draft that fails | it ends | the assistant says why in a sentence; the form is untouched |
 | AG-26.10 | A proposal | the builder opens *How it got here* | its steps and the sources it read are shown, each assumption marked *Challenge this* |
 | AG-26.11 | An Operator without *Can build agents* | they ask the assistant to draft or change an agent | it explains instead and says it cannot change the agent, naming *Can build agents*, with *Ask Priya (owner)* |
+| AG-26.12 | A drafted part of an agent | it is proposed | it names the option the assistant recommends and why, beside *Apply* |
 
 ## Screens
 

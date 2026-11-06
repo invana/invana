@@ -56,6 +56,7 @@ flowchart LR
 | MO-06.11 | A draft from a starter | the person deletes the kinds they do not need | the rest stays a draft until they publish it |
 | MO-06.12 | A model the assistant drafted | the person opens *How it got here* on the draft | it shows the conversation, the description it started from, and each kind it staged |
 | MO-06.13 | An Operator without *Can shape the model* | they reach *New model* | it is disabled with *Ask Priya (owner) to shape the model* |
+| MO-06.14 | A model drafted from a description, a file or a starter | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
 
 ## Screens
 

@@ -63,6 +63,7 @@ flowchart LR
 | IN-01.19 | An agent | it tries to allow an ask | it is refused; only a person decides |
 | IN-01.20 | A decided ask | History is read | it shows who decided, when, and the note (IN-F03) |
 | IN-01.21 | An ask from an agent's run | the reader opens *How it got here* | it shows the run's steps and sources up to the step that asked |
+| IN-01.22 | An agent's ask with more than one way to answer | it is shown in *Needs you* | the agent's recommended answer is marked, with its reason; the person answers with one click |
 
 ## Screens
 

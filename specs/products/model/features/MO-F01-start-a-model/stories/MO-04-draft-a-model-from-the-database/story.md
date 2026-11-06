@@ -50,6 +50,7 @@ flowchart LR
 | MO-04.9 | A view of the graph that hides a kind | the database is read | the read still lists that kind: no view narrows what the database holds |
 | MO-04.10 | A read has finished | the person opens *How it got here* on what the database holds | it shows the run that read it, who started it, when, and what was left out and why |
 | MO-04.11 | An Operator without *Can shape the model* | they open Model's health | *Read the database* is disabled with *Ask Priya (owner) to shape the model*; what the database holds still reads |
+| MO-04.12 | A drafted model | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
 
 ## Screens
 

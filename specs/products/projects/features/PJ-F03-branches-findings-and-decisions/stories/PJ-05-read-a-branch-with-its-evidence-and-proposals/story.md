@@ -60,6 +60,7 @@ flowchart LR
 | PJ-05.13 | Any agent | it tries to record a verdict or a decision | it cannot: verdicts and decisions are a person's, and an agent can only propose |
 | PJ-05.14 | An Operator without *Can work on projects* | they open a branch | it reads in full; *File a task*, *Accept* and *Reject* are disabled, naming *Can work on projects* |
 | PJ-05.15 | The engine cannot return the branch | the page loads | it says *Could not load* with the reason and *Try again* |
+| PJ-05.16 | An agent's proposed fork or decision on a branch | it is shown | it names the option the agent recommends and why; the person accepts or rejects it with one click |
 
 ## Screens
 
