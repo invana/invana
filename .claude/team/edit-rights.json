@@ -23,10 +23,10 @@
   },
   "roles": [
     {"key": "ravi", "label": "Ravi — or a session he asks directly", "all": true},
-    {"key": "product-manager", "label": "Product manager", "rights": {"specs": true, "tasks": "creates it, empty", "docs": true, "project": true, "reports": true, "raise": true, "take": true, "commit": "under /run-project"}},
+    {"key": "product-manager", "label": "Product manager", "rights": {"specs": true, "tasks": "creates it, empty", "docs": true, "project": true, "reports": true, "raise": true, "take": true, "commit": "when Ravi asked, or under a run he started"}},
     {"key": "project-lead", "label": "Project lead", "rights": {"project": "Questions for Ravi", "reports": true, "raise": true}},
     {"key": "designer", "label": "Designer", "rights": {"tasks": "own rows", "boards": true, "reports": true, "raise": true}},
-    {"key": "coder", "label": "Coder", "rights": {"code": true, "tests": true, "kit": "approved components", "changesets": true, "tasks": "own rows", "project": "own Log row · hand-off note", "reports": true, "raise": true, "commit": "when the brief says"}},
+    {"key": "coder", "label": "Coder", "rights": {"code": true, "tests": true, "kit": "approved components", "changesets": true, "tasks": "own rows", "project": "own Log row · hand-off note", "reports": true, "raise": true, "commit": "when Ravi asked, or under a run he started"}},
     {"key": "qa", "label": "QA", "rights": {"tasks": "own rows", "project": "own Log row (under /run-project)", "reports": true, "reviews": true, "raise": true}},
     {"key": "security", "label": "Security", "rights": {"reports": true, "raise": true}}
   ]

@@ -43,7 +43,7 @@ session these rules, so a project never repeats them; its *Rules for every sessi
 | Read first | `CLAUDE.md`, `.claude/team/TEAM.md`, the project's rules, the phase entry and the hand-off notes of every phase it needs |
 | Only this phase | What the entry's *Done when* says, in the files the agent's role writes (`TEAM.md` §1 *Edit rights*) |
 | Recommend the rest | Anything outside the phase or the role goes through the `recommend` skill, `--raised-in "phase <name>/<ID>"` |
-| Commit each step | The lead commits each finished step as `wip(<scope>): <ID> · step N — <what>`; never amends, rebases, resets, pushes or opens a PR |
+| Commit each step | Ravi's start of the run is the yes for these commits (`TEAM.md` §6 *Git*). The lead commits each finished step as `wip(<scope>): <ID> · step N — <what>` with `git add -A` and `--no-verify` — safe only because the phase starts from a clean tree on its own branch; the closing commit runs the hooks. Never amends, rebases, resets, pushes or opens a PR |
 | Stay on the phase branch | Never switch, create or merge branches (*Branches* below) |
 | Hand off | A hand-off note when done; past the context limit, row `partial` and a note saying where to resume |
 
