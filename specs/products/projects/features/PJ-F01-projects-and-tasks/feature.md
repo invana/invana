@@ -41,11 +41,11 @@ flowchart TD
   who -->|nobody| open["Open"]
   who -->|a person| person["Assigned · they work it"]
   who -->|an agent| ag["PJ-12 · A run opens, on the assigner's behalf"]
-  page --> pick["PJ-15 · Pick-up: manual · ask · automatic · narrowed per agent"]
-  pick -->|ask| askbox["PJ-15 · Inbox › Needs you: Start this task?"]
+  page --> pick["PJ-15 · Pick-up: Allow · Ask · Deny · narrowed per agent"]
+  pick -->|Ask| askbox["PJ-15 · Inbox › Needs you: Start this task?"]
   askbox -->|Start it| claim
   askbox -->|Not this time · deadline| held["Not started, saying why · stays open"]
-  pick -->|automatic| claim["PJ-15 · Claimed for 30 minutes"]
+  pick -->|Allow| claim["PJ-15 · Claimed for 30 minutes"]
   claim -->|lease lapses| open
   claim --> ag
   open --> pick
@@ -71,16 +71,16 @@ sequenceDiagram
   participant E as Engine
   participant A as Agent
   actor D as Person who decides (Inbox)
-  P->>E: sets the project to manual, ask or automatic; may narrow one agent
+  P->>E: sets the project to Deny, Ask or Allow; may narrow one agent
   loop while a task is open
     A->>E: looks for an open task it may take
-    alt manual
+    alt Deny
       E-->>A: nothing offered
-    else ask
+    else Ask
       A->>E: asks to start the task
       E->>D: Needs you: Start this task?
       D-->>E: Start it · Not this time
-    else automatic
+    else Allow
       E->>E: lease the task to the agent for 30 minutes
     end
   end
@@ -140,7 +140,7 @@ sequenceDiagram
 | Archiving freezes | An archived project's tasks are read only; a run already going finishes. Archiving and unarchiving are separate rows in History |
 | Order is derived | Waves, what a task waits on and the critical path are the engine's derivation from dependencies. A dependency carries a condition: on success · on failure · any outcome. A loop is refused, naming it |
 | Failure edges are contingency | A dependency on failure is drawn dashed and never counts toward the critical path; a task whose condition cannot now be met says why, or reads *Never triggered* |
-| Pick-up mode | Per project: *Manual* · *Ask first* (the default) · *Automatic* — Block, Ask first and Allow for starting a task ([the three modes](../../../settings/product.md#decisions)). *Automatic* is Allow set by a person, who confirms it after seeing which agents will start which tasks and the token budget cap. An agent's own mode can be narrower, never wider. A claim is a 30-minute lease, one claim per task; a lapsed claim returns the task to open |
+| Pick-up mode | Per project, for starting a task: *Allow* · *Ask* (the default) · *Deny* ([the three modes](../../../settings/product.md#decisions)). *Allow* is set by a person, who confirms it after seeing which agents will start which tasks and the token budget cap. An agent's own mode can be narrower, never wider. A claim is a 30-minute lease, one claim per task; a lapsed claim returns the task to open |
 | Whose behalf a pick-up runs | The person who set the pick-up mode |
 | The backend owns every number | Counts of tasks by state, a project's counts and the critical path come from the engine; Studio formats and never adds up |
 | Agent outcomes carry a trace | A task's result, a claim and a blocked reason open *How it got here* |
@@ -184,7 +184,6 @@ sequenceDiagram
 
 | Question | Who answers |
 |---|---|
-| Pick-up reads *Manual · Ask first · Automatic* while every other mode reads *Block · Ask first · Allow*. Recommend: keep the pick-up words — they say what happens to a task — and show the mode beside them; one set of words everywhere is the alternative | Ravi |
 | Recurring work. The engine's recurring-task design makes a task template on a cron that creates a new task each firing. That is a second kind of schedule beside AG-F07, where a schedule names an agent and instructions and whether a run creates work is the run's business. Recommend: no task templates — a recurring task is an AG-F07 schedule whose run creates the task for a person; PJ-18 keeps dependencies with conditions only. The template, its overlap policy and its title placeholders stay in the engine document, unmoved | Ravi |
 | Pick-up is set by the project's owner in the earlier plan, but a project has no owner other than its creator. Recommend: whoever can work on projects, as written here | Ravi |
 | A rejected result: the engine design says the note becomes a new task and the original returns to *Assigned*; this spec keeps the note on the same task, as a thread. Recommend: the same task, so the history of one piece of work stays in one place | Ravi |

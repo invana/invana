@@ -32,7 +32,7 @@ flowchart TD
   a --> as["As started by · in a view of the graph"]
   as --> m["Each row: what · to what · its skills need · its rules · the starter · the view · for everyone · result · why not"]
   m -->|a refused row| why(["Why not names the check: a rule · the person · for everyone · not in what it may do"])
-  a --> dg["Who it may hand work to: always · asks its owner · never, and the rule that allows it"]
+  a --> dg["Who it may hand work to: Allow · Ask · Deny, and the rule that allows it"]
   a -->|Open in Agents| ag(["AG-F01 · the agent's sheet"])
   a -->|What it may touch| wt(["ST-30 · each item's mode, level and who set it"])
   a -->|Add a rule| at{"Can manage people?"}
@@ -54,7 +54,7 @@ flowchart TD
 | ST-07.8 | A run no person started | its access is read | *Started by* reads `—` and refuses nothing |
 | ST-07.9 | A helper an agent made | its access is checked | it holds its maker's root agent's access, never rules of its own |
 | ST-07.10 | An agent's group | it holds a rule | the agent holds it too |
-| ST-07.11 | *Who it may hand work to* | it is read | each agent it may hand work to, the rule that allows it, and *always · asks its owner · never* |
+| ST-07.11 | *Who it may hand work to* | it is read | each agent it may hand work to, the rule that allows it, and *Allow · Ask · Deny* |
 | ST-07.12 | A run's step | its checks refuse | the step fails *refused* before it runs, naming the rule or the person; the refusal is in *Refusals* and History (IN-F03) |
 | ST-07.13 | Someone who can manage people | they add a rule from here or from the agent's sheet in Agents | it is one holding; the agent holds it at once |
 | ST-07.14 | An Operator | they open an agent | everything reads; *Add a rule* is shown as *Ask Priya* |

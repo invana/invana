@@ -54,10 +54,10 @@ flowchart TD
   gate -->|yes| go(["It runs"])
   gate -->|no| ref(["Refused before it runs · names the rule or the person"])
   ref -.-> hist(["IN-F03 · History"])
-  gate -->|its mode| mode{"Allow · Ask first · Block"}
+  gate -->|its mode| mode{"Allow · Ask · Deny"}
   mode -->|Allow| go
-  mode -->|Ask first| askf(["IN-01 · waits for a yes in Needs you"])
-  mode -->|Block| blk["ST-31 · Refused · the agent asks for more"]
+  mode -->|Ask| askf(["IN-01 · waits for a yes in Needs you"])
+  mode -->|Deny| blk["ST-31 · Refused · the agent asks for more"]
   blk --> more{"IN-01 · whoever may change that mode decides"}
   more -->|Allow · for this run, N days or always| go
   more -->|Decline · expires| refd(["The step ends refused · named in How it got here"])
@@ -101,7 +101,7 @@ sequenceDiagram
 | ST-10 | [See and change who holds an access rule](stories/ST-10-see-and-change-who-holds-an-access-rule/story.md) | idea |
 | ST-11 | [Test whether someone can do something](stories/ST-11-test-whether-someone-can-do-something/story.md) | idea |
 | ST-30 | [See what an agent may touch](stories/ST-30-see-what-an-agent-may-touch/story.md) | idea |
-| ST-31 | [A blocked agent asks for more](stories/ST-31-a-blocked-agent-asks-for-more/story.md) | idea |
+| ST-31 | [A denied agent asks for more](stories/ST-31-a-blocked-agent-asks-for-more/story.md) | idea |
 
 ## Access
 
@@ -118,7 +118,8 @@ sequenceDiagram
 | An agent's access from its own sheet | Read: every member · attach a rule: `iam-admin` | As above |
 | Read what an agent may touch — every item's mode, its level and who set it | Operator — every member | — |
 | Set a mode on a rule's line | `iam-admin` · shown as *Can manage people*, as writing the rule | As above |
-| Decide an agent's ask for more | Whoever may change the mode that blocked it (IN-F01) | The ask reads; its acts are disabled, naming who it waits on |
+| Edit an agent's own rule — tighten only | `builder` · shown as *Can build agents* · Admin, from the agent's sheet (AG-F01) | Each mode reads; changing it is disabled, naming *Can build agents* |
+| Decide an agent's ask for more | Whoever may change the mode that denied it (IN-F01) | The ask reads; its acts are disabled, naming who it waits on |
 
 ## States
 
@@ -129,17 +130,17 @@ sequenceDiagram
 | Loading | The sheet opens at once; lists show loading rows; counts read `—` until the engine gives them |
 | Has data | Access rules one row each, the selected one beside them: what it allows, its limits, who holds it |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused save says why in place, naming the line or the name |
-| Agent working or proposing | *Draft from the assistant · Not saved*, with who it changes, before anything changes · an agent blocked by a mode, asking for more in Needs you |
+| Agent working or proposing | *Draft from the assistant · Not saved*, with who it changes, before anything changes · an agent denied by a mode, asking for more in Needs you |
 | No access | Every rule, person, group and agent reads; each write is shown as *Ask Priya*, naming someone who can manage people |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
-| Allowed only where every check allows | What the skill needs ∩ the agent's access rules ∩ the person who started the run ∩ the view of the graph ∩ every rule for everyone ∩ a key's own rule. A refusal names the check and the rule (or the person) that refused |
-| Nothing is allowed that no rule allows | Every line allows; there is no line that forbids. A rule for everyone is how a Graph keeps something back |
-| Four kinds of access rule | *Built in* — the six grants (Operator · Can work on projects · Can build agents · Can shape the model · Owner · Can manage people), read-only · *Custom* · *A key's own* — narrows one key · *For everyone* — the most anyone in the Graph may do, held without being given |
-| A line | What may be done · to what · with conditions · and, for agents, a mode — Allow · Ask first · Block ([the three modes](../../product.md#decisions)). Conditions are only: some fields (only these · all but these), helper depth (at most N levels), until (an instant) |
+| Allowed only where every check allows | What the skill needs ∩ the agent's access rules ∩ the person who started the run ∩ the view of the graph ∩ every rule for everyone ∩ a key's own rule ∩ an agent's own rule. A refusal names the check and the rule (or the person) that refused |
+| Nothing is allowed that no rule allows | Every line allows, except a Deny, which goes only on the *For everyone* rule and on an agent's own rule ([Deny inside one Graph](../../product.md#decisions)). A rule for everyone is how a Graph keeps something back; the other rules a holder has still add up |
+| Five kinds of access rule | *Built in* — the six grants (Operator · Can work on projects · Can build agents · Can shape the model · Owner · Can manage people), read-only · *Custom* · *A key's own* — narrows one key · *An agent's own* — narrows one agent, edited from its sheet by *Can build agents*, and only tightens · *For everyone* — the most anyone in the Graph may do, held without being given |
+| A line | What may be done · to what · with conditions · and, for agents, a mode — Allow · Ask · Deny ([the three modes](../../product.md#decisions)). Conditions are only: some fields (only these · all but these), helper depth (at most N levels), until (an instant) |
 | What it reaches | Lines group by what they reach: graph data · AI models · outside (the web, MCP tools, mail) · cache · people · agents (making helpers, handing work on) · projects · datasets |
 | Who holds access | People (members and service accounts), groups and agents. A key acts as its holder. Workers hold none — they only run steps |
 | A group passes on what it holds | Every person and agent in it holds what the group holds, built-in rules included; nothing is copied |
@@ -160,7 +161,7 @@ sequenceDiagram
 | Access rules — kind, lines, limits, version, who drafted it | Write · read |
 | Versions of a rule — who saved it, when, why | Write · read |
 | Holdings — who holds a rule, how (directly · via a group · for a run), who added them, when it ends | Write · read |
-| A line's mode for agents — Allow · Ask first · Block — and who set it | Write · read |
+| A line's mode for agents — Allow · Ask · Deny — and who set it | Write · read |
 | Groups and their people and agents | Write · read |
 | Service accounts | Write · read |
 | Keys — name, holder, its own rule, expiry, last used | Write · read |
@@ -185,10 +186,6 @@ sequenceDiagram
 | Question | Who answers |
 |---|---|
 | The board names a key *Access key* (*Profile and keys*); the glossary says *Personal access token*. Recommend: *key* on screen — shorter, and the board already reads it; the glossary changes with Ravi's yes | Ravi |
-| Two rules an agent holds at one level disagree — one line Allow, another Block. *Nothing is allowed that no rule allows* and *Not building: lines that forbid* make holdings a union; the tightest-binds precedence makes Block forbid. Recommend: a mode only tightens across levels — install, Graph, agent — and inside one level the holder's lines stay a union, so Block lives on rules for everyone and an agent's own rule. Blocking until Ravi answers | Ravi |
-| How does each act fall into the defaults — is an AI model call a read or a spend, and a tool call? Recommend: by what the function touches — reads the graph and nothing outside are reads; writes the graph, changes the model and brings data in are writes; a tool its server does not mark read-only is a send; an AI model call inside the token budget is a read, and going past it is a spend | Ravi |
-| May an Admin set Ask first at the install — a tool that asks first in every Graph? *Access is per Graph* and *Rules shared across Graphs* (Not building) leave no install-wide access rule to hold that line, so the install level is only what an Admin turns on, offers and limits. Recommend: keep it so — an install switch is on (the Graph decides) or off (Block); Ask first starts at the Graph | Ravi |
-| Does every Block let the agent ask for more? Recommend: yes, once per run per item; no *Block, never ask* setting | Ravi |
 | What does *Ask Priya* do when pressed? The board links it to the Inbox; the source docs build no access-request flow and only name who to ask. Recommend: it raises an ask for the grant in that person's Needs you (IN-01), as an agent's ask for access does | Ravi |
 | The board's limits read *Tokens a day* and *Runs at once*; the rules carry tokens a month and a run, and agents at once. Recommend: a month and a run, as the engine stores them; the board is redrawn | Ravi |
 
@@ -196,7 +193,7 @@ sequenceDiagram
 
 | Item | Why not |
 |---|---|
-| Lines that forbid | Nothing allowed by default, plus rules for everyone, covers it; precedence is where access gets unreadable |
+| Lines that forbid, beyond Deny | Deny goes only on the *For everyone* rule and an agent's own rule; anywhere else, precedence is where access gets unreadable |
 | Conditions beyond fields, depth and until | Time windows, addresses and tags are unproven |
 | Rules shared across Graphs | Everything is per Graph |
 | Rules on workers | Workers run any agent's steps; access belongs to the agent |

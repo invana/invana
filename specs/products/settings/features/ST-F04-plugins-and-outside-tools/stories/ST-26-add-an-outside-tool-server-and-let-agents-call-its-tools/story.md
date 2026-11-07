@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [ST-F04](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add a server by address and name; read its tools again; turn it on or off | — |
-| Operator | Read every server, its tools, which ask first and which skills use them | *Add a server*, *Read its tools again* and the switch disabled, naming the Admin |
+| Operator | Read every server, its tools, each one's mode and which skills use them | *Add a server*, *Read its tools again* and the switch disabled, naming the Admin |
 
 ## Flow
 
@@ -51,13 +51,13 @@ flowchart TD
 | ST-26.5 | A server that changed its tools | nothing is done | nothing changes; agents call only the tools frozen when it was added |
 | ST-26.6 | An Admin | they read its tools again | a new revision is frozen; a new tool starts at its first version, a changed tool's version moves, an unchanged one keeps it, a dropped one leaves |
 | ST-26.7 | A server turned on | a plan calls a tool the server marks read-only | it runs as a read |
-| ST-26.8 | A server turned on, the tool's mode left at its default | a plan calls any other tool | it is Ask first: the run waits for a yes in Needs you (IN-01); a no fails the step as *not sent* |
+| ST-26.8 | A server turned on, the tool's mode left at its default | a plan calls any other tool | it is Ask: the run waits for a yes in Needs you (IN-01); a no fails the step as *not sent* |
 | ST-26.9 | A server turned off | a plan calls its tool | the step is refused, saying the plugin is off and who can turn it on |
 | ST-26.10 | The server is down at call time | a step calls it | the step fails, naming the address; it is not retried |
 | ST-26.11 | A server that wants a token the workers do not hold | a step calls it | the step is refused, naming the setting the workers need |
 | ST-26.12 | An Operator | they open MCP servers | every server and its tools read; *Add a server*, *Read its tools again* and the switch are disabled, naming the Admin |
 | ST-26.13 | An add, a refresh or a switch | it is done | History records who did it and when (IN-F03) |
-| ST-26.14 | A server's tools | they are read | each tool shows its mode for this Graph — Allow · Ask first · Block — and who set it |
+| ST-26.14 | A server's tools | they are read | each tool shows its mode for this Graph — Allow · Ask · Deny — and who set it |
 
 ## Screens
 

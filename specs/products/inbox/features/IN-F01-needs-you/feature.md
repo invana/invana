@@ -12,7 +12,7 @@ depends_on: [PJ-F02]
 
 # Needs you — approvals and notifications
 
-> Whatever an agent is set to ask first about — by default every send, change and spend — waits for a person,
+> Whatever an agent is set to Ask about — by default every send, change and spend — waits for a person,
 > showing exactly what it will do; everything else that should reach a person arrives in the same Inbox, by rules an owner writes. The decision it helps make:
 > *should this go — this message, this access, these tokens — and what needs me first?*
 
@@ -106,10 +106,10 @@ sequenceDiagram
 | One list of what waits | Needs you holds every ask an agent or a run makes of a person — access · budget · delegation · send · question · more than a mode allows (ST-31) — a held delivery of a finished run, a breaking model publish, and project work (PJ-F02). The Inbox icon and the header carry one count: unread updates + asks waiting on the reader + runs waiting on the reader's answer |
 | An ask shows what it will do | Exactly what will be sent — for a message its To, Subject and body; for a delivery the channel and message — frozen when it is asked. Allowing sends that, never a re-render |
 | An ask names its routing | Each ask says who asked and on whose behalf (*Ravi ▸ Route analyst*), what it wants in one line, who it is routed to and why (*world owner* · *agent owner* · *started the run* · *wrote the task* · *install admin*), how long it has waited, and its run |
-| Routed to whoever owns what is asked for | The owner of the view of the graph for access; the target agent's owner for a delegation and a send; the person who started the run for budget; the task's author for a question; an install admin for workers; whoever may change a mode at the level that blocked an agent (ST-31) |
+| Routed to whoever owns what is asked for | The owner of the view of the graph for access; the target agent's owner for a delegation and a send; the person who started the run for budget; the task's author for a question; an install admin for workers; whoever may change a mode at the level that denied an agent (ST-31) |
 | Only the people it is routed to decide | A Graph role does not widen it — an owner not named is refused like anyone else. Any one of them decides; no quorum, no order |
 | A deadline, one reminder | Each ask has a deadline. One reminder goes at half-time to those who have not decided. At the deadline it is *expired, not sent*; a late decision is refused |
-| Never decided by itself | Nothing set to Ask first is ever decided by itself; an agent acts without asking only where a person set Allow ([the three modes](../../../settings/product.md#decisions)). Expiry tells the approvers and the requester in the Inbox |
+| Never decided by itself | Nothing set to Ask is ever decided by itself; an agent acts without asking only where a person set Allow ([the three modes](../../../settings/product.md#decisions)). Expiry tells the approvers and the requester in the Inbox |
 | An ask ends with its run | When its run ends, every pending ask of it leaves Needs you and closes expired; what it held is not sent. A held delivery and a breaking publish keep their own deadline |
 | A waiting step holds; the run carries on | Only the step that asked waits |
 | Allowed for this run | An allowed ask reaches that agent, for this run, never its children. *Allow always* exists only on a delegation and adds the target to the caller's *May delegate to* |

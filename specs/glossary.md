@@ -56,8 +56,8 @@ stands for.
 | **Retune** | Narrow or widen the view of the graph from a run, then ask again | Retune |
 | **What it may do** | The functions an agent or plan may run, with what arguments, each with its mode | Envelope |
 | **Access rule** | Who may do what, as sentences: *Can ask*, *Can change data* | Policy |
-| **Allow · Ask first · Block** | The mode of each act an agent takes — it acts · it waits for a yes in the Inbox · it is refused, naming who set it. Set by a person, by hand on an item or on an access rule's line; agents only | Mode |
-| **Asks first** | An act set to Ask first waits in the Inbox, showing exactly what it will do — by default every write, send, spend and access change | Approval |
+| **Allow · Ask · Deny** | The mode of each act an agent takes — it acts · it waits for a yes in the Inbox · it is refused, naming who set it. Set by a person, by hand on an item or on an access rule's line; agents only | Mode |
+| **Asks first** | An act set to Ask waits in the Inbox, showing exactly what it will do — by default every write, send, spend and access change | Approval |
 | **Token budget** | The tokens an agent, schedule or eval set may spend in a period — never currency | Budget |
 | **Workers · runs at once** | The machines that run work, and how many runs a Graph may have going | Pool · lane · worker |
 | **Worker group · Join key** | Workers that share labels and run the same kinds of step · the key a new worker joins a group with, shown once | Worker pool · join token |
@@ -76,7 +76,7 @@ stands for.
 | **Can manage people** | Members, groups, access rules, other people's keys | `iam-admin` |
 | **Member** | A person or an agent with access to a Graph | Member · agent binding |
 | **Personal access token** | A long-lived credential a person mints for themselves, shown once | Token |
-| **Built in · Custom · A key's own · For everyone** | The kinds of access rule: the six grants, read-only · one written here · one that narrows a single key · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
+| **Built in · Custom · A key's own · An agent's own · For everyone** | The kinds of access rule: the six grants, read-only · one written here · one that narrows a single key · one that narrows a single agent, from its sheet · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
 | **Who holds it** | The people, groups, agents and keys an access rule reaches, and how — directly, via a group, for a run | Held by · attachments |
 | **Who it changes** | Before an access rule is saved: who gains, who loses, which skills would break | Impact |
 | **What it can do** | What an agent may actually do once every check is applied, with why not for each refusal | Effective access |
@@ -113,7 +113,7 @@ stands for.
 | **Effort** | How hard an agent tries before it stops — steps, replans, questions back | Effort |
 | **Helper** | An agent another agent makes for one piece of work, inside that agent's bounds; it retires when the work closes | Ephemeral child agent · spawn |
 | **Outside agent** | An agent outside Invana, added by its agent card, that an agent may hand a task to | Remote agent · A2A |
-| **May delegate to** | The agents an agent may hand work to — always · ask each time · never | `may_delegate` |
+| **May delegate to** | The agents an agent may hand work to — Allow · Ask · Deny for each | `may_delegate` |
 | **Evals** | Fixed questions with checks, replayed before a skill or agent is published | Eval set |
 | **Model version** | A provider's exact model name, pinned by an agent or skill | Pin |
 | **Schedule** | An agent and instructions on a cron, with where the result goes | Schedule |
@@ -155,7 +155,7 @@ stands for.
 | **Met · unmet · needs a person** | A criterion's outcome on a result; *needs a person* when its check could not run | Criterion outcome |
 | **Accept · Send back** | A person closes a task on its result · reopens it, the note on the failing criterion | Accept · reject |
 | **A pass to judge · Good enough · Go again** | A loop's pass waiting on a person · settle it · run another, the note its input | Verdict (runtime) |
-| **Pick-up · Manual · Ask first · Automatic** | How agents take a project's tasks — Block · Ask first · Allow for starting one: only when assigned · asking a person first · on their own, where a person set and confirmed it | Pick-up mode |
+| **Pick-up · Allow · Ask · Deny** | How agents take a project's tasks — the mode for starting one: on their own, where a person set and confirmed it · asking a person first · only when assigned | Pick-up mode |
 | **Claimed** | A task an agent has taken by pick-up, for a while; a lapsed claim returns it | Claim |
 | **Order** | A project's tab of its tasks in waves, by what each waits on | Plan canvas |
 | **Open · Assigned · In progress · Needs input · Blocked · In review · Done · Failed · Cancelled** | A task's state, read off its latest run; only the last three are written, by a person | Todo status (derived) |

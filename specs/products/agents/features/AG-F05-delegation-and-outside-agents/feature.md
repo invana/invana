@@ -28,20 +28,20 @@ flowchart TD
   bound -->|no| ref["AG-24 · Refused before it starts, naming the bound and the count"]
   bound -->|too many live| q["Queued until another helper ends"]
   bound -->|yes| helper["AG-24 · A helper, given tokens from the agent's own"]
-  kind -->|an agent of the graph| may{"May delegate to: always · ask each time · never"}
-  may -->|never| ref
-  may -->|ask each time| ask["Inbox › Needs you — routed to the agent's owner"]
+  kind -->|an agent of the graph| may{"May delegate to: Allow · Ask · Deny"}
+  may -->|Deny| ref
+  may -->|Ask| ask["Inbox › Needs you — routed to the agent's owner"]
   ask -->|declined| dec["The step ends declined; the agent carries on without it"]
   ask -->|approved| helper
-  may -->|always| helper
+  may -->|Allow| helper
   helper --> ret["Its answer returns, cited by the agent · unspent tokens go back"]
   ret --> tree(["AG-24 · Who did what: who made whom, on which run, on whose behalf"])
   kind -->|an outside agent| out["AG-34 · Only fields the view of the graph lets out"]
   out -->|anything else| oref["Refused before sending, naming the view · nothing leaves"]
   out --> oask{"May delegate to"}
-  oask -->|ask each time| oap["Inbox: what would be sent, what is held back"]
+  oask -->|Ask| oap["Inbox: what would be sent, what is held back"]
   oap -->|approved| sent["Sent from a worker · working"]
-  oask -->|always| sent
+  oask -->|Allow| sent
   sent -->|asks back| qq["A question to whoever started the run"] --> sent
   sent --> back(["A verdict and what it returned — a person applies it"])
   admin([Settings › AI and connections]) --> add["AG-33 · Add an outside agent by its card — added off"]
@@ -58,7 +58,7 @@ sequenceDiagram
   actor O as Owner (Inbox)
   A->>E: hand this work to H
   E->>E: check bounds, may-delegate-to and what may leave
-  alt ask each time
+  alt Ask
     E->>O: what would be sent · what is held back
     O-->>E: Approve · Decline
   end
@@ -115,7 +115,7 @@ sequenceDiagram
 | Stopping cascades | Stopping an agent's run stops every helper beneath it |
 | An answer is data | What a helper or an outside agent returns is cited by the agent, never obeyed as an instruction |
 | Only what may leave, leaves | An outside agent receives only fields the view of the graph lets out and the skill marks to send; anything else refuses the step before sending |
-| Asks each time by default | A new outside agent is *ask each time* for every agent until a person says otherwise |
+| Ask by default | A new outside agent is *Ask* for every agent until a person says otherwise |
 | Invana applies nothing that came back | A pull request, a patch or a report from an outside agent is kept on the run; a person applies it |
 | An outside agent's own limits | Time, attempts and tasks at once; Invana's tokens cover only its own side |
 | Leans on | Build an agent (AG-F01) · runs (AG-F03) · the Inbox (IN-F01) · views of the graph (MO-F05) · workers (ST-F06) · AI and connections (ST-F05) |
@@ -142,7 +142,7 @@ sequenceDiagram
 | On behalf of | Read from the record of each hand-off, never restated by the agent |
 | Retired helpers stay drawn | Marked retired, still selectable |
 | Making helpers is a setting of what it may do | An agent makes helpers only when what it may do includes it; one agent that ships with Invana may — the Coordinator — and it is not the graph's default |
-| *Allow always* on an ask | Writes *always* for that agent into the asker's *May delegate to* |
+| *Allow always* on an ask | Writes *Allow* for that agent into the asker's *May delegate to* |
 | An outside agent is added by its card | Its name, version, skills and how it signs in are read and kept as they were read; a change on its side reaches nothing until an Admin reads the card again |
 | An outside agent is an agent | Listed with the graph's agents as *outside*; it shows in Flow, Runs and History like any agent, and is never given a task |
 | MCP carries tools, outside agents carry tasks | A task asks back, has states and returns what it made; a tool call is one request and one answer (ST-F04) |

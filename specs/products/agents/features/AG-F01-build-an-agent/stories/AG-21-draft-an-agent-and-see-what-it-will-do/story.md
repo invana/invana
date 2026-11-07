@@ -33,7 +33,7 @@ flowchart LR
   n -->|Create agent| d["A draft, as a sheet · Setup"]
   d --> sk["Skills — add from the install's skills, suggested ones first"]
   sk -->|a skill needs a function it may not run| m["Marked on the skill, naming the function"]
-  d --> wm["What it may do — functions by reach, each Allow · Ask first · Block, fixed arguments, what needs each"]
+  d --> wm["What it may do — functions by reach, each Allow · Ask · Deny, fixed arguments, what needs each"]
   wm -->|looser than the Graph · an access change Allow| wx["Refused, naming the level"]
   d --> lim["Limits — tokens a run and a month, runs at once, helpers, effort"]
   lim -->|a run budget above the month's| lw["Flagged under the field"]
@@ -49,7 +49,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask first · Block, starting at the Graph's) and a token budget |
+| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask · Deny, starting at the Graph's) and a token budget |
 | AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template whose *What it may do* comes with it, and opens as a sheet on Setup with a *Draft* chip |
 | AG-21.3 | A name another agent already has, retired or not | they save | it is refused, naming the agent that has it |
 | AG-21.4 | *What it may do* with nothing allowed | they save | it is refused: an agent that may run nothing is a mistake |
@@ -57,14 +57,14 @@ flowchart LR
 | AG-21.6 | A draft | its Setup opens | it shows instructions, voice, skills, model version and effort, limits, access, where it runs and lifecycle; an agent with no skill says it runs on the graph's own plans alone |
 | AG-21.7 | The skills of the install | the builder presses *Add a skill* | the picker lists published and draft skills, the template's suggested skills first; the added skill shows its version, when to use it, the functions it needs, and offered against applied — *too few to read* below the threshold |
 | AG-21.8 | A skill that needs a function the agent may not run | it is added | its row marks the need, naming the function, with *Edit what it may do* — before any run is refused |
-| AG-21.9 | *What it may do* | it opens | it reads *6 of 25 functions*, grouped by what each reaches (reads the graph · writes the graph · sends · …), each with its mode — Allow · Ask first · Block — who set it, the arguments fixed for this agent and what needs it; a function nothing needs reads *nothing needs it* |
+| AG-21.9 | *What it may do* | it opens | it reads *6 of 25 functions*, grouped by what each reaches (reads the graph · writes the graph · sends · …), each with its mode — Allow · Ask · Deny — who set it, the arguments fixed for this agent and what needs it; a function nothing needs reads *nothing needs it* |
 | AG-21.10 | A function allowed only with an argument fixed | a plan sets that argument otherwise | the plan is refused before it runs, naming the function and the argument |
 | AG-21.11 | Limits | they open | tokens a run and a month, runs at once, may create helpers, how deep and how many, and effort (steps, replans, questions) each sit beside what they bound and whether a run is stopped at it; an empty cell shows the number a run reads, never a dash |
 | AG-21.12 | A run budget above the month budget | they type it | it is flagged under the field and Save is refused until it holds |
 | AG-21.13 | The agent's own limits, the work's view of the graph and the graph's rules | Setup opens | they read as three rows that nest, so a refusal is predictable before it happens |
 | AG-21.14 | A plan that names a function the agent may not run, or would pass a limit | it is about to run | it is refused before anything is dispatched, naming the bound and its side — the agent, the view of the graph, or a rule — and nothing is spent |
 | AG-21.15 | An agent that proposes a change to its own limits | the proposal arrives | a narrowing is offered to apply; a widening is never proposed by the agent — only a person widens a limit |
-| AG-21.16 | Access | it opens | the access rules it holds, then each function — its skills need it · its rules allow it · the person who started the run · the view of the graph · in effect · why not — and who it may hand work to (always · asks · never) |
+| AG-21.16 | Access | it opens | the access rules it holds, then each function — its skills need it · its rules allow it · the person who started the run · the view of the graph · in effect · why not — and who it may hand work to (Allow · Ask · Deny) |
 | AG-21.17 | Where it runs | it opens | each kind of work its functions do, the workers that run it and their free slots; its triggers — the schedules that start it, *Can be given tasks*, *Runs with nobody to ask*; *Callable over MCP* disabled while it is a draft |
 | AG-21.18 | Flow | it opens | triggers → the agent → its skills → the helpers it may create, drawn from records; the foot says it is drawn from the agent's instructions and skills, and that a run may replan within them, never wider |
 | AG-21.19 | Edits on several parts of Setup | they press Save | one version is saved, carrying only what moved; adding a skill is saved on its own so a refusal names that skill |

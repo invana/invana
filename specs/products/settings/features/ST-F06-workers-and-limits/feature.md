@@ -97,7 +97,6 @@ sequenceDiagram
 
 | Rule | Detail |
 |---|---|
-| The install's limits are the ceiling | A Graph's tokens a month and runs at once bound every mode ([the three modes](../../product.md#decisions)): an Allow never spends past them, and a run held at them asks for more (ST-23) |
 | Limits are set once, read everywhere | An Admin sets each Graph's tokens a month, runs at once, worker group and *queue or refuse*; the Graph reads them in Usage and limits and never changes them |
 | A run waiting is not a run running | It holds no slot, uses no worker and costs nothing |
 | Questions go first | Work is taken in this order: a question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents). Busy Graphs share the install equally; an idle Graph's share is lent |

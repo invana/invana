@@ -33,7 +33,7 @@ flowchart TD
   new -->|Create agent| draft["AG-21 · A draft, as a sheet: Setup · Flow · Versions"]
   draft --> setup["Skills · what it may do · limits · access · where it runs · Flow"]
   setup -->|a skill needs a function it may not run| mark["Marked on the skill, naming the function"]
-  setup --> modes["AG-21 · What it may do: each item Allow · Ask first · Block, narrowed for this agent"]
+  setup --> modes["AG-21 · What it may do: each item Allow · Ask · Deny, narrowed for this agent"]
   modes -->|looser than the Graph| mx["Refused, naming the level that set it"]
   setup --> test["AG-36 · Test in the practice graph"]
   test -->|no practice graph named| tx["Disabled — an Admin names one in Settings"]
@@ -110,7 +110,7 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | No unbounded agent | Every agent starts from a template that brings what it may do; there is no agent that may run anything |
-| What it may do is modes | Each thing the agent may touch carries Allow · Ask first · Block ([the three modes](../../../settings/product.md#decisions)). A builder narrows a single agent; its own modes are lines of its own access rule and never loosen what the Graph set |
+| What it may do is modes | Each thing the agent may touch carries Allow · Ask · Deny ([the three modes](../../../settings/product.md#decisions)). A builder narrows a single agent from its sheet; its own modes are lines of its own access rule — *An agent's own*, a fifth kind beside *A key's own* (ST-F02) — which only tightens what the Graph set |
 | What it may do is checked before it runs | A plan that names a function the agent may not run, an argument it must not change, or a limit it would pass is refused before anything is dispatched — nothing is spent |
 | A refusal names its side | The agent's own limits, the view of the graph the work runs in, or a rule that must always hold — whichever bound it |
 | Bounds nest | An agent's own limits ∩ the work's view of the graph ∩ the graph's rules, frozen when a run opens; a run's helpers may only narrow them |
@@ -144,7 +144,7 @@ sequenceDiagram
 | Record | Read or write |
 |---|---|
 | Agent — name, kind, status, instructions, voice, voice dials, what it may do, limits, effort, model pin | Write · read |
-| The agent's own modes — lines of its own access rule (ST-F02) | Write · read |
+| The agent's own modes — lines of its own access rule, *An agent's own* (ST-F02) | Write · read |
 | Agent version and its reason | Write · read |
 | Skills added to the agent | Write · read |
 | The agent's tests and their runs in the practice graph | Write · read |
@@ -177,7 +177,6 @@ sequenceDiagram
 
 | Question | Who answers |
 |---|---|
-| The agent's own modes are lines of an access rule of its own — a fifth kind beside *A key's own*, narrowing one agent. Recommend: yes, so one record decides; *Can build agents* writes it from the sheet, as it writes *What it may do* | Ravi |
 | Who builds agents — *Can build agents* in a graph (the engine today) or an Admin only, once agents are install-wide (AG-F02)? The spec states the engine's rule meanwhile | Ravi |
 | Effort is drawn as *Low · Medium · High*; the engine stores steps, replans and questions. Presets over the three numbers, or the numbers alone? | Ravi |
 | The boards show tokens *today*; the engine budgets a run and a month. Add a daily budget, or draw the run and the month? | Ravi |

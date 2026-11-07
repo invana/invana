@@ -10,7 +10,7 @@ boards: [inbox]
 # IN-01 · Decide what an agent asks before it acts
 
 **As** the owner of an agent, a view of the graph or a run **I want** every ask routed to me — access, budget, a
-delegation, a send, a question — showing exactly what it will do **so that** nothing set to Ask first leaves, changes or
+delegation, a send, a question — showing exactly what it will do **so that** nothing set to Ask leaves, changes or
 spends without my yes — the agent proposes the act, and I decide whether it goes.
 
 Tasks: [task.md](task.md) · Feature: [IN-F01](../../feature.md)
@@ -45,7 +45,7 @@ flowchart LR
 | IN-01.1 | An agent step that wants to send a message | the step reaches the send | it holds, and an ask appears in Needs you for the people it is routed to; the rest of the run carries on |
 | IN-01.2 | An ask to send | it is read | it shows exactly what will be sent — To, Subject and the start of the body — with *See all it will send* opening the whole message as it will go |
 | IN-01.3 | Any ask | it is read | it names who asked and on whose behalf (*ravi ▸ Route analyst*), what it wants in one line, who it is routed to and why, how long it has waited, the deadline as time left, and its run |
-| IN-01.4 | An ask | it is raised | it is routed by its kind — access to the owner of the view of the graph; a delegation or a send to the target agent's owner; budget to the person who started the run; a question to the task's author; workers to an install admin; more than a mode allows to whoever may change it at the level that blocked it — and says which |
+| IN-01.4 | An ask | it is raised | it is routed by its kind — access to the owner of the view of the graph; a delegation or a send to the target agent's owner; budget to the person who started the run; a question to the task's author; workers to an install admin; more than a mode allows to whoever may change it at the level that denied it — and says which |
 | IN-01.5 | An ask to send, routed to the reader | they press *Send it* | exactly what was shown is sent, never a re-render, and the run carries on |
 | IN-01.6 | An ask routed to the reader | they press *Not this time* or *Decline* with a note | nothing is sent, the step ends *not sent*, and the note is kept |
 | IN-01.7 | An ask for access, routed to the reader | they press *Allow* | it is allowed for this run, for that agent only, never its children |

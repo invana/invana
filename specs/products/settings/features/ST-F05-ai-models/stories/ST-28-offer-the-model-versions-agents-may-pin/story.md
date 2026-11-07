@@ -58,7 +58,7 @@ flowchart TD
 | ST-28.10 | A provider that rate-limits, a local model that is not running, or a rotated key | a run calls it | the run fails, naming the endpoint and the provider's message — never as *cannot answer* |
 | ST-28.11 | A ping | it runs | it is a run; History records who pinged, when and the result (IN-F03) |
 | ST-28.12 | An Operator | they open AI models | everything reads but keys; *Add a model*, *Ping* and every act are disabled, naming the Admin |
-| ST-28.13 | A model version | it is read | it shows its mode for this Graph — Allow · Ask first · Block — and who set it |
+| ST-28.13 | A model version | it is read | it shows its mode for this Graph — Allow · Ask · Deny — and who set it |
 
 ## Screens
 
