@@ -35,6 +35,7 @@ flowchart TD
   v -->|no| ref["Refused in place, naming the line or the name"]
   ref --> e
   v -->|yes| imp(["ST-05 · who it changes, then Save"])
+  e -->|a line's mode| md["Allow · Ask first · Block · an access change never Allow"] --> v
   r --> h["History — every saved version"]
   r -->|Delete · a custom rule| dl{"Held by anyone?"}
   dl -->|yes| hl["Lists its holders · they lose it on confirm"]
@@ -58,6 +59,9 @@ flowchart TD
 | ST-02.10 | A rule for everyone, saved | any holder in the Graph is checked | it bounds them without being given to them; several all apply |
 | ST-02.11 | An Operator | they open a custom rule | it reads; *Edit* and *Delete* are shown as *Ask Priya*, naming someone who can manage people |
 | ST-02.12 | Someone who can manage people | they open a built-in rule | *Edit* is absent; the rule says it is built in |
+| ST-02.13 | A line | it is read or edited | it carries a mode for agents — Allow · Ask first · Block — and a line set to none reads its default: Allow for a read, Ask first for a write, a send, a spend and an access change |
+| ST-02.14 | A line reaching an access change | its mode is set to Allow | the save is refused in place, naming the line: an access change is never Allow for an agent |
+| ST-02.15 | A line reaching data | it is written | it reaches data by sensitivity — public · internal · confidential · personal — or names one kind |
 
 ## Screens
 

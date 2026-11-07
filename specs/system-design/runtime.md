@@ -629,7 +629,7 @@ sequenceDiagram
 | Sensors that poll outside systems | A run waits on a person or an event, never on a spin loop |
 | Backfill and catch-up | A schedule's missed firing is recorded as missed, not replayed |
 | Approval quorums and escalation chains | Unproven complexity |
-| Auto-approval, or auto-acceptance on a verdict timeout | A rule that decides on the agent's behalf is the switch these pauses replace; an unjudged draft is a failed run |
+| Auto-approval, or auto-acceptance on a verdict timeout | Nothing set to Ask first is ever decided by itself: an agent acts without asking only where a person set Allow ([the three modes](../products/settings/product.md#decisions)); an unjudged draft is a failed run |
 | An agent giving a verdict on output | A mechanical judgement is a `verify` step with an `until` predicate |
 | A plan authoring UI | A plan is data validated against an envelope, never a hand-drawn graph of steps |
 | An external orchestrator adapter | The plan-as-data model gives a general executor nothing to do; another executor would be its own package implementing the protocol |

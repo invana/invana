@@ -61,7 +61,7 @@ flowchart BT
 | **Streaming is the default** | Steps and answers paint as they arrive, for a question and a load alike |
 | **Hard deletes, downward cascade** | No soft deletes, no trash, no undo. Retention removes whole windows, never single rows. Retire and retract exist where history must stay resolvable |
 | **The engine owns every number** | The engine computes and stores every number when the fact settles; Studio formats it, never derives it |
-| **Asks before it acts** | A write, a send, a spend or an access change waits on a person's yes, recorded as an approval |
+| **Acts only as far as the person allows** | Each act an agent takes runs as Allow, Ask first or Block, set by a person; a write, a send, a spend and an access change wait on a person's yes by default, recorded as an approval ([the three modes](../products/settings/product.md#decisions)) |
 
 ## Metrics are stored
 

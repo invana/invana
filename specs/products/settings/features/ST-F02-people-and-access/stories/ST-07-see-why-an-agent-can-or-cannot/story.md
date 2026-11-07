@@ -34,6 +34,7 @@ flowchart TD
   m -->|a refused row| why(["Why not names the check: a rule · the person · for everyone · not in what it may do"])
   a --> dg["Who it may hand work to: always · asks its owner · never, and the rule that allows it"]
   a -->|Open in Agents| ag(["AG-F01 · the agent's sheet"])
+  a -->|What it may touch| wt(["ST-30 · each item's mode, level and who set it"])
   a -->|Add a rule| at{"Can manage people?"}
   at -->|yes| ok(["Held at once"])
   at -->|no| ask["Ask Priya"]
@@ -57,7 +58,7 @@ flowchart TD
 | ST-07.12 | A run's step | its checks refuse | the step fails *refused* before it runs, naming the rule or the person; the refusal is in *Refusals* and History (IN-F03) |
 | ST-07.13 | Someone who can manage people | they add a rule from here or from the agent's sheet in Agents | it is one holding; the agent holds it at once |
 | ST-07.14 | An Operator | they open an agent | everything reads; *Add a rule* is shown as *Ask Priya* |
-| ST-07.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it and the rule it named |
+| ST-07.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it, the rule it named, and the mode that applied with who set it |
 
 ## Screens
 

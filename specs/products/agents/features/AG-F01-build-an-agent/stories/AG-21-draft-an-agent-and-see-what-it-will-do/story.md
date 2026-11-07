@@ -33,7 +33,8 @@ flowchart LR
   n -->|Create agent| d["A draft, as a sheet · Setup"]
   d --> sk["Skills — add from the install's skills, suggested ones first"]
   sk -->|a skill needs a function it may not run| m["Marked on the skill, naming the function"]
-  d --> wm["What it may do — functions by reach, fixed arguments, what needs each"]
+  d --> wm["What it may do — functions by reach, each Allow · Ask first · Block, fixed arguments, what needs each"]
+  wm -->|looser than the Graph · an access change Allow| wx["Refused, naming the level"]
   d --> lim["Limits — tokens a run and a month, runs at once, helpers, effort"]
   lim -->|a run budget above the month's| lw["Flagged under the field"]
   d --> acc["Access — rules it holds, each function needed against what is allowed"]
@@ -48,7 +49,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each a switch) and a token budget |
+| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask first · Block, starting at the Graph's) and a token budget |
 | AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template whose *What it may do* comes with it, and opens as a sheet on Setup with a *Draft* chip |
 | AG-21.3 | A name another agent already has, retired or not | they save | it is refused, naming the agent that has it |
 | AG-21.4 | *What it may do* with nothing allowed | they save | it is refused: an agent that may run nothing is a mistake |
@@ -56,7 +57,7 @@ flowchart LR
 | AG-21.6 | A draft | its Setup opens | it shows instructions, voice, skills, model version and effort, limits, access, where it runs and lifecycle; an agent with no skill says it runs on the graph's own plans alone |
 | AG-21.7 | The skills of the install | the builder presses *Add a skill* | the picker lists published and draft skills, the template's suggested skills first; the added skill shows its version, when to use it, the functions it needs, and offered against applied — *too few to read* below the threshold |
 | AG-21.8 | A skill that needs a function the agent may not run | it is added | its row marks the need, naming the function, with *Edit what it may do* — before any run is refused |
-| AG-21.9 | *What it may do* | it opens | it reads *6 of 25 functions*, grouped by what each reaches (reads the graph · writes the graph · sends · …), each with the arguments fixed for this agent and what needs it; a function nothing needs reads *nothing needs it* |
+| AG-21.9 | *What it may do* | it opens | it reads *6 of 25 functions*, grouped by what each reaches (reads the graph · writes the graph · sends · …), each with its mode — Allow · Ask first · Block — who set it, the arguments fixed for this agent and what needs it; a function nothing needs reads *nothing needs it* |
 | AG-21.10 | A function allowed only with an argument fixed | a plan sets that argument otherwise | the plan is refused before it runs, naming the function and the argument |
 | AG-21.11 | Limits | they open | tokens a run and a month, runs at once, may create helpers, how deep and how many, and effort (steps, replans, questions) each sit beside what they bound and whether a run is stopped at it; an empty cell shows the number a run reads, never a dash |
 | AG-21.12 | A run budget above the month budget | they type it | it is flagged under the field and Save is refused until it holds |
@@ -71,7 +72,11 @@ flowchart LR
 | AG-21.21 | A draft that never ran | they press *Discard draft* and confirm | it is deleted and Agents opens; an agent that has run or ships with Invana is refused, naming *Retire* |
 | AG-21.22 | An Operator without *Can build agents* | they open an agent | every tab reads; *New agent*, every edit, *Make default* and *Discard draft* are disabled, naming *Can build agents*, with *Ask Priya (owner)* |
 | AG-21.23 | A sheet whose engine read fails | it opens | the tab names what it could not read, in the engine's words; the rest of the sheet still reads |
-| AG-21.24 | A run refused by the agent's limits | the person opens *How it got here* | its steps show the refused step, the bound and whose it was |
+| AG-21.24 | A run refused by the agent's limits | the person opens *How it got here* | its steps show the refused step, the bound and whose it was, and each step's mode with who set it |
+| AG-21.25 | A builder | they set an item's mode for this agent tighter than the Graph's | it saves as the agent's own, naming them; *What it may touch* (ST-30) reads it at once |
+| AG-21.26 | A builder | they set an item's mode for this agent looser than the Graph's, or an access change to Allow | it is refused in place, naming the level that set it, or that an access change is never Allow |
+| AG-21.27 | An Operator without *Can build agents* | they open *What it may do* | each mode reads with who set it; changing it is disabled, naming *Can build agents* |
+
 
 ## Screens
 

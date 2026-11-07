@@ -37,6 +37,7 @@ flowchart LR
   p -->|Delete, confirmed| s
   run --> res(["Delivered to the Inbox — a failure says so and opens the run"])
   res -->|outward, approval on| ask["Inbox › Needs you · Send it · Not this time"]
+  f -->|outward approval off| conf["What goes where · Confirm sets Allow, naming who set it"] --> ok
 ```
 
 ## Acceptance criteria
@@ -53,7 +54,7 @@ flowchart LR
 | AG-42.8 | The same outage, *Run every missed one* · *Skip* | it comes back | one run per missed firing opens, at most 24 · none opens and each is kept as *skipped* |
 | AG-42.9 | A firing's run settles | it is delivered | the owner and each recipient have an Inbox row; a failed run is delivered as a failure that opens the run |
 | AG-42.10 | A schedule delivering to a channel, outward approval on | its run settles | the delivery waits in the approvers' (else the owner's) *Needs you*, showing what will be sent and where; *Not this time* or the deadline passing sends nothing, saying why |
-| AG-42.11 | Outward approval switched off | its run settles | the delivery is sent with no ask |
+| AG-42.11 | A member who can work on projects | they switch outward approval off | it shows what goes where — each channel and recipient — and saves only on *Confirm* as Allow, recording who set it and when; once on Allow, a settled run's delivery is sent with no ask, and the schedule names who set it |
 | AG-42.12 | A schedule | the member presses *Run now* | a firing marked *run now* is kept and a run opens at once |
 | AG-42.13 | A schedule paused, then resumed a day later | it resumes | no firing from the paused day runs; the next firing is the next one from now, and every earlier firing is still listed |
 | AG-42.14 | A schedule's page | it is opened | it shows its instructions, where it delivers, and every firing newest first — due time, outcome, reason, *catch-up* or *run now* when so, and *Open run* |
@@ -70,6 +71,8 @@ flowchart LR
 | Schedules | Operator | agents.schedules · Nothing is scheduled · Read only | — | agents.schedules · Loading | agents.schedules · Read only | agents.schedules · Could not load | agents.schedules · Running | agents.schedules · Read only |
 | New schedule | Admin | agents.schedules · New schedule | — | — | agents.schedules · New schedule | agents.schedules · New schedule refused | — | — |
 | New schedule | Operator | — | — | — | — | — | — | agents.schedules · Read only |
+| Outward approval off | Admin | — | — | — | agents.schedules · Confirm Allow | agents.schedules · New schedule refused | — | — |
+| Outward approval off | Operator | — | — | — | agents.schedules · A schedule · Read only | — | — | agents.schedules · Read only |
 | A schedule | Admin | agents.schedules · A schedule · No firings yet | — | agents.schedules · A schedule · Loading | agents.schedules · A schedule | agents.schedules · A schedule · Last run failed | agents.schedules · A schedule · Running | — |
 | A schedule | Operator | agents.schedules · A schedule · No firings yet | — | agents.schedules · A schedule · Loading | agents.schedules · A schedule · Read only | agents.schedules · A schedule · Last run failed | agents.schedules · A schedule · Running | agents.schedules · A schedule · Read only |
 | A delivered result and an outward ask | Admin | — | — | — | inbox · A schedule's result | inbox · A schedule's failed run | inbox · Send this schedule's result? | — |

@@ -30,7 +30,9 @@ flowchart TD
   m -->|Operator| na["Controls disabled, naming Can work on projects"]
   m -->|manual| man["Agents wait; a person assigns or starts (PJ-12)"]
   m -->|ask, the default| ask["An agent that finds an open task asks"]
-  m -->|auto| auto["An agent that finds an open task takes it"]
+  m -->|auto| conf["Allow, set by a person: which agents will start which tasks · the token budget cap"]
+  conf -->|Confirm| auto["An agent that finds an open task takes it"]
+  conf -->|Cancel| s
   s --> nar["Narrow one agent: never wider than the project"]
   nar -->|wider requested| ref["Refused, saying the project allows less"]
   ask --> inbox["Inbox › Needs you: Start this task? · what the agent will do"]
@@ -59,6 +61,7 @@ sequenceDiagram
     E->>D: Needs you: Start this task?
     D-->>E: Start it · Not this time
   else auto
+    Note over P,E: set only after the person confirmed what agents will start and the budget cap
     E->>E: claim the task for 30 minutes
   end
   E->>A: opens the run on behalf of the person who set the mode
@@ -76,16 +79,17 @@ sequenceDiagram
 | PJ-15.4 | A project in *Ask first* | an agent finds an open task it may take | it asks in the Inbox's *Needs you* — which task and what it will do — and does not start |
 | PJ-15.5 | An ask | the person presses *Start it* | the task is claimed and a run opens on behalf of the person who set the mode |
 | PJ-15.6 | An ask | the person presses *Not this time*, or its deadline passes | nothing starts, the ask says why, and the task stays open |
-| PJ-15.7 | A project in *Automatic* | an agent finds an open task it may take | it claims it with no ask and a run opens |
+| PJ-15.7 | A project a person set to *Automatic* — Allow | an agent finds an open task it may take | it claims it with no ask and a run opens, inside the token budget cap shown when it was set |
 | PJ-15.8 | A task | an agent claims it | the claim is a lease of 30 minutes, the task shows who holds it and until when, and a second agent cannot claim it |
 | PJ-15.9 | A claim | its 30 minutes pass without a run opening | the claim lapses, the task returns to open and shows that it lapsed |
-| PJ-15.10 | An agent given a narrower mode than the project | it looks for work | it behaves by its own mode; *Manual* beats *Ask first*, which beats *Automatic* |
+| PJ-15.10 | An agent given a narrower mode than the project | it looks for work | it behaves by its own mode; *Manual* beats *Ask first*, which beats *Automatic* — Block over Ask first over Allow |
 | PJ-15.11 | An attempt to give an agent a wider mode than the project | it is saved | it is refused, saying the project allows less; nothing is saved |
 | PJ-15.12 | An agent that is paused or retired | a task is open | it takes nothing, and its row on Pick-up says why |
 | PJ-15.13 | A task picked up by an agent | its run settles | the result is posted to the task as *In review*; an agent never accepts it, and a person does (PJ-12) |
 | PJ-15.14 | A claimed or picked-up task | the person opens its run | *How it got here* shows the claim, the steps and the sources |
 | PJ-15.15 | A task on an archived project | an agent looks for work | it takes nothing |
 | PJ-15.16 | An Operator | they open Pick-up or an ask in *Needs you* | both read; the mode controls, *Start it* and *Not this time* are disabled, naming *Can work on projects* |
+| PJ-15.17 | A member who can work on projects | they choose *Automatic* | it shows which staffed agents would start which open tasks now, and the token budget cap they run within; it is saved only on *Confirm*, and History records who set Allow |
 
 ## Screens
 
@@ -93,6 +97,8 @@ sequenceDiagram
 |---|---|---|---|---|---|---|---|---|
 | Pick-up | Admin | projects.project · Pick-up · No agents staffed | — | projects.project · Pick-up · Loading | projects.project · Pick-up | projects.project · Pick-up · Could not save | projects.project · Pick-up · Claims running | — |
 | Pick-up | Operator | projects.project · Pick-up · No agents staffed · Read only | — | projects.project · Pick-up · Loading | projects.project · Pick-up · Read only | projects.project · Pick-up · Could not load | projects.project · Pick-up · Claims running | projects.project · Pick-up · Read only |
+| Choose Automatic | Admin | — | — | projects.project · Pick-up · Loading | projects.project · Pick-up · Confirm Automatic | projects.project · Pick-up · Could not save | — | — |
+| Choose Automatic | Operator | — | — | — | — | — | — | projects.project · Pick-up · Read only |
 | A claimed task | Admin | — | — | — | projects.task · Claimed | projects.task · Claim lapsed | projects.task.thinking | — |
 | A claimed task | Operator | — | — | — | projects.task · Claimed · Read only | projects.task · Claim lapsed · Read only | projects.task.thinking · Read only | projects.task · Read only |
 | An agent asks to start a task | Admin | — | — | — | inbox · Start this task? | inbox · Start this task? · Not started | inbox · Start this task? | — |

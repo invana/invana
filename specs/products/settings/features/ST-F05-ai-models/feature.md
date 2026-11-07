@@ -78,6 +78,7 @@ flowchart TD
 | A version nothing names can go | Removing a version or renaming an endpoint that a view of the graph names is refused, naming the views |
 | A pinned version stays listed | A version that something pins and is not offered reads *withdrawn*, naming who pins it; those agents' runs refuse rather than fall back |
 | No release feed | Invana never says a newer version exists; an Admin offers the version they want |
+| Each model version shows its mode | Every model version reads its mode for this Graph — Allow · Ask first · Block ([the three modes](../../product.md#decisions)) — and who set it; a version not offered is Block for every Graph |
 | Failures name the provider | A rate limit, a stopped local model or a rotated key fails naming the endpoint — never as *cannot answer* |
 | Leans on | Agents pinning a version (AG-F01 · AG-29) · views of the graph (MO-F05) · access rules on AI models (ST-F02) · History (IN-F03) |
 

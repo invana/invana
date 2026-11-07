@@ -56,6 +56,7 @@ flowchart TD
 | ST-05.11 | A saved change | History is read | it shows who saved it, when and why (IN-F03) |
 | ST-05.12 | A draft from the assistant | the person opens *How it got here* | it shows the sentence, the lines the assistant proposed, and the checks they passed |
 | ST-05.13 | An Operator | they open a draft or the sheet | *Draft with the assistant* and *Save rule* are shown as *Ask Priya* |
+| ST-05.14 | A change to a line's mode | *Who it changes* is read | each agent whose mode moves is named, with the item, its mode before and after, and how often it used it in the last 30 days |
 
 ## Screens
 

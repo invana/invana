@@ -5,7 +5,7 @@
 One knowledge graph, one set of rules, for every thinker and the systems they build.
 
 People and agents work on the same curated knowledge graph, and its ontology governs both. What they do there is
-decide — agents do the work; the person decides.
+decide — agents think alongside, and act only as far as the person allows.
 
 ## How Invana names itself
 
@@ -13,7 +13,7 @@ decide — agents do the work; the person decides.
 |---|---|---|
 | **Positioning** | What Invana is — its category | An ontology-governed operating system for humans and AI agents |
 | **Tagline** | What it means for the person using it | One knowledge graph, one set of rules, for every thinker and the systems they build |
-| **Philosophy** | How every agent and skill behaves — Invana's and the team's own | Help thinkers decide: agents think alongside, the person decides. |
+| **Philosophy** | How every agent and skill behaves — Invana's and the team's own | Help thinkers decide: agents think alongside, and act only as far as the person allows. |
 | **Motto** | For the website; never shown in the product | Think it through. Decide with evidence. |
 
 | Surface | Headline | Sub-line |
@@ -71,7 +71,7 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 |---|---|
 | **Users** | Members of a Graph — people and agents, each with access rules |
 | **A type system** | The ontology — every record has a kind, every kind its rules |
-| **Permissions** | Access rules, *what it may do*, and *asks first* for anything that writes, sends, spends or changes access |
+| **Permissions** | Access rules, *what it may do*, and a mode on every act an agent takes — Allow · Ask first · Block |
 | **Processes** | Runs — every execution of a plan, by a person or an agent, in one journal |
 | **A scheduler** | Schedules, and workers with the runs a Graph may have going at once |
 | **Resource limits** | Token budgets, and each Graph's limits set by the install |
@@ -89,7 +89,7 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 | **Plain words in, work out** | A question in plain English becomes queries, a plan and an answer — or choices to pick from |
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
-| **Asks before it acts** | Anything that writes, sends, spends or changes access waits for the person, showing exactly what will happen |
+| **Acts only as far as the person allows** | Every act an agent takes is Allow, Ask first or Block, set by a person. A write, a send, a spend and an access change ask first unless a person set otherwise, showing exactly what will happen; an access change is never Allow ([Settings](products/settings/product.md#decisions)) |
 | **Split by persona** | An analyst never sees agent tuning; a builder never sees project branches ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are

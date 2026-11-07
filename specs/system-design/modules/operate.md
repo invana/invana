@@ -42,7 +42,7 @@ flowchart LR
 |---|---|
 | A firing is recorded even when it does nothing | Skipped by an overlap or missed-firing policy is a firing with a stated reason |
 | Missed firings follow the schedule's policy | `catch_up` once · `run_all` · `skip` |
-| Outward deliveries wait for an approval | Unless the schedule switches it off; never auto-approved |
+| Outward deliveries wait for an approval | Unless a person sets the schedule's deliveries to Allow, seeing what goes where; who set it is recorded. Never decided by itself |
 | Whether a firing creates work is the run's business | The schedule names an agent and instructions, never a Flow or a project |
 
 ## What it owns

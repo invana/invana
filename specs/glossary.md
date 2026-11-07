@@ -54,9 +54,10 @@ stands for.
 | **Rule** | A statement that must always hold — on the install, a Graph or a project — checked block · warn · report | Rule · guardrail · invariant |
 | **Request** | What a person or an agent asked of the model — a rule refused it, the Graph could not answer it, or *Ask for a change* — kept until someone who can shape the model allows, drafts or declines it | Request |
 | **Retune** | Narrow or widen the view of the graph from a run, then ask again | Retune |
-| **What it may do** | The functions an agent or plan may run, with what arguments | Envelope |
+| **What it may do** | The functions an agent or plan may run, with what arguments, each with its mode | Envelope |
 | **Access rule** | Who may do what, as sentences: *Can ask*, *Can change data* | Policy |
-| **Asks first** | An agent that wants to send, change or spend waits in the Inbox, showing exactly what it will do | Approval |
+| **Allow · Ask first · Block** | The mode of each act an agent takes — it acts · it waits for a yes in the Inbox · it is refused, naming who set it. Set by a person, by hand on an item or on an access rule's line; agents only | Mode |
+| **Asks first** | An act set to Ask first waits in the Inbox, showing exactly what it will do — by default every write, send, spend and access change | Approval |
 | **Token budget** | The tokens an agent, schedule or eval set may spend in a period — never currency | Budget |
 | **Workers · runs at once** | The machines that run work, and how many runs a Graph may have going | Pool · lane · worker |
 | **Worker group · Join key** | Workers that share labels and run the same kinds of step · the key a new worker joins a group with, shown once | Worker pool · join token |
@@ -103,7 +104,7 @@ stands for.
 | **Suggested change** | A new version of a skill, plan, rule, criterion or template, with its evidence, waiting for a person in *Needs you* | Proposal (memory) |
 | **Annotation** | What a person or the assistant says about records, kept with the Graph | Annotation |
 | **Walkthrough · Presenting** | A board's answers replayed one step at a time; presenting is its read-only mode | Walkthrough |
-| **Agent** | A colleague that takes work, answers in threads and asks before acting | Agent |
+| **Agent** | A colleague that takes work, answers in threads and acts only as far as a person allows | Agent |
 | **Skill** | A playbook an agent may be offered, written as instructions | Skill |
 | **Function** | One operation a plan may call, from a plugin; read-only in Studio | Function (`namespace.verb`) |
 | **Plan · its steps** | How an agent carries work out, generated from instructions or packaged | Flow · Task |
@@ -154,7 +155,7 @@ stands for.
 | **Met · unmet · needs a person** | A criterion's outcome on a result; *needs a person* when its check could not run | Criterion outcome |
 | **Accept · Send back** | A person closes a task on its result · reopens it, the note on the failing criterion | Accept · reject |
 | **A pass to judge · Good enough · Go again** | A loop's pass waiting on a person · settle it · run another, the note its input | Verdict (runtime) |
-| **Pick-up · Manual · Ask first · Automatic** | How agents take a project's tasks: only when assigned · asking a person first · on their own | Pick-up mode |
+| **Pick-up · Manual · Ask first · Automatic** | How agents take a project's tasks — Block · Ask first · Allow for starting one: only when assigned · asking a person first · on their own, where a person set and confirmed it | Pick-up mode |
 | **Claimed** | A task an agent has taken by pick-up, for a while; a lapsed claim returns it | Claim |
 | **Order** | A project's tab of its tasks in waves, by what each waits on | Plan canvas |
 | **Open · Assigned · In progress · Needs input · Blocked · In review · Done · Failed · Cancelled** | A task's state, read off its latest run; only the last three are written, by a person | Todo status (derived) |
