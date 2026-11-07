@@ -66,7 +66,7 @@ sequenceDiagram
 |---|---|---|
 | Read every row, the counts over the Graph, by actor, by record and refusals | Admin | — |
 | Read their own acts and the rows of runs they can open | Operator — every member | The rest is counted, not shown — a line says how many |
-| Export the rows the reader can see | Operator — every member | — |
+| Export the rows the reader can see | Operator — every member — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../settings/product.md#decisions)) | — |
 | Read every change and compare two versions of a record the reader can open | Operator — every member | A record in another Graph, or one the reader cannot open, reads as absent |
 | Restore an earlier version | Not here — the record's own page, by its own role | — |
 
@@ -136,7 +136,6 @@ sequenceDiagram
 | Question | Who answers |
 |---|---|
 | Does History read across every Graph the person is on, as the board's subtitle does? Recommend: per Graph — a Graph is the reasoning boundary; the Inbox question in IN-F01 settles both | Ravi |
-| May an Operator export the rows they can see? The engine bounds an export by the reader's rows. Recommend: yes — an export is a reading | Ravi |
 
 ## Not building
 

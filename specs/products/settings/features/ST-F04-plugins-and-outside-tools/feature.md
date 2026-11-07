@@ -99,7 +99,7 @@ sequenceDiagram
 | Installed is the engine's word | A tool plugin whose extra is not installed is listed as not installed, naming the extra; its functions cannot be planned |
 | A function keeps its version | Each function versions on its own; a run records the version it ran; after a breaking version the previous one serves re-runs for a while |
 | Plans come two ways | *Generated* from a skill's instructions, or *packaged* in a plugin; a person never writes a plan in Studio |
-| A tool that sends starts at Ask | A function that sends — mail, any call carrying Graph data out of the install, any MCP tool whose read-only hint no Admin confirmed for its revision — is a send, at Ask on the starting lines ([Which act a call is](../../product.md#decisions)); asking, it waits for a yes in Needs you, and a no fails it as *not sent* |
+| A tool that sends starts at Ask | A function that sends — mail, any call carrying Graph data out of the install, any MCP tool whose read-only hint no Admin confirmed for its revision — is a send, at Ask on every starting line but the Owner's ([Which act a call is](../../product.md#decisions)); asking, it waits for a yes in Needs you, and a no fails it as *not sent* |
 | Each tool shows its mode | Every function reads its mode for this Graph — Allow · Ask · Deny — and who set it |
 | Outside work runs on workers | Tool and MCP steps run on workers, never in the engine serving Studio; with no worker free they wait, then fail saying no worker took them |
 | Secrets stay on the workers | A function reads only the secrets its plugin declares, from the worker's environment; nothing rides a run |

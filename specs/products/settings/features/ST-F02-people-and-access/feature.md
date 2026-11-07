@@ -37,6 +37,8 @@ flowchart TD
   imp -->|someone loses · a skill would break| warn["Losses with their 30-day use · the skills that would break"]
   warn -->|Save anyway| save
   warn -->|Cancel| edit
+  imp -->|widens one's own access · gives or takes Owner · loosens a built-in or For everyone rule| two(["Waits for an Owner it does not benefit · one Owner: takes effect in 24 hours, alerted"])
+  imp -->|leaves an act nobody can decide · narrows an Owner's access changes| nod["Refused in place, naming the line"]
   list --> test["ST-11 · Can someone do this? — the rule that decides"]
   test -->|allowed| yes(["Yes · each check that allowed it"])
   test -->|refused| no(["No · the first check that refused, named"])
@@ -107,20 +109,21 @@ sequenceDiagram
 
 | Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
 |---|---|---|
-| Read every access rule, its lines, limits, holders and versions | Operator — every member | — |
+| Read every access rule, its lines, limits, holders and versions | Every member in a signed-in session — no line governs it; an agent or a key reads it under a line ([Reading access is no act — for people](../../product.md#decisions)) | A key's details — its own rule, expiry, last use — read only to its holder and to someone who can manage people; anyone else sees its name and holder |
 | Read people, service accounts, groups and each agent's access | Operator — every member | — |
-| *Can someone do this?* — test access | Operator — every member | — |
+| *Can someone do this?* — test access | Operator — every member in a signed-in session; an agent or a key under a line | — |
 | New rule · Edit · Delete · Draft with the assistant · Save | `iam-admin` · shown as *Can manage people* | The act is shown as *Ask Priya*, naming someone who can manage people; the tooltip names the grant |
-| Add people, a group or an agent to a rule · take them off | `iam-admin` · shown as *Can manage people* | As above |
+| Add people, a group or an agent to a rule · take them off | `iam-admin` · shown as *Can manage people*; widening one's own access is an Ask, and Owner and *Can manage people* are given or taken only by an Owner it does not benefit (ST-10.10) | As above |
 | Add person · New service account · New group · a group's members | `iam-admin` · shown as *Can manage people* | As above |
-| Mint and revoke one's own key | Operator — every member | — |
+| Mint and revoke one's own key · mark it agent-operated | Operator — every member | — |
 | Mint a key for a service account · revoke another holder's key | `iam-admin` · shown as *Can manage people* | The holder field offers only *You*; *Revoke* on another's key is disabled, naming who can manage people |
 | An agent's access from its own sheet | Read: every member · attach a rule: `iam-admin` | As above |
 | Read what an agent may touch — every item's value, its level and who set it | Operator — every member | — |
-| Set a line's value — on a custom, a built-in, a person's own or the *For everyone* rule | `iam-admin` · shown as *Can manage people*, as writing the rule; loosening needs a session, never a key | As above |
-| Lock a Deny line on a holder's own rule · mark a key or service account agent-operated | `iam-admin` · shown as *Can manage people* | As above |
+| Set a line's value — on a custom, a built-in, a person's own or the *For everyone* rule | `iam-admin` · shown as *Can manage people*, as writing the rule; loosening needs a session, never a key; loosening a built-in or the *For everyone* rule waits for an Owner who did not make it (ST-02.20); only an Owner edits another Owner's own rule (ST-02.18) | As above |
+| Lock a Deny line on a holder's own rule — never one on an Owner's access changes · mark a key or service account agent-operated | `iam-admin` · shown as *Can manage people* | As above |
 | Edit an agent's own rule — tighten, or loosen back no further than the Graph, never past a locked line | `builder` · shown as *Can build agents* · Admin, from the agent's sheet (AG-F01) | Each value reads; changing it is disabled, naming *Can build agents* |
-| Decide an ask — an agent's ask for more, or a person's act set to Ask | Someone who holds Allow on that act, never the asker nor whoever it benefits; the Owner always holds Allow on access changes (IN-F01) | The ask reads; its acts are disabled, naming who it waits on |
+| Change the daily caps on asks for more — per holder and for the Graph | `owner` · shown as *Owner*, in *This graph › General* (ST-14) | The caps read in *Usage and limits* (ST-13); changing them is shown as *Ask Priya (owner)* |
+| Decide an ask — an agent's ask for more, or a person's act set to Ask | Someone who holds Allow on that act, from a signed-in session, never the asker nor whoever it benefits; the Owner always holds Allow on access changes (IN-F01) | The ask reads; its acts are disabled, naming who it waits on |
 
 ## States
 
@@ -153,9 +156,9 @@ sequenceDiagram
 | A key can only narrow | A key acts as its holder and may carry its own rule; it is never wider than the holder, and the holder's own access still applies |
 | Disabled, never hidden | Without *Can manage people* every write shows, shown as *Ask <name>* (design language §5); reading is every member's |
 | Asks for access go to the Inbox | An ask for access, a higher limit, or more than a line allows (ST-31) is an ask in Needs you (IN-01); allowed, it adds the holder for this run · N days · always, and *Who holds it* says when it ends |
-| A locked Deny | Someone who can manage people may lock a Deny line on a holder's own rule; a builder cannot change or remove it |
-| Agent-operated keys | A key or service account marked *agent-operated* by someone who can manage people is held to every rule agents are — its access changes are never Allow, and its asks are an agent's |
-| Asks for more are bounded | An *item* is one act on one thing — a function, a kind or a sensitivity, an AI model version, an agent, or a line. Asks for more are capped per holder per day, and a repeat of an open ask joins it rather than making another (ST-31) |
+| A locked Deny | Someone who can manage people may lock a Deny line on a holder's own rule — never one that reaches an Owner's access changes; a builder cannot change or remove it |
+| Agent-operated keys | A key or service account marked *agent-operated* — by someone who can manage people, or by a holder on their own key — is held to every rule agents are: its access changes are never Allow, and its asks are an agent's. A service account's keys start agent-operated; clearing the mark widens its holder |
+| Asks for more are bounded | An *item* is one act on one thing — a function, a kind or a sensitivity, an AI model version, an agent, or a line. Asks for more are capped at 20 per holder per day, and at 200 for the whole Graph — limits its Owner changes in *This graph › General* (ST-14). A helper's or a delegate's asks count against its root agent. A repeat of an open ask joins it rather than making another (ST-31) |
 | Leans on | Asks (IN-F01) · History of every change and refusal (IN-F03) · agents built in Agents (AG-F01) · views of the graph (MO-F05) · members of the Graph (ST-F01) |
 
 ## Data touched
@@ -172,6 +175,8 @@ sequenceDiagram
 | Keys — name, holder, its own rule, expiry, last used | Write · read |
 | Refusals in History (IN-F03) | Read |
 | Usage against limits — tokens, agents at once, helpers — stored by the engine | Read |
+| The Graph's daily caps on asks for more — per holder and for the Graph — and the asks made today | Write · read |
+| A change waiting for an Owner — what it changes, who made it, whom it benefits, when it takes effect on the one-Owner delay | Write · read |
 
 ## Decisions
 
@@ -181,7 +186,7 @@ sequenceDiagram
 | Access rules read as sentences | A rule's name and lines read as plain sentences (*Analysts can ask*); the exact lines are one click deeper |
 | The grants are built-in rules | The six grants are the built-in rules; holding *Can build agents* is holding that rule. Their starting lines are shown and their values may be changed; the rules are never deleted or renamed, and the Owner's Allow on access changes never moves ([Someone can always decide](../../product.md#decisions)) |
 | Agents are read here, built in Agents | The Agents tab reads each agent's access; *Open in Agents* opens its sheet. A rule added to an agent from either side is one record |
-| Every member reads | Reading access is never gated; only changing it is |
+| Every member reads | Reading access is never gated for a person in a signed-in session; only changing it is ([Reading access is no act — for people](../../product.md#decisions)) |
 | Test access writes nothing | *Can someone do this?* runs the engine's own check without running anything; a link may carry the check and opens filled |
 | Keys are shown once | A key's secret is shown once, at creation, and never again |
 | Rules as files | `invana iam apply · list · show` writes and reads custom and for-everyone rules as files, printing who it changes first; the engine holds it to every rule Studio is held to ([Every permission rule is the engine's](../../product.md#decisions)) |
@@ -193,9 +198,6 @@ sequenceDiagram
 | The board names a key *Access key* (*Profile and keys*); the glossary says *Personal access token*. Recommend: *key* on screen — shorter, and the board already reads it; the glossary changes with Ravi's yes | Ravi |
 | What does *Ask Priya* do when pressed? The board links it to the Inbox; the source docs build no access-request flow and only name who to ask. Recommend: it raises an ask for the grant in that person's Needs you (IN-01), as an agent's ask for access does | Ravi |
 | The board's limits read *Tokens a day* and *Runs at once*; the rules carry tokens a month and a run, and agents at once. Recommend: a month and a run, as the engine stores them; the board is redrawn | Ravi |
-| What does each grant's built-in rule start its writes at? Ask on every rule leaves no one holding Allow, so a person's write would wait with nobody to decide it. Recommend: each grant starts the writes it gives at Allow, the Owner's rule starts every act at Allow, and sends and spends start at Ask on every other rule | Ravi |
-| Which sensitivity does unlabelled data count as? *Normal* is not one of public · internal · confidential · personal. Recommend: internal | Ravi |
-| How many asks for more may one holder raise a day? Recommend: 20, a limit on the Graph (ST-F06) | Ravi |
 
 ## Not building
 

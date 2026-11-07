@@ -78,7 +78,7 @@ flowchart TD
 | A version nothing names can go | Removing a version or renaming an endpoint that a view of the graph names is refused, naming the views |
 | A pinned version stays listed | A version that something pins and is not offered reads *withdrawn*, naming who pins it; those agents' runs refuse rather than fall back |
 | No release feed | Invana never says a newer version exists; an Admin offers the version they want |
-| An endpoint has a clearance | The highest sensitivity it may receive, set by the Admin; a call carrying data above it is a send ([Which act a call is](../../product.md#decisions)) |
+| An endpoint has a clearance | The highest sensitivity it may receive. A new local or self-hosted endpoint starts at *personal*, an outside provider at *internal*; an Admin changes it, told how much unlabelled data it can reach; an endpoint counts as local only when the engine resolves it to loopback or a private network at each call, rebinding checked (ST-28); a call carrying data above it is a send ([Which act a call is](../../product.md#decisions)) |
 | Each model version shows its mode | Every model version reads its mode for this Graph — Allow · Ask · Deny ([the three modes](../../product.md#decisions)) — and who set it |
 | Failures name the provider | A rate limit, a stopped local model or a rotated key fails naming the endpoint — never as *cannot answer* |
 | Leans on | Agents pinning a version (AG-F01 · AG-29) · views of the graph (MO-F05) · access rules on AI models (ST-F02) · History (IN-F03) |
@@ -106,7 +106,6 @@ flowchart TD
 | Question | Who answers |
 |---|---|
 | `.claude/team/TEAM.md` §7 gives *AI providers* to a Graph's Owner; the docs make AI models the install Admin's. Recommend: Admin only — the spec follows that, and TEAM.md §7 is corrected (recommendation raised) | Ravi |
-| What clearance does a new endpoint start at? Recommend: a local model or an install-hosted one starts at personal; an outside provider at internal, until the Admin raises it | Ravi |
 
 ## Not building
 

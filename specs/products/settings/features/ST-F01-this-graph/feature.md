@@ -55,7 +55,7 @@ flowchart TD
 | Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
 |---|---|---|
 | Read General, Connection (never the password), members and usage | Operator — every member | — |
-| Change name, description, instructions · Archive · Unarchive | `owner` · shown as *Owner* | Fields read-only; *Save* and *Archive* shown as *Ask Priya (owner)* |
+| Change name, description, instructions, the daily caps on asks for more · Archive · Unarchive | `owner` · shown as *Owner* | Fields read-only; *Save* and *Archive* shown as *Ask Priya (owner)* |
 | Change the connection · Test connection · Read the database's types again | `owner` · shown as *Owner* | Address, user, database and status read; the password field is absent; acts shown as *Ask Priya (owner)* |
 | Change a person's grants · remove a person | `iam-admin` · shown as *Can manage people* | The list reads; *Edit* and *Remove* shown as *Ask Priya*, naming someone who can manage people |
 | Add a person | As ST-08 | As ST-08 |

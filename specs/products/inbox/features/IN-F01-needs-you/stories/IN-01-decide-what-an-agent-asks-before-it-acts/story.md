@@ -68,6 +68,8 @@ flowchart LR
 | IN-01.24 | Any ask | it is raised, then allowed | it stores the exact act — function, arguments, targets and their versions — with a hash; the yes runs only that act; a write whose targets changed since the ask is refused, naming what changed |
 | IN-01.25 | Any ask | it is read | the engine's record of the act leads — what, to whom, every recipient, outside domains flagged; the asker's words follow, labelled as theirs and shown as plain text with control and direction characters visible; no answer is preselected; *always* is never the first choice; the sources the step read are linked |
 | IN-01.26 | A person's act that a line sets to Ask | they take it | it holds, telling them who it waits on; an ask appears in *Needs you* for people who hold Allow on that act, never the asker nor whoever it benefits; the asker's own acts on it are disabled |
+| IN-01.27 | An ask routed to the reader | they decide it with a key, as a service account, or as an agent | it is refused; only a person's signed-in session decides an ask ([Only a person's session decides](../../../../../settings/product.md#decisions)) |
+| IN-01.28 | An ask from a person | it is decided by someone the asker added to the Graph or to a rule in the last 30 days | it goes, and History records an alert that every Owner is told of |
 
 ## Screens
 

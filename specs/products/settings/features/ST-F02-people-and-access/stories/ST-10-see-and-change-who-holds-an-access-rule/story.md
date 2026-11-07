@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [ST-F02](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read who holds a rule; add people, a group or an agent — for this run · N days · always; take a holder off | — |
+| Admin | Read who holds a rule; add people, a group or an agent — for this run · N days · always; take a holder off. Widening their own access asks someone it does not benefit; Owner and *Can manage people* are given or taken only by an Owner it does not benefit | *Add* on Owner or *Can manage people*, for anyone but an Owner, raises an ask to the Owners |
 | Operator | Read who holds a rule and how | *+ Add people, a group or an agent* and *Take off* shown as *Ask Priya*, naming someone who can manage people |
 
 ## Flow
@@ -30,6 +30,9 @@ flowchart TD
   a --> ok(["Holds it at the next check"])
   t -->|Take off| off(["Loses it at the next check"])
   t -->|cannot manage people| ask["Ask Priya"]
+  a -->|widens the one adding · Owner or Can manage people, not by an Owner it does not benefit| w{"An Owner it does not benefit?"}
+  w -->|yes| wa(["An ask in their Needs you · every Owner alerted"])
+  w -->|only one Owner, and it benefits| wd(["Takes effect in 24 hours · the Owner alerted · may cancel"])
   ib([An ask for access allowed in the Inbox · IN-01]) --> held["Held for this run · N days · always, with when it ends"]
   held --> t
 ```
@@ -47,6 +50,8 @@ flowchart TD
 | ST-10.7 | An ask for access allowed in the Inbox (IN-01) | *Who holds it* is read | the holder shows, *for run #N* or for the time allowed, with when it ends |
 | ST-10.8 | A holding added or taken off | History is read | it shows who did it and when (IN-F03) |
 | ST-10.9 | An Operator | they open *Who holds it* | every holder reads; adding and taking off are shown as *Ask Priya* |
+| ST-10.10 | Owner or *Can manage people* | it is given or taken, by any path | it takes effect only from an Owner it does not benefit — at once when that Owner makes it, else as an ask routed to the Owners it does not benefit; every Owner is alerted and History records it. With only one Owner, whom it benefits, it takes effect after 24 hours, with an alert to that Owner and a History row, and the Owner may cancel it until then ([One Owner: a delay, not a second person](../../../../product.md#decisions)) |
+| ST-10.11 | A person | their own change would widen what they hold — directly, through a group, or through an agent, service account or key of theirs | it is an ask, routed to someone it does not benefit, whatever the lines say, and they are told who it waits on ([No one widens their own access](../../../../product.md#decisions)) |
 
 ## Screens
 
@@ -55,4 +60,6 @@ flowchart TD
 | Who holds it | Admin | settings.access · Nobody holds it | settings.access · Nothing matches | settings.access · Loading | settings.access | settings.access · Could not load | — | — |
 | Who holds it | Operator | shell.locked · Nobody holds it | shell.locked · Nothing matches | shell.locked · Loading | shell.locked | shell.locked · Could not load | — | shell.locked |
 | Add a holder | Admin | — | — | — | settings.access · Add a holder | settings.access · Could not add | — | — |
+| A change that waits for an Owner | Admin | — | — | — | settings.access · Waits for an Owner | — | — | — |
+| A change that waits for an Owner | Operator | — | — | — | — | — | — | shell.locked |
 | Add a holder | Operator | — | — | — | — | — | — | shell.locked |

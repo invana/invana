@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [ST-F01](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Change name, description and instructions; archive and unarchive; change the connection after a passing test; read the database's types again | — |
+| Admin | Change name, description and instructions; the daily caps on asks for more; archive and unarchive; change the connection after a passing test; read the database's types again | — |
 | Operator | Read the Graph's name, description, instructions and its connection — engine, version, address, user, database, status | Fields read-only; the password field is absent; *Save*, *Archive*, *Test connection* shown as *Ask Priya (owner)* |
 
 ## Flow
@@ -28,6 +28,7 @@ Tasks: [task.md](task.md) · Feature: [ST-F01](../../feature.md)
 flowchart TD
   s([Settings › This graph]) --> g["General: name · description · instructions"]
   g -->|setup unfinished| tl["The setup timeline leads"]
+  g --> caps["Daily caps on asks for more"] --> sv
   g --> sv{"Save"}
   sv -->|refused| sf["Says what is wrong"]
   sv -->|ok| gs(["Saved"])
@@ -61,6 +62,7 @@ flowchart TD
 | ST-14.13 | Credentials rotated outside Invana | the status is read | it reads unreachable, with the last time it connected |
 | ST-14.14 | A test | it runs | History records who tested it and when (IN-F03) |
 | ST-14.15 | An Operator | they open General or Connection | everything reads but the password; *Save*, *Archive* and *Test connection* are shown as *Ask Priya (owner)* |
+| ST-14.16 | An owner | they change the daily caps on asks for more — per holder and for the Graph (ST-F02) — in General and save | the new caps bind from the next ask; *Usage and limits* reads them (ST-13); History records who changed them (IN-F03) |
 
 ## Screens
 

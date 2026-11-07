@@ -75,7 +75,7 @@ sequenceDiagram
 |---|---|---|
 | Read the map, a model, a kind, the links between models and their history | Operator — every member | — |
 | Link two models · commit or discard staged links · remove a link | `modeller` · shown as *Can shape the model* | *Link models* disabled — *Ask Priya (owner) to shape the model*; a drag between models does nothing and says why |
-| Export a model, with or without its records | Operator — every member | — |
+| Export a model, with or without its records | Operator — every member — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../settings/product.md#decisions)) | — |
 | Import a model · restore an earlier version | `modeller` · shown as *Can shape the model* | *Import a model file* disabled — *Ask Priya (owner) to shape the model* |
 
 ## States

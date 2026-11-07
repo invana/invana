@@ -29,7 +29,7 @@ flowchart TD
   s([Settings › AI and connections › AI models]) --> l["Versions: exact name · endpoint · pinned by · status"]
   l -->|no endpoint| e["Add an endpoint"]
   e --> k["Kind → its own fields · name · key"]
-  k --> sv(["Saved"]) --> p{"Ping"}
+  k --> cl["Clearance · how much unlabelled data it can reach"] --> sv(["Saved"]) --> p{"Ping"}
   p -->|fails| pf["The provider's message, word for word"]
   p -->|passes| ok(["Proven"])
   l --> of["Offer a version by its exact name"]
@@ -60,6 +60,8 @@ flowchart TD
 | ST-28.12 | An Operator | they open AI models | everything reads but keys; *Add a model*, *Ping* and every act are disabled, naming the Admin |
 | ST-28.13 | A model version | it is read | it shows its mode for this Graph — Allow · Ask · Deny — and who set it |
 | ST-28.14 | A model call to an outside provider | it carries data above the endpoint's clearance | it counts as a send, held to the line on sends; an ask names the data, its sensitivity and the provider |
+| ST-28.15 | An endpoint whose address may be local | a call goes to it | it counts as local, cleared for *personal*, only when the engine resolves its address to loopback or a private network at that call, rebinding checked; one that resolves elsewhere is held to an outside provider's clearance |
+| ST-28.16 | An Admin adding or editing an endpoint | they pick its clearance | it says how much unlabelled data, across the install's Graphs, the endpoint can reach without asking — unlabelled counts as *internal* ([Unlabelled data](../../../../product.md#decisions)) |
 
 ## Screens
 

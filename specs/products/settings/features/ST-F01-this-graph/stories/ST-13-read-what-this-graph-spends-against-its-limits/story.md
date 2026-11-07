@@ -29,6 +29,7 @@ flowchart TD
   m --> by["By agent: tokens and runs this month"]
   m -->|near a limit| nl["Says so · only an Admin raises it"]
   m -->|at a limit| at["Agents stop and say why · questions from people still answer"]
+  m --> cap["Asks for more today · against the daily caps"]
   m -->|nothing run yet| z["Zero against each limit · no agents listed"]
   m -->|an Admin| lim(["ST-16 · Limits for each graph"])
 ```
@@ -45,6 +46,7 @@ flowchart TD
 | ST-13.6 | An Operator | they open *Usage and limits* | nothing on it can be changed, and *Limits for each graph* is absent |
 | ST-13.7 | An Admin | they open *Usage and limits* | *Limits for each graph* reads below, where they raise one (ST-16) |
 | ST-13.8 | The usage cannot load | the page opens | it says it could not load and offers to try again |
+| ST-13.9 | A member | they open *Usage and limits* | the daily caps on asks for more read — per holder and for the Graph — with the asks made today against each, and each holder at its cap named; the Owner changes them in *This graph › General* (ST-14) |
 
 ## Screens
 

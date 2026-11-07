@@ -35,6 +35,7 @@ flowchart TD
   l -->|a person · Remove| rm{"The last owner?"}
   rm -->|yes| r
   rm -->|no| cf["Confirm"] --> gone(["Removed · their work stays"])
+  l -->|only one Owner| one["Warns: one person decides access"]
   l -->|Add person| p8(["ST-08"])
   l -->|an agent's row| a35(["AG-35 · the agent in this Graph"])
   l -->|without Can manage people| ask(["Reads · acts show Ask Priya"])
@@ -46,7 +47,7 @@ flowchart TD
 |---|---|---|---|
 | ST-12.1 | A member | they open *Settings › This graph › People and access* | people and agents read in one list: a person with their grants, an agent with its version and *Update available* when there is one |
 | ST-12.2 | A Graph just created | its members are read | its creator is the only member, holding Owner |
-| ST-12.3 | Someone who can manage people | they change a person's grants and save | the person holds exactly those grants from their next call; with none they are an Operator |
+| ST-12.3 | Someone who can manage people | they change a person's grants and save | the person holds exactly those grants from their next call; with none they are an Operator; giving or taking Owner or *Can manage people*, and widening their own grants, wait as ST-10.10 and ST-10.11 say |
 | ST-12.4 | The Graph's only owner | someone removes them or takes Owner away | it is refused, saying a Graph always has an owner |
 | ST-12.5 | Someone who can manage people | they remove a person, confirming | the person leaves the list; their work and authorship stay; their open tasks stay assigned and say who is gone |
 | ST-12.6 | A person removed while working in the Graph | they make their next call | it is refused, and Studio says their access changed |
@@ -54,6 +55,7 @@ flowchart TD
 | ST-12.8 | A filter that matches no one | it is applied | *No one matches* shows with *Clear filter* |
 | ST-12.9 | An Operator without *Can manage people* | they open the list | every member reads; *Edit* and *Remove* are shown as *Ask Priya*, naming someone who can manage people |
 | ST-12.10 | Any change to a person's grants or membership | it saves | History records who changed whom, and when (IN-F03) |
+| ST-12.11 | A Graph with only one Owner | its members are read by someone who can manage people | a warning says only one person can decide access changes: an ask nobody else can decide fails closed, and a change that benefits that Owner takes effect only after 24 hours; *Edit* on a person offers giving them Owner |
 
 ## Screens
 
@@ -61,5 +63,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Members | Admin | settings.people · Only you | settings.people · No one matches | settings.people · Loading | settings.people | settings.people · Last owner | — | — |
 | Members | Operator | settings.people · Only you | settings.people · No one matches | settings.people · Loading | settings.people · Read only | settings.people · Could not load | — | settings.people · Read only |
+| One Owner warning | Admin | settings.people · One Owner | — | — | settings.people · One Owner | — | — | — |
+| One Owner warning | Operator | — | — | — | — | — | — | — |
 | A person's grants | Admin | — | — | — | settings.people · Edit grants | settings.people · Last owner | — | — |
 | A person's grants | Operator | — | — | — | — | — | — | settings.people · Read only |

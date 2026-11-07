@@ -81,7 +81,7 @@ stands for.
 | **Who it changes** | Before an access rule is saved: who gains, who loses, which skills would break | Impact |
 | **What it can do** | What an agent may actually do once every check is applied, with why not for each refusal | Effective access |
 | **Can someone do this?** | A check of whether a person, agent or key may do something to something, and which check decides; nothing runs | Test access |
-| **Service account** | A member with no sign-in that owns keys for scripts; marked *agent-operated* when an outside agent drives it, and then held to the rules agents are | Service account |
+| **Service account** | A member with no sign-in that owns keys for scripts; its keys start marked *agent-operated*, held to the rules agents are | Service account |
 | **Group** | People and agents in one Graph that hold access rules together | Group |
 | **Sign out here · Sign out everywhere** | End this device's session · every session of the account | Revoke refresh token(s) |
 

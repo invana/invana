@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [ST-F02](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Mint and revoke their own keys; mint a key for a service account; revoke any key that reaches the Graph | — |
-| Operator | Mint and revoke their own keys, on their profile and in this Graph | *Holder* offers only *You*; *Revoke* on another's key shown as *Ask Priya*, naming someone who can manage people |
+| Admin | Mint and revoke their own keys and mark them agent-operated; mint a key for a service account; read every key's details; revoke any key that reaches the Graph | — |
+| Operator | Mint and revoke their own keys and mark them agent-operated, on their profile and in this Graph | *Holder* offers only *You*; another's key reads by name and holder only; *Revoke* on it shown as *Ask Priya*, naming someone who can manage people |
 
 ## Flow
 
@@ -30,7 +30,7 @@ flowchart TD
   g([People and access › Keys]) --> gl["Every key that reaches this Graph: key · holder · narrowed to · expires · last used"]
   l -->|none| e["No keys yet — what a key is for · New key"]
   l -->|some| k["Name · last four · created · last used · expires"]
-  e --> n["New key: name · holder · narrow to · expires"]
+  e --> n["New key: name · holder · narrow to · expires · agent-operated · starting lines: reads Allow · writes Ask · sends, spends and access changes Deny unless set"]
   k --> n
   gl --> n
   n --> v{"Name free · under the ceiling · never wider than the holder?"}
@@ -72,8 +72,10 @@ sequenceDiagram
 | ST-09.12 | A call made with a key | it tries to mint or revoke a key, change a password, delete the account or add a user | it is refused — managing credentials needs a signed-in session |
 | ST-09.13 | A holder's password change | their keys are used | they still work; only sessions end |
 | ST-09.14 | A key in a URL | a call carries it there | it is not accepted |
-| ST-09.15 | *People and access › Keys* | it is read | every live or expired key bound to the Graph and every profile key of a member: key · holder · narrowed to · expires · last used |
-| ST-09.16 | An Operator | they open *Keys* | they read every key; *Holder* offers only *You*; *Revoke* on another's key is shown as *Ask Priya* |
+| ST-09.15 | *People and access › Keys*, read by someone who can manage people | it is read | every live or expired key bound to the Graph and every profile key of a member: key · holder · narrowed to · expires · last used |
+| ST-09.16 | An Operator | they open *Keys* | their own keys read in full; another's key reads by name and holder only — its own rule, expiry and last use are absent; *Holder* offers only *You*; *Revoke* on another's key is shown as *Ask Priya* |
+| ST-09.17 | A new key | it is minted | its own rule starts reads at Allow, writes at Ask, and sends, spends and access changes at Deny unless the minter sets them when the key is made, never wider than the holder; the starting lines are shown before the key is made |
+| ST-09.18 | A key | its holder marks it *agent-operated*, or it is a service account's key | it is held to every rule agents are, its access changes never Allow; a service account's keys start marked; clearing the mark is a widening of its holder (ST-02.16 · ST-10.11) |
 
 ## Screens
 
