@@ -14,6 +14,7 @@ depends_on: []
 
 > What a person, or the assistant, says about the records — kept with them for whoever loads them next — and the fixes
 > made to the records themselves, held on the board until the person decides to save them to the Graph.
+> The decision it helps make: *which notes and fixes belong in the Graph, and which stay on the board?*
 
 ## User journey
 

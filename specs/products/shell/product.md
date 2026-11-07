@@ -10,6 +10,7 @@ personas: [analyst, owner, admin]
 
 > Sign in, create or open a Graph, and find anything — the frame every mode and overlay sits in. Not a mode of its
 > own: what every mode shares, and the path from a new Graph to its first answer, every claim citing its record.
+> The decision it helps make: *which Graph to work in, and where to go next?*
 
 Journeys: [J01 · From an empty install to a first answer](../../journeys/J01-from-an-empty-install-to-a-first-answer.md) ·
 [J05 · Join a Graph someone set up](../../journeys/J05-join-a-graph-someone-set-up.md)

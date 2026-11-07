@@ -9,6 +9,7 @@ personas: [modeller, curator]
 # Model
 
 > Give the Graph's data meaning: shape its models, link them, decide what agents may see and what must always hold.
+> The decision it helps make: *what the data means, what agents may see and what must always hold?*
 
 Everything downstream — what can be asked, what can be loaded, what an agent is grounded in — resolves against the
 models shaped here. One Graph binds to one graph database and holds many models, each named for its domain.

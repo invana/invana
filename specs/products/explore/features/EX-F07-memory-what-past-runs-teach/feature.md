@@ -15,6 +15,7 @@ depends_on: [EX-F04]
 > What carries over from one run to the next: records in the Graph an agent reads with a step it plans, and changes a
 > person accepts on the evidence of what happened — so the person decides which skill, plan, rule or criterion to
 > change, from counts they can open, and never finds the setup changed behind their back.
+> The decision it helps make: *which skill, plan, rule or criterion should change, given what past runs show?*
 
 ## User journey
 

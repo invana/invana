@@ -15,6 +15,7 @@ depends_on: []
 > A model is never started from a blank page: Invana drafts it from what the database already holds, from a
 > description the assistant turns into kinds, from a file, a starter or an ontology a field already published. The
 > person decides what to keep, and nothing is published until they publish it.
+> The decision it helps make: *which drafted kinds and links belong in the model, and is it ready to publish?*
 
 ## User journey
 

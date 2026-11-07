@@ -9,6 +9,7 @@ personas: [builder, admin, owner]
 # Agents
 
 > Build agents and skills once for the install, see how every run went, and put agents on a schedule.
+> The decision it helps make: *which agent is ready to be given work, and on what schedule?*
 
 ## Problem
 

@@ -16,6 +16,7 @@ depends_on: [EX-F01, EX-F03, EX-F04]
 > something broke — and the ways a person steers how it is reasoned: a method with its assumptions shown, facts
 > from beyond the Graph marked as such, and a fork to try another direction — so the person knows which kind of
 > nothing they have, and what an answer rests on, before acting on it.
+> The decision it helps make: *which kind of nothing is this, and which method and facts may an answer rest on?*
 
 ## User journey
 

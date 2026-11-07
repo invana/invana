@@ -9,6 +9,7 @@ personas: [analyst, owner, builder, decision-maker]
 # Inbox
 
 > Answer what waits on you, see what is running, and read what people and agents did — in one place, over the work.
+> The decision it helps make: *which ask to approve or refuse, and which run to stop?*
 
 ## Problem
 

@@ -10,6 +10,7 @@ personas: [owner, admin, analyst]
 
 > Run this Graph, the install and your own account: who may do what, the connection, AI models, plugins, workers and
 > limits — summoned over the work, never a page of its own.
+> The decision it helps make: *who may do what in this Graph and install, with which models and limits?*
 
 ## Problem
 

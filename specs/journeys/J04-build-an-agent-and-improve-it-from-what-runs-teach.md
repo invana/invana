@@ -31,7 +31,7 @@ flowchart TD
   J -->|Not this time| K1["Nothing sent"]
   I -->|no| K["AG-22 · Read how the agent is doing"]
   K --> L["EX-29 · See what is failing quietly"]
-  L --> M["EX-31 · A suggested change with its evidence"]
+  L --> M["EX-31 · A suggested change with its evidence · How it got here"]
   M --> N{"EX-32 · Sam decides"}
   N -->|accept| O(["A new skill version · authored, timed, with its reason"])
   N -->|decline| P(["Kept as declined, with why"])
@@ -63,4 +63,4 @@ flowchart TD
 
 ## Done when
 
-- The agent runs on its schedule, asks before anything leaves Invana, and every change to its skills is a version a person accepted, with its evidence.
+- The agent runs on its schedule, asks before anything leaves Invana, and every change to its skills is a version a person accepted, with its evidence and *How it got here*.

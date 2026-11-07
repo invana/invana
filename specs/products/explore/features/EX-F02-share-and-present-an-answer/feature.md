@@ -14,6 +14,7 @@ depends_on: []
 
 > What an answer becomes once it holds up: shared with the Graph's members, exported for anyone else, shown step by
 > step, or added to a project as evidence — so the person who decides sees what was found and how.
+> The decision it helps make: *who needs to see this answer, and in which form, to decide on it?*
 
 ## User journey
 

@@ -9,6 +9,7 @@ personas: [analyst, decision-maker, modeller]
 # Explore
 
 > Ask the Graph a question in plain words, and read, keep and share an answer you can trace to its records.
+> The decision it helps make: *does this answer hold up well enough to act on and share?*
 
 ## Problem
 

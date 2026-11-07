@@ -59,6 +59,7 @@ flowchart TD
 | EX-31.11 | Evidence with a suggested change open | the person reads Evidence | the count says a suggested change waits, one click to it |
 | EX-31.12 | A suggested change | nothing is decided | nothing changes; no threshold applies it by itself |
 | EX-31.13 | An Operator without the grant its target needs | they open it | they read it; deciding says *Ask Priya (owner)* |
+| EX-31.14 | A suggested change | the person opens *How it got here* | its steps and sources are shown — the detector or run that made it and the runs its evidence counts |
 
 ## Screens
 

@@ -27,8 +27,8 @@ were dropped and why, or re-open it when a source is retracted.
 
 | Goal | Measured by |
 |---|---|
-| Every decision cites the findings, runs and datasets it rests on | Open — set at the spec review |
-| An agent proposes forks and decisions; a person accepts or rejects them | Open — set at the spec review |
+| Every decision cites the findings, runs and datasets it rests on | Settled — a decision's lineage opens every finding it cites and their run and dataset cites (PJ-11) |
+| An agent proposes forks and decisions; a person accepts or rejects them | Settled — only a person who can work on projects accepts or rejects a proposal, recorded in their name (PJ-05.8–PJ-05.11 · PJ-08.11) |
 
 ## Features
 

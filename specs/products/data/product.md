@@ -10,6 +10,7 @@ personas: [curator, modeller, admin]
 
 > Gather data that is reusable across the install, labelled by where it came from, checked against standards, and
 > added to a Graph by version.
+> The decision it helps make: *which data, at which version, is fit to add to a Graph?*
 
 ## Problem
 
