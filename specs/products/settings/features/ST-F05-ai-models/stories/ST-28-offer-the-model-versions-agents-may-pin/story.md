@@ -62,6 +62,7 @@ flowchart TD
 | ST-28.14 | A model call to an outside provider | it carries data above the endpoint's clearance | it counts as a send, held to the line on sends; an ask names the data, its sensitivity and the provider |
 | ST-28.15 | An endpoint whose address may be local | a call goes to it | it counts as local, cleared for *personal*, only when the engine resolves its address to loopback or a private network at that call, rebinding checked; one that resolves elsewhere is held to an outside provider's clearance |
 | ST-28.16 | An Admin adding or editing an endpoint | they pick its clearance | it says how much unlabelled data, across the install's Graphs, the endpoint can reach without asking — unlabelled counts as *internal* ([Unlabelled data](../../../../product.md#decisions)) |
+| ST-28.17 | An Admin | they raise an endpoint's clearance | it writes a History row naming the endpoint, the old and new clearance and who raised it, and alerts the Owners of each Graph that uses the endpoint |
 
 ## Screens
 

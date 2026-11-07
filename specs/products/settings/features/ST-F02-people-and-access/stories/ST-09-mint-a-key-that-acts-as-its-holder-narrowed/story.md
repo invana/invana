@@ -76,6 +76,7 @@ sequenceDiagram
 | ST-09.16 | An Operator | they open *Keys* | their own keys read in full; another's key reads by name and holder only — its own rule, expiry and last use are absent; *Holder* offers only *You*; *Revoke* on another's key is shown as *Ask Priya* |
 | ST-09.17 | A new key | it is minted | its own rule starts reads at Allow, writes at Ask, and sends, spends and access changes at Deny unless the minter sets them when the key is made, never wider than the holder; the starting lines are shown before the key is made |
 | ST-09.18 | A key | its holder marks it *agent-operated*, or it is a service account's key | it is held to every rule agents are, its access changes never Allow; a service account's keys start marked; clearing the mark is a widening of its holder (ST-02.16 · ST-10.11) |
+| ST-09.19 | An agent-operated key | it reads access rules, holders or *Can someone do this?* | the read is under a line on its own rule, starting at Deny, as an agent's does; on a key not marked it starts at Allow, with its other reads ([Reading access is no act](../../../../product.md#decisions)) |
 
 ## Screens
 

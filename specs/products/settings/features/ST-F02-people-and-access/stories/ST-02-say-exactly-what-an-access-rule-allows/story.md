@@ -75,6 +75,7 @@ flowchart TD
 | ST-02.19 | A change to any line | it would leave an act with nobody able to decide it | it is refused in place, naming the act; an ask that nobody but whoever it benefits could decide fails closed at once, saying why, but for the one-Owner delay |
 | ST-02.20 | Someone who can manage people | they save a change that loosens a built-in rule or the *For everyone* rule | it waits for an Owner who did not make it, and every Owner is alerted; with only one Owner, who made it, it takes effect after 24 hours, with an alert to that Owner and a History row, and the Owner may cancel it until then |
 | ST-02.21 | A person whose last sign-in was over 15 minutes ago | they make or allow an access change, a send of confidential or personal data, or raising a limit | they sign in again first; nothing changes until they do |
+| ST-02.22 | An Owner, in a Graph with other Owners | they make or allow an access change | it is a History row, and every other Owner is alerted, naming the change and who made it |
 
 ## Screens
 
