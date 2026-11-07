@@ -18,7 +18,7 @@ flowchart TD
   A([Settings › People and access · or the agent's sheet]) --> B{"How is it set?"}
   B -->|by policy| C["ST-02 · A rule's line: Allow · Ask · Deny"]
   B -->|by hand, one agent| D["AG-21 · What it may do: narrow this agent"]
-  C --> E["ST-05 · Who it changes — agents whose mode moves"]
+  C --> E["ST-05 · Who it changes — holders whose value moves"]
   E -->|Save| F
   D -->|looser than the Graph · an access change Allow| DX["Refused, naming the level"] --> D
   D -->|Save| F["ST-30 · What it may touch — each item, every level, who set it"]
@@ -47,7 +47,7 @@ sequenceDiagram
   P->>E: sets a mode — a rule's line, or the agent's own
   E-->>P: who it changes, then saved, naming Priya
   A->>E: a step wants to act
-  E->>E: tightest mode across the Graph and the agent
+  E->>E: when the step runs — the strictest line across the Graph, the agent's own and its caller chain
   alt Allow
     E->>A: it acts
   else Ask

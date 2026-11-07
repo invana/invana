@@ -62,6 +62,8 @@ flowchart LR
 | AG-42.16 | A schedule edited by another member | it next fires | it runs on behalf of its original owner |
 | AG-42.17 | A channel a schedule delivers to | an Admin removes the channel | it is refused, naming the schedule |
 | AG-42.18 | An Operator | they open Agents › Schedules and a schedule | both read; *New schedule*, *Run now*, *Pause*, *Resume*, *Edit* and *Delete* are disabled, naming *Can work on projects* |
+| AG-42.19 | A schedule whose deliveries are on Allow | anyone edits it, or the person who set Allow loses the right to set it | outward approval returns to Ask, naming why, and History records it; until then its runs are bounded by both the person who set Allow and the schedule's owner |
+| AG-42.20 | A schedule's outward approval | a delivery is due | it is a line like any other: the strictest of it and every rule for everyone binds, so a *For everyone* Deny on sends holds whatever the schedule says |
 
 ## Screens
 

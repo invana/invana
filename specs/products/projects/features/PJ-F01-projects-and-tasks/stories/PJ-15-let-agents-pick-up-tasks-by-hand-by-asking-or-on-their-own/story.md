@@ -75,7 +75,7 @@ sequenceDiagram
 |---|---|---|---|
 | PJ-15.1 | A project | its Pick-up opens | it shows the project's mode — *Allow*, *Ask* or *Deny* — *Ask* for a project never set, and each staffed agent's own mode beside it |
 | PJ-15.2 | A member who can work on projects | they change the project's mode | it is saved, History records who and from what to what, and the next look an agent takes uses it |
-| PJ-15.3 | A project in *Deny* | an agent could take an open task | it does not; nothing is asked and nothing is claimed |
+| PJ-15.3 | A project in *Deny* | an agent could take an open task | it does not; nothing is asked and nothing is claimed — Deny opens no run, so there is no ask for more (ST-31.13) |
 | PJ-15.4 | A project in *Ask* | an agent finds an open task it may take | it asks in the Inbox's *Needs you* — which task and what it will do — and does not start |
 | PJ-15.5 | An ask | the person presses *Start it* | the task is claimed and a run opens on behalf of the person who set the mode |
 | PJ-15.6 | An ask | the person presses *Not this time*, or its deadline passes | nothing starts, the ask says why, and the task stays open |
@@ -90,6 +90,8 @@ sequenceDiagram
 | PJ-15.15 | A task on an archived project | an agent looks for work | it takes nothing |
 | PJ-15.16 | An Operator | they open Pick-up or an ask in *Needs you* | both read; the mode controls, *Start it* and *Not this time* are disabled, naming *Can work on projects* |
 | PJ-15.17 | A member who can work on projects | they choose *Allow* | it shows which staffed agents would start which open tasks now, and the token budget cap they run within; it is saved only on *Confirm*, and History records who set Allow |
+| PJ-15.18 | A project a person set to *Allow* | an agent picks up a task | its run is bounded by both the person who set Allow and the task's author, and the task's text is read as data, never as instructions; when the setter loses the right to set Allow, the project returns to *Ask* and History records why |
+| PJ-15.19 | A project's pick-up value | an agent looks for work | it is a line like any other: the strictest of the project's, the agent's own and every rule for everyone binds, so a *For everyone* Deny on starting work holds whatever the project says |
 
 ## Screens
 

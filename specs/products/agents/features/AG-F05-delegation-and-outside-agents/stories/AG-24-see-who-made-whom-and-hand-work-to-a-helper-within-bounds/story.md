@@ -58,6 +58,7 @@ flowchart LR
 | AG-24.15 | A run stopped | it stops | every helper beneath it ends *stopped with its parent* |
 | AG-24.16 | An agent's Flow | it opens | it draws the helpers it may make and the agents it may delegate to — Allow · Ask · Deny |
 | AG-24.17 | An Operator without *Can build agents* | they open an agent's helper settings | they read; editing is disabled, naming *Can build agents* |
+| AG-24.18 | A helper or a delegated agent | it takes a step | the strictest value along the whole caller chain binds, the root agent's own rule included; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose line denied it |
 
 ## Screens
 

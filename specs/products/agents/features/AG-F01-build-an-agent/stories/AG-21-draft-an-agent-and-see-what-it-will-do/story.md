@@ -49,7 +49,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask · Deny, starting at the Graph's) and a token budget |
+| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask · Deny, starting at a new agent's starting lines — reads Allow, the rest Ask — never looser than the Graph) and a token budget |
 | AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template whose *What it may do* comes with it, and opens as a sheet on Setup with a *Draft* chip |
 | AG-21.3 | A name another agent already has, retired or not | they save | it is refused, naming the agent that has it |
 | AG-21.4 | *What it may do* with nothing allowed | they save | it is refused: an agent that may run nothing is a mistake |
@@ -74,8 +74,9 @@ flowchart LR
 | AG-21.23 | A sheet whose engine read fails | it opens | the tab names what it could not read, in the engine's words; the rest of the sheet still reads |
 | AG-21.24 | A run refused by the agent's limits | the person opens *How it got here* | its steps show the refused step, the bound and whose it was, and each step's mode with who set it |
 | AG-21.25 | A builder | they set an item's mode for this agent tighter than the Graph's | it saves as the agent's own, naming them; *What it may touch* (ST-30) reads it at once |
-| AG-21.26 | A builder | they set an item's mode for this agent looser than the Graph's, or an access change to Allow | it is refused in place, naming the level that set it, or that an access change is never Allow |
+| AG-21.26 | A builder | they set an item's mode for this agent looser than the Graph's, past a line someone who can manage people locked, or an access change to Allow | it is refused in place, naming the level or the lock that set it, or that an access change is never Allow |
 | AG-21.27 | An Operator without *Can build agents* | they open *What it may do* | each mode reads with who set it; changing it is disabled, naming *Can build agents* |
+| AG-21.28 | A change to an agent's own rule from the API, a key or a rule file applied from the command line | it loosens past the Graph or a locked line, or sets an access change to Allow | the engine refuses it as Studio does, naming the level; loosening with a key is refused, naming that it needs a person's session |
 
 
 ## Screens

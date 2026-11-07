@@ -36,7 +36,7 @@ stands for.
 | **Version** | One immutable, hashed state of a dataset, model, skill or agent | Version |
 | **Add to this graph** | Load a dataset version into one of this Graph's models | Bind |
 | **Origin** | Where a dataset came from: official · collected · generated · observed · derived | Origin |
-| **Sensitivity** | public · internal · confidential · personal — on a dataset or a column | Sensitivity |
+| **Sensitivity** | public · internal · confidential · personal — on a dataset, a column or a property of a kind | Sensitivity |
 | **Retracted** | A dataset version withdrawn by its source, with a reason; kept, and everything citing it flagged | Retracted |
 | **Standard** | A shared, versioned set of terms, allowed values and required fields a dataset may claim | Standard |
 | **Checks** | How a dataset scores against the standard it claims, with what breaks it | Conformance · validation report |
@@ -56,8 +56,8 @@ stands for.
 | **Retune** | Narrow or widen the view of the graph from a run, then ask again | Retune |
 | **What it may do** | The functions an agent or plan may run, with what arguments, each with its mode | Envelope |
 | **Access rule** | Who may do what, as sentences: *Can ask*, *Can change data* | Policy |
-| **Allow · Ask · Deny** | The mode of each act an agent takes — it acts · it waits for a yes in the Inbox · it is refused, naming who set it. Set by a person, by hand on an item or on an access rule's line; agents only | Mode |
-| **Asks first** | An act set to Ask waits in the Inbox, showing exactly what it will do — by default every write, send, spend and access change | Approval |
+| **Allow · Ask · Deny** | The value on every line of an access rule, for people, agents and keys alike — it acts · it waits for a yes in the Inbox · it is refused, naming the line and who set it. What no line reaches is denied; where lines disagree, the strictest wins. Set only by a person, by hand on an item or on a rule's line | Mode · permission |
+| **Asks first** | An act a line sets to Ask — a person's or an agent's — waits in the Inbox, showing exactly what it will do, for someone who holds Allow on it | Approval |
 | **Token budget** | The tokens an agent, schedule or eval set may spend in a period — never currency | Budget |
 | **Workers · runs at once** | The machines that run work, and how many runs a Graph may have going | Pool · lane · worker |
 | **Worker group · Join key** | Workers that share labels and run the same kinds of step · the key a new worker joins a group with, shown once | Worker pool · join token |
@@ -76,12 +76,12 @@ stands for.
 | **Can manage people** | Members, groups, access rules, other people's keys | `iam-admin` |
 | **Member** | A person or an agent with access to a Graph | Member · agent binding |
 | **Personal access token** | A long-lived credential a person mints for themselves, shown once | Token |
-| **Built in · Custom · A key's own · An agent's own · For everyone** | The kinds of access rule: the six grants, read-only · one written here · one that narrows a single key · one that narrows a single agent, from its sheet · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
+| **Built in · Custom · A person's own · A key's own · An agent's own · For everyone** | The kinds of access rule: the six grants, with their starting lines shown · one written here · one that narrows a single person · one that narrows a single key · one that narrows a single agent, from its sheet · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
 | **Who holds it** | The people, groups, agents and keys an access rule reaches, and how — directly, via a group, for a run | Held by · attachments |
 | **Who it changes** | Before an access rule is saved: who gains, who loses, which skills would break | Impact |
 | **What it can do** | What an agent may actually do once every check is applied, with why not for each refusal | Effective access |
 | **Can someone do this?** | A check of whether a person, agent or key may do something to something, and which check decides; nothing runs | Test access |
-| **Service account** | A member with no sign-in that owns keys for scripts | Service account |
+| **Service account** | A member with no sign-in that owns keys for scripts; marked *agent-operated* when an outside agent drives it, and then held to the rules agents are | Service account |
 | **Group** | People and agents in one Graph that hold access rules together | Group |
 | **Sign out here · Sign out everywhere** | End this device's session · every session of the account | Revoke refresh token(s) |
 
@@ -162,7 +162,7 @@ stands for.
 | **Needs you · Running · History** | The Inbox's three parts: what waits on the person, what runs, what people and agents did | Approvals and notifications · runs · ledger and events |
 | **Updates** | The notifications a rule sent the person, in the Inbox beside Needs you; they never toast | Notification |
 | **Done** | The Inbox's runs that ended today, beside Running | Settled runs |
-| **Send it · Not this time · Allow · Decline · Allow always** | The acts on an ask: a send · access, budget or a delegation · a delegation for good | Approve · decline · scope always |
+| **Send it · Not this time · Allow · Decline · Allow always · Decline for N days** | The acts on an ask: a send · access, budget or a delegation · a delegation for good · an ask for more, kept from coming back for up to 90 days | Approve · decline · scope always |
 | **Expired, not sent** | An ask nobody decided by its deadline, or whose run ended; nothing it held went | Expired approval |
 | **Notification rule · History alert** | Which events reach whom, in the Inbox and on which channels · which acts in History tell whom, in the Inbox | Notification rule · alert rule |
 | **Channel** | Where a notification leaves Invana — email, Slack or a webhook; *In app* is the Inbox, not a channel | Notification channel |

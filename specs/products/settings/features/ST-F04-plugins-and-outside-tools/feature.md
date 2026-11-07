@@ -36,7 +36,7 @@ flowchart TD
   call -->|no| rj["Refused · names the key and its rule · recorded"]
   call -->|yes| run(["ST-27 · A run, as the key's holder ∩ the agent · in History"])
   run -->|a draft dataset version| pub(["A person publishes it (DA-F01)"])
-  run -->|calls a tool that sends · Ask by default| ap["Waits for a yes in Needs you (IN-01)"]
+  run -->|calls a tool that sends · Ask on the starting lines| ap["Waits for a yes in Needs you (IN-01)"]
 ```
 
 ```mermaid
@@ -99,7 +99,7 @@ sequenceDiagram
 | Installed is the engine's word | A tool plugin whose extra is not installed is listed as not installed, naming the extra; its functions cannot be planned |
 | A function keeps its version | Each function versions on its own; a run records the version it ran; after a breaking version the previous one serves re-runs for a while |
 | Plans come two ways | *Generated* from a skill's instructions, or *packaged* in a plugin; a person never writes a plan in Studio |
-| A tool that sends is Ask by default | A function that sends — mail, any MCP tool its server does not mark read-only — is Ask unless a person sets its mode otherwise ([the three modes](../../product.md#decisions)); asking, it waits for a yes in Needs you, and a no fails it as *not sent* |
+| A tool that sends starts at Ask | A function that sends — mail, any call carrying Graph data out of the install, any MCP tool whose read-only hint no Admin confirmed for its revision — is a send, at Ask on the starting lines ([Which act a call is](../../product.md#decisions)); asking, it waits for a yes in Needs you, and a no fails it as *not sent* |
 | Each tool shows its mode | Every function reads its mode for this Graph — Allow · Ask · Deny — and who set it |
 | Outside work runs on workers | Tool and MCP steps run on workers, never in the engine serving Studio; with no worker free they wait, then fail saying no worker took them |
 | Secrets stay on the workers | A function reads only the secrets its plugin declares, from the worker's environment; nothing rides a run |
@@ -151,7 +151,7 @@ sequenceDiagram
 | OAuth for outside servers or callers | A bearer token or a key covers it now |
 | MCP resources, prompts, sampling, elicitation | Plans call tools; the rest has no place in a plan |
 | Following a server's changed tool list | The list is frozen until an Admin reads it again |
-| An Admin marking a tool read-only | The server's own hint decides; turn the plugin off to stop it |
+| An Admin marking a tool read-only | An Admin only confirms the server's own hint, per revision; a tool the server does not mark stays a send |
 | Hot-loading a new or refreshed server | What a process runs is fixed when it starts |
 | A raw graph query as a served tool | Served agents answer with records cited |
 | A general write path from outside | Writes have contracts; only a draft push writes, and a person publishes |

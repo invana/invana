@@ -10,7 +10,7 @@ boards: [inbox]
 # IN-01 · Decide what an agent asks before it acts
 
 **As** the owner of an agent, a view of the graph or a run **I want** every ask routed to me — access, budget, a
-delegation, a send, a question — showing exactly what it will do **so that** nothing set to Ask leaves, changes or
+delegation, a send, a question, a person's act set to Ask — showing exactly what it will do **so that** nothing set to Ask leaves, changes or
 spends without my yes — the agent proposes the act, and I decide whether it goes.
 
 Tasks: [task.md](task.md) · Feature: [IN-F01](../../feature.md)
@@ -45,7 +45,7 @@ flowchart LR
 | IN-01.1 | An agent step that wants to send a message | the step reaches the send | it holds, and an ask appears in Needs you for the people it is routed to; the rest of the run carries on |
 | IN-01.2 | An ask to send | it is read | it shows exactly what will be sent — To, Subject and the start of the body — with *See all it will send* opening the whole message as it will go |
 | IN-01.3 | Any ask | it is read | it names who asked and on whose behalf (*ravi ▸ Route analyst*), what it wants in one line, who it is routed to and why, how long it has waited, the deadline as time left, and its run |
-| IN-01.4 | An ask | it is raised | it is routed by its kind — access to the owner of the view of the graph; a delegation or a send to the target agent's owner; budget to the person who started the run; a question to the task's author; workers to an install admin; more than a mode allows to whoever may change it at the level that denied it — and says which |
+| IN-01.4 | An ask | it is raised | it is routed by its kind — access to the owner of the view of the graph; a delegation or a send to the target agent's owner; budget to the person who started the run; a question to the task's author; workers to an install admin; more than a line allows to whoever may change that line; a person's act set to Ask to people who hold Allow on it — never to the asker nor whoever it benefits — and says which |
 | IN-01.5 | An ask to send, routed to the reader | they press *Send it* | exactly what was shown is sent, never a re-render, and the run carries on |
 | IN-01.6 | An ask routed to the reader | they press *Not this time* or *Decline* with a note | nothing is sent, the step ends *not sent*, and the note is kept |
 | IN-01.7 | An ask for access, routed to the reader | they press *Allow* | it is allowed for this run, for that agent only, never its children |
@@ -64,6 +64,10 @@ flowchart LR
 | IN-01.20 | A decided ask | History is read | it shows who decided, when, and the note (IN-F03) |
 | IN-01.21 | An ask from an agent's run | the reader opens *How it got here* | it shows the run's steps and sources up to the step that asked, and the mode that made it ask, its level and who set it |
 | IN-01.22 | An agent's ask with more than one way to answer | it is shown in *Needs you* | the agent's recommended answer is marked, with its reason; the person answers with one click |
+| IN-01.23 | An ask routed to the reader | they allow it | the engine checks again, at that moment, that the reader may still decide it and every check the act needs; if one fails, the yes is refused, naming the check, and nothing runs |
+| IN-01.24 | Any ask | it is raised, then allowed | it stores the exact act — function, arguments, targets and their versions — with a hash; the yes runs only that act; a write whose targets changed since the ask is refused, naming what changed |
+| IN-01.25 | Any ask | it is read | the engine's record of the act leads — what, to whom, every recipient, outside domains flagged; the asker's words follow, labelled as theirs and shown as plain text with control and direction characters visible; no answer is preselected; *always* is never the first choice; the sources the step read are linked |
+| IN-01.26 | A person's act that a line sets to Ask | they take it | it holds, telling them who it waits on; an ask appears in *Needs you* for people who hold Allow on that act, never the asker nor whoever it benefits; the asker's own acts on it are disabled |
 
 ## Screens
 
@@ -73,5 +77,7 @@ flowchart LR
 | Needs you — an ask | Operator | inbox · Nothing needs you | inbox · Nothing matches | inbox · Loading | inbox | inbox · Could not load | inbox · An agent asks to send | inbox · Not yours to answer |
 | An ask — what it will send | Admin | — | — | inbox · Loading | inbox · See all it will send | inbox · Already decided | inbox · An agent asks to send | — |
 | An ask — what it will send | Operator | — | — | inbox · Loading | inbox · See all it will send | inbox · Already decided | inbox · An agent asks to send | inbox · Not yours to answer |
+| A person's ask | Admin | — | — | inbox · Loading | inbox · A person asks | inbox · Already decided | — | — |
+| A person's ask | Operator | — | — | inbox · Loading | inbox · A person asks | inbox · Already decided | — | inbox · Not yours to answer |
 | An ask — expired | Admin | — | — | — | inbox · Expired, not sent | — | — | — |
 | An ask — expired | Operator | — | — | — | inbox · Expired, not sent | — | — | inbox · Expired, not sent |

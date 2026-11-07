@@ -109,7 +109,8 @@ sequenceDiagram
 | Tokens are set aside | Making or delegating to a helper sets tokens aside from the agent's remaining budget; unspent tokens return when it ends, and a history row says so. Asking for more than remains is refused, naming what remains |
 | A helper is never wider | It works inside the view of the graph its run opened with, and within the agent's own bounds; it may only narrow them |
 | Helpers end with the work | A helper is made for one piece of work and retires when it closes; its row and its runs are kept |
-| A delegated agent keeps its own access | An agent of the graph asked for help works with its own access, inside both views of the graph, paid from the asker's tokens |
+| A delegated agent keeps its own access | An agent of the graph asked for help works with its own access, narrowed by the root agent's own rule, inside both views of the graph, paid from the asker's tokens; the strictest value along the caller chain binds ([The strictest along the caller chain](../../../settings/product.md#decisions)) |
+| *May delegate to* is a line | Each agent's Allow · Ask · Deny is a line like any other; the strictest of it and every rule for everyone binds |
 | No loops | An agent already in the run's chain cannot be asked again; an outside agent cannot call back into the graph inside the same task |
 | Every helper ends for one reason | served · cannot answer · out of tokens · out of time · out of steps · no progress · loop · stopped with its parent · stopped · failed |
 | Stopping cascades | Stopping an agent's run stops every helper beneath it |

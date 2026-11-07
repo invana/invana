@@ -59,6 +59,7 @@ flowchart TD
 | ST-28.11 | A ping | it runs | it is a run; History records who pinged, when and the result (IN-F03) |
 | ST-28.12 | An Operator | they open AI models | everything reads but keys; *Add a model*, *Ping* and every act are disabled, naming the Admin |
 | ST-28.13 | A model version | it is read | it shows its mode for this Graph — Allow · Ask · Deny — and who set it |
+| ST-28.14 | A model call to an outside provider | it carries data above the endpoint's clearance | it counts as a send, held to the line on sends; an ask names the data, its sensitivity and the provider |
 
 ## Screens
 

@@ -71,7 +71,7 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 |---|---|
 | **Users** | Members of a Graph — people and agents, each with access rules |
 | **A type system** | The ontology — every record has a kind, every kind its rules |
-| **Permissions** | Access rules, *what it may do*, and a mode on every act an agent takes — Allow · Ask · Deny |
+| **Permissions** | Access rules whose every line is Allow · Ask · Deny — one model for people, agents and keys alike — and *what it may do* |
 | **Processes** | Runs — every execution of a plan, by a person or an agent, in one journal |
 | **A scheduler** | Schedules, and workers with the runs a Graph may have going at once |
 | **Resource limits** | Token budgets, and each Graph's limits set by the install |
@@ -89,7 +89,7 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 | **Plain words in, work out** | A question in plain English becomes queries, a plan and an answer — or choices to pick from |
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
-| **Acts only as far as the person allows** | Every act an agent takes is Allow, Ask or Deny, set by a person. A write, a send, a spend and an access change are Ask unless a person set otherwise, showing exactly what will happen; an access change is never Allow ([Settings](products/settings/product.md#decisions)) |
+| **Acts only as far as the person allows** | Every act — a person's, an agent's or a key's — is Allow, Ask or Deny by the lines a person set; what no line reaches is denied, and the strictest line wins. An Ask waits for someone who holds Allow on it, showing exactly what will happen, and is never decided by the one it benefits; an agent's access change is never Allow ([Settings](products/settings/product.md#decisions)) |
 | **Split by persona** | An analyst never sees agent tuning; a builder never sees project branches ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are

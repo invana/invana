@@ -48,7 +48,7 @@ flowchart TD
 | ST-29.5 | A tool plugin whose extra is not installed | it is read | it says it is not installed, naming the extra; it cannot be turned on |
 | ST-29.6 | An Admin | they turn a tool plugin on | agents may call its functions from the next step, with no restart; runs already waiting pick it up |
 | ST-29.7 | A plugin turned off | a step calls one of its functions | the step is refused, saying the plugin is off and who can turn it on |
-| ST-29.8 | A function that sends — `mail.send` — its mode left at its default | a step calls it | it is Ask: the run waits for a yes in Needs you (IN-01); a no fails the step as *not sent* |
+| ST-29.8 | A function that sends — `mail.send` — reached only by a starting line | a step calls it | it is Ask: the run waits for a yes in Needs you (IN-01); a no fails the step as *not sent* |
 | ST-29.9 | A tool step and no worker free | it waits past its allowance | it fails, saying no worker took it |
 | ST-29.10 | A function needing a secret the workers do not hold | a step calls it | it is refused, naming the setting the workers need |
 | ST-29.11 | A web page whose robots.txt disallows it | a web tool would read it | nothing is read, and the step says so with the address |
