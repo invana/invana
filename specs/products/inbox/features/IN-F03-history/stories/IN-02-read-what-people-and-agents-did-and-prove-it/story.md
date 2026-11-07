@@ -64,7 +64,7 @@ flowchart LR
 | IN-02.20 | An Operator | they open History | they read their own acts and the rows of runs they can open; a line counts the rest, *counted, not shown*; the counts over the Graph are not shown |
 | IN-02.21 | An Operator | they follow a link to a row they cannot see | it reads *not found* |
 | IN-02.22 | The engine cannot read History | it opens | it says what it could not read, with *Try again* |
-| IN-02.23 | An outside agent reading through an access key | its row is read | it is named as outside, with the key's name |
+| IN-02.23 | An outside agent reading through a key | its row is read | it is named as outside, with the key's name |
 | IN-02.24 | Rows arriving while History is open | the reader is on the first page | new rows join the top without moving the rows below |
 
 ## Screens

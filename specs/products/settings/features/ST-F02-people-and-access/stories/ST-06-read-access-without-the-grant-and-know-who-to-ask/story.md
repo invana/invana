@@ -28,7 +28,9 @@ flowchart TD
   o([An Operator opens People and access]) --> r["Every rule reads · You can look"]
   r --> n["You can read every rule. Priya and Ravi can change them"]
   r --> a["Edit · New rule shown as Ask Priya (can manage people)"]
-  a -->|Ask Priya| ib(["Names who to ask — what it sends is an open question"])
+  a -->|Ask Priya| ib(["IN-01 · a person's ask for the grant, in Priya's Needs you · Asked Priya"])
+  ib -->|allowed| g(["Holds the grant for the time picked"])
+  ib -->|declined · expired| d2(["Still Ask Priya · the answer named"])
   w([Any write without its grant]) --> d["Disabled, never hidden · names the grant and who holds it"]
   w -->|grant lost since the screen loaded| e["The engine refuses · names the grant and who holds it"]
   e --> d
@@ -47,6 +49,7 @@ flowchart TD
 | ST-06.7 | An Operator | they search, filter or open any rule, person, group or agent | it works as it does for someone who can manage people; only the writes differ |
 | ST-06.8 | A detail surface whose main act the reader cannot do — a skill, an agent, a model, a project | it opens | one line says *You can read this skill. Editing needs Can build agents — ask Ravi* |
 | ST-06.9 | An install Admin who is not a member of the Graph | they open its access | they are refused like any non-member — being Admin opens no Graph |
+| ST-06.10 | A member who lacks the grant an act needs | they press *Ask Priya* | one person's ask for that grant appears in Needs you (IN-01) — Priya's when she may give it, else of those who may; never decided by the asker nor whoever it benefits, and Owner or *Can manage people* only by an Owner it does not benefit; the act reads *Asked Priya*, and pressing again joins the open ask; allowed, the reader holds the grant for the time picked |
 
 ## Screens
 
@@ -54,3 +57,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | People and access, read only | Admin | — | — | — | — | — | — | — |
 | People and access, read only | Operator | shell.locked · Built in only | shell.locked · Nothing matches | shell.locked · Loading | shell.locked | shell.locked · Grant lost | — | shell.locked |
+| *Ask Priya*, pressed | Admin | — | — | — | — | — | — | — |
+| *Ask Priya*, pressed | Operator | — | — | — | shell.locked · Asked | — | — | — |

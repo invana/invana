@@ -57,5 +57,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A rule — its limits | Admin | settings.access · No limit | — | settings.access · Loading | settings.access | settings.access · Could not load | — | — |
-| A rule — its limits | Operator | shell.locked · No limit | — | shell.locked · Loading | shell.locked | shell.locked · Could not load | — | shell.locked |
+| A rule — its limits | Admin | settings.access · No limit | — | settings.access · Loading | settings.access · Its limits | settings.access · Could not load | — | — |
+| A rule — its limits | Operator | shell.locked · No limit | — | shell.locked · Loading | shell.locked · Its limits | shell.locked · Could not load | — | shell.locked |

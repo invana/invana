@@ -155,6 +155,7 @@ sequenceDiagram
 | The tightest limit binds | Limits sit on rules; across a holder's rules the tightest wins. An agent's own settings sit under them; one above is refused when saved, naming the rule |
 | A key can only narrow | A key acts as its holder and may carry its own rule; it is never wider than the holder, and the holder's own access still applies |
 | Disabled, never hidden | Without *Can manage people* every write shows, shown as *Ask <name>* (design language §5); reading is every member's |
+| *Ask <name>* raises an ask | Pressed, it raises a person's ask for the grant the act needs, in Needs you (IN-01) of the person named — or, when they cannot give it, of those who can; it is never decided by the asker nor whoever it benefits, and Owner and *Can manage people* only by an Owner it does not benefit. A repeat joins the open ask (ST-06.10) |
 | Asks for access go to the Inbox | An ask for access, a higher limit, or more than a line allows (ST-31) is an ask in Needs you (IN-01); allowed, it adds the holder for this run · N days · always, and *Who holds it* says when it ends |
 | A locked Deny | Someone who can manage people may lock a Deny line on a holder's own rule — never one that reaches an Owner's access changes; a builder cannot change or remove it |
 | Agent-operated keys | A key or service account marked *agent-operated* — by someone who can manage people, or by a holder on their own key — is held to every rule agents are: its access changes are never Allow, and its asks are an agent's. A service account's keys start agent-operated; clearing the mark widens its holder |
@@ -195,9 +196,6 @@ sequenceDiagram
 
 | Question | Who answers |
 |---|---|
-| The board names a key *Access key* (*Profile and keys*); the glossary says *Personal access token*. Recommend: *key* on screen — shorter, and the board already reads it; the glossary changes with Ravi's yes | Ravi |
-| What does *Ask Priya* do when pressed? The board links it to the Inbox; the source docs build no access-request flow and only name who to ask. Recommend: it raises an ask for the grant in that person's Needs you (IN-01), as an agent's ask for access does | Ravi |
-| The board's limits read *Tokens a day* and *Runs at once*; the rules carry tokens a month and a run, and agents at once. Recommend: a month and a run, as the engine stores them; the board is redrawn | Ravi |
 
 ## Not building
 

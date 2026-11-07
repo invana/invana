@@ -75,7 +75,7 @@ stands for.
 | **Owner** | The Graph's settings, connection and AI providers, and the three grants above | `owner` |
 | **Can manage people** | Members, groups, access rules, other people's keys | `iam-admin` |
 | **Member** | A person or an agent with access to a Graph | Member · agent binding |
-| **Personal access token** | A long-lived credential a person mints for themselves, shown once | Token |
+| **Key** | A long-lived credential a member mints for themselves, or for a service account; it acts as its holder, may be narrowed, expires, and is shown once | Personal access token |
 | **Built in · Custom · A person's own · A key's own · An agent's own · For everyone** | The kinds of access rule: the six grants, with their starting lines shown · one written here · one that narrows a single person · one that narrows a single key · one that narrows a single agent, from its sheet · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
 | **Who holds it** | The people, groups, agents and keys an access rule reaches, and how — directly, via a group, for a run | Held by · attachments |
 | **Who it changes** | Before an access rule is saved: who gains, who loses, which skills would break | Impact |
@@ -190,3 +190,4 @@ stands for.
 | Job · job run | Run |
 | Wizard · setup wizard | *Create a graph*, in steps |
 | Graph admin | Owner · Can manage people |
+| Personal access token · access key · API key | Key |
