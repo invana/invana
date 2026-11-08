@@ -116,10 +116,13 @@ def build() -> tuple[dict[str, list[dict[str, object]]], dict[str, list[str]]]:
         return bool(declared)
     products = sorted(SPECS.glob("products/*/product.md")) + sorted(SPECS.glob("foundation/*/product.md"))
     n_features = n_stories = 0
+    # The foundation every product uses (Inbox, Settings, Shell) hangs under one group, not under the platform.
+    found = {"parts": 0, "features": 0, "stories": 0, "p": {}}
 
     for hue, product_md in enumerate(products, start=1):
         pmeta, pbody = front_matter(product_md)
         pid = str(pmeta["id"])
+        is_found = product_md.parts[-3] == "foundation"
         product_code = built_in(pid, pmeta)
         features = sorted(product_md.parent.glob("features/*/feature.md"))
         p_stories = 0
@@ -171,6 +174,7 @@ def build() -> tuple[dict[str, list[dict[str, object]]], dict[str, list[str]]]:
             "type": "product",
             "data": {
                 "layer": "product",
+                "kind": "Foundation" if is_found else "Product",
                 "code": pid,
                 "name": pmeta.get("title", pid),
                 "status": pmeta.get("status", ""),
@@ -181,9 +185,31 @@ def build() -> tuple[dict[str, list[dict[str, object]]], dict[str, list[str]]]:
             },
         })
         nodes.extend(feature_nodes)
-        edges.append({"id": f"invana->{pid}", "source": "invana", "target": pid, "type": "ships"})
+        if is_found:
+            edges.append({"id": f"foundation->{pid}", "source": "foundation", "target": pid, "type": "contains"})
+            found["parts"] += 1  # type: ignore[operator]
+            found["features"] += len(features)  # type: ignore[operator]
+            found["stories"] += p_stories  # type: ignore[operator]
+            found["p"].update(persona_flags(pmeta))  # type: ignore[union-attr]
+        else:
+            edges.append({"id": f"invana->{pid}", "source": "invana", "target": pid, "type": "ships"})
         n_features += len(features)
         n_stories += p_stories
+
+    if found["parts"]:
+        nodes.append({
+            "id": "foundation",
+            "type": "group",
+            "data": {
+                "layer": "product",
+                "kind": "Foundation",
+                "name": "Foundation",
+                "sub": "What every product uses",
+                "stats": f"{found['parts']} parts · {found['features']} features · {found['stories']} stories",
+                "p": {k: 1 for k in PERSONAS if k in found["p"]},  # type: ignore[operator]
+            },
+        })
+        edges.append({"id": "invana->foundation", "source": "invana", "target": "foundation", "type": "contains"})
 
     _, vision = front_matter(SPECS / "vision.md")
     tagline = re.search(r"^\*\*(.+?)\*\*", vision, re.M)
@@ -194,7 +220,10 @@ def build() -> tuple[dict[str, list[dict[str, object]]], dict[str, list[str]]]:
             "code": "PLATFORM",
             "name": "Invana",
             "summary": tagline.group(1) if tagline else "",
-            "counts": f"{len(products)} products · {n_features} features · {n_stories} stories",
+            "counts": (
+                f"{len(products) - found['parts']} products · {found['parts']} foundation · "  # type: ignore[operator]
+                f"{n_features} features · {n_stories} stories"
+            ),
             "system": " · ".join(f"{v} {'APIs' if k == 'apis' else k}" for k, v in sys_info["counts"].items()),  # type: ignore[union-attr]
         },
     })
