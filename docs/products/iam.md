@@ -3,7 +3,7 @@
 **Status: proposal, under review.** Who may do what, to which resources, within which limits — for people and
 agents alike, in one place. Prototype: the *Invana — IAM and Scale-out* canvas, pages *IAM › …*.
 
-Product spec: [ST-F02 · People and access](../../specs/products/settings/features/ST-F02-people-and-access/feature.md) — IAM-01…IAM-11 are ST-01…ST-11 there, with their criteria, rules and decisions. What is left here has not moved.
+Product spec: [ST-F02 · People and access](../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — IAM-01…IAM-11 are ST-01…ST-11 there, with their criteria, rules and decisions. What is left here has not moved.
 
 | | |
 |---|---|

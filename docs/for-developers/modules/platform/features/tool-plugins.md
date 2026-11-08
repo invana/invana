@@ -12,7 +12,7 @@ and a terminal read the same thing.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [plugins](plugins.md) · [distributed execution](distributed-execution.md) · [approvals](../../operate/features/approvals.md) · [products › plugins §9](../../../../products/plugins.md#9-where-it-is-administered) · [products › agents AG-13](../../../../products/agents.md) |
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 

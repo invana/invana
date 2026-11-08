@@ -257,7 +257,7 @@ class CatalogueQuerySet:
         ([PM15](docs/for-developers/modules/agents/features/providers-and-models.md)).
         The name is the provider's own column now — it is no longer derived from
         the kind, so two endpoints on one vendor are two participants with two
-        keys and two names somebody chose (specs/products/settings/features/ST-F05-ai-models/feature.md § Decisions).
+        keys and two names somebody chose (specs/foundation/settings/features/ST-F05-ai-models/feature.md § Decisions).
         """
         stmt = (
             select(LLMModel.id, LLMProvider.name, LLMModel.model_id)

@@ -12,7 +12,7 @@ address, and the address names the row whose credential is used.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [author-an-agent](author-an-agent.md) · [envelope-and-budget](envelope-and-budget.md) |
 
-Product spec: [ST-F05 · AI models](../../../../../specs/products/settings/features/ST-F05-ai-models/feature.md) — ST-28; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F05 · AI models](../../../../../specs/foundation/settings/features/ST-F05-ai-models/feature.md) — ST-28; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

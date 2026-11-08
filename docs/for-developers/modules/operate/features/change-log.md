@@ -10,7 +10,7 @@ read from the records that already hold the versions and the events that minted 
 | API / CLI / Studio | ✅ / 🔵 / ✅ |
 | Related | [audit-and-activity](audit-and-activity.md) · [see-what-ran](see-what-ran.md) · products: [shell.md](../../../../products/shell.md) SH-14 · [agents.md](../../../../products/agents.md) AG-06 · AG-09 · [modeller.md](../../../../products/modeller.md) MO-09 |
 
-Product spec: [IN-F03 · History](../../../../../specs/products/inbox/features/IN-F03-history/feature.md) — IN-03; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
+Product spec: [IN-F03 · History](../../../../../specs/foundation/inbox/features/IN-F03-history/feature.md) — IN-03; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
 
 ## Surfaces
 

@@ -14,7 +14,7 @@ Product spec: [PJ-F02 · Objectives and review](../../../../../specs/products/pr
 
 ## Approvals in the queue
 
-Stays, not moved: [IN-F01](../../../../../specs/products/inbox/features/IN-F01-needs-you/feature.md) decides an ask as shown — changing what it will do before allowing it is in its *Not building*. Amending the gated call's arguments is open for Ravi there.
+Stays, not moved: [IN-F01](../../../../../specs/foundation/inbox/features/IN-F01-needs-you/feature.md) decides an ask as shown — changing what it will do before allowing it is in its *Not building*. Amending the gated call's arguments is open for Ravi there.
 
 | # | Capability | Notes |
 |---|---|---|

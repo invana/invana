@@ -184,7 +184,7 @@ backend.
 | Not | Where it lives |
 |---|---|
 | A scope or status statement | [`for-developers/README.md`](for-developers/README.md) — the feature index, its `Slice` column and its Shipped / Partly built tables |
-| A schema | The `What this module owns` section of each [module spec](for-developers/modules/) |
+| A schema | The `What this module owns` section of each [module spec](for-developers/modules) |
 | An API spec | [`for-developers/modules/platform/spec.md`](for-developers/modules/platform/spec.md) §5, and the generated client |
 | A design record | Each feature's own file. A decision lives with the feature it governs, in present tense; there is no RFC tree and no history of what was tried |
 | A delivery plan | [`for-developers/README.md#delivery`](for-developers/README.md#delivery) |

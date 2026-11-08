@@ -7,7 +7,7 @@ or promoted, and reused when it matches — is the flow of **Task**s that carrie
 System design: [orchestration.md](../../specs/system-design/orchestration.md) — the records (Todo · Flow · Task · TaskRun · Lens · Artifact · Stream · Prompt), where a plan comes from, who writes what, the catalogue, agents · skills · plans, a skill drawn as a plan, the lens on a run, budget, replan and *Not building*. This file keeps the retired two-noun model (§§1–3), the examples, grammar and runtime detail not yet reconciled with it (§§4–11), build status (§§12–14) and what is not decided (§15).
 
 > ⚠ **This document is ahead of the rest of `for-developers/`.** It states the model the product is
-> moving to. The feature files under [modules/](modules/) still describe the older split — Thought ·
+> moving to. The feature files under [modules/](modules) still describe the older split — Thought ·
 > Thinking · Step · Workflow · Project as five separate concepts — and none of them has been rewritten
 > yet. Where the two disagree, this file is the intent and they are the present tense. §11 is the map
 > between them.
@@ -1349,7 +1349,7 @@ Stated so nobody mistakes this document for finished.
 | **Ad-hoc asks become Task rows** | Every question ever asked is a row in `tasks`. Cheap, but it makes the table's growth rate the question volume |
 | **Where `stitch` splits** | The child Task inside an import and the standalone `stitches apply` are different acts sharing one word (§4.3). Both need naming before either is built |
 | **Is introspection a run?** | It is one act that either works or does not, with no partial state. Making it a Task buys a trace; leaving it alone keeps the model honest about what a run is (§4.1) |
-| **Every feature file still says the old model** | None of [modules/](modules/) has been rewritten. Until they are, this file and they disagree — deliberately, and only in this direction |
+| **Every feature file still says the old model** | None of [modules/](modules) has been rewritten. Until they are, this file and they disagree — deliberately, and only in this direction |
 
 ## Not building (retired rows)
 

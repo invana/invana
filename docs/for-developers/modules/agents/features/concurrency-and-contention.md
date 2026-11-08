@@ -10,7 +10,7 @@ The outermost bound in the same family as an envelope and a budget — one level
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [delegation](delegation.md) · [schedules](../../operate/features/schedules.md) · [runtime-and-adapters](../../ask/features/runtime-and-adapters.md) |
 
-Product spec: [ST-F06 · Workers and limits](../../../../../specs/products/settings/features/ST-F06-workers-and-limits/feature.md) — ST-16; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F06 · Workers and limits](../../../../../specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md) — ST-16; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 

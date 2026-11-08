@@ -16,7 +16,7 @@ makes "who recommended what, citing what, on behalf of whom" answerable.
 | Depends on | every module emits into it |
 | Depended on by | [Memory](../memory/spec.md) (evidence reads the record) |
 
-Product spec: [IN · Inbox](../../../../specs/products/inbox/product.md) — its features IN-F01–F03 hold the stories, rules and product decisions of this module. This file keeps the domain words, the engine shape and the rows other products have not moved yet.
+Product spec: [IN · Inbox](../../../../specs/foundation/inbox/product.md) — its features IN-F01–F03 hold the stories, rules and product decisions of this module. This file keeps the domain words, the engine shape and the rows other products have not moved yet.
 
 System design: [operate.md](../../../../specs/system-design/modules/operate.md) — every write is an event, schedules and the clock, the tables it owns, observability. This file keeps the vocabulary, the decisions and what it does not build.
 

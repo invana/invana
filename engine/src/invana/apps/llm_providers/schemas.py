@@ -3,7 +3,8 @@
 A provider is a **configured endpoint**; the models it offers are a
 sub-resource ([PM9](docs/for-developers/modules/agents/features/providers-and-models.md)).
 There is no ``is_default`` anywhere here — the lens ``cast`` answers *which
-model when nobody said* ([ST-F05 § Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)).
+model when nobody said*
+([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
 """
 
 from __future__ import annotations

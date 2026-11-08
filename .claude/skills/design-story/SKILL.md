@@ -30,7 +30,7 @@ This section is the only place the designer's model split is defined. The agent'
 
 ## 1. Read the brief
 
-The story's `story.md` (`specs/products/<product>/features/<CODE>-F<nn>-*/stories/<STORY-ID>-*/story.md`) is the
+The story's `story.md` (`specs/<area>/<product>/features/<CODE>-F<nn>-*/stories/<STORY-ID>-*/story.md`) is the
 whole brief:
 
 | Part of the story | What you take from it |

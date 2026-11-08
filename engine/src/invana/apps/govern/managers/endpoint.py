@@ -24,7 +24,7 @@ pin the Graph no longer offers, or one the lens denies, refuses the run rather
 than falling back to another model. A pin never names an alias — pinning
 ``*-latest`` would pin nothing.
 
-**Removal** ([ST-F05 § Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)).
+**Removal** ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
 A model a cast names cannot quietly stop existing — the refusal names the
 worlds, and the recourse is to retune them first. A model nothing names says so,
 so the safe case is visibly safe.
@@ -164,7 +164,7 @@ class LLMEndpointManager:
 
         The shipped cast is computed over what the Graph *offers*, so a Graph
         with providers and no cast still runs
-        ([ST-F05 § Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)).
+        ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
         """
         shipped = shipped_cast([(e.address, e.capabilities) for e in offered])
         if effective is None:
@@ -289,7 +289,7 @@ class LLMEndpointManager:
         """Edit an endpoint, refusing a rename a world still names.
 
         The ``name`` is the address's middle segment
-        ([ST-F05 § Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)),
+        ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)),
         so renaming moves ``llm/<name>/*`` in one write. A rule or a cast left
         naming the old address points at a participant that no longer exists,
         and a bound that matches nothing bounds nothing — migration ``53``

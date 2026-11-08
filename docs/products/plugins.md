@@ -5,7 +5,7 @@ How the catalogue (today's built-in steps) and the new tools become one versione
 | | |
 |---|---|
 | Today | `engine/src/invana/runtime/catalogue/` — ~30 catalogue entries in 7 modules (one per bound), a closed set built at import, dispatched in-process by `runtime/executor.py` |
-| Proposal | `engine/src/invana/plugins/` — every task type lives in a **plugin**; core plugins always load, tool plugins load when their extra is installed and run only while an Admin has enabled them (a gate checked at dispatch, so no restart — [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)). The registry of everything available builds itself from the manifests |
+| Proposal | `engine/src/invana/plugins/` — every task type lives in a **plugin**; core plugins always load, tool plugins load when their extra is installed and run only while an Admin has enabled them (a gate checked at dispatch, so no restart — [ST-F04](../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md)). The registry of everything available builds itself from the manifests |
 | Requirement | **Distributed**: deploy N workers and get more runs and tasks per second; a worker can die without losing work |
 | Not decided here | Which executor (procrastinate · Dramatiq · Prefect) — B14 measures |
 
@@ -179,8 +179,8 @@ flowchart LR
 | Surface | What |
 |---|---|
 | Studio | **Agents › Plugins** — the registry: every plugin (core, tool, simulator, MCP), its task types with their manifests and versions, its skills and flows, enabled or not, who may call them, how often they run |
-| CLI | `invana plugins list` · `show <plugin>` · `enable <plugin>` · `disable <plugin>` · `invana worker` · `invana plugins mcp add <url> --name <name>` · `mcp refresh <name>` ([ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) |
-| API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's page reads `GET …/catalogue/{step_key}` ([AG-F06](../../specs/products/agents/features/AG-F06-plans-and-functions/feature.md)) · [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) · `POST /plugins/mcp` · `/plugins/mcp/{name}/refresh` — [ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) |
+| CLI | `invana plugins list` · `show <plugin>` · `enable <plugin>` · `disable <plugin>` · `invana worker` · `invana plugins mcp add <url> --name <name>` · `mcp refresh <name>` ([ST-F04](../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) |
+| API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's page reads `GET …/catalogue/{step_key}` ([AG-F06](../../specs/products/agents/features/AG-F06-plans-and-functions/feature.md)) · [ST-F04](../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) · `POST /plugins/mcp` · `/plugins/mcp/{name}/refresh` — [ST-F04](../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) |
 | Access | Only an install Admin enables a plugin; worlds and guardrails decide which agents may call its task types |
 
 ## 10. Changes to existing docs, applied when B06 lands

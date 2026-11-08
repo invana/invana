@@ -74,7 +74,7 @@ class AgentAtCeiling(Exception):
     """This **agent** is already working as many runs as its budget allows.
 
     A different bound from :class:`Refused`, which is the Graph's
-    ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
+    ([ST-F06 § Decisions](specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
     a budget bounds one agent's simultaneity, the Graph's ceiling bounds the
     machine's. They are checked in that order, so an agent at its own ceiling is
     told about *its* ceiling rather than queued behind the Graph's.
@@ -257,7 +257,7 @@ class PoolExhausted(Exception):
     could not get a database connection did not ask a bad question, and telling
     it so sends the reader to fix the query. The pool and its size are the
     actionable facts, so they ride on the exception
-    ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
+    ([ST-F06 § Decisions](specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
     """
 
     def __init__(self, *, graph_id: str, pool: str, size: int) -> None:

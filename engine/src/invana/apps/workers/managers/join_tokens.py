@@ -1,6 +1,6 @@
 """Join tokens — mint, list, revoke, and the live checks of a join.
 
-specs/products/settings/features/ST-F06-workers-and-limits/feature.md. A join token is
+specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md. A join token is
 a ``personal_access_tokens`` row with the ``invana_join_`` prefix, held by the
 install's ``workers`` service account (created on the first mint, a member of no
 Graph) and narrowed to one pool through ``worker_pool_id`` · ``join_cap`` ·

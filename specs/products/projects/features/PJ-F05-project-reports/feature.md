@@ -50,7 +50,7 @@ flowchart TD
 
 | Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
 |---|---|---|
-| Read the draft and every version · export a version | Operator — every member who can see the project; an export — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../settings/product.md#decisions)) | — |
+| Read the draft and every version · export a version | Operator — every member who can see the project; an export — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../../foundation/settings/product.md#decisions)) | — |
 | Draft from the records · edit the draft · publish a version | `contributor` · shown as *Can work on projects* · Admin | Every version reads; *Draft from the records*, *Edit* and *Publish* disabled, naming *Can work on projects* |
 
 ## States

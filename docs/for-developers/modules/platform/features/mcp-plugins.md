@@ -12,7 +12,7 @@ later reaches no plan until an Admin refreshes it — and the plugin is switched
 | API / CLI / Studio | ✅ / ✅ / 🔵 — the Agents › Plugins surface is C03 |
 | Related | [tool plugins](tool-plugins.md) · [plugins](plugins.md) · [approvals](../../operate/features/approvals.md) · [products › plugins §2, §9](../../../../products/plugins.md#2-code-layout) · [products › agents AG-13](../../../../products/agents.md) |
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-26; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-26; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 

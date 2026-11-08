@@ -7,11 +7,11 @@ this file are the starting point; copy one, never write a spec from a blank page
 
 ```
 specs/
-├── README.md                       index: product → feature → story, with status and open tasks
+├── README.md                       index: products, then foundation → feature → story, with status and open tasks
 ├── vision.md · personas.md · glossary.md · design-language.md
 ├── system-design/                  architecture.md · data-model.md · integrations.md
 ├── journeys/J<nn>-<slug>.md        end-to-end flows across products
-└── products/<product>/
+└── products/<product>/            also foundation/<part>/ — Inbox · Settings · Shell, same layout
     ├── product.md
     └── features/<CODE>-F<nn>-<slug>/
         ├── feature.md              user journey · stories index · access · states · rules · decisions · not building
@@ -29,7 +29,7 @@ specs/
 | One folder per feature | `feature.md` holds what its stories share; each story is a folder of its own under `stories/` |
 | One folder per story | `story.md` and `task.md`, nothing else. The story is the source of truth; the tasks are how each role delivers it |
 | Folder name = ID + slug | `MO-F03-load-data-into-a-kind/` · `MO-17-pick-where-the-data-comes-from/`. The slug may change; the ID never does |
-| Products are the UI's areas | Explorer `EX` · Modeller `MO` · Data `DA` · Agents `AG` · Projects `PJ` · Inbox `IN` · Settings `ST` · Shell `SH` |
+| Two areas, one format | **Products** in `products/` — Explore `EX` · Model `MO` · Data `DA` · Agents `AG` · Projects `PJ`. **Foundation** in `foundation/` — what every product uses, not a product: Inbox `IN` · Settings `ST` · Shell `SH`. Both are written the same way; the list is `vision.md` › *Products* and *Foundation* |
 | Journeys cross products | A journey strings stories from several features into one person's path, with its branches |
 
 ## IDs

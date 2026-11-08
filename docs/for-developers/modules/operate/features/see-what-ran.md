@@ -15,7 +15,7 @@ system doing, and what did it do last night" has one answer instead of four pane
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [the runtime](../../platform/features/runtime.md) (what produces every row here) · [inspect-what-landed](../../bring-data-in/features/inspect-what-landed.md) · [audit-and-activity](audit-and-activity.md) · [reasoning-trace](../../ask/features/reasoning-trace.md) · [delegation](../../agents/features/delegation.md) · [projects-and-tasks](../../work/features/projects-and-tasks.md) |
 
-Product spec: [IN-F02 · Running](../../../../../specs/products/inbox/features/IN-F02-running/feature.md) — IN-06; the story, its criteria, journey, states and product decisions live there; the run page is [AG-F03](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md). This file keeps the vocabulary, the Studio layout and the engine shape.
+Product spec: [IN-F02 · Running](../../../../../specs/foundation/inbox/features/IN-F02-running/feature.md) — IN-06; the story, its criteria, journey, states and product decisions live there; the run page is [AG-F03](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md). This file keeps the vocabulary, the Studio layout and the engine shape.
 
 ## The four words this feature keeps apart
 

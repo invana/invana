@@ -88,7 +88,7 @@ Every role, always: `.handoffs/**` · `/tmp/**` · `/private/tmp/**` · `.claude
 | Kit · canvas code | `~/Projects/invana/design-kit/**` · `~/Projects/invana/canvas/**` |
 | Changesets | `.changeset/**` |
 | Specs | `specs/**` |
-| Story tasks | `specs/products/*/features/*/stories/*/task.md` |
+| Story tasks | `specs/products/*/features/*/stories/*/task.md` · `specs/foundation/*/features/*/stories/*/task.md` |
 | Other docs | `docs/**` · `README.md` · `CONTRIBUTING.md` · `CHANGELOG.md` |
 | Boards (canvas) | `.design/**` |
 | Project file | `.claude/team/projects/*/project.md` |
@@ -160,7 +160,7 @@ flowchart LR
 Nothing skips a gate. No design below `specified`; no code below `designed`.
 
 **The story is the source of truth; its tasks are how it gets delivered.** Every story is a folder —
-`specs/products/<p>/features/<feature>/stories/<STORY-ID>-<slug>/` — with `story.md` (the product manager's) and
+`specs/<area>/<p>/features/<feature>/stories/<STORY-ID>-<slug>/` (`<area>` is `products` or `foundation`) — with `story.md` (the product manager's) and
 `task.md`, one table every builder shares (`.claude/skills/product-spec/format.md` › *Tasks*):
 
 | When the story is | Who adds tasks | Then |

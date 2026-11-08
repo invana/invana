@@ -100,7 +100,7 @@ Code, docs and the CLI keep the domain terms in `for-developers/terminology.md`;
 `area.feature.surface.variant`, lower snake, dots for depth — `agents.runs`, `projects.task.thinking`. The areas are
 `start · explore · model · data · agents · inbox · settings · projects · shell`. One canvas page per area, one row per name prefix.
 
-## 8. Where every product went
+## 8. Where every product and foundation part went
 
 | Was | Now | Tier |
 |---|---|---|

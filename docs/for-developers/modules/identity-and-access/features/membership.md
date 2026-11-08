@@ -10,7 +10,7 @@ is the [Graph roles](roles.md) they hold.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [roles](roles.md) · [sessions](sessions.md) · [projects-and-tasks](../../work/features/projects-and-tasks.md) · [envelope-and-budget](../../agents/features/envelope-and-budget.md) |
 
-Product spec: [ST-F01 · This graph](../../../../../specs/products/settings/features/ST-F01-this-graph/feature.md) — ST-12; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape, the CLI and the rows not moved.
+Product spec: [ST-F01 · This graph](../../../../../specs/foundation/settings/features/ST-F01-this-graph/feature.md) — ST-12; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape, the CLI and the rows not moved.
 
 ## Surfaces
 

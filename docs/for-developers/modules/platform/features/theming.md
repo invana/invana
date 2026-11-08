@@ -10,7 +10,7 @@ once, defined in one place.
 | API / CLI / Studio | — / — / ✅ |
 | Related | [design-system](design-system.md) · [graph-canvas](../../explore/features/graph-canvas.md) |
 
-Product spec: [SH-07 · Make the frame work my way](../../../../../specs/products/shell/features/SH-F03-find-your-way/stories/SH-07-make-the-frame-work-my-way/story.md) — light and dark, the person's choice, the canvas following the theme and the rules a person sees live in SH-F03. This file keeps the build rules for theme variants, density and radius.
+Product spec: [SH-07 · Make the frame work my way](../../../../../specs/foundation/shell/features/SH-F03-find-your-way/stories/SH-07-make-the-frame-work-my-way/story.md) — light and dark, the person's choice, the canvas following the theme and the rules a person sees live in SH-F03. This file keeps the build rules for theme variants, density and radius.
 
 ## Capabilities
 

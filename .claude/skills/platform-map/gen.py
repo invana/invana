@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the Invana platform map dataset from specs/ and the code.
 
-Walks specs/products/*/product.md → features/*/feature.md → stories/*/story.md for the product layer, and reads the
+Walks specs/{products,foundation}/*/product.md → features/*/feature.md → stories/*/story.md for the product layer, and reads the
 system and code layers from the code (`system.py`). Writes one `@invana/graph-datasets` module: the Invana platform
 at the root, one tree of nodes under it, and the cross edges between them. Every product, feature and story carries
 the personas its front matter names; every feature also carries the access its Access table grants. The one
@@ -114,7 +114,7 @@ def build() -> tuple[dict[str, list[dict[str, object]]], dict[str, list[str]]]:
             else:
                 unknown.append(f"{src} → {target.split(':', 1)[1]}")
         return bool(declared)
-    products = sorted(SPECS.glob("products/*/product.md"))
+    products = sorted(SPECS.glob("products/*/product.md")) + sorted(SPECS.glob("foundation/*/product.md"))
     n_features = n_stories = 0
 
     for hue, product_md in enumerate(products, start=1):

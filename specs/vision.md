@@ -89,7 +89,7 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 | **Plain words in, work out** | A question in plain English becomes queries, a plan and an answer — or choices to pick from |
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
-| **Acts only as far as the person allows** | Every act — a person's, an agent's or a key's — is Allow, Ask or Deny by the lines a person set; what no line reaches is denied, and the strictest line wins. An Ask waits for someone who holds Allow on it, showing exactly what will happen, and is never decided by the one it benefits; an agent's access change is never Allow ([Settings](products/settings/product.md#decisions)) |
+| **Acts only as far as the person allows** | Every act — a person's, an agent's or a key's — is Allow, Ask or Deny by the lines a person set; what no line reaches is denied, and the strictest line wins. An Ask waits for someone who holds Allow on it, showing exactly what will happen, and is never decided by the one it benefits; an agent's access change is never Allow ([Settings](foundation/settings/product.md#decisions)) |
 | **Split by persona** | An analyst never sees agent tuning; a builder never sees project branches ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
@@ -97,9 +97,9 @@ How these look on screen is [design-language.md](design-language.md); the words 
 
 ## Products
 
-The products are the areas of Studio ([design-language.md](design-language.md) §8). Each sits in one of Invana's two
-layers: the **operating system** runs the Graph and its ontology; **decision intelligence** is a person deciding over
-it. The layers are how Invana is explained, never places in Studio.
+The products are the places a person comes to do the work ([design-language.md](design-language.md) §8). Each sits in
+one of Invana's two layers: the **operating system** runs the Graph and its ontology; **decision intelligence** is a
+person deciding over it. The layers are how Invana is explained, never places in Studio.
 
 | Code | Product | Layer | Tier | Lets a person |
 |---|---|---|---|---|
@@ -108,9 +108,24 @@ it. The layers are how Invana is explained, never places in Studio.
 | `DA` | [Data](products/data/product.md) | Operating system | modal · sheet | Gather the data — datasets, versions, loads, standards and checks |
 | `AG` | [Agents](products/agents/product.md) | Operating system | modal · sheet | Build agents and skills, read their runs, schedule them |
 | `PJ` | [Projects](products/projects/product.md) | Decision intelligence | mode | Pursue a question — tasks, branches, findings, decisions, reports |
-| `IN` | [Inbox](products/inbox/product.md) | Operating system | modal | Answer what needs them, see what runs, read what happened |
-| `ST` | [Settings](products/settings/product.md) | Operating system | modal · sheet | Run this Graph, the install and their own account |
-| `SH` | [Shell](products/shell/product.md) | Operating system | page · modal | Sign in, create a Graph and find their way |
+
+## Foundation
+
+What every product uses and no person comes to as a place of work: the frame they sit in, who may do what, and what
+waits on a person. The foundation is not a product — it is never sold, pitched or listed as one — and sits under both
+layers. Its specs are written like a product's, in `foundation/`.
+
+| Code | Part | Tier | Lets a person |
+|---|---|---|---|
+| `SH` | [Shell](foundation/shell/product.md) | page · modal | Sign in, create a Graph and find their way |
+| `ST` | [Settings](foundation/settings/product.md) | modal · sheet | Run this Graph, the install and their own account |
+| `IN` | [Inbox](foundation/inbox/product.md) | modal | Answer what needs them, see what runs, read what happened |
+
+| Decision | Detail |
+|---|---|
+| Five products, one foundation | Explore, Projects, Model, Data and Agents are the products; Shell, Settings and Inbox are the foundation every product uses |
+| *Foundation* is a vision and docs word | Studio never shows it; a person sees Inbox, Settings and the shell by their own names |
+| A part of the foundation serves every product | An ask, an access line, a limit or a way in that only one product needs belongs to that product |
 
 ## Scope
 

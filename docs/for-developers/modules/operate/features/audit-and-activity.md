@@ -10,7 +10,7 @@ citing what, on whose behalf" has an answer rather than an opinion.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [reasoning-trace](../../ask/features/reasoning-trace.md) · [lineage](../../agents/features/lineage.md) · [evidence](../../memory/features/evidence.md) |
 
-Product spec: [IN-F03 · History](../../../../../specs/products/inbox/features/IN-F03-history/feature.md) — IN-02; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
+Product spec: [IN-F03 · History](../../../../../specs/foundation/inbox/features/IN-F03-history/feature.md) — IN-02; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
 
 ## Surfaces
 

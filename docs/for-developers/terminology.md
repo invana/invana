@@ -69,7 +69,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Eval set** | A skill's or agent's fixed questions, each with **checks**: rule checks are hard and counted; a **judged** score comes from a pinned judge model and is labelled, never mixed with them. [6.6](modules/skills/features/evals.md) |
 | **Pin** | An exact model version name an agent, skill version or judge thinks with — `claude-opus-5-5`, never an alias. Moving one is a change. [5.9](modules/agents/features/pinned-model-versions.md) |
 | **Graph connector** | The package that speaks to one graph database — `invana-neo4j`, `invana-janusgraph`. Always qualified. |
-| **Setup** | The *sequence* a Graph walks from created to answering — four required steps and two optional ones, derived from facts and never ticked. [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) |
+| **Setup** | The *sequence* a Graph walks from created to answering — four required steps and two optional ones, derived from facts and never ticked. [SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) |
 | **Onboarding wizard** | The *surface* that walks it: the stepper and the selected step's lesson, on the graph page. Reopened any time from the graduation cap in `header.right`. Setup is the state; the onboarding wizard is where you walk it. Never "the setup wizard", never "the tour", never "onboarding flow" |
 | **Setup step** | One of them. `done · next · todo · blocked · skipped · broken`. |
 | **Gate** | A group of setup steps, named for what it unlocks: **Connected** · **Grounded** · **Answering**. |
@@ -266,7 +266,7 @@ sub-slots, the URL params and the retired words are in
 | From · To (for a stitch's two sides) | **Source** · **Target** | the payload's own words (`source_version_id`, `target_type`); *from/to* reads as direction, which an anchor does not have |
 | Links (as a surface name) | **Stitches** | *link* is the record the engine stores; *stitch* is what a person does, and the product already has `Flow(kind = stitch)`. The word *link* keeps its place in `model_links` |
 | API key · PAT · service account | **Personal access token**, spelled out | it is a person's identity with a longer life, not a key and not an account of its own |
-| Wizard · onboarding · checklist · getting started | **Setup**, and **setup step** | nothing is walked modally, nothing is ticked and nothing is dismissed — the steps are derived, so the words for walking one are all false ([SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · [SU7](modules/platform/features/setup.md)) |
+| Wizard · onboarding · checklist · getting started | **Setup**, and **setup step** | nothing is walked modally, nothing is ticked and nothing is dismissed — the steps are derived, so the words for walking one are all false ([SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · [SU7](modules/platform/features/setup.md)) |
 | Rail · left rail · activity bar | **`leftNav`** | the kit's prop name is the word; nothing else names a region |
 | Sidebar · left panel · docked panel | **`leftSection`** | ditto |
 | Editor · main content · canvas area · workspace | **`mainSection`** | ditto |

@@ -1,6 +1,6 @@
 """The Pools page tiles and the Capacity tab.
 
-specs/products/settings/features/ST-F06-workers-and-limits/feature.md. Counts of
+specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md. Counts of
 workers and slots come from the worker rows; what waits, what finished and what
 is suggested come from the ``worker_stats`` rows the gateway sweep writes every
 30 s. Nothing is derived by Studio.

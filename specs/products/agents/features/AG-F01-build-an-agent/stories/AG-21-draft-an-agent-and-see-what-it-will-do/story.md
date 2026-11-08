@@ -49,7 +49,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask · Deny, starting at a new agent's starting lines ([Starting lines are shown](../../../../../settings/product.md#decisions)), never looser than the Graph) and a token budget |
+| AG-21.1 | A builder in Agents | they open *New agent* | a modal asks for a name, what it should do in plain words, what it may do (read the graph · tell people · change data · use the internet, each Allow · Ask · Deny, starting at a new agent's starting lines ([Starting lines are shown](../../../../../../foundation/settings/product.md#decisions)), never looser than the Graph) and a token budget |
 | AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template whose *What it may do* comes with it, and opens as a sheet on Setup with a *Draft* chip |
 | AG-21.3 | A name another agent already has, retired or not | they save | it is refused, naming the agent that has it |
 | AG-21.4 | *What it may do* with nothing allowed | they save | it is refused: an agent that may run nothing is a mistake |

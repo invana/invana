@@ -17,7 +17,7 @@ Journeys: [J01 · From an empty install to a first answer](../../journeys/J01-fr
 
 ## Problem
 
-A person who has to learn nine products before their first answer gives up; one who reaches a dead end when they lack
+A person who has to learn five products and their settings before their first answer gives up; one who reaches a dead end when they lack
 access does not know whom to ask.
 
 ## Users

@@ -37,7 +37,7 @@ The agents that do the legwork, and the instructions they run on. Prototype page
 | AG-F10 | Skill usage | In Studio | AG-10 |
 | AG-F11 | Library › Plans — generated, read-only; revisions in runs | In Studio (plans · revisions in runs, C03) | AG-11 |
 | AG-F12 | Library › Templates — chosen by code from the result’s shape, ranked by the classified intent | In Studio · New (intent ranking — engine ✅ B13) | AG-12 |
-| AG-F13 | Plugins — the registry of every plugin (core, tool, simulator, MCP) with its task types, manifests, versions, skills and flows; Admin enables | In Studio (C03) · engine registry API ✅ B06b ([ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) · MCP plugins ✅ B07 ([ST-F04](../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) | AG-13 |
+| AG-F13 | Plugins — the registry of every plugin (core, tool, simulator, MCP) with its task types, manifests, versions, skills and flows; Admin enables | In Studio (C03) · engine registry API ✅ B06b ([ST-F04](../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) · MCP plugins ✅ B07 ([ST-F04](../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) | AG-13 |
 | AG-F14 | LLM endpoints and model versions — agents pin an exact version name | In Studio (endpoints · pinning, C03 · its own page, C10) | AG-14 |
 | AG-F15 | Performance with degradation alerts | In Studio (C10, [AG-F03](../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md)) · alert notifications not built | AG-15 |
 | AG-F16 | Concurrency pools | In Studio | AG-16 |

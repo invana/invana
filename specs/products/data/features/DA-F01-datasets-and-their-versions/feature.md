@@ -79,7 +79,7 @@ Datasets sit above Graphs, so their acts are owned by the dataset's creator or t
 | Read a private dataset | Its creator · Admin | Absent everywhere — never listed, never *no access* |
 | Change a dataset's title, description and sensitivity · share it | Its creator · Admin | Absent, not disabled; a line names the creator |
 | Retract a version | Admin (`is_superuser`) | *Retract* absent; a retracted version reads the same for everyone |
-| Export a version | Anyone who can read the dataset — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../settings/product.md#decisions)) | — |
+| Export a version | Anyone who can read the dataset — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../../foundation/settings/product.md#decisions)) | — |
 | Set a refresh schedule | Its creator, from the CLI | Read only in Studio for everyone |
 
 ## States

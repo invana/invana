@@ -292,7 +292,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for IN · `modules/operate/` (not schedules) · `reviews/P05-audit.md` |
 | Stories | IN-F01 · IN-F02 · IN-F03 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/inbox/features/IN-F01-*` … `IN-F03-*` |
+| Lands | `specs/foundation/inbox/features/IN-F01-*` … `IN-F03-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -307,7 +307,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for ST-F02 · ST-F03 · `modules/identity-and-access/` · `reviews/P05-audit.md` · `docs/products/iam.md` |
 | Stories | ST-F02 · ST-F03 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/settings/features/ST-F02-*` · `ST-F03-*` |
+| Lands | `specs/foundation/settings/features/ST-F02-*` · `ST-F03-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -322,7 +322,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for ST-F01 · ST-F04–F06 · `modules/platform/` · `connect-and-model/features/{connect-a-database,graph-settings}.md` · `agents/features/{providers-and-models,workers}.md` · `reviews/P05-audit.md` · `docs/products/platform.md` · `plugins.md` |
 | Stories | ST-F01 · ST-F04 · ST-F05 · ST-F06 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/settings/features/ST-F01-*` · `ST-F04-*` … `ST-F06-*` |
+| Lands | `specs/foundation/settings/features/ST-F01-*` · `ST-F04-*` … `ST-F06-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -337,7 +337,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for SH and journeys · `docs/products/shell.md` · `onboarding.md` · `platform/features/{search,design-system}.md` · every `feature.md` written so far |
 | Stories | SH-F01 · SH-F02 · SH-F03 · journeys J01–J05 |
 | Done when | as P06 for these features · each journey draws one person's path across products in mermaid with every branch, and each feature it crosses links into it |
-| Lands | `specs/products/shell/features/SH-F01-*` … `SH-F03-*` · `specs/journeys/` |
+| Lands | `specs/foundation/shell/features/SH-F01-*` … `SH-F03-*` · `specs/journeys/` |
 | Boards | — |
 | Review | |
 | Approve | |

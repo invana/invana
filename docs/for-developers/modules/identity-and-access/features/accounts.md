@@ -10,7 +10,7 @@ person is small on purpose.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [usernames](usernames.md) · [sessions](sessions.md) · [membership](membership.md) |
 
-Product spec: [ST-F03 · You — account and sessions](../../../../../specs/products/settings/features/ST-F03-you-account-and-sessions/feature.md) — ST-15; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F03 · You — account and sessions](../../../../../specs/foundation/settings/features/ST-F03-you-account-and-sessions/feature.md) — ST-15; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 
