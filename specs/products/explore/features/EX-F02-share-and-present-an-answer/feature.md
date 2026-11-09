@@ -14,6 +14,7 @@ depends_on: []
 
 > What an answer becomes once it holds up: shared with the Graph's members, exported for anyone else, shown step by
 > step, or added to a project as evidence — so the person who decides sees what was found and how.
+> The decision it helps make: *who needs to see this answer, and in which form, to decide on it?*
 
 ## User journey
 
@@ -56,7 +57,7 @@ flowchart TD
 
 | Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
 |---|---|---|
-| Copy a live link · keep a frozen snapshot · export PNG, CSV or Markdown | Operator — every member | A non-member opening a link: the Graph's not-found page |
+| Copy a live link · keep a frozen snapshot · export PNG, CSV or Markdown | Operator — every member; an export — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../../foundation/settings/product.md#decisions)) | A non-member opening a link: the Graph's not-found page |
 | Add an answer to a project as a finding | `contributor` · shown as *Can work on projects* | *Add to a project* disabled — *Ask Priya (owner)* |
 | Present a board | Operator — every member | — |
 | Add, edit, move or remove an authored step | Operator — every member, as for any change to a board | — |

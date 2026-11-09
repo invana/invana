@@ -15,7 +15,7 @@ come from" ends at a record and not at a shrug.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [load-data](load-data.md) · [reasoning-trace](../../ask/features/reasoning-trace.md) · [see-what-ran](../../operate/features/see-what-ran.md) |
 
-Product spec: [DA-F02 · Bring data in](../../../../../specs/products/data/features/DA-F02-bring-data-in/feature.md) — DA-13; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F02 · Bring data in](../../../../../specs/products/datasets/features/DS-F02-bring-data-in/feature.md) — DS-13; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

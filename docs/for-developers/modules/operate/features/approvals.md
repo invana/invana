@@ -11,7 +11,7 @@ sent** — never auto-approved.
 | API / CLI / Studio | ✅ / ✅ / 🟡 |
 | Related | [notifications](notifications.md) · [schedules](schedules.md) · [publish review](../../connect-and-model/features/publish-review.md) · [review](../../work/features/review.md) · [the runtime](../../platform/features/runtime.md) §10 |
 
-Product spec: [IN-F01 · Needs you](../../../../../specs/products/inbox/features/IN-F01-needs-you/feature.md) — IN-01; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [IN-F01 · Needs you](../../../../../specs/foundation/inbox/features/IN-F01-needs-you/feature.md) — IN-01; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 

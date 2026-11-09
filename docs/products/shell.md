@@ -1,6 +1,6 @@
 # Shell — what every product shares
 
-Product spec: [Shell](../../specs/products/shell/product.md) — [SH-F01 · Sign in and start](../../specs/products/shell/features/SH-F01-sign-in-and-start/feature.md) · [SH-F02 · Create a graph](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · [SH-F03 · Find your way](../../specs/products/shell/features/SH-F03-find-your-way/feature.md). The stories, breadcrumbs, ⌘K, first run, set-up and the decisions that are still true live there. This file keeps the header, layout and Activity of the retired product shell, the CLI, and the rows not moved.
+Product spec: [Shell](../../specs/foundation/shell/product.md) — [SH-F01 · Sign in and start](../../specs/foundation/shell/features/SH-F01-sign-in-and-start/feature.md) · [SH-F02 · Create a graph](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · [SH-F03 · Find your way](../../specs/foundation/shell/features/SH-F03-find-your-way/feature.md). The stories, breadcrumbs, ⌘K, first run, set-up and the decisions that are still true live there. This file keeps the header, layout and Activity of the retired product shell, the CLI, and the rows not moved.
 
 System design: [api-and-cli.md](../../specs/system-design/api-and-cli.md) — the CLI. This file keeps the CLI's build status.
 

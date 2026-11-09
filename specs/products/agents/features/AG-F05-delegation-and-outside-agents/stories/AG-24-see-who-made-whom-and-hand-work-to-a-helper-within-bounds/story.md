@@ -30,7 +30,7 @@ flowchart LR
   b -->|no| r["Refused before it starts, naming the bound and the count"]
   b -->|too many live| q["Queued until another helper ends"]
   b -->|yes| h["A helper, tokens set aside"]
-  a -->|an agent that asks each time| ask["Inbox › Needs you"]
+  a -->|an agent set to Ask| ask["Inbox › Needs you"]
   ask -->|approved| h
   ask -->|declined| d["Declined; the agent carries on"]
   h --> v["Its verdict returns, cited · unspent tokens back"]
@@ -49,15 +49,16 @@ flowchart LR
 | AG-24.6 | A helper's verdict | it returns | the agent cites it; *How it got here* shows the hand-off, its steps and sources |
 | AG-24.7 | A helper that fails | its run settles | the failure is the agent's evidence, named in its answer, never a silent gap |
 | AG-24.8 | A helper that asks a question | it asks | the question reaches whoever started the run, naming the helper |
-| AG-24.9 | An agent of the graph listed *ask each time* or not listed | the agent delegates to it | an ask waits in *Needs you* for that agent's owner, and the step waits on it |
-| AG-24.10 | An agent listed *never*, or one already in the run's chain | the agent delegates to it | it is refused before it starts, naming *never* or *loop* |
-| AG-24.11 | An ask approved with *Allow always* | it is approved | the asker's *May delegate to* reads *always* for that agent |
+| AG-24.9 | An agent of the graph set to *Ask* or not listed | the agent delegates to it | an ask waits in *Needs you* for that agent's owner, and the step waits on it |
+| AG-24.10 | An agent set to *Deny*, or one already in the run's chain | the agent delegates to it | it is refused before it starts, naming *Deny* or *loop* |
+| AG-24.11 | An ask approved with *Allow always* | it is approved | the asker's *May delegate to* reads *Allow* for that agent |
 | AG-24.12 | A run with helpers | *Who did what* opens | who made whom is drawn — each helper with its depth, state, tokens against what it was given, and on whose behalf; retired helpers stay drawn, marked |
 | AG-24.13 | A helper picked | its card opens | its bounds read beside its parent's — view of the graph, what it may do, tokens — and it is never wider |
 | AG-24.14 | Many helpers under one agent | *Who did what* opens | they collapse to a count, opened on a click |
 | AG-24.15 | A run stopped | it stops | every helper beneath it ends *stopped with its parent* |
-| AG-24.16 | An agent's Flow | it opens | it draws the helpers it may make and the agents it may delegate to — always · asks · never |
+| AG-24.16 | An agent's Flow | it opens | it draws the helpers it may make and the agents it may delegate to — Allow · Ask · Deny |
 | AG-24.17 | An Operator without *Can build agents* | they open an agent's helper settings | they read; editing is disabled, naming *Can build agents* |
+| AG-24.18 | A helper or a delegated agent | it takes a step | the strictest value along the whole caller chain binds, the root agent's own rule included; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose line denied it |
 
 ## Screens
 

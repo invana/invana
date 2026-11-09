@@ -107,15 +107,15 @@ language do.
 
 | File | What stayed | Why | Where it would go |
 |---|---|---|---|
-| `spec.md` | 2 *Studio does not write* · 4 What this module owns · 5 the *Studio* row · 7 BD6 · BD9 · 7a The drawn states · 8 *Import from Studio* | retired — Upload in the browser mints versions (DA-16); datasets are install-wide; old artboards | — |
+| `spec.md` | 2 *Studio does not write* · 4 What this module owns · 5 the *Studio* row · 7 BD6 · BD9 · 7a The drawn states · 8 *Import from Studio* | retired — Upload in the browser mints versions (DS-16); datasets are install-wide; old artboards | — |
 | `features/datasets.md` | Decisions DT17 | not placed — drafts pushed by a narrowed token | ST-F02 |
 | `features/retract-and-refresh.md` | Decisions DR3 | plan — flags on findings and Inbox items land later | — |
-| `features/bind-a-dataset.md` | Decisions BV3 | retired — any member binds; DA-F03 says *Can shape the model* | — |
-| `features/load-data.md` | Decisions LD5 · Not building *Import from Studio* | retired — Data › Upload (DA-16) | — |
-| `features/load-a-bundle.md` | *The problem this closes* · *It is a workflow, not a new concept* | plan — the defect the bundle closes (DA-18's *so that*) | — |
+| `features/bind-a-dataset.md` | Decisions BV3 | retired — any member binds; DS-F03 says *Can shape the model* | — |
+| `features/load-data.md` | Decisions LD5 · Not building *Import from Studio* | retired — Data › Upload (DS-16) | — |
+| `features/load-a-bundle.md` | *The problem this closes* · *It is a workflow, not a new concept* | plan — the defect the bundle closes (DS-18's *so that*) | — |
 | `features/inspect-what-landed.md` | Decisions IW7 · Not building *A journal across Graphs* | retired — imports live in Data › Upload | — |
 | `features/inspect-what-landed.md` | Not building *A data browser over the whole graph* | not placed — Explore's job | EX-F01 Not building |
-| `features/standards.md` | Not building *Validation queue items from violations* | retired — the queue exists (DA-07) | — |
+| `features/standards.md` | Not building *Validation queue items from violations* | retired — the queue exists (DS-07) | — |
 
 ### connect-and-model
 
@@ -232,7 +232,7 @@ left is the superseded plan, build status and engine notes.
 
 | File | What stayed | Why | Where it would go |
 |---|---|---|---|
-| [README.md](../products/README.md) | Header · The products · Two places · Prerequisites P-01–P-22 · Terms · Conflicts · Open registry · Not building | retired (products as places, the launcher, the five-product ceiling) · plan (prerequisites, the registry phases) · not placed (*Author chain* · *Constraint*) | *Author chain* → DA-F01 · *Constraint* → MO-F02; delete the rest |
+| [README.md](../products/README.md) | Header · The products · Two places · Prerequisites P-01–P-22 · Terms · Conflicts · Open registry · Not building | retired (products as places, the launcher, the five-product ceiling) · plan (prerequisites, the registry phases) · not placed (*Author chain* · *Constraint*) | *Author chain* → DS-F01 · *Constraint* → MO-F02; delete the rest |
 | [explorer.md](../products/explorer.md) | Header · CLI build status · *Drawn, not built yet* · Not building | retired (*no product rail*) · plan | Delete; the gaps are designer and coder work on EX-F01–EX-F06 |
 | [modeller.md](../products/modeller.md) | Header · CLI · Decisions (the rail, its pages, *Graph settings tabs*) · *Studio today, mapped* · Not building | retired — the rail and its pages; Settings › This graph replaces Graph settings · plan · engine detail (stitch counts) | Delete |
 | [datasets.md](../products/datasets.md) | Header · CLI build status · Decisions *Paths carry the publisher* · *Imports tiles are the engine's* · *Launcher position* | plan · engine detail · retired (the launcher) · not true yet (`datasets pack · unpack`) | `specs/system-design/modules/bring-data-in.md` · api-and-cli.md |

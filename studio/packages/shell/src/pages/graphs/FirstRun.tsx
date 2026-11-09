@@ -48,8 +48,7 @@ export function FirstRun({ graphs }: { graphs: readonly Graph[] }) {
 						What are you trying to decide?
 					</TypographyH2>
 					<TypographyMuted>
-						Think it through. Decide with evidence. Pick a way in; you can do
-						the others later.
+						Pick a way in; you can do the others later.
 					</TypographyMuted>
 				</div>
 
@@ -57,7 +56,7 @@ export function FirstRun({ graphs }: { graphs: readonly Graph[] }) {
 					<WayIn
 						icon={<Database className="size-5 text-primary" />}
 						title="Connect a graph database"
-						description="Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune — the Modeller drafts a model from what is there."
+						description="Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune — Invana drafts a model from what is there."
 					>
 						<Button onClick={() => navigate("/graphs/new")}>Connect</Button>
 					</WayIn>

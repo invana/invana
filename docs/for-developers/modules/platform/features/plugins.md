@@ -16,7 +16,7 @@ builds itself from the manifests once at start-up and is then frozen.
 > **so that** the planner, the validator, the catalogue route and a future worker all read the same
 > declaration without a second registry to keep in step.
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/products/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29 holds what a person sees of plugins: what one is, switching, versions recorded. This file is the engine layout and stays whole.
+Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29 holds what a person sees of plugins: what one is, switching, versions recorded. This file is the engine layout and stays whole.
 
 ## Capabilities
 

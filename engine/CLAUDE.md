@@ -4,7 +4,8 @@ Python service powering Invana. FastAPI + SQLAlchemy async + Alembic + uv + Ruff
 
 ## Read first
 
-- [`docs/system-design.md`](../docs/system-design.md) — platform-wide system design (vocabulary, Graphs, agents, knowledge graph flow) — orientation only; `for-developers/` is authoritative for scope. Applies to engine + studio + integrations.
+- [`specs/vision.md`](../specs/vision.md) — what Invana is and how every agent behaves.
+- [`docs/system-design.md`](../docs/system-design.md) — install-wide system design (vocabulary, Graphs, agents, knowledge graph flow) — orientation only; `for-developers/` is authoritative for scope. Applies to engine + studio + integrations.
 - [`docs/for-developers/README.md`](../docs/for-developers/README.md) — the feature index and the authoritative scope. Read the feature's own file before editing what it covers.
 - [`docs/for-developers/terminology.md`](../docs/for-developers/terminology.md) — the product's words. Code, routes and copy follow it.
 - The container model: `User → Graph (1:1 connection)`. Graph-scoped URLs live under `/api/v1/u/{username}/{graphSlug}/...`; users carry a globally unique username.

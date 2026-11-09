@@ -10,7 +10,7 @@ connector from then on.
 | API / CLI / Studio | ✅ / — / 🟡 |
 | Related | [introspect-a-database](introspect-a-database.md) · [domain-models](domain-models.md) |
 
-Product spec: [ST-F01 · This graph](../../../../../specs/products/settings/features/ST-F01-this-graph/feature.md) — ST-14; the story, its criteria, the connection's rules, states and product decisions live there. This file keeps the create-a-Graph flow (for SH-F02), the engine shape and the rows not moved.
+Product spec: [ST-F01 · This graph](../../../../../specs/foundation/settings/features/ST-F01-this-graph/feature.md) — ST-14; the story, its criteria, the connection's rules, states and product decisions live there. This file keeps the create-a-Graph flow (for SH-F02), the engine shape and the rows not moved.
 
 ## Capabilities
 

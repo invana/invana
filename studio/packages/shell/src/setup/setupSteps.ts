@@ -3,7 +3,7 @@ import type { SetupTarget } from "./SetupSlots";
 
 /**
  * What each setup step is called, why it is there, and where it is done
- * (specs/products/shell/features/SH-F02-create-a-graph/feature.md).
+ * (specs/foundation/shell/features/SH-F02-create-a-graph/feature.md).
  *
  * One list, two renderings: the board on the graph page and the timeline in the
  * Info panel read the same rows, so the sequence cannot say two different things
@@ -114,7 +114,7 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			"The Model panel reads active on a published version, and an import will accept --model.",
 		concept: {
 			title: "The model is the shared vocabulary",
-			body: "Ontology, not schema. Agents, queries and stitches all speak the types you publish — which is why two databases can be joined under one set of words.",
+			body: "Agents, queries and links between models all speak the kinds you publish — which is why two databases can be joined under one set of words.",
 		},
 		settingsSection: "model",
 	},

@@ -3,86 +3,84 @@ id: DA
 title: Data
 status: idea
 owner: Ravi
-personas: [curator, modeller, admin]
+personas: [analyst, curator, modeller]
 ---
 
 # Data
 
-> Gather data that is reusable across the install, labelled by where it came from, checked against standards, and
-> added to a Graph by version.
+> The Graph's records — every node and relationship, each an instance of a kind in a published model: browse them,
+> see which break the model, fix and merge them, trace where each came from, and keep what people say about them.
+> The decision it helps make: *which records can be trusted, and what must be fixed before anyone relies on them?*
 
 ## Problem
 
-Data copied into each Graph by hand loses where it came from, who may use it and which version an answer rested on.
-Nobody can retract a bad source or prove that a dataset meets the standard it claims.
+A model says what the data should be; nothing shows what it is. Records that break the model, duplicates and
+silent fixes stay hidden until an answer rests on them, and nobody can say who changed a record or where it came from.
 
 ## Users
 
 | Persona | Comes here to |
 |---|---|
-| Data curator | Publish datasets and versions, label their origin and sensitivity, check them against standards |
-| Modeller | Add a dataset version to this Graph and see what landed |
-| Install admin | Retract a version, manage standards |
+| Analyst | Browse the records of a kind, read one record whole, read and manage annotations |
+| Data curator | See what breaks the model, fix many records at once, merge duplicates, trace a record to what wrote it |
+| Modeller | See how the records sit against a model they are changing |
 
 ## Goals
 
 | Goal | Measured by |
 |---|---|
-| Every record traces back to its dataset version and its authors | Open — set at the spec review |
-| A retracted version flags everything that cites it | Open — set at the spec review |
+| Every record that breaks its model is found before an answer rests on it | Open — set at the spec review |
+| No change to a record is silent: each names who made it, in which run, and why | Open — set at the spec review |
 
 ## Features
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| DA-F01 | [Datasets and their versions](features/DA-F01-datasets-and-their-versions/feature.md) | DA-01 · DA-02 · DA-03 · DA-04 · DA-12 · DA-14 · DA-17 | idea |
-| DA-F02 | [Bring data in](features/DA-F02-bring-data-in/feature.md) | DA-05 · DA-06 · DA-10 · DA-13 · DA-16 · DA-18 | idea |
-| DA-F03 | [Add a dataset to this graph](features/DA-F03-add-a-dataset-to-this-graph/feature.md) | DA-11 | idea |
-| DA-F04 | [Standards and checks](features/DA-F04-standards-and-checks/feature.md) | DA-07 · DA-08 · DA-09 · DA-15 | idea |
+| DA-F01 | [Records by kind](features/DA-F01-records-by-kind/feature.md) | DA-01 | idea |
+| DA-F02 | [Quality against the model](features/DA-F02-quality-against-the-model/feature.md) | DA-02 | idea |
+| DA-F03 | [Bulk fixes](features/DA-F03-bulk-fixes/feature.md) | DA-03 | idea |
+| DA-F04 | [Merge duplicates](features/DA-F04-merge-duplicates/feature.md) | DA-04 | later |
+| DA-F05 | [Lineage](features/DA-F05-lineage/feature.md) | DA-05 | idea |
+| DA-F06 | [Record history](features/DA-F06-record-history/feature.md) | DA-06 | idea |
+| DA-F07 | [Annotations](features/DA-F07-annotations/feature.md) | DA-07 | idea |
 
 ## Surfaces
 
 | Surface | Tier | Board |
 |---|---|---|
-| Catalogue | modal | `data.catalogue` |
-| Upload | modal | `data.upload` |
-| Checks | modal | `data.checks` |
-| Collect | modal | `data.collect` |
-| A dataset | sheet | `data.dataset` |
+| Records — by kind | modal | `data.records` |
+| A record — Values · Lineage · History · Annotations | sheet | `data.record` |
+| Quality — what breaks the model | modal | `data.quality` |
+| A fix across records — preview and run | modal | `data.fix` |
+| Merge two records | modal | `data.merge` |
+| Annotations — every annotation in the Graph | modal | `data.annotations` |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| Datasets are install-wide | A dataset sits above Graphs, named `publisher/name`; a Graph adds a version of it to one of its models |
-| Core and experimental | Tables, versions, adding to a Graph and imports are core; collecting with an agent, observations, documents and standards are shown labelled *Experimental* |
-| Invana is a destination | It does not extract: no source connectors, no cursors, no mapping grammar. What arrives already conforms to a model, or is rejected record by record |
-| Records go into a model | A load names the one model its records conform to and belong to; the model is the container a person already thinks in. Two loads into one model are one body of data, matched by the model's keys; records that must not merge belong to another model |
-| Provenance is model · record · file · run | Every node and relationship a load writes says what it conforms to, which record it was, which file it came in and which load wrote it — so an answer traces back to a dataset |
-| Every load is a run | Validated or bulk, a load streams, retries, cancels and leaves a trace like any run; its kind says whether it checked anything |
-| Two ways in, one version | A dataset version is made by *Upload* in the browser or by the import command; both mint the same version, and every dialog prints its command twin. Loads into a model from pipelines are the command line and the API |
-| Datasets are tables and documents | A dataset is a versioned table from one source under one authorship; a documents dataset holds papers and notices |
-| Versions are cited | A finding, an answer or an add to a graph cites an exact version; a fix is a new version, a withdrawn one is retracted |
-| A dataset is written by its creator | Its creator or an install Admin publishes its versions, shares it, adds rows, attaches standards and fixes problems; anyone who can read it may export it, and someone who can shape a graph's model may add it there |
-| Sensitivity is read by rules | Labels on a dataset and its columns are stored and served; rules on what a run may send read them once a rule names one |
-| Registry seams | `publisher/name`, a content hash and references by version are what an open registry would need later |
+| Data is the Graph's records | Every node and relationship in the Graph's graph database, each an instance of a kind in a published model. Scope is the Graph; Data sits in the Ontology pillar beside Model |
+| Model says what should be; Data shows what is | Model owns kinds, constraints and rules; Data reads records against them. Model's health compares a model with what the database holds, kind by kind; Data's quality is record by record |
+| Records come from the Graph's database and from Invana's own writes | v1 reads what the connected graph database holds and what people and agents write in Invana — a board's save, a fix, a merge. Loading files is [Datasets](../datasets/product.md), later |
+| Every write is a run | A fix, a merge or a board's save is one recorded run, checked against the published model before it writes; the engine refuses what the model does not allow |
+| A record's history is History | What changed a record is read from the Graph's one append-only History, filtered to the record — never a second store |
+| Annotations are instances of a built-in model | An annotation is a record of the built-in *Annotation* kind, kept by Invana, never in the customer's graph database. Explore creates them while investigating; Data keeps and manages them |
+| Merging is chosen, never inferred | A person picks the records that are one; Invana never decides two records are the same |
+| Screen words | *Data* and *Records* are on screen; *instance* is a vision and docs word |
 
 ## Depends on
 
 | Product or capability | For |
 |---|---|
-| Model | The model a dataset conforms to |
-| Agents | Collecting data with an agent |
+| Model | The published kinds, keys and constraints every record is read against |
+| Explore | Creating annotations and editing records on a board |
+| Datasets | Lineage back to a dataset version, once Datasets is taken up |
 
 ## Not building
 
 | Item | Why not |
 |---|---|
-| Proprietary datasets · pricing · a marketplace | Datasets are reusable knowledge first |
-| Provenance on every cell | Kept per dataset and per record; property changes live in the record's change log |
-| An extractor | Invana is a destination; whatever pulls the data hands it over as a dataset |
-| Inferring a model from a file | The dataset states its model; a guessed schema is one nobody chose |
-| Streaming ingest | A batch with a report is what a person can audit |
-| Deduplication or upsert heuristics | Identity comes from the model's keys, not a strategy setting |
-| Sharing across installs · packing datasets as files | The open registry, later |
-| Images, sequences, spectra | Each needs its own viewer |
+| Inferring that two records are one | Identity comes from the model's keys and a person's choice, never a guess |
+| Writing annotations into the graph database | They are Invana's; a read-only database can still be annotated |
+| A second change log per record | A record's history is History, filtered to it |
+| Editing a record's kind or keys in place | A record that needs another kind or key is a model change, made in Model |

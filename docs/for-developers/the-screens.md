@@ -308,14 +308,14 @@ drawn before the screen is built the way every other module pass runs (README §
 built*).
 
 `SetupWizardHiFi` (#16 above) is **not** one of them: despite its name it draws Graph settings, and
-setup owns no forms of its own ([SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md)). The name is the canvas's, and it stays.
+setup owns no forms of its own ([SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md)). The name is the canvas's, and it stays.
 
 | # | Artboard | What it draws | Surface | Feature | API | Studio | Shell |
 |---|---|---|---|---|---|---|---|
-| U1 | `SetupPageHiFi` | mid-setup — the island, the four-group stepper, and *Bring data in*'s lesson with its concept card and terminal line ([5](modules/platform/features/setup.md#5-surfaces)) | the graph page | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · [13.7](modules/platform/features/setup.md) SU7 · SU16 | ✅ | ✅ | ❌ |
-| U2 | `SetupBlockedHiFi` | *Bring data in* blocked by *Author a model*, and a provider pinging red | the graph page | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · the `broken` state | ✅ | ✅ | ❌ |
-| U3 | `SetupReadyHiFi` | every gate open, **What next** carrying the offers, the cap still in `header.right` | the graph page | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · SU19 | ✅ | ✅ | ❌ |
-| U4 | `SetupLocksHiFi` | the Assistant, with the gate that opens it | every gated surface | [SH-F02](../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) · `EmptyState locks` | ✅ | 🟡 | ❌ |
+| U1 | `SetupPageHiFi` | mid-setup — the island, the four-group stepper, and *Bring data in*'s lesson with its concept card and terminal line ([5](modules/platform/features/setup.md#5-surfaces)) | the graph page | [SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · [13.7](modules/platform/features/setup.md) SU7 · SU16 | ✅ | ✅ | ❌ |
+| U2 | `SetupBlockedHiFi` | *Bring data in* blocked by *Author a model*, and a provider pinging red | the graph page | [SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · the `broken` state | ✅ | ✅ | ❌ |
+| U3 | `SetupReadyHiFi` | every gate open, **What next** carrying the offers, the cap still in `header.right` | the graph page | [SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · SU19 | ✅ | ✅ | ❌ |
+| U4 | `SetupLocksHiFi` | the Assistant, with the gate that opens it | every gated surface | [SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · `EmptyState locks` | ✅ | 🟡 | ❌ |
 
 **The screens are built; the artboards are not.** Studio ships `SetupBoard`, `SetupTimeline` and
 `SetupLock` composed from the kit — the drawings above are still owed, and are what a board pass

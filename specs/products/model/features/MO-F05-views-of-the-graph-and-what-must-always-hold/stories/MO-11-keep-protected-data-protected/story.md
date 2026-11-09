@@ -50,7 +50,7 @@ flowchart LR
 | MO-11.5 | A property another rule already holds | the rule is saved | it is refused naming that rule |
 | MO-11.6 | A saved rule | it lists | its name is made from the rule — `Deal.price never leaves` · `*.email never read` · `Deal.price in counts only` — its scope reads *This graph*, and it shows what it stopped this week |
 | MO-11.7 | `Deal.price` *Read in counts only* | a run sums or counts it | the result returns; a query returning the value itself is refused |
-| MO-11.8 | `Deal.price` *Stays in the Graph* | a run calls an AI model or a third-party source | no record value crosses in that run |
+| MO-11.8 | `Deal.price` *Stays in the Graph* | a run calls an AI model or an outside service | no record value crosses in that run |
 | MO-11.9 | A run that needs `Deal.price` held by *Never read* | it is asked | it ends *cannot answer*, naming the rule, and a request is filed (MO-13) |
 | MO-11.10 | A rule on a property | the person opens it | it shows *Rule* (the kinds carrying the property, the rule as a sentence, the views it is allowed in, refused this week — who · where · when) · *Refusals* (every request it filed) · *History* (its events, before and after) |
 | MO-11.11 | A run in progress | the rule is edited | that run keeps what it was frozen with; the next run gets the new rule |

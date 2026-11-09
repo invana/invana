@@ -10,9 +10,27 @@ spec approved by Ravi — are drawn. The designer draws; it never edits a spec a
 of the story's `task.md`. How the team works around a design is `.claude/team/TEAM.md`; §0 says what Invana is — every board serves a person
 making a decision.
 
+## 0. Pick the model
+
+This section is the only place the designer's model split is defined. The agent's default is Opus. Use Sonnet only where a pattern already exists and the job is to follow it.
+
+| Work | Model |
+|---|---|
+| A story's boards drawn for the first time: layout, flow, every state, both lenses, mapping to the kit | **Opus** |
+| A new shell, mode or design language, or a canvas staged for a proposal | **Opus** |
+| Porting approved boards or chrome into another canvas through an existing generator | Sonnet |
+| A fix round on review or design-QA comments, or one missing state on a board that already exists | Sonnet |
+| Regenerating, seeding, screenshotting or republishing a canvas | Sonnet |
+
+| Who | How |
+|---|---|
+| Whoever delegates to the designer | Leave the model unset for Opus work. For Sonnet work, pass `model: sonnet` and name the pass in the brief |
+| A top-level designer session on Opus (`claude --agent designer`, or a runner session) | Spawn a Sonnet sub-agent for the Sonnet rows. Do the §5 check yourself before you hand back. A designer that was delegated is a sub-agent and can't spawn one: it runs on the model it was given |
+| A `/run-project` run | Already applies this split: builds use the agent's model, and fix rounds and sub-agents use Sonnet (`run-project` › *Every session*, settings table) |
+
 ## 1. Read the brief
 
-The story's `story.md` (`specs/products/<product>/features/<CODE>-F<nn>-*/stories/<STORY-ID>-*/story.md`) is the
+The story's `story.md` (`specs/<area>/<product>/features/<CODE>-F<nn>-*/stories/<STORY-ID>-*/story.md`) is the
 whole brief:
 
 | Part of the story | What you take from it |
@@ -70,7 +88,7 @@ The kit rules — compose, tokens, density, the type ladder, where a component g
 | **Traceable on demand** | Every agent answer, proposal and act has *Why?* / *How it got here* one click away (peek), and the full run one more (sheet) |
 | **Asks before it acts** | An act that writes, sends, spends or changes access shows exactly what will happen before the person agrees |
 | **Every state, both lenses** | All seven states as the UI shows them — first use says why it is empty and offers the one act that starts it; failed says what failed and the next act. The Operator lens shows each act as its *Who can* row says |
-| **The shell** | One `AppLayoutV2`: header (wordmark *Invana Explorer · Modeller · Projects*, Graph picker, ⌘K, Inbox, assistant), leftNav, collapsible leftSection, mainSection `Workbook`, the assistant on the right, the footer. A surface fills its regions; it never builds a layout |
+| **The shell** | One `AppLayoutV2`: header (wordmark *Invana Explore · Model · Projects*, Graph picker, ⌘K, Inbox, assistant), leftNav, collapsible leftSection, mainSection `Workbook`, the assistant on the right, the footer. A surface fills its regions; it never builds a layout |
 | **Overlays** | Peek for one fact · modal for one task or decision · sheet for heavy authoring; never a modal on a modal; Esc returns to the work |
 | **Plain words** | Glossary words only; roles as sentences (*Operator*, *Can shape the model*); no internal nouns |
 | **Only what a user sees** | No notes, rationale or annotations on a board. Copy a person would read — an empty state's instruction, a refusal's reason — is UI and stays |

@@ -12,7 +12,7 @@ mapping and an enforcement mode; every version of the dataset is then scored aga
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [rules](../../skills/features/rules.md) · products: [datasets.md](../../../../products/datasets.md) DS-08 · DS-09 · DS-F8 · DS-F9 |
 
-Product spec: [DA-F04 · Standards and checks](../../../../../specs/products/data/features/DA-F04-standards-and-checks/feature.md) — DA-07, DA-08 and DA-09; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F04 · Standards and checks](../../../../../specs/products/datasets/features/DS-F04-standards-and-checks/feature.md) — DS-07, DS-08 and DS-09; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

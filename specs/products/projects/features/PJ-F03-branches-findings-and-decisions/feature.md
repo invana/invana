@@ -7,7 +7,7 @@ personas: [decision-maker, analyst]
 stories: [PJ-03, PJ-04, PJ-05, PJ-06, PJ-07, PJ-08, PJ-11, PJ-13]
 journeys: [J03]
 boards: [projects.project, projects.options, projects.finding, projects.task.thinking, projects.decide]
-depends_on: [PJ-F01, DA-F01, EX-F02, AG-F03, MO-F06]
+depends_on: [PJ-F01, DS-F01, EX-F02, AG-F03, MO-F06]
 ---
 
 # Branches, findings and decisions
@@ -135,7 +135,7 @@ sequenceDiagram
 | Private projects | Seen only by the people staffed on them, an Admin included (PJ-F01) |
 | Archived | An archived project reads; every act is disabled |
 | Numbers are the engine's | Branch, finding, decision and proposal numbers, balances and *current · recorded* are stored by the engine; Studio formats them |
-| Leans on | Projects and tasks (PJ-F01) · dataset versions and their retraction (DA-F01) · adding an answer as a finding (EX-F02) · runs and *How it got here* (AG-F03) · rules (MO-F06) |
+| Leans on | Projects and tasks (PJ-F01) · dataset versions and their retraction (DS-F01) · adding an answer as a finding (EX-F02) · runs and *How it got here* (AG-F03) · rules (MO-F06) |
 
 | Project type | A branch is a | Evidence is a | Verdict | Decision |
 |---|---|---|---|---|
@@ -155,7 +155,7 @@ sequenceDiagram
 | Decisions — verdict, decision, rationale, cites, addressed findings, merged into, supersedes, rules checked, warnings, decided by | Write · read |
 | Proposals — fork or decision, rationale, agent, who sent it, accepted or rejected, by whom | Write · read |
 | Tasks filed on a branch (PJ-F01) | Write · read |
-| Dataset versions cited, retraction notices (DA-F01) | Read |
+| Dataset versions cited, retraction notices (DS-F01) | Read |
 | Runs cited and their steps (AG-F03) | Read |
 | Rules in force (MO-F06) | Read |
 | History rows of every fork, finding, review, decision and proposal (IN-F03) | Write · read |

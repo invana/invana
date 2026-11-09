@@ -5,7 +5,7 @@ product: AG
 status: idea
 personas: [builder, admin]
 stories: [AG-21, AG-36, AG-29, AG-26]
-journeys: [J04]
+journeys: [J04, J06]
 boards: [agents, agents.new, agents.agent, settings.ai]
 depends_on: []
 ---
@@ -19,7 +19,7 @@ depends_on: []
 
 ## User journey
 
-Journeys this feature is a step of: [J04 · Build an agent and improve it from what runs teach](../../../../journeys/J04-build-an-agent-and-improve-it-from-what-runs-teach.md)
+Journeys this feature is a step of: [J04 · Build an agent and improve it from what runs teach](../../../../journeys/J04-build-an-agent-and-improve-it-from-what-runs-teach.md) · [J06 · Set what an agent may touch](../../../../journeys/J06-set-what-an-agent-may-touch.md)
 
 ```mermaid
 flowchart TD
@@ -33,6 +33,8 @@ flowchart TD
   new -->|Create agent| draft["AG-21 · A draft, as a sheet: Setup · Flow · Versions"]
   draft --> setup["Skills · what it may do · limits · access · where it runs · Flow"]
   setup -->|a skill needs a function it may not run| mark["Marked on the skill, naming the function"]
+  setup --> modes["AG-21 · What it may do: each item Allow · Ask · Deny, narrowed for this agent"]
+  modes -->|looser than the Graph| mx["Refused, naming the level that set it"]
   setup --> test["AG-36 · Test in the practice graph"]
   test -->|no practice graph named| tx["Disabled — an Admin names one in Settings"]
   test -->|a check fails| tf["Publish refused, naming the case"] --> setup
@@ -83,6 +85,7 @@ sequenceDiagram
 | Read every agent — its setup, what it may do, its limits, voice, model version, Flow and versions | Operator — every member of the graph | — |
 | Create an agent, edit a draft, test it, publish a version, discard a draft | `builder` · shown as *Can build agents* · Admin | *New agent*, *Test* and *Publish* disabled, naming *Can build agents* — *Ask Priya (owner)* |
 | Change voice, model version, effort or limits · Pause · Resume · Retire · Make default | `builder` · *Can build agents* · Admin | The setting reads as saved; the act is disabled, naming *Can build agents* |
+| Narrow the agent's own modes — tighten, or loosen back no further than the Graph, never past a locked line | `builder` · *Can build agents* · Admin | Each mode reads; changing it is disabled, naming *Can build agents* |
 | Give the agent an access rule | `iam-admin` · shown as *Can manage people* · Admin | The rules it holds read; *Add an access rule* disabled, naming *Can manage people* |
 | Give the agent a rule of its own that must always hold | Who may change the graph's rules (MO-F05) | The rule reads; editing it is disabled, naming who may |
 | Offer model versions to pin | Admin, in Settings › AI and connections | A version not offered cannot be picked |
@@ -107,6 +110,7 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | No unbounded agent | Every agent starts from a template that brings what it may do; there is no agent that may run anything |
+| What it may do is modes | Each thing the agent may touch carries Allow · Ask · Deny ([one access model](../../../../foundation/settings/product.md#decisions)). A builder narrows a single agent from its sheet; its own modes are lines of its own access rule — *An agent's own*, beside *A person's own* and *A key's own* (ST-F02) — which starts with a new agent's starting lines ([Starting lines are shown](../../../../foundation/settings/product.md#decisions)) and tightens what the Graph set, or loosens back no further — never past a line someone who can manage people locked |
 | What it may do is checked before it runs | A plan that names a function the agent may not run, an argument it must not change, or a limit it would pass is refused before anything is dispatched — nothing is spent |
 | A refusal names its side | The agent's own limits, the view of the graph the work runs in, or a rule that must always hold — whichever bound it |
 | Bounds nest | An agent's own limits ∩ the work's view of the graph ∩ the graph's rules, frozen when a run opens; a run's helpers may only narrow them |
@@ -140,6 +144,7 @@ sequenceDiagram
 | Record | Read or write |
 |---|---|
 | Agent — name, kind, status, instructions, voice, voice dials, what it may do, limits, effort, model pin | Write · read |
+| The agent's own modes — lines of its own access rule, *An agent's own* (ST-F02) | Write · read |
 | Agent version and its reason | Write · read |
 | Skills added to the agent | Write · read |
 | The agent's tests and their runs in the practice graph | Write · read |

@@ -1,5 +1,5 @@
 site_name: Invana
-site_description: Graph Intelligence Platform — Structured knowledge graphs into interactive decision simulation environments
+site_description: An ontology-governed decision intelligence platform for humans and AI agents
 site_url: https://invana.github.io/invana
 repo_url: https://github.com/invana/invana
 repo_name: invana/invana
@@ -63,8 +63,6 @@ nav:
           - Data: guides/graph/data.md
           - Schema: guides/graph/schema.md
       # - Running Queries: guides/running-queries.md
-      # - Running Simulations: guides/running-simulations.md
-      # - "Example: Tic-Tac-Toe": guides/tic-tac-toe-example.md
   - Studio:
       - Overview: studio/overview.md
       - Graph Modelling: studio/modelling.md

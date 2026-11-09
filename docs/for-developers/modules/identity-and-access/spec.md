@@ -12,7 +12,7 @@ product that shows it.
 | Depends on | — |
 | Depended on by | everything: every request resolves to a principal |
 
-Product spec: [ST · Settings](../../../../specs/products/settings/product.md) — its features ST-F02 and ST-F03 hold the stories, rules and product decisions of this module; ST-F01 (membership) follows. This file keeps the domain words, the engine shape and the rows not moved.
+Product spec: [ST · Settings](../../../../specs/foundation/settings/product.md) — its features ST-F02 and ST-F03 hold the stories, rules and product decisions of this module; ST-F01 (membership) follows. This file keeps the domain words, the engine shape and the rows not moved.
 
 System design: [identity-and-access.md](../../../../specs/system-design/modules/identity-and-access.md) — membership and roles, what a token carries. This file keeps the vocabulary, what the module owns and the cross-feature decisions.
 

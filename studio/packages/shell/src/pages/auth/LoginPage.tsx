@@ -36,20 +36,20 @@ import { ModeToggle } from "../../components/ModeToggle";
 const PILLARS = [
 	{
 		icon: Network,
-		title: "Curated context from scattered data",
+		title: "One model for scattered data",
 		blurb:
-			"Connectors ingest heterogeneous sources, stitched under one shared ontology.",
+			"Bring many sources into one knowledge graph, joined by links between models.",
 	},
 	{
 		icon: ShieldCheck,
-		title: "Explainable answers — never hallucinated",
-		blurb: "Trace every answer LLM → query → record → dataset, or it says so.",
+		title: "Answers you can trace",
+		blurb:
+			"Every answer traces from the LLM to the query, the record and the dataset — or it says it cannot answer.",
 	},
 	{
 		icon: GitBranch,
-		title: "Graph modelling you can evolve",
-		blurb:
-			"Version the ontology over time, across Cypher and Gremlin backends.",
+		title: "A model you can evolve",
+		blurb: "Version the model over time, across Cypher and Gremlin databases.",
 	},
 	{
 		icon: Waypoints,
@@ -59,9 +59,9 @@ const PILLARS = [
 	},
 	{
 		icon: FlaskConical,
-		title: "Simulate decisions on the graph",
+		title: "Agents that propose, people who decide",
 		blurb:
-			"Game theory, hypothesis testing, sweeps — ask what-if, not just what-is.",
+			"Agents do the work inside the rules and ask before they act; you weigh the evidence and decide.",
 	},
 ];
 
@@ -176,16 +176,17 @@ export function LoginPage() {
 					{/* Hero title + subtitle — brand-forward */}
 					<h1 className="text-4xl font-bold tracking-tight">Invana</h1>
 					<p className="mt-1 text-xl font-medium text-primary">
-						Graph Intelligence Platform
+						One knowledge graph, one set of rules, for every thinker and the
+						systems they build
 					</p>
 
 					<p className="mt-6 max-w-3xl text-xl text-muted-foreground">
-						Messy, multi-source data into a{" "}
+						People and agents on one{" "}
 						<span className="font-medium text-foreground underline decoration-primary decoration-2 underline-offset-4">
 							knowledge graph you can trust
 						</span>{" "}
-						— reason and simulate on it, with answers you can trace back to the
-						source.
+						— agents do the work, you decide, with answers you can trace back to
+						the source.
 					</p>
 
 					<ul className="mt-12 max-w-3xl space-y-6">

@@ -2,7 +2,7 @@
 
 The records a person meets, by the scope that holds them, and how they connect. This is the product's picture; the
 engine's tables and columns are [orchestration.md](orchestration.md#the-records) and
-each module's file in [modules/](modules/). The domain term for each record is
+each module's file in [modules/](modules). The domain term for each record is
 [terminology.md](../../docs/for-developers/terminology.md); the word a person reads is [glossary.md](../glossary.md).
 
 ## By scope

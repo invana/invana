@@ -6,7 +6,7 @@ configuring one is two writes — and the API takes them together, because a
 provider that offers nothing answers nothing.
 
 The ``name`` **is** the address segment
-([ST-F05 § Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)),
+([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)),
 which is the whole reason a collision is a refusal: two endpoints answering to
 one rule is a bound that cannot say which credential it meant.
 """

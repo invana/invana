@@ -11,7 +11,7 @@ by actor, by record and by refusal, and exported with its hashes.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [audit-and-activity](audit-and-activity.md) (events — the writes) · [see-what-ran](see-what-ran.md) · [the-run-page](../../agents/features/the-run-page.md) · [approvals](approvals.md) (alert rules read the ledger) · [govern spec](../../govern/spec.md) (touches, the per-run stream) · products: [agent-fabric.md](../../../../products/agent-fabric.md) AF-14 |
 
-Product spec: [IN-F03 · History](../../../../../specs/products/inbox/features/IN-F03-history/feature.md) — IN-02; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
+Product spec: [IN-F03 · History](../../../../../specs/foundation/inbox/features/IN-F03-history/feature.md) — IN-02; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
 
 ## Surfaces
 

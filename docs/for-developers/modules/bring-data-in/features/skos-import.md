@@ -12,7 +12,7 @@ the first semantic import Invana supports.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [standards](standards.md) · [ontology-import](../../connect-and-model/features/ontology-import.md) · products: [datasets.md](../../../../products/datasets.md) DS-15 · DS-F17 |
 
-Product spec: [DA-F04 · Standards and checks](../../../../../specs/products/data/features/DA-F04-standards-and-checks/feature.md) — DA-15; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F04 · Standards and checks](../../../../../specs/products/datasets/features/DS-F04-standards-and-checks/feature.md) — DS-15; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

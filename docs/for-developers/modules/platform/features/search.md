@@ -8,10 +8,10 @@ above them — filtered by access before it is ranked. ⌘K and `invana search` 
 | Index | [13.10](../../../README.md#13--platform) · Slice **B11** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / — |
-| Product | [SH-F03 · Find your way](../../../../../specs/products/shell/features/SH-F03-find-your-way/feature.md) · P-18 |
+| Product | [SH-F03 · Find your way](../../../../../specs/foundation/shell/features/SH-F03-find-your-way/feature.md) · P-18 |
 | Related | [roles](../../identity-and-access/features/roles.md) · [membership](../../identity-and-access/features/membership.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
-Product spec: [SH-06 · Do, open or ask anything from ⌘K](../../../../../specs/products/shell/features/SH-F03-find-your-way/stories/SH-06-do-open-or-ask-anything-from-k/story.md) — what ⌘K finds, its ranking, its access rule and why it reads the products' own lists live in SH-F03. This file keeps the engine's `/search` route, which `invana search` reads.
+Product spec: [SH-06 · Do, open or ask anything from ⌘K](../../../../../specs/foundation/shell/features/SH-F03-find-your-way/stories/SH-06-do-open-or-ask-anything-from-k/story.md) — what ⌘K finds, its ranking, its access rule and why it reads the products' own lists live in SH-F03. This file keeps the engine's `/search` route, which `invana search` reads.
 
 ## Capabilities
 

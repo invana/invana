@@ -9,6 +9,7 @@ personas: [modeller, curator]
 # Model
 
 > Give the Graph's data meaning: shape its models, link them, decide what agents may see and what must always hold.
+> The decision it helps make: *what the data means, what agents may see and what must always hold?*
 
 Everything downstream — what can be asked, what can be loaded, what an agent is grounded in — resolves against the
 models shaped here. One Graph binds to one graph database and holds many models, each named for its domain.
@@ -74,8 +75,8 @@ everything. Without a model a person owns, publishes and can roll forward safely
 | Composed once, at run open | The Graph's rules on properties, the agent's own bound and the run's view are composed when a run opens — a load included, with no view — and frozen on it. A view from another Graph is refused before the run is written |
 | Deny wins at any level | A narrower allow never punches through a broader deny. Across the Graph, the agent and the work, allows intersect and denies add up |
 | Reading is not sending | A query may filter on a property whose value never enters a prompt — used to compute, not to reason. What may leave is said per destination, on the rule that reached it |
-| A third-party source is allowed or denied whole | It carries no slice; data worth slicing is brought in as a model |
-| The internet is a third-party source | A search and each fetched site are addresses a rule can allow or deny; what an AI model adds from its own knowledge is off unless the rule on that AI model allows it |
+| An outside service is allowed or denied whole | It carries no slice; data worth slicing is brought in as a model |
+| The internet is an outside service | A search and each fetched site are addresses a rule can allow or deny; what an AI model adds from its own knowledge is off unless the rule on that AI model allows it |
 | A plan names a role, the view names the model | A plan says *decide* or *extract*; the view says which AI model plays it, checked against the rules |
 | A refusal is an answer | A refused source is recorded and the run carries on without it; a run refused the AI model it thinks with, or the model version it is grounded on, ends *cannot answer* naming the rule — never an error |
 | A write is governed like a read | Loading into a model is checked against the same rules before it writes; one rule decides both, and a refused target writes nothing |

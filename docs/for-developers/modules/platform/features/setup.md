@@ -10,7 +10,7 @@ step is done because the thing it asks for exists, whoever made it exist and fro
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [Connect a database](../../connect-and-model/features/connect-a-database.md) · [Author a model](../../connect-and-model/features/domain-models.md) · [Bring data in](../../bring-data-in/features/load-data.md) · [Providers and models](../../agents/features/providers-and-models.md) · [Author an agent](../../agents/features/author-an-agent.md) · [Save a plan for reuse](../../workflows/features/the-library.md) · [Schedules](../../operate/features/schedules.md) · [Command line](command-line.md) |
 
-Product spec: [SH-F02 · Create a graph](../../../../../specs/products/shell/features/SH-F02-create-a-graph/feature.md) — SH-03; the set-up steps, their rules, the gates, the lesson and the product decisions live there. This file keeps the lineage of index rows, the retired island surfaces, the engine shape and the rows not moved.
+Product spec: [SH-F02 · Create a graph](../../../../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) — SH-03; the set-up steps, their rules, the gates, the lesson and the product decisions live there. This file keeps the lineage of index rows, the retired island surfaces, the engine shape and the rows not moved.
 
 ## 2. The four features
 

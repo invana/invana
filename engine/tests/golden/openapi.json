@@ -6657,7 +6657,7 @@
         "type": "object"
       },
       "ContentionRead": {
-        "description": "What is running in this Graph and what is waiting behind it.\n\nContention has to be **visible**\n(specs/products/settings/features/ST-F06-workers-and-limits/feature.md):\nwhat is running, what is queued, and why. Without it, one agent starving the\nGraph looks exactly like the Graph being slow.",
+        "description": "What is running in this Graph and what is waiting behind it.\n\nContention has to be **visible**\n(specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md):\nwhat is running, what is queued, and why. Without it, one agent starving the\nGraph looks exactly like the Graph being slow.",
         "properties": {
           "ceiling": {
             "title": "Ceiling",
@@ -15423,7 +15423,7 @@
         "type": "object"
       },
       "LLMModelStatus": {
-        "description": "Whether this model is still offered. Removing one a cast names is refused,\nnaming the worlds ([ST-F05 \u00a7 Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions)).",
+        "description": "Whether this model is still offered. Removing one a cast names is refused,\nnaming the worlds\n([ST-F05 \u00a7 Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).",
         "enum": [
           "active",
           "removed"

@@ -30,11 +30,11 @@ flowchart LR
   e -->|no| r1["Refused, naming the setting"]
   e --> w{"Only fields that may leave?"}
   w -->|no| r2["Refused before sending, naming the view of the graph · nothing leaves"]
-  w --> k{"Ask each time?"}
-  k -->|yes| i["Inbox: to, skill, the task, each field sent or held back, limits"]
+  w --> k{"Allow or Ask?"}
+  k -->|Ask| i["Inbox: to, skill, the task, each field sent or held back, limits"]
   i -->|declined| d["Declined; the agent carries on without it"]
   i -->|approved| s
-  k -->|always| s["Sent · working"]
+  k -->|Allow| s["Sent · working"]
   s -->|asks back| q["A question to whoever started the run"] --> s
   s -->|done| v(["Verdict and what it returned, kept on the run — a person applies it"])
   s -->|failed · cancelled · past a limit| f["The reason is the agent's evidence"]
@@ -47,7 +47,7 @@ flowchart LR
 | AG-34.1 | An agent whose *May delegate to* lists an outside agent that is on | it hands it a task with one skill from its card | only fields the view of the graph lets out and the skill marks to send are sent |
 | AG-34.2 | A task carrying any other field | the agent tries to send it | it is refused before sending, naming the view of the graph; nothing leaves |
 | AG-34.3 | An outside agent that is off, or not in *May delegate to* | the agent hands it a task | it is refused, naming the setting |
-| AG-34.4 | *Ask each time* | the agent hands it a task | an ask waits in *Needs you* reading to whom, the skill, the task, each field sent or held back, and the limits |
+| AG-34.4 | *Ask* | the agent hands it a task | an ask waits in *Needs you* reading to whom, the skill, the task, each field sent or held back, and the limits |
 | AG-34.5 | The ask declined | it is declined | the step ends *declined* and the agent carries on without it, saying so |
 | AG-34.6 | A task sent | it runs | its states — submitted · working · needs input · done · failed · cancelled — read on the run as they change |
 | AG-34.7 | The outside agent asks back | it needs input | the question reaches whoever started the run; the answer goes back on the same task |

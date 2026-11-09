@@ -16,6 +16,7 @@ depends_on: [EX-F01, EX-F03, EX-F04]
 > something broke — and the ways a person steers how it is reasoned: a method with its assumptions shown, facts
 > from beyond the Graph marked as such, and a fork to try another direction — so the person knows which kind of
 > nothing they have, and what an answer rests on, before acting on it.
+> The decision it helps make: *which kind of nothing is this, and which method and facts may an answer rest on?*
 
 ## User journey
 
@@ -56,7 +57,7 @@ sequenceDiagram
   participant S as Studio
   participant E as Engine
   participant A as Assistant
-  participant W as Third-party source
+  participant W as Outside service
   P->>S: a question, Act as a scientist
   S->>E: the ask, with the approach
   E-->>S: the approach's assumptions, before the run
@@ -94,7 +95,7 @@ sequenceDiagram
 | Author, change and publish an approach | `builder` · shown as *Can build agents* | Listed read-only in Agents › Skills; *+* hidden |
 | Read third-party claims and nodes, and their references | Operator — every member | — |
 | *Keep* a third-party node in the Graph | `contributor` · shown as *Can work on projects*, and a rule allowing the write | Disabled — *Ask Priya (owner)*; refused by a rule, the rule named |
-| Allow third-party sources, or the model's own knowledge, in a view of the graph | `modeller` · shown as *Can shape the model* | The rules read-only |
+| Allow outside services, or the model's own knowledge, in a view of the graph | `modeller` · shown as *Can shape the model* | The rules read-only |
 | Add, change or remove a search provider | `owner` · shown as *Owner* | The providers read-only; *Add* hidden |
 | *Fork from here* | Operator — every member, on their own conversations | Another member's conversation: not shown |
 
@@ -102,7 +103,7 @@ sequenceDiagram
 
 | State | What the person sees |
 |---|---|
-| First use | No approach picked and no third-party source allowed: the question is answered from the Graph alone; Settings › Search providers says none is added, with *Add* for an Owner |
+| First use | No approach picked and no outside service allowed: the question is answered from the Graph alone; Settings › Search providers says none is added, with *Add* for an Owner |
 | Empty after a filter | Zero rows from a valid query: *Cannot answer*, worded as an answer to the question asked, naming what is missing |
 | Loading | The step reads what it does — *Retrying 2/3*, *Repairing*, *Searching the web · provider* — while the Graph's steps already show; *Fork from here* shows a spinner until the new conversation exists |
 | Has data | An answer whose assumptions, third-party claims and fork lineage are each one click away |
@@ -129,12 +130,12 @@ sequenceDiagram
 | A rule beats an assumption | An assumption a rule contradicts is dropped, naming the rule |
 | Anything not from the Graph is third-party | The internet, any connected source and the model's own knowledge — marked *Third-party · internet*, *· api*, *· app*, *· db*, *· agent* or *· model*, in words, on the canvas and in the panel |
 | No reference, not shown | Every third-party item keeps where it came from — for the internet the link, title, kind and when it was fetched — captured on arrival and never recomputed |
-| Off unless a rule allows it | Third-party sources and the model's own knowledge are off in every view of the graph whose rules do not allow them; a deny wins at any level |
+| Off unless a rule allows it | Outside services and the model's own knowledge are off in every view of the graph whose rules do not allow them; a deny wins at any level |
 | What it may do says whether an agent may look | An agent not allowed to search never plans a search, whatever the view allows; its instructions say only *when* |
 | A third-party node is drawn first, written on *Keep* | It is on the board only; *Keep* writes it as a source linked to what it is about, never into a model's own kinds, still marked third-party after a reload |
 | A fork copies; it does not point | A fork holds its own copies of the turns up to the reply and the board as it stood there; deleting the parent takes nothing from it |
 | Lineage is one link deep | A conversation knows its parent and the reply it branched at; nothing links conversations by inference |
-| Leans on | EX-F01 — the board and its panel · EX-F03 — the question and its view of the graph · EX-F04 — the reply, its meta line and *How it got here* · Model › rules — what third-party sources a view allows · Agents › Skills — where approaches are authored · Settings › AI and connections — search providers |
+| Leans on | EX-F01 — the board and its panel · EX-F03 — the question and its view of the graph · EX-F04 — the reply, its meta line and *How it got here* · Model › rules — what outside services a view allows · Agents › Skills — where approaches are authored · Settings › AI and connections — search providers |
 
 ## Data touched
 
@@ -145,7 +146,7 @@ sequenceDiagram
 | A run's approach and version, and its assumptions — claim, where it entered, whether checked and by which query, without it | Write (the engine) · read |
 | Search provider — name, kind, address, key, last ping | Read · write (Owner) |
 | A third-party claim or node — source, reference, title, kind, domain, fetched at, model, run | Write (the engine) · read |
-| A kept third-party source — its provenance, who kept it and when, what it is about | Write (Can work on projects) · read |
+| A kept third-party node — its provenance, who kept it and when, what it is about | Write (Can work on projects) · read |
 | A conversation's parent and the reply it forked at · its copied turns · its board | Write · read |
 
 ## Decisions
@@ -158,7 +159,7 @@ sequenceDiagram
 | Assumptions say what changes without them | Each assumption carries what the answer becomes if it does not hold, authored with the approach — so dropping one is predictable, and a re-run proves it |
 | Outside facts run their own plan | A question that needs outside facts runs a plan with Search and Fetch in its steps, so the steps a person reads say up front that it looked outside |
 | Search providers are configured rows | Never an AI model vendor's built-in search; each is an address a rule can name, pinged before it is saved, its detail listing the rules that name it. They sit in Settings › AI and connections as their own list, never inside an AI model's settings: an AI model is who an agent thinks with, a search provider a third party the Graph lets it reach |
-| The internet is one third-party source | Every source connected later reaches a run the same way: an address a rule can name, a mark, a reference. A source that cannot give a reference is not connected |
+| The internet is one outside service | Every service connected later reaches a run the same way: an address a rule can name, a mark, a reference. A service that cannot give a reference is not connected |
 | A fork starts with the board at its reply | The board as the conversation had drawn it then; the parent's current board when none was kept at that reply |
 | A deleted parent leaves the fork whole | The banner reads *Forked from a deleted conversation*, with no link; a delete is never blocked by forks |
 | Only a settled answer is a fork point | A running, refused or failed reply has nothing to branch from |

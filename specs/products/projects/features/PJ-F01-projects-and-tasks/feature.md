@@ -41,11 +41,11 @@ flowchart TD
   who -->|nobody| open["Open"]
   who -->|a person| person["Assigned · they work it"]
   who -->|an agent| ag["PJ-12 · A run opens, on the assigner's behalf"]
-  page --> pick["PJ-15 · Pick-up: manual · ask · automatic · narrowed per agent"]
-  pick -->|ask| askbox["PJ-15 · Inbox › Needs you: Start this task?"]
+  page --> pick["PJ-15 · Pick-up: Allow · Ask · Deny · narrowed per agent"]
+  pick -->|Ask| askbox["PJ-15 · Inbox › Needs you: Start this task?"]
   askbox -->|Start it| claim
   askbox -->|Not this time · deadline| held["Not started, saying why · stays open"]
-  pick -->|automatic| claim["PJ-15 · Claimed for 30 minutes"]
+  pick -->|Allow| claim["PJ-15 · Claimed for 30 minutes"]
   claim -->|lease lapses| open
   claim --> ag
   open --> pick
@@ -71,16 +71,16 @@ sequenceDiagram
   participant E as Engine
   participant A as Agent
   actor D as Person who decides (Inbox)
-  P->>E: sets the project to manual, ask or automatic; may narrow one agent
+  P->>E: sets the project to Deny, Ask or Allow; may narrow one agent
   loop while a task is open
     A->>E: looks for an open task it may take
-    alt manual
+    alt Deny
       E-->>A: nothing offered
-    else ask
+    else Ask
       A->>E: asks to start the task
       E->>D: Needs you: Start this task?
       D-->>E: Start it · Not this time
-    else automatic
+    else Allow
       E->>E: lease the task to the agent for 30 minutes
     end
   end
@@ -140,7 +140,7 @@ sequenceDiagram
 | Archiving freezes | An archived project's tasks are read only; a run already going finishes. Archiving and unarchiving are separate rows in History |
 | Order is derived | Waves, what a task waits on and the critical path are the engine's derivation from dependencies. A dependency carries a condition: on success · on failure · any outcome. A loop is refused, naming it |
 | Failure edges are contingency | A dependency on failure is drawn dashed and never counts toward the critical path; a task whose condition cannot now be met says why, or reads *Never triggered* |
-| Pick-up mode | Per project: *Manual* · *Ask first* (the default) · *Automatic*. An agent's own mode can be narrower, never wider. A claim is a 30-minute lease, one claim per task; a lapsed claim returns the task to open |
+| Pick-up mode | Per project, for starting a task: *Allow* · *Ask* (the default) · *Deny* ([the three modes](../../../../foundation/settings/product.md#decisions)). *Allow* is set by a person, who confirms it after seeing which agents will start which tasks and the token budget cap. An agent's own mode can be narrower, never wider; pick-up is a line like any other, so a *For everyone* Deny on starting work holds. The token budget cap is a total across every run pick-up opens, enforced by the engine. An Allow is bounded by the person who set it and each task's author, and lapses when the setter loses the right to set it ([A standing Allow is bounded](../../../../foundation/settings/product.md#decisions)). A claim is a 30-minute lease, one claim per task; a lapsed claim returns the task to open |
 | Whose behalf a pick-up runs | The person who set the pick-up mode |
 | The backend owns every number | Counts of tasks by state, a project's counts and the critical path come from the engine; Studio formats and never adds up |
 | Agent outcomes carry a trace | A task's result, a claim and a blocked reason open *How it got here* |

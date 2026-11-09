@@ -1,7 +1,7 @@
 # Operate
 
 The engine shape of running the thing: every write as an event, schedules, notifications and approvals on one clock,
-and the numbers read from the record. The product rules are [Inbox](../../products/inbox/product.md) and its features
+and the numbers read from the record. The product rules are [Inbox](../../foundation/inbox/product.md) and its features
 IN-F01 to IN-F03; schedules are [AG-F07](../../products/agents/features/AG-F07-schedules/feature.md). Logs, traces and
 metrics are [observability.md](../observability.md); the runs themselves are [orchestration.md](../orchestration.md).
 On screen events are *History* and an approval is an *ask* ([glossary.md](../../glossary.md)).
@@ -42,7 +42,7 @@ flowchart LR
 |---|---|
 | A firing is recorded even when it does nothing | Skipped by an overlap or missed-firing policy is a firing with a stated reason |
 | Missed firings follow the schedule's policy | `catch_up` once · `run_all` · `skip` |
-| Outward deliveries wait for an approval | Unless the schedule switches it off; never auto-approved |
+| Outward deliveries wait for an approval | Unless a person sets the schedule's deliveries to Allow, seeing what goes where; who set it is recorded. Never decided by itself |
 | Whether a firing creates work is the run's business | The schedule names an agent and instructions, never a Flow or a project |
 
 ## What it owns
@@ -55,7 +55,7 @@ flowchart LR
 | `approvals` | What waits to leave, its approvers and deadline |
 | The clock | One loop per engine process: schedules, deliveries, notification rules, approval deadlines — each step idempotent on a unique key, so a restart or a second process repeats nothing |
 | Metrics | Per query and per LLM call: latency, tokens, cost, errors — derived from the record |
-| `api_tokens` | Scoped tokens for outside agents, with their allowed reads ([ST-F04](../../products/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) |
+| `api_tokens` | Scoped tokens for outside agents, with their allowed reads ([ST-F04](../../foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) |
 | Retention | How long task runs, their streams, emissions and events are kept, and what a purge removes |
 | The runs journal | A reading of `todos` and `task_runs` — this module owns the surface, never the tables |
 

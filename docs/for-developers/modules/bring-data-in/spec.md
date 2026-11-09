@@ -16,7 +16,7 @@ failure vocabulary — and everything it writes carries the record it came from.
 | Depends on | [Connect and model](../connect-and-model/spec.md) (a dataset binds to a model) · [Platform](../platform/features/runtime.md) (an import is a run the runtime walks) · [Workflows](../workflows/spec.md) (its plans are builtin library versions) |
 | Depended on by | everything that answers from data |
 
-Product spec: [Data](../../../../specs/products/data/product.md) — the product, its features DA-F01–F04, and the module-wide product rules and decisions live there. This file keeps the vocabulary and the engine shape.
+Product spec: [Datasets](../../../../specs/products/datasets/product.md) — the product, its features DS-F01–F04, and the module-wide product rules and decisions live there. This file keeps the vocabulary and the engine shape.
 
 System design: [bring-data-in.md](../../../../specs/system-design/modules/bring-data-in.md) — the contract, the import run, the entry points and when it goes wrong (§§ 2 · 3 · 5 · 6). This file keeps the vocabulary, what the module owns, its decisions, the drawn states and the retired Studio rows of §§ 2 · 5.
 

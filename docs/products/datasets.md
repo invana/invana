@@ -20,7 +20,7 @@ System design: [api-and-cli.md](../../specs/system-design/api-and-cli.md) — th
 | New | Not built; designed here |
 | Blocked · P-nn | New, and cannot ship until prerequisite P-nn exists ([README](README.md#prerequisites)) |
 
-Product spec: [Data](../../specs/products/data/product.md) — its features DA-F01–F04, their stories (DS-nn are DA-nn), origin, provenance, standards and the product decisions live there. This file keeps the CLI and the rows still to place.
+Product spec: [Datasets](../../specs/products/datasets/product.md) — its features DS-F01–F04, their stories DS-nn, origin, provenance, standards and the product decisions live there. This file keeps the CLI and the rows still to place.
 
 ## CLI — build status
 
@@ -47,7 +47,7 @@ What each command does, and the conventions, are in [api-and-cli.md](../../specs
 
 | Decision | Detail |
 |---|---|
-| Imports tiles are the engine's | The Imports, Running and Failed counts, the median time and *Imports a day* come from `GET /api/v1/runs/stats?kind=import&kind=bulk&days=30&tz=…` over every Graph the reader is in ([IN-F02](../../specs/products/inbox/features/IN-F02-running/feature.md)) — not from the fifty newest rows per Graph the journal list reads |
+| Imports tiles are the engine's | The Imports, Running and Failed counts, the median time and *Imports a day* come from `GET /api/v1/runs/stats?kind=import&kind=bulk&days=30&tz=…` over every Graph the reader is in ([IN-F02](../../specs/foundation/inbox/features/IN-F02-running/feature.md)) — not from the fifty newest rows per Graph the journal list reads |
 | Paths carry the publisher | A dataset is `/datasets/catalogue/<publisher>/<name>`, a standard `/datasets/standards/<publisher>/<name>`, a validation item `/datasets/validation/<publisher>/<name>/<key>/<term>` |
 | Launcher position | First: the launcher follows the thinker's path, and gathering comes first |
 

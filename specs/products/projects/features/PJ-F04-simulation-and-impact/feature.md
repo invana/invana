@@ -7,7 +7,7 @@ personas: [decision-maker, analyst]
 stories: [PJ-09, PJ-10]
 journeys: []
 boards: [projects.options, projects.decide]
-depends_on: [PJ-F03, DA-F01, AG-F03, EX-F01]
+depends_on: [PJ-F03, DS-F01, AG-F03, EX-F01]
 ---
 
 # Simulation and impact
@@ -73,7 +73,7 @@ sequenceDiagram
 | Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
 |---|---|---|
 | Read a project's simulations, their results and their runs | Operator — every member who can see the project | — |
-| Simulate · add a finding from a result · save a result as a dataset | `contributor` · shown as *Can work on projects* · Admin; saving a dataset also needs what DA-F01 asks to publish one | *Simulate*, *Add finding* and *Save as dataset* disabled, naming *Can work on projects* |
+| Simulate · add a finding from a result · save a result as a dataset | `contributor` · shown as *Can work on projects* · Admin; saving a dataset also needs what DS-F01 asks to publish one | *Simulate*, *Add finding* and *Save as dataset* disabled, naming *Can work on projects* |
 | Read the impact of an option | Operator — every member who can see the project; every read is under the Graph's view | — |
 | Install a simulator | Admin — as a plugin (ST-F04) | — |
 
@@ -100,15 +100,15 @@ sequenceDiagram
 | Fields are what the simulator declares | The dialog draws one control per declared field; a missing or mistyped field is refused before a run opens. Data a simulator cannot use is its own refusal, in its words |
 | Where it is offered | On a branch's header, and on the project's with the branch to pick. Never on a dropped or merged branch or an archived project; a parked branch may be simulated. Hidden while no simulator is installed |
 | Always derived | Every result reads *derived* and says its rows are predictions, not observations; saved as a dataset it is derived, from the simulation's inputs |
-| Reuse, not new acts | *Add finding* is the finding of PJ-F03, citing the simulation's run; *Save as dataset* is DA-F01's dataset |
+| Reuse, not new acts | *Add finding* is the finding of PJ-F03, citing the simulation's run; *Save as dataset* is DS-F01's dataset |
 | Numbered per project | *s1*, *s2*, like branches and findings, because people type them |
 | A record, never edited | A simulation is kept as it ran; to change it, simulate again. A simulator removed since still reads, with the version it ran |
 | Reach starts from the evidence | Impact starts from the graph records the option's findings cite, every stance, and walks 1, 2 or 3 hops (2 by default); each hop is what the one before reached, less what was already reached |
 | Bounded, and says so | At most 12 records expanded per hop, each to 50 neighbours, the most-reached first; a cut reach reads *More lies beyond* |
-| Under the view | Every impact read is the Explorer's expand, under the Graph's view, so a type the view hides is never reached |
+| Under the view | Every impact read is Explore's expand, under the Graph's view, so a type the view hides is never reached |
 | How sure is the evidence's | How many of the findings it starts from a person reviewed, and the origins of the datasets they cite — never a score |
 | Reach only | No what-if values and no figure in any currency |
-| Leans on | Branches and findings (PJ-F03) · datasets and their versions (DA-F01) · runs (AG-F03) · the Explorer's expand (EX-F01) · plugins (ST-F04) |
+| Leans on | Branches and findings (PJ-F03) · datasets and their versions (DS-F01) · runs (AG-F03) · Explore's expand (EX-F01) · plugins (ST-F04) |
 
 ## Data touched
 
@@ -116,9 +116,9 @@ sequenceDiagram
 |---|---|
 | Simulations — branch, number, simulator and its version, fields, seed, pinned inputs, the run, who and when | Write · read |
 | The simulation's run and its result (AG-F03) | Write · read |
-| Dataset versions it reads, and the derived dataset it may save (DA-F01) | Read · write |
+| Dataset versions it reads, and the derived dataset it may save (DS-F01) | Read · write |
 | Findings citing a simulation's run (PJ-F03) | Write |
-| The graph, through the Explorer's expand, for impact | Read |
+| The graph, through Explore's expand, for impact | Read |
 
 ## Decisions
 

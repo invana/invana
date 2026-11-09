@@ -631,7 +631,7 @@ the frontier, not the plan**: everything behind the cursor is history, everythin
 | A visual Task-graph authoring UI | A plan is data validated against an envelope; drawing from prose and promotion from a run that served are the authoring paths |
 | Versioned Tasks | The run freezes what ran; a version table records it twice |
 | Cloning a reusable plan on use | Copies drift, and *which copy is right* becomes a question |
-| Auto-approval · auto-acceptance | A rule deciding on the agent's behalf is what these pauses replace |
+| Auto-approval · auto-acceptance | Nothing set to Ask is ever decided by itself: nothing acts without asking but where a person's line says Allow ([one access model](../foundation/settings/product.md#decisions)), and a raised pause waits for a person |
 | Backfill · polling sensors | A missed firing is handled by its schedule's policy — one catch-up run, every missed one (at most 24), or none. A run waits on a person or an event, never a spin loop |
 | Generating prose from a plan | Two generators pointing at each other drift, and neither stays authoritative |
 | Redrawing on every keystroke | Half a sentence is not an instruction |

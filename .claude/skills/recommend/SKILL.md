@@ -26,7 +26,7 @@ python3 .claude/skills/recommend/add.py add --from <role> --raised-in "<where>" 
 
 - It prints the new ID (`R007`). List the IDs under `## Recommendations` in your report.
 - A title already in the table is refused with the existing ID — name that ID in your report instead.
-- Check first: `add.py list --open`.
+- Check first: `add.py list --open` (or `--status taken · declined · done`).
 
 | Raise it | Not it |
 |---|---|
@@ -38,7 +38,7 @@ python3 .claude/skills/recommend/add.py add --from <role> --raised-in "<where>" 
 ```bash
 python3 .claude/skills/recommend/add.py take R007 --priority P2 --as "phase specs-accounts/P03"
 python3 .claude/skills/recommend/add.py take R008 --priority P3 --as "declined — <reason>"
-python3 .claude/skills/recommend/add.py done R007     # its work is done; a declined row stays
+python3 .claude/skills/recommend/add.py done R007     # its work is done: status done; no row is ever deleted
 ```
 
 | Priority | Means |

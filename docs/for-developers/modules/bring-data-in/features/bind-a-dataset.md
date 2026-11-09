@@ -10,7 +10,7 @@ import run, so its records land validated, with provenance, and the trace is the
 | API / CLI / Studio | 🟡 / 🟡 / ✅ |
 | Related | [datasets](datasets.md) · [load-data](load-data.md) · [retract-and-refresh](retract-and-refresh.md) · products: [datasets.md](../../../../products/datasets.md) DS-11 · DS-F11 |
 
-Product spec: [DA-F03 · Add a dataset to this graph](../../../../../specs/products/data/features/DA-F03-add-a-dataset-to-this-graph/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F03 · Add a dataset to this graph](../../../../../specs/products/datasets/features/DS-F03-add-a-dataset-to-this-graph/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

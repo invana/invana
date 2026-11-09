@@ -1,9 +1,9 @@
 # Identity and access
 
 The engine shape of who a request is and what it may change: membership, Graph roles, and what a token carries. The
-product rules are [Settings](../../products/settings/product.md),
-[ST-F02](../../products/settings/features/ST-F02-people-and-access/feature.md) and
-[ST-F03](../../products/settings/features/ST-F03-you-account-and-sessions/feature.md). The API's auth conventions are
+product rules are [Settings](../../foundation/settings/product.md),
+[ST-F02](../../foundation/settings/features/ST-F02-people-and-access/feature.md) and
+[ST-F03](../../foundation/settings/features/ST-F03-you-account-and-sessions/feature.md). The API's auth conventions are
 [api-and-cli.md](../api-and-cli.md). On screen a role is a grant — *Operator*, *Can work on projects*, *Can shape the
 model* ([glossary.md](../../glossary.md)).
 

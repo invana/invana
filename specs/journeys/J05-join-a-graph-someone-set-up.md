@@ -19,7 +19,7 @@ flowchart TD
   B --> C["SH-02 · Home: the Graph, with its question"]
   C --> D["EX-11 · Explore: questions drawn from the published model"]
   D --> E["EX-01 · Ask"]
-  E --> F(["An answer, cited · J02"])
+  E --> F(["An answer, cited · How it got here · J02"])
   C --> G["SH-04 · SH-06 · Move between modes · find with ⌘K"]
   G --> H{"An act Tom lacks"}
   H --> I["SH-20 · Disabled · Needs Can shape the model — Ask Priya (owner)"]

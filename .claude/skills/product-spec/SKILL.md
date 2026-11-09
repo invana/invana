@@ -14,7 +14,7 @@ The procedure the **product manager** follows — only the product manager (or R
 | `templates/product.md` · `feature.md` · `story.md` · `task.md` · `journey.md` (this skill) | The only starting points. Copy one; never write a spec from a blank page. A story is a folder: `story.md` and an empty `task.md` |
 | `specs/glossary.md` · `personas.md` | The words a person reads on screen; who the stories are for |
 | `specs/design-language.md` | How surfaces behave: modes, peek · modal · sheet, the assistant |
-| `.claude/team/TEAM.md` §0 · §7 | What Invana is (decision intelligence); the access model — Admin and Operator |
+| `specs/vision.md` · `.claude/team/TEAM.md` §0 · §7 | What Invana is; how every role builds to it; the access model — Admin and Operator |
 | `specs/migrations.md` | Agreed changes not yet made |
 
 ## 0. Journey first
@@ -75,8 +75,8 @@ retired story keeps its ID in the feature's *Not building* table with the reason
 
 | Thing | How |
 |---|---|
-| A product | `products/<slug>/product.md` from the template; a new, unique two-letter code |
-| A feature | `products/<product>/features/<CODE>-F<nn>-<slug>/feature.md`; the next free number; a row in `product.md` › Features. Its summary names the decision it helps make |
+| A product | `products/<slug>/product.md` from the template; a new, unique two-letter code. What every product uses, and no person comes to as a place of work, is foundation: `foundation/<slug>/product.md`, same template |
+| A feature | `<area>/<product>/features/<CODE>-F<nn>-<slug>/feature.md`; the next free number; a row in `product.md` › Features. Its summary names the decision it helps make |
 | The user journey | `## User journey` first: a mermaid `flowchart` from where the person starts to where they end, every story's step labelled with its ID, every branch (no access, failed, refused, asks permission). A `sequenceDiagram` too when an agent, a background run or a permission ask is involved. Draw it before the stories — the stories are its steps written down |
 | A user story | A folder `stories/<CODE>-<nn>-<slug>/` in its feature: `story.md` from the template, complete on its own — the designer's whole brief for the story's canvas page, and the coder's and QA's for the build. Five parts, in order (below); its status in the front-matter. A row in the feature's `## Stories` table and its `stories:` key |
 | Its tasks | `task.md` beside it, copied from the template with the table empty. You never write a task: the designer, the coder and QA each add their own when the story reaches their gate (`format.md` › *Tasks*). A task that asks for what the story does not say comes back to you as a `raise` row — change the story, or say why not |

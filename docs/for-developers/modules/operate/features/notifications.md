@@ -11,7 +11,7 @@ inbox to send to; a **notification** is one inbox row; a **delivery** is one sen
 | API / CLI / Studio | ✅ / ✅ / 🟡 |
 | Related | [approvals](approvals.md) · [schedules](schedules.md) · [audit-and-activity](audit-and-activity.md) · [roles](../../identity-and-access/features/roles.md) |
 
-Product spec: [IN-F01 · Needs you](../../../../../specs/products/inbox/features/IN-F01-needs-you/feature.md) — IN-04 · IN-05; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [IN-F01 · Needs you](../../../../../specs/foundation/inbox/features/IN-F01-needs-you/feature.md) — IN-04 · IN-05; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 

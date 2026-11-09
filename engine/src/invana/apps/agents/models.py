@@ -90,7 +90,7 @@ DEFAULT_BUDGET: dict[str, int | float] = {
     "max_fanout": 200,
     # Across every run this agent is working. The **Graph's** ceiling is a
     # different bound with a different policy
-    # ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
+    # ([ST-F06 § Decisions](specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
     "max_concurrent_runs": 3,
 }
 

@@ -10,7 +10,7 @@ that owns tokens for scripts) and its **groups**, with the policies each holds.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [membership](membership.md) · [roles](roles.md) · [policies](policies.md) · [tokens](tokens.md) · products: [iam.md](../../../../products/iam.md) IAM-08 |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/products/settings/features/ST-F02-people-and-access/feature.md) — ST-08; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-08; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

@@ -7,8 +7,9 @@ follows it too. `CLAUDE.md` is the law; this file is how the team works under it
 
 ## 0. What Invana is — every role builds to this
 
-**Invana is a decision intelligence platform: it exists to help a person make better decisions.** Agents do the work;
-the person decides. Everything the team specifies, draws, builds and tests serves that.
+**Invana is an ontology-governed decision intelligence platform for humans and AI agents** ([vision](../../specs/vision.md)). Every
+agent — Invana's and the team's — follows the vision's [philosophy](../../specs/vision.md#how-invana-names-itself):
+agents do the work; the person decides. For the team, that person is Ravi. Everything the team specifies, draws, builds and tests serves that.
 
 | Principle | What it means | Example |
 |---|---|---|
@@ -25,6 +26,7 @@ the person decides. Everything the team specifies, draws, builds and tests serve
 | Designer | Drawing the proposal and the choice, not the form; one primary act per decision; the trace one click away (peek → sheet), never on the first screen |
 | Coder | Recording every agent step, source, assumption and actor when it happens, so the trace is served by the engine, not rebuilt by Studio; never acting on a write without the person's yes |
 | Security | Threat-modelling every agent act and data flow — prompt injection through graph data, an agent acting without a yes, data leaving a Graph or the install |
+| Project lead | Running only what Ravi approved; every choice that is his goes to him as a question with a recommendation, never decided for him |
 | QA | Proving each trace criterion and each ask-first with the coder's tests and agent evals — recommending the ones missing; failing a surface that shows machinery by default or hides how a result was reached |
 
 ## 1. The team
@@ -51,7 +53,7 @@ flowchart TD
 |---|---|---|---|
 | **Ravi** — product owner | — | Scope, priorities, both reviews, every decision marked *Ravi's call* | — |
 | **Product manager** | `product-manager.md` · Opus · `/product-spec` | What and why — products, features, stories, criteria, journeys, access per act — and running the team: delegates, routes requests, prioritises and takes up recommendations, batches questions for Ravi, presents both reviews, moves statuses | Draws screens · writes code or tests · decides scope alone |
-| **Designer** | `designer.md` · Opus · `/design-story` | How it looks — the boards a spec names, drawn on the canvas from `@invana/design-kit` components only; component requests | Edits any file in the repo — a spec, a doc or any code · draws with a component not yet in the kit |
+| **Designer** | `designer.md` · Opus, Sonnet for routine passes (`/design-story` §0) · `/design-story` | How it looks — the boards a spec names, drawn on the canvas from `@invana/design-kit` components only; component requests | Edits any file in the repo — a spec, a doc or any code · draws with a component not yet in the kit |
 | **Coder** | `coder.md` · Opus | How it is built — engine, Studio and approved `@invana/design-kit` components, with every test (unit and end to end, engine and Studio), evals and a changeset | Builds beyond the spec · redesigns a screen · edits a doc or a spec |
 | **QA** | `qa.md` · Sonnet · `/code-review-invana` · `/design-qa` | That it works and is right — runs the coder's backend, frontend and end-to-end tests and agent evals, reviews the code, design QA; reports and recommends | Edits any file but its reports — code, tests or docs · commits |
 | **Project lead** | `project-lead.md` · Sonnet · `/run-project` · `/project-dashboard` | Getting a project done — when and in what order its phases run, starting and stopping the run, triaging a blocked phase, the project's *Questions for Ravi* | Decides what a phase builds · writes a spec, a doc, a board or code · marks a phase `done` |
@@ -70,10 +72,10 @@ Every role edits only its own files. Anything else it thinks should change is a 
 | Role | Product code | Tests · evals | Kit · canvas code | Changesets | Specs | Story tasks | Other docs | Boards (canvas) | Project file | Team rules | Own reports | Project reviews | Raise a recommendation | Take one up | Commit |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Ravi — or a session he asks directly | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Product manager | — | — | — | — | ✅ | ✅ creates it, empty | ✅ | — | ✅ | — | ✅ | — | ✅ | ✅ | ✅ under /run-project |
+| Product manager | — | — | — | — | ✅ | ✅ creates it, empty | ✅ | — | ✅ | — | ✅ | — | ✅ | ✅ | ✅ when Ravi asked, or under a run he started |
 | Project lead | — | — | — | — | — | — | — | — | ✅ Questions for Ravi | — | ✅ | — | ✅ | — | — |
 | Designer | — | — | — | — | — | ✅ own rows | — | ✅ | — | — | ✅ | — | ✅ | — | — |
-| Coder | ✅ | ✅ | ✅ approved components | ✅ | — | ✅ own rows | — | — | ✅ own Log row · hand-off note | — | ✅ | — | ✅ | — | ✅ when the brief says |
+| Coder | ✅ | ✅ | ✅ approved components | ✅ | — | ✅ own rows | — | — | ✅ own Log row · hand-off note | — | ✅ | — | ✅ | — | ✅ when Ravi asked, or under a run he started |
 | QA | — | — | — | — | — | ✅ own rows | — | — | ✅ own Log row (under /run-project) | — | ✅ | ✅ | ✅ | — | — |
 | Security | — | — | — | — | — | — | — | — | — | — | ✅ | — | ✅ | — | — |
 
@@ -86,7 +88,7 @@ Every role, always: `.handoffs/**` · `/tmp/**` · `/private/tmp/**` · `.claude
 | Kit · canvas code | `~/Projects/invana/design-kit/**` · `~/Projects/invana/canvas/**` |
 | Changesets | `.changeset/**` |
 | Specs | `specs/**` |
-| Story tasks | `specs/products/*/features/*/stories/*/task.md` |
+| Story tasks | `specs/products/*/features/*/stories/*/task.md` · `specs/foundation/*/features/*/stories/*/task.md` |
 | Other docs | `docs/**` · `README.md` · `CONTRIBUTING.md` · `CHANGELOG.md` |
 | Boards (canvas) | `.design/**` |
 | Project file | `.claude/team/projects/*/project.md` |
@@ -102,7 +104,9 @@ Every role, always: `.handoffs/**` · `/tmp/**` · `/private/tmp/**` · `.claude
 - **Not enforced by the hook**: which rows of a project file a role edits (the coder and QA their own Log row and
   hand-off note, the project lead *Questions for Ravi*), which rows of a story's `task.md` (each role only the rows
   whose Owner it is — `scripts/specs/check.py` checks the owner and the order), what a script run from Bash writes, and sub-agents of other
-  types (`general-purpose` parts a coder starts) — these hold by the rule above.
+  types (`general-purpose` parts a coder starts) — these hold by the rule above. A part inherits the rights of the role
+  that starts it and is briefed with them; QA's pass 1 checks every changed path against the edit rights of the role
+  that changed it.
 - A plain session — Ravi's — is not checked.
 
 **One path for change**: recommendation → the product manager prioritises it and takes it up as a session, a phase or a
@@ -151,12 +155,12 @@ flowchart LR
 | `idea → specified` | Every story has its five parts and every `## Screens` cell names its board or `—`; the feature's user journey, Access and States written; `scripts/specs/check.py` passes; a feature that touches access, data, agents or an outside system has its security threat model, each mitigation written as a criterion; **Ravi has approved the spec** | Product manager, after Ravi's yes |
 | `specified → designed` | Every board the spec names is drawn on its story's page on the canvas; every designer task in its `task.md` is `done`; **Ravi has approved the boards** | Product manager, after Ravi's yes |
 | `designed → built` | Code, tests and changeset done; every coder task `done` and every criterion in one; QA pass 1 and pass 2 both PASS | Product manager |
-| `built → verified` | Every criterion has a passing test or a recorded check; every QA task `done` and every criterion in one | Product manager, from QA's report |
+| `built → verified` | Every criterion has a passing test or a recorded check; every QA task `done` and every criterion in one | Product manager, from QA's report; the criterion → evidence table from QA's `## Checked` goes with the commit question to Ravi |
 
 Nothing skips a gate. No design below `specified`; no code below `designed`.
 
 **The story is the source of truth; its tasks are how it gets delivered.** Every story is a folder —
-`specs/products/<p>/features/<feature>/stories/<STORY-ID>-<slug>/` — with `story.md` (the product manager's) and
+`specs/<area>/<p>/features/<feature>/stories/<STORY-ID>-<slug>/` (`<area>` is `products` or `foundation`) — with `story.md` (the product manager's) and
 `task.md`, one table every builder shares (`.claude/skills/product-spec/format.md` › *Tasks*):
 
 | When the story is | Who adds tasks | Then |
@@ -284,14 +288,14 @@ sequenceDiagram
 
 - Ask the owner, not a neighbour: *what* → product manager · *how it looks* → designer · *how it is built* → coder.
 - Never answer for another role. A coder never decides a criterion; a designer never adds a story.
-- A non-blocking request names the recommendation you went ahead with, so the owner can overrule it.
+- A non-blocking request names the recommendation you went ahead with, so the owner can overrule it — only for a reversible choice inside your role. The product manager lists every such row in `cycle.md` under *Waiting on you*.
 - The product manager batches every `decide` row for Ravi into one question set, never one at a time.
 - **Requests or recommendations.** A *Requests* row is what the current task needs to finish — a question, a blocking gap, a review. Anything that should change beyond it — a missing test, an unproven criterion, a fix, a doc, a component, a follow-up — is a recommendation, never an edit and never a request. A defect in what the task was asked to deliver stays a *Finding* and goes to a fix round.
 
 ### Reports
 
 Every role writes its reports as markdown to `.agent-reports/<agent>/` — git-ignored, never committed. A re-run
-overwrites the file. Hand-offs stay in `.handoffs/`.
+rewrites the report but adds a row to its `## Rounds` table, so an earlier FAIL stays visible. Hand-offs stay in `.handoffs/`.
 
 | Agent | Files | Line 1 |
 |---|---|---|
@@ -304,10 +308,12 @@ overwrites the file. Hand-offs stay in `.handoffs/`.
 
 | Part | Holds |
 |---|---|
-| Line 1 | `RESULT: …` exactly — the product manager reads this line, not the whole report |
+| Line 1 | `RESULT: …` exactly — the product manager reads this line first; before moving a gate it reads `## Checked` too |
 | `## Summary` | At most three bullets |
 | `## Work` (PM, designer, coder) or `## Findings` (QA, security) | A table — files and IDs, or severity · where · what · how to fix |
+| `## Checked` (QA, security) | Each check run: the criterion, board or scanner (with its version) · the command or screenshot · its result. A check not run is a `note`, never a pass; a PASS without this section is not a PASS |
 | `## Requests` | The table above: To · Type · About · Ask · Recommend · Blocking |
+| `## Rounds` | One row per run of this report: round · RESULT · blockers — never rewritten |
 
 ## 4. When to stop and ask Ravi
 
@@ -318,9 +324,13 @@ overwrites the file. Hand-offs stay in `.handoffs/`.
 | A new design-kit component, or a change to one that alters its props, behaviour or look elsewhere | Which existing kit component draws an element · a kit fix within the token rules |
 | Access: who may do something new | Test names, file layout, refactors inside the change |
 | Anything irreversible or outward: commit, push, release, delete data, publish to someone else | Env blockers you can fix in one command |
+| Restarting a run with a changed scope, or an env fix that touches a product file (`docker/**` included) | Restarting a run Ravi started — same project and phases — after a usage limit or a hand-off |
+| Declining a `security`, `blocker` or P1 recommendation | Declining a P3 recommendation — listed in `cycle.md` |
+| Writing to a Graph outside a test database — active scans and fuzzing included | Loading or reseeding demo data (`demos/`) |
 
 When you ask, give options with your recommendation first. When you decide inside a task you were given, write it into
-the file it governs if your role writes that file, else make it a recommendation; list it in your report. A conversation with Ravi is not a task: it writes nothing until he asks.
+the file it governs if your role writes that file, else make it a recommendation; list it in your report with the
+line that supports it and the option you rejected. A conversation with Ravi is not a task: it writes nothing until he asks.
 
 ## 5. Review with Ravi
 
@@ -328,7 +338,7 @@ Ravi reviews each feature twice. The product manager assembles and presents both
 
 | Review | When | Holds | Ravi answers per story |
 |---|---|---|---|
-| **The spec** | Before any design | Feature file(s) and user journey, check passing · the boards each story names · Access · the threat model when it touches access, data or agents · decisions taken, open questions, breaking changes | **approve** (→ `specified`) · **change** (→ product manager) · **drop** |
+| **The spec** | Before any design | Feature file(s) and user journey, check passing · the boards each story names · Access · the threat model when it touches access, data or agents · decisions taken with the options weighed and the reason for the pick, open questions, breaking changes | **approve** (→ `specified`) · **change** (→ product manager) · **drop** |
 | **The boards** | Before any code | Canvas link · each story's page with every named board drawn · component requests and their status · open questions | **approve** (→ `designed`) · **change** (→ designer for the look, product manager for the what) · **drop** |
 
 ## 6. Standards every role keeps
@@ -350,7 +360,7 @@ Ravi reviews each feature twice. The product manager assembles and presents both
 | Change | No backward compatibility; no aliases or shims. Demo data keeps working |
 | Writes | Talk is not a request to write (`CLAUDE.md`): a question or discussion changes no file until Ravi asks for the write |
 | Scope | A task changes only what it was asked for, in the files its role writes (§1 *Edit rights*). Anything else is one row in `.claude/team/agents-recommendations.md` and a line in your report — never fixed on the way. Only the product manager takes a recommendation up — as a session, a phase or a project, Ravi approving scope |
-| Git | Never commit, push or release unless the current instruction says so. Stage named paths only — never `git add -A` or `git add .`. Never edit or commit over another session's work |
+| Git | A commit needs Ravi's yes: his words in the current turn, or a run he started (`/run-project`) whose project file names the commits it makes. A brief from another role never authorises a commit on its own. Never push or release. Stage named paths only — never `git add -A` or `git add .` — except the runner on its own phase branch, which starts from a clean tree. Never edit or commit over another session's work |
 | Context | Past 300k tokens, hand off with `/handoff` (`CLAUDE.md` › *Hand-off at 300k tokens*) |
 
 ## 7. The access model

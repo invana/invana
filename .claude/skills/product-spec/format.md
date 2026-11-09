@@ -7,11 +7,11 @@ this file are the starting point; copy one, never write a spec from a blank page
 
 ```
 specs/
-├── README.md                       index: product → feature → story, with status and open tasks
+├── README.md                       index: products, then foundation → feature → story, with status and open tasks
 ├── vision.md · personas.md · glossary.md · design-language.md
 ├── system-design/                  architecture.md · data-model.md · integrations.md
 ├── journeys/J<nn>-<slug>.md        end-to-end flows across products
-└── products/<product>/
+└── products/<product>/            also foundation/<part>/ — Inbox · Settings · Shell, same layout
     ├── product.md
     └── features/<CODE>-F<nn>-<slug>/
         ├── feature.md              user journey · stories index · access · states · rules · decisions · not building
@@ -29,7 +29,7 @@ specs/
 | One folder per feature | `feature.md` holds what its stories share; each story is a folder of its own under `stories/` |
 | One folder per story | `story.md` and `task.md`, nothing else. The story is the source of truth; the tasks are how each role delivers it |
 | Folder name = ID + slug | `MO-F03-load-data-into-a-kind/` · `MO-17-pick-where-the-data-comes-from/`. The slug may change; the ID never does |
-| Products are the UI's areas | Explorer `EX` · Modeller `MO` · Data `DA` · Agents `AG` · Projects `PJ` · Inbox `IN` · Settings `ST` · Shell `SH` |
+| Two areas, one format | **Capabilities** in `products/` — Explore `EX` · Model `MO` · Data `DA` · Datasets `DS` · Agents `AG` · Projects `PJ`. **The operating system** in `foundation/` — what every capability uses: Inbox `IN` · Settings `ST` · Shell `SH`. Both are written the same way; the list is `vision.md` › *Pillars and capabilities* and *The operating system* |
 | Journeys cross products | A journey strings stories from several features into one person's path, with its branches |
 
 ## IDs
@@ -56,8 +56,10 @@ specs/
 | `designed` | Drawn and approved for build | Every board the spec names is on the canvas, and the boards review approved them |
 | `built` | Shipped in Studio and the engine | Every surface the feature needs is done |
 | `verified` | Proven | Every acceptance criterion has a passing test or a recorded check |
+| `later` | Parked, outside the ladder — kept so nothing decides it by accident | Ravi parks it; taking it up sets it back to `idea` |
 
-A feature's status is the lowest status among its stories. A product's status is the lowest among its features.
+A feature's status is the lowest status among its stories that are not `later`, or `later` when all are. A product's status is the lowest among its features.
+A board is drawn once its story is `designed`: below that, an undrawn board is a warning, from `designed` up an error.
 A story's status never runs ahead of its tasks: `designed` needs every designer task `done`, `built` every coder task,
 `verified` every QA task — and at least one task of that role. Ravi's review is still the gate; the tasks are its
 precondition. The check enforces both.

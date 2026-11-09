@@ -14,7 +14,7 @@ Ravi to review.
 | | |
 |---|---|
 | Goal | `specs/` holds every product, feature and story Invana has or plans, plus `vision` · `personas` · `glossary` · `system-design/` · `journeys/`, all passing the spec check · every moved section is cut from its source · `docs/for-developers/README.md` is a review index of what stayed and why · no code cites a cut section |
-| Specs | Products EX · MO · DA · AG · PJ · IN · ST · SH; features EX-F01–F07 · MO-F01–F06 · DA-F01–F04 · AG-F01–F07 · PJ-F01–F05 · IN-F01–F03 · ST-F01–F06 · SH-F01–F03 (tentative — P01's mapping fixes them); journeys J01–J05 |
+| Specs | Products EX · MO · DA · AG · PJ · IN · ST · SH; features EX-F01–F07 · MO-F01–F06 · DS-F01–F04 · AG-F01–F07 · PJ-F01–F05 · IN-F01–F03 · ST-F01–F06 · SH-F01–F03 (tentative — P01's mapping fixes them); journeys J01–J05 |
 | Not in this project | Drawing boards (Screens cells name existing Agent-version boards or `—`; missing boards become designer work later) · changing product code beyond citation paths (P21) · deleting anything that was not moved · `.changeset/` text · editing `.claude/` or `CLAUDE.md` (their citations go to a recommendation for Ravi) |
 
 Run it: `python3 .claude/skills/run-project/run.py specs-migration` (the project-lead does, with `--start`).
@@ -215,9 +215,9 @@ None — docs phases need no stack.
 |---|---|
 | Agent | product-manager |
 | Read | the mapping rows for DA · `modules/bring-data-in/` · `reviews/P03-audit.md` · `docs/products/datasets.md` |
-| Stories | DA-F01 · DA-F02 · DA-F03 · DA-F04 |
+| Stories | DS-F01 · DS-F02 · DS-F03 · DS-F04 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/data/features/DA-F01-*` … `DA-F04-*` |
+| Lands | `specs/products/datasets/features/DS-F01-*` … `DS-F04-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -292,7 +292,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for IN · `modules/operate/` (not schedules) · `reviews/P05-audit.md` |
 | Stories | IN-F01 · IN-F02 · IN-F03 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/inbox/features/IN-F01-*` … `IN-F03-*` |
+| Lands | `specs/foundation/inbox/features/IN-F01-*` … `IN-F03-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -307,7 +307,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for ST-F02 · ST-F03 · `modules/identity-and-access/` · `reviews/P05-audit.md` · `docs/products/iam.md` |
 | Stories | ST-F02 · ST-F03 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/settings/features/ST-F02-*` · `ST-F03-*` |
+| Lands | `specs/foundation/settings/features/ST-F02-*` · `ST-F03-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -322,7 +322,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for ST-F01 · ST-F04–F06 · `modules/platform/` · `connect-and-model/features/{connect-a-database,graph-settings}.md` · `agents/features/{providers-and-models,workers}.md` · `reviews/P05-audit.md` · `docs/products/platform.md` · `plugins.md` |
 | Stories | ST-F01 · ST-F04 · ST-F05 · ST-F06 |
 | Done when | as P06 for these features |
-| Lands | `specs/products/settings/features/ST-F01-*` · `ST-F04-*` … `ST-F06-*` |
+| Lands | `specs/foundation/settings/features/ST-F01-*` · `ST-F04-*` … `ST-F06-*` |
 | Boards | — |
 | Review | |
 | Approve | |
@@ -337,7 +337,7 @@ None — docs phases need no stack.
 | Read | the mapping rows for SH and journeys · `docs/products/shell.md` · `onboarding.md` · `platform/features/{search,design-system}.md` · every `feature.md` written so far |
 | Stories | SH-F01 · SH-F02 · SH-F03 · journeys J01–J05 |
 | Done when | as P06 for these features · each journey draws one person's path across products in mermaid with every branch, and each feature it crosses links into it |
-| Lands | `specs/products/shell/features/SH-F01-*` … `SH-F03-*` · `specs/journeys/` |
+| Lands | `specs/foundation/shell/features/SH-F01-*` … `SH-F03-*` · `specs/journeys/` |
 | Boards | — |
 | Review | |
 | Approve | |

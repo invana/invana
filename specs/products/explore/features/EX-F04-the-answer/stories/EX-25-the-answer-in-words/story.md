@@ -55,7 +55,7 @@ flowchart LR
 | EX-25.7 | A view of the graph that does not send record values to an AI model | the answer settles | the records stand alone, and the step says *Answer skipped — this view does not send record values to a model* |
 | EX-25.8 | More than 50 rows | the words are written | they are written from the first 50 and say they spoke from a sample |
 | EX-25.9 | The model fails or times out | the words are written | the records stand as the answer; the Answer step is marked failed and the run is still answered |
-| EX-25.10 | A view of the graph that allows third-party sources | a claim comes from beyond the Graph | it is marked *Third-party* with its source |
+| EX-25.10 | A view of the graph that allows outside services | a claim comes from beyond the Graph | it is marked *Third-party* with its source |
 | EX-25.11 | An answer with words | the person opens *How it got here* | the Answer step shows what it was given and the claims it kept and dropped |
 
 ## Screens

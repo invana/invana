@@ -21,8 +21,8 @@ that work and go away again.
 | 3 | **Agents are helpers, not machinery** | The assistant is always one click away on the right. Agents are colleagues: they answer in threads, ask before acting, and show how they got there |
 | 4 | **Say less** | A surface shows the next decision, not every fact. Detail is one click deeper (peek → sheet), never on the first screen |
 | 5 | **Plain words** | Roles, limits and states are sentences. No internal nouns on screen (see §6) |
-| 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explorer, Modeller and Projects are modes of one workspace, named in the wordmark; everything else is summoned |
-| 7 | **The agent proposes, the person decides** | Invana is a decision intelligence platform. An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
+| 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explore, Model and Projects are modes of one workspace, named in the wordmark; everything else is summoned |
+| 7 | **The agent proposes, the person decides** | Invana is built for decisions ([vision](vision.md)). An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
 | 8 | **Traceable on demand** | Every answer, proposal and act can show how it got there — steps, sources, assumptions, who did what — through *Why?*, *How it got here* and the full run. Never on the first screen; always one click away |
 
 ## 2. The layout
@@ -31,7 +31,7 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 
 | Region | Holds | Rule |
 |---|---|---|
-| Header | Wordmark *Invana Explorer · Modeller · Projects* (plain *Invana* with no Graph open) · Graph picker › crumb · ⌘K *Do, open or ask anything* · bell · Assistant · avatar | The wordmark names the mode in main and changes with it; the crumb never repeats it. No launcher |
+| Header | Wordmark *Invana Explore · Model · Projects* (plain *Invana* with no Graph open) · Graph picker › crumb · ⌘K *Do, open or ask anything* · bell · Assistant · avatar | The wordmark names the mode in main and changes with it; the crumb never repeats it. No launcher |
 | leftNav | **Modes** above the line: Explore · Model · Projects. **Summoners** below: Data · Agents · Inbox. At the bottom: Settings · Help | A mode changes main; a summoner opens an overlay. Icons carry a label underneath. The leftNav never collapses |
 | leftSection | What the current mode works on: boards and conversations · kinds and relationships · projects and my tasks | **Collapsible** (header toggle, ⌘B, or click the active mode). When collapsed, the toggle leads main's tab row |
 | mainSection | The work: board tabs (the workbook), the canvas, a project | Never a list of settings |
@@ -100,14 +100,15 @@ Code, docs and the CLI keep the domain terms in `for-developers/terminology.md`;
 `area.feature.surface.variant`, lower snake, dots for depth — `agents.runs`, `projects.task.thinking`. The areas are
 `start · explore · model · data · agents · inbox · settings · projects · shell`. One canvas page per area, one row per name prefix.
 
-## 8. Where every product went
+## 8. Where every capability and operating-system part went
 
 | Was | Now | Tier |
 |---|---|---|
 | Home · Graphs · Onboarding | `start.home` (no Graph open) · the Graph picker · *Create a graph* (5 steps, the model shaped in step 3) | page · modal |
 | Explorer | **Explore** mode — boards, conversations, dashboards; tools on right-click | mode |
 | Modeller | **Model** mode — the map, Health, History; rules and views as a sheet | mode · sheet |
-| Datasets · Imports | **Data** — Catalogue · Upload · Checks · Collect; a dataset as a sheet | modal · sheet |
+| — | **Data** — Records · Quality · Annotations; a record as a sheet | modal · sheet |
+| Datasets · Imports | **Datasets**, later — Catalogue · Upload · Checks · Collect; a dataset as a sheet | modal · sheet |
 | Agent Builder · Fleet dashboard | **Agents** — Agents · Runs · Skills · Schedules; an agent, a skill, a run as sheets | modal · sheet |
 | Activity · Notifications | **Inbox** — Needs you · Running · History | modal |
 | Graph settings · IAM · Settings · Fleet workers · Profile | **Settings** — This graph · Invana · You; access rules as a sheet | modal · sheet |

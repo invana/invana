@@ -3,7 +3,7 @@
 **The engine's code shape, and how the code gets there.** Sibling to
 [building-studio/code-shape.md](../building-studio/code-shape.md) — that says how Studio is laid out;
 this says how the engine is, and what still has to move. Neither says what the product *does*: that is
-[README.md](../README.md) and the feature files under [modules/](../modules/).
+[README.md](../README.md) and the feature files under [modules/](../modules).
 
 | | |
 |---|---|

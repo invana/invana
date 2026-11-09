@@ -44,7 +44,7 @@ flowchart LR
 |---|---|---|---|
 | PJ-03.1 | A project just created | a member opens it | the overview reads its question and type, and one branch — the question as asked — open, with *No findings yet* |
 | PJ-03.2 | A project with branches | the overview opens | each branch shows its number (*b1*), title, status (open · pursuing · parked · dropped · merged) and balance (*3 supports · 1 contradicts*), in the words of the project's type |
-| PJ-03.3 | Findings that cite dataset versions | the overview opens | *Datasets used* lists each dataset version those findings cite, as dataset and version, each opening its dataset (DA-F01); there is no second list to keep |
+| PJ-03.3 | Findings that cite dataset versions | the overview opens | *Datasets used* lists each dataset version those findings cite, as dataset and version, each opening its dataset (DS-F01); there is no second list to keep |
 | PJ-03.4 | A simulation saved a derived dataset | the overview opens | *Datasets made* lists it, labelled derived |
 | PJ-03.5 | A project with open tasks | the overview opens | it counts the open tasks and lists them, each opening its task |
 | PJ-03.6 | A branch with proposals waiting | the overview opens | the branch shows *N proposals waiting*, opening that branch's proposals |

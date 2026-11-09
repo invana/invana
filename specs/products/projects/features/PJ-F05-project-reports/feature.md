@@ -7,7 +7,7 @@ personas: [decision-maker, analyst]
 stories: [PJ-14]
 journeys: [J03]
 boards: [projects.report]
-depends_on: [PJ-F03, DA-F01]
+depends_on: [PJ-F03, DS-F01]
 ---
 
 # Project reports
@@ -50,7 +50,7 @@ flowchart TD
 
 | Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
 |---|---|---|
-| Read the draft and every version · export a version | Operator — every member who can see the project | — |
+| Read the draft and every version · export a version | Operator — every member who can see the project; an export — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../../foundation/settings/product.md#decisions)) | — |
 | Draft from the records · edit the draft · publish a version | `contributor` · shown as *Can work on projects* · Admin | Every version reads; *Draft from the records*, *Edit* and *Publish* disabled, naming *Can work on projects* |
 
 ## States
@@ -78,7 +78,7 @@ flowchart TD
 | Read rendered | Headings, lists, bold and paragraphs in the kit's typography; a finding's cites as numbered marks listed once under *Cites*, a run as *run 8195c5e8*. *Read · Edit* switches the draft to its Markdown |
 | Export | Markdown — the version's body, or the draft's, as it reads; PDF — the browser's print of the rendered version |
 | An archived project | Its report reads; drafting, editing and publishing are off |
-| Leans on | Branches, findings and decisions (PJ-F03) · dataset versions and retraction (DA-F01) |
+| Leans on | Branches, findings and decisions (PJ-F03) · dataset versions and retraction (DS-F01) |
 
 ## Data touched
 
@@ -87,7 +87,7 @@ flowchart TD
 | The report — its draft, who last edited it and when | Write · read |
 | Report versions — number, body, the dataset versions cited, who published and when | Write · read |
 | The project's question, branches, findings, verdicts and decisions (PJ-F03) | Read |
-| Dataset versions and their retraction (DA-F01) | Read |
+| Dataset versions and their retraction (DS-F01) | Read |
 | History rows of every draft and publish (IN-F03) | Write |
 
 ## Decisions

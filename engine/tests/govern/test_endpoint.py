@@ -2,7 +2,7 @@
 
 ``is_default`` and ``agents.llm_config_id`` are both gone, so the cast is the
 only answer to *which model when nobody said*
-([ST-F05 § Decisions](specs/products/settings/features/ST-F05-ai-models/feature.md#decisions) ·
+([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions) ·
 [PM14](docs/for-developers/modules/agents/features/providers-and-models.md)).
 Two things have to be true for that to be safe: a Graph that cast nothing still
 runs, and a cast naming a model the Graph does not offer refuses rather than

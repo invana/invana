@@ -8,7 +8,7 @@ todos*. Builds on [agent-fabric.md](agent-fabric.md) and
 
 ## User stories
 
-SO-01–SO-07 are ST-17–ST-23 in [ST-F06 · Workers and limits](../../specs/products/settings/features/ST-F06-workers-and-limits/feature.md). SO-08 is PJ-15 in [PJ-F01 · Projects and tasks](../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md), with the pick-up rules.
+SO-01–SO-07 are ST-17–ST-23 in [ST-F06 · Workers and limits](../../specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md). SO-08 is PJ-15 in [PJ-F01 · Projects and tasks](../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md), with the pick-up rules.
 
 ## Decisions
 

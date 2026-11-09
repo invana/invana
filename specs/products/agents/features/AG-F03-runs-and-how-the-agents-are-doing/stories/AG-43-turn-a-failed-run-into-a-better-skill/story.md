@@ -45,6 +45,7 @@ flowchart LR
 | AG-43.5 | A run whose skill already has a draft | *Improve this skill* is pressed | the run is added as a test to that draft; a second draft is never made |
 | AG-43.6 | An Operator without *Can build agents* | they read a failed run | *Request a change* is in its place; it sends the skill's builder a request with the run attached, to *Needs you* |
 | AG-43.7 | A failed run that applied no skill | the step opens | *Improve this skill* is absent |
+| AG-43.8 | A proposed change to a skill from a failed run | it is shown | it names the change it recommends and why, beside the alternatives it weighed |
 
 ## Screens
 

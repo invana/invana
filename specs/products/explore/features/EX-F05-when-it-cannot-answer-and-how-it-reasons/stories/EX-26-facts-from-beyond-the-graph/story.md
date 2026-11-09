@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read third-party claims and nodes and their references, *Keep* a third-party node, allow third-party sources in a view of the graph, add and change search providers | — |
+| Admin | Read third-party claims and nodes and their references, *Keep* a third-party node, allow outside services in a view of the graph, add and change search providers | — |
 | Operator | Read third-party claims and nodes and their references | *Keep* disabled — *Ask Priya (owner)*; the rules and search providers read-only. With *Can work on projects*: *Keep*; with *Can shape the model*: the rules; as Owner: search providers |
 
 ## Flow
@@ -56,7 +56,7 @@ flowchart TD
 | EX-26.2 | A claim from beyond the Graph | it is shown in the words, on the canvas or in the panel | it is marked *Third-party ·* its source — internet, api, app, db, agent or model |
 | EX-26.3 | A third-party item from the internet | the person opens its reference | it shows the link, title, kind (website, document, file), domain and when it was fetched; the link opens in a new tab |
 | EX-26.4 | A third-party item with no reference | the answer is assembled | it is not shown |
-| EX-26.5 | A view of the graph whose rules do not allow third-party sources | a question needs outside facts | it is answered from the Graph alone and the trace says nothing was asked outside |
+| EX-26.5 | A view of the graph whose rules do not allow outside services | a question needs outside facts | it is answered from the Graph alone and the trace says nothing was asked outside |
 | EX-26.6 | A rule that refuses the search | the run plans it | the search is refused before it is sent, the step names the rule, and the words say *I'm not allowed to look that up here* in the agent's voice |
 | EX-26.7 | An agent not allowed to search | the question needs outside facts | no search is planned, and the words say it can only answer from the Graph here |
 | EX-26.8 | A source whose domain a rule refuses, or a page that does not load | the run fetches | that source is skipped and named on the step with its link; the others are used |

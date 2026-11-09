@@ -14,6 +14,7 @@ depends_on: []
 
 > Where an answer is looked at: a quiet, saved board that draws what the Graph holds, lets the analyst move around it,
 > pick things out and read the rows behind it — so they can judge what the answer says before deciding what to do with it.
+> The decision it helps make: *does this answer say what it seems to, and is it worth acting on?*
 
 ## User journey
 

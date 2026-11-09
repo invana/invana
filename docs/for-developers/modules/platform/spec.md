@@ -92,7 +92,7 @@ Inside a work panel, the bands are the same five everywhere:
 |---|---|
 | A selection opens a canvas | Picking a row draws its plan, its lineage, its DAG. Closing stays the tab's X |
 
-*Nothing autosaves in an editor* and *a pulsing dot means running* are in the [Shell product spec](../../../../specs/products/shell/product.md).
+*Nothing autosaves in an editor* and *a pulsing dot means running* are in the [Shell product spec](../../../../specs/foundation/shell/product.md).
 
 ## 3. Theming
 
@@ -101,7 +101,7 @@ Inside a work panel, the bands are the same five everywhere:
 | Structure is square, controls are slightly round | One radius token for controls, zero elsewhere |
 | Density is a theme concern | A dense inspector and an airy form use the same components at different sizes |
 
-Light and dark as equals, and colour carrying meaning once, are in [SH-F03](../../../../specs/products/shell/features/SH-F03-find-your-way/feature.md).
+Light and dark as equals, and colour carrying meaning once, are in [SH-F03](../../../../specs/foundation/shell/features/SH-F03-find-your-way/feature.md).
 
 ## 6a. Studio end-to-end tests
 

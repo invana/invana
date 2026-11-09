@@ -102,10 +102,10 @@ sequenceDiagram
 |---|---|
 | Rules and views is one sheet | Opened from Model: *Rules* (what must always hold) · *Views* (what agents may see) · *Requests* (asked of the model by people and agents), the open requests counted in its head |
 | A view narrows, never widens | A view may hide models, kinds and properties, slice a model, pick the AI model that decides and say what may leave. It never widens a rule on a property; one that would is refused at save, naming the rule |
-| Five layers | A view narrows along graph data · AI models · third-party sources · cache · people; worker capacity is not a layer |
+| Five layers | A view narrows along graph data · AI models · outside services · cache · people; worker capacity is not a layer |
 | Hidden is structural | A hidden property does not exist for the run — a query naming it is refused, and a whole record comes back without it. Nothing is filtered afterwards |
 | Only declared axes slice | A published model declares which property carries time, which carries place and which are selectable dimensions; it declares none until a person does. A view slices only along declared axes — any other is refused naming the model and the axis. The axes travel with the model's file, and a declared axis naming a property the model lacks is refused at import |
-| Default is the widest | A Graph with no view and no rule sees every published model, every AI model its owner configured and every third-party source its agents may use |
+| Default is the widest | A Graph with no view and no rule sees every published model, every AI model its owner configured and every outside service its agents may use |
 | Naming shares | A view made by retuning a run is private to that run. Naming it adds it to the Graph's views; the name field reads *Name it to add it to Views*. The name is unique in the Graph; only the first naming shares, a rename renames |
 | One view per run | A run composes the rules on properties, its agent's own bound and its view once, when it opens, and keeps that; a later edit reaches only the next run |
 | A view is picked, never typed | Every control offers what the Graph declares — published model versions, their axes, configured AI models, caches — with *any version* beside each exact version |

@@ -4,7 +4,7 @@ How Invana is put together, one level above the code: the parts it ships, the la
 every feature keeps. What it is for is [vision.md](../vision.md); its records are [data-model.md](data-model.md); what
 it talks to is [integrations.md](integrations.md). The engine's shape is [orchestration.md](orchestration.md) ·
 [governance-and-lens.md](governance-and-lens.md) · [runtime.md](runtime.md) · [observability.md](observability.md) ·
-[api-and-cli.md](api-and-cli.md) · one file per module in [modules/](modules/). The services and the engine's bands are drawn in
+[api-and-cli.md](api-and-cli.md) · one file per module in [modules/](modules). The services and the engine's bands are drawn in
 [architecture.svg](../../docs/for-developers/architecture.svg).
 
 ## The parts
@@ -61,7 +61,7 @@ flowchart BT
 | **Streaming is the default** | Steps and answers paint as they arrive, for a question and a load alike |
 | **Hard deletes, downward cascade** | No soft deletes, no trash, no undo. Retention removes whole windows, never single rows. Retire and retract exist where history must stay resolvable |
 | **The engine owns every number** | The engine computes and stores every number when the fact settles; Studio formats it, never derives it |
-| **Asks before it acts** | A write, a send, a spend or an access change waits on a person's yes, recorded as an approval |
+| **Acts only as far as the person allows** | Each act — a person's, an agent's or a key's — runs as Allow, Ask or Deny by the lines of the access rules it holds, checked by the engine when the step runs; an Ask waits on the yes of someone who holds Allow on it, recorded as an approval ([one access model](../foundation/settings/product.md#decisions)) |
 
 ## Metrics are stored
 

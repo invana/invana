@@ -109,15 +109,15 @@ export function WorldPicker({
 			appearance="inline"
 			side="top"
 			label="Ask in"
-			triggerAriaLabel="World"
+			triggerAriaLabel="View of the graph"
 			triggerClassName="shrink-0"
 			triggerIcon={Globe}
 			triggerTag={
-				nextAskOnly ? "next ask only" : missing ? "world deleted" : undefined
+				nextAskOnly ? "next ask only" : missing ? "view deleted" : undefined
 			}
 			tooltip={
 				missing && !nextAskOnly
-					? "This thread's world was deleted — it asks in Everything now."
+					? "This thread's view of the graph was deleted — it asks in Everything now."
 					: undefined
 			}
 			value={lensId ?? EVERYTHING}
@@ -134,7 +134,7 @@ export function WorldPicker({
 			actions={[
 				{
 					id: "manage",
-					label: "Manage worlds…",
+					label: "Manage views of the graph…",
 					icon: Settings2,
 					onSelect: onManage,
 				},

@@ -6,11 +6,11 @@ hide:
 
 # Invana
 
-## Graph Intelligence Platform
+**An ontology-governed decision intelligence platform for humans and AI agents.**
 
-**Structured knowledge graphs into interactive decision simulation environments.**
+One knowledge graph, one set of rules, for every thinker and the systems they build.
 
-Invana is an open-source platform that combines graph modelling, high-performance query execution, visual exploration, and decision simulation into a single tool. Connect to your graph database, model your domain ontology, query and visualize your data, and run simulations — all from one place.
+Invana is open source. People and agents work on the same knowledge graph, and the ontology governs both: agents do the work, the person decides, with evidence anyone can follow.
 
 <div class="grid cards" markdown>
 
@@ -42,7 +42,7 @@ Invana is an open-source platform that combines graph modelling, high-performanc
 
     ---
 
-    Run decision simulations with game theory, hypothesis testing, and parameter sweeps on your graph models.
+    Run a simulator on a project branch over pinned dataset versions, reproducible from its seed, and cite the result in a finding.
 
     [:octicons-arrow-right-24: Learn more](concepts/simulations.md)
 

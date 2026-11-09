@@ -202,7 +202,7 @@ def _flush() -> None:
 
 @click.group(cls=TracedGroup)
 def app() -> None:
-    """Invana — Graph Intelligence Platform."""
+    """Invana — An ontology-governed decision intelligence platform for humans and AI agents."""
     # Importing invana configured logging (and telemetry's OTLP handler on top);
     # the CLI only lowers the chatter to INFO, in place.
     set_level("INFO")

@@ -12,10 +12,11 @@ Usage::
     python3 .claude/skills/recommend/add.py take R004 --priority P2 --as "phase specs-accounts/P03"
     python3 .claude/skills/recommend/add.py take R005 --priority P3 --as "declined — covered by R002"
     python3 .claude/skills/recommend/add.py done R004
-    python3 .claude/skills/recommend/add.py list [--open] [--raised-in specs-accounts]
+    python3 .claude/skills/recommend/add.py list [--open] [--status taken] [--raised-in specs-accounts]
 
-``add`` refuses a title that is already in the table and prints the existing row's ID instead. ``done`` deletes a row
-once the work it was taken up as is done; a declined row is kept so it is not raised again. Standard library only.
+Every row carries a *Status* — ``open`` when raised, ``taken`` or ``declined`` once taken up, ``done`` once its work is
+done — and every write rewrites the counts line above the table. A row is never deleted, so an ID is never reused.
+``add`` refuses a title that is already in the table and prints the existing row's ID instead. Standard library only.
 """
 from __future__ import annotations
 
@@ -28,7 +29,11 @@ from pathlib import Path
 
 ROOT = Path(os.environ.get("CLAUDE_PROJECT_DIR") or Path(__file__).resolve().parents[3])
 FILE = ROOT / ".claude" / "team" / "agents-recommendations.md"
-HEAD = ["ID", "Date", "From", "Raised in", "Kind", "Severity", "Title", "Description", "Priority", "Taken up as"]
+HEAD = ["ID", "Status", "Date", "From", "Raised in", "Kind", "Severity", "Title", "Description", "Priority",
+        "Taken up as"]
+STATUSES = ["open", "taken", "declined", "done"]
+STATS = "<!-- stats: written by add.py -->"
+C = {name: i for i, name in enumerate(HEAD)}
 ROLES = ["product-manager", "project-lead", "designer", "coder", "qa", "security", "ravi"]
 KINDS = ["bug", "test", "docs", "security", "component", "debt", "idea"]
 SEVERITIES = ["blocker", "high", "medium", "low"]
@@ -43,7 +48,7 @@ def cell(value: str) -> str:
 def load() -> tuple[list[str], int, list[list[str]]]:
     """The file's lines, the index of the table's header line, and its rows as cell lists."""
     lines = FILE.read_text().rstrip("\n").split("\n")
-    head = next((i for i, ln in enumerate(lines) if ln.startswith("| ID | Date |")), None)
+    head = next((i for i, ln in enumerate(lines) if ln.startswith("| ID | Status | Date |")), None)
     if head is None:
         sys.exit(f"No recommendations table in {FILE.relative_to(ROOT)}")
     rows = []
@@ -59,6 +64,13 @@ def save(lines: list[str], head: int, rows: list[list[str]]) -> None:
     while end < len(lines) and lines[end].startswith("|"):
         end += 1
     lines[head + 2:end] = ["| " + " | ".join(r) + " |" for r in rows]
+    counts = " · ".join(f"{sum(r[C['Status']] == s for r in rows)} {s}" for s in STATUSES)
+    stats = f"{STATS}\n**{len(rows)} recommendations** · {counts}"
+    at = next((i for i, ln in enumerate(lines) if ln == STATS), None)
+    if at is None:
+        lines[head:head] = stats.split("\n") + [""]
+    else:
+        lines[at:at + 2] = stats.split("\n")
     FILE.write_text("\n".join(lines) + "\n")
 
 
@@ -74,12 +86,12 @@ def add(a: argparse.Namespace) -> None:
         sys.exit("--raised-in is `session`, `phase <project>/<ID>` or `project <name>`")
     lines, head, rows = load()
     title = cell(a.title)
-    if same := next((r for r in rows if r[6].lower() == title.lower()), None):
+    if same := next((r for r in rows if r[C["Title"]].lower() == title.lower()), None):
         print(f"{same[0]} already says this — add to it through the product manager, not a new row")
         return
     n = max((int(r[0][1:]) for r in rows if re.fullmatch(r"R\d+", r[0])), default=0) + 1
     rid = f"R{n:03d}"
-    rows.append([rid, dt.date.today().isoformat(), a.who, a.raised_in, a.kind, a.severity, title,
+    rows.append([rid, "open", dt.date.today().isoformat(), a.who, a.raised_in, a.kind, a.severity, title,
                  cell(a.description), "", ""])
     save(lines, head, rows)
     print(rid)
@@ -88,28 +100,33 @@ def add(a: argparse.Namespace) -> None:
 def take(a: argparse.Namespace) -> None:
     lines, head, rows = load()
     row = find(rows, a.id)
-    row[8], row[9] = a.priority, cell(getattr(a, "as"))
+    row[C["Priority"]], row[C["Taken up as"]] = a.priority, cell(getattr(a, "as"))
+    row[C["Status"]] = "declined" if row[C["Taken up as"]].startswith("declined") else "taken"
     save(lines, head, rows)
-    print(f"{a.id} · {row[8]} · {row[9]}")
+    print(f"{a.id} · {row[C['Status']]} · {row[C['Priority']]} · {row[C['Taken up as']]}")
 
 
 def done(a: argparse.Namespace) -> None:
     lines, head, rows = load()
     row = find(rows, a.id)
-    if not row[9] or row[9].startswith("declined"):
-        sys.exit(f"{a.id} is not taken up as work — a declined row stays")
-    save(lines, head, [r for r in rows if r[0] != a.id])
-    print(f"{a.id} closed")
+    if row[C["Status"]] != "taken":
+        sys.exit(f"{a.id} is {row[C['Status']]}, not taken up as work — only a taken row is done")
+    row[C["Status"]] = "done"
+    save(lines, head, rows)
+    print(f"{a.id} done")
 
 
 def show(a: argparse.Namespace) -> None:
     _, _, rows = load()
     for r in rows:
-        if a.open and r[9]:
+        if a.open and r[C["Status"]] != "open":
             continue
-        if a.raised_in and a.raised_in not in r[3]:
+        if a.status and r[C["Status"]] != a.status:
             continue
-        print(" · ".join(x for x in (r[0], r[2], r[3], r[4], r[5], r[6], r[8], r[9]) if x))
+        if a.raised_in and a.raised_in not in r[C["Raised in"]]:
+            continue
+        keep = ("ID", "Status", "From", "Raised in", "Kind", "Severity", "Title", "Priority", "Taken up as")
+        print(" · ".join(r[C[k]] for k in keep if r[C[k]]))
 
 
 def main() -> None:
@@ -132,7 +149,8 @@ def main() -> None:
     p.add_argument("id")
     p.set_defaults(fn=done)
     p = sub.add_parser("list", help="print the rows")
-    p.add_argument("--open", action="store_true", help="only rows not yet taken up")
+    p.add_argument("--open", action="store_true", help="only rows not yet taken up (status open)")
+    p.add_argument("--status", choices=STATUSES, help="only rows with this status")
     p.add_argument("--raised-in", default="", help="only rows whose Raised in contains this")
     p.set_defaults(fn=show)
     a = ap.parse_args()

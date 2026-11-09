@@ -1,7 +1,7 @@
 [project]
 name = "invana-engine"
 version = "0.0.0"
-description = "Invana — Graph Intelligence Platform"
+description = "Invana — An ontology-governed decision intelligence platform for humans and AI agents"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [

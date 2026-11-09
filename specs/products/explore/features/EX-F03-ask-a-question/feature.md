@@ -15,6 +15,7 @@ depends_on: [EX-F01]
 > How a person puts a question to the Graph — in plain words to the one assistant beside their work, or as a query
 > they type themselves — and gets asked back rather than guessed for, so the answer they decide on is to the question
 > they meant.
+> The decision it helps make: *is this the question I mean to ask?*
 
 ## User journey
 

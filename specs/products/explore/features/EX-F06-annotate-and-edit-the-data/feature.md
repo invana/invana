@@ -14,6 +14,7 @@ depends_on: []
 
 > What a person, or the assistant, says about the records — kept with them for whoever loads them next — and the fixes
 > made to the records themselves, held on the board until the person decides to save them to the Graph.
+> The decision it helps make: *which notes and fixes belong in the Graph, and which stay on the board?*
 
 ## User journey
 
@@ -92,7 +93,7 @@ sequenceDiagram
 |---|---|
 | An annotation is on data | It names the records it is about — a node, a relationship, one value, a set (highlight) or two or more nodes (group). Nothing free on the board |
 | One word | *Annotation*, with an author — a person or the assistant. Tools in Annotate: Annotate · Highlight · Group |
-| It belongs to the Graph | Kept by Invana against the records, never on a board and never in the customer's graph database; a read-only database can be annotated. Any board that loads a record shows its annotations |
+| It belongs to the Graph | Data keeps it as a record of the built-in *Annotation* kind ([DA-F07](../../../data/features/DA-F07-annotations/feature.md)); any board that loads a record shows its annotations |
 | A value annotation keeps its value | When the record's value differs it says *Was 71% when noted*; it never rewrites itself |
 | A deleted record | Its annotation is listed as *its record was deleted*, with what it said |
 | Reach | A person's annotations reach the Graph. The assistant's stay in their conversation until a person adds them to the Graph or dismisses them |
@@ -101,7 +102,7 @@ sequenceDiagram
 | Annotations are drawn with the data | Cards are laid out with the records, so none overlaps a node or another card, and an image export carries them; they are never counted, typed, exported as data or undone |
 | Unsaved is the board's history since the last save | Undo and Redo move it; what the engine brings in, an expansion, is never unsaved |
 | The model is the schema | The engine refuses a type or key the published model does not have, whatever Studio sends |
-| Leans on | EX-F01 — the board and the Element panel · EX-F02 — authored steps that show annotations · Model — the published model edits are checked against |
+| Leans on | EX-F01 — the board and the Element panel · EX-F02 — authored steps that show annotations · Model — the published model edits are checked against · Data — where annotations are kept and managed (DA-F07) |
 
 ## Data touched
 
@@ -116,7 +117,7 @@ sequenceDiagram
 
 | Decision | Detail |
 |---|---|
-| Annotations live in Invana, not the customer's database | Authorship and conversations are Invana's; a read-only graph database can still be annotated |
+| Explore creates, Data keeps | An annotation is made here, while investigating; finding, editing and removing every annotation in the Graph is Data's ([DA-F07](../../../data/features/DA-F07-annotations/feature.md)), which keeps them in Invana, never in the customer's graph database |
 | The assistant proposes, the person adds | The assistant's annotations are proposals in their conversation; only a person's *Add to the graph* makes them the Graph's |
 | Edits stage, then save as one run | Added · edited · deleted stay marked on the board until *Save n changes*; the save is one recorded run. A Cypher database writes it in one transaction; a Gremlin database writes edit by edit and stops at the first refusal, saying what was applied |
 | Unsaved marks | New: a dashed outline in the warning colour. Edited: a dot in the warning colour. Deleted: a faded, dashed ghost in place |

@@ -30,7 +30,7 @@ flowchart LR
   a --> c["Its name, version, skills and sign-in, as read"]
   c --> n["A name · the credential's name · the workers it calls from · limits"]
   n --> off(["Added, off"])
-  off -->|Turn on| on(["On — offered to agents' May delegate to, ask each time"])
+  off -->|Turn on| on(["On — offered to agents' May delegate to, Ask"])
   on -->|Read the card again| c
 ```
 
@@ -41,7 +41,7 @@ flowchart LR
 | AG-33.1 | An Admin | they give an outside agent's card address | its name, version, how it signs in and the skills on its card are read and shown before it is added |
 | AG-33.2 | A card that cannot be read | they add it | it says why, and nothing is added |
 | AG-33.3 | A card read | the Admin names it, the credential's name and the workers it calls from | it is added *off*, the card kept as it was read |
-| AG-33.4 | An outside agent | the Admin turns it on | agents' *May delegate to* offers it, *ask each time* by default, with the skills on its card |
+| AG-33.4 | An outside agent | the Admin turns it on | agents' *May delegate to* offers it, *Ask* by default, with the skills on its card |
 | AG-33.5 | A card changed on the other side | nothing is done | nothing changes until an Admin presses *Read the card again*; a skill the card has dropped refuses, naming the card's date |
 | AG-33.6 | An outside agent | it is read | it shows its endpoint, skills, credential name (never its value), workers it calls from, limits — time, attempts, tasks at once — and on or off |
 | AG-33.7 | An outside agent | it is listed with the graph's agents | it reads *outside*, is never offered a task, and holds no token budget of its own |

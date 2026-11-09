@@ -54,6 +54,7 @@ flowchart LR
 | EX-23.10 | A question asked back on a scheduled run | it is answered in Inbox › Needs you | the same run resumes; each firing's answer stays its own |
 | EX-23.11 | A question asked back | an agent tries to answer it | it is refused — only a person answers |
 | EX-23.12 | The run is cancelled while a question waits | it cancels | the question closes as unanswered and says so |
+| EX-23.13 | A question asked back with choices | it is shown | one choice is marked as the assistant's recommendation, with its reason in a line; the person answers with one click |
 
 ## Screens
 

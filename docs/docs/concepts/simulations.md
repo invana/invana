@@ -1,229 +1,59 @@
 # Simulations
 
-Invana's simulation engine lets you run decision models, game theory experiments, and hypothesis tests on your graph data. Define players, rules, strategies, and parameters — then simulate outcomes.
-
-## Concepts
-
-### The Simulation Loop
+Before you commit to an option, try it. A simulation runs a **simulator** over pinned dataset versions on a
+project **branch**, and ranks what is likely to work. Invana checks the simulator's fields, pins its inputs, runs it
+and labels the result — the simulator does the science; Invana never computes a figure itself.
 
 ```mermaid
-flowchart TD
-    A[Define Model] --> B[Set Parameters]
-    B --> C[Configure Players & Strategies]
-    C --> D[Define Rules & Constraints]
-    D --> E[Run Simulation]
-    E --> F{More parameter combinations?}
-    F -->|Yes| E
-    F -->|No| G[Analyze Results]
-    G --> H[Test Hypothesis]
+flowchart LR
+    B[A branch and its hypothesis] --> S[Simulate: pick the simulator, its fields, its inputs, a seed]
+    S --> C{Checked before it runs}
+    C -->|a field or an input is wrong| S
+    C -->|ok| R[A run: queued, then running]
+    R --> O[A ranked result, labelled derived]
+    O --> F[Add a finding that cites the run]
+    O --> D[Save as a derived dataset]
 ```
 
-### Models
+## How a simulation works
 
-A simulation model defines the structure of the game or decision environment. It maps to your graph ontology — nodes are entities, edges are relationships, and the simulation evolves the graph state over time.
-
-### Players
-
-Players are agents that act within the simulation. Each player has:
-
-- **Identity** — Name, type, attributes
-- **Strategy** — How they make decisions
-- **Objectives** — What they're optimizing for
-- **Constraints** — What they can and cannot do
-
-### Strategies
-
-Strategies define how players make decisions:
-
-| Strategy | Description |
+| Part | What it means |
 |---|---|
-| **Random** | Choose uniformly at random from legal moves |
-| **Greedy** | Choose the move with the best immediate payoff |
-| **Minimax** | Optimal play in zero-sum two-player games |
-| **Nash Equilibrium** | No player can improve by changing only their strategy |
-| **Custom** | Define your own decision function |
+| **A simulator is a plugin** | Each simulator plugin contributes one simulator. With none installed, *Simulate* is not shown |
+| **It runs on a branch** | A branch is one option of a project, with its hypothesis. Simulate it before you pursue, park or drop it |
+| **Fields** | The simulator declares its fields; Studio draws one control for each. A missing or mistyped field is refused before a run opens |
+| **Inputs are pinned** | Each input dataset is pinned by version and content. A version retracted since is refused before any record is read |
+| **Reproducible** | The seed is kept — Invana picks one when you give none. The same simulator version, fields, inputs and seed give the same result |
+| **A simulation is a run** | It runs under the Graph's rules, with its own run page, steps and tokens, in the same journal as every other run |
+| **Always derived** | Every result says its rows are predictions, not observations. Saved as a dataset, it is derived from the simulation's inputs |
+| **A record, never edited** | A simulation is kept as it ran. To change it, simulate again |
 
-### Rules
+## From a result to a decision
 
-Rules are declarative constraints evaluated on the graph state:
-
-```json
-{
-  "name": "No self-loops",
-  "condition": "source != target",
-  "applies_to": "all_edges",
-  "enforcement": "hard"
-}
-```
-
-| Enforcement | Description |
+| Step | What happens |
 |---|---|
-| `hard` | Violation prevents the action |
-| `soft` | Violation applies a penalty to the payoff |
+| **Add a finding** | A finding on the branch cites the simulation's run, for or against its hypothesis |
+| **See the impact** | The project's *Impact* tab walks 1, 2 or 3 hops out from the records an option's findings cite, so you see who a decision reaches before you commit |
+| **Decide** | The decision cites the findings; the trail runs back through the simulation to the dataset versions it read |
 
-### Parameters
+## Who can simulate
 
-Parameter spaces define the variables that change across simulation runs:
+| Role | Can |
+|---|---|
+| **Admin** | Simulate on any branch |
+| **Operator** | Simulate with *Can work on projects*; otherwise *Simulate* is disabled and says why |
 
-```json
-{
-  "parameters": [
-    {
-      "name": "cooperation_weight",
-      "type": "range",
-      "min": 0.0,
-      "max": 1.0,
-      "step": 0.1
-    },
-    {
-      "name": "network_size",
-      "type": "discrete",
-      "values": [10, 50, 100, 500]
-    }
-  ]
-}
-```
+## Simulators today
 
-Invana runs every combination (parameter sweep) and reports results for each.
+| Simulator | Predicts | Status |
+|---|---|---|
+| **Genomic prediction** | The progeny of every cross, ranked by how many meet every trait target | ✅ |
 
-## Example: Tic-Tac-Toe
+A new simulator is a plugin written against the simulator contract in the Plugin SDK.
 
-A complete example of modelling a game in Invana.
+## Not yet
 
-### 1. Define the Model
-
-```json
-{
-  "name": "Tic-Tac-Toe",
-  "description": "3x3 grid, two players, first to three in a row wins",
-  "node_types": [
-    {"name": "Cell", "properties": [
-      {"name": "row", "type": "integer"},
-      {"name": "col", "type": "integer"},
-      {"name": "state", "type": "string", "enum": ["empty", "X", "O"]}
-    ]},
-    {"name": "Board", "properties": [
-      {"name": "turn", "type": "integer"},
-      {"name": "status", "type": "string", "enum": ["playing", "X_wins", "O_wins", "draw"]}
-    ]}
-  ],
-  "edge_types": [
-    {"name": "HAS_CELL", "source": "Board", "target": "Cell"},
-    {"name": "ADJACENT", "source": "Cell", "target": "Cell"}
-  ]
-}
-```
-
-### 2. Define Players
-
-```json
-{
-  "players": [
-    {"name": "Player X", "strategy": "minimax", "symbol": "X"},
-    {"name": "Player O", "strategy": "random", "symbol": "O"}
-  ]
-}
-```
-
-### 3. Define Rules
-
-```json
-{
-  "rules": [
-    {
-      "name": "Valid move",
-      "condition": "cell.state == 'empty'",
-      "enforcement": "hard"
-    },
-    {
-      "name": "Win condition",
-      "condition": "three consecutive cells with same symbol in row, column, or diagonal",
-      "triggers": "set board.status to '{symbol}_wins'"
-    },
-    {
-      "name": "Draw condition",
-      "condition": "all cells filled and no winner",
-      "triggers": "set board.status to 'draw'"
-    }
-  ]
-}
-```
-
-### 4. Run Simulation
-
-```bash
-curl -X POST http://localhost:8000/api/v1/simulations/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "simulation_id": "sim_abc",
-    "runs": 1000,
-    "parameters": [
-      {"name": "player_o_strategy", "values": ["random", "greedy", "minimax"]}
-    ]
-  }'
-```
-
-### 5. Analyze Results
-
-```json
-{
-  "simulation_id": "sim_abc",
-  "total_runs": 3000,
-  "results": [
-    {
-      "parameters": {"player_o_strategy": "random"},
-      "outcomes": {"X_wins": 956, "O_wins": 12, "draw": 32},
-      "avg_moves": 6.2
-    },
-    {
-      "parameters": {"player_o_strategy": "greedy"},
-      "outcomes": {"X_wins": 634, "O_wins": 198, "draw": 168},
-      "avg_moves": 7.1
-    },
-    {
-      "parameters": {"player_o_strategy": "minimax"},
-      "outcomes": {"X_wins": 0, "O_wins": 0, "draw": 1000},
-      "avg_moves": 9.0
-    }
-  ]
-}
-```
-
-**Insight:** Minimax vs Minimax always draws — perfect play leads to a stalemate. This validates the game model.
-
-## Hypothesis Testing
-
-Formulate and test hypotheses against simulation results:
-
-```json
-{
-  "hypothesis": "Minimax strategy wins more than 80% against random",
-  "metric": "X_wins / total_runs",
-  "condition": "> 0.80",
-  "parameters": {"player_o_strategy": "random"},
-  "result": {
-    "observed": 0.956,
-    "passes": true,
-    "confidence": 0.99
-  }
-}
-```
-
-## Live Simulation Streaming
-
-For long-running simulations, progress is streamed via WebSocket:
-
-```
-WS /ws/simulation-stream
-
-→ {"action": "start", "simulation_id": "sim_abc"}
-← {"type": "progress", "run": 100, "total": 1000, "elapsed_ms": 2400}
-← {"type": "progress", "run": 200, "total": 1000, "elapsed_ms": 4800}
-...
-← {"type": "complete", "duration_ms": 24000, "results": {...}}
-```
-
-## What's Next?
-
-- [Algorithms](algorithms.md) — Use algorithms as simulation inputs
-- [Studio: Simulation Board](../studio/simulation-board.md) — Visual builder
+| Item | When |
+|---|---|
+| Parameter sweeps · game theory | After 1.0 |
+| What-if values per node | A simulator's job, when one models it |

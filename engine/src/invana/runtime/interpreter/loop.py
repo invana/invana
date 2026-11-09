@@ -456,7 +456,7 @@ class TaskRuntime:
 
         ``max_concurrent_runs`` on the budget bounds how many runs one agent is
         working at once, which is a different bound from the Graph's ceiling
-        ([ST-F06 § Decisions](specs/products/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
+        ([ST-F06 § Decisions](specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
         one bounds an actor, the other bounds the machine. Checked first so an
         agent at its own bound is told *that*, rather than queued behind a
         Graph ceiling it was never going to reach.

@@ -53,11 +53,11 @@ repos:
   - repo: local
     hooks:
       - id: specs-check
-        name: product specs follow the standard format (specs)
+        name: specs follow the standard format; surfaces match the vision (specs)
         entry: python3 scripts/specs/check.py
         language: system
         pass_filenames: false
-        files: ^(specs/|scripts/specs/)
+        always_run: true
 
       - id: edit-rights-matrix
         name: TEAM.md's edit-rights matrix matches edit-rights.json

@@ -7,10 +7,15 @@ The format is .claude/skills/product-spec/format.md. This script enforces the me
 required sections, IDs, story shape, the task table, cross-links, screen words and the no-history rule — so the
 product-manager agent and its reviewers can spend their judgment on what the spec says.
 
-A feature is a folder, ``products/<p>/features/<CODE>-F<nn>-<slug>/feature.md``; each of its stories is a folder under
+A spec area is a product (``products/<p>/``) or a part of the foundation every product uses (``foundation/<p>/``),
+both written the same way. A feature is a folder, ``<area>/<p>/features/<CODE>-F<nn>-<slug>/feature.md``; each of its
+stories is a folder under
 ``stories/<CODE>-<nn>-<slug>/`` holding ``story.md`` and ``task.md``. A story's status may not run ahead of its tasks,
 and a feature's status is the lowest of its stories'. Boards are checked against the Agent version canvas when it is
-built locally (`.design/` is not in git); without it the board check is skipped and says so.
+built locally (`.design/` is not in git); without it the board check is skipped and says so. A board is drawn once its
+story is designed, so an undrawn board is an error from `designed` up and a warning below it. A story or feature at
+`later` is parked, outside the ladder: a feature's status is the lowest of its stories that are not parked, or
+`later` when all of them are.
 """
 import re
 import sys
@@ -20,7 +25,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SPECS = ROOT / 'specs'
 CANVAS = ROOT / '.design' / 'canvas-agent-version' / 'project'
 
+AREAS = {'products': 'Products', 'foundation': 'Foundation'}
 STATUSES = ['idea', 'specified', 'designed', 'built', 'verified']
+LATER = 'later'  # parked: outside the ladder until it is taken up
 KEYS = {
     'product': ['id', 'title', 'status', 'owner', 'personas'],
     'feature': ['id', 'title', 'product', 'status', 'personas', 'stories', 'journeys', 'boards', 'depends_on'],
@@ -84,7 +91,7 @@ def kind_of(path):
     rel = path.relative_to(SPECS).parts
     if rel[0] == 'journeys':
         return 'journey'
-    if rel[0] != 'products':
+    if rel[0] not in AREAS:
         return None
     if len(rel) == 3 and rel[2] == 'product.md':
         return 'product'
@@ -112,6 +119,41 @@ def glossary_banned():
         cell = row.strip('|').split('|')[0]
         words += [w.strip(' *`') for w in re.split(r'[·,]', cell) if w.strip(' *`')]
     return [w for w in words if len(w) > 2]
+
+
+def check_surfaces():
+    """Hold every surface to the vision: the positioning and tagline each file carries, and the README's pillars.
+
+    The vision's *How Invana names itself* tables are the one home: the lines, and which file carries which. The
+    README's *Pillar* column may only name a pillar the vision lists, or the operating system.
+    """
+    vision = SPECS / 'vision.md'
+    rows = table_rows(section(vision.read_text(), 'How Invana names itself'))
+    lines = {r[0].strip('* '): r[2] for r in rows if len(r) == 3 and r[0].startswith('**')}
+    norm = lambda t: ' '.join(t.split()).lower()
+    for r in rows:
+        if len(r) != 4 or r[0] == 'Surface':
+            continue
+        for f in re.findall(r'`([^`]+\.[a-z]+)`', r[1]):
+            path = ROOT / f
+            if not path.exists():
+                err(vision, f'surface file `{f}` does not exist')
+                continue
+            text = norm(path.read_text())
+            for line in (r[2], r[3]):
+                if line in lines and norm(lines[line].rstrip('.')) not in text:
+                    err(path, f'does not carry the {line.lower()} word for word: "{lines[line]}"')
+    pillars = {r[0].strip('* ') for r in table_rows(section(vision.read_text(), 'Pillars and capabilities'))
+               if len(r) == 3 and r[0].startswith('**')}
+    readme = ROOT / 'README.md'
+    feats = table_rows(readme.read_text().split('## Core features', 1)[-1].split('\n## ', 1)[0])
+    if not feats or 'Pillar' not in feats[0]:
+        err(readme, '`## Core features` has no Pillar column')
+        return
+    col = feats[0].index('Pillar')
+    for r in feats[1:]:
+        if r[col] not in pillars | {'Operating system'}:
+            err(readme, f'pillar `{r[col]}` is not one the vision names ({", ".join(sorted(pillars))} or Operating system)')
 
 
 def check_story(path, fm, body, boards_cited):
@@ -148,7 +190,9 @@ def check_story(path, fm, body, boards_cited):
         if cells[1] not in ('Admin', 'Operator'):
             err(path, f'Screens lens `{cells[1]}` is not Admin or Operator')
         lenses.setdefault(cells[0], set()).add(cells[1])
-        boards_cited.update(c.split(' · ')[0].strip('` ') for c in cells[2:] if c not in ('—', '-', ''))
+        level = STATUSES.index(fm['status']) if fm.get('status') in STATUSES else 0
+        for b in (c.split(' · ')[0].strip('` ') for c in cells[2:] if c not in ('—', '-', '')):
+            boards_cited[b] = max(boards_cited.get(b, 0), level)
     for surf, ls in lenses.items():
         if ls != {'Admin', 'Operator'}:
             err(path, f'Screens `{surf}` needs a row for both Admin and Operator')
@@ -228,14 +272,15 @@ def main(write_index=False):
         fm, body = front_matter(path, path.read_text())
         docs[path] = (kind, fm, body)
 
-    ids, stories, tasks_of, boards_cited = {}, {}, {}, set()
+    ids, stories, tasks_of, boards_cited = {}, {}, {}, {}
     banned = glossary_banned()
+    check_surfaces()
     for path, (kind, fm, body) in docs.items():
         for k in KEYS[kind]:
             if k not in fm:
                 err(path, f'front-matter is missing `{k}`')
-        if 'status' in fm and fm['status'] not in STATUSES:
-            err(path, f'status `{fm["status"]}` is not one of {", ".join(STATUSES)}')
+        if 'status' in fm and fm['status'] not in STATUSES + [LATER]:
+            err(path, f'status `{fm["status"]}` is not one of {", ".join(STATUSES + [LATER])}')
         for s in SECTIONS[kind]:
             if s not in sections(body):
                 err(path, f'missing section `## {s}`')
@@ -270,7 +315,8 @@ def main(write_index=False):
                 err(path, f'journey id `{fid}` is not J<nn>')
             if '```mermaid' not in section(body, 'The journey'):
                 err(path, 'The journey needs a mermaid diagram')
-        boards_cited |= set(fm.get('boards', []))
+        for b in fm.get('boards', []):
+            boards_cited[b] = max(boards_cited.get(b, 0), STATUSES.index(fm['status']) if fm.get('status') in STATUSES else 0)
         for i, line in enumerate(body.splitlines(), 1):
             if HISTORY.search(line):
                 err(path, f'line {i}: history in a spec — say what is true now')
@@ -302,9 +348,10 @@ def main(write_index=False):
                 if sid not in on_map:
                     err(path, f'{sid} is not on the User journey diagram — label its step with the id')
         levels = [docs[p][1].get('status') for p in here.values()]
-        levels = [STATUSES.index(s) for s in levels if s in STATUSES]
-        if levels and fm.get('status') in STATUSES and STATUSES.index(fm['status']) != min(levels):
-            err(path, f'status `{fm["status"]}` is not the lowest of its stories (`{STATUSES[min(levels)]}`)')
+        live = [STATUSES.index(s) for s in levels if s in STATUSES]
+        want = STATUSES[min(live)] if live else (LATER if levels else None)
+        if want and fm.get('status') != want:
+            err(path, f'status `{fm.get("status")}` is not the lowest of its stories that are not parked (`{want}`)')
 
     known = set(ids)
     for path, (kind, fm, body) in docs.items():
@@ -323,8 +370,11 @@ def main(write_index=False):
 
     if CANVAS.exists():
         drawn = {p.name[:-8] for p in CANVAS.glob('*.dc.html')}
-        for b in sorted(boards_cited - drawn):
-            errors.append(f'board `{b}` is cited by a spec but is not on the canvas')
+        for b in sorted(set(boards_cited) - drawn):
+            if boards_cited[b] >= STATUSES.index('designed'):
+                errors.append(f'board `{b}` is cited by a designed spec but is not on the canvas')
+            else:
+                warnings.append(f'board `{b}` is not drawn yet')
     elif boards_cited:
         warnings.append('board check skipped — the Agent version canvas is not built locally')
 
@@ -348,9 +398,14 @@ def open_tasks(tasks):
 
 def index(docs, tasks_of):
     rows = []
-    products = sorted(((fm, p) for p, (k, fm, _) in docs.items() if k == 'product'), key=lambda x: x[0]['id'])
+    products = sorted(((fm, p) for p, (k, fm, _) in docs.items() if k == 'product'),
+                      key=lambda x: (list(AREAS).index(x[1].relative_to(SPECS).parts[0]), x[0]['id']))
+    area = None
     for fm, p in products:
-        rows.append(f'\n## {fm["title"]} · `{fm["id"]}` · {fm["status"]}\n')
+        if p.relative_to(SPECS).parts[0] != area:
+            area = p.relative_to(SPECS).parts[0]
+            rows.append(f'\n## {AREAS[area]}\n')
+        rows.append(f'\n### {fm["title"]} · `{fm["id"]}` · {fm["status"]}\n')
         rows.append('| Feature | Story | Title | Status | Open tasks |\n|---|---|---|---|---|')
         feats = sorted(((f, q) for q, (k, f, _) in docs.items() if k == 'feature' and f.get('product') == fm['id']),
                        key=lambda x: x[0]['id'])
@@ -366,7 +421,8 @@ def index(docs, tasks_of):
         rows.append('\n## Journeys\n\n| ID | Journey | Stories |\n|---|---|---|')
         rows += [f'| {f["id"]} | [{f["title"]}]({q.relative_to(SPECS)}) | {" · ".join(f.get("stories", []))} |' for f, q in journeys]
     (SPECS / 'README.md').write_text(
-        '# Invana product specs\n\nWhat Invana does and why — products, features, user stories and the tasks that '
+        '# Invana product specs\n\nWhat Invana does and why — products, the foundation every product uses, features, '
+        'user stories and the tasks that '
         'deliver them, journeys. Every spec follows one format and passes `python3 scripts/specs/check.py`. '
         'This index is generated by `python3 scripts/specs/check.py --index` — do not edit it by hand.\n'
         + ('\n'.join(rows) if rows else '\nNo specs yet.') + '\n')

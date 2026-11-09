@@ -32,11 +32,12 @@ stands for.
 | **Link between models** | A declared meeting of two models — the same entity, or a relationship across them | Stitch · anchor · relationship link |
 | **Constraint** | One property's range with a unit, or one standard's values, on one kind — Reject or Flag for review when a record breaks it | Property constraint (validation rule) |
 | **What the database holds** | The kinds, properties and counts read from the graph database, with when — compared with the model, never the model | Physical mirror · introspection |
+| **Records** | The Graph's nodes and relationships, each one of a kind in a published model; *Data* lists them by kind | Instance — node · relationship |
 | **Dataset** | Tables from one source under one authorship, shared across the install, in versions | Dataset |
 | **Version** | One immutable, hashed state of a dataset, model, skill or agent | Version |
 | **Add to this graph** | Load a dataset version into one of this Graph's models | Bind |
 | **Origin** | Where a dataset came from: official · collected · generated · observed · derived | Origin |
-| **Sensitivity** | public · internal · confidential · personal — on a dataset or a column | Sensitivity |
+| **Sensitivity** | public · internal · confidential · personal — on a dataset, a column or a property of a kind | Sensitivity |
 | **Retracted** | A dataset version withdrawn by its source, with a reason; kept, and everything citing it flagged | Retracted |
 | **Standard** | A shared, versioned set of terms, allowed values and required fields a dataset may claim | Standard |
 | **Checks** | How a dataset scores against the standard it claims, with what breaks it | Conformance · validation report |
@@ -54,9 +55,10 @@ stands for.
 | **Rule** | A statement that must always hold — on the install, a Graph or a project — checked block · warn · report | Rule · guardrail · invariant |
 | **Request** | What a person or an agent asked of the model — a rule refused it, the Graph could not answer it, or *Ask for a change* — kept until someone who can shape the model allows, drafts or declines it | Request |
 | **Retune** | Narrow or widen the view of the graph from a run, then ask again | Retune |
-| **What it may do** | The functions an agent or plan may run, with what arguments | Envelope |
+| **What it may do** | The functions an agent or plan may run, with what arguments, each with its mode | Envelope |
 | **Access rule** | Who may do what, as sentences: *Can ask*, *Can change data* | Policy |
-| **Asks first** | An agent that wants to send, change or spend waits in the Inbox, showing exactly what it will do | Approval |
+| **Allow · Ask · Deny** | The value on every line of an access rule, for people, agents and keys alike — it acts · it waits for a yes in the Inbox · it is refused, naming the line and who set it. What no line reaches is denied; where lines disagree, the strictest wins. Set only by a person, by hand on an item or on a rule's line | Mode · permission |
+| **Asks first** | An act a line sets to Ask — a person's or an agent's — waits in the Inbox, showing exactly what it will do, for someone who holds Allow on it | Approval |
 | **Token budget** | The tokens an agent, schedule or eval set may spend in a period — never currency | Budget |
 | **Workers · runs at once** | The machines that run work, and how many runs a Graph may have going | Pool · lane · worker |
 | **Worker group · Join key** | Workers that share labels and run the same kinds of step · the key a new worker joins a group with, shown once | Worker pool · join token |
@@ -74,13 +76,13 @@ stands for.
 | **Owner** | The Graph's settings, connection and AI providers, and the three grants above | `owner` |
 | **Can manage people** | Members, groups, access rules, other people's keys | `iam-admin` |
 | **Member** | A person or an agent with access to a Graph | Member · agent binding |
-| **Personal access token** | A long-lived credential a person mints for themselves, shown once | Token |
-| **Built in · Custom · A key's own · For everyone** | The kinds of access rule: the six grants, read-only · one written here · one that narrows a single key · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
+| **Key** | A long-lived credential a member mints for themselves, or for a service account; it acts as its holder, may be narrowed, expires, and is shown once | Personal access token |
+| **Built in · Custom · A person's own · A key's own · An agent's own · For everyone** | The kinds of access rule: the six grants, with their starting lines shown · one written here · one that narrows a single person · one that narrows a single key · one that narrows a single agent, from its sheet · the most anyone in the Graph may do, held without being given | Managed · custom · inline · boundary policy |
 | **Who holds it** | The people, groups, agents and keys an access rule reaches, and how — directly, via a group, for a run | Held by · attachments |
 | **Who it changes** | Before an access rule is saved: who gains, who loses, which skills would break | Impact |
 | **What it can do** | What an agent may actually do once every check is applied, with why not for each refusal | Effective access |
 | **Can someone do this?** | A check of whether a person, agent or key may do something to something, and which check decides; nothing runs | Test access |
-| **Service account** | A member with no sign-in that owns keys for scripts | Service account |
+| **Service account** | A member with no sign-in that owns keys for scripts; its keys start marked *agent-operated*, held to the rules agents are | Service account |
 | **Group** | People and agents in one Graph that hold access rules together | Group |
 | **Sign out here · Sign out everywhere** | End this device's session · every session of the account | Revoke refresh token(s) |
 
@@ -93,7 +95,7 @@ stands for.
 | **Why?** | The peek behind a citation: words → query → records → dataset | Reasoning trace |
 | **How it got here** | An agent result's steps, sources and assumptions, each marked *Challenge this* | Trace · run frames |
 | **Cannot answer** | The Graph does not hold it — said plainly, with who can help; never a failure | Cannot answer |
-| **Third-party** | From beyond the Graph — the internet, a connected source, the model's own knowledge — always with its reference | Third party |
+| **Third-party** | From beyond the Graph — the internet, an outside service, the model's own knowledge — always with its reference | Third party |
 | **Search provider** | A web search service a Graph adds, each an address a rule can name | Search provider |
 | **Act as · approach** | A method picked for one question — a scientist, a designer — with the assumptions it brings, shown before the run | Stance |
 | **Assumptions** | What an answer rests on that the Graph did not prove: proven · assumed · refused, each with what changes without it | Assumption ledger |
@@ -103,7 +105,7 @@ stands for.
 | **Suggested change** | A new version of a skill, plan, rule, criterion or template, with its evidence, waiting for a person in *Needs you* | Proposal (memory) |
 | **Annotation** | What a person or the assistant says about records, kept with the Graph | Annotation |
 | **Walkthrough · Presenting** | A board's answers replayed one step at a time; presenting is its read-only mode | Walkthrough |
-| **Agent** | A colleague that takes work, answers in threads and asks before acting | Agent |
+| **Agent** | A colleague that takes work, answers in threads and acts only as far as a person allows | Agent |
 | **Skill** | A playbook an agent may be offered, written as instructions | Skill |
 | **Function** | One operation a plan may call, from a plugin; read-only in Studio | Function (`namespace.verb`) |
 | **Plan · its steps** | How an agent carries work out, generated from instructions or packaged | Flow · Task |
@@ -112,7 +114,7 @@ stands for.
 | **Effort** | How hard an agent tries before it stops — steps, replans, questions back | Effort |
 | **Helper** | An agent another agent makes for one piece of work, inside that agent's bounds; it retires when the work closes | Ephemeral child agent · spawn |
 | **Outside agent** | An agent outside Invana, added by its agent card, that an agent may hand a task to | Remote agent · A2A |
-| **May delegate to** | The agents an agent may hand work to — always · ask each time · never | `may_delegate` |
+| **May delegate to** | The agents an agent may hand work to — Allow · Ask · Deny for each | `may_delegate` |
 | **Evals** | Fixed questions with checks, replayed before a skill or agent is published | Eval set |
 | **Model version** | A provider's exact model name, pinned by an agent or skill | Pin |
 | **Schedule** | An agent and instructions on a cron, with where the result goes | Schedule |
@@ -154,14 +156,14 @@ stands for.
 | **Met · unmet · needs a person** | A criterion's outcome on a result; *needs a person* when its check could not run | Criterion outcome |
 | **Accept · Send back** | A person closes a task on its result · reopens it, the note on the failing criterion | Accept · reject |
 | **A pass to judge · Good enough · Go again** | A loop's pass waiting on a person · settle it · run another, the note its input | Verdict (runtime) |
-| **Pick-up · Manual · Ask first · Automatic** | How agents take a project's tasks: only when assigned · asking a person first · on their own | Pick-up mode |
+| **Pick-up · Allow · Ask · Deny** | How agents take a project's tasks — the mode for starting one: on their own, where a person set and confirmed it · asking a person first · only when assigned | Pick-up mode |
 | **Claimed** | A task an agent has taken by pick-up, for a while; a lapsed claim returns it | Claim |
 | **Order** | A project's tab of its tasks in waves, by what each waits on | Plan canvas |
 | **Open · Assigned · In progress · Needs input · Blocked · In review · Done · Failed · Cancelled** | A task's state, read off its latest run; only the last three are written, by a person | Todo status (derived) |
 | **Needs you · Running · History** | The Inbox's three parts: what waits on the person, what runs, what people and agents did | Approvals and notifications · runs · ledger and events |
 | **Updates** | The notifications a rule sent the person, in the Inbox beside Needs you; they never toast | Notification |
 | **Done** | The Inbox's runs that ended today, beside Running | Settled runs |
-| **Send it · Not this time · Allow · Decline · Allow always** | The acts on an ask: a send · access, budget or a delegation · a delegation for good | Approve · decline · scope always |
+| **Send it · Not this time · Allow · Decline · Allow always · Decline for N days** | The acts on an ask: a send · access, budget or a delegation · a delegation for good · an ask for more, kept from coming back for up to 90 days | Approve · decline · scope always |
 | **Expired, not sent** | An ask nobody decided by its deadline, or whose run ended; nothing it held went | Expired approval |
 | **Notification rule · History alert** | Which events reach whom, in the Inbox and on which channels · which acts in History tell whom, in the Inbox | Notification rule · alert rule |
 | **Channel** | Where a notification leaves Invana — email, Slack or a webhook; *In app* is the Inbox, not a channel | Notification channel |
@@ -189,3 +191,4 @@ stands for.
 | Job · job run | Run |
 | Wizard · setup wizard | *Create a graph*, in steps |
 | Graph admin | Owner · Can manage people |
+| Personal access token · access key · API key | Key |

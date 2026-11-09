@@ -2,8 +2,8 @@ openapi: "3.1.0"
 info:
   title: Invana API
   description: |
-    Graph Intelligence Platform — API for ontology modelling, query execution,
-    graph database connections, and decision simulations.
+    An ontology-governed decision intelligence platform for humans and AI agents — API for models, queries, graph database connections,
+    agents, projects and simulations.
   version: "0.1.0"
   license:
     name: Apache 2.0

@@ -10,7 +10,7 @@ assistant on the right. Access spans every product and belongs to none.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [policies](policies.md) · [effective access](effective-access.md) · [people and groups](people-and-groups.md) · [tokens](tokens.md) · [the Agents shell](../../agents/features/the-agents-shell.md) · products: [iam.md](../../../../products/iam.md) · [shell.md](../../../../products/shell.md) |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/products/settings/features/ST-F02-people-and-access/feature.md) — ST-01 · ST-06; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-01 · ST-06; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

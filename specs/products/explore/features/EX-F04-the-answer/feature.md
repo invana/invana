@@ -14,6 +14,7 @@ depends_on: [EX-F01, EX-F03]
 
 > What a question gives back: a few cited words, then the drawing, table, number or chart the records call for —
 > watched as it is worked out and traceable to every record behind it — so the person can judge whether to act on it.
+> The decision it helps make: *does this answer hold up well enough to act on?*
 
 ## User journey
 

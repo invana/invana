@@ -49,7 +49,7 @@ flowchart TD
   out -->|outward approval on| ask["Inbox › Needs you — what will be sent"]
   ask -->|Send it| sent(["Sent to the channel"])
   ask -->|Not this time · deadline passes| held(["Not sent, saying why"])
-  out -->|outward approval off| sent
+  out -->|outward approval off — Allow, set by a person| sent
   list --> acts["AG-42 · Run now · Pause · Resume · Edit · Delete"]
   acts -->|Run now| run
 ```
@@ -110,7 +110,7 @@ sequenceDiagram
 | Missed firings | A firing reached more than five minutes late is missed. *Run once on recovery* (the default) runs the latest, marked catch-up, and keeps the rest as skipped · *Run every missed one* runs each, at most 24 · *Skip* runs none |
 | If the last run is still going | *Skip* (the default) skips the firing, saying so · *Run anyway* opens it |
 | Delivery follows the settled run | Inbox rows to the owner and recipients, and one delivery per channel. A failed run is delivered as a failure that opens the run, never dropped |
-| Outward deliveries ask first | A delivery to a channel waits in the Inbox for the approvers, else the owner, until its deadline (a day by default) — then it is not sent. A schedule may switch this off |
+| Outward deliveries ask | A delivery to a channel is Ask: it waits in the Inbox for the approvers, else the owner, until its deadline (a day by default) — then it is not sent. A person may set it to Allow ([the three modes](../../../../foundation/settings/product.md#decisions)) after seeing what goes where; the schedule records who set it. An edit, or the setter losing the right to set Allow, returns it to Ask (AG-42.19) |
 | Pause and resume | Pausing keeps every firing; a run going when paused finishes and is delivered. Resuming fires from now — what fell while paused is not missed, because nobody wanted it |
 | On whose behalf | The owner is whoever created the schedule; editing it never changes on whose behalf it runs |
 | A paused or retired agent | Its schedule's firings fail, naming the agent; the schedule stays on |
@@ -121,7 +121,7 @@ sequenceDiagram
 
 | Record | Read or write |
 |---|---|
-| Schedules — name, agent, instructions, repeat, zone, on or paused, missed and overlap choices, delivery, outward approval, approvers, owner, next run | Write · read |
+| Schedules — name, agent, instructions, repeat, zone, on or paused, missed and overlap choices, delivery, outward approval and who set it, approvers, owner, next run | Write · read |
 | Firings — when due, outcome, reason, catch-up or run now, the run, when delivered | Write · read |
 | The run each firing opens (AG-F03) | Write · read |
 | Inbox rows and outward-delivery asks (IN-F01) | Write · read |

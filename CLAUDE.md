@@ -1,6 +1,8 @@
-# Invana — Graph Intelligence Platform
+# Invana
 
-Structured knowledge graphs into interactive decision simulation environments.
+An ontology-governed decision intelligence platform for humans and AI agents ([vision](specs/vision.md)). Every agent — Invana's and
+the team's — follows the vision's [philosophy](specs/vision.md#how-invana-names-itself); for the team, the person who
+decides is Ravi.
 
 ## Talk is not a request to write
 
@@ -85,7 +87,7 @@ are the `build-studio` skill; how a board is drawn is `design-story`.
    file or module spec it governs (its Decisions table, present tense, no history); a new feature gets its index row
    and its own file. There is no RFC tree.
 1. **No code without complete implementation design decisions**, written down first (rule 0).
-2. Always ask when in doubt.
+2. **When in doubt, ask — with a recommendation:** the options, your pick and why.
 3. make the development setup work across operating systems for seamless community developer contributions. 
 4. Engine and Studio are built together, distributed flexibly (one image or separate).
 5. Don't write too many tests, write few positive and negative tests, not soo many random tests.

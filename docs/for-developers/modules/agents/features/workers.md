@@ -12,7 +12,7 @@ the engine says where steps wait and how many workers would clear them.
 | API / CLI / Studio | ✅ / ✅ / 🔵 |
 | Related | [distributed-execution](../../platform/features/distributed-execution.md) 13.11 (the envelope, the executor) · [tool-plugins](../../platform/features/tool-plugins.md) 13.12 (`invana worker` today) · [concurrency-and-contention](concurrency-and-contention.md) 5.7 (a Graph's slot pools — a different thing) · [tokens](../../identity-and-access/features/tokens.md) · options: [workers-and-orchestration](../../../building-engine/workers-and-orchestration.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) › Workers, AF-10 · AF-11 · [scale-out.md](../../../../products/scale-out.md) |
 
-Product spec: [ST-F06 · Workers and limits](../../../../../specs/products/settings/features/ST-F06-workers-and-limits/feature.md) — ST-24 · ST-25; the stories, their criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [ST-F06 · Workers and limits](../../../../../specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md) — ST-24 · ST-25; the stories, their criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

@@ -10,7 +10,7 @@ from, licensed, versioned and hashed, so a result can be reproduced from the exa
 | API / CLI / Studio | ✅ / 🟡 / ✅ |
 | Related | [retract-and-refresh](retract-and-refresh.md) · [bind-a-dataset](bind-a-dataset.md) · [change-log](../../operate/features/change-log.md) · products: [datasets.md](../../../../products/datasets.md) DS-01 · DS-02 · DS-03 · DS-04 · DS-12 · DS-F16 |
 
-Product spec: [DA-F01 · Datasets and their versions](../../../../../specs/products/data/features/DA-F01-datasets-and-their-versions/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F01 · Datasets and their versions](../../../../../specs/products/datasets/features/DS-F01-datasets-and-their-versions/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

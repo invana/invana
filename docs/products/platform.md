@@ -14,7 +14,7 @@ changes them. See [README › Two places](README.md#two-places).
 
 ## Stories
 
-SH-23 · AF-10 · AF-11 · AF-17 · AF-18 · AF-19 are ST-16 · ST-24 · ST-25 · ST-26 · ST-27 · ST-28 in [Settings](../../specs/products/settings/product.md).
+SH-23 · AF-10 · AF-11 · AF-17 · AF-18 · AF-19 are ST-16 · ST-24 · ST-25 · ST-26 · ST-27 · ST-28 in [Settings](../../specs/foundation/settings/product.md).
 
 ## Decisions
 
