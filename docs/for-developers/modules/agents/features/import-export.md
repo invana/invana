@@ -10,9 +10,9 @@ Export writes the same files back, so what Invana holds stays portable.
 | Index | [5.17](../../../README.md#5--agents) · Slice **S-TBD** |
 | Module | [Agents](../spec.md) |
 | API / CLI / Studio | 🔵 / 🔵 / 🔵 |
-| Related | [the Agent Builder](install-wide-agents-and-skills.md) · [authoring a skill](../../skills/features/authoring-a-skill.md) (SK23–SK25) · [instructions, publish and roll back](../../skills/features/instructions-publish-rollback.md) · [evals](../../skills/features/evals.md) · products: [agent-builder.md](../../../../products/agent-builder.md) AB-05, AB-06 |
+| Related | [the Agent Builder](install-wide-agents-and-skills.md) · [authoring a skill](../../skills/features/authoring-a-skill.md) (SK23–SK25) · [instructions, publish and roll back](../../skills/features/instructions-publish-rollback.md) · [evals](../../skills/features/evals.md) · products: agent-builder.md AB-05, AB-06 |
 
-Product spec: [AG-F02 · The agents catalogue](../../../../../specs/products/agents/features/AG-F02-the-agents-catalogue/feature.md) — AG-39 and AG-40; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F02 · The agents catalogue](../../../../../specs/capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md) — AG-39 and AG-40; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

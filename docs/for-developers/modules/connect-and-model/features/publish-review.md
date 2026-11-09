@@ -9,10 +9,10 @@ that would fail — and publishes only after **another member** approves it. Not
 | Index | [1.9](../../../README.md#1--connect-and-model) · Slice **B10** |
 | Module | [Connect and model](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Product | [modeller.md › Decisions](../../../../products/modeller.md#decisions) — *Publish review* · *Breaking data changes* · MO-05 · P-16 |
+| Product | modeller.md › Decisions — *Publish review* · *Breaking data changes* · MO-05 · P-16 |
 | Related | [domain-models](domain-models.md) · [model-editor](model-editor.md) · [approvals](../../operate/features/approvals.md) · [change-log](../../operate/features/change-log.md) · [roles](../../identity-and-access/features/roles.md) |
 
-Product spec: [MO-F02 · Change and publish a model](../../../../../specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F02 · Change and publish a model](../../../../../specs/capabilities/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

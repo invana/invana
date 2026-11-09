@@ -699,7 +699,8 @@ class TraceRead(BaseModel):
     #: none of them did, so the Cost tile is absent rather than `$0.00` (SR40).
     cost_usd: float | None = None
     #: The ceilings this run was dispatched under — the agent's effective
-    #: budget (SR41 · [AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
+    #: budget (SR41 ·
+    #: [AG-F01 § Decisions](specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
     #: ``None`` on a run with no agent, which has no ceiling to draw against.
     #: Token budgets; ``max_tokens`` is ``max_tokens_run`` under its old name
     #: and the money keys are answered as stored, both for one release.
@@ -708,7 +709,8 @@ class TraceRead(BaseModel):
     result: dict | None = None
     #: The world this run was asked under, and its name **as frozen**
     #: ([SR36](docs/for-developers/modules/operate/features/see-what-ran.md) ·
-    #: specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions). Both
+    #: specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+    #: Both
     #: ``None`` reads *Everything*, which is a real world and the default one —
     #: never a blank, which would read as *not recorded*. The name comes from
     #: ``lens_snapshot`` rather than from the row, so renaming a world does not
@@ -727,7 +729,7 @@ class TraceRead(BaseModel):
     error: dict | None = None
 
 
-# ── Prompt answers (specs/products/explore/features/EX-F04-the-answer/feature.md) ──
+# ── Prompt answers (specs/capabilities/explore/features/EX-F04-the-answer/feature.md) ──
 
 
 class AnswerPrompt(BaseModel):

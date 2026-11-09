@@ -10,7 +10,7 @@ know what they want to ask.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [ask-in-natural-language](ask-in-natural-language.md) · [the-answer-surface](the-answer-surface.md) |
 
-Product spec: [EX-F03 · Ask a question](../../../../../specs/products/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F03 · Ask a question](../../../../../specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

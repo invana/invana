@@ -74,4 +74,4 @@ grows it in the left panel.
 
 ## 7. Deliberately absent
 
-In [Explore › Not building](../../../../specs/products/explore/product.md).
+In [Explore › Not building](../../../../specs/capabilities/explore/product.md).

@@ -17,7 +17,7 @@ question asked back, a pull request returned. Inside a Graph agents still [deleg
 | API / CLI / Studio | 🔵 / 🔵 / 🔵 |
 | Related | [delegation](delegation.md) · [envelope-and-budget](envelope-and-budget.md) · [mcp-plugins](../../platform/features/mcp-plugins.md) · [approvals](../../operate/features/approvals.md) |
 
-Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-33 and AG-34; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-33 and AG-34; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

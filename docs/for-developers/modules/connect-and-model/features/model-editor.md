@@ -10,7 +10,7 @@ it is committed together.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [the-model-page](the-model-page.md) · [domain-models](domain-models.md) · [graph-canvas](../../explore/features/graph-canvas.md) · [selection-and-the-panel](../../explore/features/selection-and-the-panel.md) |
 
-Product spec: [MO-F02 · Change and publish a model](../../../../../specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F02 · Change and publish a model](../../../../../specs/capabilities/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

@@ -1,6 +1,6 @@
 # Telemetry — cleanup tracker
 
-What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (13.4) shipped (T1–T8 on
+What is left after [telemetry](telemetry.md) (13.5) and logging (13.4) shipped (T1–T8 on
 `feat/trace-studio-to-engine`). Work only these; do not start new telemetry features from here.
 
 **Status:** ✅ done · 🟡 open · ⏸ deferred on purpose · ❌ won't do.

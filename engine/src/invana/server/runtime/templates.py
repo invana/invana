@@ -1,7 +1,7 @@
 """Projection templates — authoring the mapping from a shape to a surface.
 
 A template is what stops the model from authoring markup
-(specs/products/explore/features/EX-F04-the-answer/feature.md § Decisions), so it is authored
+(specs/capabilities/explore/features/EX-F04-the-answer/feature.md § Decisions), so it is authored
 here, by a person, and versioned.
 
 Two things this router refuses:

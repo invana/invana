@@ -11,7 +11,7 @@ here.
 | Depends on | — |
 | Depended on by | everything: the global model is the grounding context for every question |
 
-Product spec: [Model](../../../../specs/products/model/product.md) — the product, its features MO-F01–F04, and the module-wide product rules and decisions live there. This file keeps the engine shape.
+Product spec: [Model](../../../../specs/capabilities/model/product.md) — the product, its features MO-F01–F04, and the module-wide product rules and decisions live there. This file keeps the engine shape.
 
 System design: [connect-and-model.md](../../../../specs/system-design/modules/connect-and-model.md) — the three layers, connecting and portability (§§ 2 · 4 · 5). This file keeps the vocabulary, what the module owns with how a model is stored, its decisions and the drawn states.
 
@@ -69,7 +69,7 @@ model onto it; the introspector reads back what is actually there. Neither write
 
 | # | Decision |
 |---|---|
-| CM7 | In Studio the module is two folders — `model/` is a model authored on its own, `stitch/` is what happens between two published ones. [code-shape.md](../../building-studio/code-shape.md) §4.1d. |
+| CM7 | In Studio the module is two folders — `model/` is a model authored on its own, `stitch/` is what happens between two published ones. code-shape.md §4.1d. |
 | CM8 | **Setup is derived from facts, never from a checklist someone ticks.** A section is done when the thing it asks for exists. The engine reads that at serialize time and reports it in `setup_state`; nothing has to be told a thing happened. This module owns the `graphs.setup_state` column and the derivation; **which steps there are, what they are grouped into and how they are drawn is [13.7 Setup](../platform/features/setup.md)**, which is where the six sections and their conditions are stated. |
 | CM9 | The only thing `setup_state` **stores** is a skip. A required section cannot be skipped, so it has no stored state at all; an optional one is `done` (derived), `skipped` (stored) or `todo`. `POST /setup/{section}` takes `skip` and `reset`, and reset clears the skip rather than un-doing the work. |
 | CM10 | **Projecting a model's DDL is a run.** Publishing pushes constraints and indexes through `project_model` (bound `schema_write`), not through the projector called from a route — the one schema write that still reached the database with no run behind it. |

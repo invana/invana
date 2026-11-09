@@ -162,7 +162,7 @@ def matches(pattern: str, address: str) -> bool:
     Segment-wise, with ``*`` taking one and ``**`` taking the rest. Nothing here
     is about precedence: a broader pattern and a narrower one both simply match,
     and which one *wins* is
-    [Model product § Decisions](specs/products/model/product.md#decisions)'s answer — deny, at any
+    [Model product § Decisions](specs/capabilities/model/product.md#decisions)'s answer — deny, at any
     specificity — decided by the caller and never by how long a pattern is.
     """
     pat = pattern.strip().split("/")

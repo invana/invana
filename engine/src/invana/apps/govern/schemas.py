@@ -2,7 +2,7 @@
 
 A lens reads back as **one object** — its rules grouped by layer, its cast, its
 ``as_of`` — because that is what an auditor is handed
-([Model product § Decisions](specs/products/model/product.md#decisions)). Nothing here composes a
+([Model product § Decisions](specs/capabilities/model/product.md#decisions)). Nothing here composes a
 world out of four requests.
 """
 
@@ -123,7 +123,7 @@ class LensListResponse(BaseModel):
     a second request would let the rules and the right to edit them arrive at
     different moments — which is the one moment a control could flicker into
     existence. The rules render for everyone either way
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions);
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions);
     this says whether the **authoring** controls are drawn at all.
     """
 
@@ -296,7 +296,7 @@ class AppliedDiffRead(BaseModel):
     ``differs`` names the fields of ``run_touches.applied`` that are not equal,
     and ``a`` / ``b`` carry only those fields — a reader is shown the difference,
     not two whole documents to find it in
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
     """
 
     differs: list[str]
@@ -320,7 +320,7 @@ class CompareRead(BaseModel):
     """Two runs, side by side. **The diff is the deliverable**, not the answers.
 
     Nothing is simulated and no answer is synthesised from another
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
     — which is
     also why comparing costs money and says so.
     """
@@ -332,7 +332,7 @@ class CompareRead(BaseModel):
     shared: list[str]
     #: Keyed by address, and only the shared addresses that differ — a
     #: participant both runs read the same way is in ``shared`` and says no more
-    #: (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+    #: (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
     differed: dict[str, AppliedDiffRead] = Field(default_factory=dict)
     counts: CompareCounts = Field(default_factory=CompareCounts)
 

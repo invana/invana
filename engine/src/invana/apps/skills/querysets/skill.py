@@ -56,7 +56,7 @@ class SkillQuerySet:
 
         What the seeder matches on: a person who renamed the builtin playbook
         has made it theirs, and a second copy beside it would be the product
-        arguing with them ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
+        arguing with them ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)).
         """
         stmt = select(Skill).where(Skill.graph_id == graph_id, Skill.name == name)
         return (await session.execute(stmt)).scalar_one_or_none()

@@ -11,7 +11,7 @@ degradation named the day it ships.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [pinned-model-versions](pinned-model-versions.md) · [change-log](../../operate/features/change-log.md) |
 
-Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-17, AG-22 and AG-28; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape, and who pins a model until ST-F05 is written.
+Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-17, AG-22 and AG-28; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape, and who pins a model until RT-F01 is written.
 
 ## Capabilities
 

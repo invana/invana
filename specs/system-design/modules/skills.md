@@ -1,9 +1,9 @@
-# Skills
+# Skills — `agents`
 
 The engine shape of what a run is **given** before it runs: a skill is a playbook offered to a step, versioned, and
-reached only through the agent that holds it. The product rules are [Agents](../../products/agents/product.md) and
-[AG-F04](../../products/agents/features/AG-F04-skills/feature.md); rules travel the same path and are
-[MO-F06](../../products/model/features/MO-F06-rules-agents-work-by/feature.md)'s. The agent is [agents.md](agents.md);
+reached only through the agent that holds it. The product rules are [Agents](../../capabilities/agents/product.md) and
+[AG-F04](../../capabilities/agents/features/AG-F04-skills/feature.md); rules travel the same path and are
+[MO-F06](../../capabilities/model/features/MO-F06-rules-agents-work-by/feature.md)'s. The agent is [agents.md](agents.md);
 the plan a skill draws as is [workflows.md](workflows.md) and [orchestration.md](../orchestration.md).
 
 ## Offered, not obeyed
@@ -13,7 +13,7 @@ the plan a skill draws as is [workflows.md](workflows.md) and [orchestration.md]
 | Shape | A playbook — how to approach something | One statement — what must hold |
 | Reaches a step | Through the agent that holds it | Through its scope — install, Graph or project |
 | Recorded per step | Offered · reported applied, by version | Offered · cited, by version |
-| Enforced | Never | Only where it carries a check, at the acts the check names ([MO-F06](../../products/model/features/MO-F06-rules-agents-work-by/feature.md)) |
+| Enforced | Never | Only where it carries a check, at the acts the check names ([MO-F06](../../capabilities/model/features/MO-F06-rules-agents-work-by/feature.md)) |
 
 - The gap between *offered* and *applied* is the signal a person acts on: rewrite the skill, or unbind it.
 - What must hold on a run is an envelope bound ([agents.md](agents.md)) or a criterion ([work.md](work.md)), never a skill.

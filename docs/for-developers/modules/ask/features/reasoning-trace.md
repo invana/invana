@@ -3,19 +3,19 @@
 The whole run, after the fact: every step with its prompt, its rationale, the query it generated, the
 records it read, what it cost, and which skills and rules it was offered.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
 | Index | [3.7](../../../README.md#3--ask) · Slice **S9c** |
 | Module | [Ask](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [streaming-and-the-workflow](streaming-and-the-workflow.md) (while it runs) · [evidence](../../memory/features/evidence.md) |
+| Related | [streaming-and-the-workflow](streaming-and-the-workflow.md) (while it runs) · evidence |
 
-Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F04 · The answer](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -36,5 +36,5 @@ Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/featu
 
 ## Decisions
 
-In [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) › Decisions.
+In [EX-F04 · The answer](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/feature.md) › Decisions.
 

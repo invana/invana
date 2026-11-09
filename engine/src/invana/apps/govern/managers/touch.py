@@ -193,7 +193,7 @@ class TouchManager:
 
         Two runs that each happened for real, placed side by side. Nothing is
         simulated and no answer is synthesised from another
-        (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
+        (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
         — every
         value here was recorded by a run that ran.
 
@@ -202,7 +202,7 @@ class TouchManager:
         *touched 2 · shared 2 · differed 0* for two runs where one sliced a type
         and the other rewrote its projection, so a shared address also carries
         **how** it differed
-        (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+        (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
         Only the fields that actually differ are listed: a participant both runs
         read identically is shared and says nothing more.
         """
@@ -239,7 +239,7 @@ class TouchManager:
 #: The fields of ``run_touches.applied`` a compare reads. Closed rather than
 #: derived from the documents, so a key one run happens to carry and the other
 #: does not cannot quietly become a difference nobody decided to report
-#: (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+#: (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
 _APPLIED_FIELDS: tuple[str, ...] = (
     "models",
     "select",

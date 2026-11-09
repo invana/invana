@@ -8,9 +8,9 @@ and tokens hold policies; nothing is allowed that no policy a holder has allows.
 | Index | [11.7](../../../README.md#11--identity-and-access) · Slice **I01** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [effective access](effective-access.md) · [people and groups](people-and-groups.md) · [tokens](tokens.md) · [roles](roles.md) · [the IAM product](the-iam-product.md) · [approvals](../../operate/features/approvals.md) · products: [iam.md](../../../../products/iam.md) IAM-01 · 02 · 03 · 04 · 05 · 06 · 10 · 11 |
+| Related | [effective access](effective-access.md) · [people and groups](people-and-groups.md) · [tokens](tokens.md) · [roles](roles.md) · [the IAM product](the-iam-product.md) · [approvals](../../operate/features/approvals.md) · products: iam.md IAM-01 · 02 · 03 · 04 · 05 · 06 · 10 · 11 |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-01 · ST-02 · ST-03 · ST-05 · ST-10 · ST-11; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [AC-F02 · People and access](../../../../../specs/os/access/features/AC-F02-access-rules/feature.md) — AC-03 · AC-04 · AC-05 · AC-06 · AC-11 · AC-08; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

@@ -252,7 +252,7 @@ class ContentionRead(BaseModel):
     """What is running in this Graph and what is waiting behind it.
 
     Contention has to be **visible**
-    (specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md):
+    (specs/os/runtime/features/RT-F03-workers-and-the-queue/feature.md):
     what is running, what is queued, and why. Without it, one agent starving the
     Graph looks exactly like the Graph being slow.
     """

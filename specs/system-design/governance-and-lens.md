@@ -2,9 +2,8 @@
 
 What may take part in a run, what did, and how a person tunes the difference. The **lens** declares what a run may
 see, use and send; the **touch record** proves what it did. The run it grounds is [orchestration.md](orchestration.md);
-where people set it is [MO-F05](../products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md).
-On screen a world is *a view of the graph* and a guardrail is *a rule* ([glossary.md](../glossary.md)). The loop,
-sub-world reasoning, cost and the run drawings are still argued in [governance.md](../../docs/for-developers/governance.md).
+where people set it is [MO-F05](../capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md).
+On screen a world is *a view of the graph* and a guardrail is *a rule* ([glossary.md](../glossary.md)).
 
 ## What it rests on
 

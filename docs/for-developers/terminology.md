@@ -1,6 +1,6 @@
 # Terminology
 
-The product's words, pinned. Every module spec, every screen and every API name uses these — and only
+The product's words, pinned. Every spec, every screen and every API name uses these — and only
 these. If a word is not here, it is not ours.
 
 ## How a feature is named
@@ -22,21 +22,19 @@ implementation and the description said the product.
 | **A feature's path follows only when the word goes** | a rename changes display names, and the feature file's slug stays: nobody reads it, and moving it breaks every link that points at it. It moves only when the product stops using the word altogether, as *roster* did ([AG12](modules/agents/features/author-an-agent.md)) — and then every link is fixed in the same commit |
 
 
-## How a module is named
+## How a package is named
 
-**A module is named for the records it holds — a plural noun — and has that one name in the docs,
-in Studio and in the engine.** `modules/<group>/<module>/` · `features/<module>/` · `apps/<module>/`
-and `server/<module>/`. The full map is [module-structure.md](module-structure.md) §2 and §3.
+**Every part of Invana is one package, with one name from its spec folder to its boards.** The operating system's
+parts are `graphs` · `access` · `runtime`; the capabilities are `model` · `data` · `datasets` · `agents` · `explore` ·
+`projects`. The names, the form each takes in every layer and the settled clashes are
+[One name across layers](../../specs/system-design/architecture.md#one-name-across-layers) — the only source; this
+file never restates them.
 
 | Rule | |
 |---|---|
-| A **plural noun** | `models` · `agents` · `runs` · `lenses` · `plans` · `projects`. Never a verb phrase — *bring data in*, *connect and model*, *operate* name what a person does, which is a feature's register, not a module's |
-| **Singular** only for one surface or a mass noun | `explorer` · `assistant` · `memory` · `setup` · `runtime` · `tooling` · `design` |
-| A **qualifier stays** where the word needs it | `graph-connectors` — *connector* alone is never ours ([§8](#8-words-we-do-not-use)). The engine's `graph/connectors/` keeps its name |
-| **One name, three layers** | a Studio folder, an engine app and a docs module that name one thing name it the same way. A band (`core`, `runtime`, `activity`) keeps its own name; a module whose records live in one takes only `server/<module>/` |
-| The **`leftNav` label may differ** | the label says what a person does there, the module names what it holds: *Govern* → `lenses`, *Library* → `plans`, *Model* → `models` |
-| A **group** orders the docs | *Data · Exploration · Answers · Work · Orchestration · Governance · Platform* — a folder level in `docs/for-developers/modules/` only |
-| A **feature number is permanent** | it moves with the feature file and is never reused — `5.1` is providers-and-models wherever it lives, like a decision ID (`SR7`) |
+| A **package** is named for the part, a **feature** for what a person does | `access` holds *Sign in*; `datasets` holds *Bring data in*. A verb phrase is a feature's register, never a package's |
+| A **docs path keeps its slug** until its package is renamed | `modules/<old-slug>/` folders under `for-developers/` keep their paths: code cites them. They move with the package renames, and every link is fixed in the same commit |
+| A **feature number is permanent** | it moves with the feature file and is never reused — `5.1` stays what it named, like a decision ID (`SR7`) |
 
 ## 1. The overloaded word
 
@@ -54,13 +52,13 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | Term | Means |
 |---|---|
 | **Graph** | The bounded domain and the reasoning boundary. An agent never crosses it. One Graph binds to exactly one graph database. |
-| **Graph settings** | A product of the Graph: **General** · **Connection** · **Members** (people and agents) · **Usage**. LLM providers and each Graph's lanes are the platform's **Settings**. [1.12](modules/connect-and-model/features/graph-settings.md) |
-| **Settings** | The platform's configuration, off any Graph: **Graph limits** · **LLM providers** · **Plugins** · **MCP servers** · **Remote agents**. Never "Install settings". [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
-| **Platform** | The products off any Graph — Home, Datasets, Agent Builder, Fleet, Settings. They carry no Graph picker. The other place is **a Graph**. A Graph's products are Explorer, Modeller, Projects, Activity, IAM and Graph settings. |
-| **Fleet** | The platform's worker pools and their workers. Never the agents: their health is the Agent Builder's **Overview**. [5.15](modules/agents/features/workers.md) |
-| **Agent Builder** | The platform product where agents and skills are built and versioned, and where their health across Graphs is read: Overview · Agents · Skills · Functions · Library · Performance · Import and export. A Graph has no Agents product. [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
+| **Graph settings** | The open Graph's own settings — **General** · **Connection** · **Members** (people and agents) · **Usage** — part of Graph (`graphs`), shown as *Settings › This graph*. [GR-F04](../../specs/os/graph/features/GR-F04-this-graph/feature.md) |
+| **Install settings** | The install's configuration, off any Graph — each Graph's limits, AI models, plugins, MCP servers and outside agents — shown as *Settings › Invana*. Limits, models and plugins are Runtime's (`runtime`); outside agents are Agents' (`agents`) |
+| **Operating system** | What runs every install: Graph · Access · Runtime — the packages `graphs` · `access` · `runtime`. A vision and docs word; in code its parts are packages beside the capabilities |
+| **Capability** | What a person works in: Model · Data · Datasets · Agents · Explore · Projects — the packages `model` · `data` · `datasets` · `agents` · `explore` · `projects`, grouped by pillar. A vision and docs word |
+| **Worker pool** | The install's workers, in groups that share labels — Runtime (`runtime`), [RT-F03](../../specs/os/runtime/features/RT-F03-workers-and-the-queue/feature.md). On screen *Workers*. How each agent is doing is Agents' (`agents`), never the pool's |
 | **Rule** | One statement that is always true, scoped `install`, `graph` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. [6.4](modules/skills/features/rules.md) |
-| **Library** | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. One `leftNav` item, three sections ([G41](building-studio/graph-detail-page.md)). Never the journal — that is **Runs**. |
+| **Library** | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. One `leftNav` item, three sections (G41). Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. On disk it is an **Agent Skills folder** — `SKILL.md` plus `references/`, `scripts/`, `assets/` — stored whole per version; its **plan** is the compiled form workers run. [6.1](modules/skills/features/authoring-a-skill.md) |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model, a dataset. A draft is not a version. [10.6](modules/operate/features/change-log.md) |
 | **Change log** | Every version of every versioned record — who, when, why, the diff, the effect after. It is the Events list narrowed to the events that mint a version, never a second record. A **change** is one such event. Never "audit log" for this narrower list, never "revision history". |
@@ -69,7 +67,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Eval set** | A skill's or agent's fixed questions, each with **checks**: rule checks are hard and counted; a **judged** score comes from a pinned judge model and is labelled, never mixed with them. [6.6](modules/skills/features/evals.md) |
 | **Pin** | An exact model version name an agent, skill version or judge thinks with — `claude-opus-5-5`, never an alias. Moving one is a change. [5.9](modules/agents/features/pinned-model-versions.md) |
 | **Graph connector** | The package that speaks to one graph database — `invana-neo4j`, `invana-janusgraph`. Always qualified. |
-| **Setup** | The *sequence* a Graph walks from created to answering — four required steps and two optional ones, derived from facts and never ticked. [SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) |
+| **Setup** | The *sequence* a Graph walks from created to answering — four required steps and two optional ones, derived from facts and never ticked. [GR-F02](../../specs/os/graph/features/GR-F02-create-a-graph/feature.md) |
 | **Onboarding wizard** | The *surface* that walks it: the stepper and the selected step's lesson, on the graph page. Reopened any time from the graduation cap in `header.right`. Setup is the state; the onboarding wizard is where you walk it. Never "the setup wizard", never "the tour", never "onboarding flow" |
 | **Setup step** | One of them. `done · next · todo · blocked · skipped · broken`. |
 | **Gate** | A group of setup steps, named for what it unlocks: **Connected** · **Grounded** · **Answering**. |
@@ -90,7 +88,7 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Anchor** | A declared link saying two types are the same entity (`Publisher.code ≡ Sponsor.publisher_code`), resolved by a key on each side. It links; it never merges. |
 | **Relationship link** | A declared cross-model edge type (`Article -[MENTIONS]-> Drug`). Its endpoints come from a key on each side *or* from a dataset — never both. Never inferred. |
 | **Global model** | The read-time union of every published model plus its links. Derived, never stored, never edited. The **widest** grounding context — what a run sees when no lens narrows it. |
-| **Lens** | What a run may **see**, **use** and **send** — pinned for one run and frozen onto it. It narrows **five layers**: `graph data` (model versions, stitches, datasets, and slices of them), `llm` (which models, bound to roles by a **cast**), `third party` (apps, APIs, databases, peer agents — and what may be sent to each), `cache` and `human`. One record with two jobs, told apart by `kind`: a **guardrail** is pinned on the Graph or an agent and always in force; a **world** is named and picked per question. Naming an unnamed lens is what shares it. Never "scope" — `rules.scope` is a different thing; never "ground" — *Grounded* is a setup gate. [govern/spec.md](modules/govern/spec.md) · [orchestration § 0.9](orchestration.md#09-grounding-a-run--the-lens) |
+| **Lens** | What a run may **see**, **use** and **send** — pinned for one run and frozen onto it. It narrows **five layers**: `graph data` (model versions, stitches, datasets, and slices of them), `llm` (which models, bound to roles by a **cast**), `third party` (apps, APIs, databases, peer agents — and what may be sent to each), `cache` and `human`. One record with two jobs, told apart by `kind`: a **guardrail** is pinned on the Graph or an agent and always in force; a **world** is named and picked per question. Naming an unnamed lens is what shares it. Never "scope" — `rules.scope` is a different thing; never "ground" — *Grounded* is a setup gate. [govern/spec.md](modules/govern/spec.md) · orchestration § 0.9 |
 | **World** | A **named** Lens — a reusable narrowing people pick per question and compare. Never a *subgraph*, which is an [emission](#4-asking-and-answering). |
 | **Guardrail** | A Lens pinned on the Graph or an agent, always in force, on its own surface. A world narrows it and can never widen it. Not a permission on a person. |
 | **Layer** | One of five classes of participant a run may engage. Never a **lane**, which is one parallel element of a fan-out. |
@@ -117,14 +115,14 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 
 | Term | Means |
 |---|---|
-| **Todo** | What a person wrote — the only thing a user authors. Prose, criteria, an optional assignee and due date. It has no status of its own: its state derives from its runs, and only acceptance is stored. [§6](#6-work) |
+| **Todo** | What a person wrote — the only thing a user authors. Prose, criteria, an optional assignee and due date. It has no status of its own: its state derives from its runs, and only acceptance is stored. [§6](#6-projects-and-schedules) |
 | **Flow** | A flow of Tasks — the thing that carries a Todo out. The record is `Flow` (table `flows`, route `/flows`). Three origins: `generated` · `packaged` · `promoted`. A **reusable** flow (`reusable = true`) is one the library lists and a run may select; there is no separate *workflow*. On screen a listed flow is a **plan** (*Packaged plans*, *Plan · route-audit r9*) and its drawing is its **Flow** tab. |
 | **Task** | One node inside a Flow: `callable` · `composite` · `human`. **Never a thing a user authors** — a Task cannot exist outside a flow. Users see *step*; the record is a `Task`. Its `key` is a plain identifier — by default its function with dots as underscores (`nl_translate`) — and is what `${steps.<key>.<output>}` binds against. |
-| **Function** | One operation a Task may call, from a plugin, named **`namespace.verb`** — `graph.read.query`, `nl.translate`, `web.read_url`. A Task names it as `step_key`. One bound per function. **Install-wide and read-only**: code from a plugin an install Admin enables, or from a **library** whose proposed functions an install Admin approves — never authored or edited in Studio or copied into a Graph; skills use them, and builders read them. [the function library](../products/agent-fabric.md#the-function-library) |
+| **Function** | One operation a Task may call, from a plugin, named **`namespace.verb`** — `graph.read.query`, `nl.translate`, `web.read_url`. A Task names it as `step_key`. One bound per function. **Install-wide and read-only**: code from a plugin an install Admin enables, or from a **library** whose proposed functions an install Admin approves — never authored or edited in Studio or copied into a Graph; skills use them, and builders read them. the function library |
 | **Step** | A Task in the role of a child — the authoring format writes `steps:`. A role, not a second record. |
 | **TaskRun** | One execution. Its `role` says what the execution is for: `execute` · `plan` · `evaluate`. A delegated child is a TaskRun carrying `parent_run_id`. The word is now literal — a run is a TaskRun. |
 | **Kind** | What a Flow is *about*: `ask · import · bulk · stitch · model · enrich`. The subject, and what the journal filters on. Never *how* it executes — that is `form` on a Task — and never *what the run is for* — that is `role`. |
-| **Catalogue** (of functions) | Engine word — `runtime/catalogue`, `GET …/catalogue/{step_key}` — for the closed set of **functions** a flow may name by `step_key`; in product copy it is just *Functions*. In the product, *Agents catalogue* is the install's agents and skills. The set is grouped by the bound each spends. Closed is the point: a planner that could invent a callable could escape any ceiling. [orchestration § 0.6](orchestration.md#06-the-catalogue--what-a-plan-may-name) |
+| **Catalogue** (of functions) | Engine word — `runtime/catalogue`, `GET …/catalogue/{step_key}` — for the closed set of **functions** a flow may name by `step_key`; in product copy it is just *Functions*. In the product, *Agents catalogue* is the install's agents and skills. The set is grouped by the bound each spends. Closed is the point: a planner that could invent a callable could escape any ceiling. orchestration § 0.6 |
 | **Emission** | One thing a step produced — a subgraph, table, metric, chart or prose block. An answer is its emissions. |
 | **Run frame** | One frame of a TaskRun's stream: a Task transition, a reasoning line, an emission arriving. `TaskStream` is the log of them, and its `seq` is the resume cursor. |
 | **Session** | A named thread of asks, assigned to an agent. It references Todos; it is not one — a conversation never runs and has no outcome. |
@@ -147,34 +145,31 @@ and `server/<module>/`. The full map is [module-structure.md](module-structure.m
 | **Section** | One collapsible, resizable part of a stacked view panel — the kit's `PanelStackSection`, with its own header, count, search and drill-in. The Agents view panel has two: **Agents** and **LLMs**. Never a *drawer*: nothing in Studio slides over anything. |
 | **Assistant** | The one conversational surface, available everywhere, holding the current selection. Its panel is titled **Ask Assistant** — the noun is *Assistant*, the panel's name says whose. |
 | **Soul** | Who an agent is and how it speaks — Markdown on the agent, read only by the steps whose words a person reads. Never *persona*, never *character*: a soul changes words, not what runs. [5.8](modules/agents/features/soul.md) |
-| **Third-party** | Anything that is not from the Graph: from an outside service — the **internet**, or an `api`, `app`, `db` or `agent` the Graph connects — or from the **model**'s own knowledge. Always badged `third-party · <source>` and always carrying its reference: the link for the internet, the locator for any other source. [3.13](modules/ask/features/beyond-the-graph.md) |
+| **Third-party** | Anything that is not from the Graph: from an outside service — the **internet**, or an `api`, `app`, `db` or `agent` the Graph connects — or from the **model**'s own knowledge. Always badged `third-party · <source>` and always carrying its reference: the link for the internet, the locator for any other source. 3.13 |
 | **Inspector** | The surface that states what is selected and edits it. The canvas selects; the Inspector edits. |
 | **Console** | The rows behind a drawing, and the query that drew them. |
 | **Annotation** | What a person or the assistant says about the graph's records — on a node, a relationship, one of its values, a set or a group of them — kept with the Graph, so every board that loads the records shows it. Its kinds are the anchor's shape; never *note*, *callout* or *comment* as separate things, and never a shape drawn free on the board. [4.8](modules/explore/features/annotations.md) |
 | **Walkthrough** | A board's answers replayed one **step** at a time — each step is the reply that drew it. *Presenting* is its read-only mode. [4.6](modules/explore/features/walkthrough.md) |
-| **Runs** | The journal of every TaskRun in a Graph — newest first, delegated children nested under their parent. **Imports** is this journal with `kind in (import, bulk)` preselected, and a Todo's `Runs` tab is it filtered to one Todo. Never "Jobs", never "Thoughts". **This renames the surface**: *Runs* was forbidden while a run was called a thinking; now `TaskRun` is the record and the journal takes its name. [10.5](modules/operate/features/see-what-ran.md) |
-| **Activity** | The Graph product for what happened in it: **Runs** · **Approvals** · **Ledger** │ **Schedules** · **Events** · **Inbox** · **Rules** · **Channels**. [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
-| **Events** | The tree of writes — who wrote what, on whose behalf. Runs lists runs; Events lists writes. Neither is the other. [10.2](modules/operate/features/audit-and-activity.md) |
-| **Explorer** | The screen the canvas is on — the `leftNav` item, the breadcrumb crumb and the `Explorer · …` artboards all name the same thing: the canvas, and what is selected on it. It is not the page (the graph's URL is the page) and it is not the tab strip (that is Boards). |
+| **Runs** | The journal of every TaskRun in a Graph — newest first, delegated children nested under their parent. **Imports** is this journal with `kind in (import, bulk)` preselected, and a Todo's `Runs` tab is it filtered to one Todo. Never "Jobs", never "Thoughts". **This renames the surface**: *Runs* was forbidden while a run was called a thinking; now `TaskRun` is the record and the journal takes its name. Read in Agents (`agents`), [AG-F03](../../specs/capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md). [10.5](modules/operate/features/see-what-ran.md) |
+| **Events** | The tree of writes — who wrote what, on whose behalf; on screen *History*, Access's (`access`). Runs lists runs; Events lists writes. Neither is the other. [10.2](modules/operate/features/audit-and-activity.md) |
+| **Explore** | The mode the canvas is on — the Explore capability (`explore`): its boards, its conversations, the canvas and what is selected on it. It is not the page (the graph's URL is the page) and it is not the tab strip (that is Boards). |
 
 ### The shell's regions
 
 Seven words, and only these, name a place on screen. They are `AppLayoutV2`'s prop names — the kit
-owns them, so code, docs, artboards, URLs and e2e locators all say the same thing. The diagram, the
-sub-slots, the URL params and the retired words are in
-[building-studio/the-shell.md](building-studio/the-shell.md#the-regions--and-their-names).
+owns them, so code, docs, artboards, URLs and e2e locators all say the same thing.
 
 | Region | Is |
 |---|---|
 | **`header`** | the full-width top bar — `header.left` · `header.center` · `header.right` |
-| **`leftNav`** | the icon column — one icon per module that has a `leftSection` panel ([module-structure.md](module-structure.md) §2) |
+| **`leftNav`** | the icon column — one icon per mode or overlay that has a `leftSection` panel |
 | **`leftSection`** | the resizable left column — holds the open panel |
 | **`mainSection`** | the open pages |
 | **`rightSection`** | the resizable right column — the Inspector, or the Assistant |
 | **`bottomSection`** | the resizable bottom column — the Console |
 | **`footer`** | the full-width status bar — `footer.left` · `footer.right` |
 
-## 6. Work
+## 6. Projects and schedules
 
 | Term | Means |
 |---|---|
@@ -208,8 +203,8 @@ sub-slots, the URL params and the retired words are in
 |---|---|
 | **Principal** | Who acted: `user · agent · system · external · anonymous`. |
 | **Agent** | A principal that can be assigned work, carrying provider, model, skills, envelope and budget. Built and versioned at the install, in the **agents catalogue**; a Graph invites it as a member and gives it access, never its definition, budget or instructions. |
-| **Agents catalogue** | The install's agents and skills, built and versioned there by an install Admin; nothing runs from it. A Graph adds agents from it, never skills. [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
-| **Core agent · core skill** | Shipped with the engine, versioned with its release, added to every Graph and never removed from it: the Explorer, Modeller, Data and Agents assistants; the dialect skills (Cypher query, Gremlin query) chosen by the connector's languages; natural-language query. [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
+| **Agents catalogue** | The install's agents and skills, built and versioned there by an install Admin — the Agents capability (`agents`); nothing runs from it. A Graph adds agents from it, never skills. [AG-F02](../../specs/capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md) · [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
+| **Core agent · core skill** | Shipped with the engine, versioned with its release, added to every Graph and never removed from it: the Explore, Model, Data and Agents assistants; the dialect skills (Cypher query, Gremlin query) chosen by the connector's languages; natural-language query. [5.16](modules/agents/features/install-wide-agents-and-skills.md) |
 
 | **Envelope** | The static bounds on an agent: allowed `step_key`s, which reusable flows it may `ref`, pinned arguments. What it may **do**. Validated before dispatch. |
 | **Budget** | The cost ceiling a run may spend — the smallest of the agent's, the plan's and the Todo's. **At the ceiling the run pauses and asks**, as an `approval`; in-flight work finishes and nothing is discarded. Never a hard stop — that is a separate `hard_ceiling`. |
@@ -230,7 +225,7 @@ sub-slots, the URL params and the retired words are in
 | Not this | Say | Why |
 |---|---|---|
 | Mission · Atlas · Workspace | **Graph** | one container, one word |
-| Bring data in · Connect and model · Operate · Ask · Work · Workflows · Govern — as a **module** name | `imports` · `models` + `graphs` · `runs` + `events` · `assistant` · `projects` · `plans` · `lenses` | a module is named for what it holds ([§ How a module is named](#how-a-module-is-named)); a verb phrase is a feature's register. *Govern* stays the `leftNav` label |
+| A product, module or group name for a part of Invana | the **package** — `graphs` · `access` · `runtime` · `model` · `data` · `datasets` · `agents` · `explore` · `projects` | one package, one name, from spec folder to board ([§ How a package is named](#how-a-package-is-named)); a verb phrase is a feature's register |
 | Dashboard | **Board** — a *declared* board when the difference matters | every surface is a board: drawn on a canvas or declared from panels (`renders: canvas · declared`). The kit's package is `@invana/boards` and its component `Board`. HyperDX's own dashboards keep their name, since they are that product's word, not ours |
 | Intent | **Instructions** for guidance, **understanding** for the step | the word is ambiguous between the two |
 | Instructions (as a prose blob) | **Rules** | guidance is a list of statements, not a paragraph |
@@ -266,7 +261,7 @@ sub-slots, the URL params and the retired words are in
 | From · To (for a stitch's two sides) | **Source** · **Target** | the payload's own words (`source_version_id`, `target_type`); *from/to* reads as direction, which an anchor does not have |
 | Links (as a surface name) | **Stitches** | *link* is the record the engine stores; *stitch* is what a person does, and the product already has `Flow(kind = stitch)`. The word *link* keeps its place in `model_links` |
 | API key · PAT · service account | **Personal access token**, spelled out | it is a person's identity with a longer life, not a key and not an account of its own |
-| Wizard · onboarding · checklist · getting started | **Setup**, and **setup step** | nothing is walked modally, nothing is ticked and nothing is dismissed — the steps are derived, so the words for walking one are all false ([SH-F02](../../specs/foundation/shell/features/SH-F02-create-a-graph/feature.md) · [SU7](modules/platform/features/setup.md)) |
+| Wizard · onboarding · checklist · getting started | **Setup**, and **setup step** | nothing is walked modally, nothing is ticked and nothing is dismissed — the steps are derived, so the words for walking one are all false ([GR-F02](../../specs/os/graph/features/GR-F02-create-a-graph/feature.md) · [SU7](modules/platform/features/setup.md)) |
 | Rail · left rail · activity bar | **`leftNav`** | the kit's prop name is the word; nothing else names a region |
 | Sidebar · left panel · docked panel | **`leftSection`** | ditto |
 | Editor · main content · canvas area · workspace | **`mainSection`** | ditto |

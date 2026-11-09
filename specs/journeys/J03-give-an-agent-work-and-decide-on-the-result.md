@@ -2,7 +2,7 @@
 id: J03
 title: Give an agent work and decide on the result
 personas: [decision-maker]
-stories: [PJ-01, PJ-16, PJ-12, PJ-15, PJ-18, IN-01, AG-24, PJ-17, PJ-06, PJ-07, PJ-14]
+stories: [PJ-01, PJ-16, PJ-12, PJ-15, PJ-18, AC-15, AG-24, PJ-17, PJ-06, PJ-07, PJ-14]
 boards: [projects.list, projects.project, projects.task, projects.task.thinking, inbox, projects.finding, projects.decide, projects.report]
 ---
 
@@ -23,7 +23,7 @@ flowchart TD
   E --> F{"The agent works"}
   F -->|needs a helper| G["AG-24 · Hands part to a helper, within its bounds"] --> F
   F -->|outside what it may do| R["Refused before it starts, naming the bound"]
-  F -->|wants to send or change| H["IN-01 · Asks in the Inbox, showing exactly what will happen"]
+  F -->|wants to send or change| H["AC-15 · Asks in the Inbox, showing exactly what will happen"]
   H -->|Send it| F
   H -->|Not this time| F2["Nothing sent · the step ends not sent"]
   F -->|needs input| NI["Needs input · Ana answers in the thread"] --> F
@@ -44,7 +44,7 @@ flowchart TD
 | 2 | Say what done means | Projects · project | PJ-16 | `projects.project` |
 | 3 | Write a task and assign it to an agent | Projects · task | PJ-12 · PJ-18 | `projects.task` |
 | 4 | The agent picks it up and works, handing parts to helpers | Projects · task thread | PJ-15 · AG-24 | `projects.task.thinking` |
-| 5 | Decide what the agent asks before it acts | Inbox · Needs you | IN-01 | `inbox` |
+| 5 | Decide what the agent asks before it acts | Inbox · Needs you | AC-15 | `inbox` |
 | 6 | Review the result | Projects · task | PJ-12 · PJ-17 | `projects.task` |
 | 7 | Weigh the finding | Projects · finding | PJ-06 | `projects.finding` |
 | 8 | Record the decision | Projects · decide | PJ-07 | `projects.decide` |
@@ -54,7 +54,7 @@ flowchart TD
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | The agent asks in the Inbox and waits; *Not this time* sends nothing | IN-01 | `inbox` |
+| It needs permission | The agent asks in the Inbox and waits; *Not this time* sends nothing | AC-15 | `inbox` |
 | It fails | The task reads *Failed* with why; a re-run starts it again | PJ-12 | `projects.task` |
 | The person has no access | Without *Can work on projects*, Ana reads the project; writing, assigning and deciding name who can | PJ-12 · PJ-07 | `projects.task` |
 | Outside what the agent may do | Refused before it starts, naming the bound; nothing is spent | AG-24 | `projects.task.thinking` |

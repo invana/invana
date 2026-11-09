@@ -10,7 +10,7 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [graph-canvas](graph-canvas.md) · [the-assistant](../../ask/features/the-assistant.md) · [model-editor](../../connect-and-model/features/model-editor.md) |
 
-Product spec: [EX-F01 · The board and its canvas](../../../../../specs/products/explore/features/EX-F01-the-board-and-its-canvas/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F01 · The board and its canvas](../../../../../specs/capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## What the panel shows, per kind
 

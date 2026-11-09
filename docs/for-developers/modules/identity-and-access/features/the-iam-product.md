@@ -8,9 +8,9 @@ assistant on the right. Access spans every product and belongs to none.
 | Index | [11.10](../../../README.md#11--identity-and-access) · Slice **I01** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [policies](policies.md) · [effective access](effective-access.md) · [people and groups](people-and-groups.md) · [tokens](tokens.md) · [the Agents shell](../../agents/features/the-agents-shell.md) · products: [iam.md](../../../../products/iam.md) · [shell.md](../../../../products/shell.md) |
+| Related | [policies](policies.md) · [effective access](effective-access.md) · [people and groups](people-and-groups.md) · [tokens](tokens.md) · the Agents shell · products: iam.md · shell.md |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-01 · ST-06; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [AC-F02 · People and access](../../../../../specs/os/access/features/AC-F02-access-rules/feature.md) — AC-03 · AC-07; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

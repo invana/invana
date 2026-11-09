@@ -11,7 +11,7 @@ steps* and a TaskRun is a *Run* ([glossary.md](../glossary.md)).
 | It is | It is not |
 |---|---|
 | A **plan interpreter** — it walks a validated plan graph, holds a frontier, honours the signals steps return | A job scheduler — no backfill, no catch-up |
-| Closed to the **catalogue** — every step calls one function from it | A plugin host for steps — a function reaches the catalogue only through an enabled plugin or an approved library ([AG-F06](../products/agents/features/AG-F06-plans-and-functions/feature.md)) |
+| Closed to the **catalogue** — every step calls one function from it | A plugin host for steps — a function reaches the catalogue only through an enabled plugin or an approved library ([AG-F06](../capabilities/agents/features/AG-F06-plans-and-functions/feature.md)) |
 | A **policy engine** — its abstractions exist to refuse, not to permit | A framework or a package — there is no second implementation of anything |
 
 | Property | Means |
@@ -331,7 +331,7 @@ Each stops a run for a person, for a different reason, at a different moment, wi
 | Only a person decides or judges | An agent never approves anything, its own step included |
 | None auto-resolves | A passed deadline is `stop(failed)` naming who was asked — never an auto-approval or auto-acceptance |
 | A token budget reached is an approval | The runtime raises it; it has no deadline and parks until a person decides. It gates dispatch, so lanes in flight finish and the overshoot is at most that set |
-| A verdict is not a Todo's acceptance | Acceptance closes work somebody owns (`closed_at`); a verdict decides whether a loop goes round again. Both wait in the Inbox's *Needs you* ([IN-F01](../foundation/inbox/features/IN-F01-needs-you/feature.md)) |
+| A verdict is not a Todo's acceptance | Acceptance closes work somebody owns (`closed_at`); a verdict decides whether a loop goes round again. Both wait in the Inbox's *Needs you* ([AC-F05](../os/access/features/AC-F05-asks-and-approvals/feature.md)) |
 
 ## What requires approval
 
@@ -345,7 +345,7 @@ Each stops a run for a person, for a different reason, at a different moment, wi
 |---|---|
 | Evaluated before dispatch | Nothing is spent by a step waiting for approval |
 | The request names the call | Step, resolved arguments, what it reads, what it writes, what it will spend — never "the agent wants to continue" |
-| Who may decide is the Inbox's | Set per ask in [IN-F01](../foundation/inbox/features/IN-F01-needs-you/feature.md); a Graph of one is not an exemption — still asked, one click |
+| Who may decide is the Inbox's | Set per ask in [AC-F05](../os/access/features/AC-F05-asks-and-approvals/feature.md); a Graph of one is not an exemption — still asked, one click |
 | A fanned-out step asks once | One approval covers the step and all its lanes, and states the lane count |
 | Amending is bounded | A person may edit the arguments; the amended call is re-validated against the envelope at resume, and a bound that changed in between refuses it |
 | The decision is a record | The `TaskPrompt` holds who answered, when, and the answer with any amended arguments, beside an event — never a synthetic step |
@@ -516,7 +516,7 @@ Beyond the fields in [orchestration.md › The records](orchestration.md):
 ## Executor and workers
 
 Invana runs its own work: no broker, no external scheduler to stand up first, so the first question works the day it
-is installed. Workers on other machines are optional ([ST-F06](../foundation/settings/features/ST-F06-workers-and-limits/feature.md)).
+is installed. Workers on other machines are optional ([RT-F04](../os/runtime/features/RT-F04-limits/feature.md)).
 
 ```mermaid
 sequenceDiagram
@@ -615,7 +615,7 @@ sequenceDiagram
 | Repetition on nodes and signals | Declared back-edges were weighed: legible, but the bound becomes a global recursion limit that does not know which loop it bounds. A child run per iteration costs a plan, a stream and an await per pass — right for delegation, too heavy for iteration. `replan` as the loop regenerates the plan every pass and loses the structure being iterated on |
 | Three pauses, three nouns | Clarification is *I do not know*; approval *I may not proceed*; verdict *I may not judge what I just made*. When, relative to dispatch, sets the bound |
 | Every kind runs here | One interpreter, one frontier, one set of rows, events and trace for every kind of plan |
-| procrastinate is the distributed executor | It matched or beat Dramatiq on throughput, fan-out and latency, recovered a killed worker as fast, and adds no service; Prefect was send-bound and lost a dead worker's envelopes ([the benchmark](../../docs/for-developers/modules/platform/features/distributed-execution.md)). Hatchet, Temporal and DBOS are compared in [workers-and-orchestration.md](../../docs/for-developers/building-engine/workers-and-orchestration.md) |
+| procrastinate is the distributed executor | It matched or beat Dramatiq on throughput, fan-out and latency, recovered a killed worker as fast, and adds no service; Prefect was send-bound and lost a dead worker's envelopes ([the benchmark](../../docs/for-developers/modules/platform/features/distributed-execution.md)). |
 | One cache | On the provider call, keyed by content hash |
 
 ## Not building
@@ -629,7 +629,7 @@ sequenceDiagram
 | Sensors that poll outside systems | A run waits on a person or an event, never on a spin loop |
 | Backfill and catch-up | A schedule's missed firing is recorded as missed, not replayed |
 | Approval quorums and escalation chains | Unproven complexity |
-| Auto-approval, or auto-acceptance on a verdict timeout | Nothing set to Ask is ever decided by itself: nothing acts without asking but where a person's line says Allow ([one access model](../foundation/settings/product.md#decisions)); an unjudged draft is a failed run |
+| Auto-approval, or auto-acceptance on a verdict timeout | Nothing set to Ask is ever decided by itself: nothing acts without asking but where a person's line says Allow ([one access model](../os/access/product.md#decisions)); an unjudged draft is a failed run |
 | An agent giving a verdict on output | A mechanical judgement is a `verify` step with an `until` predicate |
 | A plan authoring UI | A plan is data validated against an envelope, never a hand-drawn graph of steps |
 | An external orchestrator adapter | The plan-as-data model gives a general executor nothing to do; another executor would be its own package implementing the protocol |

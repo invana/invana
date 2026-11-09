@@ -11,7 +11,7 @@ one model — **the model is a filter, not a second page**.
 | API / CLI / Studio | ✅ / — / ✅ — every tab reads its own data; the read-only reading is drawn and is reached when identity-and-access grants write (MP24) |
 | Related | [model-editor](model-editor.md) · [stitch-models](stitch-models.md) · [introspect-a-database](introspect-a-database.md) · [domain-models](domain-models.md) · [the library's plan page](../../workflows/features/the-library.md) |
 
-Product spec: [MO-F04 · Model health and history](../../../../../specs/products/model/features/MO-F04-model-health-and-history/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F04 · Model health and history](../../../../../specs/capabilities/model/features/MO-F04-model-health-and-history/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -51,7 +51,7 @@ The **Models** board (`board.kind = models`) — one board, whatever the scope. 
 ### Artboards
 
 Drawn on [The Model Page](https://claude.ai/artifact/VjqhkUx3sYHJqM3FccEt9q), one row per name prefix. Named `module.feature.surface.variant` —
-the file, the frame title and a row in [the-screens.md](../../../the-screens.md#beyond-the-42--the-model-page).
+the file, the frame title and a row in the-screens.md.
 
 | Artboard | Draws |
 |---|---|

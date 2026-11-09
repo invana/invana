@@ -10,7 +10,7 @@ A Graph holds many, and each one travels.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [model-editor](model-editor.md) · [share-a-model](share-a-model.md) · [stitch-models](stitch-models.md) · [publish-review](publish-review.md) |
 
-Product spec: [MO-F01 · Start a model](../../../../../specs/products/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F01 · Start a model](../../../../../specs/capabilities/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

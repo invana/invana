@@ -1,7 +1,7 @@
 """SQLAlchemy models for Govern — the lens, the ledger's projection, and requests.
 
 ``lenses`` is **one table for two things**
-([Model product § Decisions](specs/products/model/product.md#decisions)): a *world* people pick per
+([Model product § Decisions](specs/capabilities/model/product.md#decisions)): a *world* people pick per
 question and a *guardrail* always in force, separated by ``kind``. A Graph's
 guardrail is one property rule — ``target`` · ``access`` · ``leaves`` — whose
 ``rules`` are compiled from it at save, so enforcement, the frozen snapshot and
@@ -170,7 +170,8 @@ class Lens(Base):
         """What every surface prints, including for a lens nobody has named.
 
         *Nothing set* and *nothing permitted* must never look alike
-        (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions), and
+        (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions),
+        and
         an unnamed lens is a real narrowing that simply has no name yet.
         """
         return self.name or "this run only"

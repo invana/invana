@@ -8,9 +8,9 @@ that owns tokens for scripts) and its **groups**, with the policies each holds.
 | Index | [11.9](../../../README.md#11--identity-and-access) · Slice **I01** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [membership](membership.md) · [roles](roles.md) · [policies](policies.md) · [tokens](tokens.md) · products: [iam.md](../../../../products/iam.md) IAM-08 |
+| Related | [membership](membership.md) · [roles](roles.md) · [policies](policies.md) · [tokens](tokens.md) · products: iam.md IAM-08 |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-08; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [AC-F03 · People and access](../../../../../specs/os/access/features/AC-F03-groups-keys-and-holders/feature.md) — AC-09; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

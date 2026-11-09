@@ -3,19 +3,19 @@
 When *Understand* cannot settle what is being asked, it asks back — as a closed question with grounded
 options, not a request for another paragraph.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
 | Index | [3.6](../../../README.md#3--ask) · Slice **S9c** |
 | Module | [Ask](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [projections](projections.md) (how it is asked) · [when-it-cannot-answer](when-it-cannot-answer.md) |
+| Related | [projections](projections.md) (how it is asked) · when-it-cannot-answer |
 
-Product spec: [EX-F03 · Ask a question](../../../../../specs/products/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F03 · Ask a question](../../../../../specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -39,7 +39,7 @@ Product spec: [EX-F03 · Ask a question](../../../../../specs/products/explore/f
 
 | # | Decision |
 |---|---|
-| CQ8 | **Understanding is a loop, not one question.** `understand` runs under `loop: {until: understood, max_iterations: n}` — it may ask, be answered, and ask again when the answer opened a new ambiguity. Every round is an **iteration of the same run**, not a new run and not a new Task: the thread reads as one exchange and the trace stays one row with three iterations under it ([orchestration § 6](../../../orchestration.md#6-three-kinds-of-repetition-and-they-nest)). |
-| CQ9 | **The loop is bounded by the envelope, and the bound is `max_clarifications`.** Hitting it is not a failure: the run states what it still does not know and answers on the reading it can defend, or parks for a person ([when-it-cannot-answer](when-it-cannot-answer.md)). An unbounded clarifier is a way to spend a person's attention without a ceiling. |
+| CQ8 | **Understanding is a loop, not one question.** `understand` runs under `loop: {until: understood, max_iterations: n}` — it may ask, be answered, and ask again when the answer opened a new ambiguity. Every round is an **iteration of the same run**, not a new run and not a new Task: the thread reads as one exchange and the trace stays one row with three iterations under it (orchestration § 6). |
+| CQ9 | **The loop is bounded by the envelope, and the bound is `max_clarifications`.** Hitting it is not a failure: the run states what it still does not know and answers on the reading it can defend, or parks for a person (when-it-cannot-answer). An unbounded clarifier is a way to spend a person's attention without a ceiling. |
 | CQ11 | **The options are read under the run's lens.** When the model grounds its choices in the graph, the `options_query` it wrote crosses `graph_data` like any other read the run makes — the run's own lens is composed into it and the read is recorded as a touch — so a world that excludes a carrier never offers it as a choice. A refusal, a lens violation or a failed query falls back to the fixed options: the question still stands, its choices are only less grounded. |
 

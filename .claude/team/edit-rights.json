@@ -6,7 +6,7 @@
     {"key": "kit", "label": "Kit · canvas code", "paths": ["~/Projects/invana/design-kit/**", "~/Projects/invana/canvas/**"]},
     {"key": "changesets", "label": "Changesets", "paths": [".changeset/**"]},
     {"key": "specs", "label": "Specs", "paths": ["specs/**"]},
-    {"key": "tasks", "label": "Story tasks", "paths": ["specs/products/*/features/*/stories/*/task.md", "specs/foundation/*/features/*/stories/*/task.md"]},
+    {"key": "tasks", "label": "Story tasks", "paths": ["specs/*/*/features/*/stories/*/task.md"]},
     {"key": "docs", "label": "Other docs", "paths": ["docs/**", "README.md", "CONTRIBUTING.md", "CHANGELOG.md"]},
     {"key": "boards", "label": "Boards (canvas)", "paths": [".design/**"]},
     {"key": "project", "label": "Project file", "paths": [".claude/team/projects/*/project.md"]},

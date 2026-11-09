@@ -8,9 +8,9 @@ disagree with the traces they summarise.
 | Index | [10.3](../../../README.md#10--operate) · Slice **S11** |
 | Module | [Operate](../spec.md) |
 | API / CLI / Studio | 🔵 / — / 🔵 |
-| Related | [audit-and-activity](audit-and-activity.md) · [evidence](../../memory/features/evidence.md) · [envelope-and-budget](../../agents/features/envelope-and-budget.md) |
+| Related | [audit-and-activity](audit-and-activity.md) · evidence · [envelope-and-budget](../../agents/features/envelope-and-budget.md) |
 
-Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-28; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and what is not settled.
+Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-28; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and what is not settled.
 
 ## Capabilities
 

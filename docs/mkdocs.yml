@@ -63,12 +63,6 @@ nav:
           - Data: guides/graph/data.md
           - Schema: guides/graph/schema.md
       # - Running Queries: guides/running-queries.md
-  - Studio:
-      - Overview: studio/overview.md
-      - Graph Modelling: studio/modelling.md
-      - Query Workspace: studio/query-workspace.md
-      - Visualization: studio/visualization.md
-      - Simulation Board: studio/simulation-board.md
   - Deployment:
       - Docker: deployment/docker.md
       - Production: deployment/production.md
@@ -78,7 +72,6 @@ nav:
       - Code Reference: api-reference/
   - Development:
       - Contributing: development/contributing.md
-      - RFCs: development/rfcs.md
       - Changelog: development/changelog.md
 
 markdown_extensions:

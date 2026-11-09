@@ -1,7 +1,7 @@
 """The cast — innermost wins, and only then is it checked.
 
 A plan names a **role**; the cast resolves it to a model address
-([Model product § Decisions](specs/products/model/product.md#decisions)). ``role: decide`` says *how
+([Model product § Decisions](specs/capabilities/model/product.md#decisions)). ``role: decide`` says *how
 much this matters*, which stays true when the model line-up moves — ``tier``
 does not, and a model id written into a plan is a plan that cannot leave its
 Graph.
@@ -38,7 +38,7 @@ class CastResolution:
     #: Where the address came from: ``todo`` · ``plan`` · ``agent`` · ``shipped``.
     source: str = "shipped"
     #: The bound the denying rule came from, so the refusal says whom to ask
-    #: ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
+    #: ([AG-F01 § Decisions](specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
     denied_in: str | None = None
 
     @property
@@ -134,7 +134,7 @@ def shipped_cast(models: list[tuple[str, dict]]) -> dict[str, str]:
     Dropping ``is_default`` means a Graph with providers configured and no cast
     could otherwise run nothing, so the trade for removing the second
     model-picking mechanism is that **this has to be right**
-    ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
+    ([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)).
 
     ``models`` is ``[(address, capabilities)]`` from the catalogue. Four rules,
     each one a sentence from the design:

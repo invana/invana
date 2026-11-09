@@ -106,7 +106,7 @@ class SeededAgent:
     default: bool = False
     surface: str = "explorer"
     # The bounds the interpreter enforces on delegation — depth, fan-out, spend
-    # (specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md § Decisions). Empty on an
+    # (specs/capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md § Decisions). Empty on an
     # agent that does not delegate, which is all of them but one.
     budget: dict = field(default_factory=dict)
     # Steps, replans, clarifications — how hard it tries (EB9). Its own column,

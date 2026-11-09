@@ -4,7 +4,7 @@ Both are read-heavy and edited through the product, so these exist for the same
 reason every other admin view does: somebody debugging a Graph needs to see the
 rows. Nothing here is sensitive — a lens is meant to be readable, which is the
 whole argument of
-specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions.
+specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions.
 """
 
 from __future__ import annotations

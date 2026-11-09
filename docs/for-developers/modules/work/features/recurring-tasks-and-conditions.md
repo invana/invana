@@ -4,10 +4,10 @@ A Todo template on a cron, and dependencies that fire on failure as well as succ
 happens every day opens itself, and the work that only matters when something breaks has a way to say
 so.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
@@ -16,7 +16,7 @@ so.
 | API / CLI / Studio | 🔵 / — / 🔵 |
 | Related | [projects-and-tasks](projects-and-tasks.md) · [schedules](../../operate/features/schedules.md) |
 
-Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-18 (dependencies with conditions); the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the recurring-task templates the product spec does not take, because they contradict the one kind of schedule ([AG-F07](../../../../../specs/products/agents/features/AG-F07-schedules/feature.md)).
+Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-18 (dependencies with conditions); the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the recurring-task templates the product spec does not take, because they contradict the one kind of schedule ([AG-F07](../../../../../specs/capabilities/agents/features/AG-F07-schedules/feature.md)).
 
 ## Not moved — recurring task templates
 

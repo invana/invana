@@ -1,9 +1,9 @@
-# Memory
+# Memory — `explore`
 
 The engine shape of what carries over between runs. An agent remembers nothing on its own: what it knows next time is
 a record in the Graph it reads with a planned step, or a change a person accepted on the evidence of what happened. The
 product rules — recall is a planned step, counts not scores, a suggested change carries its evidence — are
-[EX-F07](../../products/explore/features/EX-F07-memory-what-past-runs-teach/feature.md). The run record it reads is
+[EX-F07](../../capabilities/explore/features/EX-F07-memory-what-past-runs-teach/feature.md). The run record it reads is
 [orchestration.md](../orchestration.md).
 
 ## Two paths, and the one that does not exist

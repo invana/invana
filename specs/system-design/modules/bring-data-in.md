@@ -1,9 +1,9 @@
-# Bring data in
+# Loads — `datasets`
 
 The engine shape of a load. Invana is a destination: something else extracts and transforms, and what arrives is a
 dataset that already conforms to a model. The product rules — a load names its model, checked one record at a time,
-everything written traces back, a load is a run — are [Datasets](../../products/datasets/product.md) and
-[DS-F02](../../products/datasets/features/DS-F02-bring-data-in/feature.md). How every kind of run is walked is
+everything written traces back, a load is a run — are [Datasets](../../capabilities/datasets/product.md) and
+[DS-F02](../../capabilities/datasets/features/DS-F02-bring-data-in/feature.md). How every kind of run is walked is
 [runtime.md](../runtime.md) › *Every kind runs here*; the commands are [api-and-cli.md](../api-and-cli.md) › *Commands*.
 
 ## The contract

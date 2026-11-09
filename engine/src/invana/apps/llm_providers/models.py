@@ -10,7 +10,7 @@ segment and they are not the same thing
 
 There is **no default provider** — the lens ``cast`` answers *which model when
 nobody said*, and a second mechanism would disagree with it
-([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
+([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)).
 
 Hard delete, cascade-from-Graph (matches the redesign's initial schema cascade
 matrix); a provider's models cascade with it.
@@ -88,7 +88,7 @@ _llm_credential_kind_enum = Enum(
 class LLMModelStatus(enum.StrEnum):
     """Whether this model is still offered. Removing one a cast names is refused,
     naming the worlds
-    ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions))."""
+    ([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions))."""
 
     active = "active"
     removed = "removed"
@@ -112,7 +112,7 @@ class LLMProvider(Base):
 
     #: The address segment — ``llm/<name>/<model id>``. A word somebody picked
     #: and can read back in a refusal, never the vendor and never a uuid
-    #: ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
+    #: ([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)).
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     provider: Mapped[LLMProviderKind] = mapped_column(_llm_provider_kind_enum, nullable=False)
     # Nullable: ollama / local providers don't need a key.

@@ -44,7 +44,7 @@ needed them — building the graph before one exists means designing the wrong g
 triggers have now fired: [2.3](../../bring-data-in/features/load-a-bundle.md) needs a branch, a
 fan-out and a composition, and a draft-judge-refine flow needs an iteration that waits on a person
 (§4.1). Pools and automations are still waiting. The split, and the trigger that unblocks each, is
-[building-engine §17](../../../building-engine/migration-plan.md#17-order-of-the-band-work).
+building-engine §17.
 
 | # | Change | Risk |
 |---|---|---|
@@ -88,13 +88,13 @@ today. Only the *bundle* needs the deferred machinery.
 
 ## Retired — superseded by the live task model
 
-The live records are [orchestration § 0](../../../orchestration.md#0-the-records).
+The live records are orchestration § 0.
 
 | Section | Retired row | Why |
 |---|---|---|
 | 3.1 | A kind is a property of the todo; `runs.kind` selects a plan | `kind` is the subject of the Flow |
 | 3 | `plan_origin = reused:<id>` | `plan_origin` is `authored · generated · reused` |
-| 11 | Membership is the permission — any member decides, there are no roles | Who decides an ask is the Inbox's (IN-F01), under Graph roles |
+| 11 | Membership is the permission — any member decides, there are no roles | Who decides an ask is the Inbox's (AC-F05), under Graph roles |
 | 11 | The decision as `approved_by` · `approved_at` · `args_before` · `args_after` on the step row | A pause is a `TaskPrompt` row — who answered, when, the answer |
 | 15 · 17 | Log lines in `run_logs` rows (`ts · level · step_id · lane · message`, capped per run); `import_jobs.logs` folding into them | A log line goes to OpenTelemetry correlated by `run_id`; there is no log table |
 | 19 | `task_runs` gains `approval_state` · `approved_by_id` · `approved_at` · `args_before` · `verdict_state` · `verdict_by_id` · `verdict_at` · `verdict_note` | `TaskPrompt` holds every pause and its answer |

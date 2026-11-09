@@ -6,7 +6,7 @@
 | Features | [projects-and-tasks](features/projects-and-tasks.md) · [objectives-and-criteria](features/objectives-and-criteria.md) · [review](features/review.md) · [recurring-tasks-and-conditions](features/recurring-tasks-and-conditions.md) · [branches-and-decisions](features/branches-and-decisions.md) · [project-reports](features/project-reports.md) · [private-projects](features/private-projects.md) · [simulation](features/simulation.md) · [impact](features/impact.md) |
 | Depends on | [Agents](../agents/spec.md) (the assignee, and what it may run) · Ask (a Todo runs as a TaskRun) · Explore (the canvas the panel selects from) |
 
-Product spec: [Projects](../../../../specs/products/projects/product.md) — its features PJ-F01–PJ-F05 hold the stories, surfaces, states and product decisions.
+Product spec: [Projects](../../../../specs/capabilities/projects/product.md) — its features PJ-F01–PJ-F05 hold the stories, surfaces, states and product decisions.
 
 System design: [work.md](../../../../specs/system-design/modules/work.md) — what the module owns, a Todo's derived status and who writes acceptance, staffing and permission, derived order. This file keeps the vocabulary, the retired status machine, the decisions and what it does not build.
 
@@ -22,7 +22,7 @@ Product-wide words are pinned in [terminology.md](../../terminology.md). What th
 | **Branch** | one line of inquiry inside a project — the type calls it a hypothesis, thesis, option, position or lead | a sub-project · a git branch |
 | **Finding** | one piece of evidence on a branch, with a **stance** (`supports · contradicts · context`) and its cites | a criterion's outcome |
 | **Project decision** | a person's verdict and decision on a branch, checked by the rules; append-only, superseded never edited | an approval's answer |
-| **Project proposal** | an agent's suggested fork or decision, waiting for a person | a memory proposal ([8.3](../memory/features/proposals.md)) |
+| **Project proposal** | an agent's suggested fork or decision, waiting for a person | a memory proposal (8.3) |
 | **Simulation** | one run of a simulator plugin on a branch, over pinned dataset versions; its result is `derived` | an observation · a finding — a finding may cite it |
 
 **A Todo is not a run, and a Task is not a Todo.** A Todo is work with a definition of done; a

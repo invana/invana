@@ -8,7 +8,7 @@ System design: [runtime.md](../../../../specs/system-design/runtime.md) — inst
 | | |
 |---|---|
 | Index | [§11 · Platform](../../README.md#11--platform) |
-| Features | [design-system](features/design-system.md) · [theming](features/theming.md) · [command-line](features/command-line.md) · [logging](features/logging.md) · [telemetry](features/telemetry.md) · [admin-and-health](features/admin-and-health.md) · [setup](features/setup.md) · [runtime](features/runtime.md) · [plugins](features/plugins.md) · [search](features/search.md) · [distributed-execution](features/distributed-execution.md) · [tool-plugins](features/tool-plugins.md) · [mcp-plugins](features/mcp-plugins.md) · [list-contract](features/list-contract.md) |
+| Features | [design-system](features/design-system.md) · [theming](features/theming.md) · command-line · logging · [telemetry](features/telemetry.md) · admin-and-health · [setup](features/setup.md) · [runtime](features/runtime.md) · [plugins](features/plugins.md) · [search](features/search.md) · [distributed-execution](features/distributed-execution.md) · [tool-plugins](features/tool-plugins.md) · [mcp-plugins](features/mcp-plugins.md) · [list-contract](features/list-contract.md) |
 | Depends on | — |
 | Depended on by | every Studio surface, every install, and — through [the runtime](features/runtime.md) — every module that runs anything |
 
@@ -59,7 +59,7 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 | Artboard | Feature | Shows |
 |---|---|---|
 | The finance story · every story, the screen that shows it | — | the canvas's own index: which artboard carries which story |
-| CLI · the hand-off | [command-line](features/command-line.md) | `invana` at a terminal, and where it stops and Studio starts |
+| CLI · the hand-off | command-line | `invana` at a terminal, and where it stops and Studio starts |
 | Graph · settings | [design-system](features/design-system.md) | a settings surface built from the same panel skeleton as every work panel |
 | All 42 | [design-system](features/design-system.md) · [theming](features/theming.md) | the shell below — every screen is the same chrome around a different middle |
 
@@ -92,7 +92,7 @@ Inside a work panel, the bands are the same five everywhere:
 |---|---|
 | A selection opens a canvas | Picking a row draws its plan, its lineage, its DAG. Closing stays the tab's X |
 
-*Nothing autosaves in an editor* and *a pulsing dot means running* are in the [Shell product spec](../../../../specs/foundation/shell/product.md).
+*Nothing autosaves in an editor* and *a pulsing dot means running* are in the [Graph product spec](../../../../specs/os/graph/product.md).
 
 ## 3. Theming
 
@@ -101,7 +101,7 @@ Inside a work panel, the bands are the same five everywhere:
 | Structure is square, controls are slightly round | One radius token for controls, zero elsewhere |
 | Density is a theme concern | A dense inspector and an airy form use the same components at different sizes |
 
-Light and dark as equals, and colour carrying meaning once, are in [SH-F03](../../../../specs/foundation/shell/features/SH-F03-find-your-way/feature.md).
+Light and dark as equals, and colour carrying meaning once, are in [GR-F03](../../../../specs/os/graph/features/GR-F03-find-your-way/feature.md).
 
 ## 6a. Studio end-to-end tests
 

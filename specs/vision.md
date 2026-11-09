@@ -84,22 +84,28 @@ product — it is how Invana works, in every install. It enforces the ontology; 
 
 | Part | Answers | Holds | Spec today |
 |---|---|---|---|
-| **Graph** | Where am I working? | Create a Graph and connect its graph database · its members, people and agents · usage · finding the way — modes, crumbs, ⌘K · notifications | [Shell](foundation/shell/product.md) · [Settings](foundation/settings/product.md) › This graph · [Inbox](foundation/inbox/product.md) › notifications |
-| **Access** | Who may act, and what did they do? | Sign-in, accounts, sessions and keys · access lines, Allow · Ask · Deny, for people, agents and keys alike · asks and approvals · History | [Shell](foundation/shell/product.md) › sign in · [Settings](foundation/settings/product.md) › People and access · You · [Inbox](foundation/inbox/product.md) › Needs you · History |
-| **Runtime** | What does the work, within which limits? | AI models · plugins and outside tools · workers, schedules' capacity and each Graph's limits · graph database connectors | [Settings](foundation/settings/product.md) › AI models · Plugins · Workers and limits |
+| **Graph** | Where am I working? | Create a Graph and connect its graph database · its members, people and agents · usage · finding the way — modes, crumbs, ⌘K · the Inbox — what needs a person, and notifications | [os/graph/product.md](os/graph/product.md) — GR |
+| **Access** | Who may act, and what did they do? | Sign-in, accounts, sessions and keys · access lines, Allow · Ask · Deny, for people, agents and keys alike · asks and approvals · History | [os/access/product.md](os/access/product.md) — AC |
+| **Runtime** | What does the work, within which limits? | AI models · plugins and outside tools · workers, the queue and each Graph's limits · graph database connectors | [os/runtime/product.md](os/runtime/product.md) — RT |
 
 | An OS has | Invana has | Part |
 |---|---|---|
 | **Users** | Members of a Graph — people and agents, each with access rules | Graph · Access |
 | **A type system** | The ontology — every record has a kind, every kind its rules; owned by the Ontology pillar, enforced here | — |
 | **Permissions** | Access rules whose every line is Allow · Ask · Deny — one model for people, agents and keys alike — and *what it may do* | Access |
-| **Processes** | Runs — every execution of a plan, by a person or an agent, in one journal | Runtime |
-| **A scheduler** | Schedules, and workers with the runs a Graph may have going at once | Runtime |
+| **Processes** | Runs — every execution of a plan, by a person or an agent, in one journal, executed on workers; Agents reads them | Runtime |
+| **A scheduler** | Workers and the queue, with the runs a Graph may have going at once; Agents sets the schedules that feed it | Runtime |
 | **Resource limits** | Token budgets, and each Graph's limits set by the install | Runtime |
 | **Drivers** | Graph database connectors | Runtime |
 | **Extensions** | Plugins — tool, MCP and simulator plugins that add what agents can do | Runtime |
 | **Logs** | History, the change log and provenance — who did what, to which record, from which dataset | Access |
-| **A shell** | The Assistant and the Inbox — plain words in, work out; what needs a person waits there | Graph |
+| **A shell** | The frame — modes, crumbs, ⌘K — and the Inbox, where what needs a person waits | Graph |
+
+| Decision | Detail |
+|---|---|
+| Runtime runs the work | Workers, the queue and each Graph's limits are Runtime's |
+| Agents reads and schedules it | Reading runs — what is running and what ran — and setting schedules are Agents' (AG) |
+| The Assistant is not the operating system | The Assistant is a feature of Explore (EX) |
 
 ## Principles
 
@@ -110,7 +116,7 @@ product — it is how Invana works, in every install. It enforces the ontology; 
 | **Plain words in, work out** | A question in plain English becomes queries, a plan and an answer — or choices to pick from |
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
-| **Acts only as far as the person allows** | Every act — a person's, an agent's or a key's — is Allow, Ask or Deny by the lines a person set; what no line reaches is denied, and the strictest line wins. An Ask waits for someone who holds Allow on it, showing exactly what will happen, and is never decided by the one it benefits; an agent's access change is never Allow ([Settings](foundation/settings/product.md#decisions)) |
+| **Acts only as far as the person allows** | Every act — a person's, an agent's or a key's — is Allow, Ask or Deny by the lines a person set; what no line reaches is denied, and the strictest line wins. An Ask waits for someone who holds Allow on it, showing exactly what will happen, and is never decided by the one it benefits; an agent's access change is never Allow ([Settings](os/access/product.md#decisions)) |
 | **Split by persona** | An analyst never sees agent tuning; a builder never sees project branches ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
@@ -130,12 +136,12 @@ all of them run on [the operating system](#the-operating-system). How each looks
 
 | Code | Capability | Pillar | Tier | Lets a person |
 |---|---|---|---|---|
-| `MO` | [Model](products/model/product.md) | Ontology | mode · sheet | Give the data meaning — models, links between models, views of the graph, rules |
-| `DA` | [Data](products/data/product.md) | Ontology | modal · sheet | Know the Graph's records — by kind, against the model, fixed, traced and annotated |
-| `DS` | [Datasets](products/datasets/product.md), later | Ontology | modal · sheet | Gather data across the install — datasets, versions, loads, standards and checks |
-| `AG` | [Agents](products/agents/product.md) | Agents | modal · sheet | Build agents and skills, read their runs, schedule them |
-| `EX` | [Explore](products/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, annotations, memory |
-| `PJ` | [Projects](products/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports |
+| `MO` | [Model](capabilities/model/product.md) | Ontology | mode · sheet | Give the data meaning — models, links between models, views of the graph, rules |
+| `DA` | [Data](capabilities/data/product.md) | Ontology | modal · sheet | Know the Graph's records — by kind, against the model, fixed, traced and annotated |
+| `DS` | [Datasets](capabilities/datasets/product.md), later | Ontology | modal · sheet | Gather data across the install — datasets, versions, loads, standards and checks |
+| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal · sheet | Build agents and skills, read their runs, schedule them |
+| `EX` | [Explore](capabilities/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, annotations, memory |
+| `PJ` | [Projects](capabilities/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports |
 
 | Decision | Detail |
 |---|---|
@@ -182,7 +188,7 @@ The same records host different kinds of work; none is a special case.
 |---|---|
 | An extractor — source connectors, cursors, a mapping grammar | Invana is a destination: whatever already pulls the data hands it over as a dataset that conforms to a model |
 | Write-back to a source | The Graph is the destination, never the system of record upstream |
-| Fuzzy entity resolution · node merge on an anchor | Links between models are declared, never inferred; an anchor links, it never merges. Two records merge only when a person picks them ([Data](products/data/product.md), later) |
+| Fuzzy entity resolution · node merge on an anchor | Links between models are declared, never inferred; an anchor links, it never merges. Two records merge only when a person picks them ([Data](capabilities/data/product.md), later) |
 | Multi-tenancy · an Organisation record | One install is one organisation |
 | Proprietary datasets · pricing · a marketplace | Datasets are reusable knowledge first |
 | Provenance on every cell | Provenance is kept per dataset and per record; property changes live in the record's change log |

@@ -153,4 +153,3 @@ graph LR
 
 - [Building an Ontology](../guides/building-ontology.md) — Step-by-step guide
 - [Query Engine](query-engine.md) — Execute queries against your modelled data
-- [Studio: Modelling](../studio/modelling.md) — Visual ontology designer

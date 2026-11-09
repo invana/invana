@@ -10,9 +10,9 @@ records in the graph break it today before the constraint is saved.
 | Index | [1.11](../../../README.md#1--connect-and-model) · Slice **M04** |
 | Module | [Connect and model](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [the-model-page](the-model-page.md) (the type page) · [publish-review](publish-review.md) · [standards](../../bring-data-in/features/standards.md) · [load-data](../../bring-data-in/features/load-data.md) · products: [modeller.md](../../../../products/modeller.md) MO-08 · MO-F7 · [datasets.md](../../../../products/datasets.md) › Standards and checks |
+| Related | [the-model-page](the-model-page.md) (the type page) · [publish-review](publish-review.md) · [standards](../../bring-data-in/features/standards.md) · [load-data](../../bring-data-in/features/load-data.md) · products: modeller.md MO-08 · MO-F7 · datasets.md › Standards and checks |
 
-Product spec: [MO-F02 · Change and publish a model](../../../../../specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F02 · Change and publish a model](../../../../../specs/capabilities/model/features/MO-F02-change-and-publish-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

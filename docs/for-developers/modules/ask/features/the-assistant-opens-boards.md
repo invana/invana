@@ -8,9 +8,9 @@ with the filters set, marked *set by the assistant*, and its reply carries a lin
 | Index | [3.15](../../../README.md#3--ask) · Slice **F05** |
 | Module | [Ask](../spec.md) |
 | API / CLI / Studio | 🟡 / — / 🟡 |
-| Related | [the-assistant](the-assistant.md) · [list-contract](../../platform/features/list-contract.md) · [the-run-page](../../agents/features/the-run-page.md) · [the-ledger](../../operate/features/the-ledger.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) › Lists, filters and the assistant · AF-26 |
+| Related | [the-assistant](the-assistant.md) · [list-contract](../../platform/features/list-contract.md) · [the-run-page](../../agents/features/the-run-page.md) · [the-ledger](../../operate/features/the-ledger.md) · products: agent-fabric.md › Lists, filters and the assistant · AF-26 |
 
-Product spec: [EX-F03 · Ask a question](../../../../../specs/products/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F03 · Ask a question](../../../../../specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

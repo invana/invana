@@ -9,11 +9,11 @@ prints; *bindings* (``skill_ids`` · ``workflow_spec``) — how it thinks;
 exists; *standing limits* (``workflow_spec`` · ``effort`` · ``budget``) — what it
 may do, how hard it tries and what it may spend, whoever asks; and *voice*
 (``soul`` · ``soul_traits``) — how it speaks, and nothing else
-(specs/products/agents/features/AG-F01-build-an-agent/feature.md § Decisions).
+(specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md § Decisions).
 
 There is no world column: what a run may see comes with the work that opens it,
 and an agent's own narrowing is a guardrail scoped ``agent:<id>``
-(specs/products/agents/features/AG-F01-build-an-agent/feature.md § Decisions).
+(specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md § Decisions).
 
 Every JSON column is ``sqlalchemy.JSON`` (never JSONB) so SQLite dev keeps
 working; ids are ``String(36)`` UUIDs like every other table.
@@ -90,7 +90,7 @@ DEFAULT_BUDGET: dict[str, int | float] = {
     "max_fanout": 200,
     # Across every run this agent is working. The **Graph's** ceiling is a
     # different bound with a different policy
-    # ([ST-F06 § Decisions](specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md#decisions)).
+    # ([RT-F04 § Rules](specs/os/runtime/features/RT-F04-limits/feature.md#rules)).
     "max_concurrent_runs": 3,
 }
 

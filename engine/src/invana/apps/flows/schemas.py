@@ -50,7 +50,7 @@ class PlanCallerRead(BaseModel):
     skill_id: str | None = None
     #: The version of *this* plan the caller inlined. Below the current one
     #: means the library has moved on since — which a surface **says** and
-    #: never acts on ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
+    #: never acts on ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)).
     version: int
     args: dict = {}
 
@@ -65,7 +65,8 @@ class FlowRead(BaseModel):
     description: str
     kind: str
     # `builtin · authored · promoted` are the library's badge; `generated` is
-    # the fourth and is never listed (specs/products/agents/features/AG-F06-plans-and-functions/feature.md § Decisions).
+    # the fourth and is never listed (specs/capabilities/agents/features/AG-F06-plans-and-functions/feature.md §
+    # Decisions).
     origin: str
     intent: list[str]
     reusable: bool

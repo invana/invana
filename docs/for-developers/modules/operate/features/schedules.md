@@ -9,9 +9,9 @@ is a **firing**, recorded whether it ran or not.
 | Index | [10.1](../../../README.md#10--operate) · Slice **B08** |
 | Module | [Operate](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [notifications](notifications.md) · [approvals](approvals.md) · [see-what-ran](see-what-ran.md) · [instructions](../../skills/features/instructions-publish-rollback.md) · products [shell.md › Decisions](../../../../products/shell.md#decisions) SH-13 |
+| Related | [notifications](notifications.md) · [approvals](approvals.md) · [see-what-ran](see-what-ran.md) · [instructions](../../skills/features/instructions-publish-rollback.md) · AG-42 |
 
-Product spec: [AG-F07 · Schedules](../../../../../specs/products/agents/features/AG-F07-schedules/feature.md) — AG-42; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F07 · Schedules](../../../../../specs/capabilities/agents/features/AG-F07-schedules/feature.md) — AG-42; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

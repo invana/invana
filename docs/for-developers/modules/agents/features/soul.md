@@ -9,9 +9,9 @@ do; the soul is why it does not sound like a robot while doing it.
 | Index | [5.8](../../../README.md#5--agents) · Slice **S-TBD** |
 | Module | [Agents](../spec.md) |
 | API / CLI / Studio | 🟡 / — / ✅ |
-| Related | [author-an-agent](author-an-agent.md) · [the answer, in words](../../ask/features/the-answer-in-words.md) · [ask in natural language](../../ask/features/ask-in-natural-language.md) · [act as](../../ask/features/act-as.md) |
+| Related | [author-an-agent](author-an-agent.md) · [the answer, in words](../../ask/features/the-answer-in-words.md) · [ask in natural language](../../ask/features/ask-in-natural-language.md) · act as |
 
-Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F01 · Build an agent](../../../../../specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -39,5 +39,5 @@ Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/fe
 
 | # | Decision |
 |---|---|
-| SO1 | **A soul is a Markdown field on the agent, not a skill and not a stance.** A skill is offered where it is bound and reported as applied — character is neither optional nor a claim to cite. A stance is a method whose value is its declared assumptions ([AA5](../../ask/features/act-as.md#decisions)). The soul is who the agent is, so it lives on the agent. |
+| SO1 | **A soul is a Markdown field on the agent, not a skill and not a stance.** A skill is offered where it is bound and reported as applied — character is neither optional nor a claim to cite. A stance is a method whose value is its declared assumptions (AA5). The soul is who the agent is, so it lives on the agent. |
 | SO7 | **The soul is a tab on the agent's page, not a field on its form.** It sits beside Overview · Skills & callables · Thinking · Activity because it is authored and versioned on its own, and a paragraph of Markdown does not fit a form row. The preview answers a sample ask the author can change, since a voice is judged on the questions this agent actually gets. |

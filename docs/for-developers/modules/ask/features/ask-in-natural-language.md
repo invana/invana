@@ -8,9 +8,9 @@ model, validated, executed, projected — and answered only from what the graph 
 | Index | [3.2](../../../README.md#3--ask) · Slice **S9b** |
 | Module | [Ask](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [clarifying-questions](clarifying-questions.md) · [streaming-and-the-workflow](streaming-and-the-workflow.md) · [when-it-cannot-answer](when-it-cannot-answer.md) |
+| Related | [clarifying-questions](clarifying-questions.md) · [streaming-and-the-workflow](streaming-and-the-workflow.md) · when-it-cannot-answer |
 
-Product spec: [EX-F03 · Ask a question](../../../../../specs/products/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F03 · Ask a question](../../../../../specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -72,7 +72,7 @@ assembled at the crossing from structured turns, so each part is cut by its own 
 
 | # | Decision |
 |---|---|
-| NL2 | **The lens names the model, not the agent and never a picker in the composer.** A plan names a role, the lens's `cast` resolves it to a model address, and the address names the configured provider whose credential is used ([GV10](../../govern/spec.md) · [PM1](../../agents/features/providers-and-models.md)). The composer offers the ask kind and the world chip; it never offers a model — the world's cast names it ([WO5](../../govern/features/worlds.md#decisions)). |
+| NL2 | **The lens names the model, not the agent and never a picker in the composer.** A plan names a role, the lens's `cast` resolves it to a model address, and the address names the configured provider whose credential is used ([GV10](../../govern/spec.md) · PM1). The composer offers the ask kind and the world chip; it never offers a model — the world's cast names it ([WO5](../../govern/features/worlds.md#decisions)). |
 | NL6 | **The read-only guard matches write clauses as words, never as substrings, and never inside a literal.** `offset`, `dataset` and `asset` all end in the letters *set*, and a query saying any of them was refused as a write; so was every read-only `CALL { … }` subquery, and any question containing the word *merge* in quotes. Word boundaries also close the other side — `CREATE(n)` written without a space used to pass. A subquery that writes is caught by the `CREATE` or `SET` inside it, so the brace is not a marker of its own. |
 | NL7 | **A refused query is a policy refusal, not a model failure.** The model answered; Invana declined the answer. It settles as `query_not_read_only` carrying the query as evidence — the same cause `validate_query` raises — rather than `llm_failed`, which told the reader *the model could not produce an answer* and sent them to check the LLM provider, the one part of the chain that was working. The guard stays the outermost of four: the connection's read-only flag, the envelope's pin on `execute_graph_query` and the `validate_query` step each check again closer to the database. |
 | NL8 | **The prompt describes the global model, not the mirror.** The grounding block is built from the authored models' active versions plus the active stitches ([CM3](../../connect-and-model/spec.md#6-cross-feature-decisions)) — that is where a type's description, a property's description and a stitch are authored, and they are what let the model map *length* to `longest` or read *which country* across two models. The introspected mirror carries none of them, and its `_inv_*` bookkeeping properties are not the domain. The mirror is still the version a run **engages** and the `QueryLens` is built from ([GV33](../../govern/spec.md#4-cross-feature-decisions)): what the model is told and what the lens bounds are different roles, and neither is traded for the other. A Graph with no authored model is grounded on the mirror, headed as undescribed, because labels alone beat no grounding. |

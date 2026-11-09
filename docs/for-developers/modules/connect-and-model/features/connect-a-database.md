@@ -10,7 +10,7 @@ connector from then on.
 | API / CLI / Studio | ✅ / — / 🟡 |
 | Related | [introspect-a-database](introspect-a-database.md) · [domain-models](domain-models.md) |
 
-Product spec: [ST-F01 · This graph](../../../../../specs/foundation/settings/features/ST-F01-this-graph/feature.md) — ST-14; the story, its criteria, the connection's rules, states and product decisions live there. This file keeps the create-a-Graph flow (for SH-F02), the engine shape and the rows not moved.
+Product spec: [GR-F04 · This graph](../../../../../specs/os/graph/features/GR-F04-this-graph/feature.md) — GR-15; the story, its criteria, the connection's rules, states and product decisions live there. This file keeps the create-a-Graph flow (for GR-F02), the engine shape and the rows not moved.
 
 ## Capabilities
 
@@ -58,7 +58,7 @@ flowchart TD
 | # | Decision |
 |---|---|
 | CD8 | The database name is a column on `graph_connections`, not a key inside the encrypted `auth` blob. It is passed to the connector only when set. |
-| CD10 | **Testing a connection is a run.** `test_connection` (bound `network`) proves the connection through the runtime — trigger `user` from the form, `system` from a ping ([orchestration § 4.1](../../../orchestration.md#41-what-is-a-task--and-what-is-not)). The provider row it proves stays configuration. |
+| CD10 | **Testing a connection is a run.** `test_connection` (bound `network`) proves the connection through the runtime — trigger `user` from the form, `system` from a ping (orchestration § 4.1). The provider row it proves stays configuration. |
 | CD11 | **Connecting drafts a model, in one call.** `POST /api/v1/graphs/connect` tests the connection (a failing test refuses with the connector's message and makes nothing), makes the Graph, saves the connection, registers it, and reads the database into a new **authored** model whose draft holds every label, relationship type, index and constraint the connector reports. The draft is ready when the call returns; the Graph's read-only `global` mirror still follows from the registration, as before. Nothing is published (ID1). |
 | CD12 | **The connect form names nothing it can derive.** The Graph's name is the database name when one is given, else the URI's host (`bolt://neo4j:7687` → `neo4j`); its slug is that name made URL-safe, suffixed `-2`, `-3` … when the owner already has it. The drafted model is named for the Graph. Both are renamed later — the Graph in Graph settings › Basic, the model from its page. |
 | CD13 | **`/graphs/new` is the connect form.** A Graph with no database answers nothing, so there is no name-only Graph: the six engine cards, URI, User, Password, *Test* and *Connect and draft a model*. The database name is left to the connector's default here and is edited in Graph settings › Database (CD8). Success opens the drafted model's canvas with the assistant docked (`…/modeller/models?model=<id>&model_open=1&models_view=schema&right=assistant`). |

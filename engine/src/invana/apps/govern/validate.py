@@ -2,7 +2,7 @@
 
 A world that cannot legally run is one nobody should be able to store and then
 wonder about
-(specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions), so
+(specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions), so
 every check here happens while somebody is still looking at the form.
 
 Three refusals, and each names the bound rather than saying *not permitted*:

@@ -10,9 +10,9 @@ and a terminal read the same thing.
 | Index | [13.12](../../../README.md#13--platform) · Slice **B06b** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [plugins](plugins.md) · [distributed execution](distributed-execution.md) · [approvals](../../operate/features/approvals.md) · [products › plugins §9](../../../../products/plugins.md#9-where-it-is-administered) · [products › agents AG-13](../../../../products/agents.md) |
+| Related | [plugins](plugins.md) · [distributed execution](distributed-execution.md) · [approvals](../../operate/features/approvals.md) · products › plugins §9 · products › agents AG-13 |
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [RT-F02 · Plugins and outside tools](../../../../../specs/os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md) — RT-04; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 
@@ -25,7 +25,7 @@ Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundat
 | C5 | A skill in a plugin | `plugins/tools/web/skills/collect-dataset/` — `skill.toml` + `instructions.md`; seeded into every Graph like the built-in playbook, `origin = builtin` |
 | C7 | The registry API | `GET /api/v1/plugins` · `/plugins/{name}` · `POST /plugins/{name}/enable · disable` — a function's read is Graph-scoped, `GET …/catalogue/{step_key}` ([the-catalogue](../../workflows/features/the-catalogue.md)) |
 | C8 | The CLI | `invana plugins list · show · enable · disable` · `invana worker` |
-| C9 | Tools run in workers | Under `executor = "procrastinate"`, every tool step is deferred as a `TaskEnvelope` to the `tools.<labels>` queue its resources name and leased by an `invana worker` through the engine's worker gateway ([workers](../../agents/features/workers.md)); the API process waits for its outcome |
+| C9 | Tools run in workers | Under `executor = "procrastinate"`, every tool step is deferred as a `TaskEnvelope` to the `tools.<labels>` queue its resources name and leased by an `invana worker` through the engine's worker gateway (workers); the API process waits for its outcome |
 | C12 | Wire forms | `Out`, `TaskFailure`, `NeedsInput`, `CannotAnswer` and `Converse` cross the queue as JSON and are raised again in the API process |
 
 ## Journey
@@ -124,7 +124,7 @@ sequenceDiagram
 | TP5 | **procrastinate is the `workers` extra**, not a core dependency: `psycopg` and procrastinate are Postgres-only and a SQLite dev install never needs them. `all` includes it, so every image has it. |
 | TP6 | **Outcomes come back through `envelope_outcomes`**, keyed by idempotency key, polled by the API process. procrastinate stores no result; a row also makes a redelivery return the recorded outcome instead of running twice. |
 | TP7 | **procrastinate's schema is applied by `invana migrate`** on Postgres, through its own schema manager, after Alembic — its tables are not ours to diff in the golden schema. |
-| TP8 | **The engine runs the reaper.** Each `invana worker` heartbeats the gateway every 2 s; the engine's sweep retries the jobs of a worker silent 30 s ([workers](../../agents/features/workers.md)). |
+| TP8 | **The engine runs the reaper.** Each `invana worker` heartbeats the gateway every 2 s; the engine's sweep retries the jobs of a worker silent 30 s (workers). |
 | TP9 | **`send` is gated by the interpreter, through the approvals inbox.** Before a `send` step dispatches, the run holds on an `Approval` (`subject_kind = "step"`, the args frozen as its payload, approver = the run's actor, else the Graph's owner, 24 h deadline). Approving or declining resumes the run; the task type itself never asks. |
 | TP10 | **Secrets live in the worker's environment** as `INVANA_SECRET_<NAME>`, read through `ctx.secret(name)`, which refuses a name the plugin's `plugin.toml` does not declare. No secrets table this slice. |
 | TP11 | **`web.search` speaks SearXNG.** The `web_search` secret is a SearXNG base URL; an open, self-hostable search keeps a vendor key out of the product. |
@@ -132,7 +132,7 @@ sequenceDiagram
 | TP15 | **The runtime names only the gate's shape.** `SendGate` (request · decision) is declared in the interpreter; `ApprovalSendGate` over the inbox lives with the approvals manager, and each front-end that builds a runtime installs it (the API at start-up, the CLI in `with_runtime`). With none installed a `send` step fails `blocked · approvals_unavailable` — nothing is sent. The approval's subject is the step row, which a resumed run re-runs. |
 | TP16 | **A plugin skill is seeded as a published v1 whose plan is the one-step `human` placeholder, marked `generated`,** so the first draw replaces it — a skill version always has a plan, and the instructions are what the plugin ships. |
 | TP17 | **Two keys of one plugin that end alike take whole-key folders** — `uniprot_get/`, `pubchem_get/`, and `pubmed_search/` beside them for symmetry; keys stay as the product named them. |
-| TP18 | **Studio reads the registry and switches only what the engine marks switchable.** Agents › Plugins lists `/plugins` filtered by kind; a row opens `plugin:<name>`, a task type on it `task_type:<key>` — two Studio-only board kinds. Enable and Disable show only to an install Admin on a `switchable` plugin. *Connect an MCP server* stays in the CLI ([agents.md › Decisions](../../../../products/agents.md#decisions) *Plugins registry* · *Task type versions*). |
+| TP18 | **Studio reads the registry and switches only what the engine marks switchable.** Agents › Plugins lists `/plugins` filtered by kind; a row opens `plugin:<name>`, a task type on it `task_type:<key>` — two Studio-only board kinds. Enable and Disable show only to an install Admin on a `switchable` plugin. *Connect an MCP server* stays in the CLI (agents.md › Decisions *Plugins registry* · *Task type versions*). |
 | TP14 | **Wire forms are tagged JSON.** `{kind: "out", …Out}` · `{kind: "failure", cls, cause, message, short, evidence, raw}` · `{kind: "needs_input", question, options}` · `{kind: "cannot_answer", reason, exchange}` · `{kind: "converse", reply, options, exchange}`; anything else a worker raises is `failure · defect · worker_error`. |
 
 ## Not building

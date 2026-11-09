@@ -9,9 +9,9 @@ carry a **check** — a machine half, read at the acts it names, and enforced `b
 | Index | [6.4](../../../README.md#6--skills) · Slice **S12b** · **B04** (P-12: install scope, checks) |
 | Module | [Skills](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [authoring-a-skill](authoring-a-skill.md) · [objectives-and-criteria](../../work/features/objectives-and-criteria.md) · [standards](../../bring-data-in/features/standards.md) · products: [modeller.md](../../../../products/modeller.md) MO-12 · MO-F11 |
+| Related | [authoring-a-skill](authoring-a-skill.md) · [objectives-and-criteria](../../work/features/objectives-and-criteria.md) · [standards](../../bring-data-in/features/standards.md) · products: modeller.md MO-12 · MO-F11 |
 
-Product spec: [MO-F06 · Rules agents work by](../../../../../specs/products/model/features/MO-F06-rules-agents-work-by/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F06 · Rules agents work by](../../../../../specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

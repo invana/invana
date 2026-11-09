@@ -1,6 +1,6 @@
 """A write is a governed crossing, addressed by the model version it lands in.
 
-[Model product § Decisions](specs/products/model/product.md#decisions) · load-data.md LD24 ·
+[Model product § Decisions](specs/capabilities/model/product.md#decisions) · load-data.md LD24 ·
 stitch-models.md ST53. Real Postgres, no mocks; nothing here reaches a graph
 database — the crossing is decided and recorded before and after the write.
 """

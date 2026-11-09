@@ -3,10 +3,10 @@
 The *Plan* step picks a published template by intent. Generation is what happens when nothing fits —
 the fallback, not the default.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
@@ -15,7 +15,7 @@ the fallback, not the default.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [the-library](the-library.md) · [envelope-validation](envelope-validation.md) · [promote-a-plan](promote-a-plan.md) |
 
-Product spec: [AG-F06 · Plans and functions](../../../../../specs/products/agents/features/AG-F06-plans-and-functions/feature.md) — AG-18; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F06 · Plans and functions](../../../../../specs/capabilities/agents/features/AG-F06-plans-and-functions/feature.md) — AG-18; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

@@ -12,7 +12,7 @@ GET ``/pins``                          who pins each model address
 =====================================  ==========================================
 
 **No ``set-default``**: the lens ``cast`` answers *which model when nobody said*
-([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
+([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)).
 
 Defines no function — path to view, nothing else.
 """

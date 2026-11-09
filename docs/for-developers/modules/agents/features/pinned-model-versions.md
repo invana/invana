@@ -9,9 +9,9 @@ changes nothing until a person moves the pin, and any run can be re-run on the v
 | Index | [5.9](../../../README.md#5--agents) · Slice **B02** (P-17) |
 | Module | [Agents](../spec.md) |
 | API / CLI / Studio | 🟡 / 🟡 / 🟡 |
-| Related | [providers-and-models](providers-and-models.md) · [author-an-agent](author-an-agent.md) · [evals](../../skills/features/evals.md) · [change-log](../../operate/features/change-log.md) · products: [agents.md](../../../../products/agents.md) AG-14 · [shell.md](../../../../products/shell.md) SH-18 |
+| Related | providers-and-models · [author-an-agent](author-an-agent.md) · [evals](../../skills/features/evals.md) · [change-log](../../operate/features/change-log.md) · products: agents.md AG-14 · AG-32 |
 
-Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F01 · Build an agent](../../../../../specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -20,7 +20,7 @@ Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/fe
 | Settings › LLM providers | A page of its own: models by version name, each row naming the agents, skill versions and eval judges pinned to it (`GET …/llm/pins`), and a notice for a pinned version the Graph no longer offers ([5.10](fleet-performance.md)) |
 | Agent page › Thinking | *Model version*: none, or an exact version; moving it is its own act with a why, gated (C03) |
 | Skill page › Instructions | The draft's model version, published with the next version (C03) |
-| Run page | *Re-run…* on the header of a settled root ask → the re-run dialog: *Ran with* (model version · agent version · world), *The same versions — reproduce it* · *Current versions — compare*, Cancel · Re-run. A re-run's page carries *Compare with the original* (SH-18, C09) |
+| Run page | *Re-run…* on the header of a settled root ask → the re-run dialog: *Ran with* (model version · agent version · world), *The same versions — reproduce it* · *Current versions — compare*, Cancel · Re-run. A re-run's page carries *Compare with the original* (AG-32, C09) |
 | CLI | `invana llms list` · `models <endpoint>` print the addresses a pin takes; `invana agents pin <agent> --model <address>` passes the eval gate on the new pin first |
 
 ## Engine
@@ -52,7 +52,7 @@ Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/fe
 | PV7 | **Re-run is a new root run**, linked by `rerun_of_run_id`; it never touches the original. `same` replays the recorded versions and refuses, naming it, when one is gone; `current` reads today's pins and cast. |
 | PV8 | **A person's pick for one ask is innermost.** The composer's model pick names the model for that ask only; it outranks the pins, and it is lens-checked like them. It moves no pin and mints no version. |
 | PV9 | **The skill pin is the plan's.** A run whose plan was drawn from a skill version calls that version's pin; a run on a generated plan reads the agent's. |
-| PV10 | **Re-run takes a settled ask.** An `nl` or `ql` root that is no longer queued, running or waiting. It opens as a run of its own, in no session, so the original reply is never rewritten; every task an ask runs reads its session as optional, and a model call's audit event points at the run when there is no session. `same` pins the recorded `model_version` and copies the frozen lens; the plan is drawn afresh. Replaying plan revision 0 and the offered skill versions waits for the run page that shows them (SH-18). |
+| PV10 | **Re-run takes a settled ask.** An `nl` or `ql` root that is no longer queued, running or waiting. It opens as a run of its own, in no session, so the original reply is never rewritten; every task an ask runs reads its session as optional, and a model call's audit event points at the run when there is no session. `same` pins the recorded `model_version` and copies the frozen lens; the plan is drawn afresh. Replaying plan revision 0 and the offered skill versions waits for the run page that shows them (AG-32). |
 
 | PV12 | **Re-run is the run page's act, and only where the engine takes it.** *Re-run…* is on the header of a root `nl` or `ql` run that has settled; a step, an import or a live run has none. It opens a dialog whose *Re-run on* is a segmented control — *The same versions — reproduce it* · *Current versions — compare* — the control the Share dialog uses for its one choice; the request is `POST …/runs/{id}/rerun {versions}`, and a 409 is shown in the dialog in the engine's own words (`version_not_offered` names the version). |
 | PV13 | ***Ran with* shows what the run recorded, nothing else**: the model version (or *not recorded*; a `ql` run *calls no model*), the agent and its version, the world as frozen. The skill version and dataset versions are not on the run record, so they are not drawn; *current* names no versions ahead of time, because they are resolved when the run opens. |

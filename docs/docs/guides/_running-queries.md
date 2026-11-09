@@ -222,4 +222,3 @@ curl -X POST http://localhost:8000/api/v1/queries/explain \
 ## Next Steps
 
 - [Query Engine Concepts](../concepts/query-engine.md) — understand the execution pipeline
-- [Visualization](../studio/visualization.md) — render query results as interactive graphs

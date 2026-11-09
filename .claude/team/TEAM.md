@@ -88,7 +88,7 @@ Every role, always: `.handoffs/**` · `/tmp/**` · `/private/tmp/**` · `.claude
 | Kit · canvas code | `~/Projects/invana/design-kit/**` · `~/Projects/invana/canvas/**` |
 | Changesets | `.changeset/**` |
 | Specs | `specs/**` |
-| Story tasks | `specs/products/*/features/*/stories/*/task.md` · `specs/foundation/*/features/*/stories/*/task.md` |
+| Story tasks | `specs/*/*/features/*/stories/*/task.md` |
 | Other docs | `docs/**` · `README.md` · `CONTRIBUTING.md` · `CHANGELOG.md` |
 | Boards (canvas) | `.design/**` |
 | Project file | `.claude/team/projects/*/project.md` |

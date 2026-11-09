@@ -4,15 +4,15 @@ What carries over between runs. An agent does not remember on its own: everythin
 time is either **a record in the graph it queries**, or **something a person changed on the evidence**
 of what happened. This module owns both paths, and the evidence that drives them.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
 | Index | [§8 · Memory](../../README.md#8--memory) |
-| Features | [evidence](features/evidence.md) · [recall-by-query](features/recall-by-query.md) · [proposals](features/proposals.md) · [consolidation](features/consolidation.md) |
+| Features | evidence · recall-by-query · proposals · consolidation |
 | Depends on | [Ask](../ask/spec.md) (runs produce the record) · [Skills](../skills/spec.md) · [Workflows](../workflows/spec.md) · [Work](../work/spec.md) (criterion outcomes) |
 | Depended on by | every module that improves with use |
 

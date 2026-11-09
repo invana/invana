@@ -30,19 +30,20 @@ class SendMessage(BaseModel):
     llm_provider_id: str | None = None
     #: An explicit model for this one ask — an ``llm_models`` id. It still has
     #: to be one this Graph offers and it does **not** bypass the lens: a pick
-    #: is a resolution, not a widening ([Model product § Decisions](specs/products/model/product.md#decisions)).
+    #: is a resolution, not a widening ([Model product § Decisions](specs/capabilities/model/product.md#decisions)).
     llm_model_id: str | None = None
     # How long (seconds) to budget this ask: the LLM translation (nl) and the
     # query execution (nl + ql). Lets slow models/queries be granted more time.
     # Falls back to the translate/driver defaults when omitted.
     timeout_s: float | None = Field(default=None, gt=0, le=600)
     #: The world this one ask runs in — *Next ask only*
-    #: ([EX-F03 § Decisions](specs/products/explore/features/EX-F03-ask-a-question/feature.md#decisions)).
+    #: ([EX-F03 § Decisions](specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md#decisions)).
     #: **Omitted and null mean different things**: omitted is the session's
     #: world ([AS5](docs/for-developers/modules/ask/spec.md)); null is
     #: *Everything, inside the guardrails*, for this ask only. The run freezes
     #: what it resolves to; the id alone would be a pointer at a row that can
-    #: move (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+    #: move (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md §
+    #: Decisions).
     lens_id: str | None = Field(default=None, max_length=36)
     #: ``load`` when the system asks on the person's behalf to draw a reply —
     #: a table's whole-node twin. The turn is a canvas operation, not a
@@ -168,7 +169,7 @@ class SessionMessageRead(BaseModel):
     steps: list[RunNodeRead] = []
     #: The world this turn's run was frozen with, and its name as frozen — so a
     #: rename or a delete since never changes what a past turn says
-    #: ([EX-F03 § Decisions](specs/products/explore/features/EX-F03-ask-a-question/feature.md#decisions)).
+    #: ([EX-F03 § Decisions](specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md#decisions)).
     #: Both null is *Everything*.
     lens_id: str | None = None
     lens_name: str | None = None

@@ -12,7 +12,7 @@ run time.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [the-answer-surface](the-answer-surface.md) (the emission kinds) · [clarifying-questions](clarifying-questions.md) (when a step asks) · [the-library](../../workflows/features/the-library.md) (the same promote-what-served pattern) |
 
-Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F04 · The answer](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## 3. A template
 
@@ -72,5 +72,5 @@ it here yet.
 
 | | |
 |---|---|
-| Studio | `src/pages/graphs-detail/features/ask/projections/` — `TemplatesDrawer` (the section) over `TemplatesPanel` (the body). **Templates is Library's third drawer, not a `leftNav` item** ([G38](../../../building-studio/graph-detail-page.md)): a template is to an answer what a plan is to a run, so it sits beside `Plans` and `Catalogue`. The drawer owns the header — label, the `11 · 5 result` count, search, the `kind`/`surface` filter and the `+` that authors one; `&template=` drills into one, read end to end, inside the drawer |
-| The word | A **template** here is the versioned, person-authored thing this feature describes. Nothing else in Studio may take the name — see [code-shape.md](../../../building-studio/code-shape.md) §4.1b |
+| Studio | `src/pages/graphs-detail/features/ask/projections/` — `TemplatesDrawer` (the section) over `TemplatesPanel` (the body). **Templates is Library's third drawer, not a `leftNav` item** (G38): a template is to an answer what a plan is to a run, so it sits beside `Plans` and `Catalogue`. The drawer owns the header — label, the `11 · 5 result` count, search, the `kind`/`surface` filter and the `+` that authors one; `&template=` drills into one, read end to end, inside the drawer |
+| The word | A **template** here is the versioned, person-authored thing this feature describes. Nothing else in Studio may take the name — see code-shape.md §4.1b |

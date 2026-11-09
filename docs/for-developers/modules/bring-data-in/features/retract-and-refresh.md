@@ -8,9 +8,9 @@ schedule mints new versions while its consumers stay pinned to the one they chos
 | Index | [2.5](../../../README.md#2--bring-data-in) · Slice **B03** (P-08) |
 | Module | [Bring data in](../spec.md) |
 | API / CLI / Studio | ✅ / 🟡 / 🟡 |
-| Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [schedules](../../operate/features/schedules.md) · products: [datasets.md](../../../../products/datasets.md) DS-03 · DS-14 · DS-F14 · DS-F15 |
+| Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [schedules](../../operate/features/schedules.md) · products: datasets.md DS-03 · DS-14 · DS-F14 · DS-F15 |
 
-Product spec: [DS-F01 · Datasets and their versions](../../../../../specs/products/datasets/features/DS-F01-datasets-and-their-versions/feature.md) — DS-03 and DS-14; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F01 · Datasets and their versions](../../../../../specs/capabilities/datasets/features/DS-F01-datasets-and-their-versions/feature.md) — DS-03 and DS-14; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

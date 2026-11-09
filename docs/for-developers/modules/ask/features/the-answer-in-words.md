@@ -8,15 +8,15 @@ claim cited to the record behind it. The table and the subgraph are still there;
 | Index | [3.12](../../../README.md#3--ask) · Slice **S-TBD** |
 | Module | [Ask](../spec.md) |
 | API / CLI / Studio | 🔵 / — / 🔵 |
-| Related | [what an answer is made of](the-answer-surface.md) · [soul](../../agents/features/soul.md) · [beyond the graph](beyond-the-graph.md) · [ask in natural language](ask-in-natural-language.md) |
+| Related | [what an answer is made of](the-answer-surface.md) · [soul](../../agents/features/soul.md) · beyond the graph · [ask in natural language](ask-in-natural-language.md) |
 
-Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F04 · The answer](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
 | Surface | Shape | Components |
 |---|---|---|
-| Prose emission | `ProseBody`: sentences with inline citation markers, third-party claims badged | `EmissionCard` · `ProseBody` · citation chip · `ThirdPartyBadge` ([3.13](beyond-the-graph.md)) |
+| Prose emission | `ProseBody`: sentences with inline citation markers, third-party claims badged | `EmissionCard` · `ProseBody` · citation chip · `ThirdPartyBadge` (3.13) |
 | Trace | The Answer step with its exchange ([SR42](../../operate/features/see-what-ran.md#decisions)), claims kept and dropped | `TraceDialog` |
 
 ## Engine
@@ -25,7 +25,7 @@ Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/featu
 |---|---|
 | Entry | `answer_in_words`, bound `llm`, after `verify_result` in every `nl-*` plan |
 | Inputs | the ask · the intent summary · up to 50 rows with their record ids · the soul |
-| Tool output | `claims: [{text, cites: [record_id…]} \| {text, third_party: {source, reference, …}}]` — the third-party shape is [3.13](beyond-the-graph.md#engine)'s |
+| Tool output | `claims: [{text, cites: [record_id…]} \| {text, third_party: {source, reference, …}}]` — the third-party shape is 3.13's |
 | Emission | `prose` · payload `{claims}` · citation = union of cited record ids |
 | Egress | `the_question` + `property_values`; without `property_values` the step is skipped, not failed |
 | Order | the prose emission's `seq` precedes the emissions it cites |

@@ -1,7 +1,7 @@
-# Agents
+# Agents — `agents`
 
 The engine shape of an agent: the principal that runs work, its bindings and its standing limits. The product rules
-are [Agents](../../products/agents/product.md) and [AG-F01](../../products/agents/features/AG-F01-build-an-agent/feature.md);
+are [Agents](../../capabilities/agents/product.md) and [AG-F01](../../capabilities/agents/features/AG-F01-build-an-agent/feature.md);
 the records a run is made of are [orchestration.md](../orchestration.md); what a run may see, use and send is
 [governance-and-lens.md](../governance-and-lens.md). Skills are [skills.md](skills.md), plans [workflows.md](workflows.md).
 On screen the envelope is *what it may do*, the budget a *token budget* and the soul a *voice* ([glossary.md](../../glossary.md)).
@@ -44,8 +44,6 @@ Each bound is stated, each refuses with the bound named, and none is negotiable 
 | Worlds, guardrails and their casts | [govern.md](govern.md). An agent's own guardrail is a `lenses` row scoped `agent:<id>`; the agent holds no pointer to it |
 | The model a run uses | The lens's cast, role → model address — never a field on the agent |
 
-Column list, ER diagram and migration order: [govern-and-agents-data-model.md](../../../docs/for-developers/building-engine/govern-and-agents-data-model.md).
-
 ## How an agent is composed
 
 Five groups of settings; only two are tables of their own — the rest is columns on `agents` or a pointer to another
@@ -55,7 +53,7 @@ module's record.
 |---|---|---|---|
 | **Who** | How it sounds | `soul` (Markdown, read only by prose steps) · `soul_traits` (`humour` · `formality` · `emoji` · `greeting`) | This module |
 | **Focus** | What it works on | `instructions` — reaches Understand and Translate | This module |
-| **Thinking** | How much it tries, and which way | `effort` (`max_steps` · `max_replans` · `max_clarifications`) · `stance_id` | This module · the stance is Ask's |
+| **Thinking** | How much it tries, and which way | `effort` (`max_steps` · `max_replans` · `max_clarifications`) · `stance_id` | This module · the stance is in [ask.md](ask.md) |
 | **Can do** | How it approaches work, and what it may run | `skill_bindings` · `envelope.allow` · `pins` · `plans` | [skills.md](skills.md) · this module |
 | **Limits** | What it may ever spend and reach, and never see | `budget` (cost and reach ceilings) · `policy` (`can_be_assigned` · `unattended`) · its guardrail | This module · [govern.md](govern.md) |
 | *The work* | What one run may see and spend | The session's, Todo's or schedule's world · spend per run | The session · [work.md](work.md) · [govern.md](govern.md) |

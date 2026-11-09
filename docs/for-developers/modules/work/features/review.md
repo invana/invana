@@ -8,13 +8,13 @@ tasks that wait.
 | Index | [9.3](../../../README.md#9--work) · Slice **S12b** |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | 🔵 / — / 🔵 |
-| Related | [projects-and-tasks](projects-and-tasks.md) · [objectives-and-criteria](objectives-and-criteria.md) · [consolidation](../../memory/features/consolidation.md) · [the runtime](../../platform/features/runtime.md) (§10 — the three pauses this queue decides) |
+| Related | [projects-and-tasks](projects-and-tasks.md) · [objectives-and-criteria](objectives-and-criteria.md) · consolidation · [the runtime](../../platform/features/runtime.md) (§10 — the three pauses this queue decides) |
 
-Product spec: [PJ-F02 · Objectives and review](../../../../../specs/products/projects/features/PJ-F02-objectives-and-review/feature.md) — PJ-17; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F02 · Objectives and review](../../../../../specs/capabilities/projects/features/PJ-F02-objectives-and-review/feature.md) — PJ-17; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Approvals in the queue
 
-Stays, not moved: [IN-F01](../../../../../specs/foundation/inbox/features/IN-F01-needs-you/feature.md) decides an ask as shown — changing what it will do before allowing it is in its *Not building*. Amending the gated call's arguments is open for Ravi there.
+Stays, not moved: [AC-F05](../../../../../specs/os/access/features/AC-F05-asks-and-approvals/feature.md) decides an ask as shown — changing what it will do before allowing it is in its *Not building*. Amending the gated call's arguments is open for Ravi there.
 
 | # | Capability | Notes |
 |---|---|---|

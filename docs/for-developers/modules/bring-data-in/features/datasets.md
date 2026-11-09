@@ -8,9 +8,9 @@ from, licensed, versioned and hashed, so a result can be reproduced from the exa
 | Index | [2.4](../../../README.md#2--bring-data-in) · Slice **B03** (P-08) |
 | Module | [Bring data in](../spec.md) |
 | API / CLI / Studio | ✅ / 🟡 / ✅ |
-| Related | [retract-and-refresh](retract-and-refresh.md) · [bind-a-dataset](bind-a-dataset.md) · [change-log](../../operate/features/change-log.md) · products: [datasets.md](../../../../products/datasets.md) DS-01 · DS-02 · DS-03 · DS-04 · DS-12 · DS-F16 |
+| Related | [retract-and-refresh](retract-and-refresh.md) · [bind-a-dataset](bind-a-dataset.md) · [change-log](../../operate/features/change-log.md) · products: datasets.md DS-01 · DS-02 · DS-03 · DS-04 · DS-12 · DS-F16 |
 
-Product spec: [DS-F01 · Datasets and their versions](../../../../../specs/products/datasets/features/DS-F01-datasets-and-their-versions/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F01 · Datasets and their versions](../../../../../specs/capabilities/datasets/features/DS-F01-datasets-and-their-versions/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -19,7 +19,7 @@ Product spec: [DS-F01 · Datasets and their versions](../../../../../specs/produ
 | `datasets.catalogue` | Studio `/datasets/catalogue` — `CataloguePage` |
 | `datasets.dataset` · `.provenance` · `.versions` · `datasets.record` | Studio `/datasets/catalogue/<publisher>/<name>[/provenance · /records[/<key>] · /versions]` — `DatasetPage` and its tabs |
 | `datasets.observe` · `datasets.share` | Studio — `ObserveDialog` · `ShareDialog` on the dataset header, for its writer |
-| `invana datasets list · show · import · versions · diff · history · share` | CLI (products/datasets.md › CLI) |
+| `invana datasets list · show · import · versions · diff · history · share` | CLI (capabilities/datasets.md › CLI) |
 
 ## Engine
 

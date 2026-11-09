@@ -122,7 +122,7 @@ class Flow(Base):
     args_schema: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     #: `[{key, version, args}]` — what this plan **spent**: the library plans it
     #: inlined, and the arguments it tuned on each. The rows themselves are a
-    #: copy taken at composition (specs/products/agents/features/AG-F04-skills/feature.md § Decisions),
+    #: copy taken at composition (specs/capabilities/agents/features/AG-F04-skills/feature.md § Decisions),
     #: so this records the act rather than pointing at a plan that could move.
     uses: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     #: Provenance, N:M — the skill versions this plan was drawn from.

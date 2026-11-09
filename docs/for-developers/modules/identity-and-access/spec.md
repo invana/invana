@@ -12,7 +12,7 @@ product that shows it.
 | Depends on | — |
 | Depended on by | everything: every request resolves to a principal |
 
-Product spec: [ST · Settings](../../../../specs/foundation/settings/product.md) — its features ST-F02 and ST-F03 hold the stories, rules and product decisions of this module; ST-F01 (membership) follows. This file keeps the domain words, the engine shape and the rows not moved.
+Product spec: [ST · Settings](../../../../specs/os/access/product.md) — its features AC-F03 and AC-F01 hold the stories, rules and product decisions of this module; GR-F04 (membership) follows. This file keeps the domain words, the engine shape and the rows not moved.
 
 System design: [identity-and-access.md](../../../../specs/system-design/modules/identity-and-access.md) — membership and roles, what a token carries. This file keeps the vocabulary, what the module owns and the cross-feature decisions.
 
@@ -46,7 +46,7 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | `policies` · `policy_versions` · `policy_attachments` | [policies](features/policies.md) |
 | `groups` · `group_members` | [people and groups](features/people-and-groups.md) |
 | Auth routes | `/api/v1/auth/*`; everything else is graph-scoped under `/api/v1/u/{username}/{graphSlug}/…` |
-| The superuser flag | what the admin application checks — the application itself is [13.6](../platform/features/admin-and-health.md) |
+| The superuser flag | what the admin application checks — the application itself is 13.6 |
 
 ## 5. Cross-feature decisions
 

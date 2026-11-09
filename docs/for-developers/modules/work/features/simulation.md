@@ -9,10 +9,10 @@ back `derived`.
 | Index | [9.8](../../../README.md#9--work) · B09 · C06 |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Product | [products/projects.md](../../../../products/projects.md) PJ-F6 · PJ-09 · P-06 · P-07 |
+| Product | capabilities/projects.md PJ-F6 · PJ-09 · P-06 · P-07 |
 | Related | [plugins](../../platform/features/plugins.md) (the simulator kind) · [branches-and-decisions](branches-and-decisions.md) · [datasets](../../bring-data-in/features/datasets.md) · [see what ran](../../operate/features/see-what-ran.md) |
 
-Product spec: [PJ-F04 · Simulation and impact](../../../../../specs/products/projects/features/PJ-F04-simulation-and-impact/feature.md) — PJ-09; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F04 · Simulation and impact](../../../../../specs/capabilities/projects/features/PJ-F04-simulation-and-impact/feature.md) — PJ-09; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

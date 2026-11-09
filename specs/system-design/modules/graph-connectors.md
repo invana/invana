@@ -1,10 +1,10 @@
-# Graph connectors
+# Graph connectors — `runtime`
 
 How the engine speaks to a graph database, and how someone adds one. The engine knows two query languages, not six
 vendors; each vendor is a small package that supplies a driver and overrides only what the standard language cannot
 express. Which databases speak which language, and the rule each crossing keeps, is
 [integrations.md](../integrations.md); where a Graph is bound to its database is
-[ST-F01](../../foundation/settings/features/ST-F01-this-graph/feature.md); how a view of the graph is composed before it
+[GR-F04](../../os/graph/features/GR-F04-this-graph/feature.md); how a view of the graph is composed before it
 reaches a connector is [governance-and-lens.md](../governance-and-lens.md).
 
 ## Words

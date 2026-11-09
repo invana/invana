@@ -3,9 +3,7 @@
 The engine's task model: a person writes a **Todo**, a **Flow** of **Task**s carries it out, and a **TaskRun** is one
 execution of it. Nothing a user authors is ever a `Task`. The layers it sits in are [architecture.md](architecture.md);
 the records a person meets are [data-model.md](data-model.md); what a run may see, use and send is
-[governance-and-lens.md](governance-and-lens.md). The plan grammar, repetition, pauses, triggers, pool bounds and worked
-examples are still in [orchestration.md](../../docs/for-developers/orchestration.md) §§ 4–11. On screen a Todo is a
-*Task*, a Flow is a *Plan* and a TaskRun is a *Run* ([glossary.md](../glossary.md)).
+[governance-and-lens.md](governance-and-lens.md). On screen a Todo is a *Task*, a Flow is a *Plan* and a TaskRun is a *Run* ([glossary.md](../glossary.md)).
 
 ## The records
 
@@ -370,7 +368,7 @@ invent a callable could escape any ceiling. The vocabulary has two tiers, and on
 
 | Test | Detail |
 |---|---|
-| It passes the three questions | Observable steps · can fail halfway · worth a trace ([§ 4.1](../../docs/for-developers/orchestration.md#41-what-is-a-task--and-what-is-not)) |
+| It passes the three questions | Observable steps · can fail halfway · worth a trace |
 | It declares typed outputs | `when`, `until` and `${steps.x.y}` bind against them; an undeclared output is an undocumented API |
 | It spends exactly one bound | The envelope check is per callable; an entry spanning two bounds cannot be ceilinged |
 | It is not control flow | `if` · `loop` · `map` · `retry` · `stop` are plan grammar, never entries |
@@ -631,7 +629,7 @@ the frontier, not the plan**: everything behind the cursor is history, everythin
 | A visual Task-graph authoring UI | A plan is data validated against an envelope; drawing from prose and promotion from a run that served are the authoring paths |
 | Versioned Tasks | The run freezes what ran; a version table records it twice |
 | Cloning a reusable plan on use | Copies drift, and *which copy is right* becomes a question |
-| Auto-approval · auto-acceptance | Nothing set to Ask is ever decided by itself: nothing acts without asking but where a person's line says Allow ([one access model](../foundation/settings/product.md#decisions)), and a raised pause waits for a person |
+| Auto-approval · auto-acceptance | Nothing set to Ask is ever decided by itself: nothing acts without asking but where a person's line says Allow ([one access model](../os/access/product.md#decisions)), and a raised pause waits for a person |
 | Backfill · polling sensors | A missed firing is handled by its schedule's policy — one catch-up run, every missed one (at most 24), or none. A run waits on a person or an event, never a spin loop |
 | Generating prose from a plan | Two generators pointing at each other drift, and neither stays authoritative |
 | Redrawing on every keystroke | Half a sentence is not an instruction |

@@ -100,7 +100,7 @@ class Graph(Base):
     # and a provider for it to instruct (setup.md SU5).
     instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Skips, per section. Everything else about setup is derived at serialize
-    # time (specs/foundation/shell/features/SH-F02-create-a-graph/feature.md § Decisions).
+    # time (specs/os/graph/features/GR-F02-create-a-graph/feature.md § Decisions).
     # Shape: {graph_info: {completed_at?, skipped_at?}, instructions: {...}, skills: {...}, datasets: {...}}.
     setup_state: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     status: Mapped[GraphStatus] = mapped_column(_graph_status_enum, nullable=False, default=GraphStatus.active)

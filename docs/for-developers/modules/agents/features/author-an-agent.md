@@ -11,7 +11,7 @@ and its voice.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [lifecycle](lifecycle.md) · [bindings](../../skills/features/bindings.md) |
 
-Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-21 and AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F01 · Build an agent](../../../../../specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md) — AG-21 and AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -26,11 +26,11 @@ Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/fe
 | Assignee picker | Staffed agents first, then the rest | `RichSelect` |
 
 Components in **bold** do not exist yet and are built in `design-kit` first, with a story —
-[building-studio/govern-and-agents-panels.md § 3](../../../building-studio/govern-and-agents-panels.md).
+building-studio/govern-and-agents-panels.md § 3.
 
 ## Engine
 
-Full schema: [building-engine/govern-and-agents-data-model.md](../../../building-engine/govern-and-agents-data-model.md).
+Full schema: building-engine/govern-and-agents-data-model.md.
 
 | Thing | Shape |
 |---|---|
@@ -42,7 +42,7 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | What it is using, over HTTP | `GET …/agents/{id}/meters` → `{tokens_this_month, max_tokens_month, max_tokens_run, running, queued, max_concurrent_runs, runs_this_month, sessions, spawned_this_month, depth, max_children, max_depth, max_fanout, max_tokens}` — `max_tokens` is `max_tokens_run` under its one-release name ([EB8](envelope-and-budget.md#decisions)); every number derived on read ([AG31](#decisions)) |
 | Its sessions, over HTTP | `GET …/sessions?agent_id=` — the caller's own sessions bound to this agent; sessions stay private to whoever opened them |
 | Effort | `agents.effort` JSON; `AgentRead.effort` as stored and `AgentRead.effective_effort` as a run reads it ([EB11](envelope-and-budget.md#decisions)) |
-| **Dropped** | `llm_config_id` — an agent binds no provider ([PM1](providers-and-models.md)) |
+| **Dropped** | `llm_config_id` — an agent binds no provider (PM1) |
 | Its guardrail | a `lenses` row, `kind = guardrail`, `scope = agent:<id>` — Govern's table, Govern's routes ([GR5](../../govern/features/guardrails.md)). The agent holds no pointer to it |
 | The cast | resolved per run from the effective lens — the work's world, then the guardrails' casts, then the shipped default. Resolution: [govern § 2](../../govern/spec.md) |
 | Tokens this month | `SUM(tokens_in + tokens_out)` over the agent's root runs that started this **calendar month** and their steps, on `ix_task_runs_agent_started` — not a counter column. It reads as `AgentListResponse.tokens_this_month`, a `{agent_id: tokens}` sidecar: one grouped read for the whole list; an agent with no run is absent and reads `0` ([AG11](#decisions) · [EB15](envelope-and-budget.md#decisions)) |
@@ -57,12 +57,12 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | # | Decision |
 |---|---|
 | AG5 | **Work that names no world runs in *Everything*, never in a blank.** *Nothing set* and *nothing permitted* must never look alike ([GR6](../../govern/features/guardrails.md)), and the widest state is still inside the guardrails — the Graph's and the agent's own. |
-| AG12 | **The word is *agents*, and *roster* is retired.** A drawer is named for the rows it holds, and the rows are agents — the same rule that makes `Projects` › `Projects` and `Skills` › `Skills` read straight ([G33](../../../building-studio/graph-detail-page.md)). *Roster* named the table an agent lands in, and a table's name is not what a person reads, so it is gone from the label, from the drawer id (`?section=agents`), from this file's own slug, and from the engine and Studio comments that carried it. An old `?section=roster` link still lands here: an unknown drawer falls to the first one, and this is the first one. Where *roster* meant the skills an agent carries, the word is **bindings** ([BN8](../../skills/features/bindings.md)) — one word was doing two jobs. |
+| AG12 | **The word is *agents*, and *roster* is retired.** A drawer is named for the rows it holds, and the rows are agents — the same rule that makes `Projects` › `Projects` and `Skills` › `Skills` read straight (G33). *Roster* named the table an agent lands in, and a table's name is not what a person reads, so it is gone from the label, from the drawer id (`?section=agents`), from this file's own slug, and from the engine and Studio comments that carried it. An old `?section=roster` link still lands here: an unknown drawer falls to the first one, and this is the first one. Where *roster* meant the skills an agent carries, the word is **bindings** ([BN8](../../skills/features/bindings.md)) — one word was doing two jobs. |
 
 | AG14 | **What an agent may run is a callable, and the word is *callable*.** The envelope's allowed set is callables from the catalogue ([terminology](../../../terminology.md)); *capability* stays the name of a feature file's section, so one word does not do two jobs. |
 | AG23 | **The agent is one page with eleven tabs** — Overview · Runs · Instructions · Soul · Model · Flow · Access · Limits · Deploy · Evals · History — laid out in [the agent page](the-agent-page.md), which owns its tabs, head and builder. |
 | AG26 | **An agent has no world column; its narrowing is its guardrail.** The migration gives each agent that carried a world an agent-scoped guardrail with that world's rules and cast, so nothing an agent could reach widens on the way. |
-| AG27 | **The default stance ships after the stance itself.** Until stances are rows with an author and a version, the Thinking tab carries focus and effort only, and `agents.stance_id` is not added — a foreign key to a table that does not exist yet would be scaffolding. AG20 and AG21 stand; the stance lands with [act as](../../ask/features/act-as.md). |
+| AG27 | **The default stance ships after the stance itself.** Until stances are rows with an author and a version, the Thinking tab carries focus and effort only, and `agents.stance_id` is not added — a foreign key to a table that does not exist yet would be scaffolding. AG20 and AG21 stand; the stance lands with act as. |
 | AG28 | **A voice edit is `agent.soul_set`; every other edit is `agent.update`; one edit is one version.** `soul` and `soul_traits` change how the agent speaks and nothing it may do, so the audit names them apart — the dials in full, the soul by its length, since the version holds the text. Saving a soul and an effort together moves the version once and emits both events. |
 | AG29 | **Humour is switched off by the caller when it knows, and by a stated rule when it does not.** `render_traits(traits, went_wrong=True)` renders `humour: off` for a reply already known to be a refusal, an error or a pause. Understand decides *in the same call* whether it cannot answer, so there is no second call to switch the dial for; its prompt carries the rule as a sentence instead — *when you refuse, cannot answer, or report an error or a pause, use no humour* ([AG17](#decisions)). |
 | AG30 | **What this agent can do is read, never stored.** A skill's `needs` are the distinct callables of its current version's plan in plan order — `uses` is already inlined into those rows, and is listed beside them as `key@version`; `missing` is the needs its envelope does not allow; offered and applied are **this agent's** runs of the current version, with the Graph-wide floor for *too few to read*. The read also carries the totals the Overview tab prints — `offered` and `applied` summed across the bound skills, and `prompt_chars` ([BN15](../../skills/features/bindings.md#decisions)) — so Studio sums nothing. A callable's `needed_by` is the same reading turned round, plus the base plans in the envelope's `templates`, each at its newest version. |

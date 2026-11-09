@@ -10,7 +10,7 @@ the model — it is what you compare the model against.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [connect-a-database](connect-a-database.md) · [domain-models](domain-models.md) |
 
-Product spec: [MO-F01 · Start a model](../../../../../specs/products/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F01 · Start a model](../../../../../specs/capabilities/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

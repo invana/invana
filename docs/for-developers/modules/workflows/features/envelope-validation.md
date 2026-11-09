@@ -10,7 +10,7 @@ nothing and is refused with the bound named.
 | API / CLI / Studio | 🟡 / — / 🔵 |
 | Related | [envelope-and-budget](../../agents/features/envelope-and-budget.md) (where bounds are authored) · [plan-selection](plan-selection.md) |
 
-Product spec: [AG-F06 · Plans and functions](../../../../../specs/products/agents/features/AG-F06-plans-and-functions/feature.md) — AG-18; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F06 · Plans and functions](../../../../../specs/capabilities/agents/features/AG-F06-plans-and-functions/feature.md) — AG-18; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

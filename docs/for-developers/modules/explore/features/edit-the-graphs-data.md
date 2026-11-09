@@ -8,9 +8,9 @@ held on the board until saved, and saved to the database as one run.
 | Index | [4.7](../../../README.md#4--explore) · Slice **—** (not scheduled) |
 | Module | [Explore](../spec.md) |
 | API / CLI / Studio | 🔵 / — / 🔵 |
-| Related | [selection-and-the-panel](selection-and-the-panel.md) · [graph-canvas](graph-canvas.md) · [boards](boards.md) · [model-editor](../../connect-and-model/features/model-editor.md) · Invana Products EX-20 · EX-21 ([explorer.md](../../../../products/explorer.md)) |
+| Related | [selection-and-the-panel](selection-and-the-panel.md) · [graph-canvas](graph-canvas.md) · [boards](boards.md) · [model-editor](../../connect-and-model/features/model-editor.md) · Invana Products EX-20 · EX-21 (explorer.md) |
 
-Product spec: [EX-F06 · Annotate and edit the data](../../../../../specs/products/explore/features/EX-F06-annotate-and-edit-the-data/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F06 · Annotate and edit the data](../../../../../specs/capabilities/explore/features/EX-F06-annotate-and-edit-the-data/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -25,7 +25,7 @@ Product spec: [EX-F06 · Annotate and edit the data](../../../../../specs/produc
 
 ## Engine
 
-**The route opens a run.** Nothing writes outside the runtime ([orchestration](../../../orchestration.md) §4.1a):
+**The route opens a run.** Nothing writes outside the runtime (orchestration §4.1a):
 the route checks the role and the batch against the model, then opens a run of the flow
 `data-edit@1`, whose one task `apply_data_edits` writes through the connector's data writer.
 

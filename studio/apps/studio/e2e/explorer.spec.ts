@@ -89,7 +89,7 @@ test("a rejected query is a diagnosis, never an answer", async ({ page }) => {
 	await expect(emission(page)).toHaveCount(0);
 });
 
-test("SH-07 the user menu switches the assistant off, and back on", async ({
+test("GR-11 the user menu switches the assistant off, and back on", async ({
 	page,
 }) => {
 	await page.goto(`${GRAPH}/explorer`);

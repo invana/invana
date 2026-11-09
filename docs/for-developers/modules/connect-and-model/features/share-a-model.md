@@ -10,7 +10,7 @@ git are the registry.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [domain-models](domain-models.md) · [starter-models](starter-models.md) · [stitch-models](stitch-models.md) |
 
-Product spec: [MO-F03 · Link and share models](../../../../../specs/products/model/features/MO-F03-link-and-share-models/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F03 · Link and share models](../../../../../specs/capabilities/model/features/MO-F03-link-and-share-models/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

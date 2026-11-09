@@ -8,9 +8,9 @@ citing what, on whose behalf" has an answer rather than an opinion.
 | Index | [10.2](../../../README.md#10--operate) · Slice **S5.5 · S12a** |
 | Module | [Operate](../spec.md) |
 | API / CLI / Studio | 🟡 / — / 🟡 |
-| Related | [reasoning-trace](../../ask/features/reasoning-trace.md) · [lineage](../../agents/features/lineage.md) · [evidence](../../memory/features/evidence.md) |
+| Related | [reasoning-trace](../../ask/features/reasoning-trace.md) · [lineage](../../agents/features/lineage.md) · evidence |
 
-Product spec: [IN-F03 · History](../../../../../specs/foundation/inbox/features/IN-F03-history/feature.md) — IN-02; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
+Product spec: [AC-F06 · History](../../../../../specs/os/access/features/AC-F06-history/feature.md) — AC-16; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
 
 ## Surfaces
 

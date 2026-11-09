@@ -11,11 +11,11 @@ inbox to send to; a **notification** is one inbox row; a **delivery** is one sen
 | API / CLI / Studio | ✅ / ✅ / 🟡 |
 | Related | [approvals](approvals.md) · [schedules](schedules.md) · [audit-and-activity](audit-and-activity.md) · [roles](../../identity-and-access/features/roles.md) |
 
-Product spec: [IN-F01 · Needs you](../../../../../specs/foundation/inbox/features/IN-F01-needs-you/feature.md) — IN-04 · IN-05; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [GR-F05 · Needs you](../../../../../specs/os/graph/features/GR-F05-the-inbox/feature.md) — GR-16 · GR-17; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 
-The Studio surfaces as built today; the Inbox modal and Settings › Notifications in IN-F01 replace them.
+The Studio surfaces as built today; the Inbox modal and Settings › Notifications in GR-F05 replace them.
 
 | Surface | Shape |
 |---|---|
@@ -42,7 +42,7 @@ The Studio surfaces as built today; the Inbox modal and Settings › Notificatio
 
 ## Decisions
 
-Engine rows, and the tray rows the Inbox modal supersedes; the product decisions are IN-F01's.
+Engine rows, and the tray rows the Inbox modal supersedes; the product decisions are GR-F05's.
 
 | # | Decision |
 |---|---|

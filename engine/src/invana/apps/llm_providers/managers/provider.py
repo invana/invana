@@ -310,7 +310,7 @@ class LLMProviderManager:
         """Stop offering a model. **Mechanical** — whether it may go is a Govern
         question, asked by
         :class:`~invana.apps.govern.managers.endpoint.LLMEndpointManager` before
-        this is reached (specs/foundation/settings/features/ST-F05-ai-models/feature.md § Decisions)."""
+        this is reached (specs/os/runtime/features/RT-F01-ai-models/feature.md § Decisions)."""
         address = LLMEndpoint(row=provider, model=model).address
         model_id = model.id
         await self.models_qs.delete(session, model)

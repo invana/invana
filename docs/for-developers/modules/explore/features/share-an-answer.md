@@ -8,9 +8,9 @@ as a file — never as access.
 | Index | [4.5](../../../README.md#4--explore) · Slice **C09** (EX-15) |
 | Module | [Explore](../spec.md) |
 | API / CLI / Studio | ✅ / 🔵 / ✅ |
-| Related | [boards](boards.md) · [the-console](the-console.md) · [the-answer-surface](../../ask/features/the-answer-surface.md) · [roles](../../identity-and-access/features/roles.md) · products: [explorer.md](../../../../products/explorer.md) EX-15 |
+| Related | [boards](boards.md) · [the-console](the-console.md) · [the-answer-surface](../../ask/features/the-answer-surface.md) · [roles](../../identity-and-access/features/roles.md) · products: explorer.md EX-15 |
 
-Product spec: [EX-F02 · Share and present an answer](../../../../../specs/products/explore/features/EX-F02-share-and-present-an-answer/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F02 · Share and present an answer](../../../../../specs/capabilities/explore/features/EX-F02-share-and-present-an-answer/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

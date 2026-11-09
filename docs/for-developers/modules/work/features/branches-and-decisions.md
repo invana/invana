@@ -9,10 +9,10 @@ the rules in force. Agents **propose**; people decide.
 | Index | [9.5](../../../README.md#9--work) · B05 |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Product | [products/projects.md](../../../../products/projects.md) PJ-F1 · PJ-F2 · PJ-F3 · PJ-F4 · PJ-F5 |
+| Product | capabilities/projects.md PJ-F1 · PJ-F2 · PJ-F3 · PJ-F4 · PJ-F5 |
 | Related | [projects-and-tasks](projects-and-tasks.md) · [project-reports](project-reports.md) · [private-projects](private-projects.md) · [rules](../../skills/features/rules.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
-Product spec: [PJ-F03 · Branches, findings and decisions](../../../../../specs/products/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) — PJ-03 · PJ-04 · PJ-05 · PJ-06 · PJ-07 · PJ-08 · PJ-11 · PJ-13; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F03 · Branches, findings and decisions](../../../../../specs/capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) — PJ-03 · PJ-04 · PJ-05 · PJ-06 · PJ-07 · PJ-08 · PJ-11 · PJ-13; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

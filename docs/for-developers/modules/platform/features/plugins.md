@@ -10,13 +10,13 @@ builds itself from the manifests once at start-up and is then frozen.
 | Index | [13.9](../../../README.md#13--platform) · Slice **B06a** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | — / — / — — the engine layout only; the registry API, `invana plugins` and Agents › Plugins are [13.12](tool-plugins.md) |
-| Related | [the runtime](runtime.md) · [read the catalogue](../../workflows/features/the-catalogue.md) · [products › plugins](../../../../products/plugins.md) |
+| Related | [the runtime](runtime.md) · [read the catalogue](../../workflows/features/the-catalogue.md) · products › plugins |
 
 > **As** an engine developer adding a task type, **I want** one folder with its manifest and its code,
 > **so that** the planner, the validator, the catalogue route and a future worker all read the same
 > declaration without a second registry to keep in step.
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-29 holds what a person sees of plugins: what one is, switching, versions recorded. This file is the engine layout and stays whole.
+Product spec: [RT-F02 · Plugins and outside tools](../../../../../specs/os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md) — RT-04 holds what a person sees of plugins: what one is, switching, versions recorded. This file is the engine layout and stays whole.
 
 ## Capabilities
 
@@ -28,7 +28,7 @@ Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundat
 | C4 | Packaged flows | `flows/<key>.toml` — the fixed multi-step plans the plugin ships (`model-import@1`, `stitch-apply@1`, …) |
 | C5 | Checked at start-up | A manifest whose key's last dotted segment is not its folder, whose `run.py` has no `async def run(ctx, v)`, or whose key repeats stops the process with the file named |
 | C6 | Frozen per process | Built once; nothing registers while plans run |
-| C7 | Keys are `namespace.verb` | `graph.read.query`, `nl.translate`, `web.read_url` — [agent-fabric › The function library](../../../../products/agent-fabric.md#the-function-library); moving a task type between plugins renames nothing |
+| C7 | Keys are `namespace.verb` | `graph.read.query`, `nl.translate`, `web.read_url` — agent-fabric › The function library; moving a task type between plugins renames nothing |
 | C8 | Each Task records its task type's version | `tasks.task_version`, written when a plan's rows are exploded |
 | C9 | Simulator plugins | `plugins/simulators/<name>/`, `kind = "simulator"`: one simulator task type, its declared spec fields, and one packaged `simulate` flow — run by [9.8 Simulation](../../work/features/simulation.md) |
 

@@ -7,10 +7,10 @@ A project is visible to every member of its Graph, or only to the people and age
 | Index | [9.7](../../../README.md#9--work) · B05 |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Product | [PJ-F01 · Projects and tasks](../../../../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md) · PJ-02 · P-14 |
+| Product | [PJ-F01 · Projects and tasks](../../../../../specs/capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) · PJ-02 · P-14 |
 | Related | [roles](../../identity-and-access/features/roles.md) · [search](../../platform/features/search.md) · [projects-and-tasks](projects-and-tasks.md) |
 
-Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-02; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-02; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

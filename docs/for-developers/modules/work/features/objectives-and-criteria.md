@@ -10,7 +10,7 @@ reviewer sees which one failed.
 | API / CLI / Studio | 🔵 / — / 🔵 |
 | Depends on | [projects-and-tasks](projects-and-tasks.md) · [rules](../../skills/features/rules.md) |
 
-Product spec: [PJ-F02 · Objectives and review](../../../../../specs/products/projects/features/PJ-F02-objectives-and-review/feature.md) — PJ-16; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F02 · Objectives and review](../../../../../specs/capabilities/projects/features/PJ-F02-objectives-and-review/feature.md) — PJ-16; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

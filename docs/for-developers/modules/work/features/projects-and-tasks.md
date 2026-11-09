@@ -1,9 +1,9 @@
 # Projects and Todos
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records).** What this file
+> ⚠ **Rewritten for orchestration § 0.** What this file
 > used to call a *Task* is a **Todo**; `Task` now names a node inside a Flow. A Todo has no
 > `status` column — state derives from its runs. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 Write a Todo, assign it to a person or an agent, watch it run, accept the result. Dependencies give a
 derived order — nobody maintains a plan by hand.
@@ -15,7 +15,7 @@ derived order — nobody maintains a plan by hand.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [objectives-and-criteria](objectives-and-criteria.md) · [review](review.md) · [author-an-agent](../../agents/features/author-an-agent.md) |
 
-Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-01 · PJ-12 · PJ-15; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F01 · Projects and tasks](../../../../../specs/capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) — PJ-01 · PJ-12 · PJ-15; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

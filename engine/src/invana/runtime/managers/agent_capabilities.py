@@ -1,5 +1,5 @@
 """What an agent can do — its skills and its callables, as two tables that name
-each other ([AG-F01](specs/products/agents/features/AG-F01-build-an-agent/feature.md)).
+each other ([AG-F01](specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md)).
 
 Band 3 for the reason the bind check is: it reads ``apps/skills``,
 ``apps/flows``, the catalogue and ``task_runs``, and only the runtime may

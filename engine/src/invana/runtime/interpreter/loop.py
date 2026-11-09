@@ -456,7 +456,7 @@ class TaskRuntime:
 
         ``max_concurrent_runs`` on the budget bounds how many runs one agent is
         working at once, which is a different bound from the Graph's ceiling
-        ([ST-F06 § Decisions](specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md#decisions)):
+        ([RT-F04 § Rules](specs/os/runtime/features/RT-F04-limits/feature.md#rules)):
         one bounds an actor, the other bounds the machine. Checked first so an
         agent at its own bound is told *that*, rather than queued behind a
         Graph ceiling it was never going to reach.
@@ -464,7 +464,7 @@ class TaskRuntime:
         It **refuses and does not queue** — an agent has no policy column, and a
         second queue with its own precedence would make *why am I waiting* two
         answers instead of one. The refusal names the ceiling
-        ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
+        ([AG-F01 § Decisions](specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
 
         A run with no agent has no such bound, which is the widest reading and
         the honest one.

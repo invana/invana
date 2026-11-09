@@ -41,13 +41,13 @@ _SYSTEM = (
 
 def _ollama_up() -> bool:
     try:
-        httpx.get(_OLLAMA_URL.rstrip("/") + "/api/tags", timeout=3.0)
-        return True
+        tags = httpx.get(_OLLAMA_URL.rstrip("/") + "/api/tags", timeout=3.0).json()
+        return any(m.get("name") == _DEV_MODEL for m in tags.get("models", []))
     except Exception:
         return False
 
 
-@pytest.mark.skipif(not _ollama_up(), reason="local Ollama not reachable")
+@pytest.mark.skipif(not _ollama_up(), reason="local Ollama or its dev model not available")
 async def test_complete_tool_ollama_returns_schema_valid_object() -> None:
     provider = endpoint(LLMProviderKind.ollama, _DEV_MODEL, base_url=_OLLAMA_URL)
     result = await complete_tool(

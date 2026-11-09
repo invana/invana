@@ -148,7 +148,8 @@ async def list_lenses(
     """The Worlds drawer, or the Guardrails one.
 
     A guardrail **never appears under ``kind=world``**
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions) — that is
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions) —
+    that is
     what the filter is for, and why it is not one list with a badge.
     """
     items = await lenses.list_for_graph(

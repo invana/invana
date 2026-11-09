@@ -5,7 +5,7 @@ and an app (band 2) may not import the runtime (band 3).
 
 A citation is the model's own claim, resolved to the **version** it was offered
 — so rewording a rule, or deactivating it, never rewrites what a past step says
-it followed ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
+it followed ([MO-F06 § Decisions](specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
 Counts are derived from the record on every read; nothing accumulates on the
 rule.
 """
@@ -98,10 +98,11 @@ class RuleCitationManager:
 async def offered_rules(session: AsyncSession, *, steps) -> dict[str, OfferedRule]:
     """``rule_version_id`` → the statement that was offered, and the rule to open.
 
-    One resolve for both halves of specs/products/model/features/MO-F06-rules-agents-work-by/feature.md § Decisions's
+    One resolve for both halves of specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md §
+    Decisions's
     pair, over every step of a tree or a trace, so the two surfaces that draw a
     step row ask the same question once each rather than once per row
-    ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
+    ([MO-F06 § Decisions](specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)).
 
     A version whose rule has been deleted resolves to nothing, and the caller
     drops it: a step row shows statements, and an id is not one.

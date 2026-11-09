@@ -4,15 +4,15 @@ A question becomes a run, the run becomes steps, and the steps produce things a 
 Everything here is grounded: an answer states only what the graph holds, and says so when it holds
 nothing.
 
-> ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
 | Index | [§3 · Ask](../../README.md#3--ask) |
-| Features | [write-queries](features/write-queries.md) · [ask-in-natural-language](features/ask-in-natural-language.md) · [the-answer-surface](features/the-answer-surface.md) · [projections](features/projections.md) · [streaming-and-the-workflow](features/streaming-and-the-workflow.md) · [clarifying-questions](features/clarifying-questions.md) · [reasoning-trace](features/reasoning-trace.md) · [when-it-cannot-answer](features/when-it-cannot-answer.md) · [the-assistant](features/the-assistant.md) · [runtime-and-adapters](features/runtime-and-adapters.md) · [fork-a-session](features/fork-a-session.md) |
+| Features | [write-queries](features/write-queries.md) · [ask-in-natural-language](features/ask-in-natural-language.md) · [the-answer-surface](features/the-answer-surface.md) · [projections](features/projections.md) · [streaming-and-the-workflow](features/streaming-and-the-workflow.md) · [clarifying-questions](features/clarifying-questions.md) · [reasoning-trace](features/reasoning-trace.md) · when-it-cannot-answer · [the-assistant](features/the-assistant.md) · [runtime-and-adapters](features/runtime-and-adapters.md) · fork-a-session |
 | Depends on | [Agents](../agents/spec.md) (a run is executed through an agent) · Connect and model (the global model is the grounding context) |
 | Depended on by | [Work](../work/spec.md) (a task runs as a run) · Explore · Operate |
 | Owns the surface | [the-assistant](features/the-assistant.md) — the one place a question is asked, on every left panel of the graph page. It is Ask's surface, not Explore's |
@@ -84,23 +84,23 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 | Explorer · one answer, five kinds | [the-answer-surface](features/the-answer-surface.md) | `metric · table · chart · subgraph · prose` in one answer, each with its header; the empty emission; the subgraph landing on the canvas |
 | Explorer · the same records, another projection | [projections](features/projections.md) | the template picker on the emission header; incompatible templates refused with the reason |
 | Explorer · Understand asks back | [clarifying-questions](features/clarifying-questions.md) | the closed question in the thread, the parked run, the same run resuming |
-| Four ways a run ends · states sheet | [when-it-cannot-answer](features/when-it-cannot-answer.md) | retry · repair · cannot-answer · diagnosis, four surfaces that never share a shape |
+| Four ways a run ends · states sheet | when-it-cannot-answer | retry · repair · cannot-answer · diagnosis, four surfaces that never share a shape |
 | `ask.converse` | [ask-in-natural-language](features/ask-in-natural-language.md) NL12 | small talk answered as a message in the agent's voice, pointing at something to ask — no emission, no refusal |
-| `ask.cannot_answer.voiced` | [when-it-cannot-answer](features/when-it-cannot-answer.md) CA10 | a cannot-answer in the agent's voice that still names what the graph is missing and offers what it holds |
+| `ask.cannot_answer.voiced` | when-it-cannot-answer CA10 | a cannot-answer in the agent's voice that still names what the graph is missing and offers what it holds |
 | `ask.answer.prose` | [the-answer-in-words](features/the-answer-in-words.md) | the prose emission first, each claim with its citation chip; a clicked citation highlights its row in the table below |
 | `ask.answer.prose.writing` | [the-answer-in-words](features/the-answer-in-words.md) | the table painted, the Answer step running, *Writing the answer…* above it |
 | `ask.answer.prose.skipped` | [the-answer-in-words](features/the-answer-in-words.md) | the world cuts record values: the Answer step dimmed and named, the table alone |
 | `ask.answer.prose.failed_soft` | [the-answer-in-words](features/the-answer-in-words.md) | *0 of 3 claims could be cited*: the step failed, the answer stands |
-| `ask.answer.third_party` | [beyond-the-graph](features/beyond-the-graph.md) | `nl-outside` run with Search and Fetch; a graph claim cited, an internet claim badged with its link, a model claim badged with its model |
-| `ask.answer.third_party.refused` | [beyond-the-graph](features/beyond-the-graph.md) | Search struck through with the guardrail rule named, Fetch not reached, the prose saying it could not look |
-| `settings.search_providers.list` | [beyond-the-graph](features/beyond-the-graph.md) | Settings › Search providers: rows with ping state, the provider's address, and the rules that name it |
-| `settings.search_providers.list.empty` | [beyond-the-graph](features/beyond-the-graph.md) | no provider: the empty state and the add form, pinged before it saves |
+| `ask.answer.third_party` | beyond-the-graph | `nl-outside` run with Search and Fetch; a graph claim cited, an internet claim badged with its link, a model claim badged with its model |
+| `ask.answer.third_party.refused` | beyond-the-graph | Search struck through with the guardrail rule named, Fetch not reached, the prose saying it could not look |
+| `settings.search_providers.list` | beyond-the-graph | Settings › Search providers: rows with ping state, the provider's address, and the rules that name it |
+| `settings.search_providers.list.empty` | beyond-the-graph | no provider: the empty state and the add form, pinged before it saves |
 
 ## 7b. A session executes through plans, always
 
 | # | Decision |
 |---|---|
-| AS1 | **Nothing in a chat reaches a provider, a database or the graph except through a Flow.** A message that asks for something opens a TaskRun; the session records the thread ([orchestration § 4.2](../../orchestration.md#42-a-session-is-not-a-task)). There is no chat-only execution path, which is what makes an answer auditable and an envelope enforceable ([§ 4.1a](../../orchestration.md#41a-nothing-executes-outside-the-runtime)). |
+| AS1 | **Nothing in a chat reaches a provider, a database or the graph except through a Flow.** A message that asks for something opens a TaskRun; the session records the thread (orchestration § 4.2). There is no chat-only execution path, which is what makes an answer auditable and an envelope enforceable (§ 4.1a). |
 | AS2 | **Selection order is: a matched reusable plan · a generated plan.** Both are `Flow` rows; `plan_origin` says which served. A reusable plan is packaged or promoted, never drawn by hand ([7.2](../workflows/features/plan-selection.md) · [6.5](../skills/features/instructions-publish-rollback.md#decisions) IS3) — promoting the plan that answered a question well ([7.4](../workflows/features/promote-a-plan.md)) is how it is answered well, permanently. |
 | AS3 | **Understanding is a bounded loop** ([clarifying-questions](features/clarifying-questions.md) CQ8–CQ10): several rounds of clarification are iterations of one run, and the thread shows one exchange. |
 | AS4 | **The session is not the unit of governance; the run is.** Budget, lens, envelope and approval all attach to the run — so two asks in one thread can be grounded differently and billed separately, and neither inherits the other's spend. |

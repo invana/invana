@@ -7,8 +7,11 @@ The format is .claude/skills/product-spec/format.md. This script enforces the me
 required sections, IDs, story shape, the task table, cross-links, screen words and the no-history rule — so the
 product-manager agent and its reviewers can spend their judgment on what the spec says.
 
-A spec area is a product (``products/<p>/``) or a part of the foundation every product uses (``foundation/<p>/``),
-both written the same way. A feature is a folder, ``<area>/<p>/features/<CODE>-F<nn>-<slug>/feature.md``; each of its
+A spec area is a part of the operating system every capability uses (``os/<p>/``) or a capability
+(``capabilities/<p>/``), both written the same way. The index lists the operating system before the capabilities.
+``specs/_stale/`` holds material that is not live: it is never checked, and a link into it from a live spec or doc
+(anything else in ``specs/`` or ``docs/``) is an error. A feature is a folder,
+``<area>/<p>/features/<CODE>-F<nn>-<slug>/feature.md``; each of its
 stories is a folder under
 ``stories/<CODE>-<nn>-<slug>/`` holding ``story.md`` and ``task.md``. A story's status may not run ahead of its tasks,
 and a feature's status is the lowest of its stories'. Boards are checked against the Agent version canvas when it is
@@ -25,7 +28,14 @@ ROOT = Path(__file__).resolve().parents[2]
 SPECS = ROOT / 'specs'
 CANVAS = ROOT / '.design' / 'canvas-agent-version' / 'project'
 
-AREAS = {'products': 'Products', 'foundation': 'Foundation'}
+STALE = '_stale'  # specs/_stale/: not live, never checked, never linked to
+# Index order: the operating system, then the capabilities.
+AREAS = {'os': 'Operating system', 'capabilities': 'Capabilities'}
+# A relative link target: `[text](path)` or `[text](<path>)`, and the `[id]: path` reference definition.
+LINK = re.compile(r'\]\(\s*(?:<([^<>\n]+)>|([^)\s#<>]+))[^)\n]*\)'
+                  r'|^ {0,3}\[[^\]\n]+\]:[ \t]*(?:<([^<>\n]+)>|([^\s<>#]+))', re.M)
+FENCE = re.compile(r'^```.*?^```', re.S | re.M)
+CODE = re.compile(r'`[^`\n]*`')
 STATUSES = ['idea', 'specified', 'designed', 'built', 'verified']
 LATER = 'later'  # parked: outside the ladder until it is taken up
 KEYS = {
@@ -156,6 +166,34 @@ def check_surfaces():
             err(readme, f'pillar `{r[col]}` is not one the vision names ({", ".join(sorted(pillars))} or Operating system)')
 
 
+def is_stale(path):
+    """True when ``path`` sits under ``specs/_stale/``."""
+    return path.is_relative_to(SPECS / STALE)
+
+
+def check_stale_links():
+    """Refuse every markdown link from a live spec or doc into ``specs/_stale/``.
+
+    Live is every ``.md`` under ``specs/`` (but ``_stale/`` itself) and under ``docs/``. Only ``[text](path)`` links
+    (the path bare or in angle brackets, an anchor dropped) and ``[id]: path`` definitions with a relative path count —
+    never URLs, code spans or fenced code — so a rule may still name the folder in backticks. The target need not
+    exist: a link into ``_stale/`` is refused whether or not it resolves.
+    """
+    stale = (SPECS / STALE).resolve()
+    for top in (SPECS, ROOT / 'docs'):
+        for path in sorted(top.rglob('*.md')):
+            if is_stale(path) or 'node_modules' in path.parts:
+                continue
+            text = CODE.sub('', FENCE.sub('', path.read_text(encoding='utf-8', errors='replace')))
+            for match in LINK.findall(text):
+                target = next(t for t in match if t).split('#', 1)[0].strip()
+                if not target or re.match(r'^[a-z][a-z0-9+.-]*:', target, re.I) or target.startswith('/'):
+                    continue
+                if (path.parent / target).resolve().is_relative_to(stale):
+                    err(path, f'links into `specs/{STALE}/` (`{target}`) — '
+                              'stale material is never linked from a live spec or doc')
+
+
 def check_story(path, fm, body, boards_cited):
     """The five parts of one story; returns its criterion IDs."""
     sid = fm.get('id', '')
@@ -266,6 +304,8 @@ def check_tasks(path, sid, criteria, status):
 def main(write_index=False):
     docs = {}
     for path in sorted(SPECS.rglob('*.md')):
+        if is_stale(path):
+            continue
         kind = kind_of(path)
         if kind in (None, 'task'):
             continue
@@ -275,6 +315,7 @@ def main(write_index=False):
     ids, stories, tasks_of, boards_cited = {}, {}, {}, {}
     banned = glossary_banned()
     check_surfaces()
+    check_stale_links()
     for path, (kind, fm, body) in docs.items():
         for k in KEYS[kind]:
             if k not in fm:
@@ -421,7 +462,7 @@ def index(docs, tasks_of):
         rows.append('\n## Journeys\n\n| ID | Journey | Stories |\n|---|---|---|')
         rows += [f'| {f["id"]} | [{f["title"]}]({q.relative_to(SPECS)}) | {" · ".join(f.get("stories", []))} |' for f, q in journeys]
     (SPECS / 'README.md').write_text(
-        '# Invana product specs\n\nWhat Invana does and why — products, the foundation every product uses, features, '
+        '# Invana product specs\n\nWhat Invana does and why — the operating system, the capabilities, features, '
         'user stories and the tasks that '
         'deliver them, journeys. Every spec follows one format and passes `python3 scripts/specs/check.py`. '
         'This index is generated by `python3 scripts/specs/check.py --index` — do not edit it by hand.\n'

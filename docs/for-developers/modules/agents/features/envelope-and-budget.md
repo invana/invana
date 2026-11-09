@@ -10,7 +10,7 @@ anything is dispatched — so a plan outside the bounds costs nothing.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [envelope-validation](../../workflows/features/envelope-validation.md) (the check) · [delegation](delegation.md) |
 
-Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-21; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F01 · Build an agent](../../../../../specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md) — AG-21; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -36,7 +36,7 @@ Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/fe
 
 Three groups, by what a number limits: **Budget** — what it may spend · **Effort** — how hard it tries
 before it stops · **Reach** — how wide it may spread. Budget and Reach are `agents.budget` JSON; Effort
-is `agents.effort` JSON ([EB9](#decisions)). [Data model § 5.1](../../../building-engine/govern-and-agents-data-model.md).
+is `agents.effort` JSON ([EB9](#decisions)). Data model § 5.1.
 
 **Budget** — `agents.budget`
 
@@ -51,14 +51,14 @@ is `agents.effort` JSON ([EB9](#decisions)). [Data model § 5.1](../../../buildi
 |---|---|---|---|
 | `max_steps` | `16` | steps in one plan | ✅ at validation |
 | `max_replans` | `1` | a `verify` cannot loop forever | ✅ the interpreter |
-| `max_clarifications` | `3` | per run — `understand` stops asking. **`0` means it never asks**: an ambiguity is resolved by a declared assumption, never a silent one ([AA4](../../ask/features/act-as.md#decisions)) | ✅ `understand` |
+| `max_clarifications` | `3` | per run — `understand` stops asking. **`0` means it never asks**: an ambiguity is resolved by a declared assumption, never a silent one (AA4) | ✅ `understand` |
 
 **Reach** — `agents.budget`
 
 | Key | Value | What it bounds | Enforced |
 |---|---|---|---|
 | `max_fanout` | `200` lanes | a `map_over` beyond it is refused **at validation**, not mid-run | declared — nothing dispatches a fanned-out node yet |
-| `max_concurrent_runs` | `3` | across every run this agent is working. The **Graph's** ceiling is separate ([concurrency](concurrency-and-contention.md)) | ✅ at admission, refused by name ([CC11](concurrency-and-contention.md)) |
+| `max_concurrent_runs` | `3` | across every run this agent is working. The **Graph's** ceiling is separate (concurrency) | ✅ at admission, refused by name (CC11) |
 | `max_children` · `max_depth` | `3` · `2` | delegation ([delegation](delegation.md)) | ✅ |
 
 ### A pinned argument
@@ -77,7 +77,7 @@ opening a row.
 | # | Decision |
 |---|---|
 | EB6 | **A ceiling the wire does not carry is one no screen can draw.** Every key of `effective_budget` rides `GET …/runs/{id}/trace`, not the two the first board happened to need. |
-| EB7 | **Declared is not the same as enforced, and the table says which.** `max_concurrent_runs` is enforced at admission and refuses naming the agent ([CC11](concurrency-and-contention.md)). `max_tokens_run` and `max_tokens_month` are declared and drawn against — stopping on a token budget is EB2's *never during* and [orchestration § 0.10](../../../orchestration.md)'s budget approval. `max_fanout` is declared and unread until something dispatches a `map_over`. |
+| EB7 | **Declared is not the same as enforced, and the table says which.** `max_concurrent_runs` is enforced at admission and refuses naming the agent (CC11). `max_tokens_run` and `max_tokens_month` are declared and drawn against — stopping on a token budget is EB2's *never during* and orchestration § 0.10's budget approval. `max_fanout` is declared and unread until something dispatches a `map_over`. |
 | EB10 | **The column is `envelope`, and its plan list is `plans`.** `workflow_spec` named a workflow where the thing is a bound, and `templates` named library plans with a word the product uses for projection templates. Both old names are read for one release, and the API answers both, so a reader that has not moved keeps working. |
 | EB9 | **Effort is its own bound, neither budget nor character.** Steps, replans and clarifications are not money, so they do not sit under a word that means money; and they decide what runs, so they cannot sit in the [soul](soul.md), which only chooses words ([SO2](soul.md#decisions)). They read like temperament and are enforced like a ceiling — a soul can make an agent *sound* persistent, only Effort makes it retry. No preset: three numbers set once, read on the Ceilings table. |
 | EB11 | **Effort is read by presence, from `effort` first, then `workflow_spec`, then `budget`.** `max_clarifications: 0` is an agent that never asks, never a fall-through to the default three. The migration copies each agent's numbers into `effort` without removing them, the seeded agents carry `effort` of their own, and a delegated child's effort is its parent's, narrowed key by key like its budget. |

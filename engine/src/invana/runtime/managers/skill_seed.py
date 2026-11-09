@@ -7,7 +7,7 @@ could not bind it to one agent rather than another, and could not see where it
 was applied.
 
 So it is **a skill like any other**
-([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)):
+([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)):
 seeded into every Graph with ``origin = builtin``, re-seeded idempotently by
 name, never deleted — and **editable**, because publishing v2 over it is an
 ordinary act and a product that could not be corrected by its user would be

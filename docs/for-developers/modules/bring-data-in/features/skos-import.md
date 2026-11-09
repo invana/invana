@@ -10,9 +10,9 @@ the first semantic import Invana supports.
 | Index | [2.8](../../../README.md#2--bring-data-in) · Slice **B12** (P-19) |
 | Module | [Bring data in](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [standards](standards.md) · [ontology-import](../../connect-and-model/features/ontology-import.md) · products: [datasets.md](../../../../products/datasets.md) DS-15 · DS-F17 |
+| Related | [standards](standards.md) · [ontology-import](../../connect-and-model/features/ontology-import.md) · products: datasets.md DS-15 · DS-F17 |
 
-Product spec: [DS-F04 · Standards and checks](../../../../../specs/products/datasets/features/DS-F04-standards-and-checks/feature.md) — DS-15; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F04 · Standards and checks](../../../../../specs/capabilities/datasets/features/DS-F04-standards-and-checks/feature.md) — DS-15; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

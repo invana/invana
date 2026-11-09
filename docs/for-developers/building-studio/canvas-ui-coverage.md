@@ -7,8 +7,8 @@ canvas: **check here before building canvas chrome.**
 | | |
 |---|---|
 | Package | `@invana/canvas-ui` — source at `~/Projects/invana/canvas/packages/canvas-ui` |
-| Studio folders | [`features/explorer/` · `features/boards/`](../module-structure.md#121-studio) |
-| Where it disagrees | [module-structure.md](../module-structure.md) §4 *Kit substitutions* is the plan of record and wins |
+| Studio folders | `features/explorer/` · `features/boards/` |
+| Where it disagrees | [`specs/`](../../../specs/README.md) wins |
 | Rule it enforces | CLAUDE.md › *Design rules* — anything bound to canvas state belongs to `@invana/canvas-ui`; a component the kit lacks is built **there**, with a story, not in `studio/` |
 
 ## 1. The rule
@@ -20,7 +20,7 @@ canvas: **check here before building canvas chrome.**
 | CU3 | **Chrome is never hand-rolled.** A floating card over the canvas is `Panel` + `PanelContent` with a `position`. A `div` with `absolute right-3 top-3 … rounded-lg border shadow-lg` and a hand-built header is a bug, not a style. |
 | CU4 | **One-at-a-time side panels are `useSidePanels`.** [canvases.md](../modules/explore/features/boards.md) CV6 — Layers · Styling · History share an anchor — is exactly what the hook expresses. A hand-rolled `overlay` union is a reimplementation of it. |
 | CU5 | **Visibility runs through the store's first-class API.** `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes` / `showAllHidden`, available since `@invana/graph` 0.0.12. Studio does not model "hidden" itself, and does not filter the data to fake it. |
-| CU6 | **A Studio adapter that outgrows Studio is promoted, not kept.** `typeColor.ts` reads the `@invana/styling` data palette; canvas-ui's own `typeColor` hashes into a hardcoded list. Ours is the better one, so it goes **down** into canvas-ui rather than staying a private Studio copy ([code-shape.md](code-shape.md) — a component belongs in the lowest layer that can own it). |
+| CU6 | **A Studio adapter that outgrows Studio is promoted, not kept.** `typeColor.ts` reads the `@invana/styling` data palette; canvas-ui's own `typeColor` hashes into a hardcoded list. Ours is the better one, so it goes **down** into canvas-ui rather than staying a private Studio copy (code-shape.md — a component belongs in the lowest layer that can own it). |
 | CU8 | **A canvas-ui change never alters an existing default.** New options are opt-in; `GraphCanvasApp`'s base config, the bundled behaviours and the shipped palettes stay as they are unless changing one is the actual request. A default flipped in passing changes every canvas in every consumer at once, and the failure surfaces as "rendering broke" in one browser rather than as the config change it was. Same rule for scope: a bug reported while a change is in flight is a separate piece of work, not an invitation to widen it. |
 | CU9 | **Available now beats right eventually — but never a half-port.** Studio adopts what a *released* canvas-ui ships (Track A) as soon as the journey allows, and leaves the rest alone. A surface still being built in canvas (Track B) means Studio's existing file stays exactly as it is until the release lands: no wrapper, no partial adoption, no "temporary" second copy. That is why a Track B item is always two commits in two repos — the canvas-side build, then the Studio-side deletion — and why the deletion is not started early. |
 
@@ -52,7 +52,7 @@ Audited 2026-09-10 against `@invana/canvas-ui@0.0.14`.
 | `explorer/LayersPanel.tsx` | 0 | **`LayersViewPanel`** | ✅ **Replaced.** `DataBoardPage` mounts the kit panel in `Panel` + `PanelContent` |
 | `explorer/ExplorerCanvas.tsx` › `ExplorerHeaderToolbar` | 284 | **`GraphControlsToolbar`** | ❌ **Fork.** Composes the same six section hooks (`useLayout` · `useViewSection` · `useSelectMode` · `useGrid` · `useStyleEditorSection` · `useHistorySection`). The magnet toggle and the WebGL/WebGPU picker are genuinely ours — they are two `extraItems` |
 | `explorer/visibility.ts` | 0 | **`GraphStore` visibility API** | ✅ **Deleted.** Hidden is the store's flag; the edge cascade is the store's |
-| `explorer/StylingPanel.tsx` | 0 | **`StylingViewPanel`** (B1) | ✅ **Replaced**, with `apply={false}` — Studio keeps painting, the card only edits ([module-structure.md](../module-structure.md) §4) |
+| `explorer/StylingPanel.tsx` | 0 | **`StylingViewPanel`** (B1) | ✅ **Replaced**, with `apply={false}` — Studio keeps painting, the card only edits |
 | `canvases/CanvasHistoryPanel.tsx` | 171 | **`CanvasVersionsViewPanel`** | ⏳ **Built, awaiting a release.** B4 has shipped in canvas-ui (`view-panels/canvas-versions`, with a story) and lands here on the next canvas version. It draws the timeline; the rows, the restore and the per-row banner query stay ours — they read the engine's `canvas_states`, which canvas-ui knows nothing about (a row *is* a `CanvasStateSnapshot`; *version* is the word the user reads — [canvases.md](../modules/explore/features/boards.md) CV11) |
 | `boards/DataBoardPage.tsx` › the `overlay` union | ~40 | **`useSidePanels`** | ⚠️ **Reimplements CV6.** The hook turns a list of `SidePanelDef`s into the toggles, the open-state and the region body |
 | `explorer/InspectorViewPanel.tsx` | 178 | `DetailCard` · `PropertyDetailView` · `EdgeEndpoints` · `defaultPropertyRenderers` | ⚠️ **Partial.** Property rendering by kind is duplicated. The provenance block and the `missing` badge are ours. Carries `bg-blue-500/20` · `text-purple-400` — tokens-only violations |
@@ -139,7 +139,7 @@ reactive type list, styled in one and hidden in the other.
 **On B2's name.** `InspectorPanel` is taken — `toolbars/InspectorPanel` *edits* the click-inspect
 target through `PropertiesEditor`. B2 is read-only and driven by the *selection*. Two components
 called inspector in one package is a name that stops being true the first time either moves
-([code-shape.md](code-shape.md) §4.1a), so the subject names it. *Inspector* stays Invana's word for
+(code-shape.md §4.1a), so the subject names it. *Inspector* stays Invana's word for
 the region ([terminology.md](../terminology.md)); `SelectionViewPanel` is what fills it.
 
 ### To build — the other five

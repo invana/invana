@@ -8,9 +8,9 @@ most useful number in the product.
 | Index | [6.3](../../../README.md#6--skills) · Slice **S12c** |
 | Module | [Skills](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [bindings](bindings.md) · [evidence](../../memory/features/evidence.md) · [proposals](../../memory/features/proposals.md) |
+| Related | [bindings](bindings.md) · evidence · proposals |
 
-Product spec: [AG-F04 · Skills](../../../../../specs/products/agents/features/AG-F04-skills/feature.md) — AG-30; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F04 · Skills](../../../../../specs/capabilities/agents/features/AG-F04-skills/feature.md) — AG-30; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 

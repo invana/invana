@@ -1,5 +1,5 @@
 /**
- * SSE subscription to the audit-event live tail (specs/foundation/inbox/features/IN-F03-history/feature.md).
+ * SSE subscription to the audit-event live tail (specs/os/access/features/AC-F06-history/feature.md).
  *
  * Opens a native `EventSource` against `/api/v1/u/.../events/stream` (per-graph)
  * or `/api/v1/events/stream` (global). On each `event: row` frame, invalidates

@@ -9,10 +9,10 @@ Admin**.
 | Index | [11.6](../../../README.md#11--identity-and-access) · Slice **B11** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Product | [shell.md › Decisions](../../../../products/shell.md#decisions) — *Roles per Graph* · *Without the role* · P-18 |
+| Product | shell.md › Decisions — *Roles per Graph* · *Without the role* · P-18 |
 | Related | [membership](membership.md) · [search](../../platform/features/search.md) · [guardrails](../../govern/features/guardrails.md) · [rules](../../skills/features/rules.md) · [datasets](../../bring-data-in/features/datasets.md) |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-06; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [AC-F02 · People and access](../../../../../specs/os/access/features/AC-F02-access-rules/feature.md) — AC-07; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## What each role may change
 
@@ -38,7 +38,7 @@ Reading is never gated: every `GET` on a Graph is open to every member. A role g
 | `DELETE …/members/{member}` | removes the membership; their work stays |
 | `GET …/access` | `{roles, areas: [{area, role, allowed, holders}]}` |
 | `/auth/me` | `graphs[].roles` |
-| CLI | `invana members list · add --role · set-roles --role · remove` ([13.3](../../platform/features/command-line.md)) |
+| CLI | `invana members list · add --role · set-roles --role · remove` (13.3) |
 | Studio · access | `useAccess()` (shell) reads `GET …/access` once per Graph, key `["access", owner, graph]`; `gateOf` (core) turns an area into allowed · role · holders · reason |
 | Studio · a gated act | `ActButton area=…` (shell) — the kit `Button`, or disabled with the reason as tooltip and accessible description; `gateItem(item, gate)` does the same for a panel header action |
 | Studio · a read-only surface | `ReadOnlyNotice area noun` (shell) — *You can read this skill. Editing needs the builder role — ask ravi.* (board `agents.skills.detail.readonly`) |
@@ -72,7 +72,7 @@ Reading is never gated: every `GET` on a Graph is open to every member. A role g
 | RO11 | The CLI holds database credentials and acts as the `--user` it names; role enforcement is the API's. `invana members` refuses what the manager refuses — an unknown role, a person with no account, the last owner. |
 | RO12 | Existing members keep what they had: the creator becomes `owner`, everyone else `contributor · builder · modeller`. |
 | RO15 | What is gated is the **entry act** of an area — the button that opens an authoring dialog or writes straight away (*New agent*, *Edit instructions*, *Publish*, *New project*, *Save*). A dialog's own submit is not gated again: its entry already was. Area by product follows the engine table: Agents' agents, skills, evals, plans, templates and plugins → `build`; LLM providers → `settings`; Modeller's models, stitches, rules and guardrails → `model`, its Graph settings and Members → `settings`; Projects' projects, findings, decisions, todos → `work`; Activity's schedules → `work`, rules and channels → `settings`. Asking is every member's. Datasets are install-scoped and keep B03's checks; a plugin's enable and disable are install-wide (`/api/v1/plugins…`) and gated by no Graph role. *Save as dataset* on a simulation is gated as `work`, the act that starts it, though the dataset route itself is install-wide. |
-| RO17 | Graph settings gains a **Members** tab: one row per member — name, roles as badges, *since* — and for an owner *Edit* (the five roles as a checkbox set; `viewer` always held) and *Remove* (confirmed). *Add member* takes an email or a username and roles. Below it a **Roles** key: role · what it may change. The last owner's refusal (409) and an unknown account (404) show in the dialog, in the engine's words. Without `owner` the tab reads, its acts disabled as ST-06 says. |
+| RO17 | Graph settings gains a **Members** tab: one row per member — name, roles as badges, *since* — and for an owner *Edit* (the five roles as a checkbox set; `viewer` always held) and *Remove* (confirmed). *Add member* takes an email or a username and roles. Below it a **Roles** key: role · what it may change. The last owner's refusal (409) and an unknown account (404) show in the dialog, in the engine's words. Without `owner` the tab reads, its acts disabled as AC-07 says. |
 | RO20 | `iam-admin` is a peer role: `owner` does not imply it. The Graph's creator holds `owner` and `iam-admin`. A Graph always has an iam-admin — removing or demoting the last one is refused (409), as for the last owner. |
 | RO21 | Members moves to the `iam` area: adding, re-roling and removing a member needs iam-admin, from IAM › People or Graph settings › Members. |
 | RO18 | Graph settings' connection tab is **Database**, keyed `?tab=database`, so the strip reads Basic · Database · Members as the product names them ([1.12](../../connect-and-model/features/graph-settings.md)). |

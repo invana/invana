@@ -12,7 +12,7 @@ refusal files.
 | API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [worlds](worlds.md) (what narrows within these) · [requests](requests.md) (what a refusal files) · [audit-and-activity](../../operate/features/audit-and-activity.md) (every edit is an event) |
 
-Product spec: [MO-F05 · Views of the graph and what must always hold](../../../../../specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F05 · Views of the graph and what must always hold](../../../../../specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

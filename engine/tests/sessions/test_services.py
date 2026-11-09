@@ -183,7 +183,7 @@ class TestSessionPersistence:
 class TestQueryLanguageAsksAnswer:
     """A query-language ask reads the graph and never drafts a model
     (docs/for-developers/modules/ask/features/write-queries.md · WQ5 ·
-    specs/products/agents/features/AG-F01-build-an-agent/feature.md § Decisions)."""
+    specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md § Decisions)."""
 
     async def test_a_ql_ask_runs_through_an_agent_that_reads_the_graph(self, session, graph, user):
         agents = AgentManager()
@@ -246,7 +246,7 @@ class TestFriendlyQueryError:
 
 
 class TestOperationLogging:
-    """Canvas operations logged as session turns (specs/products/explore/features/EX-F01-the-board-and-its-canvas)
+    """Canvas operations logged as session turns (specs/capabilities/explore/features/EX-F01-the-board-and-its-canvas)
     — no graph DB needed:
     these exercise persistence + the context-replay exclusion directly."""
 

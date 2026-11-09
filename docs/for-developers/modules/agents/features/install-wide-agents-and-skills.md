@@ -7,9 +7,9 @@ Invana is deployed like a database server: one deployment per organisation. The 
 | Index | [5.16](../../../README.md#5--agents) · Slice **S-TBD** |
 | Module | [Agents](../spec.md) |
 | API / CLI / Studio | 🔵 / 🔵 / 🔵 |
-| Related | [author-an-agent](author-an-agent.md) · [import and export](import-export.md) · [workers](workers.md) · [instructions, publish and roll back](../../skills/features/instructions-publish-rollback.md) · [evals](../../skills/features/evals.md) · [policies](../../identity-and-access/features/policies.md) · [products README › Two places](../../../../products/README.md#two-places) |
+| Related | [author-an-agent](author-an-agent.md) · [import and export](import-export.md) · workers · [instructions, publish and roll back](../../skills/features/instructions-publish-rollback.md) · [evals](../../skills/features/evals.md) · [policies](../../identity-and-access/features/policies.md) · products README › Two places |
 
-Product spec: [AG-F02 · The agents catalogue](../../../../../specs/products/agents/features/AG-F02-the-agents-catalogue/feature.md) — AG-35 and AG-40; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F02 · The agents catalogue](../../../../../specs/capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md) — AG-35 and AG-40; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Two places
 
@@ -21,11 +21,11 @@ Product spec: [AG-F02 · The agents catalogue](../../../../../specs/products/age
 | Product | Rail | Feature |
 |---|---|---|
 | Agent Builder | Overview │ Agents · Skills · Functions · Library │ Performance · Import and export | this file · [5.17](import-export.md) |
-| Fleet | Pools · Workers · Capacity · Join tokens | [5.15](workers.md) |
-| Settings | Graph limits │ LLM providers · Plugins · MCP servers · Remote agents | this file (C9) · [5.1](providers-and-models.md) · [5.7](concurrency-and-contention.md) |
+| Fleet | Pools · Workers · Capacity · Join tokens | 5.15 |
+| Settings | Graph limits │ LLM providers · Plugins · MCP servers · Remote agents | this file (C9) · 5.1 · 5.7 |
 | Graph settings | General · Connection │ Members · Usage | this file (C6–C8, C10) |
-| Activity | Runs · Approvals · Ledger │ Schedules · Events · Inbox · Rules · Channels | [10.x runs](../../work/spec.md) · [shell › Activity](../../../../products/shell.md#activity) |
-| IAM | as built ([iam.md](../../../../products/iam.md)) | an agent's *Access* in Members is its IAM policies |
+| Activity | Runs · Approvals · Ledger │ Schedules · Events · Inbox · Rules · Channels | [10.x runs](../../work/spec.md) · shell › Activity |
+| IAM | as built (iam.md) | an agent's *Access* in Members is its IAM policies |
 
 ## Capabilities
 

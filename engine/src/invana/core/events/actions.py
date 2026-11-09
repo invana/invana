@@ -79,7 +79,7 @@ SKILL_DELETE = "skill.delete"
 # exists and is still being resolved by the steps it was offered to.
 SKILL_PUBLISH = "skill.publish"
 # Who was offered what, and when the bindings changed
-# (specs/products/agents/features/AG-F04-skills/feature.md). The target is the
+# (specs/capabilities/agents/features/AG-F04-skills/feature.md). The target is the
 # agent, because the binding is a fact about the agent's context; ``details``
 # names the skill.
 AGENT_SKILL_BOUND = "agent.skill_bound"
@@ -103,13 +103,13 @@ MODEL_CREATE = "model.create"
 MODEL_UPDATE = "model.update"
 MODEL_DELETE = "model.delete"
 MODEL_ACTIVATE = "model.activate"
-# Archive and restore (specs/products/model/features/MO-F04-model-health-and-history/feature.md § Decisions)
+# Archive and restore (specs/capabilities/model/features/MO-F04-model-health-and-history/feature.md § Decisions)
 MODEL_ARCHIVED = "model.archived"
 MODEL_RESTORED = "model.restored"
 # NL → proposed model written to a draft (docs/for-developers/modules/ask/spec.md); target = session
 MODEL_GENERATE = "model.generate"
 # The staged set turned into a published version in one action
-# (specs/products/model/features/MO-F02-change-and-publish-a-model/feature.md § Decisions)
+# (specs/capabilities/model/features/MO-F02-change-and-publish-a-model/feature.md § Decisions)
 MODEL_COMMIT = "model.commit"
 MODEL_DISCARD = "model.discard"
 # Portability (docs/for-developers/modules/connect-and-model/features/share-a-model.md)

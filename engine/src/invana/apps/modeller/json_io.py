@@ -278,7 +278,7 @@ def _check_axes(data: SchemaExport) -> None:
     silently matches no rows. Refused at import, naming the axis and the
     property — the same shape of refusal a world gets when it asks for an axis
     that was never declared
-    (specs/products/model/product.md § Decisions).
+    (specs/capabilities/model/product.md § Decisions).
     """
     known = {pk.name for pk in data.property_keys}
     if not known:

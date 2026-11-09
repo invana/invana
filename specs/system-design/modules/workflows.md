@@ -1,9 +1,9 @@
-# Workflows
+# Plans — `agents`
 
 The engine shape of where a plan comes from: a reusable **Flow** in the library, chosen by intent, generated only when
 nothing fits, validated against the running agent's bounds before anything is dispatched, and promoted when it served.
-The product rules are [Agents](../../products/agents/product.md) and
-[AG-F06](../../products/agents/features/AG-F06-plans-and-functions/feature.md). The records and the plan's grammar are
+The product rules are [Agents](../../capabilities/agents/product.md) and
+[AG-F06](../../capabilities/agents/features/AG-F06-plans-and-functions/feature.md). The records and the plan's grammar are
 [orchestration.md](../orchestration.md); how a plan runs is [runtime.md](../runtime.md). On screen a Flow is a *plan* and a
 catalogue entry a *function* ([glossary.md](../../glossary.md)).
 

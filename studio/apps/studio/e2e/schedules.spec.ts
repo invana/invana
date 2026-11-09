@@ -1,6 +1,6 @@
 /**
  * Activity › Schedules — the list and Coming up, New schedule, a schedule's
- * page and a refusal (SH-13).
+ * page and a refusal (AG-42).
  *
  * Each test makes its own `e2e-sched-` schedule — through the engine's API or
  * the dialog — and deletes it in `finally`. *Run now* is checked as queued

@@ -6,8 +6,9 @@ root with the files or folders to check (default: ``docs``):
 
     python3 scripts/specs/links.py specs docs/for-developers
 
-Checks ``[text](path)`` and ``[text](path#anchor)`` links that are relative paths — never URLs, anchors alone, code
-spans or fenced code, and not the anchor itself. Exits 1 and lists each broken link when there is one. Standard library only.
+Checks ``[text](path)`` and ``[text](path#anchor)`` links that are relative paths — never URLs, anchors alone,
+files under ``_stale/``, code spans or fenced code, and not the anchor itself. Exits 1 and lists each broken link when
+there is one. Standard library only.
 """
 from __future__ import annotations
 
@@ -31,9 +32,14 @@ def broken(path: Path) -> list[str]:
     return out
 
 
+def live(root: Path) -> list[Path]:
+    """Every ``.md`` under ``root`` but those in a ``_stale/`` folder, which is never checked."""
+    return sorted(f for f in root.rglob("*.md") if "_stale" not in f.parts)
+
+
 def main() -> int:
     roots = [Path(a) for a in sys.argv[1:]] or [Path("docs")]
-    files = [f for r in roots for f in ([r] if r.is_file() else sorted(r.rglob("*.md")))]
+    files = [f for r in roots for f in ([r] if r.is_file() else live(r))]
     bad = [b for f in files for b in broken(f)]
     print("\n".join(bad) if bad else f"{len(files)} files · no broken links")
     return 1 if bad else 0

@@ -9,10 +9,10 @@ made.
 | Index | [9.9](../../../README.md#9--work) · C06 |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | — / — / ✅ |
-| Product | [products/projects.md](../../../../products/projects.md) PJ-F7 · PJ-10 |
+| Product | capabilities/projects.md PJ-F7 · PJ-10 |
 | Related | [branches-and-decisions](branches-and-decisions.md) (the cites it starts from) · [simulation](simulation.md) (what-if values) · [graph canvas](../../explore/features/graph-canvas.md) (the expand reads it walks) |
 
-Product spec: [PJ-F04 · Simulation and impact](../../../../../specs/products/projects/features/PJ-F04-simulation-and-impact/feature.md) — PJ-10; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F04 · Simulation and impact](../../../../../specs/capabilities/projects/features/PJ-F04-simulation-and-impact/feature.md) — PJ-10; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

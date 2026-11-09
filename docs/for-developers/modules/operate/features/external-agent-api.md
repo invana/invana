@@ -10,7 +10,7 @@ a narrowed token, and getting provenance with every answer.
 | API / CLI / Studio | 🔵 / — / 🔵 |
 | Related | [audit-and-activity](audit-and-activity.md) · [inspect-what-landed](../../bring-data-in/features/inspect-what-landed.md) |
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-27; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [RT-F02 · Plugins and outside tools](../../../../../specs/os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md) — RT-03; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 

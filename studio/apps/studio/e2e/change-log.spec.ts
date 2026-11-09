@@ -1,8 +1,8 @@
 /**
- * The change log and publish review — one test per story (SH-14 · MO-09 ·
+ * The change log and publish review — one test per story (AC-17 · MO-09 ·
  * MO-05 · DS-04).
  *
- * Nothing here calls a live model or writes to the graph database. SH-14 makes
+ * Nothing here calls a live model or writes to the graph database. AC-17 makes
  * an `e2e-` agent and publishes its instructions once, so it has two versions
  * to compare, and deletes it in `finally`. MO-05 stages changes on the
  * AirRoutes draft (app state only), reads the Publish confirm without
@@ -46,7 +46,7 @@ async function draftOf(page: Page, modelId: string): Promise<string> {
 	return made.data.id;
 }
 
-test("SH-14 · a change lands in the log and Compare opens both versions", async ({
+test("AC-17 · a change lands in the log and Compare opens both versions", async ({
 	page,
 }) => {
 	const name = `e2e-change-${Date.now()}`;

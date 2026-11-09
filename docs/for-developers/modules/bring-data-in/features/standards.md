@@ -10,9 +10,9 @@ mapping and an enforcement mode; every version of the dataset is then scored aga
 | Index | [2.7](../../../README.md#2--bring-data-in) · Slice **B04** (P-12) |
 | Module | [Bring data in](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [rules](../../skills/features/rules.md) · products: [datasets.md](../../../../products/datasets.md) DS-08 · DS-09 · DS-F8 · DS-F9 |
+| Related | [datasets](datasets.md) · [bind-a-dataset](bind-a-dataset.md) · [rules](../../skills/features/rules.md) · products: datasets.md DS-08 · DS-09 · DS-F8 · DS-F9 |
 
-Product spec: [DS-F04 · Standards and checks](../../../../../specs/products/datasets/features/DS-F04-standards-and-checks/feature.md) — DS-07, DS-08 and DS-09; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [DS-F04 · Standards and checks](../../../../../specs/capabilities/datasets/features/DS-F04-standards-and-checks/feature.md) — DS-07, DS-08 and DS-09; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

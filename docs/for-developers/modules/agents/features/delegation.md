@@ -3,10 +3,10 @@
 An agent may spawn an agent and hand it work — bounded by depth, fan-out, and a budget that is a
 subset of its own. The child's run nests inside the parent's.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
@@ -15,7 +15,7 @@ subset of its own. The child's run nests inside the parent's.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [lineage](lineage.md) · [lifecycle](lifecycle.md) |
 
-Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-24; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-24; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

@@ -19,9 +19,9 @@ agent, the plan and the Todo. Each contributor narrows; none widens.
 permits that layer whole — except where it has explicitly *closed* the layer,
 which is what picking four models out of six means ([GV23]).
 
-[GV5]: specs/products/model/product.md#decisions
-[GV6]: specs/products/model/product.md#decisions
-[GV7]: specs/products/model/product.md#decisions
+[GV5]: specs/capabilities/model/product.md#decisions
+[GV6]: specs/capabilities/model/product.md#decisions
+[GV7]: specs/capabilities/model/product.md#decisions
 [GV23]: docs/for-developers/modules/govern/spec.md
 """
 
@@ -45,7 +45,7 @@ class Role(enum.StrEnum):
     """What a plan's step is doing, and therefore how much the model matters.
 
     Four, fixed. A plan names a role and the cast resolves it
-    ([Model product § Decisions](specs/products/model/product.md#decisions)) — which stays true when
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)) — which stays true when
     the model line-up moves, in a way ``tier`` does not.
     """
 
@@ -83,7 +83,7 @@ class Decision(enum.StrEnum):
 
 
 #: Which layers accept which optional keys. A third party carries no selector
-#: ([Model product § Decisions](specs/products/model/product.md#decisions)): it is permitted or
+#: ([Model product § Decisions](specs/capabilities/model/product.md#decisions)): it is permitted or
 #: denied, and ``egress`` governs the call. One you could slice is one you have
 #: effectively modelled, and the answer to that is to bring it across as a model.
 _SELECTABLE = (Layer.graph_data,)
@@ -117,7 +117,7 @@ class Rule:
     #: The bound this rule came from — *the agent's own guardrail “No egress”* —
     #: stamped when a lens is composed and frozen with the snapshot, so a
     #: refusal names which side bound it
-    #: ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
+    #: ([AG-F01 § Decisions](specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md#decisions)).
     #: Never authored.
     by: str | None = None
 
@@ -161,7 +161,7 @@ def validate_rule(rule: Rule) -> None:
     """Refuse a rule the grammar does not permit, naming the part that is wrong.
 
     Checked at **save**, never at run
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
     — a rule that
     cannot legally run is one nobody should be able to store and then wonder
     about.
@@ -269,7 +269,8 @@ class Verdict:
 
     decision: Decision
     #: The pattern that decided it — so a refusal names its rule
-    #: (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions) and
+    #: (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions)
+    #: and
     #: never says *not permitted* with nothing to act on.
     rule_matched: str | None = None
     #: The world that refused, where **no rule did** — a closed layer admits only
@@ -319,7 +320,7 @@ class Closure:
     loss fails **open**: a Graph-wide ``llm/** allow`` would satisfy a world that
     allow-listed one local model, so *Nothing leaves* would leave. Keeping each
     contributor's closure whole is what makes allow **intersect**
-    ([Model product § Decisions](specs/products/model/product.md#decisions)) rather than union.
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)) rather than union.
     """
 
     layers: frozenset[Layer] = frozenset()
@@ -344,7 +345,7 @@ class Effective:
     """A resolved, frozen lens — what a run is dispatched under.
 
     Computed once at run open and never recomputed mid-run
-    ([Model product § Decisions](specs/products/model/product.md#decisions)), which is what makes
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)), which is what makes
     ``task_runs.lens_snapshot`` reconstructible rather than a pointer at rows
     that have since moved.
     """
@@ -363,7 +364,7 @@ class Effective:
     #: order. ``name`` is carried as well as ``key`` because the run board
     #: names the world a run *was* asked under, and a rename since must not
     #: change what a past run says about itself
-    #: (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+    #: (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
     contributors: list[dict[str, Any]] = field(default_factory=list)
 
     def _closed_by(self, layer: Layer) -> str | None:
@@ -459,7 +460,7 @@ def from_snapshot(snapshot: dict[str, Any] | None) -> Effective:
 
     A run opened before Govern shipped carries no snapshot, and the widest state
     is the honest reading of that — it ran under no narrowing because there was
-    none to run under ([Model product § Decisions](specs/products/model/product.md#decisions)).
+    none to run under ([Model product § Decisions](specs/capabilities/model/product.md#decisions)).
     """
     if not snapshot:
         return Effective()
@@ -564,7 +565,7 @@ def _intersect_may_send(rules: list[Rule]) -> list[str]:
     """Egress **intersects**: what may leave is what every matching rule permits.
 
     An unmatched crossing sends nothing — the default is ``[]``
-    ([Model product § Decisions](specs/products/model/product.md#decisions)) — and that default is
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)) — and that default is
     the caller's to apply, because *no rule matched* and *a rule matched and
     permitted nothing* are the same outcome and different stories.
     """
@@ -600,7 +601,7 @@ def compose(contributors: list[Effective]) -> Effective:
     list wins, and an allow-list closed by any contributor stays closed for all
     of them. The **cast does not intersect** — two model addresses have no
     common narrowing — so innermost simply wins
-    ([Model product § Decisions](specs/products/model/product.md#decisions)).
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)).
     """
     out = Effective()
     for contributor in contributors:

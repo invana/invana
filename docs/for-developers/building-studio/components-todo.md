@@ -7,7 +7,7 @@ artboards need it, whether it is built and whether it has a story.
 | This file | Its sibling |
 |---|---|
 | **What is still owed** — the queue, with status | [design-kit-coverage.md](design-kit-coverage.md) — the board element → component **map**, the decisions behind it, and what already shipped |
-| Screens and their status | [the-screens.md](../the-screens.md) |
+| Screens and their status | the-screens.md |
 | Features and their status | [../README.md](../README.md) |
 
 ## How to read a row
@@ -59,7 +59,7 @@ Feature: [10.5 · see-what-ran](../modules/operate/features/see-what-ran.md).
 |---|---|---|---|---|---|
 | U1 | `Gantt` | `ui-extended` | **the forecast reading**: `p50` drawn **on** the bar with its Δ, band notes (`3 calls, all inside p95`), and a seam with **no estimate** — dashed, stating so beside its actual | layers · layers.forecast | ✅ |
 | U2 | `DataTable` | `tables` | indent rows (a child run under its parent), row selection (accent + inset rule), cell readings — mono · tone · struck | list · list.states · step · step.touched* | ✅ |
-| U3 | `@invana/tables` in Studio | `studio/` | **already a dependency, and already drawn with.** The row was written against a Studio that did not have it; it has, and had before this queue started — `studio/package.json` carries it and four surfaces render `DataTable`: the access-token table, the lifecycle dialog's open-work preview, and the agents' Pools and Ceilings tables. Nothing was installed to close this. What remains is not a dependency but a **screen** — the journal route that draws `list · step · step.touched*` — and that is [the-screens.md](../the-screens.md)'s row, not a component's | list · step · step.touched* | ✅ |
+| U3 | `@invana/tables` in Studio | `studio/` | **already a dependency, and already drawn with.** The row was written against a Studio that did not have it; it has, and had before this queue started — `studio/package.json` carries it and four surfaces render `DataTable`: the access-token table, the lifecycle dialog's open-work preview, and the agents' Pools and Ceilings tables. Nothing was installed to close this. What remains is not a dependency but a **screen** — the journal route that draws `list · step · step.touched*` — and that is the-screens.md's row, not a component's | list · step · step.touched* | ✅ |
 | U4 | `Legend` | `ui-extended` | swatch kinds `stripe` (the layer bar), `bracket` (a bounded repetition), `rule` (a gate). Today: dot · line · dashed · arrow · ring | in_order · layers · layers.forecast · flow | ✅ |
 | U5 | `FilterChip` | `ui-extended` | closable (`since: today ×`), and the bar's own summary (`interactive runs hidden`) | list · list.states · every panel | ✅ |
 | U7 | `RecordHeader` | `ui-extended` | **the last crumb gives way first.** Every parent crumb was truncating equally, so `runs › run:7d3184f1 › step:9b1c40e2 execute_query` rendered as `ru… › run:7d3184… › step:9b1c40e2 execute_qu…` — and the kind prefix is the one thing [SR54](../modules/operate/features/see-what-ran.md#decisions) says a crumb exists to carry. Found by rendering, not by type-check | every step board | ✅ |
@@ -123,7 +123,7 @@ the four it joins.
 
 **The queue is closed.** U3 was the last open row and it was already satisfied — `@invana/tables`
 has been a Studio dependency since before this queue began, and four surfaces draw with it. What it
-really pointed at is the journal **screen**, which is tracked in [the-screens.md](../the-screens.md).
+really pointed at is the journal **screen**, which is tracked in the-screens.md.
 
 ## 3. Notes from the build
 

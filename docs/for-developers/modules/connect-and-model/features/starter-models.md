@@ -8,9 +8,9 @@ renamed on arrival. A starting point, not a fixed schema.
 | Index | [1.7](../../../README.md#1--connect-and-model) · Slice **S7** |
 | Module | [Connect and model](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [share-a-model](share-a-model.md) · [recall-by-query](../../memory/features/recall-by-query.md) |
+| Related | [share-a-model](share-a-model.md) · recall-by-query |
 
-Product spec: [MO-F01 · Start a model](../../../../../specs/products/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F01 · Start a model](../../../../../specs/capabilities/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

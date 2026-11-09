@@ -1,6 +1,7 @@
 """Projections — the declared mapping from a shape to a surface.
 
-A projection is a **template plus values** (specs/products/explore/features/EX-F04-the-answer/feature.md § Decisions).
+A projection is a **template plus values** (specs/capabilities/explore/features/EX-F04-the-answer/feature.md §
+Decisions).
 The template owns the markup; the step supplies values. That is the same reason a
 plan is validated against an envelope: a model that can author arbitrary markup
 can author anything.

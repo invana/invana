@@ -673,7 +673,7 @@ def _lens_name(run) -> str | None:
 
     Read out of ``lens_snapshot``'s contributors rather than off the row, so a
     rename since does not rewrite what a past run says it ran under
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions). A
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions). A
     snapshot written before names were carried falls back to the slug, and one
     with neither leaves this ``None`` — which reads *Everything*.
     """

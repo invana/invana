@@ -10,7 +10,7 @@ its work still resolve.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [author-an-agent](author-an-agent.md) · [lineage](lineage.md) · [delegation](delegation.md) |
 
-Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F01 · Build an agent](../../../../../specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md) — AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

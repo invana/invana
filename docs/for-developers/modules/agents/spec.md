@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | Index | [§5 · Agents](../../README.md#5--agents) |
-| Features | [providers-and-models](features/providers-and-models.md) · [author-an-agent](features/author-an-agent.md) · [envelope-and-budget](features/envelope-and-budget.md) · [delegation](features/delegation.md) · [lifecycle](features/lifecycle.md) · [lineage](features/lineage.md) · [concurrency-and-contention](features/concurrency-and-contention.md) · [soul](features/soul.md) · [pinned-model-versions](features/pinned-model-versions.md) |
+| Features | providers-and-models · [author-an-agent](features/author-an-agent.md) · [envelope-and-budget](features/envelope-and-budget.md) · [delegation](features/delegation.md) · [lifecycle](features/lifecycle.md) · [lineage](features/lineage.md) · concurrency-and-contention · [soul](features/soul.md) · [pinned-model-versions](features/pinned-model-versions.md) |
 | Depends on | [Skills](../skills/spec.md) (what it may be offered) · [Workflows](../workflows/spec.md) (what it may run) · Ask (an agent runs a run) |
 | Depended on by | [Work](../work/spec.md) (an agent is an assignee) · Ask (a session asks through an agent) |
 
-Product spec: [Agents](../../../../specs/products/agents/product.md) — its features AG-F01 to AG-F07, the flows, the cross-feature decisions and what it does not build live there.
+Product spec: [Agents](../../../../specs/capabilities/agents/product.md) — its features AG-F01 to AG-F07, the flows, the cross-feature decisions and what it does not build live there.
 
 System design: [agents.md](../../../../specs/system-design/modules/agents.md) — where the agent sits, what it owns and how it is composed. This file keeps the vocabulary and the retired surfaces.
 
@@ -26,7 +26,7 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 | **Cast** | the lens's map from a plan's **role** to a model address. It is what names the model a run uses | a field on the agent |
 | **Envelope** | the static bounds: which callables, which pinned arguments, which ceilings | a runtime check |
 | **Effort** | how hard an agent tries before it stops — steps, replans, clarifications. Enforced like a ceiling ([EB9](features/envelope-and-budget.md#decisions)) | character · budget |
-| **Budget** | the cost ceiling a run may spend. **At the ceiling a run pauses and asks** — it does not fail ([orchestration § 0.10](../../orchestration.md#010-budget--the-ceiling-that-pauses-instead-of-failing)) | a quota · a hard stop |
+| **Budget** | the cost ceiling a run may spend. **At the ceiling a run pauses and asks** — it does not fail (orchestration § 0.10) | a quota · a hard stop |
 | **Lifetime** | `persistent` or `ephemeral` — whether the agent outlives the work it was spawned for | status |
 | **Lineage** | who authored whom, who spawned whom, on what run | an org chart |
 
@@ -36,7 +36,7 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 surfaces below are spread over the platform's **Agent Builder** (Home → Overview, Fleet dashboard →
 Overview, Agents, Skills, Functions, Performance), **Fleet** (workers and pools) and **Settings** (LLMs,
 Connections, the ceiling → Graph limits), and over a Graph's **Graph settings › Members** (the agent in this
-Graph) and **Activity** (runs, approvals, ledger). Each keeps the shape of [the Agents shell](features/the-agents-shell.md):
+Graph) and **Activity** (runs, approvals, ledger). Each keeps the shape of the Agents shell:
 a rail and a workbook, no leftSection; a record's page opens as a tab beside its section.
 
 | Surface | Region | Shape |

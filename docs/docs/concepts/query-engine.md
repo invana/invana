@@ -140,4 +140,3 @@ WS /ws/query-stream
 ## What's Next?
 
 - [Connectors](connectors.md) — How database adapters work
-- [Studio: Query Workspace](../studio/query-workspace.md) — Visual query editor

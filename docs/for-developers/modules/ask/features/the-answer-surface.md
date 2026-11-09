@@ -10,7 +10,7 @@ kind, each citing what produced it. Not a paragraph with numbers in it.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [projections](projections.md) (how each is rendered) · [reasoning-trace](reasoning-trace.md) |
 
-Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F04 · The answer](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 
@@ -47,7 +47,7 @@ chose the rendering.
 | AS15 | **Whether a subgraph is on the canvas is the reply's fact, not the record's.** The stored subgraph emission says what the step produced; the reply knows whether it is on the canvas (its click, or the thread's `load` turn). A new session's first result is painted onto the session's new canvas and logged as a `load` turn like a click, so it never offers what it already drew. Until then the reply carries the *Load to canvas* offer; drawn or not, there is no subgraph card ([AS8](#decisions)). A **table** whose translation wrote a `canvas_query` carries the same offer ([NL15](ask-in-natural-language.md#decisions)); it is answered once a later reply in the thread ran that twin. |
 | AS18 | **The meta line's time is the run's `work_ms`, not the query's.** The engine stores it when the run settles — the run's steps summed, so it equals the rows under *How I got this* added up, without the time a person spent answering ([MS4](../../platform/features/metrics-are-stored.md#decisions)). The query's own time is the Execute row. Studio formats it and derives nothing. |
 
-> ⚠ **A re-run that leaves the earlier answer ([EX-02.9](../../../../../specs/products/explore/features/EX-F04-the-answer/stories/EX-02-watch-the-answer-arrive-on-the-board/story.md)) is half-built.** A re-run today writes a new run but re-points the
+> ⚠ **A re-run that leaves the earlier answer ([EX-02.9](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/stories/EX-02-watch-the-answer-arrive-on-the-board/story.md)) is half-built.** A re-run today writes a new run but re-points the
 > reply at it, so the prior emissions are orphaned and a failed re-run leaves the
 > reply looking empty. Making a re-run additive — and putting *as of* and the
 > re-run affordance on the emission header — is the remaining work.
@@ -57,5 +57,5 @@ chose the rendering.
 | | |
 |---|---|
 | Studio | `src/pages/graphs-detail/features/ask/answer-surface/` — `EmissionCard` · `EmissionBodies` · `emissions.ts` · `ResultBlock` · `ResultsTable` |
-| Rendering inside a reply | `NotAnAnswer` ([when-it-cannot-answer](when-it-cannot-answer.md)) and `TraceDialog` ([reasoning-trace](reasoning-trace.md)) sit here too — they are how a reply reads, not surfaces of their own |
+| Rendering inside a reply | `NotAnAnswer` (when-it-cannot-answer) and `TraceDialog` ([reasoning-trace](reasoning-trace.md)) sit here too — they are how a reply reads, not surfaces of their own |
 | Not | `templates/`. **Template** is [projections](projections.md)' word for a versioned, person-authored projection template; these render an emission, they are not templates |

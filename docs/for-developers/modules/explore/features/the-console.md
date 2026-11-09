@@ -10,7 +10,7 @@ console is where both are readable without leaving the canvas.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [graph-canvas](graph-canvas.md) · [selection-and-the-panel](selection-and-the-panel.md) · [the-answer-surface](../../ask/features/the-answer-surface.md) · [write-queries](../../ask/features/write-queries.md) · [see-what-ran](../../operate/features/see-what-ran.md) |
 
-Product spec: [EX-F01 · The board and its canvas](../../../../../specs/products/explore/features/EX-F01-the-board-and-its-canvas/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F01 · The board and its canvas](../../../../../specs/capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

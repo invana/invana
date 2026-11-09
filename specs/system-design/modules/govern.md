@@ -1,9 +1,9 @@
-# Govern
+# Lenses — `model`
 
 The engine shape of what a run may **see**, **use** and **send**: the `lenses` row, where it is enforced, and the routes
-and events around it. The product rules are [Model](../../products/model/product.md),
-[MO-F05](../../products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md) and
-[MO-F06](../../products/model/features/MO-F06-rules-agents-work-by/feature.md). The lens's grammar — layers, addresses,
+and events around it. The product rules are [Model](../../capabilities/model/product.md),
+[MO-F05](../../capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md) and
+[MO-F06](../../capabilities/model/features/MO-F06-rules-agents-work-by/feature.md). The lens's grammar — layers, addresses,
 rules, egress, the touch record and composition — is [governance-and-lens.md](../governance-and-lens.md); this file does
 not restate it. On screen a world is *a view of the graph* and a guardrail is *a rule* ([glossary.md](../../glossary.md)).
 
@@ -111,8 +111,6 @@ What each reading of the touches calls for is [governance-and-lens.md › The to
 | No governance table beside the record | Every fact is a key in a document the interpreter already writes, a field on the lens, or a projection of the trace |
 | No second enforcement path | A guardrail and a world reach the interpreter as one resolved object |
 | Nothing is its own table that could be a key | A rule is an element of `rules[]`, the cast is four keys, a world's usage is one `GROUP BY` over `task_runs`. `run_touches` is the one exception, and it is a projection |
-
-Column list, ER diagram and migration order: [govern-and-agents-data-model.md](../../../docs/for-developers/building-engine/govern-and-agents-data-model.md).
 
 ## Decisions
 

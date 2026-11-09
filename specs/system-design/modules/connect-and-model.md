@@ -1,9 +1,9 @@
-# Connect and model
+# Connections and models — `graphs` · `model`
 
 The engine shape of binding a Graph to its graph database and of the models every question resolves against. The
 product rules — one Graph, one database, a published version never changes, the whole model is derived, declared never
-inferred — are [Model](../../products/model/product.md); the connection a person sets is
-[ST-F01](../../foundation/settings/features/ST-F01-this-graph/feature.md); how the engine speaks to the database is
+inferred — are [Model](../../capabilities/model/product.md); the connection a person sets is
+[GR-F04](../../os/graph/features/GR-F04-this-graph/feature.md); how the engine speaks to the database is
 [graph-connectors.md](graph-connectors.md).
 
 ## Three layers, one read

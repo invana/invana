@@ -1,5 +1,5 @@
 """What a bind is checked against — both halves of
-[AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions).
+[AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions).
 
 Binding a skill an agent could **never** run must fail when someone binds it,
 not inside a run hours later with half the work done. The check is possible now
@@ -26,7 +26,7 @@ rather than implying both did.
 What is deliberately **not** checked here:
 
 * **A narrower world at run time.** A Todo may always narrow further than its
-  agent ([Model product § Decisions](specs/products/model/product.md#decisions)); that is *cannot
+  agent ([Model product § Decisions](specs/capabilities/model/product.md#decisions)); that is *cannot
   answer — outside the lens*, and widening recovers it. Which is also why the
   lens half reads **guardrails** and not worlds ([BN10]) — an agent carries no
   world at all (AG26); its own narrowing is its guardrail, and that is read.
@@ -35,7 +35,7 @@ What is deliberately **not** checked here:
   of the band's participants is denied would refuse on grounds the check cannot
   read ([BN7](docs/for-developers/modules/skills/features/bindings.md)).
 * **A spawn's bindings.** A child's bindings are named at spawn, inside a run
-  ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)) — refusing
+  ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)) — refusing
   there would manufacture the 3am failure this check exists to prevent, and
   nobody typed it to be told. The child's narrowed envelope still refuses the
   *call* at dispatch, and an offer nothing calls costs a prompt, not an answer.

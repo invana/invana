@@ -9,9 +9,9 @@ builder — until *Create agent* makes it live; a live agent's Overview is its d
 | Index | [5.13](../../../README.md#5--agents) · Slice **F04** |
 | Module | [Agents](../spec.md) |
 | API / CLI / Studio | 🟡 / — / ✅ |
-| Related | [author-an-agent](author-an-agent.md) · [envelope-and-budget](envelope-and-budget.md) · [delegation](delegation.md) · [lifecycle](lifecycle.md) · [soul](soul.md) · [pinned-model-versions](pinned-model-versions.md) · [the-skill-page](../../skills/features/the-skill-page.md) · [the-agents-shell](the-agents-shell.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) AF-05 · AF-06 · AF-21 |
+| Related | [author-an-agent](author-an-agent.md) · [envelope-and-budget](envelope-and-budget.md) · [delegation](delegation.md) · [lifecycle](lifecycle.md) · [soul](soul.md) · [pinned-model-versions](pinned-model-versions.md) · [the-skill-page](../../skills/features/the-skill-page.md) · the-agents-shell · products: agent-fabric.md AF-05 · AF-06 · AF-21 |
 
-Product spec: [AG-F01 · Build an agent](../../../../../specs/products/agents/features/AG-F01-build-an-agent/feature.md) — AG-21, AG-36 and AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F01 · Build an agent](../../../../../specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md) — AG-21, AG-36 and AG-29; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

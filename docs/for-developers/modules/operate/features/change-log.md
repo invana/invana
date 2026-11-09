@@ -8,9 +8,9 @@ read from the records that already hold the versions and the events that minted 
 | Index | [10.6](../../../README.md#10--operate) · Slice **B01** (P-09) |
 | Module | [Operate](../spec.md) |
 | API / CLI / Studio | ✅ / 🔵 / ✅ |
-| Related | [audit-and-activity](audit-and-activity.md) · [see-what-ran](see-what-ran.md) · products: [shell.md](../../../../products/shell.md) SH-14 · [agents.md](../../../../products/agents.md) AG-06 · AG-09 · [modeller.md](../../../../products/modeller.md) MO-09 |
+| Related | [audit-and-activity](audit-and-activity.md) · [see-what-ran](see-what-ran.md) · AC-17 · agents.md AG-06 · AG-09 · modeller.md MO-09 |
 
-Product spec: [IN-F03 · History](../../../../../specs/foundation/inbox/features/IN-F03-history/feature.md) — IN-03; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
+Product spec: [AC-F06 · History](../../../../../specs/os/access/features/AC-F06-history/feature.md) — AC-17; the story, its criteria, journey, states and product decisions live there. This file keeps the Studio layout and the engine shape.
 
 ## Surfaces
 
@@ -65,4 +65,4 @@ Product spec: [IN-F03 · History](../../../../../specs/foundation/inbox/features
 | CL3 | **History and compare live under `…/history/{record_kind}/{record_id}`**, one route for every kind, read by `ChangeLogManager` in the `activity` band — the only band that may read events, every app and runs at once. |
 | CL5 | **`version` is a string on the wire** — skills, rules, plans and agents count, models use SemVer. `version_id` is the version row's id where one exists, null for an agent. |
 | CL8 | **An agent update records `details.diff`** — `{field: {before, after}}` for every changed field — beside the field names it already recorded, because an agent has no version table and its event is the only place an earlier version still exists. |
-| CL11 | **The agent and skill pages read their own history; the shared surfaces are C04.** Their History tabs read `history/<kind>/<id>`, and the skill's Plan tab reads its compare against the version before; Activity › Changes and the compare board stay with the shell ([agents.md › Decisions](../../../../products/agents.md#decisions) *Agent history* · *Skill history*). |
+| CL11 | **The agent and skill pages read their own history; the shared surfaces are C04.** Their History tabs read `history/<kind>/<id>`, and the skill's Plan tab reads its compare against the version before; Activity › Changes and the compare board stay with the shell (agents.md › Decisions *Agent history* · *Skill history*). |

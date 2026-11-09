@@ -1,10 +1,10 @@
-# Explore
+# Boards — `explore`
 
 The engine shape behind boards: what kinds of board there are, which of them write, and the one selection every
 gesture makes. The product rules — the board selects and the panel states or edits, inspect is the default, the seams a
-person sees — are [Explore](../../products/explore/product.md) and
-[EX-F01](../../products/explore/features/EX-F01-the-board-and-its-canvas/feature.md); editing the data is
-[EX-F06](../../products/explore/features/EX-F06-annotate-and-edit-the-data/feature.md).
+person sees — are [Explore](../../capabilities/explore/product.md) and
+[EX-F01](../../capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md); editing the data is
+[EX-F06](../../capabilities/explore/features/EX-F06-annotate-and-edit-the-data/feature.md).
 
 ## Six kinds, one set of gestures
 

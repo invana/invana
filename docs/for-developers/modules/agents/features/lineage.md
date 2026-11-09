@@ -10,7 +10,7 @@ structural: *where did this agent come from, and what did it do on whose behalf?
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [delegation](delegation.md) · [audit-and-activity](../../operate/features/audit-and-activity.md) |
 
-Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/products/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-24; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F05 · Delegation and outside agents](../../../../../specs/capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md) — AG-24; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

@@ -4,10 +4,10 @@ The steps are the interface. You watch `understand · plan · translate · valid
 verify` happen, with their emissions appearing as they are produced — never a spinner followed by
 everything at once.
 
-> ⚠ **Rewritten for [orchestration § 0](../../../orchestration.md#0-the-records)** — `Todo` · `Flow` ·
+> ⚠ **Rewritten for orchestration § 0** — `Todo` · `Flow` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
 > **`Task` now names a node inside a plan**, never a thing a user authored. Migration:
-> [task-model-migration.md](../../../building-engine/task-model-migration.md).
+> task-model-migration.md.
 
 | | |
 |---|---|
@@ -16,7 +16,7 @@ everything at once.
 | API / CLI / Studio | ✅ / — / ✅ |
 | Related | [reasoning-trace](reasoning-trace.md) (after the fact) · [plan-selection](../../workflows/features/plan-selection.md) |
 
-Product spec: [EX-F04 · The answer](../../../../../specs/products/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F04 · The answer](../../../../../specs/capabilities/explore/features/EX-F04-the-answer/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

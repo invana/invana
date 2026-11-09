@@ -10,9 +10,9 @@ Nothing publishes until a person does.
 | Index | [1.10](../../../README.md#1--connect-and-model) · Slice **B12** (P-19) |
 | Module | [Connect and model](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Related | [share-a-model](share-a-model.md) · [domain-models](domain-models.md) · [stitch-models](stitch-models.md) · [skos-import](../../bring-data-in/features/skos-import.md) · products: [modeller.md](../../../../products/modeller.md) MO-15 · MO-F14 |
+| Related | [share-a-model](share-a-model.md) · [domain-models](domain-models.md) · [stitch-models](stitch-models.md) · [skos-import](../../bring-data-in/features/skos-import.md) · products: modeller.md MO-15 · MO-F14 |
 
-Product spec: [MO-F01 · Start a model](../../../../../specs/products/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [MO-F01 · Start a model](../../../../../specs/capabilities/model/features/MO-F01-start-a-model/feature.md) — the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

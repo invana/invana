@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 const SAMPLES = ["airways", "arabidopsis"] as const;
 
 /**
- * The first run (SH-19): what a member with no Graph sees in place of the
+ * The first run (GR-02): what a member with no Graph sees in place of the
  * Graphs list, and what `/graphs?first-run` shows anyone.
  *
  * It asks *what are you trying to decide?* and offers three ways in, each

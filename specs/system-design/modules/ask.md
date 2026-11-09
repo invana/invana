@@ -1,11 +1,11 @@
-# Ask
+# Questions — `explore`
 
 The engine shape of a question: the steps it runs through, how a run comes together, and what each step is handed.
 The product rules — every answer is grounded, one question is one run, steps show as they happen — are
-[Explore](../../products/explore/product.md) and its features
-[EX-F03](../../products/explore/features/EX-F03-ask-a-question/feature.md) ·
-[EX-F04](../../products/explore/features/EX-F04-the-answer/feature.md) ·
-[EX-F05](../../products/explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md). The run itself is
+[Explore](../../capabilities/explore/product.md) and its features
+[EX-F03](../../capabilities/explore/features/EX-F03-ask-a-question/feature.md) ·
+[EX-F04](../../capabilities/explore/features/EX-F04-the-answer/feature.md) ·
+[EX-F05](../../capabilities/explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md). The run itself is
 [orchestration.md](../orchestration.md) and [runtime.md](../runtime.md); what it may see is
 [governance-and-lens.md](../governance-and-lens.md).
 

@@ -10,9 +10,9 @@ generated from instructions or packaged; nobody draws one.
 | Index | [6.5](../../../README.md#6--skills) · Slice **B02** (P-11 · P-15) |
 | Module | [Skills](../spec.md) |
 | API / CLI / Studio | 🟡 / 🟡 / ✅ |
-| Related | [authoring-a-skill](authoring-a-skill.md) · [evals](evals.md) · [author-an-agent](../../agents/features/author-an-agent.md) · [the-library](../../workflows/features/the-library.md) · [change-log](../../operate/features/change-log.md) · products: [agents.md › Instructions → plan](../../../../products/agents.md#instructions--plan) AG-04 · AG-08 · AG-09 · AG-11 |
+| Related | [authoring-a-skill](authoring-a-skill.md) · [evals](evals.md) · [author-an-agent](../../agents/features/author-an-agent.md) · [the-library](../../workflows/features/the-library.md) · [change-log](../../operate/features/change-log.md) · products: agents.md › Instructions → plan AG-04 · AG-08 · AG-09 · AG-11 |
 
-Product spec: [AG-F04 · Skills](../../../../../specs/products/agents/features/AG-F04-skills/feature.md) — AG-19; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F04 · Skills](../../../../../specs/capabilities/agents/features/AG-F04-skills/feature.md) — AG-19; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 

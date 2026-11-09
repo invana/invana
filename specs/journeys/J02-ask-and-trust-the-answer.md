@@ -2,7 +2,7 @@
 id: J02
 title: Ask and trust the answer
 personas: [analyst]
-stories: [SH-02, EX-01, EX-23, EX-02, EX-03, EX-25, EX-04, EX-05, EX-06, EX-24, EX-15, EX-12, EX-30]
+stories: [GR-01, EX-01, EX-23, EX-02, EX-03, EX-25, EX-04, EX-05, EX-06, EX-24, EX-15, EX-12, EX-30]
 boards: [start.home, explore.ask, explore.board, explore.board.chart, explore.board.why, explore.board.cannot, explore.share]
 ---
 
@@ -15,7 +15,7 @@ boards: [start.home, explore.ask, explore.board, explore.board.chart, explore.bo
 
 ```mermaid
 flowchart TD
-  A([Home]) --> B["SH-02 · Open the Graph"]
+  A([Home]) --> B["GR-01 · Open the Graph"]
   B --> C["EX-01 · Ask in plain words"]
   C --> D{"Is the question clear?"}
   D -->|no| E["EX-23 · Asked back: seats or flights? · a recommendation"] --> C
@@ -38,7 +38,7 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Open the Graph | Shell · Home | SH-02 | `start.home` |
+| 1 | Open the Graph | Shell · Home | GR-01 | `start.home` |
 | 2 | Ask in plain words | Explore · empty board | EX-01 | `explore.ask` |
 | 3 | Answer a question asked back, when his was unclear | Explore · the assistant | EX-23 | `explore.board` |
 | 4 | Watch the answer arrive on the board | Explore · board | EX-02 | `explore.board` |

@@ -75,7 +75,7 @@ class Skill(Base):
     #: ``builtin`` — seeded into every Graph and re-seeded idempotently by name
     #: — or ``authored``. A builtin skill is the product's own playbook and is
     #: still editable: publishing v2 over it is an ordinary act
-    #: ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
+    #: ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)).
     origin: Mapped[str] = mapped_column(String(16), default="authored", nullable=False)
 
     #: The published head. Nullable in the schema only because the skill row is
@@ -133,7 +133,7 @@ class SkillVersion(Base):
     There is no ``updated_at`` and nothing here is ever reassigned: publishing a
     change mints ``version + 1`` and repoints the skill. That is what lets
     ``task_runs.skills_offered`` name a version and still resolve years later
-    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
+    ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)).
 
     ``plan_id`` — one version, exactly one ``Flow``
     ([SK13](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
@@ -250,7 +250,7 @@ class SkillVersionClarification(Base):
 
     Recorded on the version so a redraw **never re-asks**, and so the answer
     that shaped the plan is part of what published
-    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
+    ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)).
     An unanswered row is the open question the surface draws against its
     sentence; there is at most one of those at a time, because the planner
     stops at the first ambiguity rather than collecting a queue.
@@ -281,14 +281,14 @@ class SkillBinding(Base):
     """One agent may be offered one skill.
 
     A binding points at the **skill**, never at a version
-    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)) — the agent
+    ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)) — the agent
     is offered whatever is current when the run assembles its prompt, which is
     what makes publishing a better version worth doing.
 
     A row rather than a JSON array on the agent, because binding is a write with
     its own refusal: a check that must name *which* skill it rejected, and why,
     has nothing to hold on to when the request replaces a whole list
-    ([AG-F04 § Decisions](specs/products/agents/features/AG-F04-skills/feature.md#decisions)).
+    ([AG-F04 § Decisions](specs/capabilities/agents/features/AG-F04-skills/feature.md#decisions)).
     ``bound_by_id`` and ``bound_at`` are the other half of that — who changed the
     bindings, and when.
     """
@@ -339,11 +339,11 @@ class Rule(Base):
         String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=True, index=True
     )
     #: ``false`` stops it being offered. **Not a version** and not a delete
-    #: ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)) — the
+    #: ([MO-F06 § Decisions](specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)) — the
     #: versions and every past citation stay resolvable.
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     #: Sequence in the assembled context, never importance
-    #: ([MO-F06](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md)). Nothing
+    #: ([MO-F06](specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md)). Nothing
     #: ranks a rule: it is offered or it is not.
     order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
@@ -405,7 +405,8 @@ class RuleVersion(Base):
     """One published wording of a rule. **Immutable** once written.
 
     Deactivating is not a version
-    ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)): ``active``
+    ([MO-F06 § Decisions](specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)):
+    ``active``
     lives on the rule, so turning a rule off leaves every version — and every
     step that cited one — exactly where it was.
     """
@@ -419,7 +420,8 @@ class RuleVersion(Base):
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     #: One statement. If it needs a paragraph it is two rules
-    #: ([MO-F06 § Decisions](specs/products/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)) — which is
+    #: ([MO-F06 § Decisions](specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md#decisions)) —
+    #: which is
     #: a nudge on the surface, not a length the column refuses.
     statement: Mapped[str] = mapped_column(Text, default="", nullable=False)
     #: ``{kind, …params}`` from a closed vocabulary; null on a rule that is only offered.

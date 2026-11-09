@@ -10,9 +10,9 @@ pushes **draft** dataset versions through it; a person publishes them.
 | Index | [13.16](../../../README.md#13--platform) · Slice **I02** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [MCP plugins](mcp-plugins.md) (the other direction) · [tokens](../../identity-and-access/features/tokens.md) · [effective access](../../identity-and-access/features/effective-access.md) · [external-agent-api](../../operate/features/external-agent-api.md) · [datasets › draft versions](../../bring-data-in/features/datasets.md) · products: [agent-fabric](../../../../products/agent-fabric.md) AF-18 · [iam](../../../../products/iam.md) |
+| Related | [MCP plugins](mcp-plugins.md) (the other direction) · [tokens](../../identity-and-access/features/tokens.md) · [effective access](../../identity-and-access/features/effective-access.md) · [external-agent-api](../../operate/features/external-agent-api.md) · [datasets › draft versions](../../bring-data-in/features/datasets.md) · products: agent-fabric AF-18 · iam |
 
-Product spec: [ST-F04 · Plugins and outside tools](../../../../../specs/foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md) — ST-27; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
+Product spec: [RT-F02 · Plugins and outside tools](../../../../../specs/os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md) — RT-03; the story, its criteria, journey, states and product rules live there. This file keeps the engine shape and the rows not moved.
 
 ## Capabilities
 

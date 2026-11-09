@@ -11,7 +11,7 @@ be rerun as it was, on today's versions, or retuned.
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [see-what-ran](../../operate/features/see-what-ran.md) (the journal's records and the step drill-in) · [delegation](delegation.md) (escrow, ceilings, exit reasons) · [approvals](../../operate/features/approvals.md) · [the-ledger](../../operate/features/the-ledger.md) · [the-agent-page](the-agent-page.md) · [list-contract](../../platform/features/list-contract.md) |
 
-Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/products/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-23, AG-25, AG-27, AG-32, AG-41 and AG-43; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [AG-F03 · Runs and how the agents are doing](../../../../../specs/capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) — AG-23, AG-25, AG-27, AG-32, AG-41 and AG-43; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

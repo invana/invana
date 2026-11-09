@@ -9,9 +9,9 @@ they are used: **Instructions · Flow · Functions · Agents · Usage · Excepti
 | Index | [6.7](../../../README.md#6--skills) · Slice **F04** |
 | Module | [Skills](../spec.md) |
 | API / CLI / Studio | 🟡 / — / ✅ |
-| Related | [authoring-a-skill](authoring-a-skill.md) · [instructions-publish-rollback](instructions-publish-rollback.md) · [bindings](bindings.md) · [usage](usage.md) · [evals](evals.md) · [the-agent-page](../../agents/features/the-agent-page.md) · [the-agents-shell](../../agents/features/the-agents-shell.md) · products: [agent-fabric.md](../../../../products/agent-fabric.md) AF-03 · AF-04 · AF-22 |
+| Related | [authoring-a-skill](authoring-a-skill.md) · [instructions-publish-rollback](instructions-publish-rollback.md) · [bindings](bindings.md) · [usage](usage.md) · [evals](evals.md) · [the-agent-page](../../agents/features/the-agent-page.md) · the-agents-shell · products: agent-fabric.md AF-03 · AF-04 · AF-22 |
 
-Product spec: [AG-F04 · Skills](../../../../../specs/products/agents/features/AG-F04-skills/feature.md) — AG-19 · AG-20; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AG-F04 · Skills](../../../../../specs/capabilities/agents/features/AG-F04-skills/feature.md) — AG-19 · AG-20; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 

@@ -233,8 +233,8 @@ def _first(decided: Verdict, binding: ModelBinding) -> _Governed:
 def _merge(current: _Governed, decided: Verdict, binding: ModelBinding) -> _Governed:
     """Two models declaring one type — narrowing accumulates, and deny wins.
 
-    The same reading [Model product § Decisions](specs/products/model/product.md#decisions) and
-    [Model product § Decisions](specs/products/model/product.md#decisions) already give a rule list.
+    The same reading [Model product § Decisions](specs/capabilities/model/product.md#decisions) and
+    [Model product § Decisions](specs/capabilities/model/product.md#decisions) already give a rule list.
     Picking a winner between two bounds is the one resolution that could widen,
     so there is no precedence here: the exclusions union, the selects merge, and
     a denial on either side denies the type.
@@ -284,7 +284,7 @@ def _predicates(select: dict[str, Any], *, axes: dict[str, Any]) -> list[tuple[s
     """The slice, as conditions on the properties the **model** declared.
 
     The model states which property carries valid time and which carries
-    geography ([MO-F01 § Decisions](specs/products/model/features/MO-F01-start-a-model/feature.md#decisions)),
+    geography ([MO-F01 § Decisions](specs/capabilities/model/features/MO-F01-start-a-model/feature.md#decisions)),
     so that declaration is what a slice compiles against. A rule restating the
     axis is read as documentation, never as a second source of truth — a slice
     that could name its own property would be a query, and the product has one

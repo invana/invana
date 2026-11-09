@@ -10,7 +10,7 @@ it — people and agents — and what it spends against the limits the platform 
 | API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [connect-a-database](connect-a-database.md) · [roles](../../identity-and-access/features/roles.md) · [the agents catalogue](../../agents/features/install-wide-agents-and-skills.md) |
 
-Product spec: [ST-F01 · This graph](../../../../../specs/foundation/settings/features/ST-F01-this-graph/feature.md) — ST-12 · ST-13 · ST-14; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [GR-F04 · This graph](../../../../../specs/os/graph/features/GR-F04-this-graph/feature.md) — GR-13 · GR-14 · GR-15; the stories, their criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

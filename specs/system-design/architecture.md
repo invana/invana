@@ -4,8 +4,7 @@ How Invana is put together, one level above the code: the parts it ships, the la
 every feature keeps. What it is for is [vision.md](../vision.md); its records are [data-model.md](data-model.md); what
 it talks to is [integrations.md](integrations.md). The engine's shape is [orchestration.md](orchestration.md) ·
 [governance-and-lens.md](governance-and-lens.md) · [runtime.md](runtime.md) · [observability.md](observability.md) ·
-[api-and-cli.md](api-and-cli.md) · one file per module in [modules/](modules). The services and the engine's bands are drawn in
-[architecture.svg](../../docs/for-developers/architecture.svg).
+[api-and-cli.md](api-and-cli.md) · one file per module in [modules/](modules).
 
 ## The parts
 
@@ -39,15 +38,77 @@ flowchart BT
 
 | # | Layer | Owns | Product |
 |---|---|---|---|
-| 1 | **Identity** | An account identified by email, a username that is also a URL, a revocable session, a member's roles in a Graph | Shell · Settings |
-| 2 | **Graph** | The bounded domain; its one connection to a graph database, tested before it is saved, and the graph connector that speaks to it | Settings › This graph |
+| 1 | **Identity** | An account identified by email, a username that is also a URL, a revocable session, a member's roles in a Graph | Access |
+| 2 | **Graph** | The bounded domain; its one connection to a graph database, tested before it is saved, and the graph connector that speaks to it | Graph › This graph |
 | 3 | **Model** | Models and their published versions; links between them; the read-time union of the published models every question is grounded in | Model |
 | 4 | **Data** | Datasets and their versions, conforming to a model, validated per record, written with provenance | Data |
 | 5 | **Ask** | A question becomes a run; the run's steps stream answers onto a board | Explore |
 | 6 | **Orchestration** | Which agent runs, inside what it may do and what it may see, offered which skills and rules, from which plan — and what carries over between runs | Agents · Model |
 | 7 | **Work** | What needs doing, who takes it, what done means, who accepts it, and the decisions a project reaches | Projects |
-| 8 | **Operate** | Every write as an append-only event; schedules; asks and notifications; the scoped, read-only surface outside callers use | Inbox · Agents |
+| 8 | **Operate** | Every write as an append-only event; schedules; asks and notifications; the scoped, read-only surface outside callers use | Access · Graph · Agents |
 | 9 | **Interfaces** | Studio for anything read, the CLI for anything scripted, the API as the contract between them | — |
+
+## One name across layers
+
+Every part of the operating system and every capability is one **package**, and the package's name is the same in
+every layer: its engine module, tables, routes, access actions, events, Studio package, Studio routes and boards. This
+table is the only source for those names; a name not here is added here before it is used in code.
+
+| Layer | Form | Example — `access`, records `rules` |
+|---|---|---|
+| Spec folder | `specs/os/<part>/` for the operating system · `specs/capabilities/<capability>/` | `specs/os/access/` |
+| Engine module | `engine/src/invana/<pkg>/<module>/` — one vertical slice per package | `engine/src/invana/access/<module>/` |
+| Tables | `<pkg>_<records>` | `access_rules` |
+| API routes | `/api/<pkg>/<records>` | `/api/access/rules` |
+| Access actions | `<pkg>.<records>.<verb>` | `access.rules.update` |
+| Events and spans | `<pkg>.<records>.<event>` | `access.rules.updated` |
+| Studio package | `@invana-studio/<pkg>` | `@invana-studio/access` |
+| Studio routes | `/g/:graph/<pkg>/<records>` | `/g/:graph/access/rules` |
+| Boards | `<pkg>.<surface>.<variant>` | `access.rules` |
+
+| Rule | Detail |
+|---|---|
+| One package, one name | A package has one name from spec folder to board; no alias, no second spelling |
+| No `os` level in code | The operating system is a grouping of specs; in code its parts are packages beside the capabilities |
+| Records are plural nouns | `<records>` names what the package stores, in the plural — `rules`, `runs`, `datasets` |
+| A shared package holds no product | `core`, `cli`, `server`, `ui` and `shell` hold what every package uses; a feature lives in its package |
+
+### The packages
+
+| Package | Is | Code | Spec folder |
+|---|---|---|---|
+| `graphs` | Graph — the operating system | GR | `specs/os/graph/` |
+| `access` | Access — the operating system | AC | `specs/os/access/` |
+| `runtime` | Runtime — the operating system | RT | `specs/os/runtime/` |
+| `model` | Model — Ontology | MO | `specs/capabilities/model/` |
+| `data` | Data — Ontology | DA | `specs/capabilities/data/` |
+| `datasets` | Datasets — Ontology | DS | `specs/capabilities/datasets/` |
+| `agents` | Agents — Agents | AG | `specs/capabilities/agents/` |
+| `explore` | Explore — Evidence | EX | `specs/capabilities/explore/` |
+| `projects` | Projects — Evidence | PJ | `specs/capabilities/projects/` |
+
+### The shared packages
+
+| Side | Package | Holds |
+|---|---|---|
+| Engine | `core` | What every engine package uses — configuration, the app database session, the base records |
+| Engine | `cli` | The `invana` commands |
+| Engine | `server` | The API application that mounts every package's routes |
+| Studio | `core` | What every Studio package uses — the API client and the session |
+| Studio | `ui` | Studio-only compositions of `@invana/*` and tokens |
+| Studio | `shell` | The frame every mode and overlay sits in |
+
+### Settled clashes
+
+| Where two names meet | The name |
+|---|---|
+| Graph's package | `graphs`, not `graph` |
+| Graph database connectors | `runtime/connectors` |
+| Loaders | `datasets/loads` |
+| AI models in code | `llms` |
+| Model's package | `model` |
+| The Assistant | A feature of `explore`, not a package |
+| The engine's work package | Split between `agents` and `projects`, by the story each part serves |
 
 ## Cross-cutting
 
@@ -61,7 +122,7 @@ flowchart BT
 | **Streaming is the default** | Steps and answers paint as they arrive, for a question and a load alike |
 | **Hard deletes, downward cascade** | No soft deletes, no trash, no undo. Retention removes whole windows, never single rows. Retire and retract exist where history must stay resolvable |
 | **The engine owns every number** | The engine computes and stores every number when the fact settles; Studio formats it, never derives it |
-| **Acts only as far as the person allows** | Each act — a person's, an agent's or a key's — runs as Allow, Ask or Deny by the lines of the access rules it holds, checked by the engine when the step runs; an Ask waits on the yes of someone who holds Allow on it, recorded as an approval ([one access model](../foundation/settings/product.md#decisions)) |
+| **Acts only as far as the person allows** | Each act — a person's, an agent's or a key's — runs as Allow, Ask or Deny by the lines of the access rules it holds, checked by the engine when the step runs; an Ask waits on the yes of someone who holds Allow on it, recorded as an approval ([one access model](../os/access/product.md#decisions)) |
 
 ## Metrics are stored
 

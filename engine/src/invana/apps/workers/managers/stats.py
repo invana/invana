@@ -1,6 +1,6 @@
 """The numbers Workers shows, stored every 30 s.
 
-specs/foundation/settings/features/ST-F06-workers-and-limits/feature.md. One ``worker_stats``
+specs/os/runtime/features/RT-F03-workers-and-the-queue/feature.md. One ``worker_stats``
 row per pool per bucket: workers and slots from the worker rows, ready steps
 and the oldest wait from the queue, envelopes finished from the outcomes
 workers posted, and *Suggested* — ready steps ÷ slots a worker, averaged over

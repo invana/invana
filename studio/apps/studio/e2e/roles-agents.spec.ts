@@ -1,5 +1,5 @@
 /**
- * Agents without the builder role (SH-20, board `agents.skills.detail.readonly`).
+ * Agents without the builder role (GR-12, board `agents.skills.detail.readonly`).
  *
  * A viewer opens a skill and reads it: the page opens with the line saying
  * what they may do and who to ask, and *Edit instructions* is drawn disabled —
@@ -16,7 +16,7 @@ const SKILL = "Ask about routes and airports";
 const NOTICE =
 	/You can read this skill\. Editing needs the builder role — ask .+\./;
 
-test("SH-20 a viewer reads a skill; Edit instructions is disabled, with who to ask", async ({
+test("GR-12 a viewer reads a skill; Edit instructions is disabled, with who to ask", async ({
 	page,
 	browser,
 }) => {
@@ -40,7 +40,7 @@ test("SH-20 a viewer reads a skill; Edit instructions is disabled, with who to a
 	}
 });
 
-test("SH-20 the admin edits a skill; no read-only notice", async ({ page }) => {
+test("GR-12 the admin edits a skill; no read-only notice", async ({ page }) => {
 	const id = await skillNamed(page, SKILL);
 	await page.goto(`${GRAPH}/agents/skills?page=skill:${id}`);
 	const edit = page.getByRole("button", { name: "Edit instructions" });

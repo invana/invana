@@ -24,7 +24,7 @@ pin the Graph no longer offers, or one the lens denies, refuses the run rather
 than falling back to another model. A pin never names an alias — pinning
 ``*-latest`` would pin nothing.
 
-**Removal** ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
+**Removal** ([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)).
 A model a cast names cannot quietly stop existing — the refusal names the
 worlds, and the recourse is to retune them first. A model nothing names says so,
 so the safe case is visibly safe.
@@ -87,7 +87,7 @@ class LLMEndpointManager:
         ``prefer_model_row_id`` is an explicit pick — a person naming the model
         for this one ask. It still has to be a model this Graph offers; it does
         **not** bypass the cast's check, because a pick is a resolution and not a
-        widening ([Model product § Decisions](specs/products/model/product.md#decisions)).
+        widening ([Model product § Decisions](specs/capabilities/model/product.md#decisions)).
 
         ``pins`` are model addresses, innermost first — a skill version's, then
         an agent's. The first one set is the model, or the run is refused: it
@@ -164,7 +164,7 @@ class LLMEndpointManager:
 
         The shipped cast is computed over what the Graph *offers*, so a Graph
         with providers and no cast still runs
-        ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)).
+        ([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)).
         """
         shipped = shipped_cast([(e.address, e.capabilities) for e in offered])
         if effective is None:
@@ -289,7 +289,7 @@ class LLMEndpointManager:
         """Edit an endpoint, refusing a rename a world still names.
 
         The ``name`` is the address's middle segment
-        ([ST-F05 § Decisions](specs/foundation/settings/features/ST-F05-ai-models/feature.md#decisions)),
+        ([RT-F01 § Decisions](specs/os/runtime/features/RT-F01-ai-models/feature.md#decisions)),
         so renaming moves ``llm/<name>/*`` in one write. A rule or a cast left
         naming the old address points at a participant that no longer exists,
         and a bound that matches nothing bounds nothing — migration ``53``
@@ -359,7 +359,7 @@ class LLMEndpointManager:
         Named lenses only — worlds and guardrails. An unnamed lens belongs to
         one past run and is private to it, so naming it in a refusal would give
         a person nothing they could go and retune
-        (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+        (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
 
         Reads the lenses rather than a counter: a counter can disagree with the
         rows it counts ([data model § 8](docs/for-developers/building-engine/govern-and-agents-data-model.md)).

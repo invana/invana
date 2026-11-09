@@ -1,8 +1,8 @@
-# Operate
+# Events, schedules and asks — `access` · `graphs` · `agents`
 
 The engine shape of running the thing: every write as an event, schedules, notifications and approvals on one clock,
-and the numbers read from the record. The product rules are [Inbox](../../foundation/inbox/product.md) and its features
-IN-F01 to IN-F03; schedules are [AG-F07](../../products/agents/features/AG-F07-schedules/feature.md). Logs, traces and
+and the numbers read from the record. The product rules are [GR-F05 The Inbox](../../os/graph/features/GR-F05-the-inbox/feature.md),
+[AC-F05 Asks and approvals](../../os/access/features/AC-F05-asks-and-approvals/feature.md) and [AC-F06 History](../../os/access/features/AC-F06-history/feature.md); schedules are [AG-F07](../../capabilities/agents/features/AG-F07-schedules/feature.md). Logs, traces and
 metrics are [observability.md](../observability.md); the runs themselves are [orchestration.md](../orchestration.md).
 On screen events are *History* and an approval is an *ask* ([glossary.md](../../glossary.md)).
 
@@ -11,7 +11,7 @@ On screen events are *History* and an approval is an *ask* ([glossary.md](../../
 ```mermaid
 flowchart LR
     W[Any write<br/>graph · model · skill · Todo · agent · load] --> E[(events<br/>append-only)]
-    E --> A[Activity tree<br/>per Todo, per agent, per Graph]
+    E --> A[Event tree<br/>per Todo, per agent, per Graph]
     E --> L[Live tail]
     E --> EV[Evidence · memory]
     E --> R[Retention]
@@ -55,7 +55,7 @@ flowchart LR
 | `approvals` | What waits to leave, its approvers and deadline |
 | The clock | One loop per engine process: schedules, deliveries, notification rules, approval deadlines — each step idempotent on a unique key, so a restart or a second process repeats nothing |
 | Metrics | Per query and per LLM call: latency, tokens, cost, errors — derived from the record |
-| `api_tokens` | Scoped tokens for outside agents, with their allowed reads ([ST-F04](../../foundation/settings/features/ST-F04-plugins-and-outside-tools/feature.md)) |
+| `api_tokens` | Scoped tokens for outside agents, with their allowed reads ([RT-F02](../../os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md)) |
 | Retention | How long task runs, their streams, emissions and events are kept, and what a purge removes |
 | The runs journal | A reading of `todos` and `task_runs` — this module owns the surface, never the tables |
 

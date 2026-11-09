@@ -23,7 +23,7 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 
 ## 3. What this module owns
 
-The rule records below are superseded by [MO-F06](../../../../specs/products/model/features/MO-F06-rules-agents-work-by/feature.md) (three scopes, checked rules); the skill records moved.
+The rule records below are superseded by [MO-F06](../../../../specs/capabilities/model/features/MO-F06-rules-agents-work-by/feature.md) (three scopes, checked rules); the skill records moved.
 
 | Owns | Shape |
 |---|---|
@@ -90,7 +90,7 @@ is where it is written once.
 
 ## 6. Cross-feature decisions
 
-Engine rows, and rows that stay until they are settled; the product decisions are [Agents](../../../../specs/products/agents/product.md) › Decisions and [AG-F04 · Skills](../../../../specs/products/agents/features/AG-F04-skills/feature.md).
+Engine rows, and rows that stay until they are settled; the product decisions are [Agents](../../../../specs/capabilities/agents/product.md) › Decisions and [AG-F04 · Skills](../../../../specs/capabilities/agents/features/AG-F04-skills/feature.md).
 
 | # | Decision |
 |---|---|
@@ -98,7 +98,7 @@ Engine rows, and rows that stay until they are settled; the product decisions ar
 | S4 | Rule scope is fixed: invariants on a Graph, working rules on a Project. Nothing else has rules. |
 | S5 | Deactivate rather than delete — usage and traces must stay resolvable. |
 | S6 | Neither skills nor rules are enforcement. Enforcement is an envelope bound or a criterion. |
-| S7 | **Every reading this module owns opens as a declared board, and the stack stays.** Three kinds — `skill` · `skill_usage` · `rule` — each bound to one record through `subject_id`, each composed as one `BoardSpec` from the reads the drawer already makes ([CV12](../explore/features/boards.md)). The split is by tense and by record, not by screen size: a drawer answers *which one*, a board answers *what happened*. **The board reads and the drawer writes** — publishing a version, binding an agent and deactivating a rule all stay where the thing being changed is written, so a page anybody may open carries no act with a consequence to read. Panel sets, seams and the JSON: [skills-boards.md](../../building-studio/skills-boards.md). |
+| S7 | **Every reading this module owns opens as a declared board, and the stack stays.** Three kinds — `skill` · `skill_usage` · `rule` — each bound to one record through `subject_id`, each composed as one `BoardSpec` from the reads the drawer already makes ([CV12](../explore/features/boards.md)). The split is by tense and by record, not by screen size: a drawer answers *which one*, a board answers *what happened*. **The board reads and the drawer writes** — publishing a version, binding an agent and deactivating a rule all stay where the thing being changed is written, so a page anybody may open carries no act with a consequence to read. Panel sets, seams and the JSON: skills-boards.md. |
 
 ## 7. Deliberately absent
 

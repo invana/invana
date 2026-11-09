@@ -8,10 +8,10 @@ frozen versions that cite the dataset versions behind them.
 | Index | [9.6](../../../README.md#9--work) · B05 |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | ✅ / ✅ / ✅ |
-| Product | [PJ-F05 · Project reports](../../../../../specs/products/projects/features/PJ-F05-project-reports/feature.md) · PJ-14 |
+| Product | [PJ-F05 · Project reports](../../../../../specs/capabilities/projects/features/PJ-F05-project-reports/feature.md) · PJ-14 |
 | Related | [branches-and-decisions](branches-and-decisions.md) · [retract-and-refresh](../../bring-data-in/features/retract-and-refresh.md) |
 
-Product spec: [PJ-F05 · Project reports](../../../../../specs/products/projects/features/PJ-F05-project-reports/feature.md) — PJ-14; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [PJ-F05 · Project reports](../../../../../specs/capabilities/projects/features/PJ-F05-project-reports/feature.md) — PJ-14; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Engine
 

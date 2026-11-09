@@ -289,20 +289,20 @@ async def freeze_lens(
     """Resolve the lens this run is dispatched under, and **freeze it**.
 
     ``effective = agent ∩ plan ∩ todo``
-    ([Model product § Decisions](specs/products/model/product.md#decisions)), composed once at run
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)), composed once at run
     open and never recomputed
-    ([Model product § Decisions](specs/products/model/product.md#decisions)) — which is what makes
+    ([Model product § Decisions](specs/capabilities/model/product.md#decisions)) — which is what makes
     ``lens_snapshot`` reconstructible rather than a pointer at rows that have
     since moved. A guardrail tightened tomorrow does not rewrite what this run
     was allowed to rest on
-    (specs/products/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
+    (specs/capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md § Decisions).
 
     The Graph's guardrails and the agent's go in whether or not a world was
     picked, because they are in force on every run whatever world it is asked
     under. The agent carries no world of its own — its narrowing *is* its
     guardrail ([AG26](docs/for-developers/modules/agents/features/author-an-agent.md)) —
     so the only world here is the one the work brought. **No world is the
-    widest**, not the narrowest ([Model product § Decisions](specs/products/model/product.md#decisions)):
+    widest**, not the narrowest ([Model product § Decisions](specs/capabilities/model/product.md#decisions)):
     a Graph with nothing set freezes an empty lens, which permits everything.
 
     ``within`` is the run a delegated child opens inside: its frozen lens
@@ -1043,7 +1043,7 @@ async def worlds_for_messages(db: AsyncSession, messages: list[SessionMessage]) 
 
     The name is read from the snapshot's contributors, not the live row, so a
     rename or a delete since never changes what a past turn says it ran in
-    ([EX-F03 § Decisions](specs/products/explore/features/EX-F03-ask-a-question/feature.md#decisions)). A
+    ([EX-F03 § Decisions](specs/capabilities/explore/features/EX-F03-ask-a-question/feature.md#decisions)). A
     reply that ran in *Everything* is absent.
     """
     wanted = {m.run_id: m.id for m in messages if m.run_id}

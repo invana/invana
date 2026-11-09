@@ -9,9 +9,9 @@ bound to that Graph; one minted on the profile carries its holder's identity eve
 | Index | [11.5](../../../README.md#11--identity-and-access) · Slice **S1** · narrowing **I01** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [sessions](sessions.md) · [accounts](accounts.md) · [membership](membership.md) · [policies](policies.md) · [people and groups](people-and-groups.md) · [external-agent-api](../../operate/features/external-agent-api.md) · products: [iam.md](../../../../products/iam.md) IAM-09 |
+| Related | [sessions](sessions.md) · [accounts](accounts.md) · [membership](membership.md) · [policies](policies.md) · [people and groups](people-and-groups.md) · [external-agent-api](../../operate/features/external-agent-api.md) · products: iam.md IAM-09 |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-09; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [AC-F03 · People and access](../../../../../specs/os/access/features/AC-F03-groups-keys-and-holders/feature.md) — AC-10; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## What it is, and what it is not
 
@@ -36,7 +36,7 @@ Revoking access to a Graph takes the token with it, at once.
 | Profile › **Access tokens** | A section of `/profile`, reached from its left nav beside Basic info · Appearance · Password · Danger zone ([AC6](accounts.md#decisions)) |
 | The list | One row per token: name · `invana_pat_…abcd` · created · last used · expires · Revoke. Revoked rows are gone; expired ones stay, marked |
 | At the ceiling | **New token** is disabled and the count says why; nothing is refused only after typing |
-| New token | A dialog behind the **New token** button — name and expiry stacked, then the same dialog turns into the secret with Copy and a one-time warning (ST-09.2) |
+| New token | A dialog behind the **New token** button — name and expiry stacked, then the same dialog turns into the secret with Copy and a one-time warning (AC-10.2) |
 | Revoke | Confirms by name, because the row is the only thing the person can still identify it by |
 | Empty | `EmptyState` — what a token is for, and the button that mints the first one |
 | `iam.tokens` | IAM › Tokens — *A key that acts as its holder when software calls Invana — a script, CI, Claude Code. It can only narrow what its holder may do*; table token · holder · narrowed to · expires · last used; *New token* |

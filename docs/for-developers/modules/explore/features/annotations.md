@@ -11,7 +11,7 @@ them.
 | API / CLI / Studio | 🔵 / — / 🔵 |
 | Related | [graph-canvas](graph-canvas.md) · [boards](boards.md) · [walkthrough](walkthrough.md) · [selection-and-the-panel](selection-and-the-panel.md) · [the-answer-surface](../../ask/features/the-answer-surface.md) · design canvas *Explorer · Annotate* (<https://claude.ai/artifact/Mqr1mcEde4MN4Hdf5kmK2B>) |
 
-Product spec: [EX-F06 · Annotate and edit the data](../../../../../specs/products/explore/features/EX-F06-annotate-and-edit-the-data/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F06 · Annotate and edit the data](../../../../../specs/capabilities/explore/features/EX-F06-annotate-and-edit-the-data/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

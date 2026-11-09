@@ -3,7 +3,7 @@ import type { SetupTarget } from "./SetupSlots";
 
 /**
  * What each setup step is called, why it is there, and where it is done
- * (specs/foundation/shell/features/SH-F02-create-a-graph/feature.md).
+ * (specs/os/graph/features/GR-F02-create-a-graph/feature.md).
  *
  * One list, two renderings: the board on the graph page and the timeline in the
  * Info panel read the same rows, so the sequence cannot say two different things

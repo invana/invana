@@ -1,5 +1,5 @@
 /**
- * Projects, and the **Plan** tab (specs/products/projects/features/PJ-F01-projects-and-tasks/feature.md § States).
+ * Projects, and the **Plan** tab (specs/capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md § States).
  *
  * The Plan tab is the panel half of the `plan` canvas: the same one call feeds
  * both, because a list and a DAG disagreeing about what comes next is worse

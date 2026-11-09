@@ -8,9 +8,9 @@ each step before it dispatches it, and a refusal names the layer and the policy.
 | Index | [11.8](../../../README.md#11--identity-and-access) · Slice **I01** |
 | Module | [Identity and access](../spec.md) |
 | API / CLI / Studio | ✅ / — / ✅ |
-| Related | [policies](policies.md) · [people and groups](people-and-groups.md) · [the agent page](../../agents/features/the-agent-page.md) · [delegation](../../agents/features/delegation.md) · [the ledger](../../operate/features/the-ledger.md) · [govern](../../govern/spec.md) · products: [iam.md](../../../../products/iam.md) IAM-07 · [agent-fabric.md](../../../../products/agent-fabric.md) › Agents *Access* |
+| Related | [policies](policies.md) · [people and groups](people-and-groups.md) · [the agent page](../../agents/features/the-agent-page.md) · [delegation](../../agents/features/delegation.md) · [the ledger](../../operate/features/the-ledger.md) · [govern](../../govern/spec.md) · products: iam.md IAM-07 · agent-fabric.md › Agents *Access* |
 
-Product spec: [ST-F02 · People and access](../../../../../specs/foundation/settings/features/ST-F02-people-and-access/feature.md) — ST-07 · ST-11; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
+Product spec: [AC-F02 · People and access](../../../../../specs/os/access/features/AC-F02-access-rules/feature.md) — AC-12 · AC-08; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape and the rows not moved.
 
 ## Surfaces
 

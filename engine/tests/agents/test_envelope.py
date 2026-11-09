@@ -143,7 +143,7 @@ class TestModes:
 
 class TestTheCeilings:
     """`agents.budget`, read through `effective_budget`
-    ([AG-F01 § Decisions](specs/products/agents/features/AG-F01-build-an-agent/feature.md#decisions))."""
+    ([AG-F01 § Decisions](specs/capabilities/agents/features/AG-F01-build-an-agent/feature.md#decisions))."""
 
     def test_a_row_that_sets_nothing_gets_every_ceiling(self):
         from invana.apps.agents.models import Agent

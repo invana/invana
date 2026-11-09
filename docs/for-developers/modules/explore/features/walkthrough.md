@@ -10,7 +10,7 @@ highlighted on the canvas and in the thread.
 | API / CLI / Studio | 🔵 / — / 🔵 |
 | Related | [graph-canvas](graph-canvas.md) · [boards](boards.md) · [share-an-answer](share-an-answer.md) · [the-answer-surface](../../ask/features/the-answer-surface.md) |
 
-Product spec: [EX-F02 · Share and present an answer](../../../../../specs/products/explore/features/EX-F02-share-and-present-an-answer/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
+Product spec: [EX-F02 · Share and present an answer](../../../../../specs/capabilities/explore/features/EX-F02-share-and-present-an-answer/feature.md) — the story, its criteria, journey, states and product decisions live there. This file keeps the engine and code shape.
 
 ## Surfaces
 

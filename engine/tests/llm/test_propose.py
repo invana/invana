@@ -24,8 +24,8 @@ _DEV_MODEL = os.environ.get("INVANA_TEST_OLLAMA_MODEL", "qwen3-coder:30b")
 
 def _ollama_up() -> bool:
     try:
-        httpx.get(_OLLAMA_URL.rstrip("/") + "/api/tags", timeout=3.0)
-        return True
+        tags = httpx.get(_OLLAMA_URL.rstrip("/") + "/api/tags", timeout=3.0).json()
+        return any(m.get("name") == _DEV_MODEL for m in tags.get("models", []))
     except Exception:
         return False
 
@@ -106,7 +106,7 @@ def test_validate_rejects_unsupported_property_type() -> None:
         )
 
 
-@pytest.mark.skipif(not _ollama_up(), reason="local Ollama not reachable")
+@pytest.mark.skipif(not _ollama_up(), reason="local Ollama or its dev model not available")
 async def test_propose_model_builds_people_and_projects() -> None:
     provider = endpoint(LLMProviderKind.ollama, _DEV_MODEL, base_url=_OLLAMA_URL)
     result = await propose_model(

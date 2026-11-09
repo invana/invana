@@ -11,11 +11,11 @@ sent** — never auto-approved.
 | API / CLI / Studio | ✅ / ✅ / 🟡 |
 | Related | [notifications](notifications.md) · [schedules](schedules.md) · [publish review](../../connect-and-model/features/publish-review.md) · [review](../../work/features/review.md) · [the runtime](../../platform/features/runtime.md) §10 |
 
-Product spec: [IN-F01 · Needs you](../../../../../specs/foundation/inbox/features/IN-F01-needs-you/feature.md) — IN-01; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
+Product spec: [AC-F05 · Needs you](../../../../../specs/os/access/features/AC-F05-asks-and-approvals/feature.md) — AC-15; the story, its criteria, journey, states and product decisions live there. This file keeps the engine shape.
 
 ## Surfaces
 
-The Studio surfaces as built today; the Inbox modal in IN-F01 replaces them.
+The Studio surfaces as built today; the Inbox modal in GR-F05 replaces them.
 
 | Surface | Shape |
 |---|---|
@@ -38,7 +38,7 @@ The Studio surfaces as built today; the Inbox modal in IN-F01 replaces them.
 
 ## Decisions
 
-Engine rows, and rows the Inbox has not settled; the product decisions are IN-F01's.
+Engine rows, and rows the Inbox has not settled; the product decisions are GR-F05's.
 
 | # | Decision |
 |---|---|
