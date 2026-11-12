@@ -70,6 +70,8 @@ flowchart LR
 | AC-15.26 | A person's act that a line sets to Ask | they take it | it holds, telling them who it waits on; an ask appears in *Needs you* for people who hold Allow on that act, never the asker nor whoever it benefits; the asker's own acts on it are disabled |
 | AC-15.27 | An ask routed to the reader | they decide it with a key, as a service account, or as an agent | it is refused; only a person's signed-in session decides an ask ([Only a person's session decides](../../../../product.md#decisions)) |
 | AC-15.28 | An ask from a person | it is decided by someone the asker added to the Graph or to a rule in the last 30 days | it goes, and History records an alert that every Owner is told of |
+| AC-15.29 | A person at the command line | they run `invana approvals list`, then `approve` or `decline` with a note | the asks routed to them read nearest deadline first, and a decision is held to every rule a decision in Studio is — routed to them, not late, not decided twice |
+| AC-15.30 | An ask past its deadline | someone it is routed to allows or declines it | it is refused, reading *The deadline has passed; it expires, not sent*; nothing runs |
 
 ## Screens
 

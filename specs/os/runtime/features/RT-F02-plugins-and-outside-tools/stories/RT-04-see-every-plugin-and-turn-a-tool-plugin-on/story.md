@@ -58,6 +58,8 @@ flowchart TD
 | RT-04.15 | A plugin's functions | they are read | each shows its mode for this Graph — Allow · Ask · Deny — and who set it |
 | RT-04.16 | A plugin's functions | one is opened | its inputs and outputs read as their JSON Schema |
 | RT-04.17 | A tool plugin Invana ships — web, mail, a science source | it is read | it is an MCP server run on the workers; its tools are frozen and versioned like an added server's (RT-02.6), and the same switch turns it on |
+| RT-04.18 | Anyone on the command line | they run `invana plugins list`, `show`, `enable`, `disable`, `mcp add` or `mcp refresh` | each does what its Studio act does, under the same Admin check; refused for anyone else, naming the Admin |
+| RT-04.19 | A function | it is opened | its recent calls read — when, which run, its outcome — with the skills and plans that use it |
 
 ## Screens
 

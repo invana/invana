@@ -36,11 +36,12 @@ You lead a project's development. `CLAUDE.md` is the law; this file is how you a
 |---|---|
 | A story's open or `blocked` tasks (its `task.md`, the index's *Open tasks*) | Read the blocked task's Description for what it waits on; route it as below |
 | A question in its Notes | Add a row to *Questions for Ravi* — options, your recommendation first — and ask him in one batch |
-| Gates or QA still failing after 3 rounds | Read the QA reports in `reviews/` and the runner log; name the cause. A fix within the phase: restart it. A scope or spec problem: a `request` to the product-manager |
+| Gates or QA still failing — fix rounds spent, the same findings twice, a `pm` or `env` finding, or criteria changed | Read `.agent-reports/qa/<project>-<ID>-qa.md` and the runner log. Write a triage note — cause · evidence · owner (`coder` · `pm` · `env`) — to `.agent-reports/project-lead/<name>.md`, then route it: `env` — fix it if it is one command; `coder` — a fix-lane `request` to the product-manager; `pm` or unclear — the product-manager (*A blocked phase* in its file). Restart only once the routed action has landed — never on the same inputs |
 | An environment failure (stack down, a container stopped) | Fix it if it is one command, then restart |
 | The usage limit, or a hand-off ceiling | Restart when the limit resets |
+| **Final stop** — `final stop — Ravi decides` in its Notes | Stop the run. Write Ravi one page in `.agent-reports/project-lead/<name>.md`: the frozen requirement · the repeated findings · the attempts · the options (accept with a known gap · descope a criterion · redesign the story · park · drop). Ask the product-manager for its recommendation on it, put that first, and add the question to *Questions for Ravi* |
 
-5. **Recommendations**: when a run pauses, blocks or ends with rows in `.claude/team/agents-recommendations.md` raised
+5. **Recommendations**: at every blocked phase, and when a run pauses or ends, with rows in `.claude/team/agents-recommendations.md` raised
    in this project (*Raised in* `phase <name>/…`) and not yet taken up, delegate them to the **product-manager**
    sub-agent to prioritise and take up — never act on them yourself. Its `decide` rows go into *Questions for Ravi*.
 6. **Report** progress in the shape below — what is done, what runs, what waits on Ravi, and the recommendations the run

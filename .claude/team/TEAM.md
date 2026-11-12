@@ -52,9 +52,9 @@ flowchart TD
 | Role | Agent · model · skills | Owns | Never does |
 |---|---|---|---|
 | **Ravi** — product owner | — | Scope, priorities, both reviews, every decision marked *Ravi's call* | — |
-| **Product manager** | `product-manager.md` · Opus · `/product-spec` | What and why — products, features, stories, criteria, journeys, access per act — and running the team: delegates, routes requests, prioritises and takes up recommendations, batches questions for Ravi, presents both reviews, moves statuses | Draws screens · writes code or tests · decides scope alone |
+| **Product manager** | `product-manager.md` · Opus · `/product-spec` · `/system-design` | What and why — products, features, stories, criteria, journeys, access per act — the system design and its NFRs (`specs/system-design.md`, each feature's `## Engine`) — and running the team: delegates, routes requests, prioritises and takes up recommendations, batches questions for Ravi, presents both reviews, moves statuses | Draws screens · writes code or tests · decides scope alone |
 | **Designer** | `designer.md` · Opus, Sonnet for routine passes (`/design-story` §0) · `/design-story` | How it looks — the boards a spec names, drawn on the canvas from `@invana/design-kit` components only; component requests | Edits any file in the repo — a spec, a doc or any code · draws with a component not yet in the kit |
-| **Coder** | `coder.md` · Opus | How it is built — engine, Studio and approved `@invana/design-kit` components, with every test (unit and end to end, engine and Studio), evals and a changeset | Builds beyond the spec · redesigns a screen · edits a doc or a spec |
+| **Coder** | `coder.md` · Opus | How it is built, to `specs/system-design.md` and the feature's `## Engine` — engine, Studio and approved `@invana/design-kit` components, with every test (unit and end to end, engine and Studio), evals and a changeset | Builds beyond the spec · redesigns a screen · edits a doc or a spec |
 | **QA** | `qa.md` · Sonnet · `/code-review-invana` · `/design-qa` | That it works and is right — runs the coder's backend, frontend and end-to-end tests and agent evals, reviews the code, design QA; reports and recommends | Edits any file but its reports — code, tests or docs · commits |
 | **Project lead** | `project-lead.md` · Sonnet · `/run-project` · `/project-dashboard` | Getting a project done — when and in what order its phases run, starting and stopping the run, triaging a blocked phase, the project's *Questions for Ravi* | Decides what a phase builds · writes a spec, a doc, a board or code · marks a phase `done` |
 | **Security** | `security.md` · Opus · `/security-audit` | That it is safe — threat models for sensitive specs, change audits, the release audit, a fix recommended for every finding | Edits any file but its reports — code, specs or boards · accepts a risk · writes a secret's value |
@@ -69,15 +69,15 @@ Every role edits only its own files. Anything else it thinks should change is a 
 <!-- edit-rights:start -->
 <!-- written by .claude/hooks/edit_rights.py --write from edit-rights.json; do not edit -->
 
-| Role | Product code | Tests · evals | Kit · canvas code | Changesets | Specs | Story tasks | Other docs | Boards (canvas) | Project file | Team rules | Own reports | Project reviews | Raise a recommendation | Take one up | Commit |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Ravi — or a session he asks directly | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Product manager | — | — | — | — | ✅ | ✅ creates it, empty | ✅ | — | ✅ | — | ✅ | — | ✅ | ✅ | ✅ when Ravi asked, or under a run he started |
-| Project lead | — | — | — | — | — | — | — | — | ✅ Questions for Ravi | — | ✅ | — | ✅ | — | — |
-| Designer | — | — | — | — | — | ✅ own rows | — | ✅ | — | — | ✅ | — | ✅ | — | — |
-| Coder | ✅ | ✅ | ✅ approved components | ✅ | — | ✅ own rows | — | — | ✅ own Log row · hand-off note | — | ✅ | — | ✅ | — | ✅ when Ravi asked, or under a run he started |
-| QA | — | — | — | — | — | ✅ own rows | — | — | ✅ own Log row (under /run-project) | — | ✅ | ✅ | ✅ | — | — |
-| Security | — | — | — | — | — | — | — | — | — | — | ✅ | — | ✅ | — | — |
+| Role | Product code | Tests · evals | Kit · canvas code | Changesets | Specs | Story tasks | Other docs | Boards (canvas) | Project file | Team rules | Own reports | Raise a recommendation | Take one up | Commit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ravi — or a session he asks directly | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Product manager | — | — | — | — | ✅ | ✅ creates it, empty | ✅ | — | ✅ | — | ✅ | ✅ | ✅ | ✅ when Ravi asked, or under a run he started |
+| Project lead | — | — | — | — | — | — | — | — | ✅ Questions for Ravi | — | ✅ | ✅ | — | — |
+| Designer | — | — | — | — | — | ✅ own rows | — | ✅ | — | — | ✅ | ✅ | — | — |
+| Coder | ✅ | ✅ | ✅ approved components | ✅ | — | ✅ own rows | — | — | ✅ own Log row · hand-off note | — | ✅ | ✅ | — | ✅ when Ravi asked, or under a run he started |
+| QA | — | — | — | — | — | ✅ own rows | — | — | — | — | ✅ | ✅ | — | — |
+| Security | — | — | — | — | — | — | — | — | — | — | ✅ | ✅ | — | — |
 
 Every role, always: `.handoffs/**` · `/tmp/**` · `/private/tmp/**` · `.claude/team/.live/**`.
 
@@ -94,14 +94,13 @@ Every role, always: `.handoffs/**` · `/tmp/**` · `/private/tmp/**` · `.claude
 | Project file | `.claude/team/projects/*/project.md` |
 | Team rules | `CLAUDE.md` · `.claude/**` |
 | Own reports | `.agent-reports/{role}/**` |
-| Project reviews | `.claude/team/projects/*/reviews/**` |
 | Raise a recommendation | a command, not a path |
 | Take one up | a command, not a path |
 | Commit | a command, not a path |
 
 <!-- edit-rights:end -->
 
-- **Not enforced by the hook**: which rows of a project file a role edits (the coder and QA their own Log row and
+- **Not enforced by the hook**: which rows of a project file a role edits (the coder its own Log row and
   hand-off note, the project lead *Questions for Ravi*), which rows of a story's `task.md` (each role only the rows
   whose Owner it is — `scripts/specs/check.py` checks the owner and the order), what a script run from Bash writes, and sub-agents of other
   types (`general-purpose` parts a coder starts) — these hold by the rule above. A part inherits the rights of the role
@@ -172,7 +171,8 @@ Nothing skips a gate. No design below `specified`; no code below `designed`.
 
 Each role adds its tasks before its first act on the story, and edits only rows it owns. A task the story cannot
 justify is a `raise` row to the product manager — the story changes first, never the task around it. A phase of a
-project names the stories it delivers; its agent works that story's open tasks of its role.
+project names the stories it delivers; its agent works that story's open tasks of its role. A blocked phase
+follows `project-lead.md` › *Triage* and `product-manager.md` › *A blocked phase*.
 
 **The spec names the boards.** The product manager writes each story's `## Screens` with a board name in every cell;
 the designer draws exactly those boards and never edits a spec. A board the designer needs that the spec does not
@@ -271,18 +271,18 @@ sequenceDiagram
 |---|---|
 | To | A role, or **Ravi** |
 | Type | `clarify` · `request` · `raise` · `review` · `decide` |
-| About | The ID it concerns — `MO-17.2`, `model.kind.load_data`, `engine/src/…:120` |
+| About | The ID it concerns — `RC-08.2`, `RC-F02`, `engine/src/…:120` |
 | Ask | One question or one ask, answerable on its own |
 | Recommend | What you would do, and why, in a line |
 | Blocking | `yes` (you stopped) · `no` (you went on with your recommendation) |
 
 | Type | Use it when | Example |
 |---|---|---|
-| `clarify` | The spec or board is ambiguous | Designer → PM: *MO-18.3 says "mapped" — does a skipped column count?* |
-| `request` | You need another role to produce something | PM → Designer: *Draw the boards MO-F03's stories name* · PM → Coder: *Build the approved `ImportPreview` in `ui-extended`, with a story* |
-| `raise` | Something is wrong or contradictory | Coder → PM: *MO-17.2 and MO-F01's decision disagree on drafts* |
-| `review` | Your work is ready for someone's judgment | Designer → PM: *MO-F03 boards ready* · PM → Ravi: *MO-F03 spec ready* |
-| `decide` | Only Ravi can settle it | PM → Ravi: *Breaking change to MO-17 — change it · add alongside · drop it?* · Designer → Ravi: *Component request: `ImportPreview`* |
+| `clarify` | The spec or board is ambiguous | Designer → PM: *RC-08.2 says "mapped" — does a skipped column count?* |
+| `request` | You need another role to produce something | PM → Designer: *Draw the boards RC-F02's stories name* · PM → Coder: *Build the approved `ImportPreview` in `ui-extended`, with a story* |
+| `raise` | Something is wrong or contradictory | Coder → PM: *RC-08.2 and RC-F02's decision disagree on drafts* |
+| `review` | Your work is ready for someone's judgment | Designer → PM: *RC-F02 boards ready* · PM → Ravi: *RC-F02 spec ready* |
+| `decide` | Only Ravi can settle it | PM → Ravi: *Breaking change to RC-08 — change it · add alongside · drop it?* · Designer → Ravi: *Component request: `ImportPreview`* |
 
 **Rules**
 
@@ -338,7 +338,7 @@ Ravi reviews each feature twice. The product manager assembles and presents both
 
 | Review | When | Holds | Ravi answers per story |
 |---|---|---|---|
-| **The spec** | Before any design | Feature file(s) and user journey, check passing · the boards each story names · Access · the threat model when it touches access, data or agents · decisions taken with the options weighed and the reason for the pick, open questions, breaking changes | **approve** (→ `specified`) · **change** (→ product manager) · **drop** |
+| **The spec** | Before any design | Feature file(s) and user journey, check passing · the boards each story names · Access · `## Engine` and the System impact — the NFRs touched and the `system-design.md` sections changed · the threat model when it touches access, data or agents · decisions taken with the options weighed and the reason for the pick, open questions, breaking changes | **approve** (→ `specified`) · **change** (→ product manager) · **drop** |
 | **The boards** | Before any code | Canvas link · each story's page with every named board drawn · component requests and their status · open questions | **approve** (→ `designed`) · **change** (→ designer for the look, product manager for the what) · **drop** |
 
 ## 6. Standards every role keeps
@@ -352,7 +352,7 @@ Ravi reviews each feature twice. The product manager assembles and presents both
 | Design language | `specs/design-language.md` — modes, peek · modal · sheet, the assistant, plain words |
 | Boards | Named in the spec by the product manager, `area.feature.surface.variant`. One canvas per product; **one page per user story**, named `Product › Feature › <STORY-ID> Story name`; an index canvas linking the product canvases. One interactive board per surface with **State** and **Lens** switches, laid out in the order of the story's flow |
 | Components | A new or changed kit component is a component request from the designer; on Ravi's yes the coder builds it in `@invana/design-kit` with a story. The designer never writes code |
-| Criteria are the contract | The coder builds each acceptance criterion; QA proves each one by its ID (`MO-17.2`) and reviews the code and screens against them |
+| Criteria are the contract | The coder builds each acceptance criterion; QA proves each one by its ID (`RC-08.2`) and reviews the code and screens against them |
 | Agent behaviour | Proved by the eval set of each agent or skill it touches as well as by tests: grounded answers with their sources, *cannot answer* when the Graph cannot, a complete trace, the ask before any write |
 | Security | QA's code review checks every change for authorisation, query injection, prompt injection through graph data and secrets. Security threat-models every sensitive spec and audits every release with `/security-audit`. A report names where a secret is, never its value; scans run against the local stack only |
 | Access | Every act has an owner role (§7). Specs say who; boards draw the no-access state; code enforces it; tests prove both sides |

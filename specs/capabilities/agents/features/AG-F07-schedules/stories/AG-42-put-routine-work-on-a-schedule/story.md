@@ -34,6 +34,7 @@ flowchart LR
   ok --> p["A schedule: its instructions, firings newest first, where it delivers"]
   p -->|Run now| run["A firing like any other · a run opens"]
   p -->|Pause · Resume| ok
+  ret([Its agent is retired]) --> pz["Paused · History names the agent"] -->|another agent · Resume| ok
   p -->|Delete, confirmed| s
   run --> res(["Delivered to the Inbox — a failure says so and opens the run"])
   res -->|outward, approval on| ask["Inbox › Needs you · Send it · Not this time"]
@@ -49,7 +50,7 @@ flowchart LR
 | AG-42.3 | A new schedule | its repeat is invalid, its time zone unknown, or its agent or a channel is missing | it is refused before saving, the dialog naming the field and why |
 | AG-42.4 | A saved schedule | its time comes | a run of the named agent opens with its instructions, on behalf of the schedule's owner, and the firing is kept as *opened* with its run |
 | AG-42.5 | A schedule whose last run is still going, *If the last run is still going* = *Skip* | its next firing comes | the firing is kept as *skipped*, saying why; with *Run anyway* a second run opens |
-| AG-42.6 | A schedule whose agent is paused or retired | its time comes | the firing is kept as *failed*, naming the agent, and the schedule stays on |
+| AG-42.6 | A schedule whose agent is paused | its time comes | the firing is kept as *failed*, naming the agent, and the schedule stays on |
 | AG-42.7 | The engine down across several firings, *Run once on recovery* | it comes back | one run opens, marked catch-up, and each other missed firing is kept as *skipped*, saying why |
 | AG-42.8 | The same outage, *Run every missed one* · *Skip* | it comes back | one run per missed firing opens, at most 24 · none opens and each is kept as *skipped* |
 | AG-42.9 | A firing's run settles | it is delivered | the owner and each recipient have an Inbox row; a failed run is delivered as a failure that opens the run |
@@ -65,6 +66,8 @@ flowchart LR
 | AG-42.19 | A schedule whose deliveries are on Allow | anyone edits it, or the person who set Allow loses the right to set it | outward approval returns to Ask, naming why, and History records it; until then its runs are bounded by both the person who set Allow and the schedule's owner |
 | AG-42.20 | A schedule's outward approval | a delivery is due | it is a line like any other: the strictest of it and every rule for everyone binds, so a *For everyone* Deny on sends holds whatever the schedule says |
 | AG-42.21 | A schedule edited by members other than its owner | it fires | its run is bounded by its owner and by every member who edited it since its owner last saved it — the strictest of them binds each step; its text is read as data |
+| AG-42.22 | A schedule whose agent is retired | the agent is retired (AG-29.16) | the schedule is paused, History naming the retired agent; it fires again only once a person points it at another agent and resumes it |
+| AG-42.23 | A Graph with active schedules | a member opens Agents › Schedules | *Coming up* draws the next seven days, one row per active schedule, its repeat as words, a mark on each day it fires — marked failed when its last firing failed; a paused schedule is left out |
 
 ## Screens
 

@@ -4,7 +4,7 @@ title: Open a Graph I can reach
 feature: GR-F01
 status: idea
 personas: [analyst, owner]
-boards: [start.home, start.graph_picker]
+boards: [graphs.home, graphs.graph_picker]
 ---
 
 # GR-01 · Open a Graph I can reach
@@ -30,6 +30,9 @@ flowchart TD
   l -->|mid set-up| cs(["Continue set-up · GR-F02"])
   l -->|Pin| pn["Pinned · leads the list"]
   l -->|only archived| ar["Archived · Unarchive for an Owner"]
+  l -->|filter| fl{"Mine · Shared with me · All · Active · Archived · database · my access · search"}
+  fl -->|no match| fe["No Graph matches · Clear filters"]
+  fl -->|matches| l
   m --> gp["Graph picker in the header"]
   gp --> q{"Search"}
   q -->|no match| e["No Graph matches · Clear"]
@@ -51,12 +54,14 @@ flowchart TD
 | GR-01.8 | A person whose only Graphs are archived | Home opens | they see them under *Archived*, never the first run; an Owner restores one with *Unarchive* (GR-15) |
 | GR-01.9 | A person removed from a Graph | Home or the picker reads again | that Graph is gone, and opening its address says it is not there |
 | GR-01.10 | Home | the engine cannot be read | Home names what it could not read and offers *Try again* |
+| GR-01.11 | Home listing Graphs | the person filters it | it narrows by *Mine* · *Shared with me* · *All*, by *Active* · *Archived*, by the graph database and by their access, and by a search on the name; pinned Graphs still lead what is left |
+| GR-01.12 | Home's filters | nothing matches | it says *No Graph matches* with *Clear filters* |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Home | Admin | — | — | start.home · Loading | start.home | start.home · Could not load | start.home · An agent on it | — |
-| Home | Operator | — | — | start.home · Loading | start.home | start.home · Could not load | start.home · An agent on it | start.home · Archived |
-| Graph picker | Admin | — | start.graph_picker · No match | start.graph_picker · Loading | start.graph_picker | start.graph_picker · Could not load | — | — |
-| Graph picker | Operator | — | start.graph_picker · No match | start.graph_picker · Loading | start.graph_picker | start.graph_picker · Could not load | — | — |
+| Home | Admin | — | graphs.home · No match | graphs.home · Loading | graphs.home | graphs.home · Could not load | graphs.home · An agent on it | — |
+| Home | Operator | — | graphs.home · No match | graphs.home · Loading | graphs.home | graphs.home · Could not load | graphs.home · An agent on it | graphs.home · Archived |
+| Graph picker | Admin | — | graphs.graph_picker · No match | graphs.graph_picker · Loading | graphs.graph_picker | graphs.graph_picker · Could not load | — | — |
+| Graph picker | Operator | — | graphs.graph_picker · No match | graphs.graph_picker · Loading | graphs.graph_picker | graphs.graph_picker · Could not load | — | — |

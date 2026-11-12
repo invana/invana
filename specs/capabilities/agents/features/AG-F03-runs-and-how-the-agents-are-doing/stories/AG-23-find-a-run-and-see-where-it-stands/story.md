@@ -62,6 +62,16 @@ flowchart LR
 | AG-23.20 | An Operator on someone else's run | they open it | everything reads; *Stop run* is disabled, naming who started it |
 | AG-23.21 | A run the person cannot open | they follow a link to it | it reads *not found*; the run is not listed |
 | AG-23.22 | A run | its answer is opened | *How it got here* shows its steps and sources |
+| AG-23.23 | A step that ran more than once | it opens | each attempt reads its own start and time, a failed attempt kept and struck through in place, and time waiting apart from time working |
+| AG-23.24 | A step in flight, stopped at a bound, cancelled, or that recorded nothing | it opens | it reads in that state and why, never as an empty panel |
+| AG-23.25 | A run's numbers | they read | *Bounds reached* lists replans, attempts (naming the step with the most) and questions, each against its limit; a limit not set draws no row |
+| AG-23.26 | Data touched | it reads | records created read apart from records updated, per type; a run that recorded no touches says so, never `0` |
+| AG-23.27 | What it produced | a file the run made is read | it is named with its digest; the same bytes made twice are one file |
+| AG-23.28 | A link that names a step | it is followed | the run opens with that step open |
+| AG-23.29 | A step still running | its time reads | it reads against the p50 the engine stores for that step of the plan; a step waiting on a person reads *no estimate* |
+| AG-23.30 | A run a schedule, a task or another agent started | someone opens it | *Stop run* and *Re-run* are offered to the person it runs on behalf of and to an Admin; for anyone else they are disabled, naming that person |
+| AG-23.31 | A run's steps | they read | as a waterfall on the run's clock — one row per task, its colour its status, an earlier attempt struck before the one that stuck, a bounded repetition a bracket over its rounds, a gate a rule across the time it held |
+| AG-23.32 | A step whose record was cleared by retention, or read by someone who may not act on the run | it opens | it says the step was cleared and keeps its stored numbers, or reads in full with no act offered |
 
 ## Screens
 

@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read a refusal and the rule behind it, read a diagnosis and its evidence, follow its next step — open the run, check the connection, load a dataset, change the rule | — |
+| Admin | Read a refusal and the rule behind it, read a diagnosis and its evidence, follow its next step — open the run, check the connection, bring records in, change the rule | — |
 | Operator | Read the same refusal and diagnosis, open the run, and ask the rule's owner | A next step that needs a grant — change the rule, check the connection — says *Ask Priya (owner)*; with *Can shape the model*: change the rule, as Admin |
 
 ## Flow
@@ -36,7 +36,7 @@ flowchart TD
   d --> n{"Its next step"}
   n --> t(["Open the run"])
   n --> c(["Check the connection"])
-  n --> l(["Load a dataset"])
+  n --> l(["Bring records in"])
   n -->|needs a grant| ao
 ```
 
@@ -49,7 +49,7 @@ flowchart TD
 | EX-06.3 | A refusal | it is shown | it ends with something the person can ask instead, and a refusal is never worded as *cannot answer* |
 | EX-06.4 | A step that breaks | the run stops | a diagnosis shows what broke, on which step, with the error and the query folded under it — drawn as a fault, unlike an answer and unlike a cannot answer |
 | EX-06.5 | A diagnosis | it is shown | its cause comes from the step, the error and the query — never an invented cause — and never *Something went wrong* |
-| EX-06.6 | A diagnosis | it is shown | its only action is its next step — open the run, check the connection, or load a dataset |
+| EX-06.6 | A diagnosis | it is shown | its only action is its next step — open the run, check the connection, or bring records in |
 | EX-06.7 | An AI provider's rate limit | retries run out | the diagnosis names the provider and the limit |
 | EX-06.8 | The same failure across runs | it recurs | the diagnosis reads the same each time |
 | EX-06.9 | An Operator without the grant a next step needs | they reach it | it says *Ask Priya (owner)*; with *Can shape the model*, *Open the rule* opens the rule |

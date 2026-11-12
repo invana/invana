@@ -57,6 +57,9 @@ flowchart TD
 | EX-32.9 | The same kind of suggestion rejected repeatedly | the person reads Evidence | the repeated rejections and their notes are visible |
 | EX-32.10 | Several suggested changes selected | the person looks for an act on all | there is none: each is decided on its own |
 | EX-32.11 | A decision | it is made | Inbox › History records who decided, when, and the note |
+| EX-32.13 | A suggested change to the semantic model | a person with *Can shape the model* accepts it | it becomes a draft of the model, published through the model's own review (SE-F02); nothing changes the model from Explore |
+| EX-32.14 | A published semantic change | its window passes | the outcome reads the engine's stored answer accuracy and latency for that window before and after it — improved · unchanged · worsened · unmeasured |
+| EX-32.15 | An index suggestion | anyone but an Admin accepts it | it is refused, naming the Admin |
 | EX-32.12 | An Operator without the grant its target needs | they open a suggested change | accept, edit and reject are disabled — *Ask Priya (owner)* |
 
 ## Screens

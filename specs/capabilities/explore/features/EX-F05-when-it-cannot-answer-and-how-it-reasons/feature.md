@@ -7,6 +7,7 @@ personas: [analyst, decision-maker, builder, owner]
 stories: [EX-05, EX-06, EX-24, EX-26, EX-27]
 journeys: [J02]
 boards: [explore.board, explore.board.cannot, explore.ask, explore.board.menu, agents.skills, agents.run.answer, settings.ai]
+nfrs: [NFR-SEC-5]
 depends_on: [EX-F01, EX-F03, EX-F04]
 ---
 
@@ -116,7 +117,7 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | Five ways a run ends | Answered · cannot answer · refused · failed · cancelled. A run that only replied to small talk is *conversed* — it claims nothing |
-| Four kinds of nothing never share a surface | Retrying and repairing show on their step; cannot answer is calm — a dashed border, no colour of alarm; a diagnosis is drawn as a fault with its evidence under it. Their shapes differ before a word is read |
+| Four kinds of nothing never share a surface | Retrying and repairing show on their step; cannot answer is calm — a dashed border, no colour of alarm; a diagnosis is drawn as a fault with its evidence under it — no answer header, no citation strip, its next step its only action. Their shapes differ before a word is read |
 | Nothing partial is an answer | A run that did not settle shows what it reached as steps, never as an answer |
 | Cannot answer names what is missing | Which kind, which model, or that nothing is loaded — and whether the kind is modelled but empty |
 | A diagnosis is built from evidence | The step, the error and the query — never an invented cause — and its one action is its next step |
@@ -135,7 +136,7 @@ sequenceDiagram
 | A third-party node is drawn first, written on *Keep* | It is on the board only; *Keep* writes it as a source linked to what it is about, never into a model's own kinds, still marked third-party after a reload |
 | A fork copies; it does not point | A fork holds its own copies of the turns up to the reply and the board as it stood there; deleting the parent takes nothing from it |
 | Lineage is one link deep | A conversation knows its parent and the reply it branched at; nothing links conversations by inference |
-| Leans on | EX-F01 — the board and its panel · EX-F03 — the question and its view of the graph · EX-F04 — the reply, its meta line and *How it got here* · Model › rules — what outside services a view allows · Agents › Skills — where approaches are authored · Settings › AI and connections — search providers |
+| Leans on | EX-F01 — the board and its panel · EX-F03 — the question and its view of the graph · EX-F04 — the reply, its meta line and *How it got here* · Semantics › rules (SE-F07) — what outside services a view allows · Agents › Skills — where approaches are authored · Settings › AI and connections — search providers |
 
 ## Data touched
 
@@ -148,6 +149,101 @@ sequenceDiagram
 | A third-party claim or node — source, reference, title, kind, domain, fetched at, model, run | Write (the engine) · read |
 | A kept third-party node — its provenance, who kept it and when, what it is about | Write (Can work on projects) · read |
 | A conversation's parent and the reply it forked at · its copied turns · its board | Write · read |
+
+## Engine
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `explore_approaches` | `graph_id` · `name` · `when_to_use` · `method` · `assumptions[]` (each `claim` · `without_it`) · `answer_shape` · `version` · `status` (`draft` · `published`) | Authored in Agents › Skills. A published version never changes |
+| `explore_search_providers` | `graph_id` · `name` · `kind` (`brave` · `tavily` · `searxng`) · `base_url?` · `api_key_encrypted?` · `last_ping_at` · `last_ping_ok` | Unique (`graph_id`, `name`); addressed `third_party/internet/search/{name}` |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| A conversation and its turns — the fork columns are on `explore_sessions` | [EX-F03 › Engine](../EX-F03-ask-a-question/feature.md#engine) |
+| The run — its status and outcome, steps, retries, its approach (`approach_id` · `approach_version`) and `assumptions` | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| *What it may do* — the bound a plan is checked against, whether the agent may search | [AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md#engine) |
+| The plan `nl-outside` and the functions `search_web` · `fetch_source` | [AG-F06](../../../agents/features/AG-F06-plans-and-functions/feature.md#engine) |
+| The web tools `web.search` · `web.read_url` · `web.download_file` | [RT-F02](../../../../os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md#engine) |
+| Rules allowing outside services, and `own_knowledge` on an AI model rule (off by default) | [SE-F07](../../../semantics/features/SE-F07-rules/feature.md#engine) |
+| What may cross to an outside service | [SE-F09](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
+| Boards and their versions — a fork's board | [EX-F01 › Engine](../EX-F01-the-board-and-its-canvas/feature.md#engine) |
+| A board save — how *Keep* writes | [EX-F06 › Engine](../EX-F06-annotate-and-edit-the-data/feature.md#engine) |
+
+### Routes
+
+| Route, after `/api/v1/u/{u}/{g}/explore` | Does | Story |
+|---|---|---|
+| `POST /sessions/{session}/fork` | `{message_id}` → `201` the fork | EX-27 |
+| `GET /approaches` · `POST /approaches` | The Graph's approaches · author one | EX-24 |
+| `GET /approaches/{approach}` · `PATCH /approaches/{approach}` · `POST /approaches/{approach}/publish` | Read · change (a published one makes a new draft version) · publish | EX-24 |
+| `GET /search-providers` · `POST /search-providers` | The providers, each with its last ping and the rules that name it · add one, pinged before it is saved | EX-26 |
+| `PATCH /search-providers/{provider}` · `DELETE /search-providers/{provider}` | Change, pinged again · remove one | EX-26 |
+| `POST /third-party/keep` | `{run_id, node_refs[]}` — write the picked third-party nodes into the Graph, as one run | EX-26 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `explore.sessions.fork` | A fork is made — `session_id` · `parent_id` · `message_id` |
+| `explore.approaches.publish` | An approach version is published |
+| `explore.approaches.apply` | A run starts under an approach — `run_id` · `approach_id` · `approach_version` |
+| `explore.approaches.drop_assumption` | An assumption is dropped on a run, naming the rule that contradicts it |
+| `explore.third_party.fetch` · `explore.third_party.keep` | A source is fetched · third-party nodes are kept |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 422 | Two approaches on one ask | *One run, one approach.* | EX-24.9 |
+| refused | A rule of the view of the graph refuses the question; the run settles `refused` before anything runs | *{rule} ({owner}) does not allow this — {what to ask instead}.* | EX-06.1 |
+| refused | A plan outside *What it may do*; the run settles `refused` | *{agent} may not {bound}.* | EX-06.2 |
+| step refused | A rule refuses the search; the step is refused before it is sent and the run goes on from the Graph | *I'm not allowed to look that up here.* | EX-26.6 |
+| 403 | *Keep* without *Can work on projects* | *This needs Can work on projects — ask {owner}.* | EX-26.18 |
+| 403 | *Keep* where a rule refuses the write | *{rule} does not allow writing this.* | EX-26.12 |
+| 403 | Authoring an approach without *Can build agents* | *This needs Can build agents — ask {owner}.* | EX-24.15 |
+| 403 | Adding, changing or removing a search provider by anyone but the Owner | *Only the Owner manages search providers.* | EX-26.19 |
+| 422 | A search provider whose ping fails on save | *{provider} did not answer — {why}.* | EX-26.15 |
+| 409 | A fork from a reply that is running, refused or failed | *Only a settled answer can be forked.* | EX-27.2 |
+| 404 | A fork of another member's conversation | *Not found.* | EX-27.3 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| — | No command of its own |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| Outcome beside status | `answered` · `conversed` · `cannot_answer` · `refused` · `failed` · `cancelled` on the run; *succeeded* and *cannot answer* are two claims |
+| Three endings, three signals | A step returns *cannot answer* (`CannotAnswer`), a failure (`TaskFailure`) or an answer — never one shaped as another. `execute` returning nothing is *the graph does not hold this*, never a generated guess |
+| Steps that end a run | `understand` — *cannot answer* · `plan` — refused, naming the bound · `validate` — after its one repair · `execute` — a failure with a diagnosis. `verify` records its verdict and never ends one |
+| Retry | Per step kind: attempts, backoff, jitter; each attempt a frame on its step |
+| Repair | The validation error is carried into the repair attempt's prompt |
+| A diagnosis | Assembled from the step, the error and the query, with a next step from a fixed set — never generated free-form, so the same failure reads the same |
+| An approach in the run | Reaches `understand`, `plan` and `project` as offered context; never `translate`, `validate` or `execute`; no field of it is an input to the check of *What it may do*. `verify` reads only the run's assumptions and checks them against what the run did |
+| A run's assumptions | Written on the run, each `claim` · `source` (`approach` · `question` · `model` · `rule`) · `checked` and the query that checked it · `without_it` (authored, never generated); shown as one `assumptions` part |
+| Outside facts | The `nl-outside` plan — translate · validate · execute · search · fetch · project · verify · answer — is picked when the intent `needs_outside` and *What it may do* lists the search. `search_web` and `fetch_source` are bound `third_party` |
+| What may go out | Search terms from the ask cross as `the_question`; terms carrying record values as `property_values` |
+| A third-party claim | `{text, third_party: {source, reference, title?, source_kind?, domain?, fetched_at?, model?, run_id}}`, captured on arrival and never recomputed |
+| A third-party node | A `Source` — `reference` · `title` · `source` · `source_kind` · `fetched_at` · `excerpt` — with an `ABOUT` relationship to what it concerns; on the board only until *Keep* |
+| *Keep* | Writes each picked `Source` and its `ABOUT` as a board save does (EX-F06), stamped `_inv_origin = third_party` · `_inv_source` · `_inv_reference` · `_inv_source_title` · `_inv_source_kind` · `_inv_fetched_at` · `_inv_model` · `_inv_run_id` · `_inv_kept_by` · `_inv_kept_at` |
+| A fork copies | Every turn at or below the reply's `seq`, field for field, `run_id` kept; `surface`, `agent_id`, `lens_id` and `max_tokens_run` carried; a new board from the parent's version at that reply, else its current snapshot. Forks never group conversations |
+| Fork fields on the reads | EX-F03's `GET /sessions` adds `forked_from_title` · `fork_count`; its `GET /sessions/{session}` adds `forked_from: {id, title, message_id} \| null` · `forks: [{id, title, message_id}]` |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 6 Data and storage | Two tables in Invana's own store; `Source` nodes written into the customer's graph on *Keep* | — |
+| § 10 AI and agents | The `nl-outside` plan; approaches as offered context, never an input to the bound | — |
+| § 11 Failure modes and the outside boundary | Search providers are outside services a run reaches only when a rule allows it; a failed ping fails the *Search* step and the answer is from the Graph | — |
+| § 12 Qualities | Security: search terms cross by the view's egress; provider keys stored encrypted | — |
 
 ## Decisions
 
@@ -182,7 +278,7 @@ sequenceDiagram
 | Tone or character on an approach | Who speaks is the agent's; an approach is a method |
 | Blended approaches · approaches applied by question type | A blend has no statable assumptions; applying one unasked hides the method again |
 | An approach that adds a step kind | The steps a plan may use are the runtime's; a method chooses among them |
-| Crawling or scheduled scraping | A search serves one question; collecting the web is a dataset, loaded through Data |
+| Crawling or scheduled scraping | A search serves one question; collecting the web is the customer's pipeline, loaded through Records |
 | Third-party claims mixed into Graph citations | A citation resolves to a record; a reference to a source — two different checks |
 | Connecting api · app · db · agent sources here | Each is its own feature when added, following the same three rules |
 | A tree view of forks · merging a fork back | The banner, the forked-into lines and the list mark show each link; two threads are two histories |

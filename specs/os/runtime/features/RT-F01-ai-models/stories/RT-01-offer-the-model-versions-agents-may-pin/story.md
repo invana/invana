@@ -63,6 +63,11 @@ flowchart TD
 | RT-01.15 | An endpoint whose address may be local | a call goes to it | it counts as local, cleared for *personal*, only when the engine resolves its address to loopback or a private network at that call, rebinding checked; one that resolves elsewhere is held to an outside provider's clearance |
 | RT-01.16 | An Admin adding or editing an endpoint | they pick its clearance | it says how much unlabelled data, across the install's Graphs, the endpoint can reach without asking — unlabelled counts as *internal* ([Unlabelled data](../../../../../access/product.md#decisions)) |
 | RT-01.17 | An Admin | they raise an endpoint's clearance | it writes a History row naming the endpoint, the old and new clearance and who raised it, and alerts the Owners of each Graph that uses the endpoint |
+| RT-01.18 | An Admin on an endpoint | they add a model version by the provider's exact name | it lists under that endpoint as *offered*, ranked from its published rate (RT-F01 › Decisions) |
+| RT-01.19 | An Admin | they change an endpoint's address or its own fields | the change is stored, *Ping* proves it again, and History records who changed it and when (AC-F06) |
+| RT-01.20 | An Admin | they remove an endpoint | it is refused while a view of the graph names one of its versions or something pins one, naming them; otherwise the endpoint and its versions are removed |
+| RT-01.21 | Anyone on the command line | they run `invana llms list` or `invana llms models` | the endpoints and their model versions read as the section shows them, never a key |
+| RT-01.22 | A Graph whose view of the graph resolves to no offered model version | a person asks a question or an agent run starts | it is refused before the run starts, saying no AI model answers in this graph and naming the Admins |
 
 ## Screens
 

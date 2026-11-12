@@ -12,8 +12,10 @@ here, outside the agent:
 (row ``partial``) and a fresh one continues from its note, up to ``--max-handoffs`` times |
 | Setup · gates | The project's *Setup* and *Gates* tables, re-run here. A gate's known failures pass |
 | Reviews | One ``qa`` session per kind the entry's *Review* names (``code``, ``design``), each writing \
-``reviews/<ID>-<kind>.md`` that starts ``RESULT: PASS`` or ``FAIL`` |
+``.agent-reports/qa/<project>-<ID>-<kind>.md`` that starts ``RESULT: PASS`` or ``FAIL`` |
 | Fix | Failures go to ``prompts/fix.md``, up to ``--max-fix`` rounds; then the phase is ``blocked`` |
+| Exit | A missing report, a ``pm`` or ``env`` finding, the same findings two rounds running, or a changed story \
+blocks at once; after an investigate re-run, 2 fix rounds, then the final stop |
 | Branch | Each phase is built on ``<project>/<ID>-<slug>``, cut from the last done phase's branch (the first from the \
 project's ``branch``); a stopped run resumes on it, and every step commits there |
 | Close | The row becomes ``done``; the runner commits ``feat(<scope>): <ID> · <phase>`` on the phase branch. It never \
@@ -52,6 +54,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = Path(os.environ.get("CLAUDE_PROJECT_DIR") or HERE.parents[2])
 PROJECTS = ROOT / ".claude" / "team" / "projects"
+REVIEWS = ROOT / ".agent-reports" / "qa"
 LIVE = ROOT / ".claude" / "team" / ".live" / "projects"
 CONTEXT_LIMIT = int(os.environ.get("INVANA_CONTEXT_LIMIT", "300000"))
 GRACE = int(os.environ.get("INVANA_RUNNER_HANDOFF_GRACE", "50000"))
@@ -551,39 +554,82 @@ def accept_shots(p: Project, pid: str) -> None:
         sh(["node", str(SHOOT), "--live", "--boards", ",".join(boards), "--out", str(accepted)])
 
 
-def passed(report: Path) -> bool:
-    return report.exists() and report.read_text().lstrip().upper().startswith("RESULT: PASS")
+def review(p: Project, pid: str, kind: str) -> Path:
+    """Where a phase's QA report lives: ``.agent-reports/qa/<project>-<ID>-<kind>.md``."""
+    return REVIEWS / f"{p.name}-{pid}-{kind}.md"
 
 
-def qa(p: Project, pid: str) -> list[str]:
-    """QA the phase into one report, ``reviews/<ID>-qa.md``, in two fresh ``qa`` sessions.
+def verdict(report: Path) -> str:
+    """``PASS`` or ``FAIL`` from line 1; ``""`` when the report is missing or line 1 is neither."""
+    first = (report.read_text().lstrip().splitlines() or [""])[0].strip().upper() if report.exists() else ""
+    return next((v for v in ("PASS", "FAIL") if first == f"RESULT: {v}"), "")
+
+
+OWNERS = ("coder", "pm", "env")
+
+
+def blockers(text: str) -> list[dict[str, str]]:
+    """The *Findings* table's blocker rows, each with its ``owner`` (``coder`` · ``pm`` · ``env``) and ``where``.
+
+    An owner the runner cannot read counts as ``pm``: an unclear finding goes to the product-manager, never to a fix.
+    """
+    m = re.search(r"^## Findings\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+    rows = Project.rows(m.group(1)) if m else []
+    out = []
+    for r in rows:
+        if "blocker" not in r.get("severity", "").lower():
+            continue
+        owner = r.get("owner", "").strip("` ").lower()
+        out.append({**r, "owner": owner if owner in OWNERS else "pm", "where": r.get("where", "").strip()})
+    return out
+
+
+def qa(p: Project, pid: str) -> tuple[str, str]:
+    """QA the phase into one report, ``.agent-reports/qa/<project>-<ID>-qa.md``, in two fresh ``qa`` sessions.
 
     Pass 1 proves the build — the tests the change needs (engine, Studio, end to end, agent evals), then the code
     review — and writes the report. Pass 2, only when the entry names boards, is design QA with the regression set; it
-    adds its section and sets line 1 for both. The phase passes only when both passes do.
+    adds its section and sets line 1 for both. Returns ``(verdict, report text)``: ``PASS``, ``FAIL``, or ``""`` when
+    QA wrote no report or its line 1 is neither — an environment failure, never a finding.
     """
-    (p.dir / "reviews").mkdir(exist_ok=True)
-    report = p.dir / "reviews" / f"{pid}-qa.md"
+    REVIEWS.mkdir(parents=True, exist_ok=True)
+    report = review(p, pid, "qa")
     report.unlink(missing_ok=True)
-    common = {"ID": pid, "START": f"{p.get('scope', p.name)}/{pid}-start", "REPORT": str(report.relative_to(ROOT))}
+    common = {"ID": pid, "START": start_tag(p, pid), "REPORT": str(report.relative_to(ROOT))}
     claude(p, p.prompt("qa-build", **common), pid, "qa build", 1, "qa", CHEAP_MODEL)
-    ok = passed(report)
-    if p.boards(pid) and report.exists():
+    if p.boards(pid) and verdict(report):
         claude(p, p.prompt("qa-design", **common, REGRESSION=regression(p, pid)), pid, "qa design", 1, "qa", CHEAP_MODEL)
-        ok = ok and passed(report)
-    if ok:
-        return []
-    text = report.read_text() if report.exists() else "RESULT: FAIL\n\nQA wrote no report."
-    return [f"QA failed ({report.relative_to(ROOT)}):\n{text[:8000]}"]
+    return verdict(report), report.read_text() if report.exists() else ""
+
+
+def start_tag(p: Project, pid: str) -> str:
+    return f"{p.get('scope', p.name)}/{pid}-start"
+
+
+def stories(p: Project, pid: str) -> list[str]:
+    """The ``story.md`` of each story the entry names under *Stories*, relative to the repo root."""
+    ids = re.findall(r"\b[A-Z]{2,}-\d+\b", p.entry(pid).get("stories", ""))
+    found = (f for i in ids for f in ROOT.glob(f"specs/*/*/features/*/stories/{i}-*/story.md"))
+    return sorted(str(f.relative_to(ROOT)) for f in found)
+
+
+def criteria_moved(p: Project, pid: str, agent: str) -> str:
+    """The phase's stories whose ``story.md`` changed since the phase started — unless the product-manager runs it."""
+    if agent == "product-manager" or not (paths := stories(p, pid)):
+        return ""
+    return sh(["git", "diff", "--name-only", start_tag(p, pid), "--", *paths]).stdout.strip()
 
 
 # ── one phase ──────────────────────────────────────────────────────────────
 def run_phase(p: Project, row: dict, max_fix: int, max_handoffs: int) -> bool:
-    pid, scope = row["id"], p.get("scope", p.name)
+    pid = row["id"]
     e = p.entry(pid)
     agent = e.get("agent", "coder")
     needs_qa = e.get("review", "").strip().lower() == "qa"
     print(f"\n━━ {p.name} / {pid} · {row['phase']} · {agent} · needs {', '.join(row['needs_list']) or '—'}", flush=True)
+    investigated = bool(re.search(r"investigat", row.get("notes", ""), re.I))  # one investigate re-run already spent
+    rounds = min(max_fix, 2) if investigated else max_fix
+    reports = f".agent-reports/qa/{p.name}-{pid}-*.md"
     resuming = row["status"] not in ("pending",)
     if not git_clean(p.file) and not resuming:
         print("  working tree not clean — refusing to start over someone's uncommitted work")
@@ -598,35 +644,63 @@ def run_phase(p: Project, row: dict, max_fix: int, max_handoffs: int) -> bool:
     if resuming:
         checkpoint(p, pid, "work left by an interrupted run")
     else:
-        sh(["git", "tag", "-f", f"{scope}/{pid}-start"])
+        sh(["git", "tag", "-f", start_tag(p, pid)])
     p.set_status(pid, "in progress")
     try:
         first = p.prompt("continue" if resuming else "build", ID=pid)
         if agent == "qa":
-            (p.dir / "reviews").mkdir(exist_ok=True)
-            first = AUDIT.format(report=f"{p.dir.relative_to(ROOT)}/reviews/{pid}-audit.md", where=f"{p.name}/{pid}") + first
+            REVIEWS.mkdir(parents=True, exist_ok=True)
+            first = AUDIT.format(report=review(p, pid, "audit").relative_to(ROOT), where=f"{p.name}/{pid}") + first
         until_handoffs_end(p, pid, first, "build", agent, LEAD_MODEL, max_handoffs)
         if p.status_of(pid) == "blocked":  # the session stopped on a question only Ravi can answer
             p.set_meta("status", "blocked")
             return False
-        for attempt in range(max_fix + 1):
+        if moved := criteria_moved(p, pid, agent):
+            return block(p, pid, f"criteria changed during the phase — Ravi decides: {moved}")
+        last: set[str] | None = None
+        for attempt in range(rounds + 1):
             if why := setup(p, pid):
                 return block(p, pid, why)
             p.set_status(pid, "gates")
             findings = gates(p, pid)
+            seen = {f.splitlines()[0] for f in findings}
             if not findings and needs_qa:
                 p.set_status(pid, "qa")
-                findings = qa(p, pid)
+                result, text = qa(p, pid)
+                if not result:
+                    return block(p, pid, "QA wrote no report (env) — see runner log")
+                rows = blockers(text) if result == "FAIL" else []
+                owners = {r["owner"] for r in rows}
+                if "pm" in owners:
+                    return block(p, pid, f"scope question — product-manager — see {reports}")
+                if "env" in owners and "coder" not in owners:
+                    return block(p, pid, f"environment — see {reports}")
+                if result == "FAIL":
+                    coder = [r for r in rows if r["owner"] == "coder"]
+                    seen = {r["where"] for r in coder}
+                    cols = [k for k in (coder[0] if coder else {}) if k != "owner"]
+                    table = "\n".join(["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols),
+                                       *("| " + " | ".join(r[k] for k in cols) + " |" for r in coder)])
+                    findings = [f"QA failed ({review(p, pid, 'qa').relative_to(ROOT)}) — the coder's blockers:\n"
+                                + (table if coder else text[:8000])]
             if not findings:
                 return close(p, pid, row["phase"])
-            if attempt == max_fix:
+            if seen == last:
+                return block(p, pid, f"same findings two rounds running — see {reports}")
+            last = seen
+            if attempt == rounds:
                 break
             p.set_status(pid, f"fixing {attempt + 1}")
             fix = p.prompt("fix", ID=pid, ATTEMPT=str(attempt + 1), FINDINGS="\n\n".join(findings))
             until_handoffs_end(p, pid, fix, f"fix {attempt + 1}", agent, CHEAP_MODEL, max_handoffs)
+            if moved := criteria_moved(p, pid, agent):
+                return block(p, pid, f"criteria changed during the phase — Ravi decides: {moved}")
     except RuntimeError as exc:
         return block(p, pid, str(exc))
-    return block(p, pid, f"failed after {max_fix} fix rounds — see {p.dir.relative_to(ROOT)}/reviews/")
+    if investigated:
+        return block(p, pid, f"final stop — Ravi decides: {rounds} fix rounds after an investigate re-run — "
+                             f"see {reports}")
+    return block(p, pid, f"failed after {rounds} fix rounds — see {reports}")
 
 
 def block(p: Project, pid: str, why: str) -> bool:

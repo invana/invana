@@ -34,7 +34,7 @@ One story, one QA report: line 1 is `RESULT: PASS` only when every pass that ran
 
 ## Read
 
-The feature file — capabilities, seams, engine shapes, *Done when* — and `CLAUDE.md` rules 5–7 and 13. When the feature has a spec in `specs/`, each story's `story.md` is the source of truth and every acceptance criterion is a check: prove each by its ID (`MO-17.2`) with a test or a recorded look at the screen, and report any criterion that cannot be proved.
+The feature file — capabilities, seams, engine shapes, *Done when* — and `CLAUDE.md` rules 5–7 and 13. When the feature has a spec in `specs/`, each story's `story.md` is the source of truth and every acceptance criterion is a check: prove each by its ID (`RC-08.2`) with a test or a recorded look at the screen, and report any criterion that cannot be proved.
 
 ## Testing standards
 

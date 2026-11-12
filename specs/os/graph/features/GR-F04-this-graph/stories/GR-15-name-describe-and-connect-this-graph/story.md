@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [GR-F04](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Change name, description and instructions; the daily caps on asks for more; archive and unarchive; change the connection after a passing test; read the database's types again | — |
-| Operator | Read the Graph's name, description, instructions and its connection — engine, version, address, user, database, status | Fields read-only; the password field is absent; *Save*, *Archive*, *Test connection* shown as *Ask Priya (owner)* |
+| Admin | Change name, description and instructions; the daily caps on asks for more; archive, unarchive and delete; change the connection after a passing test; read the database's types again; declare the server version, or accept an untested one; reconnect | — |
+| Operator | Read the Graph's name, description, instructions and its connection — engine, version, address, user, database, status; reconnect an unreachable connection | Fields read-only; the password field is absent; *Save*, *Archive*, *Delete*, *Test connection*, *Read types again*, *Declare version* and *Accept this version* shown as *Ask Priya (owner)* |
 
 ## Flow
 
@@ -33,6 +33,7 @@ flowchart TD
   sv -->|refused| sf["Says what is wrong"]
   sv -->|ok| gs(["Saved"])
   g --> ar["Archive · confirm"] --> ad(["Archived · Unarchive offered"])
+  g --> del["Delete · type the Graph's name"] --> dd(["Gone from Home · the database untouched · History keeps it"])
   s --> c["Connection: engine · version · address · status · last connected"]
   c --> ch["Change address, user, password or database"]
   ch --> t{"Test connection"}
@@ -40,6 +41,10 @@ flowchart TD
   t -->|passes| ok(["Save · reconnects · status refreshes"])
   ch -->|untested| off["Save off · Test the connection to save it"]
   c --> rd["Read the database's types again"]
+  c -->|unreachable| rc["Reconnect"] --> c
+  c -->|version not detected| dv["Declare the server version"] --> c
+  c -->|version untested| ut["Read-only, saying why"] --> acc{"Accept this version"}
+  acc -->|accepted| rw(["Writes open · History records who"])
   c -->|without Owner| ask(["Reads · acts show Ask Priya (owner)"])
 ```
 
@@ -63,12 +68,24 @@ flowchart TD
 | GR-15.14 | A test | it runs | History records who tested it and when (AC-F06) |
 | GR-15.15 | An Operator | they open General or Connection | everything reads but the password; *Save*, *Archive* and *Test connection* are shown as *Ask Priya (owner)* |
 | GR-15.16 | An owner | they change the daily caps on asks for more — per holder and for the Graph (AC-F04) — in General and save | the new caps bind from the next ask; *Usage and limits* reads them (GR-14); History records who changed them (AC-F06) |
+| GR-15.17 | An owner | they delete the Graph, typing its name to confirm | the Graph, its connection and its members are gone from Home, the picker and its address; the graph database's own data is untouched; History keeps who deleted it, with its name (AC-F06) |
+| GR-15.18 | A connection that is unreachable | any member presses *Reconnect* | it tries again and the status refreshes, saying when it last connected |
+| GR-15.19 | An owner | they press *Read types again* | the database's types are read again in the background, and the model's mirror of the database shows what changed |
+| GR-15.20 | A connector that cannot detect its server version | the owner declares the version | it is saved, and the property types the model offers follow it, as a detected version would |
+| GR-15.21 | A server version Invana has not tested | the connection reads | it is read-only, saying the version is untested, with *Accept this version* |
+| GR-15.22 | An untested version | the owner accepts it | writes open; History records who accepted it, and when (AC-F06) |
+| GR-15.23 | An Operator | they reach *Delete*, *Read types again*, *Declare version* or *Accept this version* | each is shown as *Ask Priya (owner)*; *Reconnect* works for them |
+| GR-15.24 | A connection that is not connected | the owner presses *Read types again* | it is refused, saying the database is not connected, with *Reconnect* |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | General | Admin | settings.people · General · Setup unfinished | — | settings.people · Loading | settings.people · General | settings.people · General · Could not save | — | — |
+| Delete this graph | Admin | — | — | — | settings.people · General · Delete | settings.people · General · Could not delete | — | — |
+| Delete this graph | Operator | — | — | — | — | — | — | settings.people · General · Read only |
 | General | Operator | settings.people · General · Setup unfinished | — | settings.people · Loading | settings.people · General · Read only | settings.people · Could not load | — | settings.people · General · Read only |
 | Connection | Admin | — | — | settings.people · Loading | settings.people · Connection | settings.people · Connection · Test failed | — | — |
 | Connection | Operator | — | — | settings.people · Loading | settings.people · Connection · Read only | settings.people · Connection · Unreachable | — | settings.people · Connection · Read only |
+| Server version | Admin | settings.people · Connection · Declare version | — | settings.people · Loading | settings.people · Connection · Untested version | settings.people · Connection · Test failed | — | — |
+| Server version | Operator | — | — | settings.people · Loading | settings.people · Connection · Untested version · Read only | settings.people · Connection · Unreachable | — | settings.people · Connection · Read only |

@@ -9,7 +9,7 @@ boards: [projects.project]
 
 # PJ-03 · See where a project stands
 
-**As** a decision maker **I want** a project's overview — its question, its branches, the datasets it used and made,
+**As** a decision maker **I want** a project's overview — its question, its branches, the loads it cited and the records it saved,
 and the work still open **so that** I know where the quest stands before I act on it.
 
 Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
@@ -29,7 +29,7 @@ flowchart LR
   pv -->|yes| pr["Private — it does not open · who can put you on it"]
   pv -->|no| load["Loading — the page is drawn, the rows fill in"]
   load -->|fails| f["Could not load · the reason · Try again"] --> load
-  load --> o["Overview: question · type · branches with status and balance · datasets used and made · open work · decisions so far"]
+  load --> o["Overview: question · type · branches with status and balance · loads cited and records saved · open work · decisions so far"]
   o -->|only the first branch, nothing cited| j["Just started: the question as asked, open"]
   o --> b["A branch → PJ-05"]
   o --> t["The tree → PJ-04"]
@@ -44,8 +44,8 @@ flowchart LR
 |---|---|---|---|
 | PJ-03.1 | A project just created | a member opens it | the overview reads its question and type, and one branch — the question as asked — open, with *No findings yet* |
 | PJ-03.2 | A project with branches | the overview opens | each branch shows its number (*b1*), title, status (open · pursuing · parked · dropped · merged) and balance (*3 supports · 1 contradicts*), in the words of the project's type |
-| PJ-03.3 | Findings that cite dataset versions | the overview opens | *Datasets used* lists each dataset version those findings cite, as dataset and version, each opening its dataset (DS-F01); there is no second list to keep |
-| PJ-03.4 | A simulation saved a derived dataset | the overview opens | *Datasets made* lists it, labelled derived |
+| PJ-03.3 | Findings that cite loads | the overview opens | *Loads cited* lists each load those findings cite, by its name, id and content hash, each opening the load in Records (RC-F02); there is no second list to keep |
+| PJ-03.4 | A simulation saved derived records | the overview opens | *Records saved* lists them by kind and count, labelled derived |
 | PJ-03.5 | A project with open tasks | the overview opens | it counts the open tasks and lists them, each opening its task |
 | PJ-03.6 | A branch with proposals waiting | the overview opens | the branch shows *N proposals waiting*, opening that branch's proposals |
 | PJ-03.7 | A project, a branch or a finding open | the shell's header shows the path | it reads *Projects › the project › H2 · title › the finding's statement*, each level linking one level up; the project is named by its name, never its key |

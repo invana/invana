@@ -84,7 +84,7 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 
 | Product or capability | For |
 |---|---|
-| Model | The published models every question is grounded in |
+| Semantics | The published models every question is grounded in |
 | Agents | The agents and skills that answer |
 | Access | Who may ask, and the views of the graph a question may pick |
 

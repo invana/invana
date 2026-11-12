@@ -4,7 +4,7 @@ title: Sign in
 feature: AC-F01
 status: idea
 personas: [analyst, owner, admin]
-boards: [start.signin]
+boards: [access.signin]
 ---
 
 # AC-01 · Sign in
@@ -52,5 +52,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Sign in | Admin | start.signin | — | start.signin · Signing in | start.signin | start.signin · Could not sign in | — | — |
-| Sign in | Operator | start.signin | — | start.signin · Signing in | start.signin | start.signin · Could not sign in | — | start.signin · No account |
+| Sign in | Admin | access.signin | — | access.signin · Signing in | access.signin | access.signin · Could not sign in | — | — |
+| Sign in | Operator | access.signin | — | access.signin · Signing in | access.signin | access.signin · Could not sign in | — | access.signin · No account |

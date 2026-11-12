@@ -57,6 +57,10 @@ flowchart LR
 | AG-36.12 | A test still running | the sheet is open | the checks fill in as each case ends; the rest of the sheet stays usable |
 | AG-36.13 | A test run | the person opens *See the test runs* | each case opens its run, and *How it got here* shows its steps and sources |
 | AG-36.14 | An Operator without *Can build agents* | they open a draft or Versions | the results and every version read; *Test*, *Publish* and *Roll back* are disabled, naming *Can build agents*, with *Ask Priya (owner)* |
+| AG-36.15 | The agent's tests | the builder writes, proposes or promotes a case, or removes one | its cases, checks, judge and gate are a skill's (AG-20.3–AG-20.7 · AG-20.14); a removed case leaves the runs it judged |
+| AG-36.16 | A live agent | its model version moves, the graph's model publishes, or the night comes | its tests run again on live, paid from the graph's eval token budget, and a worse result raises an alert for its builder, as a skill's does (AG-20.16–AG-20.18) |
+| AG-36.17 | The command line | `invana agents push` writes a draft's instructions from a file, `invana agents publish` publishes it, and `invana evals list · run · promote · drift` read and run the tests | each passes the same gate as Studio; someone without *Can build agents* is refused, naming it |
+| AG-36.18 | A draft with active cases and no settled test run over its exact text and model version, or one still running | the builder presses *Create*, *Publish* or *Roll back* | it is refused where the act was, naming the case count, with *Run the evals*; Studio never predicts the gate |
 
 ## Screens
 
@@ -68,3 +72,5 @@ flowchart LR
 | Versions | Operator | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | agents.agent · Versions |
 | Agents — a draft in the list | Admin | — | agents · No agents match | agents · Loading | agents · Draft | — | — | — |
 | Agents — a draft in the list | Operator | — | agents · No agents match | agents · Loading | agents · Draft | — | — | agents · Draft |
+| The agent's tests | Admin | agents.agent · No tests | — | agents.agent · Loading | agents.agent · Tests | agents.agent · Could not load | agents.agent · Testing | — |
+| The agent's tests | Operator | agents.agent · No tests | — | agents.agent · Loading | agents.agent · Tests · Read only | agents.agent · Could not load | agents.agent · Testing | agents.agent · Tests · Read only |

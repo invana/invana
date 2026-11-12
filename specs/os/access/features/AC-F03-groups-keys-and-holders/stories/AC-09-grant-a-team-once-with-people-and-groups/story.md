@@ -4,7 +4,7 @@ title: Grant a team once, with people and groups
 feature: AC-F03
 status: idea
 personas: [owner]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-09 · Grant a team once, with people and groups
@@ -59,12 +59,13 @@ flowchart TD
 | AC-09.12 | A member | they are removed from the Graph | their groups and holdings in this Graph go with them |
 | AC-09.13 | The keys column | it is read | it is the engine's count of the person's live keys that reach this Graph |
 | AC-09.14 | An Operator | they open People or a group | everything reads; every act is shown as *Ask Priya* |
+| AC-09.15 | A group name already used in the Graph | a *New group* is made with it | it is refused in place, naming it |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | People | Admin | settings.access · Only you | settings.access · Nothing matches | settings.access · Loading | settings.access · People and groups | settings.access · No account | — | — |
-| People | Operator | shell.locked · Only you | shell.locked · Nothing matches | shell.locked · Loading | shell.locked · People and groups | shell.locked · Could not load | — | shell.locked · People and groups |
+| People | Operator | access.locked · Only you | access.locked · Nothing matches | access.locked · Loading | access.locked · People and groups | access.locked · Could not load | — | access.locked · People and groups |
 | Groups and a group | Admin | settings.access · No groups yet | settings.access · Nothing matches | settings.access · Loading | settings.access · A group | settings.access · Could not load | — | — |
-| Groups and a group | Operator | shell.locked · No groups yet | shell.locked · Nothing matches | shell.locked · Loading | shell.locked · A group | shell.locked · Could not load | — | shell.locked · A group |
+| Groups and a group | Operator | access.locked · No groups yet | access.locked · Nothing matches | access.locked · Loading | access.locked · A group | access.locked · Could not load | — | access.locked · A group |

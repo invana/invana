@@ -49,6 +49,13 @@ flowchart LR
 | EX-09.8 | An old version | the person restores it | a new version is made from it, and every earlier version is still listed |
 | EX-09.9 | A node gone from the graph since it was drawn | the board reopens | the node stays drawn, marked missing, with when it was last seen |
 | EX-09.10 | A dense result zoomed out | over 500 relationships are drawn below 50% zoom | about 1 in 10 is drawn and the footer says *About 1 in 10 relationships drawn · zoom in for all* until every edge is drawn again |
+| EX-09.11 | A drawn node | the person picks *Expand…* | a card offers direction, relationship type, neighbour type, how many, and a property to match; the count shows before anything draws |
+| EX-09.12 | A board under a view of the graph that hides a type | the person clears the view | the hidden records draw again and are counted; the saved board was never rewritten |
+| EX-09.13 | A graph database that cannot count by type | the Legend opens | every drawn type is listed without a number, and no total is made up from a partial sum |
+| EX-09.14 | The Legend open | the person picks *Count again* | the types are counted again under the board's view of the graph, as a run, and nothing drawn changes |
+| EX-09.15 | Styling open | the person sets a relationship type's width, or labels a node type by a key, its id or its type | the board repaints at once and keeps it |
+| EX-09.16 | The Graph's run ceiling reached | the person expands a node or counts the types | it says the read is queued behind other runs and draws nothing until it runs |
+| EX-09.17 | An expansion or a count whose run fails | it settles | the run's message shows with its run, and nothing drawn changes |
 
 ## Screens
 

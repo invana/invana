@@ -12,7 +12,6 @@
     {"key": "project", "label": "Project file", "paths": [".claude/team/projects/*/project.md"]},
     {"key": "team", "label": "Team rules", "paths": ["CLAUDE.md", ".claude/**"]},
     {"key": "reports", "label": "Own reports", "paths": [".agent-reports/{role}/**"]},
-    {"key": "reviews", "label": "Project reviews", "paths": [".claude/team/projects/*/reviews/**"]},
     {"key": "raise", "label": "Raise a recommendation", "paths": []},
     {"key": "take", "label": "Take one up", "paths": []},
     {"key": "commit", "label": "Commit", "paths": []}
@@ -27,7 +26,7 @@
     {"key": "project-lead", "label": "Project lead", "rights": {"project": "Questions for Ravi", "reports": true, "raise": true}},
     {"key": "designer", "label": "Designer", "rights": {"tasks": "own rows", "boards": true, "reports": true, "raise": true}},
     {"key": "coder", "label": "Coder", "rights": {"code": true, "tests": true, "kit": "approved components", "changesets": true, "tasks": "own rows", "project": "own Log row · hand-off note", "reports": true, "raise": true, "commit": "when Ravi asked, or under a run he started"}},
-    {"key": "qa", "label": "QA", "rights": {"tasks": "own rows", "project": "own Log row (under /run-project)", "reports": true, "reviews": true, "raise": true}},
+    {"key": "qa", "label": "QA", "rights": {"tasks": "own rows", "reports": true, "raise": true}},
     {"key": "security", "label": "Security", "rights": {"reports": true, "raise": true}}
   ]
 }

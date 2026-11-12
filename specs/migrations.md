@@ -6,8 +6,11 @@ when it is picked up. Until then, specs and designs use the target words; code k
 | # | Migration | Target | Current | Scope | Status |
 |---|---|---|---|---|---|
 | M1 | Rename the `viewer` Graph role to **operator** | `GraphRole.operator`, the managed access rule `operator`, *Operator* on screen | `viewer` in code and stored data | Engine 17 files · engine tests 6 + the golden route table · Studio 17 · docs 25 · one migration rewriting stored member roles and the managed policy name · no aliases | Agreed — not started |
-| M2 | Move every product doc into `specs/` | One folder per feature, one per story (`story.md` · `task.md`), in the standard format | Moved: 5 products and the 3 foundation parts · 41 features · 158 stories · journeys J01–J05 · `system-design/`. Left in `docs/for-developers/`, `docs/products/` and `docs/system-design*`: engine detail, plans, debate and retired rows, each listed with why and where it would go in [the review index](../docs/for-developers/README.md) | Ravi reviews the index — keep, move or delete each row; the EX-F05 and EX-F07 sources in `modules/ask` and `modules/memory` are moved but not cut | Moved — leftovers waiting for review |
+| M2 | Move every product doc into `specs/` | One folder per feature, one per story (`story.md` · `task.md`), in the standard format | Moved: 5 products and the 3 foundation parts · 41 features · 158 stories · journeys J01–J05 · [system design](system-design.md). `docs/for-developers/`, `docs/products/` and `docs/system-design*` are gone: the domain terms are in [the glossary](glossary.md#domain-terms), the Studio build docs in [design-language.md](design-language.md) and the features that own each canvas. Every other old doc is merged into the live spec that owns it, or retired, and deleted: `_stale/` holds only its `README.md` and `code.md` (the code paths still to delete), and no doc | Nothing left to pull back | Done |
 | M3 | Restructure the specs to the pillars and the operating system | `specs/capabilities/` for the five capabilities; `specs/os/` with Graph `GR` · Access `AC` · Runtime `RT`, their stories re-cut from Shell, Settings and Inbox with new ids; Inbox's *Running* folded into Agents › Runs | `specs/products/` · `specs/foundation/` with Shell `SH` · Settings `ST` · Inbox `IN` | Specs · `check.py` · skills · edit rights · engine docstrings and the golden file · docs · no aliases · the map is [M3 — old→new ID map](#m3--oldnew-id-map) | Map approved · specs moved to `os/` and `capabilities/` — code, skills, edit rights and docs to follow |
+| M4 | Restore what the old docs held into the live specs | Every item the old docs held lives once in the live spec that owns it — restored, retired in a *Not building* or Decisions row, or decided from the code; every repeated fact has one home | 465 numbered gaps from eight fidelity audits of the old docs at commit `0236fa8d2d04` | Specs only · the map is [M4 — the old docs and their live homes](#m4--the-old-docs-and-their-live-homes) | Done |
+| M5 | Name the code after the products | Engine modules `semantics` (modeller · semantic · standards) · `records` · `explore` (explorer · boards · sessions) · `projects` (work) · `access` (iam · govern) · `runtime` (flows · workers · llm · llm_providers · mcp_server); Studio and the board areas follow | The old module names; `datasets` code with no product | Engine modules, their tests and the golden files · Studio packages · boards. Code is frozen on these modules until the specs pass the check | Agreed — not started |
+| M6 | Bring the Projects engine to its `## Engine` sections | [PJ-F01](capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)–[PJ-F05](capabilities/projects/features/PJ-F05-project-reports/feature.md#engine): reserved keys `tasks` · `decisions` · `review`; the agent function `projects.tasks.claim` and events `projects.tasks.claimed` · `projects.tasks.claim_lapsed`; `GET /api/v1/projects/types`; a task's state derived, never stored; the summary counts `loads` and `records_saved`; cites and simulation inputs are loads | No reserved keys; no claim function or route listing types; a stored task status; the summary counts `datasets`; cites and inputs are dataset versions | Engine `work` module, its tests and the golden route table · Studio's Projects package. After M5 | Agreed — not started |
 
 ## M3 — old→new ID map
 
@@ -18,9 +21,9 @@ keeps its slug. Content moves unchanged but for IDs and links.
 
 | Capability | Old path | New path |
 |---|---|---|
-| MO Model | `products/model/` | `capabilities/model/` |
-| DA Data | `products/data/` | `capabilities/data/` |
-| DS Datasets | `products/datasets/` | `capabilities/datasets/` |
+| MO Model | `products/model/` | `capabilities/semantics/`, as SE Semantics |
+| DA Data | `products/data/` | `capabilities/records/`, as RC Records |
+| DS Datasets | `products/datasets/` | Retired — its standards stories are in `capabilities/semantics/`, its load stories in `capabilities/records/` |
 | AG Agents | `products/agents/` | `capabilities/agents/` |
 | EX Explore | `products/explore/` | `capabilities/explore/` |
 | PJ Projects | `products/projects/` | `capabilities/projects/` |
@@ -113,3 +116,60 @@ IDs inside the capabilities do not change, but for IN-06 joining AG-F03 as AG-45
 | Count | SH | ST | IN | Total |
 |---|---|---|---|---|
 | Stories mapped, each once | 13 | 30 | 6 | 49 |
+
+## M4 — the old docs and their live homes
+
+Old paths are under `for-developers/` at commit `0236fa8d2d04` unless they start `docs/`. An item is one numbered
+PARTIAL or MISSING gap of an audit; the items each audit found already live, or retired, are not counted. *Elsewhere*
+is an item whose home is not a spec — a team file or CI, raised as a recommendation — or one that needs no change.
+
+| Old area | Old files | Live home | Items | Restored | Retired | Found | Decided | Elsewhere |
+|---|---|---|---|---|---|---|---|---|
+| Studio | `building-studio/` (8 files) · six placeholder outlines (`docs/studio/*`, `docs/development/rfcs.md`) | [System design](system-design.md) · [design-language.md](design-language.md) · [glossary.md](glossary.md) · [SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#decisions) · [AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-functions/feature.md) | 74 | 68 | 2 | 2 | 0 | 2 |
+| Connect, bring data in, connectors, govern | `modules/connect-and-model/` · `modules/bring-data-in/` · `modules/graph-connectors/` · `modules/govern/` | [Semantics](capabilities/semantics/product.md) · [SE-F02](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) · [SE-F07](capabilities/semantics/features/SE-F07-rules/feature.md#engine) · [SE-F09](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md#engine) · [RC-F02](capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) · [System design § 8](system-design.md#8-apis-and-events) | 47 | 45 | 0 | 0 | 2 | 0 |
+| Agents, skills, workflows | `modules/agents/` · `modules/skills/` · `modules/workflows/` | [AG-F01](capabilities/agents/features/AG-F01-build-an-agent/feature.md) · [AG-F02](capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md#engine) · [AG-F04](capabilities/agents/features/AG-F04-skills/feature.md#engine) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-functions/feature.md#engine) | 39 | 38 | 1 | 0 | 0 | 0 |
+| Ask, memory, explore | `modules/ask/` · `modules/memory/` · `modules/explore/` | [Explore](capabilities/explore/product.md) · [EX-F03](capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) · [EX-F07](capabilities/explore/features/EX-F07-memory-what-past-runs-teach/feature.md#engine) · [EX-F01](capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md#engine) | 49 | 47 | 1 | 0 | 1 | 0 |
+| Identity and platform | `modules/identity-and-access/` · `modules/platform/` | [Access](os/access/product.md) · [AC-F02](os/access/features/AC-F02-access-rules/feature.md#engine) · [Runtime](os/runtime/product.md) · [RT-F03](os/runtime/features/RT-F03-workers-and-the-queue/feature.md#engine) · [System design § 12](system-design.md#observability) | 75 | 69 | 2 | 2 | 2 | 0 |
+| Operate, work, building the engine | `modules/operate/` · `modules/work/` · `building-engine/` | [Projects](capabilities/projects/product.md) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-functions/feature.md#engine) · [AG-F01](capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [AC-F06](os/access/features/AC-F06-history/feature.md#engine) · [RT-F03](os/runtime/features/RT-F03-workers-and-the-queue/feature.md#engine) | 89 | 76 | 4 | 7 | 1 | 1 |
+| Products and system design | `docs/products/` · `docs/system-design*` · the top-level `for-developers/` files | [Records](capabilities/records/product.md) · [System design](system-design.md) · [SE-F09](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md#engine) · [RT-F03](os/runtime/features/RT-F03-workers-and-the-queue/feature.md) | 68 | 42 | 15 | 9 | 0 | 2 |
+| The remainder | `migration-plan.md` §10–§24 · `task-model-migration.md` · `building-engine/refactor-plan.md` §2–§6 · `modules/operate/features/see-what-ran.md` SR1–SR78 · eight placeholder files | [AG-F01](capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-functions/feature.md#engine) · [RT-F03](os/runtime/features/RT-F03-workers-and-the-queue/feature.md#engine) · [AG-F03](capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) | 24 | 22 | 0 | 0 | 0 | 2 |
+| **Total** | | | **465** | **407** | **25** | **20** | **6** | **7** |
+
+### What M4 decided
+
+| Decision | Stated in |
+|---|---|
+| C1 · A username is 2 to 64 characters and only `u` is reserved | [AC-F01](os/access/features/AC-F01-sign-in-account-and-sessions/feature.md#decisions) |
+| C2 · An agent is a member of a Graph with no Graph role; its membership is `agents_members` | [GR-F04](os/graph/features/GR-F04-this-graph/feature.md#decisions) |
+| C3 · The floor Graph role is `operator`; the code's `viewer` waits on M1 | [GR-F04 › Mechanisms](os/graph/features/GR-F04-this-graph/feature.md#mechanisms) |
+| C4 · A publish approval's impact is frozen when the preview settles | [SE-F02 › Mechanisms](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#mechanisms) |
+| C5 · Both query digests always; both texts only when the lens rewrote the query, on the step, never on the touch | [SE-F09 › Mechanisms](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md#mechanisms) |
+| C6 · C8 · Board kinds are six drawn and twelve declared, no `agent` kind; the glossary links the one list | [EX-F01 › Mechanisms](capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md#mechanisms) · [glossary.md](glossary.md) |
+| C7 · The engine's word for a link between models is `stitch` — plan keys, catalogue keys, the lens address and the CLI | [SE-F06 › Engine](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
+| Scale-out keeps its pools — one queue per label and step class, workers clamped to the pool and the Graph's quota, an idle worker drained after 5 minutes | [RT-F03](os/runtime/features/RT-F03-workers-and-the-queue/feature.md#decisions) |
+| KEDA, Auto Scaling, multi-replica orchestrators and a per-mode deployment are not built | [RT-F03](os/runtime/features/RT-F03-workers-and-the-queue/feature.md#not-building) |
+| The goals *Trust* and *Privacy*; the gateway records each AI model call | [SE-F09 › Mechanisms](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md#mechanisms) · [System design § 12](system-design.md#privacy) |
+| Only the gateway calls an AI model and only secrets holds keys — import rules | [System design § 7](system-design.md#7-architecture-and-components) |
+| A value from an AI model's output is `origin = llm`; every element Invana writes carries its run, its time and its origin | [System design § 6](system-design.md#6-data-and-storage) |
+| The router and specialist roster, the default stance and the Data assistant are retired; the shipped agents are the live set; A2A is 1.0 | [AG-F02](capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md#not-building) · [AG-F01 › Not building](capabilities/agents/features/AG-F01-build-an-agent/feature.md#not-building) · [System design § 11](system-design.md#11-failure-modes-and-the-outside-boundary) · [glossary.md](glossary.md) |
+| OpenAPI and Airbyte source adapters are not built — Invana is a destination | [Records](capabilities/records/product.md#not-building) |
+| Datasets as CSV files queried with DuckDB are not built | [Records](capabilities/records/product.md#not-building) |
+| Signed grants to remote workers and the action-vocabulary policy grammar are not built | [AC-F02](os/access/features/AC-F02-access-rules/feature.md#not-building) |
+| Every tool plugin is an MCP server; `web`, `mail` and `science` stay | [RT-F02](os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md#decisions) · [glossary.md](glossary.md) |
+| A link between models writes its relationships and withdraws them on removal | [SE-F06 › Engine](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) · [glossary.md](glossary.md) |
+| The generated admin | [System design § 13](system-design.md#13-delivery-and-operations) |
+| The `start.*` and `shell.*` boards take their package names, below | Every story's `## Screens`, every feature's `boards:`, journeys J01 · J02 · J05 |
+
+### The board rename
+
+| Old | New |
+|---|---|
+| `start.signin` | `access.signin` |
+| `shell.locked` | `access.locked` |
+| `start.home` | `graphs.home` |
+| `start.new_graph` · `.connect` · `.files` · `.shape` · `.invite` · `.ready` | `graphs.new_graph` · `.connect` · `.files` · `.shape` · `.invite` · `.ready` |
+| `start.graph_picker` | `graphs.graph_picker` |
+| `start.setup` | `graphs.setup` |
+| `shell.command` | `graphs.command` |
+| `shell.launcher` · `.open` · `.platform` | `graphs.launcher` · `.open` · `.platform` |
+| `shell.graph.new.*` · `.team` · `.review` | `graphs.new_graph.*` · `.team` · `.review` |

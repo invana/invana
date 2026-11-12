@@ -22,6 +22,7 @@ Every procedure lives in a skill; this file only routes. Load the skill **before
 | To … | Use |
 |---|---|
 | Write or change a spec, a story or a journey — or reason about any UI or flow question (journey first) | `product-spec` |
+| Write or change the system design — `specs/system-design.md`, an NFR, a feature's `## Engine` | `system-design` (with `product-spec`) |
 | Draw a story's boards | `design-story` |
 | Write or change code in `engine/`, `studio/` or `integrations/` — scope, decisions, access, engine standards, tests, finishing | `build-feature` |
 | Write or change Studio UI, a design-kit or canvas component — the design rules | `build-studio` (with `build-feature`) |

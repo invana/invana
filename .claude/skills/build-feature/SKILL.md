@@ -15,7 +15,7 @@ product-manager migrates it. `for-developers/README.md` is the feature index; ea
 one file per feature. When choosing what to build:
 
 1. **Build only what the index lists.** Anything not in `for-developers/README.md` is out of scope, even if
-   `docs/system-design.md` describes it.
+   `specs/system-design.md` describes it.
 2. **Respect what is deliberately absent.** Every module spec and feature file ends with a
    "Not building" table. Those are explicit non-goals — do not implement them, do not scaffold for
    them, do not "while I'm here" them.
@@ -31,12 +31,13 @@ one file per feature. When choosing what to build:
 7. **Use the product's words.** `docs/for-developers/terminology.md` pins them, and names the
    ones we do not use. Code, UI copy and docs follow it.
 
-The product split of Studio (Explorer, Modeller, Agents, Projects, Datasets) is planned in `docs/products/`.
+The capabilities and the operating system are `specs/vision.md` › *Pillars and capabilities* and *The operating system*.
 
 ## 2. Before code
 
 - Read `CLAUDE.md`, the feature file in `docs/for-developers/modules/<module>/features/`, its module `spec.md`, and its row in `docs/for-developers/README.md`. Build only what the index lists; respect every *Not building* row.
-- When the feature has a spec in `specs/<area>/<product>/features/` (`products` or `foundation`), the spec governs: each story's `story.md` is the source of truth — build exactly its acceptance criteria and cite their IDs (`MO-17.2`) in tests and commit messages. A story below `designed` is not built. A gap or a contradiction in the spec goes back to the **product-manager**, not into code.
+- When the feature has a spec in `specs/<area>/<product>/features/` (`capabilities` or `os`), the spec governs: each story's `story.md` is the source of truth — build exactly its acceptance criteria and cite their IDs (`RC-08.2`) in tests and commit messages. A story below `designed` is not built. A gap or a contradiction in the spec goes back to the **product-manager**, not into code.
+- **Build to the design.** `specs/system-design.md` is the high-level design — stores, components, API and event conventions, distributed execution, agents, failure modes — and its § 3 NFRs; the feature's `## Engine` is the low-level design — its records, routes, events, refusals, CLI and mechanisms. Build them as written: a table, column, route, status code or event name not in `## Engine` is not added. Prove each NFR in the feature's `nfrs:` with the check its *Enforced by* names. A build that must deviate stops and raises a `raise` row to the product manager; the design changes first, then the code.
 - **Add your tasks** to the story's `task.md` before the first line of code (`.claude/skills/product-spec/format.md` › *Tasks*): Owner `coder`, one task per commit-sized step — engine, Studio, tests, changeset — each citing the criteria it delivers and the boards it builds, with *Depends on* between them. Every criterion lands in at least one task. Mark each `doing` as you start it and `done` with its commit as evidence. Edit only rows whose Owner is `coder`; a task the story cannot justify is a `raise` row, not a task.
 - A missing or wrong feature file blocks the build: a `raise` row to the product manager, who fixes it first. A decision only Ravi can make: stop and ask.
 - Find the boards: a spec's stories name them in `## Screens` of each `story.md` and the feature's `boards:`, drawn on the Agent version canvas (`.design/canvas-agent-version/project/<board>.dc.html`). A feature not yet migrated names them in its Surfaces table, in Invana Products (`.design/canvas-products/project/`). Ask the **designer** which components draw them before writing UI.

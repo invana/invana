@@ -4,7 +4,7 @@ title: Read every access rule and who holds it
 feature: AC-F02
 status: idea
 personas: [owner, analyst]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-03 · Read every access rule and who holds it
@@ -49,10 +49,11 @@ flowchart LR
 | AC-03.9 | An Operator | they open the list | every rule reads; *New rule* and *Draft with the assistant* are shown as *Ask Priya*, naming someone who can manage people |
 | AC-03.10 | The list cannot load | the sheet opens | it says why, with *Try again* |
 | AC-03.11 | The sheet open on a rule | the page reloads | the same tab and rule open again, from the URL |
+| AC-03.12 | A member at the command line | they list the rules, or show one by name | every rule reads with its kind, whether it is saved, what it allows and who holds it; one shown adds its lines, limits and holders — the same reading Studio shows |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Access rules — the list | Admin | settings.access · Built in only | settings.access · Nothing matches | settings.access · Loading | settings.access | settings.access · Could not load | — | — |
-| Access rules — the list | Operator | shell.locked · Built in only | shell.locked · Nothing matches | shell.locked · Loading | shell.locked | shell.locked · Could not load | — | shell.locked |
+| Access rules — the list | Operator | access.locked · Built in only | access.locked · Nothing matches | access.locked · Loading | access.locked | access.locked · Could not load | — | access.locked |

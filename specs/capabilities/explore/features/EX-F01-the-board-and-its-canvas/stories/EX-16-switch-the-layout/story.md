@@ -45,6 +45,11 @@ flowchart LR
 | EX-16.6 | A board with a preset | a new answer or an expansion draws | it is laid out with the board's preset and options, never a fixed default |
 | EX-16.7 | A board of 24,477 nodes | the Layout card opens | Tree, Flow and Radial are disabled, each saying *Draws up to 3,000 nodes · this board has 24,477*; Network still runs |
 | EX-16.8 | A preset switched | the person presses ⌘Z | the board returns to the previous preset in one step |
+| EX-16.9 | Tree or Flow with *Root* on Automatic | it lays out | the root is the drawn nodes no relationship points into, else the selection, else the most connected node |
+| EX-16.10 | A board laid out with curved or orthogonal edges | it switches to Network | the edges draw straight; a route is never saved on a relationship |
+| EX-16.11 | The Layout card | the person picks each preset in turn | Network is a force layout with straight edges and labels below; Tree ↓ is a layered layout top to bottom with orthogonal edges and labels below; Flow → is a layered layout left to right with curved, routed edges and labels to the right; Radial is a radial layout with edges curving outward and labels outward |
+| EX-16.12 | Tree, Flow or Radial laying out | the footer's message line reads | it says *Laying out 2,159 nodes · Flow →* with no step count, because the layered and radial layouts report no progress; Network counts its steps (EX-F01 › States) |
+| EX-16.13 | A drawn cycle | Tree or Flow lays it out | one relationship of the cycle is drawn reversed so the layers can be ranked; the relationship itself is unchanged |
 
 ## Screens
 

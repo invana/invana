@@ -58,10 +58,12 @@ flowchart LR
 | AG-30.15 | A count above the floor | it is drawn | it reads the engine's share applied — *61% applied*; Studio never divides |
 | AG-30.16 | Usage | it is read | it says applied is the model's own report, not proof it was used well |
 | AG-30.17 | Usage | it is read | the four readings are drawn, each naming its move — the wrong agents: remove it · the wrong trigger: rewrite *when to use* · the wrong content: rewrite the instructions · it fits: leave it |
-| AG-30.18 | Any count's row | the person opens it | it opens the runs behind it, each to the step that was offered the skill; a run whose detail is purged says so, and its counts stay |
+| AG-30.18 | Any count's row | the person opens it | it opens the runs behind it, each to the step that was offered the skill — one row per step, so two steps of one run read as two rows; a run whose detail is purged says so, its counts stay, and a step whose run is gone carries no action |
 | AG-30.19 | A new version published | Usage opens | its counts start at zero; earlier versions keep theirs, and counts are never summed across versions |
 | AG-30.20 | An Operator without *Can build agents* | they open Agents or Usage | everything reads; *Add to an agent* and *Remove* are disabled, naming *Can build agents*, with *Ask Priya (owner)* |
 | AG-30.21 | A guided skill | it is added to an agent | it is refused only when the functions its instructions name are outside what the agent may do, naming them; each call a run makes is checked as it is made |
+| AG-30.22 | A skill with only a draft | Usage opens | the version reads `draft`, never `v0`, and the per-version band reads *nothing is published yet — there is no text for these counts to belong to* |
+| AG-30.23 | Usage, with an older version picked on the version bar | by agent and by outcome are read | they say *only the current version has a breakdown*, never the current version's counts under the older label |
 
 ## Screens
 

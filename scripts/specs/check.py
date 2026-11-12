@@ -2,6 +2,10 @@
 
     python3 scripts/specs/check.py            # check; exit 1 on any error
     python3 scripts/specs/check.py --index    # check, then rewrite specs/README.md
+    python3 scripts/specs/check.py --graph [--out PATH]        # parse specs/ into specs-graph.json (graph.py)
+    python3 scripts/specs/check.py --placeholders [--write]   # list, or create, missing placeholders (graph.py)
+
+The three modes are exclusive; ``--out`` needs ``--graph`` and a path, ``--write`` needs ``--placeholders``.
 
 The format is .claude/skills/product-spec/format.md. This script enforces the mechanical half of it — front-matter,
 required sections, IDs, story shape, the task table, cross-links, screen words and the no-history rule — so the
@@ -18,7 +22,8 @@ and a feature's status is the lowest of its stories'. Boards are checked against
 built locally (`.design/` is not in git); without it the board check is skipped and says so. A board is drawn once its
 story is designed, so an undrawn board is an error from `designed` up and a warning below it. A story or feature at
 `later` is parked, outside the ladder: a feature's status is the lowest of its stories that are not parked, or
-`later` when all of them are.
+`later` when all of them are. A file at `placeholder` is outside the ladder too: it is named so the graph shows it,
+nothing in it is decided, and only its front-matter is checked; it never counts toward a feature's status.
 """
 import re
 import sys
@@ -38,6 +43,7 @@ FENCE = re.compile(r'^```.*?^```', re.S | re.M)
 CODE = re.compile(r'`[^`\n]*`')
 STATUSES = ['idea', 'specified', 'designed', 'built', 'verified']
 LATER = 'later'  # parked: outside the ladder until it is taken up
+PLACEHOLDER = 'placeholder'  # named so the graph shows it; nothing in it decided yet
 KEYS = {
     'product': ['id', 'title', 'status', 'owner', 'personas'],
     'feature': ['id', 'title', 'product', 'status', 'personas', 'stories', 'journeys', 'boards', 'depends_on'],
@@ -95,6 +101,75 @@ def table_rows(text):
             continue
         rows.append([c.strip() for c in line.strip().strip('|').split('|')])
     return rows
+
+
+ID_SHAPE = re.compile(r'[A-Z]{1,4}-[A-Z]?\d+')
+FLOW_SKIP = re.compile(r'^(?:flowchart|graph|subgraph|end|classDef|class|style|linkStyle|click|direction|%%)\b')
+FLOW_SHAPES = [('([', '])', 'terminal'), ('((', '))', 'terminal'), ('[[', ']]', 'step'), ('[(', ')]', 'step'),
+               ('{{', '}}', 'decision'), ('[', ']', 'step'), ('{', '}', 'decision'), ('(', ')', 'step'),
+               ('>', ']', 'step')]
+FLOW_EDGE = re.compile(r'\s*(?:--\s+([^-|>][^>]*?)\s+-->|<?(?:-->|-\.->|==>|---|--[ox]|-\.-|===))\s*(?:\|([^|]*)\|)?\s*')
+FLOW_NODE_ID = re.compile(r'[A-Za-z0-9_]+')
+
+
+def journey_flow(body):
+    """The first mermaid ``flowchart`` of a journey's *The journey*: ``(nodes, edges)``.
+
+    ``nodes`` maps each mermaid node id to ``(label, shape)`` — the label as written (quotes stripped), the shape
+    ``terminal`` (``([ ])``, ``(( ))``), ``decision`` (``{ }``) or ``step``; a node only ever referenced keeps its id
+    as its label. ``edges`` is ``[(source, target, label)]`` in the order written, ``label`` the ``|text|`` or
+    ``-- text -->`` on the arrow, or ``''``. Returns ``({}, [])`` when there is no flowchart.
+    """
+    block = next((d for d in re.findall(r'```mermaid\n(.*?)```', section(body, 'The journey'), re.S)
+                  if d.lstrip().startswith(('flowchart', 'graph'))), None)
+    nodes, edges = {}, []
+    if block is None:
+        return nodes, edges
+    for raw in block.splitlines():
+        line = raw.strip()
+        if not line or FLOW_SKIP.match(line):
+            continue
+        pos, prev, label = 0, None, ''
+        while pos < len(line):
+            m = FLOW_NODE_ID.match(line, pos)
+            if not m:
+                break
+            nid, pos = m.group(0), m.end()
+            text, shape = None, 'step'
+            for open_, close, kind in FLOW_SHAPES:
+                if line.startswith(open_, pos):
+                    start = pos + len(open_)
+                    if line.startswith('"', start):
+                        q = line.find('"', start + 1)
+                        text, end = line[start + 1:q], line.find(close, q + 1)
+                    else:
+                        end = line.find(close, start)
+                        text = line[start:end].strip()
+                    pos, shape = end + len(close), kind
+                    break
+            if text is not None or nid not in nodes:
+                nodes[nid] = (text.strip() if text is not None else nid, shape)
+            if prev is not None:
+                edges.append((prev, nid, label))
+            e = FLOW_EDGE.match(line, pos)
+            if not e or e.end() == pos:
+                break
+            prev, label, pos = nid, (e.group(2) or e.group(1) or '').strip(), e.end()
+    return nodes, edges
+
+
+def lead_ids(label):
+    """The id-shaped tokens a diagram label starts with — ``"AC-15 · GR-16 · Asks…"`` → ``['AC-15', 'GR-16']``.
+
+    A token is id-shaped when it reads ``<CODE>-<n>`` or ``<CODE>-F<n>``; whether it names a story is the caller's
+    question. ``"Ask an Admin · RT-01"`` starts with none.
+    """
+    out = []
+    for token in label.split('·'):
+        if not ID_SHAPE.fullmatch(token.strip()):
+            break
+        out.append(token.strip())
+    return out
 
 
 def kind_of(path):
@@ -301,6 +376,24 @@ def check_tasks(path, sid, criteria, status):
     return tasks
 
 
+def check_journey_diagram(path, fm, body, stories):
+    """A journey's diagram and its ``stories:`` name the same stories, and every id a step starts with is a story."""
+    nodes, _ = journey_flow(body)
+    drawn = set()
+    for mid, (label, _shape) in nodes.items():
+        for ref in lead_ids(label):
+            if ref in stories:
+                drawn.add(ref)
+            else:
+                err(path, f'diagram node `{mid}` starts with `{ref}`, which no story defines')
+    declared = set(fm.get('stories', []))
+    if declared - drawn:
+        err(path, f'`stories` names {", ".join(sorted(declared - drawn))}, not on The journey diagram — '
+                  'start its step\'s label with the id')
+    if drawn - declared:
+        err(path, f'The journey diagram draws {", ".join(sorted(drawn - declared))}, missing from `stories`')
+
+
 def main(write_index=False):
     docs = {}
     for path in sorted(SPECS.rglob('*.md')):
@@ -320,12 +413,19 @@ def main(write_index=False):
         for k in KEYS[kind]:
             if k not in fm:
                 err(path, f'front-matter is missing `{k}`')
-        if 'status' in fm and fm['status'] not in STATUSES + [LATER]:
-            err(path, f'status `{fm["status"]}` is not one of {", ".join(STATUSES + [LATER])}')
+        if 'status' in fm and fm['status'] not in STATUSES + [LATER, PLACEHOLDER]:
+            err(path, f'status `{fm["status"]}` is not one of {", ".join(STATUSES + [LATER, PLACEHOLDER])}')
+        fid = fm.get('id', '')
+        if fm.get('status') == PLACEHOLDER:
+            if fid in ids:
+                err(path, f'id `{fid}` is also used by {ids[fid].relative_to(ROOT)}')
+            ids[fid] = path
+            if kind == 'story':
+                stories[fid] = path
+            continue
         for s in SECTIONS[kind]:
             if s not in sections(body):
                 err(path, f'missing section `## {s}`')
-        fid = fm.get('id', '')
         if fid in ids:
             err(path, f'id `{fid}` is also used by {ids[fid].relative_to(ROOT)}')
         ids[fid] = path
@@ -369,7 +469,7 @@ def main(write_index=False):
                 err(path, f'criterion uses `{w}`, a word never shown on screen (glossary.md)')
 
     for path, (kind, fm, body) in docs.items():
-        if kind != 'feature':
+        if kind != 'feature' or fm.get('status') == PLACEHOLDER:
             continue
         here = {s: p for s, p in stories.items() if p.parents[2] == path.parent}
         declared = set(fm.get('stories', []))
@@ -390,7 +490,7 @@ def main(write_index=False):
                     err(path, f'{sid} is not on the User journey diagram — label its step with the id')
         levels = [docs[p][1].get('status') for p in here.values()]
         live = [STATUSES.index(s) for s in levels if s in STATUSES]
-        want = STATUSES[min(live)] if live else (LATER if levels else None)
+        want = STATUSES[min(live)] if live else (LATER if LATER in levels else PLACEHOLDER if levels else None)
         if want and fm.get('status') != want:
             err(path, f'status `{fm.get("status")}` is not the lowest of its stories that are not parked (`{want}`)')
 
@@ -405,6 +505,8 @@ def main(write_index=False):
         for j in fm.get('journeys', []):
             if j not in ids:
                 err(path, f'`journeys` names `{j}`, which no journey defines')
+        if kind == 'journey' and fm.get('status') != PLACEHOLDER:
+            check_journey_diagram(path, fm, body, stories)
         for target in re.findall(r'\]\(([^)#:]+\.md)', body):
             if not (path.parent / target).resolve().exists():
                 err(path, f'link to `{target}` does not resolve')
@@ -469,5 +571,29 @@ def index(docs, tasks_of):
         + ('\n'.join(rows) if rows else '\nNo specs yet.') + '\n')
 
 
+def cli(argv=None):
+    """Parse the command line and run one mode; returns the exit code. A bad flag combination exits 2."""
+    import argparse
+    parser = argparse.ArgumentParser(prog='check.py', description='Check specs/, build its index, graph or placeholders.')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--index', action='store_true', help='check, then rewrite specs/README.md')
+    mode.add_argument('--graph', action='store_true', help='parse specs/ into specs-graph.json')
+    mode.add_argument('--placeholders', action='store_true', help='list the missing placeholders')
+    parser.add_argument('--out', metavar='PATH', help='where --graph writes (default: specs-graph.json at the repo root)')
+    parser.add_argument('--write', action='store_true', help='with --placeholders, create them')
+    args = parser.parse_args(argv)
+    if args.out is not None and not args.graph:
+        parser.error('--out needs --graph')
+    if args.write and not args.placeholders:
+        parser.error('--write needs --placeholders')
+    if args.graph or args.placeholders:
+        import graph
+        if args.graph:
+            graph.write_graph(args.out)
+            return 0
+        return graph.placeholders(write=args.write)
+    return main(args.index)
+
+
 if __name__ == '__main__':
-    sys.exit(main('--index' in sys.argv))
+    sys.exit(cli())

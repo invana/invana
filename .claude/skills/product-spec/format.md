@@ -7,14 +7,14 @@ this file are the starting point; copy one, never write a spec from a blank page
 
 ```
 specs/
-├── README.md                       index: products, then foundation → feature → story, with status and open tasks
+├── README.md                       index: capabilities, then the operating system → feature → story, with status and open tasks
 ├── vision.md · personas.md · glossary.md · design-language.md
-├── system-design/                  architecture.md · data-model.md · integrations.md
+├── system-design.md                the high-level design and the NFRs (the `system-design` skill)
 ├── journeys/J<nn>-<slug>.md        end-to-end flows across products
-└── products/<product>/            also foundation/<part>/ — Inbox · Settings · Shell, same layout
+└── capabilities/<product>/        also os/<part>/ — Graph · Access · Runtime, same layout
     ├── product.md
     └── features/<CODE>-F<nn>-<slug>/
-        ├── feature.md              user journey · stories index · access · states · rules · decisions · not building
+        ├── feature.md              user journey · stories index · access · states · rules · engine · system impact · decisions · not building
         └── stories/<CODE>-<nn>-<slug>/
             ├── story.md            the story: the source of truth for everyone who builds it
             └── task.md             the designer's, coder's and QA's tasks for it, in one table
@@ -28,20 +28,21 @@ specs/
 |---|---|
 | One folder per feature | `feature.md` holds what its stories share; each story is a folder of its own under `stories/` |
 | One folder per story | `story.md` and `task.md`, nothing else. The story is the source of truth; the tasks are how each role delivers it |
-| Folder name = ID + slug | `MO-F03-load-data-into-a-kind/` · `MO-17-pick-where-the-data-comes-from/`. The slug may change; the ID never does |
-| Two areas, one format | **Capabilities** in `products/` — Explore `EX` · Model `MO` · Data `DA` · Datasets `DS` · Agents `AG` · Projects `PJ`. **The operating system** in `foundation/` — what every capability uses: Inbox `IN` · Settings `ST` · Shell `SH`. Both are written the same way; the list is `vision.md` › *Pillars and capabilities* and *The operating system* |
+| Folder name = ID + slug | `RC-F02-bring-records-in/` · `RC-08-upload-a-file-into-a-model/`. The slug may change; the ID never does |
+| Two areas, one format | **Capabilities** in `capabilities/` — Semantics `SE` · Records `RC` · Agents `AG` · Explore `EX` · Projects `PJ`. **The operating system** in `os/` — what every capability uses: Graph `GR` · Access `AC` · Runtime `RT`. Both are written the same way; the list is `vision.md` › *Pillars and capabilities* and *The operating system* |
 | Journeys cross products | A journey strings stories from several features into one person's path, with its branches |
 
 ## IDs
 
 | Thing | Format | Example |
 |---|---|---|
-| Product | two-letter code | `MO` |
-| Feature | `<code>-F<nn>` | `MO-F03` |
-| User story | `<code>-<nn>`, unique within its product | `MO-17` |
-| Task | `<story>-T<n>`, unique within its story | `MO-17-T3` |
-| Acceptance criterion | `<story>.<n>` | `MO-17.2` |
+| Product | two-letter code | `RC` |
+| Feature | `<code>-F<nn>` | `RC-F02` |
+| User story | `<code>-<nn>`, unique within its product | `RC-08` |
+| Task | `<story>-T<n>`, unique within its story | `RC-08-T3` |
+| Acceptance criterion | `<story>.<n>` | `RC-08.2` |
 | Journey | `J<nn>` | `J02` |
+| Non-functional requirement | `NFR-<PILLAR>-<n>` — `REL` · `SEC` · `PERF` · `COST` · `OPS` · `SUS` · `UX` | `NFR-PERF-2` |
 | Board | `area.feature.surface.variant`, lower snake | `model.kind.load_data.map` |
 
 - An ID is never reused. A deleted story's ID stays retired.
@@ -82,6 +83,9 @@ precondition. The check enforces both.
 | Screen words come from the glossary | `glossary.md` lists the words a person reads and the ones never shown |
 | Decisions in the file they govern | A feature's decisions sit in its Decisions table; a decision spanning a product sits in `product.md` |
 | Not building is explicit | Every product and feature ends with what it deliberately leaves out, and why |
+| A feature carries its low-level design | `## Engine` holds its records, reads, routes, events, refusals, CLI and mechanisms — the feature that owns a record is its one home; others link. A story never holds a table or a payload |
+| Every refusal is a criterion | Each row of `## Engine` › *Refusals* names the story criterion where a person meets it |
+| A feature states its System impact | `None`, or the `system-design.md` sections it changes and the NFRs it touches (its `nfrs:` key). The high-level design is `system-design.md`, written with the `system-design` skill |
 
 ## Tasks
 
@@ -94,8 +98,8 @@ it, empty, with the story; each role adds its own rows when the story reaches it
 | Owner | `designer` · `coder` · `qa` |
 | Title | What gets done, in a few words |
 | Description | One or two lines: what, and what it leaves out |
-| Story | `[MO-17](story.md)` |
-| Criteria | The criterion IDs it delivers or proves (`MO-17.2 · MO-17.4`), or `—` |
+| Story | `[RC-08](story.md)` |
+| Criteria | The criterion IDs it delivers or proves (`RC-08.2 · RC-08.4`), or `—` |
 | Boards | The boards it draws, builds or checks, or `—` |
 | Depends on | Task IDs it waits for, or `—` |
 | Status | `todo` · `doing` · `blocked` · `done` · `dropped` |
@@ -115,7 +119,7 @@ it, empty, with the story; each role adds its own rows when the story reaches it
 | File | Keys |
 |---|---|
 | Product | `id · title · status · owner · personas` |
-| Feature | `id · title · product · status · personas · stories · journeys · boards · depends_on` |
+| Feature | `id · title · product · status · personas · stories · journeys · boards · nfrs · depends_on` |
 | Story | `id · title · feature · status · personas · boards` |
 | Journey | `id · title · personas · stories · boards` |
 

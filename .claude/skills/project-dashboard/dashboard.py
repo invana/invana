@@ -228,6 +228,11 @@ def sessions() -> list[dict]:
         if state != "ended" and alive(h.get("pid")) is False:
             state = "ended"
         subs = subagents(sid, h.get("subagents", {}))
+        if state == "waiting on you":  # the hook's Stop: the turn ended, which is not always a person's turn
+            if any(a["state"] == "working" for a in subs):
+                state = "waiting on agents"  # its sub-agents are still running; it resumes when they report
+            elif h.get("project"):
+                state = "between steps"  # a run's session never waits on a person; the runner takes over
         for a in subs:
             if a["state"] == "quiet" and state in ("ended", "idle"):
                 a["state"] = "ended"  # its session is gone; it cannot still be running
@@ -300,9 +305,9 @@ def project(name: str, live: dict[str, dict], commits: list[str]) -> dict:
                 "handed_off": r.get("handed_off", False), "result": r.get("result", ""),
                 "doing": s.get("doing", ""), "todos": s.get("todos", []), "subagents": s.get("subagents", [])})
         reviews = []
-        for f in sorted((p.dir / "reviews").glob(f"{pid}-*.md")):
+        for f in sorted((ROOT / ".agent-reports" / "qa").glob(f"{p.name}-{pid}-*.md")):
             first = (f.read_text().splitlines() or [""])[0]
-            reviews.append({"kind": f.stem[len(pid) + 1:], "result": first.replace("RESULT:", "").strip(),
+            reviews.append({"kind": f.stem[len(p.name) + len(pid) + 2:], "result": first.replace("RESULT:", "").strip(),
                             "path": os.path.relpath(f, ROOT)})
         mark = f"({scope}): {pid} "
         entry = p.entry(pid)

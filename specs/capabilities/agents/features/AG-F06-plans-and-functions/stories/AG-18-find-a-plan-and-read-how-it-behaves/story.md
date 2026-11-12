@@ -53,7 +53,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AG-18.1 | Agents › Skills | anyone opens *Plans* | every reusable plan lists with its name, what it is for, where it comes from (*packaged* · *generated* · *promoted*), its version, what it touches, the skills that use it and when it last ran |
-| AG-18.2 | Plans | a person filters by where it comes from or kind, or searches | the list narrows; nothing matching reads *No plans match*, naming the filter, with *Clear* |
+| AG-18.2 | Plans | a person filters by where it comes from, kind or whether a skill copies it in, or searches | the list narrows; nothing matching reads *No plans match*, naming the filter, with *Clear* |
 | AG-18.3 | A plan written for one piece of work, and a skill's own plan | Plans is read | neither is listed — the first is read from its run, the second under its skill |
 | AG-18.4 | A plan in the list | a person opens it | its page's head names the version and says what it is — its steps, what it matches, what it touches, who owns it and the agents that may run it — over tabs *Overview* · *Layers* · *Flow* · *Runs* and a 7 · 30 · 90 day window every tab follows |
 | AG-18.5 | A plan that has run | Overview is read | it shows runs, served, elapsed and work medians, tokens per run and failed against the window before; one row per step with how often it ran, its medians, failed and retried; where it fails; and which bounds it reaches |
@@ -72,6 +72,9 @@ flowchart TD
 | AG-18.18 | A plan that passed its last check | what the agent may do narrows | it is refused naming what changed; the plan stays in the list; running steps finish and the next plan is checked against the new bounds |
 | AG-18.19 | The same step refused again and again | the threshold is crossed | it is evidence, and a suggested change in *Needs you* proposes widening or tightening what the agent may do; a person decides (EX-31) |
 | AG-18.20 | A run that picked, wrote or was refused a plan | a person opens *How it got here* | its steps show why this plan, which others were considered and the check's result, each with its sources |
+| AG-18.21 | A plan some of whose runs replanned | a person picks one of those runs on the plan's page | the plan's steps read against what that run ran — *ran* · *added by a replan* · *not run* — with how many times it replanned; a replan never changes the plan |
+| AG-18.22 | A plan that declares arguments | *⋯ Arguments* is opened | each argument lists with its type, default and label, and each skill that copies the plan in with the value it gives; none reads *This plan takes no arguments* |
+| AG-18.23 | A plan's Layers drawing | a person who has never seen the plan reads it, without the legend | they can say from the drawing alone what repeats, how many times, what stops it and what declining costs, and tell an approval (a seam on the leading edge) from a verdict (a seam on the trailing edge, its `back()` bracket hanging off it); where the drawing and the run's record disagree, the tab says so and draws no further |
 
 ## Screens
 
@@ -87,6 +90,10 @@ flowchart TD
 | A plan — Runs | Operator | agents.skills · A plan's runs, no runs | agents.skills · A plan's runs, none match | agents.skills · Loading | agents.skills · A plan's runs | agents.skills · Could not load | agents.skills · A plan's runs | agents.skills · A plan's runs |
 | A plan — Versions and Export | Admin | agents.skills · A plan's versions, the first | — | agents.skills · Loading | agents.skills · A plan's versions | agents.skills · Could not load | — | — |
 | A plan — Versions and Export | Operator | agents.skills · A plan's versions, the first | — | agents.skills · Loading | agents.skills · A plan's versions | agents.skills · Could not load | — | agents.skills · A plan's versions |
+| A plan — Replanned runs | Admin | agents.skills · A plan's replanned runs, none | — | agents.skills · Loading | agents.skills · A plan's replanned runs | agents.skills · Could not load | — | — |
+| A plan — Replanned runs | Operator | agents.skills · A plan's replanned runs, none | — | agents.skills · Loading | agents.skills · A plan's replanned runs | agents.skills · Could not load | — | agents.skills · A plan's replanned runs |
+| A plan — Arguments | Admin | agents.skills · A plan's arguments, none | — | agents.skills · Loading | agents.skills · A plan's arguments | agents.skills · Could not load | — | — |
+| A plan — Arguments | Operator | agents.skills · A plan's arguments, none | — | agents.skills · Loading | agents.skills · A plan's arguments | agents.skills · Could not load | — | agents.skills · A plan's arguments |
 | Retire a version | Admin | — | — | — | agents.skills · Retire a version | agents.skills · Could not load | — | — |
 | Retire a version | Operator | — | — | — | — | — | — | agents.skills · A plan, read only |
 | A skill's own plan | Admin | agents.skill · Flow | — | agents.skill · Loading | agents.skill · Flow | agents.skill · Failed | — | — |

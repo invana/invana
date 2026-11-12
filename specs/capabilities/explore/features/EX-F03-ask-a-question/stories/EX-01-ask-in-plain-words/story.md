@@ -58,6 +58,7 @@ flowchart LR
 | EX-01.12 | A run on its way | the person cancels it | the steps done stay in the thread and nothing partial is shown as an answer |
 | EX-01.13 | The query the assistant wrote does not check against the model | it is repaired once and fails again | the run stops, showing both attempts and their errors |
 | EX-01.14 | An answered question | the person opens *How it got here* | it shows the steps, the query and what the model was given |
+| EX-01.15 | Questions already asked in the conversation | the person presses ↑ in an empty composer | their earlier questions come back, newest first, to edit and send |
 
 ## Screens
 

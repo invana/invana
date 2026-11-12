@@ -52,6 +52,8 @@ flowchart LR
 | EX-21.10 | A Graph with no published model | the person opens the form | it says *Publish a model to edit this Graph's data* with *Open Model* |
 | EX-21.11 | An element whose type or key is not in the model | its panel opens | the key stays, tagged *not in the model*; the type can be changed to one the model has |
 | EX-21.12 | An Operator without *Can work on projects* | they apply an edit | it is marked on the board; saving it to the graph is disabled with *You can change this board, not the graph* |
+| EX-21.13 | A relationship open in Edit mode | the person looks for its type | the type is fixed, with *To change it, delete it and draw it again* |
+| EX-21.14 | A node open in the panel | it shows | where it came from shows under its properties — the load and the run that wrote it, each opening its page |
 
 ## Screens
 

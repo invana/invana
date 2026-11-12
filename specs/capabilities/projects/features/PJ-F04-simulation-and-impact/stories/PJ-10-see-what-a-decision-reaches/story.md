@@ -44,7 +44,7 @@ flowchart LR
 | PJ-10.3 | Impact | the member picks 1, 2 or 3 hops | each hop shows what the one before reached, less what was already reached, counted by type — *2 hops · 38 District* |
 | PJ-10.4 | Impact tracing | a hop is being read | it says which hop it is on, and earlier hops are drawn as they land |
 | PJ-10.5 | A reach cut by a bound | it is drawn | at most 12 records were expanded per hop, each to 50 neighbours, the most reached first, and it reads *More lies beyond* |
-| PJ-10.6 | A traced reach | it is read | the most reached records are listed with their type and hop, and *How sure* names how many of the starting findings a person reviewed and the origins of the datasets they cite |
+| PJ-10.6 | A traced reach | it is read | the most reached records are listed with their type and hop, and *How sure* names how many of the starting findings a person reviewed and the sources of the loads they cite — upload, CLI, API or by hand — and their licences |
 | PJ-10.7 | A type the Graph's view hides | impact is traced | it is never reached |
 | PJ-10.8 | The graph not connected, or a read refused | impact is traced | it says why, in the engine's words |
 | PJ-10.9 | A cited record gone from the graph | impact is traced | it counts at hop 0 and reaches nothing |

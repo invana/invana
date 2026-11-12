@@ -7,6 +7,7 @@ personas: []
 stories: [XX-01]
 journeys: []
 boards: []
+nfrs: []
 depends_on: []
 ---
 
@@ -81,11 +82,61 @@ What each state means across this feature's screens.
 |---|---|
 | | |
 
-## Data touched
+## Engine
 
-| Record | Read or write |
+The low-level design: what this feature stores, serves and refuses. Conventions — naming, errors, lists, events — are
+[system-design.md](../../../../system-design.md) §§ 6–8; this section only fills them in. A record another feature
+owns is linked under *Reads*, never copied.
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `xx_records` | `graph_id` · `key` · … | Unique, defaults, what derives from it |
+
+### Reads
+
+| Record | Owner |
 |---|---|
-| | |
+| | [XX-Fnn › Engine](…) |
+
+### Routes
+
+| Route, after `/api/v1/u/{u}/{g}/xx` | Does | Story |
+|---|---|---|
+| | | XX-01 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `xx.records.create` | |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 409 | | | XX-01.n |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| — | |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| | What is derived, ordered, counted or locked, and how |
+
+## System impact
+
+`None`, or:
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § n | | NFR-… |
 
 ## Decisions
 

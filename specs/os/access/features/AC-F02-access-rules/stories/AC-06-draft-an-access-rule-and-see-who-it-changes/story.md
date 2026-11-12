@@ -4,7 +4,7 @@ title: Draft an access rule and see who it changes
 feature: AC-F02
 status: idea
 personas: [owner]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-06 · Draft an access rule and see who it changes
@@ -63,6 +63,6 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A draft rule | Admin | settings.access · Draft with the assistant | — | settings.access · Drafting | settings.access · Draft | settings.access · Line refused | settings.access · Draft from the assistant | — |
-| A draft rule | Operator | — | — | — | shell.locked | — | — | shell.locked |
+| A draft rule | Operator | — | — | — | access.locked | — | — | access.locked |
 | Who it changes | Admin | — | — | settings.access · Working out who it changes | settings.access · Nobody loses | settings.access · Skills that would break | — | — |
-| Who it changes | Operator | — | — | — | — | — | — | shell.locked |
+| Who it changes | Operator | — | — | — | — | — | — | access.locked |

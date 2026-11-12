@@ -10,7 +10,7 @@ find what is wrong. How the team works around a review is `.claude/team/TEAM.md`
 
 ## Read
 
-The change (`git diff <base>...HEAD` or the commits named), the feature file it implements, its module `spec.md`, `CLAUDE.md`, and the standard the code is held to: the **`build-feature`** skill, and **`build-studio`** for Studio or kit code. When the feature has a spec in `specs/`, review against each story's `story.md` acceptance criteria and its `task.md`: a criterion with no code or no test is a FAIL; code that does more than the spec says is a finding; a coder task marked `done` whose evidence does not hold, or a criterion no coder task names, is a finding.
+The change (`git diff <base>...HEAD` or the commits named), the feature file it implements and its `## Engine`, the `specs/system-design.md` sections its `## System impact` names and the NFRs in its `nfrs:`, `CLAUDE.md`, and the standard the code is held to: the **`build-feature`** skill, and **`build-studio`** for Studio or kit code. When the feature has a spec in `specs/`, review against each story's `story.md` acceptance criteria and its `task.md`: a criterion with no code or no test is a FAIL; code that does more than the spec says is a finding; a coder task marked `done` whose evidence does not hold, or a criterion no coder task names, is a finding.
 
 ## Look for
 
@@ -19,6 +19,7 @@ The change (`git diff <base>...HEAD` or the commits named), the feature file it 
 | Access | an act the spec's Access table names but no role guards; a graph-scoped write route not mapped to its area; a refusal Studio does not draw; a new role or area nobody decided |
 | Correctness | bugs, unhandled seams the feature file names (empty, refused, read-only, no access), races, wrong status codes |
 | Scope | anything the index does not list, or a *Not building* row built |
+| Design | a table, column, route, status code or event not in the feature's `## Engine`, or one there that is missing; a refusal whose sentence or status differs from *Refusals*; a store, service, queue or outside call `system-design.md` does not name; an NFR in `nfrs:` whose *Enforced by* check is missing or failing |
 | Engine | sync code in async paths; a number computed at read time instead of stored when the fact settles; currency; a list off the list contract; a refusal that does not name its rule; a migration that would lose demo data |
 | Studio | UI not from `@invana/*`; hex, `hsl(`, `style={{}}`, hard-coded heights; a number derived in Studio; PixiJS; server state outside TanStack Query; a committed `link:` override |
 | Docs in code | decision ids in code or tests; long column comments; missing usage docstrings on modules, classes, methods |
@@ -30,7 +31,7 @@ The change (`git diff <base>...HEAD` or the commits named), the feature file it 
 ## Report
 
 When QA runs it, it is the *Pass 1 · Code* section of the story's QA report (`.agent-reports/qa/<ID>-qa.md`, or the
-runner's `reviews/<ID>-qa.md`), its rows in that report's one *Findings* table. Anyone else writes
+runner's `.agent-reports/qa/<project>-<ID>-qa.md`), its rows in that report's one *Findings* table. Anyone else writes
 `.agent-reports/<agent>/<ID>-code.md` in the shape of `.claude/team/TEAM.md` §3 *Reports*:
 line 1 exactly `RESULT: PASS` or `RESULT: FAIL`; a *Findings* table of severity (blocker · should-fix · note) · file:line ·
 what · how to fix; then *Requests*. PASS only with no blockers. Never edit any file but the report — code, tests or docs. What should be added —

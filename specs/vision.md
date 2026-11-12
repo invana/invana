@@ -25,7 +25,7 @@ evidence behind every answer. The person decides — agents think alongside, and
 | PyPI | `engine/pyproject.toml` | Positioning | — |
 | The package | `engine/src/invana/__init__.py` | Positioning | — |
 | `invana --help` | `engine/src/invana/cli/main.py` | Positioning | — |
-| The API description | `docs/api/openapi.yaml` | Positioning | — |
+| The API description | `engine/tests/golden/openapi.json` | — | — |
 | The team's instructions | `CLAUDE.md` · `.claude/team/TEAM.md` | Positioning | — |
 | Studio sign-in | `studio/packages/shell/src/pages/auth/LoginPage.tsx` | *Invana* | Tagline |
 | Studio Graphs list | — | *Invana Studio* | — |
@@ -58,10 +58,12 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 | Part | Is | Studio shows |
 |---|---|---|
 | **Models** | The kinds of node and relationship, and their properties | Model · Kind |
-| **Links between models** | Declared meetings of two models — the same entity, or a relationship across them | Link between models |
-| **Constraints** | A property's range with a unit, or a standard's values, on one kind | Constraint |
-| **Standards** | Shared, versioned terms and allowed values a dataset claims | Standard |
-| **Rules** | Statements that must always hold — on the install, a Graph or a project | Rule |
+| **Meaning** | What each kind and property means — definitions, synonyms, units, and the outside terms it is the same as | Meaning, a tab on a kind |
+| **Taxonomies** | Broader kinds, for meaning only, and hierarchies of a property's values | Broader kind |
+| **Standards** | Shared, versioned terms and allowed values a kind or property is held to | Standard |
+| **Links and mappings** | Declared meetings of two models, a model and a standard, or two standards | Link between models |
+| **Rules** | Constraints that refuse data, derivations that add facts, act rules on what people and agents do, and alerts — on the install, a Graph or a project | Rule · Constraint · Derivation |
+| **Derived facts** | Facts the derivations add by inference, each kept with its rule and premises | Derived |
 | **Views of the graph** | What agents may see when answering a question | A view of the graph |
 
 | It governs | How |
@@ -74,7 +76,7 @@ A Graph's ontology is what its data means and what may hold in it. It is not one
 
 | Decision | Detail |
 |---|---|
-| *Ontology* is a vision and docs word | Studio never names the Graph's own ontology; it shows its parts by their glossary words |
+| *Ontology*, *semantics* and *taxonomy* are vision and docs words | Studio never shows them; it shows the parts by their glossary words — *Meaning*, *Broader kind*, *Derivation*, *Rule*, *Standard* |
 | *From an ontology* stays on screen | There the word names an outside RDFS, OWL or schema.org file a model starts from — not the Graph's own ontology |
 
 ## The operating system
@@ -97,8 +99,8 @@ product — it is how Invana works, in every install. It enforces the ontology; 
 | **A scheduler** | Workers and the queue, with the runs a Graph may have going at once; Agents sets the schedules that feed it | Runtime |
 | **Resource limits** | Token budgets, and each Graph's limits set by the install | Runtime |
 | **Drivers** | Graph database connectors | Runtime |
-| **Extensions** | Plugins — tool, MCP and simulator plugins that add what agents can do | Runtime |
-| **Logs** | History, the change log and provenance — who did what, to which record, from which dataset | Access |
+| **Extensions** | Plugins — tool, MCP and simulator plugins that add what agents can do, and Domain packs | Runtime |
+| **Logs** | History, the change log and provenance — who did what, to which record, from which load | Access |
 | **A shell** | The frame — modes, crumbs, ⌘K — and the Inbox, where what needs a person waits | Graph |
 
 | Decision | Detail |
@@ -117,6 +119,7 @@ product — it is how Invana works, in every install. It enforces the ontology; 
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
 | **Acts only as far as the person allows** | Every act — a person's, an agent's or a key's — is Allow, Ask or Deny by the lines a person set; what no line reaches is denied, and the strictest line wins. An Ask waits for someone who holds Allow on it, showing exactly what will happen, and is never decided by the one it benefits; an agent's access change is never Allow ([Settings](os/access/product.md#decisions)) |
+| **General-purpose** | Nothing in the platform is domain-specific. A domain is its ontology, its agents and its project types, shipped together as a Domain pack |
 | **Split by persona** | An analyst never sees agent tuning; a builder never sees project branches ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
@@ -124,28 +127,28 @@ How these look on screen is [design-language.md](design-language.md); the words 
 
 ## Pillars and capabilities
 
-Invana is one platform. What it offers is three **pillars**; each holds the **capabilities** a person works in, and
+Invana is one platform. What it offers is four **pillars**; each holds the **capabilities** a person works in, and
 all of them run on [the operating system](#the-operating-system). How each looks in Studio is
 [design-language.md](design-language.md) §8.
 
 | Pillar | Promise | Capabilities |
 |---|---|---|
-| **Ontology** | Data that means one thing, checked before it lands | Model · Data · Datasets, later |
-| **Agents** | Agents that work the data into insight and do the work, only as far as people allow | Agents |
+| **Ontology** | Data that means one thing, published as one versioned contract | Semantics |
+| **Intelligence** | The facts gathered, checked against the contract and traceable to where each came from | Records |
+| **Agents** | Agents that work the facts into insight and do the work, only as far as people allow | Agents |
 | **Evidence** | Every answer shown with the records behind it — the person decides | Explore · Projects |
 
 | Code | Capability | Pillar | Tier | Lets a person |
 |---|---|---|---|---|
-| `MO` | [Model](capabilities/model/product.md) | Ontology | mode · sheet | Give the data meaning — models, links between models, views of the graph, rules |
-| `DA` | [Data](capabilities/data/product.md) | Ontology | modal · sheet | Know the Graph's records — by kind, against the model, fixed, traced and annotated |
-| `DS` | [Datasets](capabilities/datasets/product.md), later | Ontology | modal · sheet | Gather data across the install — datasets, versions, loads, standards and checks |
+| `SE` | [Semantics](capabilities/semantics/product.md) | Ontology | mode · sheet | Say what the data means — models, meaning, taxonomies, standards, links and mappings, rules, inference, views of the graph — drafted, reviewed and published |
+| `RC` | [Records](capabilities/records/product.md) | Intelligence | modal · sheet | Know the Graph's records and how each got there — loads, quality against the model, fixes, merges, provenance, annotations |
 | `AG` | [Agents](capabilities/agents/product.md) | Agents | modal · sheet | Build agents and skills, read their runs, schedule them |
-| `EX` | [Explore](capabilities/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, annotations, memory |
-| `PJ` | [Projects](capabilities/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports |
+| `EX` | [Explore](capabilities/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, memory |
+| `PJ` | [Projects](capabilities/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports, alerts |
 
 | Decision | Detail |
 |---|---|
-| One platform | Invana is offered whole. Pillars and capabilities are how it is explained, never sold apart; every install has all three pillars and the operating system |
+| One platform | Invana is offered whole. Pillars and capabilities are how it is explained, never sold apart; every install has all four pillars and the operating system |
 | Pillars group the capabilities; the operating system runs them | These are the only two groupings. A capability belongs to one pillar; the operating system belongs to none |
 | Decision intelligence is the category, evidence the difference | Invana shows the evidence and the person decides; it never decides for them |
 | A part of the operating system serves every capability | An ask, an access line, a limit or a way in that only one capability needs belongs to that capability |
@@ -157,7 +160,7 @@ The install defines and limits; a Graph uses.
 
 | Scope | Holds |
 |---|---|
-| **Install** | The dataset catalogue, standards, install-wide rules, the agents and skills catalogue, workers, AI models, plugins, each Graph's limits |
+| **Install** | Standards, Domain packs, install-wide rules, the agents and skills catalogue, workers, AI models, plugins, each Graph's limits |
 | **Graph** | Models, records, annotations, views of the graph, rules that must always hold, its members (people and agents), projects, runs |
 | **Project** | Branches, tasks, findings, decisions, project rules |
 
@@ -173,26 +176,25 @@ The same records host different kinds of work; none is a special case.
 
 | Use case | How it composes |
 |---|---|
-| **Curated context for AI** | Datasets and models linked into one picture an outside agent queries through a scoped token, with provenance on every row |
-| **Deep search and research** | A document-shaped model, datasets an extractor produces, and skills that recall prior records |
+| **Curated context for AI** | Models and their records linked into one picture an outside agent queries through a scoped token, with provenance on every value |
+| **Deep search and research** | A model of sources and claims, the rows an extractor loads into it, and skills that recall prior records |
 | **Analytics** | A metrics-and-dimensions model and projections: a closed question in, a table or chart out |
 | **Knowledge management** | Several models, linked, answered as one |
-| **Compliance and audit** | The append-only history, criteria checked per task, and provenance from every element back to its dataset |
+| **Compliance and audit** | The append-only history, criteria checked per task, and provenance from every value back to its load |
 | **Domain intelligence** | A model of the entities that matter, and agents staffed on a project working tasks against criteria |
 | **Domain memory** | The domain models its own memory as kinds; a planned recall step reads and cites prior records |
-| **Decisions under uncertainty** | A project's branches, findings for and against, simulations over pinned datasets, and a decision checked by the rules |
+| **Decisions under uncertainty** | A project's branches, findings for and against, simulations over pinned loads, and a decision checked by the rules |
 
 ## Not building
 
 | Item | Why not |
 |---|---|
-| An extractor — source connectors, cursors, a mapping grammar | Invana is a destination: whatever already pulls the data hands it over as a dataset that conforms to a model |
+| An extractor — source connectors, cursors, a mapping grammar | Invana is a destination: whatever already pulls the data hands it over as a load into a model |
 | Write-back to a source | The Graph is the destination, never the system of record upstream |
-| Fuzzy entity resolution · node merge on an anchor | Links between models are declared, never inferred; an anchor links, it never merges. Two records merge only when a person picks them ([Data](capabilities/data/product.md), later) |
+| Fuzzy entity resolution · node merge on an anchor | Links between models are declared, never inferred; an anchor links, it never merges. Two records merge only when a person picks them ([Records](capabilities/records/product.md)) |
 | Multi-tenancy · an Organisation record | One install is one organisation |
-| Proprietary datasets · pricing · a marketplace | Datasets are reusable knowledge first |
-| Provenance on every cell | Provenance is kept per dataset and per record; property changes live in the record's change log |
-| Soft deletes · a trash tier · undo | Deletes are hard and cascade downward; retire and retract exist where history must stay resolvable |
+| Proprietary data · pricing · a marketplace | Records, standards and Domain packs are reusable knowledge first |
+| Soft deletes · a trash tier · undo | Deletes are hard and cascade downward; retiring and undoing a load exist where history must stay resolvable |
 | Parameter sweeps · game theory | After 1.0. Simulation is a simulator plugin run on a project branch |
 | Authoring a plan by hand | Plans are generated from instructions or packaged with a plugin |
 | Criterion weights and waivers | A criterion is met, unmet or needs a person |

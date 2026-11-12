@@ -55,6 +55,8 @@ flowchart LR
 | AG-35.12 | Filters on Agents | none match | it reads *No agents match*, naming the filters, with *Clear filters* |
 | AG-35.13 | An Operator without *Can manage people* | they open Members | the graph's agents, their versions and what they did read; *Invite agent*, *Access*, *Pause*, *Remove* and *Take update* are disabled, with *Ask Priya (owner)* |
 | AG-35.14 | An agent's run in a graph | the person opens *How it got here* | its steps name the agent and the version that ran |
+| AG-35.15 | A catalogue agent's version | its row opens | how it did in each graph that runs it — runs, served, p95 and tokens a run — against the version before, as the engine stores them |
+| AG-35.16 | Agents | the person picks *Map* | every agent draws with the skills it holds and the functions they reach; a node opens its sheet |
 
 ## Screens
 
@@ -70,3 +72,5 @@ flowchart LR
 | Update available | Operator | — | — | — | settings.people · Update available | — | — | settings.people · Read only |
 | The agent in this graph | Admin | — | — | agents.agent · Loading | agents.agent · In this graph | agents.agent · Could not load | — | — |
 | The agent in this graph | Operator | — | — | agents.agent · Loading | agents.agent · In this graph | agents.agent · Could not load | — | agents.agent · Read only |
+| Agents — the map | Admin | agents · Map empty | — | agents · Loading | agents · Map | agents · Could not load | — | — |
+| Agents — the map | Operator | agents · Map empty | — | agents · Loading | agents · Map | agents · Could not load | — | — |

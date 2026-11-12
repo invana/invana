@@ -8,12 +8,25 @@ persona is a person's job — what they come to do. What they may do is their ac
 | Key | Persona | Comes to Invana to | Works mostly in | Usual access |
 |---|---|---|---|---|
 | `analyst` | **Analyst** | Ask the Graph questions, read answers, keep boards and share them | Explore | Operator |
-| `decision-maker` | **Decision maker** — a scientist, policy maker, investor, marketer or investigator | Pursue a question: fork it into branches, weigh findings for and against, decide with a trail | Projects | Can work on projects |
+| `decision-maker` | **Decision maker** — a policy maker, investor or marketer | Pursue a question: fork it into branches, weigh findings for and against, decide with a trail | Projects | Can work on projects |
 | `modeller` | **Modeller** — a modeller or compliance lead | Give the data meaning: models, links between models, views of the graph, rules that must always hold | Model | Can shape the model |
-| `curator` | **Data curator** — a researcher, curator or lab | Gather data that is reusable, labelled by origin and checked against standards | Data | Can shape the model |
+| `researcher` | **Researcher** — a scientist | Test hypotheses against the evidence, reproducibly: every finding cites the loads and records behind it, and a study can be rerun and cited | Projects · Explore | Can work on projects |
+| `investigator` | **Investigator** — fraud, crime or compliance | Work a case from its leads to a decision, every piece of evidence kept with its chain of custody — who brought it in, from which load, and who touched it | Projects · Explore | Can work on projects |
+| `curator` | **Data curator** — a curator or lab | Bring records in, check them against the model and its standards, fix and trace them | Records | Can shape the model |
 | `builder` | **Agent builder** | Build agents and skills, test them, read how they are doing | Agents | Can build agents · Admin |
 | `owner` | **Graph owner** | Create a Graph, connect its database, invite its people and agents, set its access rules | Settings › This graph | Owner · Can manage people |
 | `admin` | **Install admin** | Run the install: AI models, workers, plugins, each Graph's limits | Settings › Invana | Admin |
+
+## Names not used for a persona
+
+| Not a persona | Who it is | Why |
+|---|---|---|
+| User | **Analyst** | every persona is a user; the job is asking |
+| Data modeler | **Modeller**, or **Data curator** when the work is gathering data | two jobs, two personas |
+| Operator, as a job (*see what ran, what it touched, what it cost*) | **Agent builder** or **Install admin**, reading Runs | *Operator* is a lens — a member who can look and ask — never a job |
+| Evaluator | **Agent builder** | proving a skill change is not worse is part of building it; evals are behind *Can build agents* |
+| Admin, as *who may do what, everywhere* | **Graph owner** for a Graph's people and access · **Install admin** for the install | access is set per Graph; the install has no Graph admin |
+| Platform engineer | **Install admin** | running the install is one job |
 
 ## How someone arrives
 

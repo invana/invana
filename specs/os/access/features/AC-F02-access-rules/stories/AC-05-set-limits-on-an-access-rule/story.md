@@ -4,7 +4,7 @@ title: Set limits on an access rule
 feature: AC-F02
 status: idea
 personas: [owner, builder]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-05 · Set limits on an access rule
@@ -44,7 +44,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-05.1 | A rule | *Its limits* is read | each limit reads label · per · ceiling · used now · a meter: *Tokens* a month · *Tokens* a run · *Agents at once* · *Helpers* a run · *Helper depth* · *Worker time* an hour · *Workers it may use* — and whether it *May ask for more* |
-| AC-05.2 | Used now | it is shown | it is the engine's: tokens this month and a run's typical tokens over 30 days from finished runs, agents at once and helpers from running runs; Studio derives none |
+| AC-05.2 | Used now | it is shown | it is the engine's: tokens this month; a run's tokens as the 95th percentile over 30 days of finished runs (*used 41,200 p95 over 30 days*); agents at once; and helpers as the largest live tree, naming its run (*used 6 in #212*); Studio derives none |
 | AC-05.3 | A holder with several rules that set the same limit | a run is checked | the tightest ceiling binds |
 | AC-05.4 | An agent whose own setting is above a ceiling of a rule it holds | the setting is saved | it is refused, naming the rule and the ceiling |
 | AC-05.5 | A holder at its tokens-a-month ceiling | a new run would start | it is refused before it starts, naming the rule |
@@ -58,4 +58,4 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A rule — its limits | Admin | settings.access · No limit | — | settings.access · Loading | settings.access · Its limits | settings.access · Could not load | — | — |
-| A rule — its limits | Operator | shell.locked · No limit | — | shell.locked · Loading | shell.locked · Its limits | shell.locked · Could not load | — | shell.locked |
+| A rule — its limits | Operator | access.locked · No limit | — | access.locked · Loading | access.locked · Its limits | access.locked · Could not load | — | access.locked |

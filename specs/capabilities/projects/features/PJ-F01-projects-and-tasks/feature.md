@@ -7,6 +7,7 @@ personas: [decision-maker, analyst]
 stories: [PJ-01, PJ-02, PJ-12, PJ-15, PJ-18]
 journeys: [J03]
 boards: [projects.list, projects.new, projects.project, projects.task, projects.task.thinking, inbox]
+nfrs: [NFR-PERF-3]
 depends_on: [AG-F01, AG-F03, AG-F07]
 ---
 
@@ -62,7 +63,7 @@ flowchart TD
   person --> rv
   rv --> dec{"A person decides"}
   dec -->|Accept| done(["Done"])
-  dec -->|Reject, with a note| ag
+  dec -->|Send back, with a note| ag
 ```
 
 ```mermaid
@@ -71,7 +72,7 @@ sequenceDiagram
   participant E as Engine
   participant A as Agent
   actor D as Person who decides (Inbox)
-  P->>E: sets the project to Deny, Ask or Allow; may narrow one agent
+  P->>E: sets the project to Deny, Ask or Allow · may narrow one agent
   loop while a task is open
     A->>E: looks for an open task it may take
     alt Deny
@@ -87,7 +88,7 @@ sequenceDiagram
   E->>A: opens a run on behalf of the person who set the mode
   A-->>E: posts a result with its steps and sources
   E-->>P: the task reads In review
-  P->>E: Accept, or Reject with a note
+  P->>E: Accept, or Send back with a note
   E-->>P: How it got here opens the run behind the result
 ```
 
@@ -109,7 +110,7 @@ sequenceDiagram
 | Read a private project, its tasks, decisions and events | Only the people staffed on it, whatever their role; an Admin or Owner not staffed on it does not see it | The project is absent: not in a list, not in search, not in History, and a link reads as not found |
 | Create or edit a project, archive or unarchive it, staff it, change who can see it | `contributor` · shown as *Can work on projects* · Admin | Everything reads; each act is disabled, naming *Can work on projects* |
 | Write a task, assign it, start it, cancel it, draw or remove a dependency | *Can work on projects* · Admin | The task reads; each act is disabled, naming *Can work on projects* |
-| Accept or reject a task's result | *Can work on projects* · Admin — a person, never an agent | The result reads, with *How it got here*; *Accept* and *Reject* disabled, naming *Can work on projects* |
+| Accept or send back a task's result | *Can work on projects* · Admin — a person, never an agent | The result reads, with *How it got here*; *Accept* and *Send back* disabled, naming *Can work on projects* |
 | Set a project's pick-up mode and narrow an agent's | *Can work on projects* · Admin | The mode reads; the controls are disabled, naming *Can work on projects* |
 | Answer an agent's ask to start a task | A person staffed on the project who can work on projects | The ask reads, naming who it waits on |
 
@@ -130,9 +131,11 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | Flat projects | A project holds tasks and branches; it has no sub-projects. A project is a record: it never runs |
-| A task is one piece of work | It has a title, a body, a project or none, an assignee, a due date and an outcome. It may have sub-tasks, bounded when a run opens; an agent may make sub-tasks for its own parts |
+| A task is one piece of work | It has a title, a body, a project or none, an assignee, a due date and an outcome |
+| Sub-tasks | A task may have sub-tasks, to any depth for people. An agent may make sub-tasks for its own parts, bounded by its run's limits (RT-F04) — depth, count and tokens. Cancelling a task cancels every sub-task at every level. A parent reads *Blocked* while any sub-task is open. The engine counts each level and a rolled-up total |
+| Dependencies are between siblings | A dependency joins two tasks that share a parent (or two top-level tasks of one project); one across levels is refused, naming both |
 | A task has no progress of its own | Its state is read off its latest run: *Open* and *Assigned* when no run yet · *In progress* while a run is open · *Needs input* on an unanswered question · *Blocked* on an unmet dependency, a paused agent, an exhausted token budget or an open sub-task · *In review* when the run settled and nobody accepted · *Done*, *Failed*, *Cancelled* once closed |
-| Only a person accepts | Accepting or rejecting is the one thing written by hand. An agent posts a result and never accepts, and a judging run's verdict is not an acceptance |
+| Only a person accepts | Accepting or sending back is the one thing written by hand. An agent posts a result and never accepts, and a judging run's verdict is not an acceptance |
 | One assignee field | A person and an agent are both assignees; assigning to an agent opens exactly one run, on behalf of whoever assigned it |
 | Staffing is a default | On a Graph-visible project, being staffed only puts a person or an agent in the assignee picker. An unstaffed agent can still be assigned by any member who can work on projects |
 | Private projects | The people staffed on a private project are its access list. Per-project access sits on top of Graph roles: being on it never grants *Can work on projects*. A private project always has at least one person on it |
@@ -145,7 +148,9 @@ sequenceDiagram
 | The backend owns every number | Counts of tasks by state, a project's counts and the critical path come from the engine; Studio formats and never adds up |
 | Agent outcomes carry a trace | A task's result, a claim and a blocked reason open *How it got here* |
 | Projects own tasks | There is no Tasks place of its own: the Tasks list is under Projects; a task with no project is listed with all of them |
-| Leans on | Build an agent (AG-F01) · runs (AG-F03) · schedules (AG-F07) · the Inbox · the Graph's members and grants in Settings › People and access |
+| Project types | A project's type relabels Project and Task — and its branches, findings and decisions — inside the project only; shared places keep the generic words with the type as a badge ([PJ-F03 › Rules](../PJ-F03-branches-findings-and-decisions/feature.md#rules)) |
+| The project key | Generated from the name, URL-safe and unique in the Graph; editable only in *New project*; refused if taken, not URL-safe or reserved (`tasks`, `decisions`, `review`), naming why, with nothing saved. Afterwards a fact on Details, never editable |
+| Leans on | Build an agent (AG-F01) · runs (AG-F03) · schedules (AG-F07) · run limits (RT-F04) · project types from Domain packs (RT-F02) · the Inbox · the Graph's members and grants in Settings › People and access |
 
 ## Data touched
 
@@ -159,8 +164,132 @@ sequenceDiagram
 | Claims — task, agent, expires | Write · read |
 | The run each assigned or picked-up task opens (AG-F03) | Write · read |
 | Inbox asks to start a task | Write · read |
-| History rows of every project and task act, including accept and reject (AC-F06) | Write · read |
+| History rows of every project and task act, including accept and send back (AC-F06) | Write · read |
 | A project's summary — counts by state, critical path | Read |
+
+## Engine
+
+The low-level design: what this feature stores, serves and refuses. Conventions — naming, errors, lists, events — are
+[system-design.md](../../../../system-design.md) §§ 6–8; this section only fills them in.
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `projects` | `graph_id` · `key` · `name` · `description` (the purpose) · `question` · `type` · `status` (`active` · `archived`) · `visibility` (`graph` · `private`) · `created_by_kind` · `created_by_id` · `created_at` | Unique (`graph_id`, `key`). `type` is a key listed by `GET /api/v1/projects/types` |
+| `projects_assignments` | `project_id` · `principal_kind` (`user` · `agent`) · `principal_id` · `assigned_by_kind` · `assigned_by_id` · `assigned_at` | Staffing, and a private project's access list. The engine writes the creator's row in the same write that creates the project or makes it private |
+| `projects_tasks` | `graph_id` · `project_id?` · `parent_id?` (*part of*) · `branch_id?` · `title` · `body` (the intent an agent plans from) · `assignee_kind?` · `assignee_id?` · `created_by_kind` · `created_by_id` · `due_at?` · `lens_id?` · `result?` · `closed_at?` · `outcome?` (`done` · `failed` · `cancelled`) | No `status` column — the state is derived (Mechanisms). A null `project_id` is the Graph's *No project* bucket |
+| `projects_task_dependencies` | `task_id` · `depends_on_id` · `on` (`success` · `failure` · `any_outcome`) · `created_by_kind` · `created_by_id` | *After* — distinct from `parent_id` |
+| `projects_task_claims` | `task_id` (unique) · `agent_id` · `claimed_at` · `expires_at` | `expires_at` is `claimed_at` plus 30 minutes |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| Runs, their prompts (a clarification is `kind = clarification`), steps, and who writes each run field | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| Agents and whether one is paused or retired | [AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md#engine) |
+| Handing work to another agent — the same act as raising a task | [AG-F05](../../../agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine) |
+| Schedules — a schedule names an agent and instructions, not a project | [AG-F07](../../../agents/features/AG-F07-schedules/feature.md#engine) |
+| Pick-up modes — a line of an access rule, the project's and each agent's | [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
+| The ask to start a task, in Needs you | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) |
+| History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
+| Run limits — depth, count and tokens of an agent's sub-tasks | [RT-F04](../../../../os/runtime/features/RT-F04-limits/feature.md#engine) |
+| Project types a Domain pack installs | [RT-F02](../../../../os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md#engine) |
+| Branches a task is filed on · the summary's branch, finding and decision counts | [PJ-F03](../PJ-F03-branches-findings-and-decisions/feature.md#engine) |
+| Criterion outcomes an accept carries | [PJ-F02](../PJ-F02-objectives-and-review/feature.md#engine) |
+
+### Routes
+
+| Route, after `/api/v1/u/{u}/{g}/projects` | Does | Story |
+|---|---|---|
+| `GET /` · `POST /` | List the projects the reader may see · create one | PJ-01 · PJ-02 |
+| `GET /{key}` · `PATCH /{key}` | Read a project · edit its name, purpose and visibility, or archive and unarchive it (`status` `active` ⇄ `archived`) | PJ-01 · PJ-02 |
+| `GET /{key}/assignments` · `POST /{key}/assignments` · `DELETE /{key}/assignments/{principal}` | Who is on it · staff · unstaff | PJ-02 |
+| `GET /{key}/plan` | The derived order | PJ-18 |
+| `GET /{key}/summary` | The project's counts | PJ-01 · PJ-03 |
+| `GET /tasks` · `POST /tasks` | List tasks (`?project=`; none open is every task, the reader's first) · create one | PJ-12 |
+| `GET /tasks/{id}` · `PATCH /tasks/{id}` | Read a task · edit its title, body, assignee or due date — assigning an agent opens its run | PJ-12 |
+| `POST /tasks/{id}/start` | A person assigned to it starts it; no run opens | PJ-12 |
+| `POST /tasks/{id}/result` | A person posts a result | PJ-12 |
+| `POST /tasks/{id}/accept` · `POST /tasks/{id}/reject` | Accept · send back with a note — a person only | PJ-12 · PJ-17 |
+| `POST /tasks/{id}/cancel` | Cancel it and every sub-task below it | PJ-12 |
+| `GET /tasks/{id}/dependencies` · `POST /tasks/{id}/dependencies` · `DELETE /tasks/{id}/dependencies/{depends_on_id}` | What it waits on · draw · remove | PJ-18 |
+| `GET /tasks/{id}/activity` | Its History, one tree | PJ-12 |
+
+| Route, install-wide | Does | Story |
+|---|---|---|
+| `GET /api/v1/projects/types` | Every project type — built in, and each a Domain pack installs — with its labels, default rules, suggested agents and skills, and report template | PJ-02 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `projects.create` · `projects.update` | A project is created · its name, purpose or visibility changes |
+| `projects.archive` · `projects.unarchive` | Two acts, two History rows |
+| `projects.assignments.add` · `projects.assignments.remove` | Staffed · unstaffed |
+| `projects.tasks.created` · `assigned` · `started` · `result_posted` · `accepted` · `rejected` · `blocked` · `cancelled` | Each act on a task; `rejected` is a send-back, its note on the event |
+| `projects.tasks.dependencies.add` · `projects.tasks.dependencies.remove` | A dependency drawn · removed |
+| `projects.tasks.claimed` | An agent claims a task |
+| `projects.tasks.claim_lapsed` | A claim's lease passes with no run opened |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 404 | A private project the caller is not on — the project, its tasks, its order, its decisions or its events | *Not found.* | PJ-02.7 · PJ-12.21 |
+| 403 | A write by someone without *Can work on projects* | *This needs Can work on projects — ask {owner}.* | PJ-01.13 · PJ-02.15 · PJ-12.22 · PJ-15.16 · PJ-18.15 |
+| 403 | An agent accepts or sends back a result | *Only a person accepts or sends back a result.* | PJ-12.14 · PJ-17.16 |
+| 422 | A create with an empty question, a type neither built in nor installed by a Domain pack, or a person or agent that does not exist | *{field}: {why}.* | PJ-02.3 |
+| 422 | An edit that leaves the name empty | *A project needs a name.* | PJ-01.8 |
+| 409 | A key already used in the Graph | *The key `{key}` is taken in this graph.* | PJ-02.17 |
+| 422 | A key that is not URL-safe, or is `tasks`, `decisions` or `review` | *`{key}` cannot be a key — {why}.* | PJ-02.17 |
+| 422 | An edit that names the key | *A project's key is fixed once saved.* | PJ-02.18 |
+| 409 | Removing the last person from a private project | *A private project always has someone on it.* | PJ-02.11 |
+| 409 | Any write to an archived project or its tasks | *{project} is archived — unarchive it first.* | PJ-01.9 · PJ-12.19 |
+| 409 | Accept or send back a task not in review; start, cancel or post a result on a closed task | *{task} is {state} — {act} needs it {wanted}.* | API only — Studio offers each act only in its state |
+| 422 | A dependency that makes a loop | *That makes a loop: {a} → {b} → {a}.* | PJ-18.4 |
+| 422 | A dependency between tasks that do not share a parent | *{a} and {b} do not share a parent — a dependency joins tasks with the same parent.* | PJ-18.12 |
+| 422 | An agent's sub-task past its run's limits | *{limit} reached — {n} of {max}.* | PJ-12.28 |
+| 422 | An agent's pick-up mode wider than the project's | *The project allows less — {mode} at most.* | PJ-15.11 |
+| 409 | A claim on a task another agent holds | *{agent} holds this task until {time}.* | PJ-15.8 |
+| 403 | A claim the strictest pick-up line denies — the project's, the agent's own or a rule for everyone | *Pick-up on {project} does not let {agent} start work.* | PJ-15.3 · PJ-15.19 |
+| 409 | A claim by an agent that is paused or retired | *{agent} is {state} — it takes no work.* | PJ-15.12 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| — | No command of its own |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| `open` · `assigned` | No run yet — *assigned* when it has an assignee |
+| `in_progress` | A run is open, or a person assigned it pressed *Start* |
+| `needs_input` | That run has an unanswered prompt of `kind = clarification` |
+| `blocked` | An unmet dependency, a paused agent, an exhausted token budget, or an open sub-task at any level |
+| `review` | The run settled, or a person posted a result, after the last send-back, and `closed_at` is null |
+| `done` · `failed` · `cancelled` | `closed_at` set, with the `outcome`; a task whose latest run failed reads *failed* until a person acts |
+| One writer of `closed_at` | Accept and cancel write `closed_at` and `outcome`; a send-back writes neither and the task reads *assigned*, its note on `projects.tasks.rejected`. Every other state is read off the task's latest run. An evaluator run (`role = evaluate`) writes a verdict on its step, never `closed_at` |
+| `projects.tasks.create` | The agent function that raises a task from inside a run, in the run's project or none; handing work to another agent is the same function |
+| `projects.tasks.claim` | The agent function that claims an open task. It reads the strictest pick-up line for the agent on the project ([AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine)): *Allow* writes the claim and opens the run on behalf of the line's setter, `projects.tasks.claimed`; *Ask* raises *Start this task?* ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine)) and claims on *Start it*; *Deny* refuses |
+| A claim lapses | When `expires_at` passes with no run opened, the claim row is removed, `projects.tasks.claim_lapsed` is written and the task reads open |
+| History is one tree | Assembled from the event store and the run's nodes — never from trace ids, whose retention is days. A delegated child run nests under the step that opened it; the *on behalf of* line is written from the root run; skills are *offered* (a fact of the prompt) or *reported* (the model's claim) |
+| One filter hides it | `hidden_ids(graph_id, reader)` names the private projects a reader is not on — those whose `projects_assignments` lack the reader's principal. Project list and get, task list and get, the order, the decisions list, search and the Graph's event feed all apply it; agents read through their own principals |
+| Order | `GET /{key}/plan` derives, among siblings: `wave` (dependency hops from the start) · `blocked_by[]` (the unmet dependencies, named) · `critical_path` (the longest `on = success` chain). A parent waits on all its sub-tasks |
+| Task counts | `GET /tasks` returns `total` and `by_status` of the listed tasks — a status with none absent — for each level and rolled up |
+| Project counts | `GET /{key}/summary`: `branches` · `branches_by_status` · `findings` · `findings_reviewed` · `loads` (distinct loads its findings cite) · `records_saved` (derived records its simulations saved, by kind) · `tasks_by_status` · `tasks_open` · `tasks_open_for_agents` · `decisions` (superseded included) · `critical_path` — from the rows the lists read; a task of another project drawn on the order is not counted |
+| The creator's name | `created_by_name` on `GET /` and `GET /{key}`, resolved from `created_by_id` in one query for the whole list; *unknown* when the creator was removed. Studio never asks per row |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 6 Data and storage | Five tables in Invana's own store; no new store | — |
+| § 8 APIs and events | The routes and events above, under `projects`; `GET /api/v1/projects/types` is install-wide, outside a Graph | — |
+| § 10 AI and agents | Two agent functions: `projects.tasks.create` and `projects.tasks.claim`, the claim on a lease checked against the pick-up lines; only a person closes a task | — |
+| § 12 Qualities | Privacy: a private project is hidden by one filter on every read path | — |
 
 ## Decisions
 
@@ -173,20 +302,23 @@ sequenceDiagram
 | Archiving is reversible | *Unarchive* sits where *Archive* was; the state rides on the name as a muted *archived* badge, not inside the counts line |
 | The detail has no footer | Each act sits where its subject is: a task is written in Tasks, a dependency is drawn on the Order tab, archive is in Details |
 | Agents is not a tab | Who is on a project is answered by the strip of people and agents under its tasks |
-| New project is one modal | Type (the three launched types; the others drawn and switched off), question, name, objective, first branch, people and agents, who can see it; rules are written on Details after it exists |
+| New project is one modal | Type (Research · Investigation · Policy · General, and any a Domain pack adds), question, name, key, objective, first branch, people and agents, who can see it. The type's default rules, suggested agents and skills and report template are applied; more rules are written on Details after it exists |
 | The people picker names members | Other members and agents are offered by name; the creator is staffed by the engine and is not offered |
 | Admins are not exempt from a private project | Whoever should see it is put on it |
-| A reject keeps its note on the task | The thread is the record: people ask, agents answer, and a rejected result returns to *Assigned* with the note above it |
+| A send-back keeps its note on the task | The thread is the record: people ask, agents answer, and a result sent back returns to *Assigned* with the note above it |
 | Pick-up is set where the work is | By whoever can work on projects, on the project, with each staffed agent's narrower mode beside it |
 | Order has two kinds of edge | A dependency on success is sequence; one on failure is contingency; any outcome is a join |
+| Reserved keys are the routes beside a project | `tasks`, `decisions` and `review` sit beside `/{key}`, so no project takes them |
+| Pick-up is one agent function | An agent claims with `projects.tasks.claim`, which checks the pick-up lines; the claim and its lapse are History rows |
+| Project types are listed install-wide | `GET /api/v1/projects/types`, beside `simulators`, lists the built-in types and those Domain packs install; *New project* reads it |
 
 ## Open questions
 
 | Question | Who answers |
 |---|---|
-| Recurring work. The engine's recurring-task design makes a task template on a cron that creates a new task each firing. That is a second kind of schedule beside AG-F07, where a schedule names an agent and instructions and whether a run creates work is the run's business. Recommend: no task templates — a recurring task is an AG-F07 schedule whose run creates the task for a person; PJ-18 keeps dependencies with conditions only. The template, its overlap policy and its title placeholders stay in the engine document, unmoved | Ravi |
+| Recurring work. The engine's recurring-task design makes a task template on a cron that creates a new task each firing. That is a second kind of schedule beside AG-F07, where a schedule names an agent and instructions and whether a run creates work is the run's business. Recommend: no task templates — a recurring task is an AG-F07 schedule whose run creates the task for a person; PJ-18 keeps dependencies with conditions only. If templates are taken up instead, they are an AG-F07 story: a template (title with placeholders such as *Trade day {date}*, body, project, assignee, criteria) on a cron; each firing creates a new task, never reopens one; an overlap policy *skip · queue · allow*; a skipped firing recorded with its reason; a person still accepts. Its seams: an instance still open at the next firing — the overlap policy decides, and the firing is listed either way · the recurrence paused — instances already made are untouched · the template edited — future instances only · a cron that would fire in the past — refused at save, naming the next valid time | Ravi |
 | Pick-up is set by the project's owner in the earlier plan, but a project has no owner other than its creator. Recommend: whoever can work on projects, as written here | Ravi |
-| A rejected result: the engine design says the note becomes a new task and the original returns to *Assigned*; this spec keeps the note on the same task, as a thread. Recommend: the same task, so the history of one piece of work stays in one place | Ravi |
+| A result sent back: the engine design says the note becomes a new task and the original returns to *Assigned*; this spec keeps the note on the same task, as a thread. Recommend: the same task, so the history of one piece of work stays in one place | Ravi |
 | Staffing other people from Studio: the product plan says it cannot be done yet, the private-projects design says the picker offers members by name. This spec follows the second. Recommend: confirm | Ravi |
 
 ## Not building
@@ -194,6 +326,8 @@ sequenceDiagram
 | Item | Why not |
 |---|---|
 | Sub-projects | Branches carry the forks |
+| Dependencies across levels of sub-tasks | Order is derived among siblings; a cross-level edge makes the derivation ambiguous |
+| Renaming a project key | Links and citations resolve by key; the key is fixed once saved |
 | Per-project roles | Graph roles cover the writes; a private project only narrows who sees it |
 | Sharing a private project read-only | Put the person on it |
 | A swimlane board per assignee | The Order answers "what is next" better |
@@ -203,3 +337,4 @@ sequenceDiagram
 | An agent accepting its own work | Only a person accepts |
 | Auto-retry of a failed task | A task that waits on failure is the escalation |
 | Recurring questions creating tasks | A schedule delivers answers; creating work is a plan's business |
+| Complex calendars for recurring work — business days, holidays, exceptions | Calendar-aware scheduling is not built ([AG-F07 › Not building](../../../agents/features/AG-F07-schedules/feature.md#not-building)) |

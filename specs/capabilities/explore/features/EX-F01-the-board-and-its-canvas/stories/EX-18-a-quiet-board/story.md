@@ -51,6 +51,7 @@ flowchart LR
 | EX-18.8 | No board open | the person opens Explore | the board is one question box, *What do you want to know about airways?*, with their kept boards under it — never a blank grid |
 | EX-18.9 | The board is slow to draw a large answer | the solve runs past 400 ms | the footer counts it and one toast says the graph appears when it settles, with *Cancel* |
 | EX-18.10 | An Operator | they open every menu | every look and arrange item works; an item that needs a grant is disabled with its reason |
+| EX-18.11 | An answer of 100,000 nodes | it draws | the count shows first, and pan and zoom keep answering while it draws |
 
 ## Screens
 

@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Create a skill, name it, say what it is and when to use it, choose guided or planned, keep files beside its instructions | — |
-| Operator | Read every skill, its versions and the functions it uses | *New skill* disabled, naming *Can build agents* — *Ask Priya (owner)*. With *Can build agents*: as Admin |
+| Admin | Create a skill, name it, say what it is and when to use it, choose guided or planned, keep files beside its instructions, delete a skill that never published | — |
+| Operator | Read every skill, its versions and the functions it uses | *New skill* and *Delete* disabled, naming *Can build agents* — *Ask Priya (owner)*. With *Can build agents*: as Admin |
 
 ## Flow
 
@@ -40,6 +40,9 @@ flowchart LR
   i -->|no when to use| wx["Publish refused, naming the field"]
   i --> p(["Published version 1 — offered to the agents it is added to"])
   s -->|cannot build agents| ro["Reads; New skill disabled — Ask Priya (owner)"]
+  sh -->|Delete| dl{"Ever published, or ships?"}
+  dl -->|no| gone(["Deleted — taken off its agents, in History"])
+  dl -->|yes| dx["Refused — Remove it from its agents"]
 ```
 
 ## Acceptance criteria
@@ -57,11 +60,14 @@ flowchart LR
 | AG-37.9 | A file in `references/` | a step that needs it runs | it is given to that step as context; it is never drawn as a step |
 | AG-37.10 | A line that needs a library | the plan is drawn | it maps only to a function an Admin approved (AG-40); until then the line is flagged and publishing waits |
 | AG-37.11 | The skills that ship with Invana | Skills opens in any graph | *Answer in natural language* is listed and cannot be removed; a builder may publish a new version over it |
-| AG-37.12 | Instructions that draw no step | the draft is drawn | it says a playbook with no steps is a rule, and offers to move it to the graph's rules (MO-F06) |
+| AG-37.12 | Instructions that draw no step | the draft is drawn | it says a playbook with no steps is a rule, and offers to move it to the graph's rules (SE-F07) |
 | AG-37.13 | A published skill | its sheet opens | *Functions it needs* lists every function its plan calls, with its bound, read from the plan |
 | AG-37.14 | An Operator without *Can build agents* | they open Skills or a skill | everything reads; *New skill* and every write are disabled, naming *Can build agents*, with *Ask Priya (owner)* |
 | AG-37.15 | A file in `scripts/` | the draft is saved | it runs unchanged, and only once an Admin approved its exact content (RT-F06); until then it reads *Waiting for an Admin* and a skill that calls it does not publish |
 | AG-37.16 | A new skill | it opens | it is *Planned*; the builder may switch it to *Guided*, and the choice is written under `metadata:` in `SKILL.md` |
+| AG-37.17 | A plugin that ships skills | Skills opens in any graph | each of its skills is listed as one that ships with Invana, its instructions as the plugin wrote them and its plan not drawn until a builder draws it; it cannot be removed, and a builder may publish a new version over it |
+| AG-37.18 | A skill that never published | the builder deletes it | the skill, its draft and its plan go, it is taken off every agent it was added to, and History records who deleted it |
+| AG-37.19 | A skill with a published version, or one that ships | anyone deletes it | it is refused — runs name its versions — with *Remove it from its agents* opening its Agents tab; nothing is deleted |
 
 ## Screens
 
@@ -75,5 +81,7 @@ flowchart LR
 | Guided or planned | Operator | agents.skill · Read only | — | — | agents.skill · Guided | — | agents.skill · Drawing | agents.skill · Read only |
 | A skill's head and versions | Admin | agents.skill · New draft | — | agents.skill · Loading | agents.skill | agents.skill · Could not load | — | — |
 | A skill's head and versions | Operator | agents.skill · Read only | — | agents.skill · Loading | agents.skill · Read only | agents.skill · Could not load | — | agents.skill · Read only |
+| Delete a skill | Admin | — | — | — | agents.skill · Delete | agents.skill · Delete refused | — | — |
+| Delete a skill | Operator | — | — | — | — | — | — | agents.skill · Read only |
 | Not a skill — a rule | Admin | — | — | — | agents.skill · No steps | — | — | — |
 | Not a skill — a rule | Operator | — | — | — | agents.skill · Read only | — | — | agents.skill · Read only |

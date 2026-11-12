@@ -37,7 +37,9 @@ flowchart TD
   c -->|any outcome| oa["Runs when the first ends either way"]
   os --> chk
   of --> chk
-  oa --> chk{"Makes a loop?"}
+  oa --> sib{"Same parent?"}
+  sib -->|no| rsib["Refused, naming both tasks · nothing saved"]
+  sib -->|yes| chk{"Makes a loop?"}
   chk -->|yes| ref["Refused, naming the loop · nothing saved"]
   chk -->|no| ok["Saved · waves, waits and the critical path recomputed"]
   ok --> st{"The first task ends"}
@@ -61,7 +63,8 @@ flowchart TD
 | PJ-18.9 | A task whose dependency is *any outcome* | the first task ends in any state | the dependent task is free to run |
 | PJ-18.10 | A dependency *on failure* | the Order tab is drawn | its edge is dashed and the critical path ignores it |
 | PJ-18.11 | The Order | waves, waits and the critical path are drawn | each is the engine's derivation; nobody types an order, and no order can be set by hand |
-| PJ-18.12 | A task from another project drawn on the Order tab | the project's counts are read | it is drawn but is not counted as this project's work |
+| PJ-18.12 | Two tasks that do not share a parent — one a sub-task of the other, at different levels, or in different projects | a dependency between them is saved | it is refused, naming both tasks and that a dependency joins tasks with the same parent; nothing is saved |
+| PJ-18.16 | Sub-tasks of one parent | its Order is read | they order among themselves in waves of their own, and the parent waits on them all |
 | PJ-18.13 | A dependency | a member who can work on projects removes it | the waves, waits and critical path are recomputed, and History records it |
 | PJ-18.14 | A task blocked or never triggered | the person opens its run history | *How it got here* shows which dependency, which outcome and which condition decided it |
 | PJ-18.15 | An Operator | they open the Order tab | it reads; *Draw a dependency* and *Remove* are disabled, naming *Can work on projects* |

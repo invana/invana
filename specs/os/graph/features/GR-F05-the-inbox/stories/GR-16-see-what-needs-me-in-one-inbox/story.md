@@ -55,7 +55,7 @@ flowchart LR
 | GR-16.11 | Studio open on any screen | a new ask or question for the reader arrives | a toast names it with *Review*, which opens it in the Inbox; an update never toasts |
 | GR-16.12 | The Inbox opening | its lists are still loading | it opens at once, rows loading in place, the count the last one read |
 | GR-16.13 | The engine cannot read the Inbox | it opens | it says what it could not read, with *Try again* |
-| GR-16.14 | A row | its product is shown | it is where the thing lives — an import Data's, a task's run Projects', a link between models Model's, a typed query Explore's, any other agent run Agents' |
+| GR-16.14 | A row | its product is shown | it is where the thing lives — a load Records', a task's run Projects', a link between models Model's, a typed query Explore's, any other agent run Agents' |
 | GR-16.15 | An event on a private project | a rule matches it | only that project's people are told |
 | GR-16.16 | An Operator | they open the Inbox | they read their own items; acts they may not take are disabled with their reason |
 

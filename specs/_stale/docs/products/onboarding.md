@@ -1,3 +1,0 @@
-# Graph onboarding — from a new Graph to a first answer
-
-Product spec: [GR-F02 · Create a graph](../../specs/os/graph/features/GR-F02-create-a-graph/feature.md) — GR-06 (runs a graph database already) · GR-07 (has files, empty database) · GR-04 (what is left before it answers); first run is [GR-02](../../specs/os/graph/features/GR-F01-open-a-graph/stories/GR-02-start-an-empty-install-from-a-question/story.md); the whole path is [J01](../../specs/journeys/J01-from-an-empty-install-to-a-first-answer.md), and joining a Graph someone set up is [J05](../../specs/journeys/J05-join-a-graph-someone-set-up.md). Every section of this file moved there.

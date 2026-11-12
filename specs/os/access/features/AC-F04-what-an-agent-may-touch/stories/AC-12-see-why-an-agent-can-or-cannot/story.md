@@ -4,7 +4,7 @@ title: See why an agent can or cannot
 feature: AC-F04
 status: idea
 personas: [owner, builder]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-12 · See why an agent can or cannot
@@ -65,8 +65,8 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Agents — the list | Admin | settings.access · No agents yet | settings.access · Nothing matches | settings.access · Loading | settings.access · Agents | settings.access · Could not load | — | — |
-| Agents — the list | Operator | shell.locked · No agents yet | shell.locked · Nothing matches | shell.locked · Loading | shell.locked · Agents | shell.locked · Could not load | — | shell.locked · Agents |
+| Agents — the list | Operator | access.locked · No agents yet | access.locked · Nothing matches | access.locked · Loading | access.locked · Agents | access.locked · Could not load | — | access.locked · Agents |
 | An agent — what it can do | Admin | settings.access · Holds no access rule | — | settings.access · Loading | settings.access · What it can do | settings.access · Could not load | — | — |
-| An agent — what it can do | Operator | shell.locked · Holds no access rule | — | shell.locked · Loading | shell.locked · What it can do | shell.locked · Could not load | — | shell.locked · What it can do |
+| An agent — what it can do | Operator | access.locked · Holds no access rule | — | access.locked · Loading | access.locked · What it can do | access.locked · Could not load | — | access.locked · What it can do |
 | An agent — refusals | Admin | settings.access · No refusals | — | settings.access · Loading | settings.access · Refusals | settings.access · Could not load | — | — |
-| An agent — refusals | Operator | shell.locked · No refusals | — | shell.locked · Loading | shell.locked · Refusals | shell.locked · Could not load | — | shell.locked · Refusals |
+| An agent — refusals | Operator | access.locked · No refusals | — | access.locked · Loading | access.locked · Refusals | access.locked · Could not load | — | access.locked · Refusals |

@@ -51,23 +51,23 @@ end when they lack access does not know whom to ask; and an ask or an update nob
 
 | Surface | Tier | Board |
 |---|---|---|
-| Home, no Graph open | page | `start.home` |
-| The Graph picker | peek | `start.graph_picker` |
-| Create a graph | modal | `start.new_graph` · `start.new_graph.connect` · `start.new_graph.files` · `start.new_graph.shape` · `start.new_graph.invite` · `start.new_graph.ready` |
-| ⌘K | modal | `shell.command` |
+| Home, no Graph open | page | `graphs.home` |
+| The Graph picker | peek | `graphs.graph_picker` |
+| Create a graph | modal | `graphs.new_graph` · `graphs.new_graph.connect` · `graphs.new_graph.files` · `graphs.new_graph.shape` · `graphs.new_graph.invite` · `graphs.new_graph.ready` |
+| ⌘K | modal | `graphs.command` |
 | This graph — people, usage | modal | `settings.people` · `settings.usage` |
 | Inbox — Needs you · Updates · Running · Done | modal | `inbox` |
 | Settings › Notifications — rules and channels | modal | `settings.notifications` |
-| No access | every surface | `shell.locked` — the act reads *Ask Priya (owner)* |
+| No access | every surface | `access.locked` — the act reads *Ask Priya (owner)* |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| Three modes, summoned overlays | Explore, Model and Projects are modes named in the wordmark; Data, Agents, Inbox and Settings are summoned over the work; there is no launcher |
+| Three modes, summoned overlays | Explore, Model and Projects are modes named in the wordmark; Records, Agents, Inbox and Settings are summoned over the work; there is no launcher |
 | Every overlay has a URL | It survives a reload and can be shared |
 | One modal for creating a Graph | Its steps stay in one modal with a step strip; the model is shaped in its third step |
-| Tokens, never currency | Every budget, limit, usage figure and alert is in tokens |
+| Tokens, never currency | Every budget, limit, usage figure and alert is in tokens ([glossary › Token budget](../../glossary.md#what-may-happen)) |
 | Nothing autosaves in an editor | An editor buffers, says how many changes are unsaved, and commits on one Save |
 | A pulsing dot means running | A still amber dot means waiting on a person; one glyph for both would hide who acts next |
 | Three parts | *This graph* (the open Graph) · *Invana* (the install, Admin only) · *You* (the person's own account) |
@@ -81,7 +81,7 @@ The layout, overlays and states are [design-language.md](../../design-language.m
 | Product or capability | For |
 |---|---|
 | Access | Signing in, and who may open a Graph |
-| Model · Data | Shaping the model and loading data while creating a Graph |
+| Semantics · Records | Shaping the model and loading records while creating a Graph |
 | Agents | The runs Inbox › Running reads (AG-F03) |
 | Projects | Project work in Needs you (PJ-F02) |
 

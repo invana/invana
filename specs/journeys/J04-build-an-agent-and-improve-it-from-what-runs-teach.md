@@ -2,7 +2,7 @@
 id: J04
 title: Build an agent and improve it from what runs teach
 personas: [builder]
-stories: [AG-19, AG-20, AG-26, AG-21, AG-36, AG-42, AC-15, AG-22, EX-29, EX-31, EX-32, AG-43]
+stories: [AG-19, AG-20, AG-26, AG-21, AG-36, AG-42, GR-16, AC-15, AG-22, EX-29, EX-31, EX-32, AG-43]
 boards: [agents.skill, agents.skills, agents.new, agents.agent, agents.schedules, agents.runs, agents.run, inbox]
 ---
 
@@ -26,7 +26,7 @@ flowchart TD
   G --> H{"A firing"}
   H -->|skipped or missed| H1["Kept with why"]
   H -->|runs| I{"Wants to send outside?"}
-  I -->|yes| J["AC-15 · Asks in the Inbox"]
+  I -->|yes| J["AC-15 · GR-16 · Asks in the Inbox"]
   J -->|Send it| K
   J -->|Not this time| K1["Nothing sent"]
   I -->|no| K["AG-22 · Read how the agent is doing"]
@@ -47,7 +47,7 @@ flowchart TD
 | 3 | Let the assistant draft the agent; see what it will do | Agents · new agent | AG-26 · AG-21 | `agents.new` |
 | 4 | Test the agent and publish a version | Agents · agent sheet | AG-36 | `agents.agent` |
 | 5 | Put the work on a schedule | Agents · Schedules | AG-42 | `agents.schedules` |
-| 6 | Decide what it asks before sending | Inbox · Needs you | AC-15 | `inbox` |
+| 6 | Decide what it asks before sending | Graph · Inbox · Needs you | AC-15 · GR-16 | `inbox` |
 | 7 | Read how it is doing | Agents · Runs | AG-22 | `agents.runs` |
 | 8 | Accept or decline a change its runs suggest | Explore · memory · Agents · run | EX-29 · EX-31 · EX-32 · AG-43 | `agents.run` |
 

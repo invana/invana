@@ -39,7 +39,7 @@ Compare meaning, not pixels: prototype data is illustrative.
 ## Report
 
 When QA runs it, it is the *Pass 2 · Design* section of the story's QA report (`.agent-reports/qa/<ID>-qa.md`, or the
-runner's `reviews/<ID>-qa.md`): add the section and your *Findings* rows, and set line 1 for both passes. Anyone else
+runner's `.agent-reports/qa/<project>-<ID>-qa.md`): add the section and your *Findings* rows, and set line 1 for both passes. Anyone else
 writes `.agent-reports/<agent>/<ID>-design.md` in the shape of `.claude/team/TEAM.md` §3 *Reports*:
 line 1 exactly `RESULT: PASS` or `RESULT: FAIL`; a *Findings* table of severity (blocker · should-fix · note) · board ·
 what · how to fix; then *Requests*. PASS only with no blockers. Never edit any file but the report — code, tests or docs. What should be added —

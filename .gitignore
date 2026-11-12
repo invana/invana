@@ -97,3 +97,6 @@ skills-lock.json
 
 # Live session status for the project dashboard (hooks write it)
 .claude/team/.live/
+
+# The spec graph — a parse of specs/**/*.md (check.py --graph), never edited or committed
+/specs-graph.json

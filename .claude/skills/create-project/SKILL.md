@@ -63,6 +63,7 @@ product-manager, code and tests for the coder.
 | Ordered by Needs | A phase starts only when every phase it needs is `done` |
 | Done when is checkable | A reviewer, or a gate, can say yes or no to it |
 | First phase is cheap | When the shape is uncertain, P01 is an inventory or a report Ravi approves before anything is changed |
+| One owner per design section | A phase that changes `specs/system-design.md` names the sections it edits in *Lands*; no two phases that can run together edit the same section |
 
 ## 4. Show the plan
 

@@ -61,7 +61,7 @@ failures*: a JSON list, in this folder, of e2e or knip items that already failed
 |---|---|
 | Agent | coder |
 | Read | <docs and specs the session reads> |
-| Stories | <story IDs it delivers (`MO-17 · MO-18`) — the agent adds and works its role's tasks in each `task.md`; — for a phase with no story> |
+| Stories | <story IDs it delivers (`RC-08 · RC-09`) — the agent adds and works its role's tasks in each `task.md`; — for a phase with no story> |
 | Done when | <the observable result — what a reviewer checks> |
 | Lands | <files, routes or surfaces it adds or changes> |
 | Boards | <board names it implements, or —> |

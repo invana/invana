@@ -50,6 +50,9 @@ flowchart TD
 | RT-09.8 | An Admin | they revoke a join key | no new worker joins with it; joined workers keep running |
 | RT-09.9 | Every number on Workers | it is read | it is the engine's, stored every 30 s; a change against last week reads `—` when nothing was measured |
 | RT-09.10 | An Operator | they open Workers | everything reads; *Drain* and *Revoke* are disabled — *Install admins add and scale workers* |
+| RT-09.11 | An Admin | they drain a worker group | every worker in it takes no new work, finishes what it holds, then stops; History records who and when (AC-F06) |
+| RT-09.12 | A member | they read a group's changes | every join, loss, drain, revoke and change to the group reads newest first, with who or what caused it and why |
+| RT-09.13 | A lost worker | it heartbeats again | it reads busy or idle again; the steps already handed on are not run a second time |
 
 ## Screens
 

@@ -4,7 +4,7 @@ title: Test whether someone can do something
 feature: AC-F02
 status: idea
 personas: [owner, builder, analyst]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-08 · Test whether someone can do something
@@ -45,10 +45,11 @@ flowchart LR
 | AC-08.6 | Who, does or to missing | the check is read | it waits for them and runs nothing |
 | AC-08.7 | An Operator | they test anyone | it works as for someone who can manage people |
 | AC-08.8 | A check that could not run | it is read | it says why, with *Try again* |
+| AC-08.9 | A filled check | its link is copied | the address carries `dialog=test` with `who` (`<kind>:<id>`), `by`, `does`, `to` and the view of the graph's id; a minted key's secret has no such link, since minting writes |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Can someone do this? | Admin | settings.access · Ask a check | — | settings.access · Checking | settings.access · No, names the rule | settings.access · Could not check | — | — |
-| Can someone do this? | Operator | shell.locked · Ask a check | — | shell.locked · Checking | shell.locked · No, names the rule | shell.locked · Could not check | — | — |
+| Can someone do this? | Operator | access.locked · Ask a check | — | access.locked · Checking | access.locked · No, names the rule | access.locked · Could not check | — | — |

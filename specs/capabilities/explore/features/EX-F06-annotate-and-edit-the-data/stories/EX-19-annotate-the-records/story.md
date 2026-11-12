@@ -13,7 +13,7 @@ boards: [explore.board.annotate]
 and see what others and the assistant noted on them **so that** whoever loads those records next sees what the data
 says, and a walkthrough can point at it.
 
-Tasks: [task.md](task.md) · Feature: [EX-F06](../../feature.md)
+Tasks: [task.md](task.md) · Feature: [EX-F06](../../feature.md) · What an annotation is and who may change it: [RC-F07](../../../../../records/features/RC-F07-annotations/feature.md)
 
 ## Who can
 
@@ -59,6 +59,12 @@ flowchart LR
 | EX-19.12 | Someone else's annotation | the person selects it | its author's initials show and delete is off with *Only Priya Nair can delete it* |
 | EX-19.13 | Saving an annotation fails | the engine refuses | the card keeps its text and says *Could not save · Try again* |
 | EX-19.14 | An Operator without *Can work on projects* | they open the mode picker | Annotate is off with *You can view annotations — Ask Priya (owner) to annotate*; every annotation still shows |
+| EX-19.15 | The Annotations panel | the person picks *From* | it lists this conversation's annotations, adds the Graph's, or shows every conversation's the person may read |
+| EX-19.16 | An annotation selected by its author | they change its colour | they pick one of amber · blue · green · red · grey; a new annotation is amber, a group blue |
+| EX-19.17 | Someone else's annotation | the person tries to change its text | it is read-only with *Only Priya Nair can change it* |
+| EX-19.18 | An assistant's annotation still in another member's conversation | someone else lists or opens annotations | it is not there — never shown as forbidden |
+| EX-19.19 | A new annotation with no text, or a value annotation with no value picked | the person leaves it | it is refused saying what is missing |
+| EX-19.20 | An annotation whose records are not on this board | the person picks *Load* on it in the panel | its records draw onto the board, framed |
 
 ## Screens
 

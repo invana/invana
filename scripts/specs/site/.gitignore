@@ -1,0 +1,4 @@
+# Build output and the site's own environment — never source.
+build/
+.venv/
+.cache/

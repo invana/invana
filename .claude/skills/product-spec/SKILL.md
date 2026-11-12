@@ -15,6 +15,7 @@ The procedure the **product manager** follows — only the product manager (or R
 | `specs/glossary.md` · `personas.md` | The words a person reads on screen; who the stories are for |
 | `specs/design-language.md` | How surfaces behave: modes, peek · modal · sheet, the assistant |
 | `specs/vision.md` · `.claude/team/TEAM.md` §0 · §7 | What Invana is; how every role builds to it; the access model — Admin and Operator |
+| `specs/system-design.md` · the `system-design` skill | The high-level design and the NFRs; how a feature's `## Engine` and `## System impact` are written |
 | `specs/migrations.md` | Agreed changes not yet made |
 
 ## 0. Journey first
@@ -50,7 +51,8 @@ Ask only what the specs and the code cannot answer, **in one batch** — the que
 | Scope | What is in, and what is deliberately out? Which product owns it — or is it a new product? |
 | Access | What can an **Admin** do, and an **Operator**? What does the Operator see otherwise — hidden, disabled with its reason, or *Ask <owner>*? Does a grant (*Can work on projects · Can build agents · Can shape the model*) change it? Is any act new to the access model? |
 | States | First use · empty after a filter · loading · has data · failed · agent working or proposing · no access — which apply, and what does each show? |
-| Data | Which records does it read or write? Is any of that new to the engine? |
+| Data | Which records does it read or write? Which feature owns each? Is any of that new to the engine? |
+| System impact | Does it add a store, a service, a queue, a worker kind, an outside system or an agent mechanism? Which NFRs does it touch — latency, scale, tokens, availability, security, privacy, accessibility? (the `system-design` skill §2) |
 | Overlap | Does an existing story already cover it? Does it contradict a recorded decision? |
 | Order | What blocks it? Which journey does it join? |
 
@@ -62,7 +64,7 @@ say so in the report.
 | Breaks | Example |
 |---|---|
 | A criterion of a story at `designed` or later changes | *Load data* requires a draft instead of a published kind |
-| A story is removed or merged, or an ID retired | Folding MO-18 into MO-17 |
+| A story is removed or merged, or an ID retired | Folding RC-09 into RC-08 |
 | A recorded decision is reversed or narrowed | *Agents ask before sending* becomes *agents send* |
 | A feature moves between products | Imports from Data into Modeller |
 | A glossary word changes | *Access rule* becomes *Policy* on screen |
@@ -75,7 +77,7 @@ retired story keeps its ID in the feature's *Not building* table with the reason
 
 | Thing | How |
 |---|---|
-| A product | `products/<slug>/product.md` from the template; a new, unique two-letter code. What every product uses, and no person comes to as a place of work, is foundation: `foundation/<slug>/product.md`, same template |
+| A product | `capabilities/<slug>/product.md` from the template; a new, unique two-letter code. What every product uses, and no person comes to as a place of work, is the operating system: `os/<slug>/product.md`, same template |
 | A feature | `<area>/<product>/features/<CODE>-F<nn>-<slug>/feature.md`; the next free number; a row in `product.md` › Features. Its summary names the decision it helps make |
 | The user journey | `## User journey` first: a mermaid `flowchart` from where the person starts to where they end, every story's step labelled with its ID, every branch (no access, failed, refused, asks permission). A `sequenceDiagram` too when an agent, a background run or a permission ask is involved. Draw it before the stories — the stories are its steps written down |
 | A user story | A folder `stories/<CODE>-<nn>-<slug>/` in its feature: `story.md` from the template, complete on its own — the designer's whole brief for the story's canvas page, and the coder's and QA's for the build. Five parts, in order (below); its status in the front-matter. A row in the feature's `## Stories` table and its `stories:` key |
@@ -83,7 +85,9 @@ retired story keeps its ID in the feature's *Not building* table with the reason
 | Access | `## Access`: each act → the role that may do it in code, and what everyone else sees. Every story's *Who can* agrees with it |
 | States | `## States`: what each of the seven states means across the feature |
 | A journey | `journeys/J<nn>-<slug>.md` when a person's path crosses products; every branch in mermaid |
-| A decision | In the Decisions table of the file it governs; present tense, no history, no decision ids |
+| Its low-level design | `## Engine` in `feature.md`: records, reads, routes, events, refusals, CLI, mechanisms. A record has one owning feature; others link. Each refusal is also a criterion in its story |
+| Its System impact | `## System impact` and the `nfrs:` key — `None`, or the `system-design.md` sections and NFRs it changes, written in the same change with the `system-design` skill |
+| A decision | In the Decisions table of the file it governs; present tense, no history, no decision ids. A system-wide decision is `system-design.md`'s |
 | A change that cannot be made now | A row in `specs/migrations.md` |
 
 **The five parts of a story**
@@ -93,7 +97,7 @@ retired story keeps its ID in the feature's *Not building* table with the reason
 | 1 | **As / I want / so that** | A persona · an outcome, not a button · a reason. Agent stories read *the agent proposes → the person decides* |
 | 2 | `## Who can` | An **Admin** row and an **Operator** row: what each can do, what the Operator sees otherwise, and any grant that lets them do more |
 | 3 | `## Flow` | A mermaid flowchart of this story's steps and every branch |
-| 4 | `## Acceptance criteria` | Given / When / Then, one ID per row (`MO-17.2`). A refusal row for the Operator; a trace row for every agent outcome (*Then How it got here shows its steps and sources*) |
+| 4 | `## Acceptance criteria` | Given / When / Then, one ID per row (`RC-08.2`). A refusal row for the Operator; a trace row for every agent outcome (*Then How it got here shows its steps and sources*) |
 | 5 | `## Screens` | Every surface the story shows × the seven states × Admin and Operator. Every cell names its board (`area.feature.surface`, or `… · State` on a board with a State switch) or `—` where the state cannot happen. You name the boards; the designer draws exactly those and never edits the spec |
 
 Write in tables and bullets, so a person and an agent read it the same way. Use only glossary words on screen.
@@ -106,7 +110,7 @@ Operator is the role code still calls `viewer` (migration M1) — write *Operato
 (`.claude/team/TEAM.md` §2).
 
 A passing spec goes to Ravi for **the spec review** (TEAM.md §5) before anyone draws it: the spec, its user journey,
-Access, the boards each story names, and the open questions. Stories move to `specified` only on his yes; only then
+Access, the boards each story names, its System impact and the open questions. Stories move to `specified` only on his yes; only then
 does the designer get a `request`. A bug no criterion covers gets its criterion here, then goes to the fix lane.
 
 ## 6. Migrate (touch it, migrate it)
@@ -116,10 +120,10 @@ A feature with no spec in `specs/` is migrated before anyone works on it:
 | From | Take | Leave |
 |---|---|---|
 | `docs/products/<product>.md` | The story rows (keep their IDs), boards, decisions | — |
-| `docs/for-developers/modules/<module>/features/<feature>.md` | The user story, capabilities as criteria, journeys, decisions, *Not building* — each story into its own folder with an empty `task.md` | Engine shapes, APIs, code layout — they stay in for-developers |
-| `docs/system-design.md` | Architecture → `specs/system-design/` | — |
+| `docs/for-developers/modules/<module>/features/<feature>.md` | The user story, capabilities as criteria, journeys, decisions, *Not building* — each story into its own folder with an empty `task.md`; engine shapes and APIs into `## Engine` | Code layout |
+| `docs/system-design.md` | Architecture → `specs/system-design.md` (the `system-design` skill) | — |
 
-Then write the parts the old docs lack (Who can, Flow, States, Screens), run the check, delete the migrated story
+Then write the parts the old docs lack (Who can, Flow, States, Screens, System impact), run the check, delete the migrated story
 block from the old file, and list what could not be placed. When a product is fully moved, update migration M2.
 
 ## 7. Report

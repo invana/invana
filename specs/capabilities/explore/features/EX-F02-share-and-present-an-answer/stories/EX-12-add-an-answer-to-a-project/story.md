@@ -29,7 +29,7 @@ flowchart LR
   g -->|no| n["Disabled — Ask Priya (owner)"]
   g -->|yes| p["Pick a project and a branch · supports · contradicts · context"]
   p -->|no project yet| e["No projects on this Graph · New project"]
-  p -->|Add| f(["A finding: its records, queries and dataset versions"])
+  p -->|Add| f(["A finding: its records, queries and loads"])
   p -->|fails| x["Could not add the finding — the reason · Try again"]
 ```
 
@@ -38,8 +38,8 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-12.1 | A settled answer and a person with *Can work on projects* | they pick *Add to a project* on its reply line | they pick a project, a branch and whether it supports, contradicts or gives context |
-| EX-12.2 | The choice made | they add it | the branch holds a finding with the answer's records, queries and dataset versions attached |
-| EX-12.3 | A finding added from an answer | someone opens it in Projects | it shows the records behind it, the dataset and the version they came from |
+| EX-12.2 | The choice made | they add it | the branch holds a finding with the answer's records, queries and the loads they came from attached |
+| EX-12.3 | A finding added from an answer | someone opens it in Projects | it shows the records behind it, the load they came from, by id and content hash |
 | EX-12.4 | A Graph with no projects | the person picks *Add to a project* | it says *No projects on this Graph* with *New project* |
 | EX-12.5 | Adding fails | the engine refuses | the person sees *Could not add the finding* with the reason and *Try again*; the answer is unchanged |
 | EX-12.6 | An answer still running, failed or stopped | its reply line shows | there is no *Add to a project* |

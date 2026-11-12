@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Open, search, reopen and start their own conversations; pick a view of the graph per conversation or per question; set a token budget per run | — |
+| Admin | Open, search, reopen, start, rename, pin, archive and delete their own conversations; pick the agent and a view of the graph per conversation, or a view per question; set a token budget per run | — |
 | Operator | The same — every member, for their own conversations | A view whose version is unpublished: disabled with its reason. A budget above the agent's: clamped, and the settings say so |
 
 ## Flow
@@ -28,7 +28,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 flowchart LR
   h([Conversations]) -->|search| s{Matches?}
   s -->|none| e["No conversation matches · Clear"]
-  s -->|some| row["A conversation"] --> o["Reopened as it was, with its outcome"]
+  s -->|some| row["A conversation"] --> bd{Its board?}
+  bd -->|open as a tab| fo["That tab is focused"] --> o
+  bd -->|kept, closed| ld["Loaded as a tab"] --> o
+  bd -->|none yet| mk["One is made"] --> o
+  bd -->|cannot load| tf["The thread opens · a toast says the board did not load"]
+  o["Reopened as it was, with its outcome"]
   h -->|New| n["A blank thread · composer focused"] -->|first question| saved(["The conversation exists"])
   o --> v["The view of the graph in the composer"]
   v -->|for this conversation| all["Every question after it"]
@@ -38,6 +43,11 @@ flowchart LR
   one --> ask
   ask -->|no| rf["Refused before it runs, naming the rule and whose it is"]
   ask -->|yes| tag(["The turn is tagged with the view it ran in"])
+  row -->|rename · pin · archive| kept(["The list follows · nothing in the thread changes"])
+  row -->|delete| del{Sure?}
+  del -->|yes| gone(["Gone from the list · its forks stay whole"])
+  o --> ag["The agent in the composer"]
+  ag -->|cannot read the graph| agr["Refused, naming the agent"]
 ```
 
 ## Acceptance criteria
@@ -57,6 +67,15 @@ flowchart LR
 | EX-10.11 | The conversation's view of the graph is deleted | the person reopens it | the composer reads *Everything* and says the view is gone; earlier turns keep the name they ran in |
 | EX-10.12 | The conversation's settings | the person sets a token budget per run above the agent's | it is clamped to the agent's, and the settings say so |
 | EX-10.13 | Two members on one Graph | one opens the history | they see only their own conversations |
+| EX-10.14 | A conversation in the history | the person renames it | the new title shows in the list, the header and the crumbs |
+| EX-10.15 | A conversation in the history | the person pins it | it lists first, before the newest, until unpinned |
+| EX-10.16 | A conversation in the history | the person archives it | it leaves the list, *Show archived* brings it back, and unarchiving restores it; its thread and board are unchanged |
+| EX-10.17 | A conversation in the history | the person deletes it and confirms | it is gone from the list; its runs stay in Agents › Runs and its forks keep their turns |
+| EX-10.18 | The agent in the composer | the person picks an agent that cannot read the graph | the question is refused before it runs, naming the agent; it is never sent to another agent |
+| EX-10.19 | A conversation whose board is open as a tab | the person opens it from the history or from a recent question | that tab is focused; the page that was in front steps behind it and nothing is closed |
+| EX-10.20 | A conversation whose board is kept but not open | the person opens it | its board is loaded as a tab and focused; nothing else is closed |
+| EX-10.21 | A conversation with no board yet | the person opens it | a board is made for it and opened as a tab |
+| EX-10.22 | A conversation whose board cannot be loaded | the person opens it | its thread still opens, and a toast says the board could not be loaded |
 
 ## Screens
 
@@ -66,5 +85,7 @@ flowchart LR
 | Conversations | Operator | explore.ask · No conversations | explore.board · No conversation matches | explore.board · Loading conversations | explore.board · Conversations | explore.board · Conversations failed | — | — |
 | The view of the graph | Admin | explore.board · Everything | — | — | explore.board · View picked | explore.board · Refused by a rule | — | explore.board · View unpublished |
 | The view of the graph | Operator | explore.board · Everything | — | — | explore.board · View picked | explore.board · Refused by a rule | — | explore.board · View unpublished |
+| Opening a conversation | Admin | — | — | explore.board · Loading conversations | explore.board · Conversations | explore.board · Board not loaded | — | — |
+| Opening a conversation | Operator | — | — | explore.board · Loading conversations | explore.board · Conversations | explore.board · Board not loaded | — | — |
 | Conversation settings | Admin | — | — | — | explore.board · Settings | — | — | explore.board · Budget clamped |
 | Conversation settings | Operator | — | — | — | explore.board · Settings | — | — | explore.board · Budget clamped |

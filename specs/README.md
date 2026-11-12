@@ -12,6 +12,7 @@ What Invana does and why — the operating system, the capabilities, features, u
 | **AC-F01** | | [Sign in, account and sessions](os/access/features/AC-F01-sign-in-account-and-sessions/feature.md) | idea | |
 | | AC-01 | [Sign in](os/access/features/AC-F01-sign-in-account-and-sessions/stories/AC-01-sign-in/story.md) | idea | [—](os/access/features/AC-F01-sign-in-account-and-sessions/stories/AC-01-sign-in/task.md) |
 | | AC-02 | [Keep my account, username and sessions in order](os/access/features/AC-F01-sign-in-account-and-sessions/stories/AC-02-keep-my-account-username-and-sessions-in-order/story.md) | idea | [—](os/access/features/AC-F01-sign-in-account-and-sessions/stories/AC-02-keep-my-account-username-and-sessions-in-order/task.md) |
+| | AC-18 | [Give a person an account](os/access/features/AC-F01-sign-in-account-and-sessions/stories/AC-18-give-a-person-an-account/story.md) | idea | [—](os/access/features/AC-F01-sign-in-account-and-sessions/stories/AC-18-give-a-person-an-account/task.md) |
 | **AC-F02** | | [Access rules](os/access/features/AC-F02-access-rules/feature.md) | idea | |
 | | AC-03 | [Read every access rule and who holds it](os/access/features/AC-F02-access-rules/stories/AC-03-read-every-access-rule-and-who-holds-it/story.md) | idea | [—](os/access/features/AC-F02-access-rules/stories/AC-03-read-every-access-rule-and-who-holds-it/task.md) |
 | | AC-04 | [Say exactly what an access rule allows](os/access/features/AC-F02-access-rules/stories/AC-04-say-exactly-what-an-access-rule-allows/story.md) | idea | [—](os/access/features/AC-F02-access-rules/stories/AC-04-say-exactly-what-an-access-rule-allows/task.md) |
@@ -70,6 +71,7 @@ What Invana does and why — the operating system, the capabilities, features, u
 | | RT-02 | [Add an outside tool server and let agents call its tools](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-02-add-an-outside-tool-server-and-let-agents-call-its-tools/story.md) | idea | [—](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-02-add-an-outside-tool-server-and-let-agents-call-its-tools/task.md) |
 | | RT-03 | [Let Claude Code and other callers use this graph](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-03-let-claude-code-and-other-callers-use-this-graph/story.md) | idea | [—](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-03-let-claude-code-and-other-callers-use-this-graph/task.md) |
 | | RT-04 | [See every plugin and turn a tool plugin on](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-04-see-every-plugin-and-turn-a-tool-plugin-on/story.md) | idea | [—](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-04-see-every-plugin-and-turn-a-tool-plugin-on/task.md) |
+| | RT-20 | [Install a Domain pack](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-20-install-a-domain-pack/story.md) | idea | [—](os/runtime/features/RT-F02-plugins-and-outside-tools/stories/RT-20-install-a-domain-pack/task.md) |
 | **RT-F03** | | [Workers and the queue](os/runtime/features/RT-F03-workers-and-the-queue/feature.md) | idea | |
 | | RT-05 | [See where work is and why it waits](os/runtime/features/RT-F03-workers-and-the-queue/stories/RT-05-see-where-work-is-and-why-it-waits/story.md) | idea | [—](os/runtime/features/RT-F03-workers-and-the-queue/stories/RT-05-see-where-work-is-and-why-it-waits/task.md) |
 | | RT-06 | [Questions go before batch work](os/runtime/features/RT-F03-workers-and-the-queue/stories/RT-06-questions-go-before-batch-work/story.md) | idea | [—](os/runtime/features/RT-F03-workers-and-the-queue/stories/RT-06-questions-go-before-batch-work/task.md) |
@@ -82,6 +84,10 @@ What Invana does and why — the operating system, the capabilities, features, u
 | | RT-12 | [See why a run started, waits or was refused](os/runtime/features/RT-F04-limits/stories/RT-12-see-why-a-run-started-waits-or-was-refused/story.md) | idea | [—](os/runtime/features/RT-F04-limits/stories/RT-12-see-why-a-run-started-waits-or-was-refused/task.md) |
 | | RT-13 | [See each AI model's rate limit and what waits on it](os/runtime/features/RT-F04-limits/stories/RT-13-see-each-ai-models-rate-limit-and-what-waits-on-it/story.md) | idea | [—](os/runtime/features/RT-F04-limits/stories/RT-13-see-each-ai-models-rate-limit-and-what-waits-on-it/task.md) |
 | | RT-14 | [Know why my run is held and ask for more](os/runtime/features/RT-F04-limits/stories/RT-14-know-why-my-run-is-held-and-ask-for-more/story.md) | idea | [—](os/runtime/features/RT-F04-limits/stories/RT-14-know-why-my-run-is-held-and-ask-for-more/task.md) |
+| **RT-F05** | | [Graph database connectors](os/runtime/features/RT-F05-graph-database-connectors/feature.md) | idea | |
+| | RT-17 | [Install a graph connector and see it offered](os/runtime/features/RT-F05-graph-database-connectors/stories/RT-17-install-a-graph-connector-and-see-it-offered/story.md) | idea | [—](os/runtime/features/RT-F05-graph-database-connectors/stories/RT-17-install-a-graph-connector-and-see-it-offered/task.md) |
+| | RT-18 | [Read and write any supported database in its own language](os/runtime/features/RT-F05-graph-database-connectors/stories/RT-18-read-and-write-any-supported-database-in-its-own-language/story.md) | idea | [—](os/runtime/features/RT-F05-graph-database-connectors/stories/RT-18-read-and-write-any-supported-database-in-its-own-language/task.md) |
+| | RT-19 | [Find similar records with the database's own vector index](os/runtime/features/RT-F05-graph-database-connectors/stories/RT-19-find-similar-records-with-the-databases-own-vector-index/story.md) | idea | [—](os/runtime/features/RT-F05-graph-database-connectors/stories/RT-19-find-similar-records-with-the-databases-own-vector-index/task.md) |
 | **RT-F06** | | [Skill scripts](os/runtime/features/RT-F06-skill-scripts/feature.md) | idea | |
 | | RT-15 | [Approve a skill's script once and let it run unchanged](os/runtime/features/RT-F06-skill-scripts/stories/RT-15-approve-a-skills-script-once-and-let-it-run-unchanged/story.md) | idea | [—](os/runtime/features/RT-F06-skill-scripts/stories/RT-15-approve-a-skills-script-once-and-let-it-run-unchanged/task.md) |
 | | RT-16 | [See what a skill's script did and why it stopped](os/runtime/features/RT-F06-skill-scripts/stories/RT-16-see-what-a-skills-script-did-and-why-it-stopped/story.md) | idea | [—](os/runtime/features/RT-F06-skill-scripts/stories/RT-16-see-what-a-skills-script-did-and-why-it-stopped/task.md) |
@@ -131,51 +137,6 @@ What Invana does and why — the operating system, the capabilities, features, u
 | | AG-39 | [Bring agents and skills in as standard files, and export them](capabilities/agents/features/AG-F08-portable-agents-and-skills/stories/AG-39-bring-agents-and-skills-in-as-standard-files-and-export-them/story.md) | idea | [—](capabilities/agents/features/AG-F08-portable-agents-and-skills/stories/AG-39-bring-agents-and-skills-in-as-standard-files-and-export-them/task.md) |
 | | AG-40 | [Turn a library into functions an Admin approves](capabilities/agents/features/AG-F08-portable-agents-and-skills/stories/AG-40-turn-a-library-into-functions-an-admin-approves/story.md) | idea | [—](capabilities/agents/features/AG-F08-portable-agents-and-skills/stories/AG-40-turn-a-library-into-functions-an-admin-approves/task.md) |
 
-### Data · `DA` · idea
-
-| Feature | Story | Title | Status | Open tasks |
-|---|---|---|---|---|
-| **DA-F01** | | [Records by kind](capabilities/data/features/DA-F01-records-by-kind/feature.md) | idea | |
-| | DA-01 | [Browse the records of a kind](capabilities/data/features/DA-F01-records-by-kind/stories/DA-01-browse-the-records-of-a-kind/story.md) | idea | [—](capabilities/data/features/DA-F01-records-by-kind/stories/DA-01-browse-the-records-of-a-kind/task.md) |
-| **DA-F02** | | [Quality against the model](capabilities/data/features/DA-F02-quality-against-the-model/feature.md) | idea | |
-| | DA-02 | [See the records that break the model](capabilities/data/features/DA-F02-quality-against-the-model/stories/DA-02-see-the-records-that-break-the-model/story.md) | idea | [—](capabilities/data/features/DA-F02-quality-against-the-model/stories/DA-02-see-the-records-that-break-the-model/task.md) |
-| **DA-F03** | | [Bulk fixes](capabilities/data/features/DA-F03-bulk-fixes/feature.md) | idea | |
-| | DA-03 | [Fix many records at once](capabilities/data/features/DA-F03-bulk-fixes/stories/DA-03-fix-many-records-at-once/story.md) | idea | [—](capabilities/data/features/DA-F03-bulk-fixes/stories/DA-03-fix-many-records-at-once/task.md) |
-| **DA-F04** | | [Merge duplicates](capabilities/data/features/DA-F04-merge-duplicates/feature.md) | later | |
-| | DA-04 | [Merge two records that are one](capabilities/data/features/DA-F04-merge-duplicates/stories/DA-04-merge-two-records-that-are-one/story.md) | later | [—](capabilities/data/features/DA-F04-merge-duplicates/stories/DA-04-merge-two-records-that-are-one/task.md) |
-| **DA-F05** | | [Lineage](capabilities/data/features/DA-F05-lineage/feature.md) | idea | |
-| | DA-05 | [Trace a record to what wrote it](capabilities/data/features/DA-F05-lineage/stories/DA-05-trace-a-record-to-what-wrote-it/story.md) | idea | [—](capabilities/data/features/DA-F05-lineage/stories/DA-05-trace-a-record-to-what-wrote-it/task.md) |
-| **DA-F06** | | [Record history](capabilities/data/features/DA-F06-record-history/feature.md) | idea | |
-| | DA-06 | [Read a record and every change to it](capabilities/data/features/DA-F06-record-history/stories/DA-06-read-a-record-and-every-change-to-it/story.md) | idea | [—](capabilities/data/features/DA-F06-record-history/stories/DA-06-read-a-record-and-every-change-to-it/task.md) |
-| **DA-F07** | | [Annotations](capabilities/data/features/DA-F07-annotations/feature.md) | idea | |
-| | DA-07 | [Find and manage the Graph's annotations](capabilities/data/features/DA-F07-annotations/stories/DA-07-find-and-manage-the-graphs-annotations/story.md) | idea | [—](capabilities/data/features/DA-F07-annotations/stories/DA-07-find-and-manage-the-graphs-annotations/task.md) |
-
-### Datasets · `DS` · later
-
-| Feature | Story | Title | Status | Open tasks |
-|---|---|---|---|---|
-| **DS-F01** | | [Datasets and their versions](capabilities/datasets/features/DS-F01-datasets-and-their-versions/feature.md) | later | |
-| | DS-01 | [Find a dataset to reuse](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-01-find-a-dataset-to-reuse/story.md) | later | [—](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-01-find-a-dataset-to-reuse/task.md) |
-| | DS-02 | [Read a dataset and how far to trust it](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-02-read-a-dataset-and-how-far-to-trust-it/story.md) | later | [—](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-02-read-a-dataset-and-how-far-to-trust-it/task.md) |
-| | DS-03 | [Versions and where each is used](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-03-versions-and-where-each-is-used/story.md) | later | [—](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-03-versions-and-where-each-is-used/task.md) |
-| | DS-12 | [Share a dataset with the install](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-12-share-a-dataset-with-the-install/story.md) | later | [—](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-12-share-a-dataset-with-the-install/task.md) |
-| | DS-14 | [Retract a version and flag what cites it](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-14-retract-a-version-and-flag-what-cites-it/story.md) | later | [—](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-14-retract-a-version-and-flag-what-cites-it/task.md) |
-| | DS-17 | [Export a version with its provenance](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-17-export-a-version-with-its-provenance/story.md) | later | [—](capabilities/datasets/features/DS-F01-datasets-and-their-versions/stories/DS-17-export-a-version-with-its-provenance/task.md) |
-| **DS-F02** | | [Bring data in](capabilities/datasets/features/DS-F02-bring-data-in/feature.md) | later | |
-| | DS-05 | [Add a few rows by hand](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-05-add-a-few-rows-by-hand/story.md) | later | [—](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-05-add-a-few-rows-by-hand/task.md) |
-| | DS-06 | [Collect a dataset with an agent](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-06-collect-a-dataset-with-an-agent/story.md) | later | [—](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-06-collect-a-dataset-with-an-agent/task.md) |
-| | DS-10 | [Keep papers and notices as a documents dataset](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-10-keep-papers-and-notices-as-a-documents-dataset/story.md) | later | [—](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-10-keep-papers-and-notices-as-a-documents-dataset/task.md) |
-| | DS-13 | [See every import and what it rejected](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-13-see-every-import-and-what-it-rejected/story.md) | later | [—](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-13-see-every-import-and-what-it-rejected/task.md) |
-| | DS-16 | [Upload a CSV and publish it](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-16-upload-a-csv-and-publish-it/story.md) | later | [—](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-16-upload-a-csv-and-publish-it/task.md) |
-| | DS-18 | [Load a bundle as one run](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-18-load-a-bundle-as-one-run/story.md) | later | [—](capabilities/datasets/features/DS-F02-bring-data-in/stories/DS-18-load-a-bundle-as-one-run/task.md) |
-| **DS-F03** | | [Add a dataset to this graph](capabilities/datasets/features/DS-F03-add-a-dataset-to-this-graph/feature.md) | later | |
-| | DS-11 | [Add a dataset version to this graph](capabilities/datasets/features/DS-F03-add-a-dataset-to-this-graph/stories/DS-11-add-a-dataset-version-to-this-graph/story.md) | later | [—](capabilities/datasets/features/DS-F03-add-a-dataset-to-this-graph/stories/DS-11-add-a-dataset-version-to-this-graph/task.md) |
-| **DS-F04** | | [Standards and checks](capabilities/datasets/features/DS-F04-standards-and-checks/feature.md) | later | |
-| | DS-07 | [Decide what breaks the standards](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-07-decide-what-breaks-the-standards/story.md) | later | [—](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-07-decide-what-breaks-the-standards/task.md) |
-| | DS-08 | [Keep a library of standards](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-08-keep-a-library-of-standards/story.md) | later | [—](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-08-keep-a-library-of-standards/task.md) |
-| | DS-09 | [Hold a dataset to a standard](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-09-hold-a-dataset-to-a-standard/story.md) | later | [—](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-09-hold-a-dataset-to-a-standard/task.md) |
-| | DS-15 | [Import a standard from a SKOS vocabulary](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-15-import-a-standard-from-a-skos-vocabulary/story.md) | later | [—](capabilities/datasets/features/DS-F04-standards-and-checks/stories/DS-15-import-a-standard-from-a-skos-vocabulary/task.md) |
-
 ### Explore · `EX` · idea
 
 | Feature | Story | Title | Status | Open tasks |
@@ -220,32 +181,6 @@ What Invana does and why — the operating system, the capabilities, features, u
 | | EX-31 | [A suggested change, with its evidence](capabilities/explore/features/EX-F07-memory-what-past-runs-teach/stories/EX-31-a-suggested-change-with-its-evidence/story.md) | idea | [—](capabilities/explore/features/EX-F07-memory-what-past-runs-teach/stories/EX-31-a-suggested-change-with-its-evidence/task.md) |
 | | EX-32 | [Accept, edit or reject a suggested change, then see if it helped](capabilities/explore/features/EX-F07-memory-what-past-runs-teach/stories/EX-32-decide-on-a-suggested-change/story.md) | idea | [—](capabilities/explore/features/EX-F07-memory-what-past-runs-teach/stories/EX-32-decide-on-a-suggested-change/task.md) |
 
-### Model · `MO` · idea
-
-| Feature | Story | Title | Status | Open tasks |
-|---|---|---|---|---|
-| **MO-F01** | | [Start a model](capabilities/model/features/MO-F01-start-a-model/feature.md) | idea | |
-| | MO-04 | [Draft a model from the database](capabilities/model/features/MO-F01-start-a-model/stories/MO-04-draft-a-model-from-the-database/story.md) | idea | [—](capabilities/model/features/MO-F01-start-a-model/stories/MO-04-draft-a-model-from-the-database/task.md) |
-| | MO-06 | [Start a model from a description, a file or a starter](capabilities/model/features/MO-F01-start-a-model/stories/MO-06-start-a-model-from-a-description-a-file-or-a-starter/story.md) | idea | [—](capabilities/model/features/MO-F01-start-a-model/stories/MO-06-start-a-model-from-a-description-a-file-or-a-starter/task.md) |
-| | MO-15 | [Start a model from an ontology](capabilities/model/features/MO-F01-start-a-model/stories/MO-15-start-a-model-from-an-ontology/story.md) | idea | [—](capabilities/model/features/MO-F01-start-a-model/stories/MO-15-start-a-model-from-an-ontology/task.md) |
-| **MO-F02** | | [Change and publish a model](capabilities/model/features/MO-F02-change-and-publish-a-model/feature.md) | idea | |
-| | MO-05 | [Change a model and publish it](capabilities/model/features/MO-F02-change-and-publish-a-model/stories/MO-05-change-a-model-and-publish-it/story.md) | idea | [—](capabilities/model/features/MO-F02-change-and-publish-a-model/stories/MO-05-change-a-model-and-publish-it/task.md) |
-| | MO-08 | [Constrain a property's values](capabilities/model/features/MO-F02-change-and-publish-a-model/stories/MO-08-constrain-a-propertys-values/story.md) | idea | [—](capabilities/model/features/MO-F02-change-and-publish-a-model/stories/MO-08-constrain-a-propertys-values/task.md) |
-| **MO-F03** | | [Link and share models](capabilities/model/features/MO-F03-link-and-share-models/feature.md) | idea | |
-| | MO-01 | [See every model on one map](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-01-see-every-model-on-one-map/story.md) | idea | [—](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-01-see-every-model-on-one-map/task.md) |
-| | MO-02 | [Open a model and a kind](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-02-open-a-model-and-a-kind/story.md) | idea | [—](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-02-open-a-model-and-a-kind/task.md) |
-| | MO-03 | [Link two models](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-03-link-two-models/story.md) | idea | [—](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-03-link-two-models/task.md) |
-| | MO-16 | [Export and import a model](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-16-export-and-import-a-model/story.md) | idea | [—](capabilities/model/features/MO-F03-link-and-share-models/stories/MO-16-export-and-import-a-model/task.md) |
-| **MO-F04** | | [Model health and history](capabilities/model/features/MO-F04-model-health-and-history/feature.md) | idea | |
-| | MO-07 | [See each model's health](capabilities/model/features/MO-F04-model-health-and-history/stories/MO-07-see-each-models-health/story.md) | idea | [—](capabilities/model/features/MO-F04-model-health-and-history/stories/MO-07-see-each-models-health/task.md) |
-| | MO-09 | [Read a model's history](capabilities/model/features/MO-F04-model-health-and-history/stories/MO-09-read-a-models-history/story.md) | idea | [—](capabilities/model/features/MO-F04-model-health-and-history/stories/MO-09-read-a-models-history/task.md) |
-| **MO-F05** | | [Views of the graph and what must always hold](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/feature.md) | idea | |
-| | MO-10 | [Narrow what agents may see](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/stories/MO-10-narrow-what-agents-may-see/story.md) | idea | [—](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/stories/MO-10-narrow-what-agents-may-see/task.md) |
-| | MO-11 | [Keep protected data protected](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/stories/MO-11-keep-protected-data-protected/story.md) | idea | [—](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/stories/MO-11-keep-protected-data-protected/task.md) |
-| | MO-13 | [Act on what people and agents ask of the model](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/stories/MO-13-act-on-what-people-and-agents-ask-of-the-model/story.md) | idea | [—](capabilities/model/features/MO-F05-views-of-the-graph-and-what-must-always-hold/stories/MO-13-act-on-what-people-and-agents-ask-of-the-model/task.md) |
-| **MO-F06** | | [Rules agents work by](capabilities/model/features/MO-F06-rules-agents-work-by/feature.md) | idea | |
-| | MO-12 | [State what must always hold](capabilities/model/features/MO-F06-rules-agents-work-by/stories/MO-12-state-what-must-always-hold/story.md) | idea | [—](capabilities/model/features/MO-F06-rules-agents-work-by/stories/MO-12-state-what-must-always-hold/task.md) |
-
 ### Projects · `PJ` · idea
 
 | Feature | Story | Title | Status | Open tasks |
@@ -273,14 +208,77 @@ What Invana does and why — the operating system, the capabilities, features, u
 | | PJ-10 | [See what a decision reaches](capabilities/projects/features/PJ-F04-simulation-and-impact/stories/PJ-10-see-what-a-decision-reaches/story.md) | idea | [—](capabilities/projects/features/PJ-F04-simulation-and-impact/stories/PJ-10-see-what-a-decision-reaches/task.md) |
 | **PJ-F05** | | [Project reports](capabilities/projects/features/PJ-F05-project-reports/feature.md) | idea | |
 | | PJ-14 | [Publish what we decided](capabilities/projects/features/PJ-F05-project-reports/stories/PJ-14-publish-what-we-decided/story.md) | idea | [—](capabilities/projects/features/PJ-F05-project-reports/stories/PJ-14-publish-what-we-decided/task.md) |
+| **PJ-F06** | | [Alerts](capabilities/projects/features/PJ-F06-alerts/feature.md) | idea | |
+| | PJ-19 | [Open a lead when the records show a pattern](capabilities/projects/features/PJ-F06-alerts/stories/PJ-19-open-a-lead-when-the-records-show-a-pattern/story.md) | idea | [—](capabilities/projects/features/PJ-F06-alerts/stories/PJ-19-open-a-lead-when-the-records-show-a-pattern/task.md) |
+
+### Records · `RC` · idea
+
+| Feature | Story | Title | Status | Open tasks |
+|---|---|---|---|---|
+| **RC-F01** | | [Records by kind](capabilities/records/features/RC-F01-records-by-kind/feature.md) | idea | |
+| | RC-01 | [Browse the records of a kind](capabilities/records/features/RC-F01-records-by-kind/stories/RC-01-browse-the-records-of-a-kind/story.md) | idea | [—](capabilities/records/features/RC-F01-records-by-kind/stories/RC-01-browse-the-records-of-a-kind/task.md) |
+| **RC-F02** | | [Bring records in](capabilities/records/features/RC-F02-bring-records-in/feature.md) | idea | |
+| | RC-08 | [Upload a file into a model](capabilities/records/features/RC-F02-bring-records-in/stories/RC-08-upload-a-file-into-a-model/story.md) | idea | [—](capabilities/records/features/RC-F02-bring-records-in/stories/RC-08-upload-a-file-into-a-model/task.md) |
+| | RC-09 | [See every load and what it rejected](capabilities/records/features/RC-F02-bring-records-in/stories/RC-09-see-every-load-and-what-it-rejected/story.md) | idea | [—](capabilities/records/features/RC-F02-bring-records-in/stories/RC-09-see-every-load-and-what-it-rejected/task.md) |
+| | RC-10 | [Load a bundle as one run](capabilities/records/features/RC-F02-bring-records-in/stories/RC-10-load-a-bundle-as-one-run/story.md) | idea | [—](capabilities/records/features/RC-F02-bring-records-in/stories/RC-10-load-a-bundle-as-one-run/task.md) |
+| | RC-11 | [Add a few records by hand](capabilities/records/features/RC-F02-bring-records-in/stories/RC-11-add-a-few-records-by-hand/story.md) | idea | [—](capabilities/records/features/RC-F02-bring-records-in/stories/RC-11-add-a-few-records-by-hand/task.md) |
+| **RC-F03** | | [Quality against the model](capabilities/records/features/RC-F03-quality-against-the-model/feature.md) | idea | |
+| | RC-02 | [See the records that break the model](capabilities/records/features/RC-F03-quality-against-the-model/stories/RC-02-see-the-records-that-break-the-model/story.md) | idea | [—](capabilities/records/features/RC-F03-quality-against-the-model/stories/RC-02-see-the-records-that-break-the-model/task.md) |
+| | RC-12 | [Decide what breaks the standards](capabilities/records/features/RC-F03-quality-against-the-model/stories/RC-12-decide-what-breaks-the-standards/story.md) | idea | [—](capabilities/records/features/RC-F03-quality-against-the-model/stories/RC-12-decide-what-breaks-the-standards/task.md) |
+| **RC-F04** | | [Bulk fixes](capabilities/records/features/RC-F04-bulk-fixes/feature.md) | idea | |
+| | RC-03 | [Fix many records at once](capabilities/records/features/RC-F04-bulk-fixes/stories/RC-03-fix-many-records-at-once/story.md) | idea | [—](capabilities/records/features/RC-F04-bulk-fixes/stories/RC-03-fix-many-records-at-once/task.md) |
+| **RC-F05** | | [Merge duplicates](capabilities/records/features/RC-F05-merge-duplicates/feature.md) | idea | |
+| | RC-04 | [Merge two records that are one](capabilities/records/features/RC-F05-merge-duplicates/stories/RC-04-merge-two-records-that-are-one/story.md) | idea | [—](capabilities/records/features/RC-F05-merge-duplicates/stories/RC-04-merge-two-records-that-are-one/task.md) |
+| **RC-F06** | | [Provenance](capabilities/records/features/RC-F06-provenance/feature.md) | idea | |
+| | RC-05 | [Trace a record to what wrote it](capabilities/records/features/RC-F06-provenance/stories/RC-05-trace-a-record-to-what-wrote-it/story.md) | idea | [—](capabilities/records/features/RC-F06-provenance/stories/RC-05-trace-a-record-to-what-wrote-it/task.md) |
+| | RC-06 | [Read a record and every change to it](capabilities/records/features/RC-F06-provenance/stories/RC-06-read-a-record-and-every-change-to-it/story.md) | idea | [—](capabilities/records/features/RC-F06-provenance/stories/RC-06-read-a-record-and-every-change-to-it/task.md) |
+| **RC-F07** | | [Annotations](capabilities/records/features/RC-F07-annotations/feature.md) | idea | |
+| | RC-07 | [Find and manage the Graph's annotations](capabilities/records/features/RC-F07-annotations/stories/RC-07-find-and-manage-the-graphs-annotations/story.md) | idea | [—](capabilities/records/features/RC-F07-annotations/stories/RC-07-find-and-manage-the-graphs-annotations/task.md) |
+
+### Semantics · `SE` · idea
+
+| Feature | Story | Title | Status | Open tasks |
+|---|---|---|---|---|
+| **SE-F01** | | [Start a model](capabilities/semantics/features/SE-F01-start-a-model/feature.md) | idea | |
+| | SE-04 | [Draft a model from the database](capabilities/semantics/features/SE-F01-start-a-model/stories/SE-04-draft-a-model-from-the-database/story.md) | idea | [—](capabilities/semantics/features/SE-F01-start-a-model/stories/SE-04-draft-a-model-from-the-database/task.md) |
+| | SE-06 | [Start a model from a description, a file or a starter](capabilities/semantics/features/SE-F01-start-a-model/stories/SE-06-start-a-model-from-a-description-a-file-or-a-starter/story.md) | idea | [—](capabilities/semantics/features/SE-F01-start-a-model/stories/SE-06-start-a-model-from-a-description-a-file-or-a-starter/task.md) |
+| | SE-15 | [Start a model from an ontology](capabilities/semantics/features/SE-F01-start-a-model/stories/SE-15-start-a-model-from-an-ontology/story.md) | idea | [—](capabilities/semantics/features/SE-F01-start-a-model/stories/SE-15-start-a-model-from-an-ontology/task.md) |
+| **SE-F02** | | [Change and publish a model](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md) | idea | |
+| | SE-05 | [Change a model and publish it](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-05-change-a-model-and-publish-it/story.md) | idea | [—](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-05-change-a-model-and-publish-it/task.md) |
+| | SE-08 | [Constrain a property's values](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-08-constrain-a-propertys-values/story.md) | idea | [—](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-08-constrain-a-propertys-values/task.md) |
+| **SE-F03** | | [Meaning](capabilities/semantics/features/SE-F03-meaning/feature.md) | idea | |
+| | SE-20 | [Say what a kind means](capabilities/semantics/features/SE-F03-meaning/stories/SE-20-say-what-a-kind-means/story.md) | idea | [—](capabilities/semantics/features/SE-F03-meaning/stories/SE-20-say-what-a-kind-means/task.md) |
+| **SE-F04** | | [Taxonomies](capabilities/semantics/features/SE-F04-taxonomies/feature.md) | idea | |
+| | SE-21 | [Place kinds and values under broader ones](capabilities/semantics/features/SE-F04-taxonomies/stories/SE-21-place-kinds-and-values-under-broader-ones/story.md) | idea | [—](capabilities/semantics/features/SE-F04-taxonomies/stories/SE-21-place-kinds-and-values-under-broader-ones/task.md) |
+| **SE-F05** | | [Standards](capabilities/semantics/features/SE-F05-standards/feature.md) | idea | |
+| | SE-17 | [Keep a library of standards](capabilities/semantics/features/SE-F05-standards/stories/SE-17-keep-a-library-of-standards/story.md) | idea | [—](capabilities/semantics/features/SE-F05-standards/stories/SE-17-keep-a-library-of-standards/task.md) |
+| | SE-18 | [Import a standard from a SKOS vocabulary](capabilities/semantics/features/SE-F05-standards/stories/SE-18-import-a-standard-from-a-skos-vocabulary/story.md) | idea | [—](capabilities/semantics/features/SE-F05-standards/stories/SE-18-import-a-standard-from-a-skos-vocabulary/task.md) |
+| **SE-F06** | | [Links and mappings](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md) | idea | |
+| | SE-01 | [See every model on one map](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-01-see-every-model-on-one-map/story.md) | idea | [—](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-01-see-every-model-on-one-map/task.md) |
+| | SE-02 | [Open a model and a kind](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-02-open-a-model-and-a-kind/story.md) | idea | [—](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-02-open-a-model-and-a-kind/task.md) |
+| | SE-03 | [Link two models](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-03-link-two-models/story.md) | idea | [—](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-03-link-two-models/task.md) |
+| | SE-16 | [Export and import a model](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-16-export-and-import-a-model/story.md) | idea | [—](capabilities/semantics/features/SE-F06-links-and-mappings/stories/SE-16-export-and-import-a-model/task.md) |
+| **SE-F07** | | [Rules](capabilities/semantics/features/SE-F07-rules/feature.md) | idea | |
+| | SE-11 | [Keep protected data protected](capabilities/semantics/features/SE-F07-rules/stories/SE-11-keep-protected-data-protected/story.md) | idea | [—](capabilities/semantics/features/SE-F07-rules/stories/SE-11-keep-protected-data-protected/task.md) |
+| | SE-12 | [State what must always hold](capabilities/semantics/features/SE-F07-rules/stories/SE-12-state-what-must-always-hold/story.md) | idea | [—](capabilities/semantics/features/SE-F07-rules/stories/SE-12-state-what-must-always-hold/task.md) |
+| | SE-13 | [Act on what people and agents ask of the model](capabilities/semantics/features/SE-F07-rules/stories/SE-13-act-on-what-people-and-agents-ask-of-the-model/story.md) | idea | [—](capabilities/semantics/features/SE-F07-rules/stories/SE-13-act-on-what-people-and-agents-ask-of-the-model/task.md) |
+| | SE-19 | [Hold a kind or property to a standard](capabilities/semantics/features/SE-F07-rules/stories/SE-19-hold-a-kind-to-a-standard/story.md) | idea | [—](capabilities/semantics/features/SE-F07-rules/stories/SE-19-hold-a-kind-to-a-standard/task.md) |
+| **SE-F08** | | [Inference](capabilities/semantics/features/SE-F08-inference/feature.md) | idea | |
+| | SE-22 | [Derive facts from a rule](capabilities/semantics/features/SE-F08-inference/stories/SE-22-derive-facts-from-a-rule/story.md) | idea | [—](capabilities/semantics/features/SE-F08-inference/stories/SE-22-derive-facts-from-a-rule/task.md) |
+| **SE-F09** | | [Views of the graph](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md) | idea | |
+| | SE-10 | [Narrow what agents may see](capabilities/semantics/features/SE-F09-views-of-the-graph/stories/SE-10-narrow-what-agents-may-see/story.md) | idea | [—](capabilities/semantics/features/SE-F09-views-of-the-graph/stories/SE-10-narrow-what-agents-may-see/task.md) |
+| **SE-F10** | | [Health and history](capabilities/semantics/features/SE-F10-health-and-history/feature.md) | idea | |
+| | SE-07 | [See each model's health](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-07-see-each-models-health/story.md) | idea | [—](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-07-see-each-models-health/task.md) |
+| | SE-09 | [Read a model's history](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-09-read-a-models-history/story.md) | idea | [—](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-09-read-a-models-history/task.md) |
 
 ## Journeys
 
 | ID | Journey | Stories |
 |---|---|---|
-| J01 | [From an empty install to a first answer](journeys/J01-from-an-empty-install-to-a-first-answer.md) | AC-01 · GR-02 · GR-05 · GR-06 · GR-07 · MO-04 · MO-06 · MO-15 · GR-04 · MO-05 · DS-16 · DS-11 · DS-13 · RT-01 · EX-01 · EX-02 · EX-04 |
-| J02 | [Ask and trust the answer](journeys/J02-ask-and-trust-the-answer.md) | GR-01 · EX-01 · EX-23 · EX-02 · EX-03 · EX-25 · EX-04 · EX-05 · EX-06 · EX-24 · EX-15 · EX-12 · EX-30 |
-| J03 | [Give an agent work and decide on the result](journeys/J03-give-an-agent-work-and-decide-on-the-result.md) | PJ-01 · PJ-16 · PJ-12 · PJ-15 · PJ-18 · AC-15 · AG-24 · PJ-17 · PJ-06 · PJ-07 · PJ-14 |
-| J04 | [Build an agent and improve it from what runs teach](journeys/J04-build-an-agent-and-improve-it-from-what-runs-teach.md) | AG-19 · AG-20 · AG-26 · AG-21 · AG-36 · AG-42 · AC-15 · AG-22 · EX-29 · EX-31 · EX-32 · AG-43 |
-| J05 | [Join a Graph someone set up](journeys/J05-join-a-graph-someone-set-up.md) | AC-01 · GR-01 · EX-11 · EX-01 · GR-08 · GR-10 · GR-12 · AC-07 · AC-11 · GR-04 |
-| J06 | [Set what an agent may touch](journeys/J06-set-what-an-agent-may-touch.md) | AC-04 · AC-06 · AG-21 · AC-13 · AC-15 · AC-14 · AC-12 |
+| J01 | [From an empty install to a first answer](journeys/J01-from-an-empty-install-to-a-first-answer.md) | AC-18 · AC-01 · GR-02 · GR-05 · GR-06 · RT-17 · GR-07 · SE-04 · SE-06 · SE-15 · GR-04 · SE-05 · RC-08 · RC-09 · RT-01 · EX-01 · EX-02 · EX-04 |
+| J02 | [Ask and trust the answer](journeys/J02-ask-and-trust-the-answer.md) | GR-01 · EX-01 · EX-23 · EX-02 · EX-03 · EX-25 · EX-04 · RC-05 · RC-06 · EX-26 · EX-05 · EX-06 · EX-24 · EX-15 · EX-12 · EX-30 |
+| J03 | [Give an agent work and decide on the result](journeys/J03-give-an-agent-work-and-decide-on-the-result.md) | PJ-01 · PJ-16 · PJ-12 · PJ-15 · PJ-18 · GR-16 · AC-15 · AG-24 · PJ-17 · PJ-06 · PJ-07 · PJ-14 |
+| J04 | [Build an agent and improve it from what runs teach](journeys/J04-build-an-agent-and-improve-it-from-what-runs-teach.md) | AG-19 · AG-20 · AG-26 · AG-21 · AG-36 · AG-42 · GR-16 · AC-15 · AG-22 · EX-29 · EX-31 · EX-32 · AG-43 |
+| J05 | [Join a Graph someone set up](journeys/J05-join-a-graph-someone-set-up.md) | AC-18 · AC-09 · AC-01 · GR-01 · EX-11 · EX-01 · GR-08 · GR-10 · GR-12 · AC-07 · AC-11 · GR-04 |
+| J06 | [Set what an agent may touch](journeys/J06-set-what-an-agent-may-touch.md) | AC-04 · AC-06 · AG-21 · AC-13 · GR-16 · AC-15 · AC-14 · AC-12 |
+| J07 | [Ready an install for its Graphs](journeys/J07-ready-an-install-for-its-graphs.md) | AC-18 · RT-17 · RT-01 · RT-04 · RT-10 · RT-09 · RT-11 · GR-14 |

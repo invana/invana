@@ -1,0 +1,125 @@
+/* Diagram zoom: every mermaid diagram sits in a frame that pans and zooms it. */
+.spec-zoom {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+  cursor: grab;
+}
+.spec-zoom:fullscreen {
+  background: var(--md-default-bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.spec-zoom.is-panning {
+  cursor: grabbing;
+}
+.spec-zoom > .mermaid {
+  margin: 0;
+  transform-origin: 0 0;
+}
+.spec-zoom__bar {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  z-index: 1;
+  display: flex;
+  gap: 0.2rem;
+}
+.spec-zoom__bar button {
+  min-width: 1.6rem;
+  padding: 0 0.3rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+/* The graph panel the build hook adds to every spec page. */
+.spec-graph table {
+  font-size: 0.7rem;
+}
+
+/* The /graph page: the graph app fills the content area under the title. */
+.spec-graph-app {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 11rem);
+  min-height: 30rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+}
+
+/*
+ * Edge to edge: the header, the left nav tree, the content and the right table of contents span the whole window.
+ * The left tree is wider than Material's 12.1rem so long story titles wrap rather than clip; drag its right edge to
+ * resize it (spec-site.js keeps the width in --spec-nav-width).
+ */
+.md-grid {
+  max-width: none;
+}
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    width: var(--spec-nav-width, 20rem);
+  }
+  /* Material pads the tree down to 11.5rem; let it use the whole sidebar. */
+  [dir="ltr"] .md-sidebar--primary .md-sidebar__inner {
+    padding-right: 0;
+  }
+  [dir="rtl"] .md-sidebar--primary .md-sidebar__inner {
+    padding-left: 0;
+  }
+}
+/* Below 76.25em the tree is a drawer; it gets the same room, never wider than the screen. */
+@media screen and (max-width: 76.234375em) {
+  .md-sidebar--primary {
+    --spec-drawer: min(20rem, 85vw);
+    width: var(--spec-drawer);
+  }
+  [dir="ltr"] .md-sidebar--primary {
+    left: calc(-1 * var(--spec-drawer));
+  }
+  [dir="rtl"] .md-sidebar--primary {
+    right: calc(-1 * var(--spec-drawer));
+  }
+  [data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
+    transform: translateX(var(--spec-drawer));
+  }
+  [dir="rtl"] [data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
+    transform: translateX(calc(-1 * var(--spec-drawer)));
+  }
+}
+.md-sidebar--primary .md-ellipsis {
+  overflow-wrap: anywhere;
+}
+.spec-nav-resize {
+  position: absolute;
+  top: 0;
+  right: -0.2rem;
+  /* The sticky sidebar has no height of its own; the grip spans the visible tree. */
+  height: calc(100vh - 3.6rem);
+  z-index: 2;
+  width: 0.4rem;
+  cursor: col-resize;
+}
+.spec-nav-resize:hover,
+.spec-nav-resize.is-dragging {
+  background: var(--md-default-fg-color--lightest);
+}
+@media screen and (max-width: 76.234375em) {
+  .spec-nav-resize {
+    display: none;
+  }
+}
+
+/* Tables fill the content width; a table wider than it scrolls inside its own frame, never the page. */
+.md-typeset .md-typeset__table {
+  display: block;
+}
+.md-typeset .md-typeset__table table:not([class]) {
+  display: table;
+  width: 100%;
+}

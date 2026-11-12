@@ -1,0 +1,8 @@
+# A workspace of one: the graph app installs on its own, apart from studio/.
+allowBuilds:
+  "@biomejs/biome": true
+  esbuild: true
+minimumReleaseAge: 60
+minimumReleaseAgeExclude:
+  # First-party packages — published by us, safe to install the moment they land.
+  - "@invana/*"

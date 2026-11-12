@@ -72,6 +72,7 @@ flowchart TD
 | EX-26.18 | An Operator without *Can work on projects* | they select third-party nodes | *Keep* is disabled — *Ask Priya (owner)* |
 | EX-26.19 | An Operator who is not the Owner | they open Search providers | they read them; *Add* is hidden |
 | EX-26.20 | An answer with third-party claims | the person opens *How it got here* | it shows the search, each fetch with its reference, and which claims came from where |
+| EX-26.21 | A kept third-party node | anyone opens it in the Element panel | it shows its reference, the run it came from, who kept it and when, and what it is about |
 
 ## Screens
 

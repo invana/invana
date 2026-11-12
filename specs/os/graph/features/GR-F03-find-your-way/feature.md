@@ -6,7 +6,8 @@ status: idea
 personas: [analyst, builder, modeller, owner]
 stories: [GR-08, GR-09, GR-10, GR-11, GR-12]
 journeys: [J05]
-boards: [explore.board, explore.board.left_closed, model.board, projects.list, agents.agent, shell.command, shell.locked, settings.me]
+boards: [explore.board, explore.board.left_closed, model.board, projects.list, agents.agent, graphs.command, access.locked, settings.me]
+nfrs: [NFR-SEC-1, NFR-PERF-3]
 depends_on: [GR-F01, AC-F02, AC-F01]
 ---
 
@@ -23,7 +24,7 @@ Journeys this feature is a step of: [J05 · Join a Graph someone set up](../../.
 ```mermaid
 flowchart TD
   g([A Graph open]) --> m["GR-08 · leftNav: Explore · Model · Projects — the wordmark names the mode"]
-  m -->|a summoner: Data · Agents · Inbox · Settings| ov["An overlay over the work · its icon outlined · Esc returns"]
+  m -->|a summoner: Records · Agents · Inbox · Settings| ov["An overlay over the work · its icon outlined · Esc returns"]
   m -->|switch mode| keep(["Same Graph, the other mode at its landing"])
   ov --> cr["GR-09 · The crumb: Graph › section › item"]
   cr -->|drill in| grow["The overlay's content is replaced · the crumb grows · Back steps up"]
@@ -76,7 +77,7 @@ flowchart TD
 
 | Rule | Detail |
 |---|---|
-| Three modes, summoned overlays | Explore, Model and Projects change main; Data, Agents, Inbox and Settings open over the work and close with Esc |
+| Three modes, summoned overlays | Explore, Model and Projects change main; Records, Agents, Inbox and Settings open over the work and close with Esc |
 | The wordmark names the mode | It changes with the mode (`specs/design-language.md` §2); the crumb never repeats it |
 | The summoner lights | While an overlay is open, its leftNav icon is outlined |
 | Every overlay has an address | It survives a reload and can be shared; an old page address opens its overlay over the last workspace |
@@ -94,7 +95,7 @@ flowchart TD
 | Colour carries meaning once | A status reads the same colour everywhere |
 | Experimental is shown, not hidden | A mode, summoner or act not yet launched carries an *Experimental* badge; nothing launched depends on one |
 | People are named | Rules, schedules and asks name people, never ids; the signed-in person reads *you* |
-| Without the grant, the surface stays | The act reads *Ask Priya (owner)* — never a dead end; a surface the person may not read at all is absent |
+| Without the grant, the surface stays | The act reads *Ask Priya (owner)* ([design-language.md › States](../../../../design-language.md#5-states)); a surface the person may not read at all is absent from the leftNav, and a direct link to it opens a locked empty state saying what it is and who can open it — never a blank |
 | Leans on | Access rules and who holds them (AC-F03) · the person's own settings (AC-F01) · the Inbox for an ask (AC-F05) |
 
 ## Data touched
@@ -105,6 +106,72 @@ flowchart TD
 | The person's access on the open Graph and who holds each role | Read |
 | The person's theme and assistant preference | Read · write |
 
+## Engine
+
+The low-level design: what this feature stores, serves and refuses. Conventions — naming, errors, lists, events — are
+[system-design.md](../../../../system-design.md) §§ 6–8; this section only fills them in.
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| — | — | No table of its own: theme and the closed assistant are the account's `preferences` ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine)); the collapsed sidebar is this browser's |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| The lists each mode serves — ⌘K matches them in the browser | Each mode's own feature |
+| The reader's roles, each area's role and who holds it | [GR-F04 › `GET /members/me`](../GR-F04-this-graph/feature.md#routes) |
+| Graphs the reader is on | [GR-F04](../GR-F04-this-graph/feature.md#engine) |
+| Private projects the reader is not on | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
+| Models · views of the graph · agents · skills · projects — the names search reads | [SE-F02](../../../../capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) · [SE-F09](../../../../capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md#engine) · [AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md#engine) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
+| The account's preferences | [AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine) |
+
+### Routes
+
+| Route, install-wide | Does | Story |
+|---|---|---|
+| `GET /api/v1/graphs/search?q=&graph=&limit=` | Name search across the reader's Graphs, or one (`graph=<user>/<slug>`): `{query, hits[{kind, id, name, graph?, product?, match}]}` — `kind` `graph` · `model` · `agent` · `skill` · `project` · `world` · `guardrail`; `product` `explore` · `model` · `agents` · `projects`, absent for a Graph; `match` `exact` · `prefix` · `contains`. `limit` 20, at most 50 | GR-10 |
+
+### Events
+
+| Event | When |
+|---|---|
+| — | No event of its own; finding writes nothing |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 404 | `graph=` names a Graph the reader is not on | *Not found.* | GR-10.14 |
+| 422 | `q` empty after trimming, or over 200 characters | *Search needs 1 to 200 characters.* | API only — the command line trims and checks before it calls; ⌘K never calls it |
+| — | An act the reader's roles do not cover is the area gate's `403` ([GR-F04](../GR-F04-this-graph/feature.md#refusals)) | — | GR-10.8 · GR-12.2 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| `invana search "<text>" [--graph <user>/<slug>]` | One line per hit — kind, name, Graph, id — closest first |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| Access before match | Each name query is handed the ids of the Graphs the reader is on; a private project is a hit only for its people; a view nobody named is never a hit |
+| Ranking | Exact, then prefix, then contains on the name, case-insensitive; ties by name |
+| Seams | A Graph the reader left stops matching on the next search; an archived Graph is still searched |
+| Not searched | Runs, schedules, findings and branches — a run is found through its Graph's runs, not by name |
+| ⌘K | Matches in the browser over the lists each mode already serves, read once per opening; it never calls the search route |
+| Who to ask | A disabled act names its role and holders from `GET …/graphs/members/me`; a role nobody holds reads *Ask an Admin* |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 8 APIs and events | One install-wide search route, for the command line | — |
+| § 12 Qualities | Privacy: access is applied before a name is matched — a Graph or a private project the reader is not on is never a hit | — |
+
 ## Decisions
 
 | Decision | Detail |
@@ -112,6 +179,7 @@ flowchart TD
 | No launcher | The person never picks a product; the leftNav holds the modes and the summoners |
 | ⌘K is the one door | *Do, open or ask anything* — acts, records and sections in one palette, with no products to switch between |
 | ⌘K matches in the browser | It reads the lists each mode already serves, once per opening, and matches as the person types; a record with no address of its own opens its section |
+| The command line searches in the engine | One engine search applies the access first — the person's Graphs, a private project only for its people — then ranks by name, exact then prefix then contains, as ⌘K does |
 | Ask is the last ⌘K entry | Whenever something is typed on a Graph; off a Graph there is no assistant |
 | The assistant closes, never disappears | Closed, it is reopened from the header; it is always one click away |
 | Tools on right-click | A canvas's tools are on its right-click menu, not a toolbar that is always shown |

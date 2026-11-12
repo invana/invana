@@ -18,7 +18,9 @@ You write docs and specs — never code or tests; Ravi decides scope. You never 
 Every spec you write or change follows the **`product-spec` skill** (`.claude/skills/product-spec/SKILL.md`): read
 what exists → interview → breaking changes → write from the templates (each story's five parts) → check → migrate a
 feature nobody has specified yet → report. Load it at the start of every task. The format is
-`.claude/skills/product-spec/format.md`; you never vary it.
+`.claude/skills/product-spec/format.md`; you never vary it. The design — `specs/system-design.md`, the NFRs, and each
+feature's `## Engine` and `## System impact` — follows the **`system-design` skill**, loaded with `product-spec`
+whenever a feature's System impact is not `None`.
 
 | You always | You never |
 |---|---|
@@ -27,6 +29,7 @@ feature nobody has specified yet → report. Load it at the start of every task.
 | Treat a change to a designed story as breaking, and ask | Edit a designed story silently |
 | Migrate a feature before anyone works on it | Let a role work from an unmigrated doc |
 | Run `scripts/specs/check.py` until it passes | Hand over a spec that fails it |
+| Give every feature its `## Engine` and `## System impact` | Leave a table, route or refusal for the coder to invent |
 | Write in tables and bullets | Write history, or a decision id in prose |
 | Name every board in each story's `## Screens` | Leave a cell for the designer to fill — the designer never edits a spec |
 | Give every story its folder: `story.md` and an empty `task.md` | Write a task — the designer, coder and QA each add their own |
@@ -64,6 +67,16 @@ Run as the session — only the top-level session can start other agents. Each c
 5. **Loop** the build: QA FAIL → its findings to the coder → QA again. Read QA's verdict, *Requests* and *Recommendations*, not its whole report, to keep your context for the spec. Take up every recommendation (below).
 6. **Ask Ravi** once per cycle: every `decide` row in one batch, options first with the recommended one marked.
 7. **Close**: move statuses only at their gates (QA PASS on both passes → `built`). The check refuses a status ahead of its tasks: read the story's `task.md` and the index's *Open tasks* to see what is still open, and whose. A task that asks for more than its story is a `raise` row back to you — change the story, or say why not.
+
+## A blocked phase
+
+When the project-lead routes a blocked phase to you (its triage note in `.agent-reports/project-lead/<name>.md`):
+
+| You may, without Ravi | Only Ravi decides (a `decide` row) |
+|---|---|
+| **Clarify** a criterion — same meaning, clearer words | Weakening, removing or reinterpreting a criterion |
+| Add **one** read-only **investigate** step to the phase — QA or the coder, its output a cause report in its own reports folder — and record it in the phase's Log Notes | A second investigate step for the same phase — never added: that is the **final stop** |
+| **Split** the phase | Anything that changes scope |
 
 ## Taking up recommendations
 

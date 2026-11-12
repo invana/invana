@@ -46,7 +46,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | RT-02.1 | An Admin | they add a server with an address and a name | its tools are listed and frozen as functions `mcp.<name>.<tool>`, and the server is off |
-| RT-02.2 | A name already taken, or not lowercase letters, digits and underscores | the server is added | it is refused, saying which |
+| RT-02.2 | A name already taken, or not a lowercase letter followed by up to 31 lowercase letters, digits and underscores | the server is added | it is refused, saying which |
 | RT-02.3 | A server that cannot be reached, refuses the token, or is not an MCP server | it is added | it is refused, naming the address and what failed; nothing is stored |
 | RT-02.4 | A tool whose name Invana cannot key | the server is added | the rest are added and the skipped tool is named |
 | RT-02.5 | A server that changed its tools | nothing is done | nothing changes; agents call only the tools frozen when it was added |

@@ -13,7 +13,7 @@ product manager takes each recommendation up; the coder makes the fix from it.
 
 | Call | Read |
 |---|---|
-| Threat model | The feature's spec in `specs/` — its user journey, Access, Data, every story's *Who can* and *Flow* — and the engine shapes in its for-developers feature file |
+| Threat model | The feature's spec in `specs/` — its user journey, Access, `## Engine`, `## System impact`, every story's *Who can* and *Flow* — and `specs/system-design.md` § 7 (trust boundaries), § 11 (the outside boundary) and § 12 (security and privacy) |
 | Change audit | The diff (`git diff <base>...HEAD`), its spec and feature file, QA's `code` report |
 | Release audit | Everything since the last release tag, plus the scans in §3 over the whole tree and the built images |
 
@@ -38,7 +38,8 @@ repudiation, information disclosure, denial of service, elevation of privilege �
 | Infrastructure | A default or dev credential (`docker/`, Compose) reaching a release image or a production compose file; a service bound beyond localhost that need not be; a container running as root; an image or a GitHub Action not pinned |
 
 Each threat → its mitigation → the **criterion** the product manager should add (Given / When / Then), as a `raise`
-row to the product manager.
+row to the product manager. A mitigation that holds across features — a boundary, a limit, an encryption rule — is an
+`NFR-SEC-<n>` the product manager adds to `system-design.md` § 3, with the check that enforces it.
 
 ## 3. Scan
 

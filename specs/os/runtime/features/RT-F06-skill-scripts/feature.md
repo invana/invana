@@ -7,6 +7,7 @@ personas: [admin, builder]
 stories: [RT-15, RT-16]
 journeys: []
 boards: [agents.skill, agents.run, inbox]
+nfrs: [NFR-REL-1, NFR-SEC-1]
 depends_on: [AG-F04, RT-F03, AC-F05]
 ---
 
@@ -107,6 +108,84 @@ sequenceDiagram
 | A script step on a run — fingerprint, arguments, output, exit code, time, memory, the limit that stopped it | Write · read |
 | Asks for approval in Needs you (AC-F05) | Write · read |
 | History rows of every approve, decline and revoke (AC-F06) | Write |
+
+## Engine
+
+The low-level design: what this feature stores, serves and refuses. Conventions — naming, errors, lists, events — are
+[system-design.md](../../../../system-design.md) §§ 6–8; this section only fills them in.
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `runtime_script_approvals` | `fingerprint` (sha256 of the script's bytes, the key) · `state` (`waiting` · `approved` · `declined` · `revoked`) · `path` · `first_skill_version_id` · `added_by_id` · `decided_by_id?` · `decided_at?` · `reason?` | Install-wide, one row per content: every skill version carrying the same bytes reads the same row |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| A skill version's folder and its `scripts/`, publishing and *Run a test* | [AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md#engine) |
+| An imported skill folder | [AG-F08](../../../../capabilities/agents/features/AG-F08-portable-agents-and-skills/feature.md#engine) |
+| The step row a script runs as, its `result` and the run's trace | [AG-F03](../../../../capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| The asks every Admin gets | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
+| Workers carrying the `code` label | [RT-F03](../RT-F03-workers-and-the-queue/feature.md#engine) |
+| History rows of every approve, decline and revoke | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |
+
+### Routes
+
+| Route, after `/api/v1/u/{u}/{g}/agents/skills/{id}` | Does | Story |
+|---|---|---|
+| `GET /scripts?version=` | The version's scripts — `path` · `fingerprint` · `state` · who decided and when · `reason` · `content` | RT-15 |
+
+| Route, install-wide, after `/api/v1/runtime/scripts` | Does | Story |
+|---|---|---|
+| `GET /{fingerprint}` | One script's content, its approval and the skill versions that carry it | RT-15 |
+| `POST /{fingerprint}/approve` · `POST /{fingerprint}/decline` · `POST /{fingerprint}/revoke` | Approve · decline `{reason}` · revoke `{reason}` | RT-15 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `runtime.scripts.ask` | A new fingerprint waits; an ask goes to every Admin |
+| `runtime.scripts.approve` · `.decline` · `.revoke` | An Admin decides, with the reason for a decline or revoke |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 403 | Approve, decline or revoke by anyone but an install Admin | *Only an Admin approves scripts — {admins}.* | RT-15.10 |
+| 409 | Publishing a version whose plan calls a script not approved | *{path} is {state} — it cannot publish until an Admin approves it.* | RT-15.4 · RT-15.7 |
+| step refused | A script waiting, declined, revoked, or whose bytes differ from what was approved — in a run or *Run a test* | *{path} is not approved: {state}{, by whom}.* | RT-15.8 · RT-16.7 · RT-16.10 |
+| step failed | A script past the time, memory or output cap | *Stopped at the {cap} cap — {value}.* | RT-16.4 |
+| step failed | An import the sandbox does not carry | *The sandbox has no {package}.* | RT-16.5 |
+| step failed | A network connection or a write outside the scratch folder | *The sandbox denied {act}.* | RT-16.6 |
+| step failed | A non-zero exit, or standard output that is not JSON | *Exited {code}: {error output}.* | RT-16.3 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| — | No command of its own |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| A new script asks | Saving or importing a skill version fingerprints each `scripts/*.py`; a fingerprint with no row writes one `waiting` and one AC-F05 ask per Admin; the first answer closes them all |
+| A script step | The function `skill.script` — `bound none` · `side_effect read` · `resources code` — args `path` · `input`; its queue is `tools.code`. Before dispatch the fingerprint of the bytes the version holds must be `approved` |
+| The sandbox | A process on a `code` worker: Python 3.14 and the install's fixed packages; no network, no secrets, no graph connection; reads its arguments as JSON on standard input and its own skill folder; writes only a scratch folder dropped when it ends |
+| Caps | `INVANA_SCRIPT_TIMEOUT_S` (60) · `INVANA_SCRIPT_MEMORY_MB` (512) · `INVANA_SCRIPT_OUTPUT_KB` (1,024), set once for the install and read on every script step |
+| What it returns | Exit 0 with JSON on standard output is the step's output; anything else fails the step with the exit code and the error output |
+| What a step records | On the step's `result`: `script` (`path` · `fingerprint`) · `input` · `output` · `exit_code` · `time_ms` · `memory_mb` · `stopped_by?` (the cap and its value) · the worker |
+| Revoke | Sets `revoked`; a step dispatched after it is refused; a step already running finishes |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 6 Data and storage | One install-wide table of approvals by fingerprint | — |
+| § 9 Distributed execution | Script steps run only on workers labelled `code`, in a sandbox | — |
+| § 12 Qualities | Security: outside code runs only once an Admin approved its exact bytes, isolated from the network, secrets and the graph | — |
 
 ## Decisions
 

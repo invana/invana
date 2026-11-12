@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Switch an answer's shape; author, change and publish answer templates | — |
+| Admin | Switch an answer's shape; author, change, publish and delete answer templates | — |
 | Operator | Switch an answer's shape; read the answer templates | The templates read-only, *+* hidden. With *Can build agents*: as Admin |
 
 ## Flow
@@ -35,8 +35,13 @@ flowchart LR
   card -->|pick another| sw{It accepts the records?}
   sw -->|yes| re(["Re-drawn from the same records · nothing re-runs"])
   sw -->|no| dis["Disabled, with why"]
-  tl([Agents › Skills · Answer templates]) -->|Can build agents| au["Author · Save as a draft · Publish"]
+  tl([Agents › Skills · Answer templates]) -->|Can build agents| au["Author: Name · Kind · Surface · Accepts · Shape · Intent → Save as a draft · Publish"]
+  tl -->|usage| us(["Every answer it drew · each opens its conversation"])
   au -->|a field it needs is missing| ref["Refused, naming the field"]
+  au -->|change a published one| nv["A new draft version · the published one stays"]
+  au -->|delete| dd{Ever published?}
+  dd -->|no| gone(["Deleted"])
+  dd -->|yes| keep["Refused · answers still read it"]
 ```
 
 ## Acceptance criteria
@@ -56,6 +61,11 @@ flowchart LR
 | EX-03.11 | A template whose definition names a field the shape lacks | it is saved | it is refused, naming the field |
 | EX-03.12 | An Operator without *Can build agents* | they open the answer templates | they read them; *+* is hidden |
 | EX-03.13 | An HTML template | it draws | it runs no script, reaches no network and loads no outside asset |
+| EX-03.14 | A published or shipped template | a person with *Can build agents* changes it | the change is a new draft version; the published one is unchanged and answers keep reading it |
+| EX-03.15 | A template | a person with *Can build agents* deletes it | a draft that never published is deleted; a published or shipped one is refused, saying answers read it |
+| EX-03.16 | The answer templates | anyone reads them | each shows how many answers it drew |
+| EX-03.17 | The answer templates of a Graph | a member opens one's usage | every answer it drew is listed, each opening the conversation it is in |
+| EX-03.18 | A person with *Can build agents* | they author a template | the form asks Name · Kind · Surface · Accepts — one constraint per line, filled from the surface until edited (a table: `result_type tabular` · `min_rows 1`) · Shape, one `key: value` per line · Intent; it ends *Save as a draft* or *Publish* |
 
 ## Screens
 
@@ -66,4 +76,6 @@ flowchart LR
 | The template picker | Admin | — | — | — | explore.board.chart · Picker | — | — | — |
 | The template picker | Operator | — | — | — | explore.board.chart · Picker | — | — | — |
 | Answer templates | Admin | agents.skills · Shipped templates | agents.skills · No template matches | agents.skills · Loading | agents.skills · Answer templates | agents.skills · Template refused | — | — |
+| Author a template | Admin | agents.skills · Author template | — | — | agents.skills · Author template | agents.skills · Template refused | — | — |
+| Author a template | Operator | — | — | — | — | — | — | agents.skills · Read only |
 | Answer templates | Operator | agents.skills · Shipped templates | agents.skills · No template matches | agents.skills · Loading | agents.skills · Answer templates | — | — | agents.skills · Read only |

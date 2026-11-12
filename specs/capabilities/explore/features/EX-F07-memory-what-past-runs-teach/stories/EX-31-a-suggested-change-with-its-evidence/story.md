@@ -54,7 +54,9 @@ flowchart TD
 | EX-31.6 | A suggested change with no evidence | it is made | it is refused and never shown |
 | EX-31.7 | An open suggested change on a target | a newer one is made on it | the newer replaces it, carrying both bodies of evidence |
 | EX-31.8 | An agent | it suggests widening its own limits or budget | it is refused; suggesting a tighter one is allowed |
-| EX-31.9 | A suggested change | it is shown | it changes one thing — a skill, a plan, an agent's skills or limits, a rule, a criterion or an answer template |
+| EX-31.9 | A suggested change | it is shown | it changes one thing — a skill, a plan, an agent's skills or limits, a rule, a criterion, an answer template, or one part of the semantic model: a synonym or definition, a broader kind, a derivation, a saved query shape or an index |
+| EX-31.15 | Questions that keep failing on a term the model does not know | the detector runs | a suggested change opens as a draft of the model — a synonym or a definition on the kind (SE-F03) — with the failing runs as its evidence |
+| EX-31.16 | A query shape that keeps running slow on one kind | the detector runs | an index suggestion opens, with the runs and their latency as evidence; only an Admin may apply it (SE-F10) |
 | EX-31.10 | Several suggested changes | the person opens Inbox › Needs you | they are ranked by the size of their evidence, not their age, and never block a run |
 | EX-31.11 | Evidence with a suggested change open | the person reads Evidence | the count says a suggested change waits, one click to it |
 | EX-31.12 | A suggested change | nothing is decided | nothing changes; no threshold applies it by itself |

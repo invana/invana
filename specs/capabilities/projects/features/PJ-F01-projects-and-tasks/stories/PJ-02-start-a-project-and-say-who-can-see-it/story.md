@@ -28,9 +28,9 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 flowchart TD
   s([Projects]) --> n["New project (modal)"]
   n -->|Operator| na["New project disabled, naming Can work on projects"]
-  n --> f["Type · question · name · objective · first branch · people and agents · who can see it"]
+  n --> f["Type · question · name · key · objective · first branch · people and agents · who can see it"]
   f --> v{"Valid?"}
-  v -->|no question · type switched off · unknown person or agent| ref["Names the field and why · nothing saved"] --> f
+  v -->|no question · unknown type · unknown person or agent · key taken, not URL-safe or reserved| ref["Names the field and why · nothing saved"] --> f
   v -->|yes| vis{"Who can see it?"}
   vis -->|Graph members| g["Created · you are staffed · every member sees it"]
   vis -->|Only the people on it| p["Created · you and the people picked are its access list"]
@@ -46,9 +46,9 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| PJ-02.1 | A member who can work on projects | they press *New project* | one modal opens with the type (the three launched types selectable, the rest drawn and switched off), the question, the name, an objective, the first branch, the agents and people, and who can see it |
+| PJ-02.1 | A member who can work on projects | they press *New project* | one modal opens with the type (the four launched types, and any type an installed Domain pack adds), the question, the name, the key, an objective, the first branch, the agents and people, and who can see it |
 | PJ-02.2 | The question typed and no name | the project is created | the name is the question's first 60 characters |
-| PJ-02.3 | A question left empty, a type that is switched off, or a person or agent that does not exist | they press *Create* | it is refused before saving, the modal naming the field and why |
+| PJ-02.3 | A question left empty, a type the install does not offer, or a person or agent that does not exist | they press *Create* | it is refused before saving, the modal naming the field and why |
 | PJ-02.4 | A project created | the engine saves it | the creator is staffed by the engine and is not offered in the picker; the project opens on its page |
 | PJ-02.5 | The people picker | it opens | it lists the Graph's other members by name, and the Graph's agents |
 | PJ-02.6 | *Only the people on it* chosen | the project is created | the creator and the people picked are its access list, and its header reads *people only:* and their names |
@@ -59,7 +59,11 @@ flowchart TD
 | PJ-02.11 | A private project | someone removes its last person | it is refused, saying a private project always has someone on it |
 | PJ-02.12 | A Graph-visible project | staffing is edited | staffing only fills the assignee picker; every member can still read the project |
 | PJ-02.13 | An agent running on a project | it reads projects | it reads through its own access; the rule for people is applied to the people-facing screens, search and History |
-| PJ-02.14 | The project rules a type needs | the modal is open | they are not asked there; they are written on the project's Details tab after it exists |
+| PJ-02.14 | A type picked | the project is created | the type's default rules are in force on it, its suggested agents and skills are offered first in the picker, and its report template is the report's starting point; further project rules are written on Details after it exists |
+| PJ-02.16 | A name typed | the key field is read | it holds a key generated from the name — lower case, URL-safe — unique in the Graph, and may be edited here |
+| PJ-02.17 | A key already used in the Graph, one that is not URL-safe, or a reserved word (`tasks`, `decisions`, `review`) | they press *Create* | it is refused, the key field naming which and why; nothing is saved |
+| PJ-02.18 | A project created | its Details are read | the key reads as a fact, never a field; no act edits it (PJ-01.7) |
+| PJ-02.19 | A project of a type | it is open | its heading, tabs, dialogs and report use the type's words — a Research project reads *Study* and *Task*, an Investigation *Case* and *Action* — while Projects, My tasks, Inbox › Needs you, Decisions, search and History use *Project* and *Task* with the type as a badge |
 | PJ-02.15 | An Operator | they open Projects | *New project* is disabled, naming *Can work on projects*; the people and visibility controls on a project read only, naming the same |
 
 ## Screens

@@ -56,7 +56,7 @@ flowchart LR
 | PJ-16.11 | A task | a member adds a criterion to it | it applies to that task alone; the inherited ones are unchanged |
 | PJ-16.12 | A task with no criteria of its own in a project with none | it is opened | it reads *No criteria — accepted by eye*, and the task can still be worked and accepted |
 | PJ-16.13 | A project criterion edited while a task's result is in review | the result is reviewed | outcomes already recorded keep the statement they judged; criteria not yet judged use the new statement |
-| PJ-16.14 | A project's rules | its Details is opened | the Graph's and the install's rules read first, dimmed and read-only, then the project's own (MO-F06) |
+| PJ-16.14 | A project's rules | its Details is opened | the Graph's and the install's rules read first, dimmed and read-only, then the project's own (SE-F07) |
 | PJ-16.15 | An Operator | they open a project's Details and a task's Criteria | both read; *Add an objective*, *Add a criterion*, *Edit*, *Remove* and *Paste a paragraph* are disabled, naming *Can work on projects* |
 
 ## Screens

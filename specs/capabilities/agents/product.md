@@ -56,6 +56,7 @@ fixed. Built separately in every Graph, the same agent drifts into many.
 | Runs | modal | `agents.runs` |
 | A run | sheet | `agents.run` · `agents.run.answer` |
 | Skills · a skill | modal · sheet | `agents.skills` · `agents.skill` |
+| Plans · a plan · a function | modal · sheet | `agents.skills` |
 | Schedules | modal | `agents.schedules` |
 
 ## Decisions
@@ -72,7 +73,7 @@ fixed. Built separately in every Graph, the same agent drifts into many.
 | Nothing that ran is deleted | A retired agent or helper keeps its row and its name, so every run and who made whom still resolves |
 | Limits read as a table | Each limit's value beside what it bounds — set once, read often — never a form of inputs |
 | Every run reads one way | Runs, how agents are doing and every hand-off read from the same stored runs, so no two numbers disagree (AG-F03) |
-| Skills are offered, never obeyed | A step is offered the skills its agent holds, each as its own item, and says which it applied; the gap between offered and applied is what a person acts on — rewrite the skill, or take it off the agent. A skill is never enforcement: what must hold is a bound on the agent or a checked rule (MO-F06) (AG-F04) |
+| Skills are offered, never obeyed | A step is offered the skills its agent holds, each as its own item, and says which it applied; the gap between offered and applied is what a person acts on — rewrite the skill, or take it off the agent. A skill is never enforcement: what must hold is a bound on the agent or a checked rule (SE-F07) (AG-F04) |
 | A skill reaches a step only through its agent | A skill no agent holds exists but is never offered |
 | What a step was given is kept by version | A step records the version of each skill it was offered, so a trace shows what it was given, not what the skill says today; evidence counts per version |
 | One skill, one plan | A skill version draws as exactly one plan; instructions that cannot be drawn as a plan are a rule, not a skill (AG-F04 · AG-F06) |
@@ -102,4 +103,4 @@ fixed. Built separately in every Graph, the same agent drifts into many.
 | A skill an agent rewrites by itself | A suggested change waits for a person (EX-F07) |
 | Promoting a plan automatically when it served | Promotion is a person's call; serving only makes it a candidate |
 | Editing an Invana plan | Its steps are the engine's functions; a changed copy names a plan nothing can run |
-| A separate plan language for loading data | A load of many datasets is an ordinary plan that reuses the one-dataset load |
+| A separate plan language for loading data | A load of many files is an ordinary plan that reuses the one-file load (RC-F02) |

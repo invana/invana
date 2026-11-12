@@ -49,7 +49,7 @@ flowchart LR
 | EX-08.4 | A query that does not parse | the person runs it | the parser's message is shown at its position and nothing runs |
 | EX-08.5 | A query naming a kind or property the model lacks | the person runs it | it is refused before it runs, naming the unknown one and what the model has |
 | EX-08.6 | A query with a write clause | the person runs it | it is refused before it runs — *That query would write to the graph — only read-only queries run here* |
-| EX-08.7 | A read-only query that mentions *offset*, *dataset* or a quoted *merge* | the person runs it | it runs |
+| EX-08.7 | A read-only query that mentions *offset*, *settings* or a quoted *merge* | the person runs it | it runs |
 | EX-08.8 | A valid query | it runs | the query and its outcome are turns in the thread, and its rows are in the console's Data |
 | EX-08.9 | A query that returns zero rows | it finishes | the reply says the Graph does not hold this, as an answer, not an error |
 | EX-08.10 | A slow query | it runs | the elapsed time shows with *Cancel* |

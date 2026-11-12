@@ -4,7 +4,7 @@ title: Read access without the grant and know who to ask
 feature: AC-F02
 status: idea
 personas: [analyst, builder]
-boards: [shell.locked]
+boards: [access.locked]
 ---
 
 # AC-07 · Read access without the grant and know who to ask
@@ -56,6 +56,6 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | People and access, read only | Admin | — | — | — | — | — | — | — |
-| People and access, read only | Operator | shell.locked · Built in only | shell.locked · Nothing matches | shell.locked · Loading | shell.locked | shell.locked · Grant lost | — | shell.locked |
+| People and access, read only | Operator | access.locked · Built in only | access.locked · Nothing matches | access.locked · Loading | access.locked | access.locked · Grant lost | — | access.locked |
 | *Ask Priya*, pressed | Admin | — | — | — | — | — | — | — |
-| *Ask Priya*, pressed | Operator | — | — | — | shell.locked · Asked | — | — | — |
+| *Ask Priya*, pressed | Operator | — | — | — | access.locked · Asked | — | — | — |

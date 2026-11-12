@@ -4,7 +4,7 @@ title: Read without the grant and see who can act
 feature: GR-F03
 status: idea
 personas: [analyst]
-boards: [shell.locked, model.board, agents.agent]
+boards: [access.locked, model.board, agents.agent]
 ---
 
 # GR-12 · Read without the grant and see who can act
@@ -50,7 +50,7 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Access rules, read | Admin | — | — | — | — | — | — | — |
-| Access rules, read | Operator | — | — | — | shell.locked | — | — | shell.locked |
+| Access rules, read | Operator | — | — | — | access.locked | — | — | access.locked |
 | A mode, read only | Admin | — | — | — | model.board | — | — | — |
 | A mode, read only | Operator | — | — | — | model.board · Read only | — | — | model.board · Read only |
 | A sheet, read only | Admin | — | — | — | agents.agent | — | — | — |

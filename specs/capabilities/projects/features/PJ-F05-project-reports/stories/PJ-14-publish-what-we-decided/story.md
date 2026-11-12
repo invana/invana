@@ -31,9 +31,9 @@ flowchart LR
   d -->|Edit| m["Its Markdown"] --> sv["Save"]
   sv --> p{"Publish version n"}
   p -->|empty| r["Refused"]
-  p --> v(["Version n · frozen · cites its dataset versions"])
+  p --> v(["Version n · frozen · cites its loads"])
   v --> x["Markdown · Print to PDF"]
-  v -->|a cited version retracted| n["A notice names it"]
+  v -->|a cited load undone| n["A load undone notice names it"]
 ```
 
 ## Acceptance criteria
@@ -46,9 +46,9 @@ flowchart LR
 | PJ-14.4 | The draft | the member switches *Read · Edit* | it shows the draft's Markdown to edit, and *Save* keeps it |
 | PJ-14.5 | A draft with unsaved edits | the member looks at *Publish* | it is off until the draft is saved |
 | PJ-14.6 | An empty draft | the member publishes | it is refused, saying there is nothing to publish |
-| PJ-14.7 | A saved draft | the member publishes | a version numbered next is frozen with its body and the dataset versions the findings cite; *Versions* counts it and the draft |
+| PJ-14.7 | A saved draft | the member publishes | a version numbered next is frozen with its body and the loads the findings cite; *Versions* counts it and the draft |
 | PJ-14.8 | A published version | anyone opens it later | it reads exactly as published, whatever changed in the project since |
-| PJ-14.9 | A version citing a dataset version retracted since | it is opened | a notice names the retracted version |
+| PJ-14.9 | A version citing a load undone since | it is opened | a *load undone* notice names the load, who undid it and when |
 | PJ-14.10 | The draft or a version | it is read | it reads rendered, its cites numbered and listed once under *Cites*, a run as *run 8195c5e8* linking to the run |
 | PJ-14.11 | A version | the member presses *Markdown* · *Print* | the body downloads as Markdown, as it reads · the browser prints the rendered version to PDF |
 | PJ-14.12 | An archived project | its Report tab is opened | the draft and versions read; *Draft from the records*, *Edit* and *Publish* are off |

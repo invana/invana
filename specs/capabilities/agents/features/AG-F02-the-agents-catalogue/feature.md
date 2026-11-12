@@ -7,6 +7,7 @@ personas: [admin, owner, builder]
 stories: [AG-35]
 journeys: []
 boards: [agents, agents.agent, settings.people]
+nfrs: []
 depends_on: [AG-F01]
 ---
 
@@ -82,6 +83,71 @@ flowchart TD
 | An agent invited into a graph — its version, status, who invited it | Write · read |
 | The access rules it holds in that graph | Write (AC-F03) · read |
 
+## Engine
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `agents_members` | `graph_id` · `agent_id` · `version` (the one the Graph runs) · `status` (`active` · `paused`) · `invited_by_id` · `invited_at` | Unique on (`graph_id`, `agent_id`). Its access rules are AC-F02 rows; it carries no definition, budget or instructions |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| Agents, their versions and `kind` | [AG-F01](../AG-F01-build-an-agent/feature.md#engine) |
+| Skills an agent carries | [AG-F04](../AG-F04-skills/feature.md#engine) |
+| Runs and their numbers per Graph, for a version across Graphs | [AG-F03](../AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| The access rules a member holds | [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
+| Plugins enabled — whether an agent's functions can run | [RT-F02](../../../../os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md#engine) |
+| The Graph's people and `default_agent_id` | [GR-F04](../../../../os/graph/features/GR-F04-this-graph/feature.md#engine) |
+
+### Routes
+
+| Route, after `/api/v1/u/{u}/{g}` | Does | Story |
+|---|---|---|
+| `GET /agents/members` · `POST /agents/members` | The Graph's agents with their version and *Update available* · invite one at its published version | AG-35 |
+| `PATCH /agents/members/{agent}` · `DELETE /agents/members/{agent}` | Pause or resume it in this Graph · remove it | AG-35 |
+| `POST /agents/members/{agent}/update` | Move to the newest published version | AG-35 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `agents.members.create` · `agents.members.update` · `agents.members.delete` | Invited · paused, resumed or moved to a version · removed |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 409 | Removing one of the Graph's shipped agents | *{agent} keeps {product} working — pause it instead.* | AG-35.7 |
+| 409 | Inviting an agent whose functions need a plugin not enabled | *{agent} needs {plugin} — an Admin enables it.* | AG-35.4 |
+| 409 | Inviting an agent retired in the catalogue | *{agent} is retired.* | AG-35.10 |
+| 403 | Invite, pause, remove or update without *Can manage people* | *This needs Can manage people — ask {owner}.* | AG-35.13 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| — | No command of its own |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| The shipped agents | `explorer` · Explorer — answers questions about this graph in plain words and shows its work; the default · `ql-query` · Query — runs the query typed, with no translation · `modeller` · Modeller — turns a described change into staged edits on the model's draft · `coordinator` · Coordinator — splits a question into parts, hands each to a helper and answers from what they return; the one shipped agent that may make helpers. `SEEDED_AGENTS` holds exactly these four |
+| Seeded on first read | A Graph gets its shipped agents when it is created, and again on the first read of its agents, idempotently; `explorer` becomes `default_agent_id` when none is set |
+| Versioned with the engine | A shipped agent's definition ships with the release; a release adds the functions and plans it brings and never gives back what an owner took away — the row remembers what it was last given |
+| Pinned per Graph | A run opens on `agents_members.version`; a newer published version is offered, never applied; runs in flight finish on theirs |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 6 Data and storage | `agents_members` in Invana's own store | — |
+| § 8 APIs and events | The routes and events above | — |
+| § 10 AI and agents | An agent is built once and invited per Graph at a pinned version | — |
+
 ## Decisions
 
 | Decision | Detail |
@@ -90,6 +156,9 @@ flowchart TD
 | The catalogue shows where each agent runs | Each agent's row names the graphs that run it and at which version |
 | An update is a chip | *Update available* on the agent's member row, and a line on its sheet saying what changed |
 | A plugin not enabled | An agent whose functions need it is offered disabled, naming the plugin; an Admin enables it |
+| The assistants Invana ships | The agents seeded in every graph are listed in [Engine › Mechanisms](#mechanisms) |
+| A version reads across graphs | A catalogue agent's version shows how it did in each graph that runs it, against the version before |
+| The map | Agents can be read as a map — each agent, its skills and the functions they reach |
 | Not built yet | Inviting agents into a graph and updates have no engine yet |
 
 ## Open questions
@@ -109,3 +178,6 @@ flowchart TD
 | Removing one of the graph's own assistants | Its product stops working without it; pause it instead |
 | A graph role for an agent | It would let an agent do whatever that role may |
 | A shipped assistant for an experimental product | *Create a graph* promises nothing experimental |
+| A router agent that classifies each ask, a fixed roster of specialists and a named skill catalogue for them | An ask goes to the agent the work names, or the Graph's default; skills reach a step only through the agent that holds them |
+| A shipped data assistant | Bringing records in is a load (RC-F02), run as a plan |
+| Shipped agents named *<Product> assistant* | A shipped agent is named for what it does — Explorer, Query, Modeller, Coordinator |

@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Edit the draft, add functions, answer the planner's questions, choose for a flagged line, publish, roll back | — |
-| Operator | Read the instructions, Plan preview, Functions it needs, Flow and History | The editor is read-only; *Add functions*, *Publish*, *Edit instructions* and *Roll back* are disabled, naming *Can build agents* — *Ask Priya (owner)*. With *Can build agents*: as Admin |
+| Admin | Edit the draft, add functions, answer the planner's questions, choose for a flagged line, set the model version, discard the draft, publish, roll back — in Studio or on the command line | — |
+| Operator | Read the instructions, Plan preview, Functions it needs, Flow and History | The editor is read-only; *Add functions*, *Discard draft*, *Publish*, *Edit instructions* and *Roll back* are disabled, naming *Can build agents* — *Ask Priya (owner)*. With *Can build agents*: as Admin |
 
 ## Flow
 
@@ -29,6 +29,9 @@ flowchart LR
   e([Instructions]) -->|Save · guided| gd["No plan — Flow says the model follows the instructions"]
   gd -->|Publish| g
   e -->|Save · planned| d{"The plan is drawn"}
+  e -->|Discard draft| dd(["The draft goes; the published version stays"])
+  e -->|Model version| mv["Kept on the draft; publishes through the evals"]
+  mv --> g
   d -->|a sentence reads two ways| q["A question under it — pick a reading"]
   q --> d
   d -->|a line maps to no function| u["Flagged — Leave it to a person · Rewrite the line"]
@@ -71,6 +74,10 @@ flowchart LR
 | AG-19.21 | A guided skill | Instructions or Flow opens | no plan is drawn; the Plan preview and Flow read *Guided — the model follows the instructions; each run shows the steps it took*, and *Functions it needs* lists the functions its agent may use that the instructions name |
 | AG-19.22 | A guided draft | the builder switches it to *Planned* | the plan is drawn as AG-19.1, and Publish waits for it like any draft |
 | AG-19.23 | A published planned version whose kept plan is gone | a run opens it | the plan is compiled again from the version's text, its answers and the function and library-plan versions it named, and is the same plan |
+| AG-19.24 | An open draft | the builder presses *Discard draft* | the draft, its answers and its plan go; the published version stays current and every agent it is added to is still offered it; a skill that never published reads *draft · empty* |
+| AG-19.25 | A draft | the builder picks the model version the skill thinks with, or clears it | it is kept on the draft and publishes with the version, through the evals like any edit; a cleared one hands the choice to the agent; a step on this skill's plan calls it as AG-29.23 says, and one the graph does not offer refuses the run, naming it |
+| AG-19.26 | The command line | `invana skills list · history · push · publish · rollback` | they do what Studio does: *push* writes the draft from a file and draws it, and a draw that asks a question prints it and stops — the question is answered in Studio; *publish* and *rollback* pass the same evals gate; someone without *Can build agents* is refused, naming it |
+| AG-19.27 | A drawn plan with two steps under one key, a function the install lacks, or a named library plan that is one-off, has no steps or is given a value of the wrong type | it is drawn | nothing is written; it says why where the flow would be, naming the step, the function or the plan and what is wrong, and the plan that was there is untouched |
 
 ## Screens
 
@@ -92,6 +99,10 @@ flowchart LR
 | A step selected | Operator | — | — | — | agents.skill · Flow step | — | — | agents.skill · Flow step |
 | Publish | Admin | — | — | — | agents.skill · Publish | agents.skill · Publish refused | agents.skill · Eval running | — |
 | Publish | Operator | — | — | — | — | — | — | agents.skill · Read only |
+| Discard draft | Admin | — | — | — | agents.skill · Discard draft | agents.skill · Could not load | — | — |
+| Discard draft | Operator | — | — | — | — | — | — | agents.skill · Read only |
+| Model version | Admin | agents.skill · New draft | — | agents.skill · Loading | agents.skill · Model version | agents.skill · Publish refused | agents.skill · Eval running | — |
+| Model version | Operator | agents.skill · Read only | — | agents.skill · Loading | agents.skill · Read only | agents.skill · Could not load | — | agents.skill · Read only |
 | History | Admin | agents.skill · History one version | — | agents.skill · Loading | agents.skill · History | agents.skill · Roll back refused | — | — |
 | History | Operator | agents.skill · History one version | — | agents.skill · Loading | agents.skill · History | agents.skill · Could not load | — | agents.skill · History |
 | The drawing as a run | Admin | — | — | agents.run · Loading | agents.run | agents.run · Failed | agents.run · Running | — |

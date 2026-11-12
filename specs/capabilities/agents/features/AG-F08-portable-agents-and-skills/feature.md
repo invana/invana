@@ -7,6 +7,7 @@ personas: [admin]
 stories: [AG-39, AG-40]
 journeys: []
 boards: [agents.skills, agents.skill, agents.agent]
+nfrs: []
 depends_on: [AG-F02, AG-F04, RT-F02, RT-F06]
 ---
 
@@ -112,6 +113,78 @@ sequenceDiagram
 | A library, its proposed functions, their JSON Schema contracts and their approval | Write · read |
 | Exported files | Read |
 
+## Engine
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| — | — | An import writes AG-F01's and AG-F04's rows as drafts and stores nothing of its own; the dry run is returned, never saved. Where a library and its approved functions are kept is an open question below |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| Agents and their versions — written as drafts on commit, read on export | [AG-F01](../AG-F01-build-an-agent/feature.md#engine) |
+| Skills, their versions, `folder` and `metadata`; the draw that compiles a planned skill | [AG-F04](../AG-F04-skills/feature.md#engine) |
+| The function catalogue a plan maps to | [AG-F06](../AG-F06-plans-and-functions/feature.md#engine) |
+| Model versions offered, for an alias | [RT-F01](../../../../os/runtime/features/RT-F01-ai-models/feature.md#engine) |
+| MCP servers an Admin adds · plugins enabled | [RT-F02](../../../../os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md#engine) |
+| Scripts and their approval | [RT-F06](../../../../os/runtime/features/RT-F06-skill-scripts/feature.md#engine) |
+
+### Routes
+
+| Route, install-wide, after `/api/v1/catalogue` | Does | Story |
+|---|---|---|
+| `POST /import` | The dry run: every file, its kind, what it becomes, its state (`ready` · `needs approval` · `refused`) and each mapped field beside its source; nothing saved | AG-39 |
+| `POST /import/commit` | Save every agent and skill of a dry run with nothing refused, as drafts | AG-39 |
+| `GET /agents/{id}/export` · `GET /skills/{id}/export` · `GET /export` | One agent `.md` · one `SKILL.md` folder · a zip of the whole catalogue | AG-39 |
+| `POST /libraries` | Read a package and its docs; proposes typed functions | AG-40 |
+| `POST /libraries/{id}/functions/{fn}/approve` | Register a proposed function, read-only from then | AG-40 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `agents.create` · `agents.skills.create` | Each imported agent and skill, as AG-F01 and AG-F04 emit them |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| refused (a row of the dry run) | A planned skill's line no function maps to | *{line} maps to no function — add a library, enable a plugin, or rewrite it.* | AG-39.5 |
+| refused (a row of the dry run) | A `references/` file over the size limit | *{file} is over {limit} characters.* | AG-39.9 |
+| refused (a row of the dry run) | An MCP server started as a local process | *Invana reaches MCP servers by address.* | AG-39.16 |
+| refused (a row of the dry run) | A hook, a command or any other file a bundle carries | *{file} is a {kind}; Invana runs no hooks or commands.* | AG-39.17 |
+| 409 | `POST /import/commit` while any row is refused | *Fix or leave out the refused files first.* | AG-39.10 |
+| 422 | A package that cannot be found or read | *{package} could not be read: {reason}.* | AG-40.7 |
+| step refused | A plan naming a library function no Admin approved | *{function} is not approved.* | AG-40.4 |
+| 403 | Import, export, add a library or approve a function without Admin | *Only an Admin does this.* | AG-39.13 · AG-40.10 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| `invana agents import <path> [--commit]` | The dry run; with `--commit`, saves it |
+| `invana agents export [<name>]` | One agent or skill, or the whole catalogue |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| Read many, write one | Agent `.md` files and `SKILL.md` folders import and export; `AGENTS.md`, Codex TOML and Claude plugin bundles are converted on import and never written |
+| Invana's fields | Read from and written under `metadata:`; a file without them still imports |
+| A planned skill on import | Its plan is compiled in the dry run by AG-F04's draw; the plan is never exported |
+| A library | Read from its package and docs; each proposed function declares inputs and outputs as JSON Schema and what it reaches, and the steps record which part of the docs each came from |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 8 APIs and events | Install-wide routes under `/api/v1/catalogue` and the CLI above | — |
+| § 11 Failure modes and the outside boundary | Outside files and packages are read, never run; a library's code reaches a plan only as an approved function | — |
+| § 12 Qualities | Security: no hook, command or local-process server from a bundle runs | — |
+
 ## Decisions
 
 | Decision | Detail |
@@ -124,15 +197,16 @@ sequenceDiagram
 | A planned skill that will not compile | Refused under the line, with *Import as guided* (AG-F04) beside the refusal |
 | Function contracts | A library's proposed functions declare their inputs and outputs as JSON Schema, as every function does (RT-F02) |
 | Export | One agent, one skill or all; the plan is not exported |
-| Versions of each format | `specs/system-design/integrations.md` › *Standards* |
+| Versions of each format | [System design § 11](../../../../system-design.md#11-failure-modes-and-the-outside-boundary) › *Standards* |
 | Not built yet | Import, export and libraries have no engine yet |
 
 ## Open questions
 
 | Question | Who answers |
 |---|---|
-| `AGENTS.md` imports as one agent (recommended), or as rules of the graph (MO-F06)? | Ravi |
+| `AGENTS.md` imports as one agent (recommended), or as rules of the graph (SE-F07)? | Ravi |
 | A planned skill that will not compile on import: offer *Import as guided* (recommended), or refuse until the file is fixed? | Ravi |
+| Where a library and its approved functions are kept, when the function catalogue is code (AG-F06) — two tables, `agents_libraries` and `agents_library_functions` (name, JSON Schema contracts, status `proposed · approved`, who approved) (recommended), or a generated plugin package an Admin installs? | Ravi |
 
 ## Not building
 

@@ -4,7 +4,7 @@ title: See what an agent may touch
 feature: AC-F04
 status: idea
 personas: [owner, builder]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-13 · See what an agent may touch
@@ -62,4 +62,4 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | What it may touch | Admin | settings.access · What it may touch · Starting lines only | settings.access · What it may touch · Nothing matches | settings.access · What it may touch · Loading | settings.access · What it may touch | settings.access · What it may touch · Could not load | — | — |
-| What it may touch | Operator | shell.locked · What it may touch · Starting lines only | shell.locked · What it may touch · Nothing matches | shell.locked · What it may touch · Loading | shell.locked · What it may touch | shell.locked · What it may touch · Could not load | — | shell.locked · What it may touch |
+| What it may touch | Operator | access.locked · What it may touch · Starting lines only | access.locked · What it may touch · Nothing matches | access.locked · What it may touch · Loading | access.locked · What it may touch | access.locked · What it may touch · Could not load | — | access.locked · What it may touch |

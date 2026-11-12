@@ -55,6 +55,8 @@ flowchart TD
 | RT-10.9 | A joined worker | it heartbeats | it takes work its group covers, holding no database credential and no inbound port |
 | RT-10.10 | An Operator | they look for *Add workers* | it is disabled — *Install admins add and scale workers* |
 | RT-10.11 | A key minted or a worker joined | it is done | History records who and when (AC-F06) |
+| RT-10.12 | An Admin | they change a worker group — its labels, slots a worker, plugins, secret names or outbound domains | the change is stored and History records who and when (AC-F06); workers that join afterwards take it |
+| RT-10.13 | A member | they open *Join keys* | every key reads its group, prefix, expiry, how many joined of its cap, and whether it is revoked — never its secret |
 
 ## Screens
 

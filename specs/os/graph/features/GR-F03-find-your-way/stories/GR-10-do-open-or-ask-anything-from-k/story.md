@@ -4,7 +4,7 @@ title: Do, open or ask anything from ⌘K
 feature: GR-F03
 status: idea
 personas: [analyst, builder, modeller]
-boards: [shell.command]
+boards: [graphs.command]
 ---
 
 # GR-10 · Do, open or ask anything from ⌘K
@@ -55,10 +55,12 @@ flowchart TD
 | GR-10.10 | Nothing matches | the list draws | it says *Nothing found*, with *Ask the assistant* |
 | GR-10.11 | A list ⌘K could not read | it matches | that group says it could not be read; the others still match |
 | GR-10.12 | Off a Graph | ⌘K opens | it lists the Graphs the person can open and Settings; *Ask the assistant* is absent |
+| GR-10.13 | A person at the command line | they run `invana search "<text>"`, across their Graphs or in one `--graph` | each hit reads its kind, name, Graph and id, closest first — Graphs and the records ⌘K finds; a Graph or a private project they are not on is never a hit |
+| GR-10.14 | A person at the command line | they search in one `--graph` they are not on | it reads *not found*, as if the Graph did not exist |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| ⌘K | Admin | shell.command · Nothing typed | shell.command · Nothing found | shell.command · Loading | shell.command | shell.command · A group failed | — | — |
-| ⌘K | Operator | shell.command · Nothing typed | shell.command · Nothing found | shell.command · Loading | shell.command | shell.command · A group failed | — | shell.command · Act disabled |
+| ⌘K | Admin | graphs.command · Nothing typed | graphs.command · Nothing found | graphs.command · Loading | graphs.command | graphs.command · A group failed | — | — |
+| ⌘K | Operator | graphs.command · Nothing typed | graphs.command · Nothing found | graphs.command · Loading | graphs.command | graphs.command · A group failed | — | graphs.command · Act disabled |

@@ -12,8 +12,9 @@ One knowledge graph, one set of rules, for every thinker and the systems they bu
 
 Invana is open source. People and agents work on the same knowledge graph, and the ontology governs both: agents do the work, the person decides, with evidence anyone can follow.
 
-Invana offers three pillars — **Ontology** (Model · Data · Datasets), **Agents** and **Evidence** (Explore ·
-Projects) — on one operating system.
+Invana offers four pillars — **Ontology** (Semantics), **Intelligence** (Records), **Agents** and **Evidence**
+(Explore · Projects) — on one operating system. Nothing in it is domain-specific: a domain is its ontology, its agents
+and its project types, shipped as a Domain pack.
 
 <div class="grid cards" markdown>
 
@@ -43,7 +44,7 @@ Projects) — on one operating system.
 
     ---
 
-    Pursue a question on branches with findings for and against. Run a simulator on a branch over pinned dataset versions, reproducible from its seed, and cite the result in a finding.
+    Pursue a question on branches with findings for and against. Run a simulator on a branch over pinned loads, reproducible from its seed, and cite the result in a finding.
 
     [:octicons-arrow-right-24: Learn more](concepts/simulations.md)
 

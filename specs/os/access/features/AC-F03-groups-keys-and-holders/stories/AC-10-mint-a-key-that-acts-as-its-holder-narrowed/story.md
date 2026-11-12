@@ -4,7 +4,7 @@ title: Mint a key that acts as its holder, narrowed
 feature: AC-F03
 status: idea
 personas: [owner, builder, curator, analyst]
-boards: [settings.me, settings.access, shell.locked]
+boards: [settings.me, settings.access, access.locked]
 ---
 
 # AC-10 · Mint a key that acts as its holder, narrowed
@@ -77,6 +77,7 @@ sequenceDiagram
 | AC-10.17 | A new key | it is minted | its own rule starts reads at Allow, writes at Ask, and sends, spends and access changes at Deny unless the minter sets them when the key is made, never wider than the holder; the starting lines are shown before the key is made |
 | AC-10.18 | A key | its holder marks it *agent-operated*, or it is a service account's key | it is held to every rule agents are, its access changes never Allow; a service account's keys start marked; clearing the mark is a widening of its holder (AC-04.16 · AC-11.11) |
 | AC-10.19 | An agent-operated key | it reads access rules, holders or *Can someone do this?* | the read is under a line on its own rule, starting at Deny, as an agent's does; on a key not marked it starts at Allow, with its other reads ([Reading access is no act](../../../../product.md#decisions)) |
+| AC-10.20 | A name the holder already uses on a live key | a key is minted with it | it is refused in place, naming it |
 
 ## Screens
 
@@ -87,4 +88,4 @@ sequenceDiagram
 | New key — then its secret | Admin | — | — | — | settings.me · Key created | settings.me · Wider than the holder | — | — |
 | New key — then its secret | Operator | — | — | — | settings.me · Key created | settings.me · Wider than the holder | — | settings.me · Only you as holder |
 | This Graph's keys | Admin | settings.access · No keys yet | settings.access · Nothing matches | settings.access · Loading | settings.access · Keys | settings.access · Could not load | — | — |
-| This Graph's keys | Operator | shell.locked · No keys yet | shell.locked · Nothing matches | shell.locked · Loading | shell.locked · Keys | shell.locked · Could not load | — | shell.locked · Keys |
+| This Graph's keys | Operator | access.locked · No keys yet | access.locked · Nothing matches | access.locked · Loading | access.locked · Keys | access.locked · Could not load | — | access.locked · Keys |

@@ -4,7 +4,7 @@ title: Say exactly what an access rule allows
 feature: AC-F02
 status: idea
 personas: [owner]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-04 · Say exactly what an access rule allows
@@ -54,7 +54,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-04.1 | A rule | it is opened | *What it allows* reads as sentences (*Ask about Airport, Route*), and what it does not (*Change data*), grouped under what they reach — graph data · AI models · outside · cache · people · agents · projects · datasets |
+| AC-04.1 | A rule | it is opened | *What it allows* reads as sentences (*Ask about Airport, Route*), and what it does not (*Change data*), grouped under what they reach — graph data · AI models · outside · cache · people · agents · projects |
 | AC-04.2 | A rule's sentences | the reader asks for the exact lines | each line shows what may be done, to what, and its conditions |
 | AC-04.3 | A custom rule being edited | a line names something outside the grammar — an unknown reach, nothing to do, a condition that is not fields · depth · until | the save is refused in place, naming the line |
 | AC-04.4 | A line with a condition on fields, depth or until | access is checked | it allows only inside its condition; a check its condition cannot judge does not allow |
@@ -76,16 +76,17 @@ flowchart TD
 | AC-04.20 | Someone who can manage people | they save a change that loosens a built-in rule or the *For everyone* rule | it waits for an Owner who did not make it, and every Owner is alerted; with only one Owner, who made it, it takes effect after 24 hours, with an alert to that Owner and a History row, and the Owner may cancel it until then |
 | AC-04.21 | A person whose last sign-in was over 15 minutes ago | they make or allow an access change, a send of confidential or personal data, or raising a limit | they sign in again first; nothing changes until they do |
 | AC-04.22 | An Owner, in a Graph with other Owners | they make or allow an access change | it is a History row, and every other Owner is alerted, naming the change and who made it |
+| AC-04.23 | Someone who can manage people, at the command line | they apply a rule file | who it changes prints first, then the custom or *For everyone* rule is created or its next version saved, held to every check Studio is; a file naming a built-in or a key's own rule is refused, naming it |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A rule — what it allows | Admin | settings.access · New rule | — | settings.access · Loading | settings.access | settings.access · Line refused | — | settings.access · Built in |
-| A rule — what it allows | Operator | — | — | shell.locked · Loading | shell.locked | shell.locked · Could not load | — | shell.locked |
+| A rule — what it allows | Operator | — | — | access.locked · Loading | access.locked | access.locked · Could not load | — | access.locked |
 | A change that waits for an Owner | Admin | — | — | — | settings.access · Waits for an Owner | settings.access · Nobody could decide | — | — |
-| A change that waits for an Owner | Operator | — | — | — | — | — | — | shell.locked |
+| A change that waits for an Owner | Operator | — | — | — | — | — | — | access.locked |
 | Sign in again | Admin | — | — | — | settings.access · Sign in again | settings.access · Sign in again · Wrong password | — | — |
 | Sign in again | Operator | — | — | — | settings.access · Sign in again | settings.access · Sign in again · Wrong password | — | — |
 | A rule — History | Admin | — | — | settings.access · Loading | settings.access · History | settings.access · Could not load | — | — |
-| A rule — History | Operator | — | — | shell.locked · Loading | shell.locked · History | shell.locked · Could not load | — | shell.locked · History |
+| A rule — History | Operator | — | — | access.locked · Loading | access.locked · History | access.locked · Could not load | — | access.locked · History |

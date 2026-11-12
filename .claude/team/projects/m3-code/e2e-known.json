@@ -1,0 +1,10 @@
+[
+ "e2e \u203a agents-fleet.spec.ts \u203a Fleet \u203a Overview draws its tiles and sections",
+ "e2e \u203a answer-surface.spec.ts \u203a a session's first subgraph is drawn; a later one is offered until loaded",
+ "e2e \u203a explorer.spec.ts \u203a 4.4 a failed query opens the console on its step, and the footer marks it",
+ "e2e \u203a explorer.spec.ts \u203a 4.4 the footer's counts open the console on the canvas's data and on its queries",
+ "e2e \u203a impact.spec.ts \u203a PJ-10 impact draws what an option's cited records reach",
+ "e2e \u203a launcher.spec.ts \u203a inside airways the launcher lists Invana, then This Graph",
+ "e2e \u203a models-page.spec.ts \u203a a model nothing was counted for draws no chart of zeros",
+ "e2e \u203a property-constraints.spec.ts \u203a a range counts what breaks it, saves on the draft, and is removed again"
+]

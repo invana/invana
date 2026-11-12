@@ -33,6 +33,8 @@ flowchart LR
   s -->|no| n["Disabled — Ask Priya (owner)"]
   s -->|yes| d["The schedule, filled with the question"] --> t(["Toast · opens it in Agents › Schedules"])
   b -->|Delete| x["Confirms, naming how many versions go with it"]
+  b -->|Save a version| m(["A named version · the last 30 kept"])
+  b -->|Rename| rn(["The new name on the left"])
 ```
 
 ## Acceptance criteria
@@ -48,6 +50,11 @@ flowchart LR
 | EX-07.7 | A settled answer | a person with *Can work on projects* picks *Schedule this* | the schedule opens filled with the question; saving it confirms with a toast that opens it in Agents › Schedules |
 | EX-07.8 | An Operator without *Can work on projects* | they reach *Schedule this* | it is disabled with *Ask Priya (owner)* |
 | EX-07.9 | No board kept yet | Explore opens | the question box shows alone, with no list of kept boards invented under it |
+| EX-07.10 | A board | the person picks *Rename* on its tab's menu | its name and what it is for change, and the list on the left shows the new name |
+| EX-07.11 | A board worth marking | the person picks *Save a version* in History and names it | a version with that name is kept beside the autosaved ones |
+| EX-07.12 | A board with 30 versions | a new version is saved | the oldest is let go, and History says *Keeps the last 30 versions* |
+| EX-07.13 | A conversation that already has a board | it is opened from the left, a link or ⌘K | its one board opens; a second board is never made for it |
+| EX-07.14 | Two boards open as tabs | the person switches between them | each keeps its camera, layout, selection and open panel |
 
 ## Screens
 
@@ -55,5 +62,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Boards on the left | Admin | explore.ask | explore.board · No board matches | explore.board · Loading | explore.board | explore.board · Failed | — | — |
 | Boards on the left | Operator | explore.ask | explore.board · No board matches | explore.board · Loading | explore.board | explore.board · Failed | — | — |
+| History · Save a version · Rename | Admin | — | — | — | explore.board | explore.board · Failed | — | — |
+| History · Save a version · Rename | Operator | — | — | — | explore.board | explore.board · Failed | — | — |
 | Schedule this | Admin | — | — | — | explore.share · Schedule | explore.share · Failed | — | — |
 | Schedule this | Operator | — | — | — | explore.share · Schedule | explore.share · Failed | — | explore.share · No access |

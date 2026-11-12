@@ -57,6 +57,7 @@ flowchart LR
 | GR-17.14 | A webhook channel with a signing secret | a delivery is sent | it carries a signature of its body the receiver can check |
 | GR-17.15 | A rule or channel change | it is saved | it is a History row (AC-F06) |
 | GR-17.16 | An Operator | they open Settings › Notifications | rules, alerts and channels read; *New rule*, *Add channel*, each switch and *Remove* are disabled, naming the owners |
+| GR-17.17 | An owner at the command line | they apply a rules file — one rule or a list | each rule is created, or replaces the rule of its name, with the same checks as *New rule*; a refused rule names its field and nothing in the file is half-applied |
 
 ## Screens
 

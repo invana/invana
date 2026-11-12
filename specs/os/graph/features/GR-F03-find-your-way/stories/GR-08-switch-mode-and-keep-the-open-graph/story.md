@@ -27,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [GR-F03](../../feature.md)
 flowchart LR
   w([A mode, a Graph open]) --> n{"leftNav"}
   n -->|Explore · Model · Projects| m(["Main changes · the wordmark names the mode · same Graph"])
-  n -->|Data · Agents · Inbox · Settings| o["An overlay over the work · its icon outlined"]
+  n -->|Records · Agents · Inbox · Settings| o["An overlay over the work · its icon outlined"]
   o -->|Esc| w
   o -->|reload| o2(["The same overlay, over the same work"])
   n -->|the active mode again| c["The sidebar collapses or opens"]
@@ -37,7 +37,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| GR-08.1 | A Graph open | the leftNav draws | Explore, Model and Projects above the line; Data, Agents and Inbox below; Settings and Help at the bottom — each icon with its label underneath |
+| GR-08.1 | A Graph open | the leftNav draws | Explore, Model and Projects above the line; Records, Agents and Inbox below; Settings and Help at the bottom — each icon with its label underneath |
 | GR-08.2 | A mode | the person picks another | main changes to that mode at its landing, in the same Graph, and the wordmark names it |
 | GR-08.3 | A mode | the person picks a summoner | its overlay opens over the work and its icon is outlined until it closes |
 | GR-08.4 | An overlay open | the person presses Esc | it closes and the work behind it is as it was |

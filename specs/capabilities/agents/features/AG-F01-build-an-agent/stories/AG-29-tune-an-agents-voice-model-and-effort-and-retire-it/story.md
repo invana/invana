@@ -67,6 +67,9 @@ flowchart TD
 | AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its sheet is disabled |
 | AG-29.20 | An ask to a paused or retired agent | it is sent | it is refused, naming the state, and *How it got here* shows the refused step and why |
 | AG-29.21 | An Operator without *Can build agents* | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume*, *Retire* and *Make default* are disabled, naming *Can build agents*, with *Ask Priya (owner)* |
+| AG-29.22 | A paused agent with a run already queued | the run's turn comes | it starts and finishes; only work that arrives after the pause is refused |
+| AG-29.23 | A step that calls a model | the run opens | the version is the person's pick for that one question, else the skill version's pin, else the agent's pin, else the view of the graph's; one that is not offered or not allowed refuses the run, naming it — nothing falls back |
+| AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's tests run first, as AG-29.9; someone without *Can build agents* is refused, naming it |
 
 ## Screens
 

@@ -42,7 +42,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AG-45.1 | Nothing is running and nothing ended today | the person opens Running | it reads *Nothing is running*, and that a question, a load, a task or a schedule starts a run |
-| AG-45.2 | Runs in flight | Running opens | each lists what it was about — the question as typed, the query, or the dataset and where it loads — its agent, *steps N of M*, time so far and tokens; the reader's runs first |
+| AG-45.2 | Runs in flight | Running opens | each lists what it was about — the question as typed, the query, or the file and the model it loads into — its agent, *steps N of M*, time so far and tokens; the reader's runs first |
 | AG-45.3 | A run in flight | its steps arrive | the row updates in place and keeps its place; the list repaints at most four times a second |
 | AG-45.4 | A run that delegated to a helper, or a step that fanned out | Running is read | each child sits under its run; past the second level they collapse, showing how many |
 | AG-45.5 | A run still going whose helper failed | it is read | it shows the helper's failure beside its own *running*; neither hides the other |

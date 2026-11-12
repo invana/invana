@@ -4,7 +4,7 @@ title: See and change who holds an access rule
 feature: AC-F03
 status: idea
 personas: [owner]
-boards: [settings.access, shell.locked]
+boards: [settings.access, access.locked]
 ---
 
 # AC-11 · See and change who holds an access rule
@@ -58,8 +58,8 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Who holds it | Admin | settings.access · Nobody holds it | settings.access · Nothing matches | settings.access · Loading | settings.access | settings.access · Could not load | — | — |
-| Who holds it | Operator | shell.locked · Nobody holds it | shell.locked · Nothing matches | shell.locked · Loading | shell.locked | shell.locked · Could not load | — | shell.locked |
+| Who holds it | Operator | access.locked · Nobody holds it | access.locked · Nothing matches | access.locked · Loading | access.locked | access.locked · Could not load | — | access.locked |
 | Add a holder | Admin | — | — | — | settings.access · Add a holder | settings.access · Could not add | — | — |
 | A change that waits for an Owner | Admin | — | — | — | settings.access · Waits for an Owner | — | — | — |
-| A change that waits for an Owner | Operator | — | — | — | — | — | — | shell.locked |
-| Add a holder | Operator | — | — | — | — | — | — | shell.locked |
+| A change that waits for an Owner | Operator | — | — | — | — | — | — | access.locked |
+| Add a holder | Operator | — | — | — | — | — | — | access.locked |

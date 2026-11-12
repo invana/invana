@@ -51,6 +51,9 @@ flowchart LR
 | EX-20.9 | A read-only connection, or a graph database Invana cannot write to yet | the person opens Changes | Save is disabled with that reason — *Saving to this database isn't supported yet*; the changes stay |
 | EX-20.10 | Unsaved changes | the person leaves the board or reloads | they are warned first that the changes will be lost |
 | EX-20.11 | An Operator without *Can work on projects* | they open Changes | *Save n changes* is disabled with *You can change this board, not the graph*; the changes stay on the board |
+| EX-20.12 | A node deleted on the board | Changes lists it | the relationships that hang on it are listed under it, and saving deletes them with it |
+| EX-20.13 | Changes staged before the model was published again | the person saves | they are checked against the model as it is now; a refusal names the change and the key |
+| EX-20.14 | A change to an element someone else deleted, or whose type changed, since the board read it | the person saves | the save is refused naming that change; every change is kept |
 
 ## Screens
 

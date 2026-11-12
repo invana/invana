@@ -7,6 +7,7 @@ personas: [analyst, decision-maker]
 stories: [EX-12, EX-15, EX-17, EX-22]
 journeys: [J02]
 boards: [explore.board, explore.share, explore.board.present, projects.finding]
+nfrs: []
 depends_on: []
 ---
 
@@ -81,7 +82,7 @@ flowchart TD
 | Only a settled answer travels | Share and Add to a project sit on a settled answer's reply line; a running, failed or stopped answer has neither |
 | A link is never access | Both links open only for members; outside people get a file |
 | An export carries only what the member already sees | Its rows are the run's, read inside its view of the graph; an export never reads the graph again |
-| A snapshot is frozen | It keeps the board's records, the answer, its citations and the dataset versions bound when it was taken, and never re-reads them; pruning the run later changes nothing |
+| A snapshot is frozen | It keeps the board's records, the answer, its citations and the loads its records came from, and never re-reads them; pruning the run later changes nothing |
 | A step is a reply that changed the board | Its title is the question, its words the assistant's message, whole; a table, chart or card stays in the thread. A reply that drew nothing is not a step; an expansion is one, titled *Expanded LHR* |
 | Hand edits between replies are one step | Layout, hide, style and move made since the last step become one *Your changes* step when the next reply arrives or presenting starts |
 | Presenting is read-only | An earlier step is only ever seen while presenting; nothing in it can be edited. Presenting writes no version and is not restored on reload |
@@ -93,10 +94,66 @@ flowchart TD
 | Record | Read or write |
 |---|---|
 | The answer's run and what it returned | Read |
-| Snapshot — a frozen version of the answer's run board | Write |
-| Dataset versions bound to the Graph | Read |
+| Snapshot — a frozen version of the answer's run board (Engine › Mechanisms *A snapshot*) | Write |
+| Loads the records came from (RC-F02) | Read |
 | The board's walkthrough — its steps | Read · write, with the board |
 | Finding on a project branch, with its evidence | Write |
+
+## Engine
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| — | — | Stores nothing of its own: a snapshot is a board version and the walkthrough is in the board's `settings` ([EX-F01 › Engine](../EX-F01-the-board-and-its-canvas/feature.md#engine)) |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| Boards, their versions and `settings` | [EX-F01 › Engine](../EX-F01-the-board-and-its-canvas/feature.md#engine) |
+| The answer's parts and their citations | [EX-F04 › Engine](../EX-F04-the-answer/feature.md#engine) |
+| The answer's run | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| Loads — stable id, content hash, undone | [RC-F02 › Engine](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
+| Findings on a branch — *Add to a project* writes one through `POST /{key}/branches/{n}/findings` | [PJ-F03 › Engine](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md#engine) |
+
+### Routes
+
+| Route | Does | Story |
+|---|---|---|
+| — | None of its own: a snapshot is kept through EX-F01's `POST /boards/run/{run}/versions`; a finding through PJ-F03's route | EX-15 · EX-12 |
+
+### Events
+
+| Event | When |
+|---|---|
+| — | None of its own: a kept snapshot and a walkthrough change are EX-F01's `explore.boards.update` |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| — | None of its own; keeping a snapshot meets EX-F01's, adding a finding PJ-F03's | — | EX-15.10 · EX-12.5 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| — | No command of its own |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| A snapshot | One `explore_board_versions` row on the answer's `run` board: `cause = report`, `label` *Snapshot — {the question}*, the reply's `message_id`. Studio composes the document in the browser; the engine stores it whole. Its link opens the page `run:{run}@{version}` |
+| What a snapshot holds | A header — the question, the chips *Snapshot* and the view of the graph as frozen, when it was taken · `narrative`, the answer's words · one panel per answer part: `table` · `metric` · `bars` · a `table` titled *Board* with the drawing's records and its node and relationship counts · `text` *No records* for an empty answer · `citations`, each query with its language and record count · `list` *Loads*, each load's id, content hash and whether it is undone |
+| The walkthrough | `settings.walkthrough` on the board, autosaved and versioned with it. A step is `id` · `title` · `narration` · `data` (what its reply added to the drawing) · `view.focus` · `view.camera` · `meta.reply_id` (absent on an authored step) · `annotation_ids` (an authored step's) |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| — | None — snapshots and the walkthrough live in EX-F01's tables | — |
 
 ## Decisions
 
@@ -105,8 +162,8 @@ flowchart TD
 | The live link is the conversation's own address | Sharing it writes nothing; it opens the same board and thread as they are when opened |
 | The snapshot keeps the board as records | The answer's drawing is kept as a *Board* table — name, type, id, with node and relationship counts — readable at any size and in either theme; the board's last picture is its thumbnail |
 | PNG is the board as last drawn · CSV is the answer's rows | PNG is disabled while nothing is drawn; CSV takes every table's rows, else the drawing's nodes, else a chart's series — disabled only when the answer has none |
-| Markdown is one file | The question as the heading, the answer, each part (tables capped at 200 rows, the rest counted), the queries as citations, the view of the graph, the dataset versions, the run and when it was shared |
-| Dataset versions are the bindings when taken | A snapshot says *bound when this was taken*, never *read by this answer* |
+| Markdown is one file | The question as the heading, the answer, each part (tables capped at 200 rows, the rest counted), the queries as citations, the view of the graph, the loads cited, the run and when it was shared |
+| Loads are cited by id and content hash | A snapshot names each load by its stable id and content hash, so it still resolves after a later load; an undone load is flagged on it |
 | Times read in the reader's own time | `Oct 2, 9:29 PM`; only the Markdown export says UTC, because it travels |
 | Present is a mode | Present sits in the mode picker; with fewer than two steps it is disabled with *Nothing to walk through yet*. While presenting the row is the picker and `◀ n/N ▶`; the rail, the dock and the forms close |
 | A step and its reply point at each other | While presenting, the current step's reply is marked and scrolled into view; every step's reply carries a `Step n` chip that starts presenting there |

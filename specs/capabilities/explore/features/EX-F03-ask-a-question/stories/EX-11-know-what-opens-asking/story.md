@@ -4,7 +4,7 @@ title: Know what opens asking
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.ask, start.new_graph.ready]
+boards: [explore.ask, graphs.new_graph.ready]
 ---
 
 # EX-11 · Know what opens asking
@@ -26,7 +26,9 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 ```mermaid
 flowchart LR
   a([Explore opened]) --> p{A model published?}
-  p -->|yes| box(["The question box — EX-01"])
+  p -->|yes| su{Set-up finished?}
+  su -->|yes| box(["The question box — EX-01"])
+  su -->|no| sn["Refused · set-up is not finished"]
   p -->|no| l["Asking opens once a model is published · what is true now"]
   l --> g{Can shape the model?}
   g -->|yes| m["Open Model"] --> pub([The model published]) --> box
@@ -42,10 +44,11 @@ flowchart LR
 | EX-11.3 | The lock, and an Operator without *Can shape the model* | they read it | the lock offers *Ask Priya (owner)* where *Open Model* would be |
 | EX-11.4 | The lock is showing | someone publishes the Graph's first model | the next visit opens on the question box |
 | EX-11.5 | A Graph just created | its last set-up step completes | the ready step says asking is open and offers the first question |
+| EX-11.6 | A Graph whose set-up has not finished | a question is sent | it is refused before it runs, saying set-up is not finished |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The lock | Admin | explore.ask · Locked | — | explore.ask · Loading | start.new_graph.ready | — | — | — |
-| The lock | Operator | explore.ask · Locked | — | explore.ask · Loading | start.new_graph.ready | — | — | explore.ask · Locked, ask the owner |
+| The lock | Admin | explore.ask · Locked | — | explore.ask · Loading | graphs.new_graph.ready | explore.ask · Set-up not finished | — | — |
+| The lock | Operator | explore.ask · Locked | — | explore.ask · Loading | graphs.new_graph.ready | explore.ask · Set-up not finished | — | explore.ask · Locked, ask the owner |

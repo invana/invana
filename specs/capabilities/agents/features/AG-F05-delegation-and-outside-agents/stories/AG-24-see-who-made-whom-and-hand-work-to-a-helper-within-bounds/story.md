@@ -59,6 +59,8 @@ flowchart LR
 | AG-24.16 | An agent's Flow | it opens | it draws the helpers it may make and the agents it may delegate to — Allow · Ask · Deny |
 | AG-24.17 | An Operator without *Can build agents* | they open an agent's helper settings | they read; editing is disabled, naming *Can build agents* |
 | AG-24.18 | A helper or a delegated agent | it takes a step | the strictest value along the whole caller chain binds, the root agent's own rule included; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose line denied it |
+| AG-24.19 | A helper an agent makes | it is made | it lives only for the work unless the parent's fixed arguments allow a lasting one, and it may make helpers only if its parent may and names it |
+| AG-24.20 | An agent's sheet | its helpers are read | every helper it made in the last 7, 30 or 90 days lists with the run it was made in, its state and its tokens against what it was given; a retired helper stays listed |
 
 ## Screens
 
@@ -70,3 +72,5 @@ flowchart LR
 | An agent's helpers and May delegate to | Operator | agents.agent · Untested draft | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
 | A delegation ask | Admin | — | — | inbox · Loading | inbox · Delegation ask | — | — | — |
 | A delegation ask | Operator | — | — | inbox · Loading | inbox · Not yours to answer | — | — | inbox · Not yours to answer |
+| An agent's helpers over time | Admin | agents.agent · No helpers | agents.agent · No helpers | agents.agent · Loading | agents.agent · Helpers | agents.agent · Could not load | — | — |
+| An agent's helpers over time | Operator | agents.agent · No helpers | agents.agent · No helpers | agents.agent · Loading | agents.agent · Helpers | agents.agent · Could not load | — | — |

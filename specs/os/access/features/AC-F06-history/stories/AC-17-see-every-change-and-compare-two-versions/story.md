@@ -40,11 +40,11 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-17.1 | Nothing versioned yet | the reader picks *Changes* | it reads *No changes yet* |
-| AC-17.2 | Changes | *Changes* is on | only the acts that made a new version of a skill, rule, plan, agent, model or dataset list, newest first: when · who · product · record `vA → vB` · why · effect after · *Compare* |
-| AC-17.3 | A change | its product is shown | it is where the record lives — skills, agents and plans Agents; rules and models Model; datasets Data |
+| AC-17.2 | Changes | *Changes* is on | only the acts that made a new version of a skill, rule, plan, agent or model, or a load, list, newest first: when · who · product · record `vA → vB` · why · effect after · *Compare* |
+| AC-17.3 | A change | its product is shown | it is where the record lives — skills, agents and plans Agents; rules and models Model; loads Records |
 | AC-17.4 | A version made with a reason | its change is read | the reason shows; a version made without one shows none, never an inferred one |
 | AC-17.5 | A version | its effect after is read | runs, failed runs and tokens on it — tokens only; a version nothing ran on reads *0 runs*, not blank |
-| AC-17.6 | A model version | its effect after is read | it is the Graph's runs while it was published, labelled *while published*, and it names the datasets it touched and how many rows fail |
+| AC-17.6 | A model version | its effect after is read | it is the Graph's runs while it was published, labelled *while published*, and it names the loads it touched and how many records fail |
 | AC-17.7 | A change | the reader presses *Compare* | the two versions show side by side: who · when · why · `vA → vB`, one card per changed field with before and after (text as changed lines), the plan's change or the model's change when there is one, and each side's effect as runs · failed · tokens per run |
 | AC-17.8 | A compare | it is read | *Tokens per run* reads one version against the other as the engine counted it (`1.4×`), toned better or worse; nothing is divided in Studio |
 | AC-17.9 | A compare | the reader picks two other versions from the record's history | they compare, from the first picked to the second |

@@ -4,7 +4,7 @@ title: Start from files with an empty database
 feature: GR-F02
 status: later
 personas: [owner, curator]
-boards: [start.new_graph.files, start.new_graph.shape, start.new_graph.ready]
+boards: [graphs.new_graph.files, graphs.new_graph.shape, graphs.new_graph.ready]
 ---
 
 # GR-07 · Start from files with an empty database
@@ -33,8 +33,8 @@ flowchart TD
   s --> d{"The person decides"}
   d -->|change| s
   d -->|accept| cr["Create graph"]
-  cr --> rd(["Ready · loading carries on below · each import checked against the model"])
-  rd -->|rows refused| rep["Reported, not written · DS-13"]
+  cr --> rd(["Ready · loading carries on below · each file a load into the model (RC-F02)"])
+  rd -->|rows refused| rep["Reported, not written · RC-09"]
   f -->|the command line instead| cli(["The command to load them, filled in for this Graph"])
 ```
 
@@ -46,18 +46,18 @@ flowchart TD
 | GR-07.2 | A column the agent cannot place | the file is read | the agent asks what it is, with a recommendation, and does not go on for that file until it is answered |
 | GR-07.3 | A file that cannot be read | it is dropped | it says why, with *Remove* and *Replace* |
 | GR-07.4 | Step 3 | it opens | the model the files fit is shown before anything is loaded |
-| GR-07.5 | The model accepted | the Graph is created | each file loads as an import run, checked against the model, while Ready shows the board |
-| GR-07.6 | Rows that do not fit | an import runs | they are reported, not written, and set-up's data step reads what landed (DS-13) |
+| GR-07.5 | The model accepted | the Graph is created | each file is a load into the model — the Records upload (RC-08) — checked against its rules, while Ready shows the board |
+| GR-07.6 | Records that do not fit | a load runs | they are rejected record by record, each named, and set-up's data step reads what landed (RC-09) |
 | GR-07.7 | Step 2 | the person prefers the command line | it shows the command to load the files, filled in for this Graph and model |
-| GR-07.8 | An import | the person opens *How it got here* | it shows each file, the kind it became, and the rows written and refused |
+| GR-07.8 | A load | the person opens *How it got here* | it shows each file, the kind it became, and the rows written and refused |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| 2 · Drop files | Admin | start.new_graph.files · No files yet | — | start.new_graph.files · Reading | start.new_graph.files | start.new_graph.files · Cannot read | start.new_graph.files · A column asked | — |
-| 2 · Drop files | Operator | start.new_graph.files · No files yet | — | start.new_graph.files · Reading | start.new_graph.files | start.new_graph.files · Cannot read | start.new_graph.files · A column asked | — |
-| 3 · Shape | Admin | — | — | start.new_graph.shape · Reading | start.new_graph.shape · From files | — | start.new_graph.shape · Drafting | — |
-| 3 · Shape | Operator | — | — | start.new_graph.shape · Reading | start.new_graph.shape · From files | — | start.new_graph.shape · Drafting | — |
-| 5 · Ready | Admin | — | — | start.new_graph.ready · Loading below | start.new_graph.ready | start.new_graph.ready · Rows refused | start.new_graph.ready · Loading below | — |
-| 5 · Ready | Operator | — | — | start.new_graph.ready · Loading below | start.new_graph.ready | start.new_graph.ready · Rows refused | start.new_graph.ready · Loading below | — |
+| 2 · Drop files | Admin | graphs.new_graph.files · No files yet | — | graphs.new_graph.files · Reading | graphs.new_graph.files | graphs.new_graph.files · Cannot read | graphs.new_graph.files · A column asked | — |
+| 2 · Drop files | Operator | graphs.new_graph.files · No files yet | — | graphs.new_graph.files · Reading | graphs.new_graph.files | graphs.new_graph.files · Cannot read | graphs.new_graph.files · A column asked | — |
+| 3 · Shape | Admin | — | — | graphs.new_graph.shape · Reading | graphs.new_graph.shape · From files | — | graphs.new_graph.shape · Drafting | — |
+| 3 · Shape | Operator | — | — | graphs.new_graph.shape · Reading | graphs.new_graph.shape · From files | — | graphs.new_graph.shape · Drafting | — |
+| 5 · Ready | Admin | — | — | graphs.new_graph.ready · Loading below | graphs.new_graph.ready | graphs.new_graph.ready · Rows refused | graphs.new_graph.ready · Loading below | — |
+| 5 · Ready | Operator | — | — | graphs.new_graph.ready · Loading below | graphs.new_graph.ready | graphs.new_graph.ready · Rows refused | graphs.new_graph.ready · Loading below | — |

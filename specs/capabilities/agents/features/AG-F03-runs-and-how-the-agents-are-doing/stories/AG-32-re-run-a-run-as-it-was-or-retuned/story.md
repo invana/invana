@@ -50,6 +50,8 @@ flowchart LR
 | AG-32.7 | A recorded version since retired or not offered | *As it was* is chosen | it is refused before it runs, naming the version |
 | AG-32.8 | A re-run | it runs | it is a run like any other — its tokens, its history rows, *How it got here* showing its steps and sources |
 | AG-32.9 | An Operator on someone else's run | they read it | *Re-run* is disabled, naming who started it |
+| AG-32.10 | A run that recorded no agent or model version | *As it was* is chosen | it is refused before it runs, saying no version was recorded and offering *Today's versions* or *Retune* |
+| AG-32.11 | A run that is not a question or a typed query — a load, a link between models, a task's run | its sheet is open | *Re-run* is disabled, saying it re-runs where it was started |
 
 ## Screens
 

@@ -5,9 +5,10 @@ product: RT
 status: idea
 personas: [admin, builder]
 stories: [RT-01]
-journeys: [J01]
+journeys: [J01, J07]
 boards: [settings.ai]
-depends_on: [AG-F01, MO-F05]
+nfrs: [NFR-SEC-2, NFR-SEC-3, NFR-PERF-3, NFR-COST-1]
+depends_on: [AG-F01, SE-F09]
 ---
 
 # AI models
@@ -18,7 +19,7 @@ depends_on: [AG-F01, MO-F05]
 
 ## User journey
 
-Journeys this feature is a step of: [J01 · From an empty install to a first answer](../../../../journeys/J01-from-an-empty-install-to-a-first-answer.md)
+Journeys this feature is a step of: [J01 · From an empty install to a first answer](../../../../journeys/J01-from-an-empty-install-to-a-first-answer.md) · [J07 · Ready an install for its Graphs](../../../../journeys/J07-ready-an-install-for-its-graphs.md)
 
 ```mermaid
 flowchart TD
@@ -81,7 +82,7 @@ flowchart TD
 | An endpoint has a clearance | The highest sensitivity it may receive. A new local or self-hosted endpoint starts at *personal*, an outside provider at *internal*; an Admin changes it, told how much unlabelled data it can reach; an endpoint counts as local only when the engine resolves it to loopback or a private network at each call, rebinding checked (RT-01); raising it writes a History row and alerts the Owners of each Graph that uses the endpoint (RT-01); a call carrying data above it is a send ([Which act a call is](../../../access/product.md#decisions)) |
 | Each model version shows its mode | Every model version reads its mode for this Graph — Allow · Ask · Deny ([the three modes](../../../access/product.md#decisions)) — and who set it |
 | Failures name the provider | A rate limit, a stopped local model or a rotated key fails naming the endpoint — never as *cannot answer* |
-| Leans on | Agents pinning a version (AG-F01 · AG-29) · views of the graph (MO-F05) · access rules on AI models (AC-F02) · History (AC-F06) |
+| Leans on | Agents pinning a version (AG-F01 · AG-29) · views of the graph (SE-F09) · access rules on AI models (AC-F02) · History (AC-F06) |
 
 ## Data touched
 
@@ -91,6 +92,90 @@ flowchart TD
 | Model versions — exact name, what it can do, its rate, status | Read · write |
 | Pins — agents, skill versions, eval judges (AG-F01 · AG-F04) | Read |
 | A ping's run (AG-F03) and History rows (AC-F06) | Write |
+
+## Engine
+
+The low-level design: what this feature stores, serves and refuses. Conventions — naming, errors, lists, events — are
+[system-design.md](../../../../system-design.md) §§ 6–8; this section only fills them in.
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `runtime_llm_providers` | `name` (`^[a-z0-9][a-z0-9_-]*$`) · `provider` (`anthropic` · `openai` · `google` · `azure` · `ollama` · `local` · `claude_agent_sdk`) · `credential_kind` (`api_key` · `local_sign_in` · `none`) · `api_key_encrypted?` · `base_url?` · `clearance` · `last_ping_at?` · `last_ping_ok?` · `last_ping_error?` · `updated_by_id` · `updated_at` | An endpoint, install-wide; `name` unique. The key is Fernet-encrypted and never serialised |
+| `runtime_llms` | `provider_id` · `model_id` (the provider's exact name) · `display_name?` · `capabilities` (`context_window` · `supports_tools` · `embedding` · `cost_rank` · `power_rank` · `local`) · `pricing` · `status` (`offered` · `withdrawn`) | A model version under an endpoint; unique (`provider_id`, `model_id`). Its address is `llm/<endpoint>/<model_id>` |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| Pins — an agent's model version, a skill version's, an eval judge's | [AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md#engine) |
+| The AI model client every run calls, and a run's resolved model | [AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) |
+| Views of the graph that name a model version — the cast | [SE-F09](../../../../capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
+| A model version's mode for this Graph, and sends above clearance | [AC-F02](../../../access/features/AC-F02-access-rules/feature.md#engine) |
+| A ping's run | [AG-F03](../../../../capabilities/agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| History rows and the Owners' alert on a raised clearance | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |
+
+### Routes
+
+| Route, install-wide, after `/api/v1/runtime/llms` | Does | Story |
+|---|---|---|
+| `GET /` | Every endpoint, by the list contract — search `name`, filter `kind`, sort `created_at` · `name` · `-updated_at`; never a key | RT-01 |
+| `POST /` | Add an endpoint `{name, provider, credential, base_url?, clearance}` | RT-01 |
+| `GET /{name}` · `PATCH /{name}` · `DELETE /{name}` | Read · edit (a blank key keeps the stored one; a new `name` renames) · remove an endpoint | RT-01 |
+| `POST /{name}/ping` | Ping it: opens a run, stores `last_ping_*` | RT-01 |
+| `GET /{name}/models` | Its model versions — search `model_id`, filter `status` | RT-01 |
+| `POST /{name}/models` · `PATCH /{name}/models/{model_id}` · `DELETE /{name}/models/{model_id}` | Offer a version · edit its ranks, pricing or status · remove it | RT-01 |
+| `GET /pins` | Each address with who pins it — agents, skill versions, judges — and the views that name it | RT-01 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `runtime.llm_providers.create` · `.update` · `.delete` · `.ping` | An endpoint is added, edited (a clearance change carries old and new), removed or pinged |
+| `runtime.llms.add` · `.update` · `.remove` | A model version is offered, edited or withdrawn, or removed |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 403 | Any write by anyone but an install Admin | *Only an Admin can change AI models — {admins}.* | RT-01.12 |
+| 422 | An endpoint name outside `^[a-z0-9][a-z0-9_-]*$` | *Use lowercase letters, digits, hyphens and underscores.* | RT-01.9 |
+| 409 | An endpoint name already taken | *{name} is taken.* | API only — the form checks it as it is typed |
+| 409 | Removing a version, or renaming or removing an endpoint, that a view of the graph names | *{address} is named by {views}.* | RT-01.6 · RT-01.20 |
+| 409 | Removing an endpoint or a version something pins | *{address} is pinned by {pins}.* | RT-01.20 |
+| 409 | A run whose pinned version is withdrawn or not offered | *{address} is not offered — {agent} pins it.* | RT-01.7 |
+| 422 | A run with no model to answer | *No AI model answers in this graph — ask {admins}.* | RT-01.22 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| `invana llms list` | Every endpoint, its kind, clearance and last ping — never a key |
+| `invana llms models <endpoint>` | Its model versions by address — what `agents pin --model` takes |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| A call's unit | `LLMEndpoint` — the endpoint, the model version and its credential, resolved once when a run opens from its view's cast; a run with none is refused before it starts |
+| A ping | A run of kind `system` that calls the endpoint once; the provider's message is stored in `last_ping_error` word for word |
+| Ranks | `cost_rank` · `power_rank` are seeded from the published rate when a version is offered; no published rate, or a subscription endpoint, ranks in the middle; an Admin may edit both, and nothing derives over an edit. They order *cheapest that can read* and *most capable* in the shipped cast, and nothing else |
+| Local is resolved per call | `capabilities.local` holds only when the engine resolves the address to loopback or a private network at that call, rebinding checked; otherwise the call is held to an outside provider's clearance |
+| Clearance at add | `personal` for a local or self-hosted endpoint, `internal` for an outside provider |
+| Withdrawn | Stopping an offered version that something pins sets `status: withdrawn`; one nothing names is deleted |
+| One cache | Only the model call is cached: keyed by a hash of endpoint, model version, prompt and parameters, scoped to the Graph, with a configured time to live; the step records `cached` so a cached run is never read as a cheap one. Query results are never cached |
+| A rate limit is backpressure | A 429 is `transient`, retried with backoff and jitter; the per-model wait is [RT-F04](../RT-F04-limits/feature.md#engine) |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 6 Data and storage | Two install-wide tables; a key encrypted at rest | — |
+| § 8 APIs and events | Install-wide `/api/v1/runtime/llms` routes and `runtime.llm*` events | — |
+| § 10 AI and agents | One model per call; no failover; one cache on the model call | — |
+| § 11 Failure modes and the outside boundary | A provider's failure is named with the endpoint and its own words; Invana inherits the provider's availability | — |
+| § 12 Qualities | Security: keys never read back; clearance on every endpoint, local resolved per call | — |
 
 ## Decisions
 

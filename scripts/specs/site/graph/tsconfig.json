@@ -1,0 +1,29 @@
+{
+	"compilerOptions": {
+		"target": "ES2023",
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"jsx": "react-jsx",
+		"types": ["vite/client", "node"],
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"skipLibCheck": true,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"composite": false,
+		"paths": {
+			"@invana/canvas": ["./node_modules/@invana/canvas"],
+			"@invana/canvas-react": ["./node_modules/@invana/canvas-react"],
+			"@invana/graph": ["./node_modules/@invana/graph"],
+			"@invana/boards": ["./node_modules/@invana/boards"],
+			"@invana/ui": ["./node_modules/@invana/ui"],
+			"@invana/forms": ["./node_modules/@invana/forms"],
+			"@invana/themes": ["./node_modules/@invana/themes"]
+		}
+	},
+	"include": ["src", "vite.config.ts"]
+}

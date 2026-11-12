@@ -7,6 +7,7 @@ personas: [builder, admin]
 stories: [AG-21, AG-36, AG-29, AG-26]
 journeys: [J04, J06]
 boards: [agents, agents.new, agents.agent, settings.ai]
+nfrs: [NFR-SEC-3, NFR-COST-1]
 depends_on: []
 ---
 
@@ -87,7 +88,7 @@ sequenceDiagram
 | Change voice, model version, effort or limits · Pause · Resume · Retire · Make default | `builder` · *Can build agents* · Admin | The setting reads as saved; the act is disabled, naming *Can build agents* |
 | Narrow the agent's own modes — tighten, or loosen back no further than the Graph, never past a locked line | `builder` · *Can build agents* · Admin | Each mode reads; changing it is disabled, naming *Can build agents* |
 | Give the agent an access rule | `iam-admin` · shown as *Can manage people* · Admin | The rules it holds read; *Add an access rule* disabled, naming *Can manage people* |
-| Give the agent a rule of its own that must always hold | Who may change the graph's rules (MO-F05) | The rule reads; editing it is disabled, naming who may |
+| Give the agent a rule of its own that must always hold | Who may change the graph's rules (SE-F07) | The rule reads; editing it is disabled, naming who may |
 | Offer model versions to pin | Admin, in Settings › AI and connections | A version not offered cannot be picked |
 | Name the practice graph | Admin, in Settings › Invana | *Test in the practice graph* disabled, naming the Admin |
 | Ask the assistant to explain an agent | Operator | — |
@@ -116,7 +117,7 @@ sequenceDiagram
 | Bounds nest | An agent's own limits ∩ the work's view of the graph ∩ the graph's rules, frozen when a run opens; a run's helpers may only narrow them |
 | Standing and situational | What an agent may ever do — functions, effort, tokens a month, runs at once, helpers, its own rule — is on the agent. What one piece of work may see and spend comes with the work: a thread, a task, a schedule |
 | Tighten, never loosen | An agent may propose narrowing its own limits; widening them is a person's act |
-| Tokens, never currency | Every budget, meter and refusal counts tokens |
+| Tokens, never currency | Every budget, meter and refusal counts tokens ([glossary › Token budget](../../../../glossary.md#what-may-happen)) |
 | Declared is not enforced | The limits table says which limits stop a run and which are only drawn against |
 | An agent sees no provider | Its model version is a pin or comes from the view of the graph; it holds no AI connection of its own |
 | Skills reach an agent only when added to it | A template suggests skills; it adds none |
@@ -131,13 +132,12 @@ sequenceDiagram
 | Nothing is deleted once it ran | Retiring keeps the agent's row, so every run, trace and helper still resolves; the name stays taken |
 | Pausing kills nothing | Runs in flight finish; open work is named item by item before the act |
 | One default | Every graph has one default agent, and it can answer questions |
-| A default way of reasoning | An agent may carry a default stance once stances exist (EX-F05); the person asking may change it for one ask |
 | No AI model offered | *New agent* says no model version is offered yet and opens Settings › AI and connections for an Admin |
 | A model version not offered at run time | The run is refused before it starts, naming the version and the view of the graph or pin that chose it |
 | A skill removed | It leaves every agent it was added to; the agent keeps working on the rest |
 | No default agent | The first published agent is offered as the graph's default |
 | The engine counts | Tokens today and this month, served, p95 and every number on the sheet are the engine's; Studio formats them |
-| Leans on | Skills (AG-F04) · runs and how agents are doing (AG-F03) · helpers and delegation (AG-F05) · access rules (AC-F03) · AI models (RT-F01) · rules that must always hold (MO-F05) · the catalogue and inviting (AG-F02) |
+| Leans on | Skills (AG-F04) · runs and how agents are doing (AG-F03) · helpers and delegation (AG-F05) · access rules (AC-F03) · AI models (RT-F01) · rules that must always hold (SE-F09) · the catalogue and inviting (AG-F02) |
 
 ## Data touched
 
@@ -152,6 +152,128 @@ sequenceDiagram
 | Model versions offered | Read (written in RT-F01) |
 | Open work it holds — runs, tasks, threads, schedules | Read · write on Pause and Retire |
 | Runs it opened — tokens, model version called, outcome | Read |
+
+## Engine
+
+### Records
+
+| Table | Columns | Notes |
+|---|---|---|
+| `agents` | `key` · `name` · `description` · `kind` (`seeded` · `authored` · `spawned` · `remote`) · `status` (`draft` · `active` · `paused` · `retired`) · `lifetime` (`persistent` · `ephemeral`) · `parent_agent_id?` · `spawned_in_run_id?` · `remote_agent_id?` · `instructions` · `instructions_draft` · `soul` · `soul_traits` · `envelope` · `budget` · `effort` · `policy` · `model_pin?` · `version` | `name` unique and never freed. One table: `envelope`, `budget`, `effort`, `policy` and `soul_traits` are JSON on the row, read by presence. `envelope` names functions by key — the catalogue is code, with no function table (AG-F06). `spawned` and `remote` rows are written by AG-F05. No provider or credential on the row. A version's reason and a retirement's *Why* ride their events (AC-F06), which Versions reads |
+
+| JSON column | Keys |
+|---|---|
+| `soul_traits` | `humour` (`off` · `light` · `playful`, default `light`) · `formality` (`casual` · `neutral` · `formal`, default `neutral`) · `emoji` (`off` · `on`, default `off`) · `greeting` (`off` · `on`, default `off`) |
+| `effort` | `max_steps` (24) · `max_replans` (1) · `max_clarifications` (3) |
+| `envelope` | `allow` (function keys) · `pins` (arguments no plan may change) · `plans` (reusable plans, `key@version`) · `entry` and `steps` (an agent of fixed steps) |
+| `budget` | `max_tokens_run` (200k) · `max_tokens_month` (5M) · `max_concurrent_runs` (3) · `max_children` (3) · `max_depth` (2) · `max_descendants` (12) · `max_live` (4) · `max_fanout` (200) |
+| `policy` | `can_be_assigned` · `unattended` · `may_delegate` (`{agent: always · ask · never}`, AG-F05) |
+| `model_pin` | An exact address `llm/<endpoint>/<model version>` |
+
+### Reads
+
+| Record | Owner |
+|---|---|
+| Runs — `agent_id` · `agent_version` · `model_version`, tokens, exit reason, the budget and effort a run opened with | [AG-F03](../AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| Skills, their bindings (`agents_skill_bindings`), the eval sets, cases, runs, the eval gate and the eval token budget | [AG-F04](../AG-F04-skills/feature.md#engine) |
+| Helpers, delegation and outside agents | [AG-F05](../AG-F05-delegation-and-outside-agents/feature.md#engine) |
+| Functions and reusable plans an envelope names | [AG-F06](../AG-F06-plans-and-functions/feature.md#engine) |
+| The agents a Graph has invited and the shipped agents | [AG-F02](../AG-F02-the-agents-catalogue/feature.md#engine) |
+| The agent's own rule — a `model_lenses` row scoped `agent:<id>`; the agent holds no pointer to it | [SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) · [AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
+| Access rules the agent holds | [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
+| The AI models an install offers and their rates | [RT-F01](../../../../os/runtime/features/RT-F01-ai-models/feature.md#engine) |
+| Tasks, schedules and conversations a lifecycle preview lists | [PJ-F01](../../../projects/features/PJ-F01-projects-and-tasks/feature.md#engine) · [AG-F07](../AG-F07-schedules/feature.md#engine) · [EX-F03](../../../explore/features/EX-F03-ask-a-question/feature.md#engine) |
+| Runs at once per Graph | [RT-F04](../../../../os/runtime/features/RT-F04-limits/feature.md#engine) |
+| The Graph's row — `default_agent_id`, written only by `POST /agents/default` and seeding (AG-F02) | [GR-F04](../../../../os/graph/features/GR-F04-this-graph/feature.md#engine) |
+| Version history — each version's reason, a retirement's *Why* | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
+
+### Routes
+
+| Route, after `/api/v1/u/{u}/{g}` | Does | Story |
+|---|---|---|
+| `GET /agents` | A page of `AgentRead` with `persistent` · `ephemeral` counts, `default_agent_id` and `tokens_this_month` as a `{agent_id: tokens}` sidecar from one grouped read | AG-21 |
+| `POST /agents` | Create a draft; takes `skill_ids`, each added through AG-F04's add | AG-21 |
+| `GET /agents/{id}` · `PATCH /agents/{id}` | `AgentRead` — the row as stored, plus `effective_budget` · `effective_effort` · `skill_ids` (read only) · change it, sending only what moved | AG-21 · AG-29 |
+| `PATCH /agents/{id}/draft` · `DELETE /agents/{id}/draft` | Write or discard the instructions draft | AG-21 · AG-36 |
+| `DELETE /agents/{id}` | Discard a draft that never ran — `204` | AG-21 |
+| `POST /agents/{id}/create` · `POST /agents/{id}/publish` · `POST /agents/{id}/rollback` | Make live (version 1), publish the draft, roll back as a draft of an earlier version — each through AG-F04's eval gate; returns `{verdict, eval_run_id, warnings}` | AG-36 · AG-29 |
+| `GET /agents/{id}/pause` · `GET /agents/{id}/retire` | The `LifecyclePreview` | AG-29 |
+| `POST /agents/{id}/pause` · `POST /agents/{id}/retire` · `POST /agents/{id}/resume` | Apply; retire takes `reason` | AG-29 |
+| `GET /agents/{id}/functions` | `{agent_id, skills[{skill_id, name, version, when_to_use, needs, uses, missing, offered, applied, enough_to_read}], callables[{step_key, bound, pinned, needed_by}], plans[key@version], offered, applied, prompt_chars}` | AG-21 |
+| `GET /agents/{id}/meters` | `{agent_id, tokens_this_month, max_tokens_month, max_tokens_run, running, queued, max_concurrent_runs, runs_this_month, sessions, spawned_this_month, depth, max_children, max_depth, max_fanout}` | AG-21 · AG-29 |
+| `GET /agents/{id}/activity` | Its recent runs | AG-21 |
+| `POST /agents/{id}/voice/preview` | Two answers to one sample ask, current voice and draft; nothing recorded or drawn against any budget | AG-29 |
+| `POST /agents/default` | Make an agent the Graph's default | AG-21 · AG-29 |
+
+### Events
+
+| Event | When |
+|---|---|
+| `agents.create` · `agents.update` | A draft is created · a field changes; `agents.update` carries the `changed` keys (envelope, budget, effort and policy included) |
+| `agents.soul_set` | The voice or a dial changes; bumps `version` |
+| `agents.activate` · `agents.publish` · `agents.rollback` | Made live · a version published · rolled back; each carries the gate's verdict and the `why` |
+| `agents.pause` · `agents.resume` · `agents.retire` · `agents.delete` | The lifecycle acts; `agents.retire` carries the reason |
+| `agents.set_default` | A Graph's default changes |
+
+### Refusals
+
+| Status | When | Sentence | Criterion |
+|---|---|---|---|
+| 409 | A name another agent has, retired or not | *{name} is taken by {agent}.* | AG-21.3 |
+| 422 | Saving with nothing in `envelope.allow` | *An agent that may run nothing is a mistake — allow something.* | AG-21.4 |
+| 422 | `max_tokens_run` above `max_tokens_month` | *A run's budget cannot exceed the month's.* | AG-21.12 |
+| 422 | An unknown voice dial or value | *{dial} takes {values}.* | API only — Studio offers the dials as fixed choices (`check_traits`) |
+| 409 | Opening a run on a `paused`, `retired` or `draft` agent — asked, assigned, scheduled or made the default | *{agent} is {state}.* | AG-29.20 · AG-36.11 |
+| 409 | Pause or Resume on a draft · `POST …/create` on an agent that is not a draft | *{agent} is a draft.* · *{agent} is already live.* | API only — Studio offers neither act there |
+| 409 | `DELETE /agents/{id}` once the agent has run or is seeded | *{agent} has run — retire it instead.* | AG-21.21 |
+| 409 | Retiring the Graph's default | *Make another agent the default first.* | AG-29.17 |
+| 422 | Making an agent the default that cannot answer questions | *{agent} cannot answer questions.* | AG-21.20 |
+| 409 | A new run past `max_concurrent_runs` — refused at admission, never queued | *{agent} is running {n} of {max} at once.* | AG-21.32 |
+| 409 | A plan naming a function outside `envelope.allow`, changing a pinned argument, or passing a limit — before dispatch | *{function} is not something {agent} may run.* · *{argument} is fixed for {agent}.* · *This passes {bound} ({side}).* | AG-21.10 · AG-21.14 |
+| 409 | A model version not offered by RT-F01 or not allowed by the view of the graph | *{model version} is not offered here.* | AG-29.10 · AG-29.23 |
+| 422 | The agent's own modes looser than the Graph's, past a locked line, or an access change set to Allow | *{level} set this — it cannot be looser here.* | AG-21.26 · AG-21.28 |
+| 403 | Loosening the agent's own modes with a key | *Loosening needs a person's session.* | AG-21.28 |
+| 403 | Any write without *Can build agents* | *This needs Can build agents — ask {owner}.* | AG-21.22 · AG-29.21 · AG-36.17 · AG-29.24 |
+| — | The eval gate's refusals on make live, publish, roll back and a pin move | [AG-F04 › Refusals](../AG-F04-skills/feature.md#refusals) | AG-36.4 · AG-36.18 · AG-29.9 |
+
+### CLI
+
+| Command | Does |
+|---|---|
+| `invana agents list` | List the Graph's agents |
+| `invana agents push` | Write the instructions draft from a file |
+| `invana agents publish` · `invana agents pin` | Publish · move the model pin — both through the eval gate |
+
+### Mechanisms
+
+| Mechanism | How |
+|---|---|
+| Read by presence | A key that is present is the value, 0 included; only an absent key takes the default in *Records*. `effective_effort` and `effective_budget` fill the defaults and are what a run reads |
+| A run records the agent | `agent_id` · `agent_version` · `model_version` and every key of `effective_budget` and `effective_effort` it opened with, the per-run cap as frozen, ride the run and its trace (AG-F03) |
+| Where each limit is enforced | `effort.*` — during the run; reaching one ends it with its exit reason (`step_limit`, …) · `max_concurrent_runs` — at admission · `max_tokens_run` · `max_tokens_month` — drawn against; reaching one raises a `budget` ask and the run waits on a person; a declined ask ends it `budget_declined` · `max_children` · `max_depth` · `max_descendants` · `max_live` · `max_fanout` — AG-F05 |
+| A conversation's cap | Never above `max_tokens_run`; clamped and frozen on the run as `params.max_tokens_run` (EX-F03) |
+| `require_available` | Runs first on every path that opens a run; a conversation bound to a paused, retired or draft agent never switches to another |
+| The voice block | `voice_for` = `render_traits(soul_traits)` then `soul`, or `DEFAULT_VOICE` when `soul` is empty; the dials come first, so a sentence in the soul can override one. `""` clears the soul; the default voice is a product constant, never stored |
+| Which steps read the voice | `RunVars.soul`, read at run open, reaches only `nl.understand` (its question back and reason) and the answer's words; translate, plan, validate and execute take no voice parameter |
+| Humour when it went wrong | `render_traits(…, went_wrong=True)` renders `humour: off`; a step that may refuse in the same call carries *when you refuse, cannot answer, or report an error or a pause, use no humour* |
+| A version | Any published change — instructions, voice, a dial, a model pin — bumps `version`; a run's `agent_version` names the voice it spoke with |
+| The model a step calls | The person's pick for that question → the skill version's pin (AG-F04) → `model_pin` → the view of the graph's cast (role → model address). Each must be offered by RT-F01 and allowed by the view, or the run is refused before it starts; nothing falls back |
+| The AI model client | `complete_tool` — one structured call to the endpoint the run resolved, over Anthropic, OpenAI, Ollama or the Claude Agent SDK. Called by `nl.understand` · `nl.translate` · `plan.compose` · `plan.draft` · `model.propose`, the eval judge, starter cases, the voice preview and grounding. No cost is stored for a person to read |
+| A skill's needs | Adding a skill checks its current plan's functions against `envelope.allow` (AG-F04 › Refusals) |
+| `LifecyclePreview` | `{agent_id, act (pause · retire), items[{kind (run · task · session · schedule), id, title, effect (finishes · blocked · unchanged · refused · paused), note}]}`; Resume has none |
+| Pause · Resume · Retire | `paused` refuses new work; a run already queued starts; Resume unblocks its tasks. Retire keeps the row and the name and pauses each schedule that starts the agent. A task's `start_agent_work` blocks the task when the agent is paused or retired (PJ-F01) |
+| `functions` | `needs` are the distinct functions of each skill's current plan in plan order; `missing` the needs `envelope.allow` lacks; `offered` and `applied` count this agent's runs of the current version; a function's `needed_by` includes the plans in `envelope.plans` at their newest version; the totals and `prompt_chars` are served so Studio sums nothing |
+| The month meter | `tokens_in + tokens_out` over root runs that started this calendar month and their steps, eval runs left out, against `effective_budget.max_tokens_month`; no run reads `0`. `sessions` counts every conversation bound to the agent, whoever opened it |
+| The command line's grant | Each command needs the grant of the route it stands for |
+
+## System impact
+
+| HLD section | Change | NFRs |
+|---|---|---|
+| § 6 Data and storage | `agents` in Invana's own store; limits as JSON on the row | — |
+| § 8 APIs and events | The routes, events and CLI above, under `agents` | — |
+| § 10 AI and agents | Every limit refuses before anything runs or is drawn against with a person's ask; the model a step calls resolves in one order with no fallback; the voice never reaches a query | — |
+| § 11 Failure modes and the outside boundary | A model version an outside provider stops offering refuses the run, naming it | — |
 
 ## Decisions
 
@@ -172,6 +294,12 @@ sequenceDiagram
 | Studio cannot clear a pin | Once set, a model version is moved, never cleared |
 | Discard a draft | A draft that never ran is deleted; an agent that ran is retired instead |
 | Who may change the graph's rules | Gives an agent a rule of its own that holds whoever asks it |
+| The model a step calls | Resolved in one order — the person's pick, the skill's pin, the agent's pin, the view of the graph's — and nothing falls back ([Engine › Mechanisms](#mechanisms)) |
+| A pause stops new work only | A run already queued starts and finishes; only work that arrives after the pause is refused |
+| A pause takes no reason | Resume undoes it in one click; only Retire asks *Why* |
+| A 0 is a value | Effort and limits are read by presence: 0 means none; only an empty cell takes the value shown |
+| Tests are evals | An agent's tests are an eval set like a skill's — the same cases, checks, judge, gate and eval token budget (AG-F04) |
+| The command line follows Studio | `invana agents push · publish · pin` and `invana evals` pass the same gate and need the same grant as Studio |
 
 ## Open questions
 
@@ -205,3 +333,7 @@ sequenceDiagram
 | *Try it once* on New agent | An agent is tried by its tests in the practice graph; one-off test runs are a skill's |
 | An estimate of what a run will cost | The engine stores none, and Studio never derives a number |
 | Remote agents in Flow and access | AG-F05 |
+| A default way of reasoning on the agent | How to approach a question is picked for that one question (*Act as*, EX-F05); an agent carries none |
+| Mapping each resource to a worker group on *Where it runs* | Worker groups follow the kinds of work an agent's functions do (RT-F03); the sheet reads them, it does not assign them |
+| A capacity forecast | The engine stores no forecast, and Studio never derives a number |
+| Sections inside the voice (*How it speaks* · *Caution* · *When unsure*) | The voice is one block of words; caution and what to do when unsure are instructions and rules |

@@ -77,6 +77,10 @@ flowchart LR
 | AG-21.26 | A builder | they set an item's mode for this agent looser than the Graph's, past a line someone who can manage people locked, or an access change to Allow | it is refused in place, naming the level or the lock that set it, or that an access change is never Allow |
 | AG-21.27 | An Operator without *Can build agents* | they open *What it may do* | each mode reads with who set it; changing it is disabled, naming *Can build agents* |
 | AG-21.28 | A change to an agent's own rule from the API, a key or a rule file applied from the command line | it loosens past the Graph or a locked line, or sets an access change to Allow | the engine refuses it as Studio does, naming the level; loosening with a key is refused, naming that it needs a person's session |
+| AG-21.29 | An ask the agent's own rule refuses before any run opens | it is sent | the reply reads *This question was not run*, naming the side that refused it and why; no run opens and nothing is spent |
+| AG-21.30 | Effort or a limit set to 0 | a run reads it | 0 is the value — *0 questions* never asks, *0 helpers* makes none; only an empty cell takes the value shown beside it |
+| AG-21.31 | Where it runs | it opens | beside each kind of work's free slots, the slots the agent's next trigger will take of that kind, counted by the engine; an agent no trigger starts reads *Nothing starts it yet* |
+| AG-21.32 | An agent already running as many runs as its *runs at once* | new work would open another | it is refused before it starts, never queued, naming *runs at once* and the count |
 
 
 ## Screens

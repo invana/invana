@@ -55,6 +55,7 @@ flowchart LR
 | EX-23.11 | A question asked back | an agent tries to answer it | it is refused — only a person answers |
 | EX-23.12 | The run is cancelled while a question waits | it cancels | the question closes as unanswered and says so |
 | EX-23.13 | A question asked back with choices | it is shown | one choice is marked as the assistant's recommendation, with its reason in a line; the person answers with one click |
+| EX-23.14 | A question asked back with choices | none fits | *Something else — let me type* takes a line in the person's words, and the same run goes on with it |
 
 ## Screens
 

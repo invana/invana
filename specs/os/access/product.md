@@ -39,7 +39,7 @@ nobody can read cannot be audited.
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| AC-F01 | [Sign in, account and sessions](features/AC-F01-sign-in-account-and-sessions/feature.md) | AC-01 · AC-02 | idea |
+| AC-F01 | [Sign in, account and sessions](features/AC-F01-sign-in-account-and-sessions/feature.md) | AC-01 · AC-02 · AC-18 | idea |
 | AC-F02 | [Access rules](features/AC-F02-access-rules/feature.md) | AC-03 · AC-04 · AC-05 · AC-06 · AC-07 · AC-08 | idea |
 | AC-F03 | [Groups, keys and who holds a rule](features/AC-F03-groups-keys-and-holders/feature.md) | AC-09 · AC-10 · AC-11 | idea |
 | AC-F04 | [What an agent may touch](features/AC-F04-what-an-agent-may-touch/feature.md) | AC-12 · AC-13 · AC-14 | idea |
@@ -50,13 +50,13 @@ nobody can read cannot be audited.
 
 | Surface | Tier | Board |
 |---|---|---|
-| Sign in | page | `start.signin` |
+| Sign in | page | `access.signin` |
 | People | modal | `settings.people` |
 | Access rules | sheet | `settings.access` |
 | You | modal | `settings.me` |
 | An ask in Needs you | modal | `inbox` |
 | History | modal | `inbox.history` |
-| No access | every surface | `shell.locked` — the act reads *Ask Priya (owner)* |
+| No access | every surface | `access.locked` — the act reads *Ask Priya (owner)* |
 
 ## Rules
 
@@ -76,7 +76,7 @@ nobody can read cannot be audited.
 | Membership reads, grants write | A member reads everything in the Graph through the Operator rule's starting lines; each grant lets them change one part of it (`.claude/team/TEAM.md` §7) |
 | Allowed only where every check allows | A request is its holder's access rules, narrowed by its own rule — a person's, or a key's; a run's step is what its skill needs ∩ the agent's rules, narrowed by its own rule ∩ the person who started it ∩ the view of the graph ∩ rules for everyone. A refusal names the check and the rule (AC-F03) |
 | Access is per Graph | Access rules, groups, service accounts' memberships and keys minted in a Graph are that Graph's. Nothing is install-wide but the install Admin |
-| Being Admin opens no Graph | The install Admin runs install rules, standards, datasets and retraction; it grants no access to a Graph's contents |
+| Being Admin opens no Graph | The install Admin runs install rules and standards; it grants no access to a Graph's contents |
 | Every credential carries its holder | A session and a key both act as the person who holds them; a key minted in a Graph is bound to it and may be narrowed |
 | Managing credentials needs a session | A call made with a key cannot mint or revoke a key, change a password, delete an account or add a user |
 | A username is an address | It is mutable, rarely, and never forwards from an old one (AC-F01) |
@@ -91,7 +91,7 @@ nobody can read cannot be audited.
 | What may be touched is a person's decision | Only a person sets a line's value; an agent may propose a tighter one, never a looser one, and asks for more in Needs you (AC-14) |
 | Where a value is set | On a connector, data, an AI model, a plugin, a tool, a skill, an agent and an access change — always as a line |
 | One place decides | A value is a line of an access rule (AC-F02). Set by hand on an item, it writes that line; set by policy, a line reaches many items at once. There is no second editor, and each value names its line and who set it |
-| Data by sensitivity and by kind | A line reaches data by its sensitivity — public · internal · confidential · personal — or names one kind; both apply and the strictest binds. Sensitivity comes from a dataset and its columns, and may also be set on a property of a kind (AC-04). Lines are enforced on what a query returns, element by element and property by property |
+| Data by sensitivity and by kind | A line reaches data by its sensitivity — public · internal · confidential · personal — or names one kind; both apply and the strictest binds. Sensitivity is set on a property of a kind (AC-04). Lines are enforced on what a query returns, element by element and property by property |
 | Levels only tighten | The Graph, then the holder's own rule. The holder's own rule keeps or tightens a value, never loosens it past the Graph's |
 | Where Deny may sit | On the Graph's *For everyone* rule and on a holder's own rule — *A person's own*, *An agent's own*, *A key's own* (AC-F03). The other rules a holder has still add up |
 | A person's Ask | Waits in Needs you (AC-F05), decided by people who hold Allow on that act — never by the asker, nor by the person or agent it benefits |

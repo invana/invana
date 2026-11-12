@@ -2,7 +2,7 @@
 id: J06
 title: Set what an agent may touch
 personas: [owner, builder]
-stories: [AC-04, AC-06, AG-21, AC-13, AC-15, AC-14, AC-12]
+stories: [AC-04, AC-06, AG-21, AC-13, GR-16, AC-15, AC-14, AC-12]
 boards: [settings.access, agents.agent, inbox, agents.run]
 ---
 
@@ -26,7 +26,7 @@ flowchart TD
   F --> G([The agent runs])
   G --> H{"The step's mode"}
   H -->|Allow| I(["It acts"])
-  H -->|Ask| J["AC-15 · Waits in Needs you, showing exactly what will happen"]
+  H -->|Ask| J["AC-15 · GR-16 · Waits in Needs you, showing exactly what will happen"]
   J -->|Allow · Send it| I
   J -->|Decline · expires| K(["Not done · the step ends not sent"])
   H -->|Deny| L["AC-14 · Refused · the agent asks for more"]
@@ -70,8 +70,8 @@ sequenceDiagram
 | 2 | See who it changes before saving | Settings · People and access | AC-06 | `settings.access` |
 | 3 | Narrow one agent by hand | Agents · the agent's sheet | AG-21 | `agents.agent` |
 | 4 | Read what the agent may touch, every level at once | Settings · People and access › Agents | AC-13 | `settings.access` |
-| 5 | The agent hits Ask and asks | Inbox · Needs you | AC-15 | `inbox` |
-| 6 | The agent hits Deny and asks for more | Inbox · Needs you · the run | AC-14 | `inbox` · `agents.run` |
+| 5 | The agent hits Ask and asks | Graph · Inbox · Needs you | AC-15 · GR-16 | `inbox` |
+| 6 | The agent hits Deny and asks for more | Graph · Inbox · Needs you · the run | AC-14 | `inbox` · `agents.run` |
 | 7 | Read which mode applied and who set it | The run · How it got here | AC-12 · AC-14 | `agents.run` |
 
 ## Branches

@@ -4,7 +4,7 @@ title: See what is left before the Graph answers
 feature: GR-F02
 status: idea
 personas: [owner, analyst]
-boards: [start.new_graph.ready, start.home, settings.people]
+boards: [graphs.new_graph.ready, graphs.home, settings.people]
 ---
 
 # GR-04 · See what is left before the Graph answers
@@ -31,7 +31,7 @@ flowchart TD
   s -->|to do| go["Its idea · why · how · the command · Open where it is made"]
   s -->|blocked| bl["Names the step that unblocks it"]
   s -->|without the role| ask["Ask Priya (owner) · Ask an Admin"]
-  go -->|done in Model, Data, Settings or a terminal| re["Set-up re-reads · the next step is chosen"]
+  go -->|done in Model, Records, Settings or a terminal| re["Set-up re-reads · the next step is chosen"]
   re --> l
   l -->|four done| a(["The first answer · set-up steps aside · offers stay one click away"])
 ```
@@ -43,7 +43,7 @@ flowchart TD
 | GR-04.1 | A Graph with required steps outstanding | set-up opens | it lists the four required steps — the database connects · a model is published · the Graph holds records · an AI model answers — with progress as *2 of 4* |
 | GR-04.2 | A step whose fact exists | set-up reads | it is checked, whoever made the fact and from wherever — Studio, the command line or another member |
 | GR-04.3 | A step to do | the person selects it | it shows its idea, why it matters, what it opens, two or three moves, the command filled in for this Graph, and how to tell it worked |
-| GR-04.4 | A step to do | the person opens it | the place that makes its fact opens — Settings › This graph, Model, Data or Settings › Invana; set-up has no form of its own |
+| GR-04.4 | A step to do | the person opens it | the place that makes its fact opens — Settings › This graph, Model, Records or Settings › Invana; set-up has no form of its own |
 | GR-04.5 | Bringing data in with no published model | set-up reads | the data step is blocked and names *Publish a model* |
 | GR-04.6 | A surface a step shuts | the person opens it | it says which step opens it — *Ask opens when an AI model answers* — with the act that does it |
 | GR-04.7 | Optional offers | set-up reads | they are listed after the required steps with no status, and never counted in progress |
@@ -58,9 +58,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Set-up on Ready | Admin | start.new_graph.ready | — | start.new_graph.ready · Loading below | start.new_graph.ready · Set-up | — | start.new_graph.ready · Drafting below | — |
+| Set-up on Ready | Admin | graphs.new_graph.ready | — | graphs.new_graph.ready · Loading below | graphs.new_graph.ready · Set-up | — | graphs.new_graph.ready · Drafting below | — |
 | Set-up on Ready | Operator | — | — | — | — | — | — | — |
 | Set-up in General | Admin | settings.people · General · Setup unfinished | — | settings.people · Loading | settings.people · General · Setup unfinished | settings.people · Could not load | — | — |
 | Set-up in General | Operator | settings.people · General · Setup unfinished | — | settings.people · Loading | settings.people · General · Setup unfinished | settings.people · Could not load | — | settings.people · General · Read only |
-| A Graph mid set-up on Home | Admin | — | — | start.home · Loading | start.home · Continue set-up | start.home · Could not load | — | — |
-| A Graph mid set-up on Home | Operator | — | — | start.home · Loading | start.home · Continue set-up | start.home · Could not load | — | start.home · Continue set-up |
+| A Graph mid set-up on Home | Admin | — | — | graphs.home · Loading | graphs.home · Continue set-up | graphs.home · Could not load | — | — |
+| A Graph mid set-up on Home | Operator | — | — | graphs.home · Loading | graphs.home · Continue set-up | graphs.home · Could not load | — | graphs.home · Continue set-up |

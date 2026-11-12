@@ -20,7 +20,7 @@ h1 { font-size:16px; margin:0; } h2 { font-size:13px; margin:18px 0 8px; text-tr
 .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .title { font-weight:600; flex:1; min-width:200px; }
 .pill { border-radius:10px; padding:1px 8px; font-size:11px; color:#fff; background:var(--idle); white-space:nowrap; }
-.s-working,.s-active,.s-started { background:var(--work); } .s-needs-you,.s-waiting-on-you { background:var(--you); }
+.s-working,.s-active,.s-started,.s-waiting-on-agents,.s-between-steps { background:var(--work); } .s-needs-you,.s-waiting-on-you { background:var(--you); }
 .s-finished { background:var(--ok); } .s-quiet { background:var(--bad); } .s-ended,.s-idle { background:var(--idle); }
 .tag { border:1px solid var(--line); border-radius:4px; padding:0 6px; font-size:11px; color:var(--mut); }
 .bar { width:120px; height:6px; background:var(--line); border-radius:3px; overflow:hidden; display:inline-block; vertical-align:middle; }
@@ -72,7 +72,7 @@ label { color:var(--mut); }
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const k = n => n >= 1000 ? `${Math.round(n / 1000)}k` : String(n || 0);
 const ago = (t, now) => { const s = Math.max(0, now - t); return s < 60 ? `${Math.round(s)}s` : s < 3600 ? `${Math.round(s / 60)}m` : `${Math.round(s / 3600)}h`; };
-const ORDER = {'needs you':0, 'working':1, 'started':1, 'active':1, 'quiet':2, 'waiting on you':3, 'idle':4, 'ended':5};
+const ORDER = {'needs you':0, 'working':1, 'waiting on agents':1, 'between steps':1, 'started':1, 'active':1, 'quiet':2, 'waiting on you':3, 'idle':4, 'ended':5};
 const pill = s => `<span class="pill s-${s.replace(/ /g, '-')}">${esc(s)}</span>`;
 let sel = null, selLabel = '', st = null;
 

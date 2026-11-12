@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Write a task, assign it to a person or an agent, start, answer an agent's question, cancel, accept or reject a result; read every task they may see | A task on a private project they are not staffed on is absent |
-| Operator | Read every task they may see, its thread, its runs and its state; open *How it got here* | *New task*, *Assign*, *Start*, *Cancel*, *Accept* and *Reject* disabled, naming *Can work on projects*. *With Can work on projects: as Admin* |
+| Admin | Write a task, assign it to a person or an agent, start, answer an agent's question, cancel, accept or send back a result; read every task they may see | A task on a private project they are not staffed on is absent |
+| Operator | Read every task they may see, its thread, its runs and its state; open *How it got here* | *New task*, *Assign*, *Start*, *Cancel*, *Accept* and *Send back* disabled, naming *Can work on projects*. *With Can work on projects: as Admin* |
 
 ## Flow
 
@@ -45,11 +45,17 @@ flowchart TD
   out -->|broke| fl["Failed · the diagnosis on the task"]
   rv --> dec{"A person decides"}
   dec -->|Accept| dn["Done"]
-  dec -->|Reject, with a note| rj["The note is on the task · back to Assigned"]
+  dec -->|Send back, with a note| rj["The note is on the task · back to Assigned"]
   rj --> ag
-  ap --> rv
+  ap -->|they press Start| ips["In progress · named, no run"]
+  ips -->|they post a result| rv
+  run([An agent's run needs a helper or a person]) -->|raises a task| new
+  rv --> hist["History of the task: who did what, for whom, caused by what"]
   open --> ag
-  ip -->|Cancel| cn["Cancelled · open sub-tasks cancel with it, and say so"]
+  ip -->|Cancel| cn["Cancelled · every open sub-task at every level cancels with it, and says so"]
+  ip -->|break it down| sub["Sub-tasks · any depth for people · bounded by the run's limits for an agent"]
+  sub -->|an agent passes its run's limits| sl["Refused · names the limit"]
+  sub --> bl
 ```
 
 ## Acceptance criteria
@@ -70,14 +76,22 @@ flowchart TD
 | PJ-12.12 | A run that has posted a result | the task is read | it reads *In review*, shows the result, and *How it got here* shows its steps, sources and assumptions |
 | PJ-12.13 | A task in review | a person presses *Accept* | it reads *Done*, History records who accepted it, and nobody but a person can have done so |
 | PJ-12.14 | An agent's result | it is posted | the agent cannot accept it; no screen or call offers an agent acceptance |
-| PJ-12.15 | A task in review | a person presses *Reject* and writes a note | the note is kept on the task, which returns to *Assigned* and may be started again |
+| PJ-12.15 | A task in review | a person presses *Send back* and writes a note | the note is kept on the task, which returns to *Assigned* and may be started again |
 | PJ-12.16 | A run that failed | the task is read | it reads *Failed* with the diagnosis on the task |
 | PJ-12.17 | A task with open sub-tasks | its run settles | it stays *In progress*, listing them |
-| PJ-12.18 | A task cancelled | its page is read | its open sub-tasks are cancelled with it, and the page says so |
+| PJ-12.18 | A task cancelled | its page is read | every open sub-task at every level below it is cancelled with it, and the page says so |
+| PJ-12.27 | A person working a task | they add a sub-task to a sub-task, at any depth | it is created under its parent; no depth limit applies to people |
+| PJ-12.28 | An agent's run making sub-tasks | one more would pass the run's limits — depth, count or tokens (RT-F04) | it is refused, naming the limit; the run carries on without it |
+| PJ-12.29 | A task with any sub-task still open, at any level | the task is read | it reads *Blocked*, naming the open sub-tasks |
+| PJ-12.30 | A task with sub-tasks | its counts are read | the engine gives the count by state for each level and a rolled-up total; Studio adds nothing up |
 | PJ-12.19 | An archived project | its tasks are read | they are read only; a run already going finishes |
 | PJ-12.20 | A task's *Runs* tab | it opens | it shows the Graph's runs filtered to this task, not a list of its own |
 | PJ-12.21 | A task on a private project | a member who is not on the project asks for it | it reads as not found |
-| PJ-12.22 | An Operator | they open a task | the thread, the state, the runs and *How it got here* read; *New task*, *Assign*, *Start*, *Cancel*, *Accept* and *Reject* are disabled, naming *Can work on projects* |
+| PJ-12.22 | An Operator | they open a task | the thread, the state, the runs and *How it got here* read; *New task*, *Assign*, *Start*, *Cancel*, *Accept* and *Send back* are disabled, naming *Can work on projects* |
+| PJ-12.23 | A task assigned to a person | they press *Start* | it reads *In progress* and names them; no run opens |
+| PJ-12.24 | A person working a task | they post a result | it reads *In review* with the result, waiting for a person to accept or send it back |
+| PJ-12.25 | An agent's run that needs a helper or a person | it raises a task from inside the run | the task is created in the run's project or none, reads who raised it and from which run, and *How it got here* opens that run |
+| PJ-12.26 | A task | its *History* opens | every act on the task and each run's attempts read as one tree — who did it, on whose behalf and caused by what — with a delegated run under the step that opened it; the *on behalf of* line comes from the run, never from the task's text, and a skill reads *offered* or *reported*, never *used* |
 
 ## Screens
 
@@ -93,3 +107,5 @@ flowchart TD
 | A task that cannot go on | Operator | — | — | — | projects.task · Blocked · Read only | projects.task · Failed · Read only | projects.task · Needs input · Read only | projects.task · Read only |
 | A closed task | Admin | — | — | — | projects.task · Done | — | — | — |
 | A closed task | Operator | — | — | — | projects.task · Done · Read only | — | — | projects.task · Read only |
+| A task's History | Admin | projects.task · History · Nothing yet | — | projects.task · Loading | projects.task · History | projects.task · Could not load | projects.task · History | — |
+| A task's History | Operator | projects.task · History · Nothing yet | — | projects.task · Loading | projects.task · History | projects.task · Could not load | projects.task · History | projects.task · History |

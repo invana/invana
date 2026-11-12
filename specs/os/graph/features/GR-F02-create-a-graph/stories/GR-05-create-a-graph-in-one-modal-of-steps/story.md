@@ -4,7 +4,7 @@ title: Create a graph in one modal of steps
 feature: GR-F02
 status: idea
 personas: [owner]
-boards: [start.new_graph, start.new_graph.connect, start.new_graph.files, start.new_graph.shape, start.new_graph.invite, start.new_graph.ready]
+boards: [graphs.new_graph, graphs.new_graph.connect, graphs.new_graph.files, graphs.new_graph.shape, graphs.new_graph.invite, graphs.new_graph.ready]
 ---
 
 # GR-05 · Create a graph in one modal of steps
@@ -64,11 +64,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| 1 · Name and question | Admin | start.new_graph | — | — | start.new_graph · Filled | start.new_graph · Address taken | — | — |
-| 1 · Name and question | Operator | start.new_graph | — | — | start.new_graph · Filled | start.new_graph · Address taken | — | — |
-| 3 · Shape | Admin | start.new_graph.shape · A starting point | — | start.new_graph.shape · Reading | start.new_graph.shape | start.new_graph.shape · Unreachable | start.new_graph.shape · Drafting | — |
-| 3 · Shape | Operator | start.new_graph.shape · A starting point | — | start.new_graph.shape · Reading | start.new_graph.shape | start.new_graph.shape · Unreachable | start.new_graph.shape · Drafting | — |
-| 4 · Invite | Admin | start.new_graph.invite · No one yet | — | — | start.new_graph.invite | start.new_graph.invite · Could not create | — | — |
-| 4 · Invite | Operator | start.new_graph.invite · No one yet | — | — | start.new_graph.invite | start.new_graph.invite · Could not create | — | — |
-| 5 · Ready | Admin | start.new_graph.ready | — | start.new_graph.ready · Loading below | start.new_graph.ready | — | start.new_graph.ready · Drafting below | — |
-| 5 · Ready | Operator | start.new_graph.ready | — | start.new_graph.ready · Loading below | start.new_graph.ready | — | start.new_graph.ready · Drafting below | — |
+| 1 · Name and question | Admin | graphs.new_graph | — | — | graphs.new_graph · Filled | graphs.new_graph · Address taken | — | — |
+| 1 · Name and question | Operator | graphs.new_graph | — | — | graphs.new_graph · Filled | graphs.new_graph · Address taken | — | — |
+| 3 · Shape | Admin | graphs.new_graph.shape · A starting point | — | graphs.new_graph.shape · Reading | graphs.new_graph.shape | graphs.new_graph.shape · Unreachable | graphs.new_graph.shape · Drafting | — |
+| 3 · Shape | Operator | graphs.new_graph.shape · A starting point | — | graphs.new_graph.shape · Reading | graphs.new_graph.shape | graphs.new_graph.shape · Unreachable | graphs.new_graph.shape · Drafting | — |
+| 4 · Invite | Admin | graphs.new_graph.invite · No one yet | — | — | graphs.new_graph.invite | graphs.new_graph.invite · Could not create | — | — |
+| 4 · Invite | Operator | graphs.new_graph.invite · No one yet | — | — | graphs.new_graph.invite | graphs.new_graph.invite · Could not create | — | — |
+| 5 · Ready | Admin | graphs.new_graph.ready | — | graphs.new_graph.ready · Loading below | graphs.new_graph.ready | — | graphs.new_graph.ready · Drafting below | — |
+| 5 · Ready | Operator | graphs.new_graph.ready | — | graphs.new_graph.ready · Loading below | graphs.new_graph.ready | — | graphs.new_graph.ready · Drafting below | — |

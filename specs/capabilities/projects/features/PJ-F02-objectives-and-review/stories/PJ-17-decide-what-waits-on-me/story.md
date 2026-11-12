@@ -33,6 +33,7 @@ flowchart LR
   k -->|a pass to judge| p["What it produced · pass 2 of 5 · tokens spent"]
   p -->|Good enough| st(["The loop settles"])
   p -->|Go again, with a note| ag(["Another pass, the note its input"])
+  k -->|an agent's proposal| pr(["Opens on its branch — accept or reject (PJ-05)"])
   k -->|a result| r["Each criterion — met · unmet · needs a person — with its evidence"]
   r -->|Accept| d(["The task is done"])
   r -->|Send back, a note on the failing criterion| b(["The task is open again"])
@@ -60,6 +61,7 @@ flowchart LR
 | PJ-17.15 | An item raised for another person | a member who can work on projects acts on it | it is decided, and History says who acted |
 | PJ-17.16 | An agent | it tries to accept a result | it is refused; only a person closes a task |
 | PJ-17.17 | An Operator | they open Needs you and an item | both read, with their evidence; *Accept*, *Send back*, *Answer*, *Good enough* and *Go again* are disabled, naming *Can work on projects* |
+| PJ-17.18 | An agent's open proposal on a branch of a project the member can see | Needs you opens | it is listed with the results — a fork or a decision, its branch, its rationale and its age — and opens on its branch, where it is accepted or rejected (PJ-05) |
 
 ## Screens
 

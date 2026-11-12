@@ -15,13 +15,14 @@ Invana is in **beta**. ✅ available · 🟡 usable, with parts still being buil
 |---|---|---|---|
 | **Ontology-governed** | Models give the data its meaning, and links between models join models from different sources | Ontology | ✅ |
 | **Rules and views of the graph** | Rules block, warn or report on what must always hold; a view of the graph bounds what agents may see, per question | Ontology | 🟡 |
-| **Datasets and provenance** | Origin, versions, licence and sensitivity on every dataset; a retraction flags everything that cites it | Ontology | 🟡 |
+| **Loads and provenance** | Every load keeps its file's hash, its licence and its run; every value traces to the load, edit, person or agent that wrote it; undoing a load flags everything that cites it | Intelligence | 🟡 |
 | **Agents** | Plans generated from each agent's instructions, checked by evals before they publish, and bounded by token budgets | Agents | 🟡 |
 | **Boards and the assistant** | Ask in plain words beside a saved board; the answer arrives on the canvas, and conversations pick up where they left off | Evidence | 🟡 |
-| **Grounded answers** | Every answer traces from the LLM to the query, the record and the dataset. When the graph can't answer, Invana says so | Evidence | ✅ |
-| **Annotations** | Note what you found on the records themselves, for the next person to read | Evidence | 🟡 |
+| **Grounded answers** | Every answer traces from the LLM to the query, the record and the load it came from. When the graph can't answer, Invana says so | Evidence | ✅ |
+| **Annotations** | Note what you found on the records themselves, for the next person to read | Intelligence | 🟡 |
 | **Decisions with a trail** | Projects keep the evidence for and against, and decisions are append-only | Evidence | ✅ |
-| **Simulation** | Run a simulator on a project branch over pinned dataset versions, reproducible from its seed | Evidence | ✅ |
+| **Simulation** | Run a simulator on a project branch over pinned loads, reproducible from its seed | Evidence | ✅ |
+| **General-purpose** | Nothing in the platform is domain-specific: a domain is its ontology, its agents and its project types, shipped together as a Domain pack | Operating system | 🟡 |
 | **Self-hosted** | One Docker Compose stack on your own machines. Your graph and your keys stay with you, and with Ollama the LLM can run on your network too | Operating system | ✅ |
 | **Roles and access** | Graph roles are enforced on every route, and search shows only what you can open | Operating system | ✅ |
 | **Plugins** | Every task comes from a plugin. Core plugins are always on; tool, MCP and simulator plugins extend what agents can do ([below](#plugins)) | Operating system | 🟡 |

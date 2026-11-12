@@ -95,12 +95,12 @@ class StaleLinks(Tree):
 
     def test_a_link_into_stale_from_a_spec_or_a_doc_fails(self):
         self.write('specs/_stale/docs/products/old.md', '# old')
-        self.write('specs/system-design/architecture.md', '[old](../_stale/docs/products/old.md#top)')
+        self.write('specs/journeys/notes.md', '[old](../_stale/docs/products/old.md#top)')
         self.write('docs/products/index.md', '[gone](../../specs/_stale/missing.md)')
         self.write('docs/angle.md', '[old](<../specs/_stale/docs/products/old.md> "title")')
         check.check_stale_links()
         self.assertEqual(sorted(e.split(':')[0] for e in check.errors),
-                         ['docs/angle.md', 'docs/products/index.md', 'specs/system-design/architecture.md'],
+                         ['docs/angle.md', 'docs/products/index.md', 'specs/journeys/notes.md'],
                          check.errors)
         self.assertTrue(all('links into `specs/_stale/`' in e for e in check.errors))
 
@@ -171,6 +171,32 @@ class WholeCheck(Tree):
         text = (self.specs / 'README.md').read_text()
         self.assertLess(text.index('## Operating system'), text.index('## Capabilities'))
         self.assertIn('[Open a graph](os/graph/features/GR-F01-open-a-graph/feature.md)', text)
+
+
+
+JOURNEY = ('---\nid: J01\ntitle: First\npersonas: []\nstories: [{stories}]\nboards: []\n---\n# First\n\n'
+           '## The journey\n\n```mermaid\nflowchart TD\n  A([Start]) --> B["GR-01 · Open it"]\n'
+           '  B --> C{{"Decide"}}\n  C -->|ask| D["GR-02 · AC-03 · Ask"] --> B\n  C -->|done| E(["{last} · Done"])\n```\n')
+
+
+class JourneyDiagram(Tree):
+    """The ids a journey diagram's steps start with match its ``stories:`` and name stories."""
+
+    def check(self, stories, last, known=('GR-01', 'GR-02', 'AC-03', 'GR-04')):
+        path = self.write('specs/journeys/J01-first.md', JOURNEY.format(stories=stories, last=last))
+        fm, body = check.front_matter(path, path.read_text())
+        check.check_journey_diagram(path, fm, body, dict.fromkeys(known, path))
+        return check.errors
+
+    def test_a_diagram_matching_its_stories_passes(self):
+        self.assertEqual(self.check('GR-01, GR-02, AC-03, GR-04', 'GR-04'), [])
+
+    def test_an_unknown_id_and_a_mismatch_with_stories_fail(self):
+        errors = self.check('GR-01, GR-02, GR-04', 'ZZ-99')
+        self.assertTrue(any('`E` starts with `ZZ-99`, which no story defines' in e for e in errors), errors)
+        self.assertTrue(any('`stories` names GR-04, not on The journey diagram' in e for e in errors), errors)
+        self.assertTrue(any('draws AC-03, missing from `stories`' in e for e in errors), errors)
+        self.assertEqual(len(errors), 3, errors)
 
 
 if __name__ == '__main__':

@@ -50,6 +50,8 @@ flowchart LR
 | EX-14.9 | Nothing has run | Queries opens | it says to ask a question or type a query |
 | EX-14.10 | The console open on a type and page | the page reloads | the same tab, type, page and step are open, the rows read from the board and the runs, never re-run |
 | EX-14.11 | The console open | the person clicks the open count again | the console collapses, and stays collapsed across a reload |
+| EX-14.12 | A query step open while its conversation has a question running | the person looks at *Re-run* | it is disabled with *A question is still running* |
+| EX-14.13 | A long value in a Data cell | the table shows it | it is cut short, the whole value showing on hover |
 
 ## Screens
 

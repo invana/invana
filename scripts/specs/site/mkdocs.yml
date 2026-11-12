@@ -1,0 +1,103 @@
+# The spec site — a browsable view of specs/, the only source. Nothing is copied: docs_dir is specs/ itself, and the
+# build hook (hooks.py) adds the graph panels and the analysis pages from check.py's parser at build time.
+# Run it: see README.md next to this file.
+site_name: Invana specs
+site_description: What Invana does and why — every spec, its dependencies, loops and gaps
+# Where `mkdocs serve` runs (README.md). The sitemap needs it, and instant navigation reads the sitemap; Material
+# rebases the sitemap's URLs on the page's own origin, so a build served elsewhere navigates the same.
+site_url: http://127.0.0.1:8000/
+docs_dir: ../../../specs
+site_dir: build
+use_directory_urls: true
+strict: false
+
+exclude_docs: |
+  _stale/
+
+not_in_nav: |
+  /tags.md
+
+validation:
+  nav:
+    omitted_files: info
+  links:
+    # Specs link out of specs/ (docs, code, the canvas); the `links` gate checks those, not this build.
+    not_found: info
+    absolute_links: info
+    unrecognized_links: info
+    anchors: info
+
+hooks:
+  - hooks.py
+
+theme:
+  name: material
+  custom_dir: overrides
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/graph-outline
+  features:
+    # A left tree, not top tabs: every section is a collapsible node, only the active branch open. `prune` keeps the
+    # large nav out of each page's HTML; `sections` (non-collapsible tops) and `expand` (all open) stay off on purpose.
+    - navigation.instant
+    - navigation.tracking
+    - navigation.path
+    - navigation.prune
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      # GitHub-style anchors, so the specs' `#section` links resolve here as they do on GitHub.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+
+plugins:
+  - search
+  - tags
+
+extra_css:
+  - assets/spec-site.css
