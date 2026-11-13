@@ -33,7 +33,7 @@ flowchart LR
   p -->|Edit| p
   p -->|Approve| f(["A read-only function, listed under the library"])
   p -->|leave it out| o(["Not a function"])
-  s([A skill's script]) -->|not a function| sc(["Approved and run as it is — RT-F06"])
+  s([A skill's script]) -->|not a function| sc(["Approved and run as it is — CP-F06"])
 ```
 
 ## Acceptance criteria
@@ -44,7 +44,7 @@ flowchart LR
 | AG-40.2 | A package and docs | Invana reads them | it proposes typed functions, each with its name, inputs and outputs as JSON Schema, and what it reaches, with *Approve* and *Edit* per row |
 | AG-40.3 | A proposed function | the Admin approves it | it is listed under *Tools they call* by where it comes from, read-only from then, and skills may call it |
 | AG-40.4 | A proposed function the Admin leaves out | a skill's plan names it | the plan is refused before it runs, naming the function |
-| AG-40.5 | A script in a skill's `scripts/` | Invana reads the skill | it is not proposed as a function; it is approved and run unchanged as a skill script (RT-F06) |
+| AG-40.5 | A script in a skill's `scripts/` | Invana reads the skill | it is not proposed as a function; it is approved and run unchanged as a skill script (CP-F06) |
 | AG-40.6 | A library being read | the Admin waits | it reads that Invana is reading the package; the rest of Skills stays usable |
 | AG-40.7 | A package that cannot be found or read | Invana reads it | it says why, naming the package; nothing is proposed |
 | AG-40.8 | Approved functions | anyone opens *Tools they call* | each lists where it comes from and how many skills call it; one nothing calls reads *not used yet*; proposals still open read *n to review* |

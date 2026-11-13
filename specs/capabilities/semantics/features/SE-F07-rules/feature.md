@@ -142,12 +142,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | A rule on a property — a `model_lenses` row, `kind = guardrail`, `scope = graph`, with `target` · `access` · `leaves` · `allowed_in` | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
-| A step's offered and cited rules · the runs a request was filed from | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| A step's offered and cited rules · the runs a request was filed from | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | Loads a check reads at | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Project decisions a check reads at · a project's rules on its Details | [PJ-F03](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md#engine) · [PJ-F01](../../../projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | The leads an alert rule opens | [PJ-F06](../../../projects/features/PJ-F06-alerts/feature.md#engine) |
 | Derived facts and inference runs | [SE-F08](../SE-F08-inference/feature.md#engine) |
-| Who may act — the act rules' enforcement among every check | [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
+| Who may act — the act rules' enforcement among every check | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes

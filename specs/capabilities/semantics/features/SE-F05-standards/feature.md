@@ -80,11 +80,11 @@ flowchart TD
 | A term | Name (unique in the version) · type `text · integer · number · boolean · date` · required · allowed values, each a code with a label · description · its source address when imported |
 | Importers per format | SKOS (SE-18) · OWL/RDFS — classes and their properties as terms, named individuals as values · SHACL — shapes as terms, `sh:in` as values, `sh:minCount` as required · CSV code lists — one column of codes, one of labels. Each previews before it imports, and keeps every source address |
 | A SKOS scheme is a standard | Concepts become terms and values: `prefLabel` the names and labels, `notation` the codes, `broader` the levels; each keeps its source address. A value hierarchy a model's property follows is SE-F04's |
-| Packs per standard | A pack is one standard's file — IAB Content Taxonomy, ISO 3166, Darwin Core — applied by an Admin from the command line, marked *pack*; a Domain pack may carry several (RT-F02) |
+| Packs per standard | A pack is one standard's file — IAB Content Taxonomy, ISO 3166, Darwin Core — applied by an Admin from the command line, marked *pack*; a Domain pack may carry several (CP-F02) |
 | A holder pins a version | A newer standard version never moves a kind or property that holds one; the holder reads that a newer one exists |
 | The engine never fetches | The browser or the CLI reads a file or URL and sends its text; the engine reads only what it is sent |
 | The engine counts | Holders per standard and the library's totals are the engine's |
-| Leans on | SE-F02 — a constraint that names a standard's values · SE-F07 — holding a kind or property to a standard, and what breaks it · RC-F03 — the records that break it · SE-F04 — value hierarchies · RT-F02 — packs |
+| Leans on | SE-F02 — a constraint that names a standard's values · SE-F07 — holding a kind or property to a standard, and what breaks it · RC-F03 — the records that break it · SE-F04 — value hierarchies · CP-F02 — packs |
 
 ## Data touched
 

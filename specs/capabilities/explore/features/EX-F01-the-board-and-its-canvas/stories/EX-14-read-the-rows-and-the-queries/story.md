@@ -18,19 +18,21 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read Data and Queries; re-run a query step | — |
-| Operator | As Admin — re-run is for their own conversation's steps | — |
+| Admin | Read Data and Queries on any board; re-run a query step | — |
+| Operator | Read Data on a board they open; read Queries and re-run a step of their own conversation's runs, or of one shared with them; a Modeller the same | A step of a run they may not read: that it ran, its status and tokens — *Content withheld* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  f([Footer counts]) -->|195 nodes · 312 relationships| d["Data: a table per type · 20 a page"]
+  f([Footer counts]) -->|195 nodes · 312 relationships| d["Data: a table per kind · 20 a page"]
   f -->|4 queries| q{Anything ran?}
   q -->|no| e["Ask a question or type a query"]
-  q -->|yes| l["Query steps, newest first"]
-  l -->|open one| s["The step: Overview · Touched · Log"]
-  s -->|Re-run| r(["A new run of that reply"])
+  q -->|yes| l["Query steps, newest first · one per graph database"]
+  l -->|open one| s{May read the run?}
+  s -->|yes| st["The step: Overview · Touched · Log"]
+  s -->|no| wh["Ran · status · tokens · Content withheld"]
+  st -->|Re-run| r(["A new run of that reply"])
   x([A query fails]) --> fl["The console opens on its Log"]
   d -->|a row| sel["The board selects that element"]
 ```
@@ -40,18 +42,19 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-14.1 | A drawn board | the person clicks `195 nodes · 312 relationships` in the footer | the console opens under the board on Data, the left section and the assistant staying full height |
-| EX-14.2 | Data open | the person picks a type | its table shows that type's own properties as columns, 20 a page, with the full count — *1–20 of 120* |
+| EX-14.2 | Data open | the person picks a kind | its table shows that kind's own properties as columns, 20 a page, with the full count — *1–20 of 120* — and the graph database each row is in |
 | EX-14.3 | A table open | the person switches to JSON | the same 20 records show as the JSON they arrived in |
 | EX-14.4 | A table open | the person picks a row | the board selects that element |
-| EX-14.5 | A conversation with queries | the person clicks `4 queries` | every query step of this conversation is listed newest first: its status, the query, language, when, how long, rows and the question that ran it |
-| EX-14.6 | A query step | the person opens it | it shows the step as the run shows it — Overview · Touched · Log — with *All queries* and *Re-run* |
+| EX-14.5 | A conversation with queries | the person clicks `4 queries` | every query step of this conversation is listed newest first: its status, the query, its graph database and language, when, how long, rows and the question that ran it |
+| EX-14.6 | A query step of a run the person may read | they open it | it shows the step as the run shows it — Overview · Touched · Log — with *All queries* and *Re-run* |
 | EX-14.7 | A query that failed | it settles | the console opens on that step's Log and the footer's `queries` carries a dot; there is no toast |
 | EX-14.8 | A query that returned no rows | its row is listed | it reads `0 rows`, and its detail still shows the query — never a failure |
 | EX-14.9 | Nothing has run | Queries opens | it says to ask a question or type a query |
-| EX-14.10 | The console open on a type and page | the page reloads | the same tab, type, page and step are open, the rows read from the board and the runs, never re-run |
+| EX-14.10 | The console open on a kind and page | the page reloads | the same tab, kind, page and step are open, the rows read from the board and the runs, never re-run |
 | EX-14.11 | The console open | the person clicks the open count again | the console collapses, and stays collapsed across a reload |
 | EX-14.12 | A query step open while its conversation has a question running | the person looks at *Re-run* | it is disabled with *A question is still running* |
 | EX-14.13 | A long value in a Data cell | the table shows it | it is cut short, the whole value showing on hover |
+| EX-14.14 | A board opened by someone who may not read its conversation's runs | they open Queries | each step lists that it ran, its status and tokens, and reads *Content withheld*; no query and no *Re-run* show |
 
 ## Screens
 
@@ -60,4 +63,4 @@ flowchart LR
 | Console · Data | Admin | explore.board.console · Nothing drawn | — | explore.board.console · Loading | explore.board.console | — | explore.board.console · Running | — |
 | Console · Data | Operator | explore.board.console · Nothing drawn | — | explore.board.console · Loading | explore.board.console | — | explore.board.console · Running | — |
 | Console · Queries | Admin | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | — |
-| Console · Queries | Operator | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | — |
+| Console · Queries | Operator | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | explore.board.console · Content withheld |

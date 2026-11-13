@@ -84,10 +84,10 @@ flowchart TD
 | Drift is matched by what a row covers | A kind, relationship, index or constraint is *in both*, *model only* or *database only* by what it covers, never by its name |
 | Growth moves only when something writes | Records are counted after every read of the database, load and link commit, each mark naming the run that wrote; never sampled on a timer |
 | Query performance per kind | Performance reads, per kind, the questions that failed — *cannot answer*, refused or erroring, each with its reason — the slow query shapes, and the indexes the engine suggests from them |
-| Advice is a draft change, never a write | A suggested index is offered as *Add index to draft*, to an Admin alone; the next publish adds it. Explore's memory may suggest the same index (EX-F07); it lands here, never applied by an agent |
+| Advice is a draft change, never a write | A suggested index is offered as *Add index to draft*, to an Admin alone; the next publish adds it. Explore's memory may suggest the same index (AG-F09); it lands here, never applied by an agent |
 | Archive, not delete | A published model is archived — out of the map, its versions still resolve for every answer and load that used them; only a never-published model is deleted. A model with active links cannot be archived |
 | The engine counts every number | Studio formats; history's effect after is stored when the version publishes and never recomputed |
-| Leans on | SE-F01 — reading the database · SE-F02 — the draft, the comparison, the review · SE-F06 — links · RC-F02 — loads into a model · EX-F07 — suggestions from memory · Agents › Runs — each run a number links to |
+| Leans on | SE-F01 — reading the database · SE-F02 — the draft, the comparison, the review · SE-F06 — links · RC-F02 — loads into a model · AG-F09 — suggestions from memory · Agents › Runs — each run a number links to |
 
 ## Data touched
 
@@ -121,8 +121,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Models, their status and versions · the review and its runs behind each publish | [SE-F01](../SE-F01-start-a-model/feature.md#engine) · [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | The statements pushed for each version | [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Links between models, and the relationship each declares | [SE-F06](../SE-F06-links-and-mappings/feature.md#engine) |
-| The connector's indexes, constraints, `EXPLAIN` and `lists_schema` | [RT-F05](../../../../os/runtime/features/RT-F05-graph-database-connectors/feature.md#engine) |
-| Runs, their caller and `triggered_by` | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| The connector's indexes, constraints, `EXPLAIN` and `lists_schema` | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
+| Runs, their caller and `triggered_by` | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | History — every version and act | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes

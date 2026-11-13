@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read an ontology, pick its kinds, preview the mapping and open it as a draft | — |
-| Operator | — | *New model* disabled — *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin |
+| Operator | See the models and their drafts; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *New model* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -51,10 +51,10 @@ flowchart LR
 | SE-15.8 | The preview | the person picks *Open as a draft* | a new draft model lands on its canvas; every kind and property keeps its source address; nothing is published |
 | SE-15.9 | A file that cannot be read, a remote context, more than 20 MB, or an unknown kind named | the person reads or previews | the dialog says why, naming the format and the line or the name; the picks are kept |
 | SE-15.10 | A URL whose server does not let the browser read it | the person reads it | the dialog names the server and says *Download the file and choose From a file* |
-| SE-15.11 | The name is used by a model in this Graph | the person opens the draft | the name is asked again beside the name field; nothing is made |
-| SE-15.12 | Property types this database cannot hold | the draft opens | they are named, and the draft still lands, unable to publish until changed |
+| SE-15.11 | The name is used by a model in the deployment | the person opens the draft | the name is asked again beside the name field; nothing is made |
+| SE-15.12 | Property types the model's graph database cannot hold | the draft opens | they are named, and the draft still lands, unable to publish until changed |
 | SE-15.13 | The preview | the person picks *Back* | the picks are kept; a reload starts the dialog again |
-| SE-15.14 | An Operator without *Can shape the model* | they reach *New model* | it is disabled with *Ask Priya (owner) to shape the model* |
+| SE-15.14 | An Operator | they reach *New model* | it is disabled with *Needs the Modeller role — ask an Admin* |
 | SE-15.15 | An ontology whose labels carry several languages | it is previewed | Each kind and property takes its label in the chosen language, else an untagged one, else any; names that clash are suffixed `_2`, and the preview says so |
 
 ## Screens

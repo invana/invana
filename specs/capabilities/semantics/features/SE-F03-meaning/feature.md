@@ -32,7 +32,7 @@ flowchart TD
   d -->|a synonym another kind already has| dup["Refused, naming the other kind"]
   d -->|an outside term that is not an address| bad["Refused, naming the field"]
   d -->|Publish — SE-05| pub(["Questions in those words resolve to this kind"])
-  mem([Explore's memory — EX-F07]) -->|proposes a synonym| prop["A draft change, waiting for a person"] --> may
+  mem([Explore's memory — AG-F09]) -->|proposes a synonym| prop["A draft change, waiting for a person"] --> may
 ```
 
 ## Stories
@@ -69,8 +69,8 @@ flowchart TD
 | Versioned with the model | Meaning is staged in the draft and published with it; it never changes a record and never breaks a version |
 | Grounding reads it | A question's words resolve against kind names, then synonyms; the answer's *How it got here* names the synonym that matched |
 | Imports carry meaning | A definition, alternative labels and source addresses from an import (SE-15 · SE-F05) land as meaning |
-| A proposal is a draft change | A synonym or definition from Explore's memory (EX-F07) or an agent waits in the draft until a person accepts it |
-| Leans on | SE-F02 — the draft and publish · SE-F05 — a standard's terms an outside term may name · SE-F06 — a mapping to a standard · EX-F07 — proposed synonyms |
+| A proposal is a draft change | A synonym or definition from Explore's memory (AG-F09) or an agent waits in the draft until a person accepts it |
+| Leans on | SE-F02 — the draft and publish · SE-F05 — a standard's terms an outside term may name · SE-F06 — a mapping to a standard · AG-F09 — proposed synonyms |
 
 ## Data touched
 

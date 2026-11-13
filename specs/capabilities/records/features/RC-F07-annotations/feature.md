@@ -4,26 +4,26 @@ title: Annotations
 product: RC
 status: idea
 personas: [analyst, curator]
-stories: [RC-07]
+stories: [RC-07, RC-13]
 journeys: []
 boards: []
 nfrs: []
-depends_on: [EX-F06]
+depends_on: [EX-F01]
 ---
 
 # Annotations
 
 > The one home for annotations: what people and the assistant say about the records, kept by Invana as records of
 > the built-in *Annotation* kind — what an annotation is, how it is kept, and every one in the Graph in one place,
-> found by record, author or kind, and edited or removed by its author. Making one on a board is Explore's
-> ([EX-F06](../../../explore/features/EX-F06-annotate-and-edit-the-data/feature.md)).
+> found by record, author or kind, and edited or removed by its author. Making one is done on a board
+> ([RC-13](stories/RC-13-annotate-the-records-on-a-board/story.md)).
 > The decision it helps make: *which annotations still hold, and which should go?*
 
 ## User journey
 
 ```mermaid
 flowchart TD
-  ex([Explore — annotate while investigating · EX-19]) --> keep["Kept as an Annotation record, in Invana"]
+  ex([On a board — annotate while investigating · RC-13]) --> keep["Kept as an Annotation record, in Invana"]
   start([Records › Annotations]) --> list["RC-07 · Every annotation · by record · author · kind"]
   keep --> list
   list -->|filter matches nothing| ef["Nothing matches — the filter named · Clear"]
@@ -39,6 +39,7 @@ flowchart TD
 | ID | Story | Status |
 |---|---|---|
 | RC-07 | [Find and manage the Graph's annotations](stories/RC-07-find-and-manage-the-graphs-annotations/story.md) | idea |
+| RC-13 | [Annotate the records on a board](stories/RC-13-annotate-the-records-on-a-board/story.md) | idea |
 
 ## Rules
 
@@ -46,7 +47,7 @@ flowchart TD
 |---|---|
 | A built-in kind | An annotation is a record of the built-in *Annotation* kind: its text, author, the records it is about, the value then, and its evidence |
 | Kept by Invana | Annotation records are kept by Invana, never in the customer's graph database; a read-only database can be annotated |
-| Explore creates, Records keeps | Annotating is done on a board (EX-F06); what an annotation is, and finding, reading, editing and removing all of them, is here |
+| Made on a board, kept here | Annotating is done on a board (RC-13); what an annotation is, and finding, reading, editing and removing all of them, is here too |
 | On data, never free | It names the records it is about — a node, a relationship, one value, a set (highlight) or two or more nodes (group) |
 | One word | *Annotation*, with an author — a person or the assistant |
 | It belongs to the Graph | Any board that loads a record shows its annotations |

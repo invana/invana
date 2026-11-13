@@ -88,7 +88,7 @@ from.
 | Semantics | The published kinds, keys, constraints, standards and rules every record is read and loaded against |
 | Explore | Creating annotations and editing records on a board |
 | Access | History, filtered to one record (AC-F06) |
-| Runtime | Workers that run each load (RT-F03) |
+| Control Plane | Workers that run each load (CP-F03) |
 
 ## Not building
 

@@ -8,7 +8,7 @@ stories: [AG-42]
 journeys: [J04]
 boards: [agents.schedules, inbox]
 nfrs: [NFR-PERF-3]
-depends_on: [AG-F01, AG-F03]
+depends_on: [AG-F01, CP-F10]
 ---
 
 # Schedules
@@ -118,7 +118,7 @@ sequenceDiagram
 | A paused agent | Its schedule's firings fail, naming the agent; the schedule stays on |
 | A retired agent | Retiring it pauses each schedule that starts it, naming the agent; the schedule fires again only once a person points it at another agent and resumes it (AG-F01) |
 | A channel in use | Removing a channel a schedule delivers to is refused, naming the schedule |
-| Leans on | Build an agent (AG-F01) · runs (AG-F03) · the Inbox (GR-F05) · channels in Settings › Notifications |
+| Leans on | Build an agent (AG-F01) · runs (CP-F10) · the Inbox (CP-F08) · channels in Settings › Notifications |
 
 ## Data touched
 
@@ -126,7 +126,7 @@ sequenceDiagram
 |---|---|
 | Schedules — name, agent, instructions, repeat, zone, on or paused, missed and overlap choices, delivery, outward approval and who set it, approvers, owner, next run | Write · read |
 | Firings — when due, outcome, reason, catch-up or run now, the run, when delivered | Write · read |
-| The run each firing opens (AG-F03) | Write · read |
+| The run each firing opens (CP-F10) | Write · read |
 | Inbox rows and outward-delivery asks (AC-F05) | Write · read |
 | History rows of every create, edit, pause, resume, delete, firing and skip (AC-F06) | Write · read |
 
@@ -147,10 +147,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | The agent a schedule names, and whether it is paused or retired | [AG-F01](../AG-F01-build-an-agent/feature.md#engine) |
-| The run a firing opens | [AG-F03](../AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
-| Outward-delivery asks and their verdicts; the strictest line on a send | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) · [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
-| Inbox rows, channels and the delivery to them | [GR-F05](../../../../os/graph/features/GR-F05-the-inbox/feature.md#engine) |
-| Where a firing's run waits — a schedule's runs are batch | [RT-F03](../../../../os/runtime/features/RT-F03-workers-and-the-queue/feature.md#engine) |
+| The run a firing opens | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| Outward-delivery asks and their verdicts; the strictest line on a send | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) · [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
+| Inbox rows, channels and the delivery to them | [CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine) |
+| Where a firing's run waits — a schedule's runs are batch | [CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes
@@ -177,7 +177,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|---|
 | 422 | An invalid repeat, an unknown time zone, or a missing agent or channel | *{field}: {why}.* | AG-42.3 |
 | 403 | Create, change, pause, resume, run now or delete without *Can work on projects* | *This needs Can work on projects.* | AG-42.18 |
-| 409 | Removing a channel a schedule delivers to — on the channel's delete ([GR-F05](../../../../os/graph/features/GR-F05-the-inbox/feature.md#engine)) | *{schedule} delivers to this channel.* | AG-42.17 |
+| 409 | Removing a channel a schedule delivers to — on the channel's delete ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)) | *{schedule} delivers to this channel.* | AG-42.17 |
 | firing failed | Its agent is paused | *{agent} is paused.* | AG-42.6 |
 
 ### CLI
@@ -194,7 +194,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | One clock per process | Every `INVANA_CLOCK_INTERVAL_S`, or woken after *Run now*, the loop opens a session, ticks, commits, and only then submits the runs the tick opened — a run starts from committed rows. A failed tick is logged and rolled back |
 | A tick | Due schedules — missed? overlapping? agent available? · firings kept and runs opened on the owner's behalf · settled runs delivered — Inbox rows and outward asks |
-| The clock is shared | A tick also runs work other features own — notification matching and sending (GR-F05), ask reminders and expiry (AC-F05), publish reviews, alert rules and the ledger's verification; each is that feature's |
+| The clock is shared | A tick also runs work other features own — notification matching and sending (CP-F08), ask reminders and expiry (AC-F05), publish reviews, alert rules and the ledger's verification; each is that feature's |
 | Missed | A firing reached more than five minutes late is missed and handled by `missed`; `run_all` replays at most 24 |
 | Overlap | `skip` keeps the firing `skipped` while the last run is going; `allow` opens another |
 | A paused agent · a retired agent | Paused — the firing is `failed`, naming the agent, the schedule stays active · retired — every active schedule that starts it is paused, the event naming the agent |
@@ -223,7 +223,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | No sources, tools or project to pick | Sources are written in the instructions, tools are the agent's, and a schedule needs no project |
 | The result opens its run | Every delivered result and every firing opens the run behind it, with *How it got here* one click away |
 | Time or a write fires the work | One feature, two trigger kinds: a cron fires on time; an event trigger fires the same work on a write — an action pattern and a scope in place of the cron, the same overlap choice and the same firing record. The record is [Engine › Records](#records) |
-| Telling someone is not a schedule | A rule that notifies or calls a webhook on an event is a notification ([GR-F05](../../../../os/graph/features/GR-F05-the-inbox/feature.md)); a schedule only opens runs. A missed notice is an annoyance, a missed run is work that silently did not happen — so only runs take the firing record |
+| Telling someone is not a schedule | A rule that notifies or calls a webhook on an event is a notification ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)); a schedule only opens runs. A missed notice is an annoyance, a missed run is work that silently did not happen — so only runs take the firing record |
 
 ## Open questions
 

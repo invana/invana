@@ -2,9 +2,9 @@
 id: SE-F09
 title: Views of the graph
 product: SE
-status: idea
+status: placeholder
 personas: [modeller, analyst]
-stories: [SE-10]
+stories: []
 journeys: []
 boards: [model.rules, explore.compare]
 nfrs: [NFR-SEC-5]
@@ -20,7 +20,8 @@ depends_on: [SE-F02, SE-F07]
 
 ```mermaid
 flowchart TD
-  start([Model › Rules and views › Views]) --> v["SE-10 · Each view: what it hides, who uses it, its runs"]
+  kept(["AC-27 · What agents may not see is a Deny rule on data/‹graph database›/‹kind› and a sensitive property"])
+  start([Model › Rules and views › Views]) --> v["Each view: what it hides, who uses it, its runs"]
   v -->|loading| sk["Skeleton rows"]
   v -->|failed| f["The views could not be read"]
   v -->|none yet| v0["Everything — only the rules on properties narrow a run"]
@@ -31,8 +32,8 @@ flowchart TD
   val -->|widens a rule| vr["Refused, naming the rule"]
   val -->|slices an axis the model never declared| va["Refused, naming the model and the axis"]
   val -->|holds| saved(["Saved — in the Graph's views"])
-  v -->|a view| board["SE-10 · The view's own page: layers, its runs, who asked under it"]
-  runs([Two runs of one question]) -->|Compare| cmp["SE-10 · Side by side — what each read, and how"]
+  v -->|a view| board["The view's own page: layers, its runs, who asked under it"]
+  runs([Two runs of one question]) -->|Compare| cmp["Side by side — what each read, and how"]
 ```
 
 ```mermaid
@@ -55,7 +56,7 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| SE-10 | [Narrow what agents may see](stories/SE-10-narrow-what-agents-may-see/story.md) | idea |
+| — | What agents may not see is [AC-27 · Keep a kind or a sensitive property from agents](../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md) | — |
 
 ## Access
 
@@ -152,16 +153,16 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 |---|---|
 | Published versions and their declared `axes` | [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Rules on properties — their compile into `rules[]` and their routes | [SE-F07](../SE-F07-rules/feature.md#engine) |
-| A run's `lens_snapshot`, its steps and its ledger | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
-| A run's `result.json` — `touches[]`, `tokens` with `tokens_cached_in`, `result.cache` — and its cost by layer and participant | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) |
-| A Task's `role` · the plan a lens may sit on | [AG-F06](../../../agents/features/AG-F06-plans-and-functions/feature.md#engine) |
+| A run's `lens_snapshot`, its steps and its ledger | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| A run's `result.json` — `touches[]`, `tokens` with `tokens_cached_in`, `result.cache` — and its cost by layer and participant | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
+| A Task's `role` · the plan a lens may sit on | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | A peer agent called as an outside party | [AG-F05](../../../agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine) |
-| The connector composing a predicate and a projection into the query it runs (`run_query`) | [RT-F05](../../../../os/runtime/features/RT-F05-graph-database-connectors/feature.md#engine) |
-| The checks every act passes, the view among them | [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
+| The connector composing a predicate and a projection into the query it runs (`run_query`) | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
+| The checks every act passes, the view among them | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | An agent's own bound | [AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md#engine) |
 | Schedules that pin a view | [AG-F07](../../../agents/features/AG-F07-schedules/feature.md#engine) |
-| Configured AI model providers and models — `llm/<provider>/<model>` | [RT-F01](../../../../os/runtime/features/RT-F01-ai-models/feature.md#engine) |
-| Who holds *Can shape the model* | [AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine) |
+| Configured AI model providers and models — `llm/<provider>/<model>` | [CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine) |
+| Who holds *Can shape the model* | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes
@@ -231,13 +232,13 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | Delegation | A delegated child's lens is its parent's or narrower, in every layer and slice; a replan never changes the lens — a different lens is a different run |
 | What the run can be told | Something outside the lens settles *outside this view*, carrying what the run was grounded in and the rule or view that kept out what it needs (SE-10.23). Something the Graph lacks settles *cannot answer* ([EX-F05](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md)) |
 | Grounded needs a record | An answer with no touches behind it is not shown as grounded |
-| What it may see, what it may do | The lens bounds what a run may see, use and send; what it may do is its access rules ([AC-F02](../../../../os/access/features/AC-F02-access-rules/feature.md#engine)), where the view is one of the checks every act passes. There is no second bound |
+| What it may see, what it may do | The lens bounds what a run may see, use and send; what it may do is its access rules ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)), where the view is one of the checks every act passes. There is no second bound |
 | Enforcement | In the interpreter before dispatch (participant, egress) and in the connector at execution (projection, predicate) — never in Studio, never by filtering afterwards. The snapshot compiles into the connector's `QueryLens`, a model address resolving to the kinds its version declares |
 | A hidden property | Not in the schema the AI model is told; a query naming it is refused at the connector; a whole record returns without it |
 | The three crossings | A run reaches the model, the graph and a write through `open_model`/`close_model` · `open_graph`/`close_graph` · `open_write`/`close_write` |
 | Validated at save | A draft lens does not widen a guardrail, selects only declared axes, matches something, and its cast is allowed — checked at save, never at run |
 | The default cast | Ships with the distribution, computed over the AI models the Graph offers: `extract` the cheapest that can read · `decide` the most capable · `judge` a local one where one exists, else the cheapest · `embed` the only embedding model, or none. A role no lens casts takes it |
-| A cast holds its AI model | Removing an AI model a view casts is refused on the runtime's route, naming the views ([RT-F01](../../../../os/runtime/features/RT-F01-ai-models/feature.md#engine)) |
+| A cast holds its AI model | Removing an AI model a view casts is refused on the runtime's route, naming the views ([CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine)) |
 | Read and send are two permissions | A run may rank by a property whose value never enters a prompt: allow/deny, `properties` and `select` govern what it reads; `egress.may_send` on the rule matching the destination governs what it sends there |
 | What may leave | Per destination, never per run. `may_send` absent from every matching rule leaves the crossing unbounded — a rule nobody wrote narrows nothing; a matching rule that states none takes the lens's `egress` default, `[]`; `[]` cuts everything. Several matching rules intersect; `everything` on one leaves the others to decide. A hosted AI model is an outside party governed this way; a local one has nothing to declare |
 | The egress cut | By prompt part — `type_names` · `property_names` · `the_question` · `property_values` — before the prompt is assembled; a description or a link's key crosses under the class of what it describes. The touch records `sent.to` · `sent.classes` · `sent.cut` on every crossing — an empty `cut` on an unbounded crossing is a fact — never the payload |
@@ -298,7 +299,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | A table of a view's rules | A rule is an element of the view, edited, compared and frozen with it |
 | Counters for a view's usage | A counter can disagree with the rows it counts; usage is a grouped read |
 | A catalogue of third-party endpoints | A deny needs no catalogue — a third party is named by its address |
-| A queue of its own | The queue is the runtime's (RT-F03) |
+| A queue of its own | The queue is the runtime's (CP-F03) |
 | AI model catalogues fetched from the provider | A typed model id is enough |
 | A frozen view that resolves through live rows | A snapshot that resolves through live rows is not a snapshot |
 | Slices on a third party | It is allowed or denied whole; what may leave governs the call |

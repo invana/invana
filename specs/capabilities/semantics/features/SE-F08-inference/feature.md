@@ -8,7 +8,7 @@ stories: [SE-22]
 journeys: []
 boards: [model.inference, model.rules]
 nfrs: [NFR-REL-1, NFR-REL-3, NFR-PERF-2, NFR-OPS-2]
-depends_on: [SE-F07, RC-F06, RT-F03]
+depends_on: [SE-F07, RC-F06, CP-F03]
 ---
 
 # Inference
@@ -80,14 +80,14 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | Rule-based only | A derivation is a rule in a supported form — OWL 2 RL, SHACL rules, or a Datalog-style *when … then …* over kinds, relationships and properties. A form outside them is refused at save |
-| Runs on the queue | Each derivation runs as an inference run on a worker (RT-F03), within the Graph's limits; a load or a change that touches a premise queues it again |
+| Runs on the queue | Each derivation runs as an inference run on a worker (CP-F03), within the Graph's limits; a load or a change that touches a premise queues it again |
 | Derived facts are records | Each derived fact is stored in Invana's store as a record labelled *derived*, with the rule version and its premises (RC-F06); it is read beside loaded records and never mistaken for one |
 | How it got here | A derived fact opens on its rule version and each premise, each premise opening its own provenance |
 | Withdrawn when its premise goes | When a premise is changed or removed, the facts that rested on it are withdrawn in the next run |
 | Write-back is opt-in | Off by default; turned on per derivation by an Admin, the facts are also written to the graph database, marked derived, and removed when withdrawn |
 | No loops forever | A run stops when no new fact is derived; a run that passes the Graph's limit stops and says so |
 | The engine counts | Facts derived and withdrawn per run and per derivation are the engine's |
-| Leans on | SE-F07 — a derivation is a rule · RC-F06 — provenance of each fact · RT-F03 — workers and the queue · AC-F02 — who may read the premises |
+| Leans on | SE-F07 — a derivation is a rule · RC-F06 — provenance of each fact · CP-F03 — workers and the queue · AC-F02 — who may read the premises |
 
 ## Data touched
 
@@ -136,7 +136,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 9 Distributed execution | A new worker job kind, `inference`, on the queue (RT-F03) | NFR-PERF-2 · NFR-REL-1 |
+| § 9 Distributed execution | A new worker job kind, `inference`, on the queue (CP-F03) | NFR-PERF-2 · NFR-REL-1 |
 | § 6 Data and storage | The derived-fact store in Invana's database | NFR-OPS-2 |
 | § 11 Failure modes and the outside boundary | Opt-in write-back of derived facts to the graph database, per derivation | NFR-REL-3 |
 

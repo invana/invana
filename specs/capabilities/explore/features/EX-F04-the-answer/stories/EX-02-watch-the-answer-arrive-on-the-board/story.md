@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Watch, cancel and re-run their own runs; load an answer to the board; *Save view* · *Share* · *Schedule this* · *Add to a project* | Another member's run: watched, not cancelled |
-| Operator | Watch, cancel and re-run their own runs; load to the board; *Save view* · *Share* | *Schedule this* and *Add to a project* disabled — *Ask Priya (owner)*. With *Can work on projects*: as Admin |
+| Admin | Watch, cancel and re-run their own runs; read and stop anyone's run (CP-F10); load an answer to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project* | — |
+| Operator | Watch, cancel and re-run their own runs; load to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project*; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *the answer*) | Another person's run: that it ran, its status and its tokens — content withheld |
 
 ## Flow
 
@@ -36,7 +36,7 @@ flowchart LR
   s --> a["The answer"] -->|a graph| d["Drawn onto the board, added to what is there"]
   a -->|not drawn yet| l["Load to canvas"] --> d
   d -->|click a node| e(["Its card in the Element panel — EX-21"])
-  a --> m["Meta line · Save view · Share · Schedule this · Add to a project"]
+  a --> m["Meta line · Keep board · Share · Schedule this · Add to a project"]
   m -->|Re-run| s
 ```
 
@@ -51,19 +51,20 @@ flowchart LR
 | EX-02.5 | The connection drops and cannot reattach | it fails | the thread says so and offers *Reload* |
 | EX-02.6 | The first answer of a new conversation is a graph | it settles | it is drawn onto the conversation's new board and offers no *Load to canvas* |
 | EX-02.7 | A graph answer not yet drawn, or a table whose rows are things in the graph | the person clicks *Load to canvas* | what it holds is added to the board, never replacing what is there, and the reply's offer is answered |
-| EX-02.8 | A drawn answer with a hub on every route | it is counted | each node and relationship counts once; the reply's counts, its record count and the board agree |
+| EX-02.8 | A drawn answer with a hub on every path, and a record linked across two graph databases | it is counted | each node and relationship counts once, the linked record once; the reply's counts, its record count and the board agree |
 | EX-02.9 | An answer | the person clicks *Re-run* | a new run reads again and the earlier answer stays; a re-run that fails shows beside it |
-| EX-02.10 | A conversation with answers | the person reopens or reloads it | every answer shows as stored and the graph is asked nothing |
-| EX-02.11 | A settled answer | the person reads its meta line | it shows the record count, the view of the graph and the run's time, with *How it got here* first and the acts after it folding into *⋯* by width |
-| EX-02.12 | An Operator without *Can work on projects* | they open *Schedule this* or *Add to a project* | it is disabled with *Ask Priya (owner)* |
+| EX-02.10 | A conversation with answers | the person reopens or reloads it | every answer shows as stored and no graph database is asked anything |
+| EX-02.11 | A settled answer | the person reads its meta line | it shows the record count, the graph databases it read and the run's time, with *How it got here* first and the acts after it folding into *⋯* by width |
+| EX-02.12 | An Operator | they open *Schedule this* or *Add to a project* | each opens, as for an Admin; the schedule runs as its creator ∩ the agent ([AG-F07](../../../../../agents/features/AG-F07-schedules/feature.md)) |
 | EX-02.13 | A drawn answer | the person clicks a node | it is selected and its card opens in the Element panel |
 | EX-02.14 | Two tabs on one conversation | a run streams | both show it; neither drives it |
+| EX-02.15 | Another person's run, opened by its address | an Operator who is not behind it and with whom no answer of it is shared opens it | it reads that it ran, its status and its tokens; its steps and parts read *Content withheld* |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The reply and its steps | Admin | — | explore.board · Nothing held | explore.board · Working | explore.board | explore.board · Step failed | explore.board · Working | — |
-| The reply and its steps | Operator | — | explore.board · Nothing held | explore.board · Working | explore.board | explore.board · Step failed | explore.board · Working | explore.board · Acts need a grant |
+| The reply and its steps | Operator | — | explore.board · Nothing held | explore.board · Working | explore.board | explore.board · Step failed | explore.board · Working | explore.board · Content withheld |
 | The answer on the board | Admin | explore.board · Load to canvas | — | explore.board · Drawing | explore.board | — | — | — |
 | The answer on the board | Operator | explore.board · Load to canvas | — | explore.board · Drawing | explore.board | — | — | — |

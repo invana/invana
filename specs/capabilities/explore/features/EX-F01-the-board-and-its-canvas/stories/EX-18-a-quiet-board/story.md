@@ -18,8 +18,8 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Every mode, every tool, every menu item | — |
-| Operator | As Admin: look, pick a mode, open every menu | Edit and Annotate open; what needs a grant inside them is disabled with its reason (EX-F06) |
+| Admin | Every mode, every tool, every menu item on any board | — |
+| Operator | Look, pick a mode, open every menu on a board they own or that is shared with them; a Modeller the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs the Modeller role — ask an Admin*. A board neither theirs nor shared: *Not found* |
 
 ## Flow
 
@@ -29,6 +29,7 @@ flowchart LR
   q -->|no| e["What it is for · Ask your first question"]
   q -->|yes| b["The row · the rail · the dock · the footer"]
   b -->|right-click a thing| m["Its menu: node · relationship · selection · board · minimap"]
+  m -->|an item the person may not take| dis["Disabled, naming the role, the owners or the rule"]
   b -->|mode picker| md{Mode}
   md -->|Focus| f["The drawing alone · the picker fades"]
   md -->|Edit · Annotate| w["The board ringed · the mode's tools"]
@@ -42,16 +43,17 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-18.1 | A board with an answer drawn | it opens | top-left shows the mode picker, then *Select ▾* (Select · Lasso · Box), then the mode's tools; top-right the rail; bottom-left the minimap over the zoom bar — and nothing else over the drawing |
-| EX-18.2 | A board in Explore | the person right-clicks a node | the node's menu opens at the pointer — Expand neighbours · Select neighbours · Centre on it · Hide · Hide every *type* · Style *type*… · Copy id |
+| EX-18.2 | A board in Explore | the person right-clicks a node | the node's menu opens at the pointer — Expand neighbours · Select neighbours · Centre on it · Hide · Hide every *kind* · Style *kind*… · Copy id |
 | EX-18.3 | A board | the person right-clicks the empty board | the board's menu opens — Layout… · Fit · Select all · Undo · Redo · minimap, grid, lock, full screen · Export image… · Export data… |
 | EX-18.4 | A menu with a destructive item | it opens | the destructive item is last, in red, and running it says *⌘Z to undo* |
 | EX-18.5 | The person has not right-clicked yet | the board is open | the footer's message line says *Right-click anything for its actions · ⌘K for every command* |
 | EX-18.6 | A board in any mode | the person picks Focus, or presses ⌘\\ | only the drawing shows; the picker fades until the pointer moves; Esc returns to Explore |
 | EX-18.7 | A board in Edit or Annotate | it is open | the board is ringed — Edit in the primary colour, Annotate in the warning colour — and the mode is not saved with the board |
-| EX-18.8 | No board open | the person opens Explore | the board is one question box, *What do you want to know about airways?*, with their kept boards under it — never a blank grid |
+| EX-18.8 | No board open | the person opens Explore | the board is one question box, *What do you want to know?*, with their boards under it — never a blank grid |
 | EX-18.9 | The board is slow to draw a large answer | the solve runs past 400 ms | the footer counts it and one toast says the graph appears when it settles, with *Cancel* |
-| EX-18.10 | An Operator | they open every menu | every look and arrange item works; an item that needs a grant is disabled with its reason |
+| EX-18.10 | An Operator | they open every menu | every look and arrange item works; an item their role does not hold is disabled, naming the role it needs |
 | EX-18.11 | An answer of 100,000 nodes | it draws | the count shows first, and pan and zoom keep answering while it draws |
+| EX-18.12 | A board the person neither owns nor is shared with, and they are not an Admin | they open its address | it reads *Not found* |
 
 ## Screens
 

@@ -8,7 +8,7 @@ stories: [AG-39, AG-40]
 journeys: []
 boards: [agents.skills, agents.skill, agents.agent]
 nfrs: []
-depends_on: [AG-F02, AG-F04, RT-F02, RT-F06]
+depends_on: [AG-F02, AG-F04, CP-F02, CP-F06]
 ---
 
 # Portable agents and skills
@@ -28,8 +28,8 @@ flowchart TD
   kind -->|AGENTS.md · Codex TOML · Claude plugin bundle| conv["AG-39 · Converted — import only"] --> map
   kind -->|a hook · a command| rk["Refused, naming why"]
   map -->|a planned skill's line maps to no function| rf["Refused under the line — Import as guided · add a library or a plugin · edit the file"] --> imp
-  map -->|a script in a skill| ap["Needs approval — RT-F06"]
-  map -->|an MCP server a bundle names| ms["Listed for an Admin to add — RT-02"]
+  map -->|a script in a skill| ap["Needs approval — CP-F06"]
+  map -->|an MCP server a bundle names| ms["Listed for an Admin to add — CP-02"]
   map -->|ready| save["Import n — saved as drafts"]
   ap --> save
   save --> test(["Tested and published like any agent — AG-36"])
@@ -73,7 +73,7 @@ sequenceDiagram
 |---|---|---|
 | Import agents and skills · export them | Admin | *Import* and *Export* are absent |
 | Add a library · approve the functions it proposes | Admin | *Add a library* is absent; proposed functions read *Waiting for an Admin* |
-| Approve a skill's script | Admin (RT-F06) | As RT-F06 |
+| Approve a skill's script | Admin (CP-F06) | As CP-F06 |
 | Read imported agents, skills and approved functions | Operator — every member of the install | — |
 
 ## States
@@ -99,10 +99,10 @@ sequenceDiagram
 | The file round-trips | An exported agent or skill imports back unchanged |
 | A dry run first | Every file is converted and mapped, every planned skill's plan compiled and every refusal named before anything is saved |
 | Imported means draft | Imported agents and skills are drafts, tested and published like any other (AG-36) |
-| Code only by approval | A library reaches a plan only as a function an Admin approved, read-only from then; a script runs only once an Admin approved it (RT-F06) |
+| Code only by approval | A library reaches a plan only as a function an Admin approved, read-only from then; a script runs only once an Admin approved it (CP-F06) |
 | A plan is not portable | It is Invana's cache of a skill's text (AG-F04): never exported, compiled again on import |
-| Nothing a bundle names starts | An MCP server in a bundle is listed for an Admin to add (RT-02); hooks and commands are refused |
-| Leans on | The catalogue (AG-F02) · skills (AG-F04) · plugins and MCP servers (RT-F02) · skill scripts (RT-F06) · AI models (RT-F01) |
+| Nothing a bundle names starts | An MCP server in a bundle is listed for an Admin to add (CP-02); hooks and commands are refused |
+| Leans on | The catalogue (AG-F02) · skills (AG-F04) · plugins and MCP servers (CP-F02) · skill scripts (CP-F06) · AI models (CP-F01) |
 
 ## Data touched
 
@@ -127,10 +127,10 @@ sequenceDiagram
 |---|---|
 | Agents and their versions — written as drafts on commit, read on export | [AG-F01](../AG-F01-build-an-agent/feature.md#engine) |
 | Skills, their versions, `folder` and `metadata`; the draw that compiles a planned skill | [AG-F04](../AG-F04-skills/feature.md#engine) |
-| The function catalogue a plan maps to | [AG-F06](../AG-F06-plans-and-functions/feature.md#engine) |
-| Model versions offered, for an alias | [RT-F01](../../../../os/runtime/features/RT-F01-ai-models/feature.md#engine) |
-| MCP servers an Admin adds · plugins enabled | [RT-F02](../../../../os/runtime/features/RT-F02-plugins-and-outside-tools/feature.md#engine) |
-| Scripts and their approval | [RT-F06](../../../../os/runtime/features/RT-F06-skill-scripts/feature.md#engine) |
+| The function catalogue a plan maps to | [AG-F06](../AG-F06-plans-and-workflows/feature.md#engine) |
+| Model versions offered, for an alias | [CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine) |
+| MCP servers an Admin adds · plugins enabled | [CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) |
+| Scripts and their approval | [CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md#engine) |
 
 ### Routes
 
@@ -193,9 +193,9 @@ sequenceDiagram
 | A name already in the catalogue | Offered as a new version of it, or a rename |
 | `AGENTS.md` | One draft agent, its body the instructions, named after its folder for the Admin to confirm |
 | Codex TOML | Converted to the agent `.md` shape; every mapped field shown beside its source, an unmapped one named as left out |
-| A Claude plugin bundle | Its agents and skills import; its MCP servers are listed for RT-02; a local-process server, a hook or a command is refused |
+| A Claude plugin bundle | Its agents and skills import; its MCP servers are listed for CP-02; a local-process server, a hook or a command is refused |
 | A planned skill that will not compile | Refused under the line, with *Import as guided* (AG-F04) beside the refusal |
-| Function contracts | A library's proposed functions declare their inputs and outputs as JSON Schema, as every function does (RT-F02) |
+| Function contracts | A library's proposed functions declare their inputs and outputs as JSON Schema, as every function does (CP-F02) |
 | Export | One agent, one skill or all; the plan is not exported |
 | Versions of each format | [System design § 11](../../../../system-design.md#11-failure-modes-and-the-outside-boundary) › *Standards* |
 | Not built yet | Import, export and libraries have no engine yet |
@@ -214,7 +214,7 @@ sequenceDiagram
 |---|---|
 | Exporting `AGENTS.md`, Codex TOML or plugin bundles | One portable format each for agents and skills; every other one is read only |
 | Running a bundle's hooks or commands | Invana runs no code it did not approve, and a command is a prompt for a person at a terminal |
-| Adding a bundle's MCP servers on import | An Admin adds a server deliberately (RT-02) |
+| Adding a bundle's MCP servers on import | An Admin adds a server deliberately (CP-02) |
 | A remote catalogue or hub | Later |
 | A function editor | Functions are code |
 | Code generated per run, or frozen into a plan at publish | Runs must reproduce, and installs on premises run only approved code |

@@ -18,8 +18,8 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Present any board they can open, from the first step or any reply's step | — |
-| Operator | As Admin — presenting is read-only | — |
+| Admin | Present any board, from the first step or any reply's step | — |
+| Operator | Present a board they own or that is shared with them — presenting is read-only; a Modeller the same | A board neither theirs nor shared: *Not found* |
 
 ## Flow
 
@@ -47,11 +47,11 @@ flowchart LR
 | EX-17.4 | Presenting | the step changes | that step's reply is marked in the thread and scrolled into view |
 | EX-17.5 | A reply with a `Step 3` chip | the person clicks the chip | presenting starts at step 3 |
 | EX-17.6 | Hand edits made between two replies | presenting starts | they are one *Your changes* step, between the two replies' steps |
-| EX-17.7 | A step whose elements are gone from the graph | it plays | the presenter says which step could not play and why, with *Skip*; missing elements are kept and marked |
+| EX-17.7 | A step whose elements are gone from their graph database, or whose graph database is switched off | it plays | the presenter says which step could not play and why, naming the graph database, with *Skip*; missing elements are kept and marked |
 | EX-17.8 | A step still settling | the person presses ▶ again | ◀ ▶ and the dots wait until the board settles; held keys do not queue |
 | EX-17.9 | Presenting | the person presses ✕ or Esc | the board returns to the latest step and the full row; nothing was written |
 | EX-17.10 | Presenting | the page reloads | the board opens at the latest step, not presenting |
-| EX-17.11 | A frozen snapshot of the board | a member presents it | it plays the walkthrough as it was when the snapshot was taken |
+| EX-17.11 | A frozen snapshot of the board | a person it is shared with presents it | it plays the walkthrough as it was when the snapshot was taken |
 
 ## Screens
 

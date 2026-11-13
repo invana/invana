@@ -3,7 +3,7 @@ id: AG-29
 title: Tune an agent's voice, model and effort, and retire it
 feature: AG-F01
 status: idea
-personas: [builder]
+personas: [builder, admin]
 boards: [agents.agent, settings.ai]
 ---
 
@@ -19,8 +19,9 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire, Make default; offer model versions in Settings › AI and connections | — |
-| Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle | Every edit and every lifecycle act disabled, naming *Can build agents* — *Ask Priya (owner)*. With *Can build agents*: every act here except offering model versions, which stays an Admin's |
+| Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Control Plane › AI models | A built-in agent's settings read; *Copy* in place of every edit |
+| Modeller | Every act an Admin has here, on the agents they own | On an agent they do not own, every edit and lifecycle act is disabled, naming its owners — *Only its owners or an Admin — ask Lee*; offering model versions reads *Ask an Admin* |
+| Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle | Every edit and lifecycle act disabled, naming the role — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -30,16 +31,15 @@ flowchart TD
   vo --> pv["Preview — one sample ask, current voice above, draft below"]
   pv -->|Save| v1(["The next version · the next run speaks with it"])
   s --> mo["Model version — offered versions only · effort"]
-  mo -->|move it| ev{Its tests hold on the new version?}
+  mo -->|move it| ev{Its evals hold on the new version?}
   ev -->|no| evx["Refused, naming the failing checks"]
   ev -->|yes| v1
   mo -->|its pinned version is not offered| px["Runs refuse at open, naming the pin — nothing falls back"]
   s --> lc{Lifecycle}
-  lc -->|Pause or Retire| pr["Each run, task, thread and schedule, with what happens to each"]
+  lc -->|Pause or Retire| pr["Each run, task, conversation and schedule, with what happens to each"]
   pr -->|confirm| pd(["Paused — Resume is one click"])
   pr -->|confirm with a reason| rt(["Retired — its row and name kept"])
-  lc -->|retire the default| dx["Refused until another agent is the default"]
-  lc -->|Make default| df(["The graph's default"])
+  lc -->|retire the default agent| dx["Refused until an Admin makes another the default"]
 ```
 
 ## Acceptance criteria
@@ -48,28 +48,29 @@ flowchart TD
 |---|---|---|---|
 | AG-29.1 | The agent's Voice | it opens | four dials — humour (off · light · playful), formality (casual · neutral · formal), emoji (off · on), greeting (off · on) — sit above the agent's own words, which are read after the dials and win where they disagree |
 | AG-29.2 | An agent with no voice written | Voice opens | it reads *Speaking in Invana's default voice* — warm, plain, brief — shown as the placeholder; saving it empty keeps it empty |
-| AG-29.3 | A changed voice | the builder presses *Preview* | one sample ask they may edit is answered twice — current voice above, draft below — stating no fact from the data, using a model the graph's rules allow; nothing is recorded or drawn against any budget |
-| AG-29.4 | A voice that says *always search the web* or *never say you can't* | a run meets what it may not do | it is still refused, naming what is missing; only the words around the refusal are the voice's |
-| AG-29.5 | Any voice | the agent refuses, cannot answer, fails or pauses on its budget | it says so without humour, whatever the dial reads |
+| AG-29.3 | A changed voice | the builder presses *Preview* | one sample ask they may edit is answered twice — current voice above, draft below — stating no fact from the data; nothing is recorded or drawn against any limit |
+| AG-29.4 | A voice that says *always search the web* or *never say you can't* | a run meets what its Access Policies do not allow | it is still refused, naming what is missing; only the words around the refusal are the voice's |
+| AG-29.5 | Any voice | the agent refuses, cannot answer, fails or pauses at a limit | it says so without humour, whatever the dial reads |
 | AG-29.6 | A long voice | it is typed | Voice shows its length in characters, which every ask carries |
 | AG-29.7 | A run in flight when the voice changes | it ends | it spoke with the voice it opened with; the next run speaks with the new one; a helper it creates speaks with its voice |
-| AG-29.8 | Model version | it opens | it lists only the versions Settings › AI and connections offers, each by the provider's exact name; a provider alias cannot be pinned |
-| AG-29.9 | A pinned version moved to another | the builder saves | the agent's tests run on the new version first; a failing hard check refuses the move naming it; otherwise the move becomes the next version with its reason |
-| AG-29.10 | A pinned version the install does not offer | a run opens | the run is refused, naming the pin; nothing calls another model; Settings › AI and connections warns, naming the agents that pin it |
-| AG-29.11 | An agent with no pin | it runs | the view of the graph decides the model, and the run records the version it called |
+| AG-29.8 | Model version | it opens | it lists only the versions Control Plane › AI models offers, each by the provider's exact name and marked *Local* or *External*; a provider alias cannot be pinned |
+| AG-29.9 | A pinned version moved to another | the builder saves | the agent's evals run on the new version first (AG-F10); a failing hard check refuses the move naming it; otherwise the move becomes the next version with its reason |
+| AG-29.10 | A pinned version the deployment does not offer | a run opens | the run is refused, naming the pin; nothing calls another model; Control Plane › AI models warns, naming the agents that pin it |
+| AG-29.11 | An agent with no pin | it runs | the deployment's default model decides, and the run records the version it called |
 | AG-29.12 | A pinned agent | Model version opens | *Versions it has run on* lists each recorded version with its first run, runs, served rate and p95 — the engine's numbers; a set pin can be moved, never cleared |
 | AG-29.13 | Effort | it opens | the most steps, replans and questions a run may take, each with the number a run reads; *0 questions* means it never asks, and every reading it picks is a declared assumption shown before the answer |
-| AG-29.14 | A live agent | the builder presses *Pause* | a dialog lists each piece of open work and what happens to it — a run in flight finishes; an open task is blocked, naming the agent; a task in review is unchanged; a thread with the agent refuses its next ask, naming the state; a schedule that starts it stays on and its runs are refused until it resumes — before *Pause* applies |
-| AG-29.15 | A paused agent | the builder presses *Resume* | it takes work again from now, in one click; nothing is replayed and its blocked tasks unblock |
-| AG-29.16 | A live agent | the builder presses *Retire* | the same list names a task in review as blocked and each schedule that starts it as paused; *Why* is asked and kept in Versions; once retired it never takes work, its row stays so every run, trace and helper resolves, and its name stays taken |
-| AG-29.17 | The graph's default agent | the builder retires it | it is refused until another agent is made the default |
+| AG-29.14 | A live agent | an owner presses *Pause* | a dialog lists each piece of open work and what happens to it — a run in flight finishes; an open task is blocked, naming the agent; a task in review is unchanged; a conversation with the agent refuses its next ask, naming the state; a schedule that starts it stays on and its firings are refused until it resumes — before *Pause* applies |
+| AG-29.15 | A paused agent | an owner presses *Resume* | it takes work again from now, in one click; nothing is replayed and its blocked tasks unblock |
+| AG-29.16 | A live agent | an owner presses *Retire* | the same list names a task in review as blocked and each schedule that starts it as paused; *Why* is asked and kept in Versions; once retired it never takes work, its row stays so every run, trace and helper resolves, and its name stays taken |
+| AG-29.17 | The deployment's default agent | an owner retires it | it is refused until an Admin makes another agent the default |
 | AG-29.18 | A helper an agent created | the work it was made for closes | it retires itself |
 | AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its sheet is disabled |
 | AG-29.20 | An ask to a paused or retired agent | it is sent | it is refused, naming the state, and *How it got here* shows the refused step and why |
-| AG-29.21 | An Operator without *Can build agents* | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume*, *Retire* and *Make default* are disabled, naming *Can build agents*, with *Ask Priya (owner)* |
+| AG-29.21 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume* and *Retire* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
 | AG-29.22 | A paused agent with a run already queued | the run's turn comes | it starts and finishes; only work that arrives after the pause is refused |
-| AG-29.23 | A step that calls a model | the run opens | the version is the person's pick for that one question, else the skill version's pin, else the agent's pin, else the view of the graph's; one that is not offered or not allowed refuses the run, naming it — nothing falls back |
-| AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's tests run first, as AG-29.9; someone without *Can build agents* is refused, naming it |
+| AG-29.23 | A step that calls a model | the run opens | the version is the person's pick for that one question, else the skill version's pin, else the agent's pin, else the deployment's default; one that is not offered refuses the run, naming it — nothing falls back |
+| AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's evals run first, as AG-29.9; someone without the role or ownership is refused, naming what is missing |
+| AG-29.25 | A Modeller on an agent they do not own | they open Voice, Model version or Lifecycle | each reads as saved; every act is disabled, naming its owners |
 
 ## Screens
 
@@ -77,7 +78,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Voice | Admin | agents.agent · Default voice | — | agents.agent · Loading | agents.agent · Voice | agents.agent · Could not save | agents.agent · Previewing | — |
 | Voice | Operator | agents.agent · Default voice | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
-| Model version and effort | Admin | agents.agent · No pin | — | agents.agent · Loading | agents.agent | agents.agent · Version not offered | agents.agent · Testing | — |
+| Model version and effort | Admin | agents.agent · No pin | — | agents.agent · Loading | agents.agent | agents.agent · Version not offered | agents.agent · Evals running | — |
 | Model version and effort | Operator | agents.agent · No pin | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Version not offered | — | agents.agent · Read only |
 | Pinned by | Admin | settings.ai · No pins | — | settings.ai · Loading | settings.ai | settings.ai · Pin not offered | — | — |
 | Pinned by | Operator | settings.ai · No pins | — | settings.ai · Loading | settings.ai | settings.ai · Pin not offered | — | settings.ai · Read only |

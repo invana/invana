@@ -99,7 +99,7 @@ flowchart TD
 | Loads, their inputs and the stamps a load writes on each element | [RC-F02 › Engine](../RC-F02-bring-records-in/feature.md#engine) |
 | History — every write and change, per value | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
 | Derived facts, their rule version and premises | [SE-F08 › Engine](../../../semantics/features/SE-F08-inference/feature.md#engine) |
-| Runs, and whether the reader may open one | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) |
+| Runs, and whether the reader may open one | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
 | The record's kind and its values in the published version | [RC-F01](../RC-F01-records-by-kind/feature.md) |
 
 ### Routes

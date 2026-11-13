@@ -18,8 +18,8 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | *Fork from here* on a settled reply of their own conversation; follow a fork to its parent and a parent to its forks | — |
-| Operator | The same, on their own conversations | Another member's conversation: no *Fork from here* |
+| Admin | *Fork from here* on a settled reply of their own conversation; follow a fork to its parent and a parent to its forks | Another person's conversation: no *Fork from here* |
+| Operator | The same, on their own conversations; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *ask a question*) | Another person's conversation: no *Fork from here* |
 
 ## Flow
 
@@ -44,11 +44,11 @@ flowchart TD
 |---|---|---|---|
 | EX-27.1 | A settled answer in their own conversation | the person opens the reply's meta line | *Fork from here* is there, after *Share*, folding into *⋯* by width |
 | EX-27.2 | A reply still running, refused or failed | the person opens its meta line | there is no *Fork from here* |
-| EX-27.3 | Another member's conversation | the person reads it | there is no *Fork from here* |
+| EX-27.3 | Another person's conversation | the person reads it | there is no *Fork from here*, and the API answers *Not found* |
 | EX-27.4 | *Fork from here* chosen | the fork is made | a new conversation opens, titled with the forked reply's question, holding copies of every turn up to that reply above a *Forked here* divider |
 | EX-27.5 | A fork | the person asks in it | the question carries the copied history and nothing after the reply |
 | EX-27.6 | A fork | it opens | the board is the one kept at that reply, else the parent's current board |
-| EX-27.7 | A fork | it opens | it starts with the parent's agent, view of the graph and token limit per run |
+| EX-27.7 | A fork | it opens | it starts with the parent's agent and token limit per run |
 | EX-27.8 | A fork | the person reads its top | *Forked from* the parent's title *at* the question, linking to the parent scrolled to that reply |
 | EX-27.9 | A reply a fork was taken at | the person reads the parent | under it, one *Forked into* line per fork, each opening it |
 | EX-27.10 | The conversation list | the person reads it | a fork shows a fork mark and *from* its parent; a parent shows how many forks it has |
@@ -61,7 +61,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Fork from here, on a reply | Admin | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | — |
+| Fork from here, on a reply | Admin | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |
 | Fork from here, on a reply | Operator | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |
 | The fork | Admin | — | — | explore.board · Working | explore.board · Forked | explore.board · Parent deleted | explore.board · Working | — |
 | The fork | Operator | — | — | explore.board · Working | explore.board · Forked | explore.board · Parent deleted | explore.board · Working | — |

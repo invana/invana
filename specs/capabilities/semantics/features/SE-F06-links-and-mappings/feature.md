@@ -148,7 +148,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | The Graph's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
 | Loads that join new records and bring a relationship's rows · record stamps | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Standards a mapping names | [SE-F05](../SE-F05-standards/feature.md#engine) |
-| Runs and the packaged plans they run | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine) · [AG-F06](../../../agents/features/AG-F06-plans-and-functions/feature.md#engine) |
+| Runs and the packaged plans they run | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes

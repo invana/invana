@@ -18,38 +18,36 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add any settled answer to a branch of any project they can see | — |
-| Operator | — | *Add to a project* disabled — *Ask Priya (owner)*. With *Can work on projects*: as Admin |
+| Admin | Add any settled answer they may read to a branch of any project | — |
+| Operator | Add a settled answer whose run they may read to a branch of a project they may add findings to ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)); a Modeller the same | A project they may not add to is not offered; with none, *Add to a project* is disabled, naming the project's owners |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([A settled answer · Add to a project]) --> g{Can work on projects?}
-  g -->|no| n["Disabled — Ask Priya (owner)"]
-  g -->|yes| p["Pick a project and a branch · supports · contradicts · context"]
-  p -->|no project yet| e["No projects on this Graph · New project"]
-  p -->|Add| f(["A finding: its records, queries and loads"])
-  p -->|fails| x["Could not add the finding — the reason · Try again"]
+  a([A settled answer · Add to a project]) --> p["Pick a project and a branch · supports · contradicts · context"]
+  p -->|no project they may add to| e["No projects to add to · New project"]
+  p -->|Add| f(["A finding: its records, queries, graph databases and loads"])
+  p -->|refused · fails| x["Could not add the finding — the reason · Try again"]
 ```
 
 ## Acceptance criteria
 
 | # | Given | When | Then |
 |---|---|---|---|
-| EX-12.1 | A settled answer and a person with *Can work on projects* | they pick *Add to a project* on its reply line | they pick a project, a branch and whether it supports, contradicts or gives context |
-| EX-12.2 | The choice made | they add it | the branch holds a finding with the answer's records, queries and the loads they came from attached |
-| EX-12.3 | A finding added from an answer | someone opens it in Projects | it shows the records behind it, the load they came from, by id and content hash |
-| EX-12.4 | A Graph with no projects | the person picks *Add to a project* | it says *No projects on this Graph* with *New project* |
-| EX-12.5 | Adding fails | the engine refuses | the person sees *Could not add the finding* with the reason and *Try again*; the answer is unchanged |
+| EX-12.1 | A settled answer the person may read | they pick *Add to a project* on its reply line | they pick a project, a branch and whether it supports, contradicts or gives context; only projects they may add findings to are offered |
+| EX-12.2 | The choice made | they add it | the branch holds a finding with the answer's records, queries, the graph databases they ran on and the loads they came from attached |
+| EX-12.3 | A finding added from an answer | someone opens it in Projects | it shows the records behind it and the load they came from, by id and content hash |
+| EX-12.4 | No project the person may add to | they pick *Add to a project* | it says *No projects to add to* with *New project* |
+| EX-12.5 | Adding fails, or PJ-F03 refuses it | the engine answers | the person sees *Could not add the finding* with the reason and *Try again*; the answer is unchanged |
 | EX-12.6 | An answer still running, failed or stopped | its reply line shows | there is no *Add to a project* |
-| EX-12.7 | An Operator without *Can work on projects* | they reach *Add to a project* | it is disabled with *Ask Priya (owner)* |
+| EX-12.7 | An Operator | they add a settled answer to a project they may add to | the finding is added, as for an Admin |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Add to a project | Admin | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | — |
-| Add to a project | Operator | — | — | — | — | — | explore.board · Agent working | explore.board · No access |
+| Add to a project | Operator | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | explore.board · No access |
 | The finding | Admin | — | — | projects.finding · Loading | projects.finding | — | — | — |
 | The finding | Operator | — | — | projects.finding · Loading | projects.finding | — | — | — |

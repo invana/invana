@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open, close and reopen the assistant; attach or remove the selection; switch it off for themselves | — |
-| Operator | The same — every member | — |
+| Operator | The same, through the agents they may use; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | No agent they may use: the assistant opens with its composer disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 
@@ -50,7 +50,7 @@ flowchart LR
 | EX-13.7 | A conversation docked | the person clicks ✕ | the board takes the width and a pill — *Assistant · <conversation title>* — shows over it |
 | EX-13.8 | The assistant closed | the person clicks the pill or the header's *Assistant* | it reopens on the same conversation |
 | EX-13.9 | A run on its way | the person closes the assistant | the run is not cancelled; reopening shows its outcome |
-| EX-13.10 | The user menu's *Assistant* switched off | the person moves between modes | no header button, no docked thread, no pill, no *Ask the assistant* in ⌘K and no *Ask about* on a record; Explore's start keeps *Your views* and says how to turn asking back on |
+| EX-13.10 | The user menu's *Assistant* switched off | the person moves between modes | no header button, no docked thread, no pill, no *Ask the Assistant* in ⌘K and no *Ask about* on a record; Explore's start keeps *Your views* and says how to turn asking back on |
 | EX-13.11 | The assistant docked | it opens | it is 440 px wide and cannot be dragged narrower than 320 px; the board moves over, never under it |
 
 ## Screens

@@ -20,7 +20,7 @@ depends_on: [SE-F02, SE-F07]
 
 ## User journey
 
-Journeys this feature is a step of: [J01 · From an empty install to a first answer](../../../../journeys/J01-from-an-empty-install-to-a-first-answer.md)
+Journeys this feature is a step of: [J01 · From a fresh deployment to a first answer](../../../../journeys/J01-from-a-fresh-deployment-to-a-first-answer.md)
 
 ```mermaid
 flowchart TD
@@ -129,20 +129,20 @@ flowchart TD
 |---|---|
 | Published models, kinds, keys and versions | [SE-F02 › Engine](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md) |
 | Constraints, standards and rules a load is checked against | [SE-F07 › Engine](../../../semantics/features/SE-F07-rules/feature.md) |
-| Runs and their steps | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) |
-| The packaged plans `model-import@1` · `bundle-import@1` · `bulk-load@1` and the functions their steps call | [AG-F06](../../../agents/features/AG-F06-plans-and-functions/feature.md) |
-| Workers and the queue a load runs on | [RT-F03](../../../../os/runtime/features/RT-F03-workers-and-the-queue/feature.md) |
+| Runs and their steps | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
+| The packaged plans `model-import@1` · `bundle-import@1` · `bulk-load@1` and the functions their steps call | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md) |
+| Workers and the queue a load runs on | [CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md) |
 | History — every value a load wrote | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
 | The view a load runs under, and the touches it records | [SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
 | Active links between models a load resolves | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | The task raised for a bundle's broken file | [PJ-F01 › Engine](../../../projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
-| The simulation run a `source = run` load saves | [PJ-F04 › Engine](../../../projects/features/PJ-F04-simulation-and-impact/feature.md#engine) |
+| The simulation run a `source = run` load saves | [EX-F05 › Engine](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine) |
 
 ### Routes
 
 | Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
 |---|---|---|
-| `POST /loads` | Start a load into a model — a file, a stream of records, or `{from_run_id, kind}` to save a run's result as derived records | RC-08 · RC-09 · RC-11 · PJ-09 |
+| `POST /loads` | Start a load into a model — a file, a stream of records, or `{from_run_id, kind}` to save a run's result as derived records | RC-08 · RC-09 · RC-11 · EX-33 |
 | `POST /loads/preview` | What a file becomes against a model, before anything is written | RC-08 |
 | `POST /loads/bundles` | Check, then load a bundle as one run; returns the run to poll or stream | RC-10 |
 | `GET /loads` | The loads, newest first, keyset-paged, filtered by status · model · source · time; a bundle run is one row | RC-09 · RC-10 |
@@ -159,7 +159,7 @@ flowchart TD
 | `records.load.start` | A load's run opens |
 | `records.load.settle` | A load's run ends, with its counts |
 | `records.load.undo` | A load is undone; carries the ids of what cites it |
-| — | A load's steps and progress are its run's `run.*` and `step.*` events ([AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md#engine)); a load has no step vocabulary of its own |
+| — | A load's steps and progress are its run's `run.*` and `step.*` events ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)); a load has no step vocabulary of its own |
 
 ### Refusals
 
@@ -174,7 +174,7 @@ flowchart TD
 | 409 | A record added by hand whose key already exists | *`{key}` already exists — a new record never overwrites one.* | RC-11.4 |
 | 409 | Undo of a bulk load, or of a load already undone | *This load cannot be undone — {reason}.* | RC-09.20 |
 | 422 | A bundle whose manifest names a missing folder, or holds a malformed file | *`{file}` fails `{check}` — nothing was loaded.* | RC-10.3 |
-| 422 | A run's result saved into a kind its rows do not fit | *These rows do not fit `{kind}` — {why}.* | PJ-09.12 |
+| 422 | A run's result saved into a kind its rows do not fit | *These rows do not fit `{kind}` — {why}.* | EX-33.15 |
 | 409 | `from_run_id` names a run with no result, or one that is not the caller's to read | *Run `{id}` has no result to save.* | API only — Studio offers *Save as records* on a result alone |
 
 ### CLI
@@ -216,7 +216,7 @@ flowchart TD
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| — | A load is a queue run on a worker (RT-F03); no new store or service | — |
+| — | A load is a queue run on a worker (CP-F03); no new store or service | — |
 
 ## Decisions
 

@@ -3,13 +3,13 @@ id: AC-17
 title: See every change and compare two versions
 feature: AC-F06
 status: idea
-personas: [owner, modeller, builder]
+personas: [admin, modeller, builder]
 boards: [inbox.history]
 ---
 
 # AC-17 · See every change and compare two versions
 
-**As** a Graph owner **I want** every new version of anything versioned — who made it, when, why, and what happened
+**As** an Admin **I want** every new version of anything versioned — who made it, when, why, and what happened
 after — and any two versions compared **so that** every change is accountable, and I can tell whether it made things
 better or worse.
 
@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every change and compare any two versions of a record in the Graph | — |
+| Admin | Read every change and compare any two versions of any record | — |
 | Operator | Read every change and compare any two versions of a record they can open | A record they cannot open reads as absent. Restoring is on the record's own page, by its own role |
 
 ## Flow
@@ -28,7 +28,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 flowchart LR
   s([Inbox › History › Changes]) -->|nothing versioned| e["No changes yet"]
   s --> c["A change: when · who · product · record vA → vB · why · effect after"]
-  c -->|Compare| cmp["Two versions side by side: each changed field · the plan · the model"]
+  c -->|Compare| cmp["Two versions side by side: each changed field · the workflow · the model · the policy's rules"]
   cmp -->|pick other versions| cmp
   c -->|first version| one["Created — nothing to compare"]
   c -->|record deleted| del["Its name as it was · deleted"]
@@ -40,12 +40,12 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-17.1 | Nothing versioned yet | the reader picks *Changes* | it reads *No changes yet* |
-| AC-17.2 | Changes | *Changes* is on | only the acts that made a new version of a skill, rule, plan, agent or model, or a load, list, newest first: when · who · product · record `vA → vB` · why · effect after · *Compare* |
-| AC-17.3 | A change | its product is shown | it is where the record lives — skills, agents and plans Agents; rules and models Model; loads Records |
+| AC-17.2 | Changes | *Changes* is on | only the acts that made a new version of a skill, rule, workflow, agent, model or Access Policy, or a load, list, newest first: when · who · product · record `vA → vB` · why · effect after · *Compare* |
+| AC-17.3 | A change | its product is shown | it is where the record lives — skills, agents and workflows Agents; rules and models Ontology; loads Intelligence; Access Policies Access Plane |
 | AC-17.4 | A version made with a reason | its change is read | the reason shows; a version made without one shows none, never an inferred one |
 | AC-17.5 | A version | its effect after is read | runs, failed runs and tokens on it — tokens only; a version nothing ran on reads *0 runs*, not blank |
-| AC-17.6 | A model version | its effect after is read | it is the Graph's runs while it was published, labelled *while published*, and it names the loads it touched and how many records fail |
-| AC-17.7 | A change | the reader presses *Compare* | the two versions show side by side: who · when · why · `vA → vB`, one card per changed field with before and after (text as changed lines), the plan's change or the model's change when there is one, and each side's effect as runs · failed · tokens per run |
+| AC-17.6 | A model version | its effect after is read | it is the deployment's runs while it was published, labelled *while published*, and it names the loads it touched and how many records fail |
+| AC-17.7 | A change | the reader presses *Compare* | the two versions show side by side: who · when · why · `vA → vB`, one card per changed field with before and after (text as changed lines), the workflow's, the model's or the policy's rules' change when there is one, and each side's effect as runs · failed · tokens per run |
 | AC-17.8 | A compare | it is read | *Tokens per run* reads one version against the other as the engine counted it (`1.4×`), toned better or worse; nothing is divided in Studio |
 | AC-17.9 | A compare | the reader picks two other versions from the record's history | they compare, from the first picked to the second |
 | AC-17.10 | A record's first version | its change is read | it reads *created* and offers no *Compare* |
@@ -55,7 +55,7 @@ flowchart LR
 | AC-17.14 | A draft | Changes is read | it is not listed; drafts are never versions |
 | AC-17.15 | A model's, agent's or skill's own History tab | *Compare* is pressed there | it opens this same compare |
 | AC-17.16 | A compare | the reader wants an earlier version back | *Restore* is on the record's own page, makes a new version, and History keeps both |
-| AC-17.17 | A record in another Graph, or one the reader cannot open | its compare is followed | it reads as absent, not forbidden |
+| AC-17.17 | A record the reader cannot open | its compare is followed | it reads as absent, not forbidden |
 | AC-17.18 | Changes filtered by product or person | nothing matches | it reads *0 of N match*, with *Clear all* |
 
 ## Screens

@@ -96,7 +96,7 @@ flowchart TD
 | Standard versions and their terms | [SE-F05](../../../semantics/features/SE-F05-standards/feature.md) |
 | Rules in scope and the `enforce` check a fix passes | [SE-F07 › Engine](../../../semantics/features/SE-F07-rules/feature.md#engine) |
 | The view an Operator reads through | [SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
-| Runs, their steps and stop | [AG-F03](../../../agents/features/AG-F03-runs-and-how-the-agents-are-doing/feature.md) |
+| Runs, their steps and stop | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
 | History — the value a fix writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
 
 ### Routes
@@ -138,7 +138,7 @@ flowchart TD
 
 | Mechanism | How |
 |---|---|
-| A check is a run | A queued run on a worker (RT-F03) that reads every record of the model's kinds against the published version — keys, validation rules, held standards and allowed relationships — and writes one problem row per break; it streams what it has read and stops on *Stop* |
+| A check is a run | A queued run on a worker (CP-F03) that reads every record of the model's kinds against the published version — keys, validation rules, held standards and allowed relationships — and writes one problem row per break; it streams what it has read and stops on *Stop* |
 | Scored per kind | A record conforms when it breaks nothing; each kind's `score` is its share of conforming records, stored when the check settles |
 | A standard's term | A held standard's term is checked as the validation rule names it: `missing` — required and empty · `not_allowed` — not one of its codes · `wrong_type` — not its type |
 | The queue is the last check | *To decide* reads the open problems (`fixed_at` null) of each model's last settled check; a new check replaces them |
@@ -150,7 +150,7 @@ flowchart TD
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| — | A check is a queued run on a worker (RT-F03); three tables in Invana's own store; no new store or service | — |
+| — | A check is a queued run on a worker (CP-F03); three tables in Invana's own store; no new store or service | — |
 
 ## Decisions
 

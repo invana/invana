@@ -37,7 +37,6 @@ flowchart TD
   pub -->|ok| ver(["Version n · frozen, with the loads it cites"])
   ver --> exp["Export — Markdown · print to PDF"]
   ver -->|a cited load is undone| notice["A load undone: the version names it in a notice"]
-  read -->|Operator| ro["Reads every version; Draft, Edit and Publish disabled, naming Can work on projects"]
   read -->|project archived| arch["Reads; Draft, Edit and Publish off"]
 ```
 
@@ -49,10 +48,14 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+*Reports* is *Acts* for Operator, Modeller and Admin — on every project the person can see
+([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)).
+
+| Act | Who | Everyone else sees |
 |---|---|---|
-| Read the draft and every version · export a version | Operator — every member who can see the project; an export — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../../os/access/product.md#decisions)) | — |
-| Draft from the records · edit the draft · publish a version | `contributor` · shown as *Can work on projects* · Admin | Every version reads; *Draft from the records*, *Edit* and *Publish* disabled, naming *Can work on projects* |
+| Read the draft and every version · export a version | Anyone who can see the project | A private project's report is absent for anyone not on it |
+| Draft from the records · edit the draft · publish a version | Anyone who can see the project — Operator · Modeller · Admin | On an archived project, every version reads; *Draft from the records*, *Edit* and *Publish* are off |
 
 ## States
 
@@ -64,13 +67,13 @@ flowchart TD
 | Has data | The draft or a version, read rendered, its cites numbered and listed once under *Cites*; *Versions* counts the draft and every version |
 | Failed | The report could not load, saying why, with *Try again*; publishing an empty draft is refused |
 | Agent working or proposing | — |
-| No access | The draft and every version read; *Draft from the records*, *Edit* and *Publish* disabled, naming *Can work on projects* |
+| No access | A private project's report is absent for anyone not on it; on an archived project the draft and every version read and *Draft from the records*, *Edit* and *Publish* are off |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
-| Drafted from the records | The draft is written by the project type's report template (PJ-F03) from the project's question, branches, evidence by stance, verdicts and decisions, in the project type's words — nothing invented, no AI model |
+| Drafted from the records | The draft is written by the project type's report template (PJ-F03) from the project's question, branches, evidence by stance, verdicts and current decisions, in the project type's words — nothing invented, no AI model. A finding resting on a what-if reads *predicted*; a superseded decision is named beside the one that supersedes it |
 | A person edits | The draft is Markdown, edited by a person before it is published |
 | One report per project | A single draft and its numbered versions |
 | Published is frozen | A version freezes its body and the loads its findings cite at that moment, by id and content hash; nothing changes it. A later change is a new version |
@@ -114,7 +117,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/projects` | Does | Story |
+| Route, after `/api/v1/projects` | Does | Story |
 |---|---|---|
 | `GET /{key}/report` · `PUT /{key}/report` | The draft and its versions · save the draft | PJ-14 |
 | `POST /{key}/report/generate` | Draft from the records, replacing the draft | PJ-14 |
@@ -133,8 +136,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Drafting, saving or publishing without *Can work on projects* | *This needs Can work on projects — ask {owner}.* | PJ-14.13 |
 | 422 | Publishing an empty draft | *There is nothing to publish.* | PJ-14.6 |
+| 404 | A private project the caller is not on | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-14.13 |
 | 409 | Drafting, saving or publishing on an archived project | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-14.12 |
 
 ### CLI
@@ -151,6 +154,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Publish | Copies the saved `draft` into the next `projects_report_versions` row with `cites[]`, the loads its findings cite at that moment |
 | The notice | `undone[]` names each cited load undone since, computed each time the version is read |
 | Export | The version's body, or the draft's, as Markdown with the notice above it |
+| Hidden projects | Every read here applies the private-project filter of [PJ-F01 › Mechanisms](../PJ-F01-projects-and-tasks/feature.md#mechanisms) |
 
 ## System impact
 
@@ -170,7 +174,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| The `projects.report` board draws the draft as written by an agent (*Route analyst*); the rules say a template drafts it. Redraw the board, or let an agent draft it? Recommend: redraw — a template keeps *nothing invented* provable | Ravi |
+| The `projects.report` board draws the draft as written by an agent; the rules say a template drafts it. Redraw the board, or let an agent draft it? Recommend: redraw — a template keeps *nothing invented* provable | Ravi |
 
 ## Not building
 
