@@ -78,7 +78,7 @@ sequenceDiagram
   A->>E: a typed query plan — kinds, properties, filters, hops, aggregates
   E->>X: every kind and property against the model and the agent's Access Policies
   X-->>E: Allow · Ask · Deny, the strictest winning
-  E->>D: one compiled step per graph database — Cypher or Gremlin, in read mode
+  E->>D: one compiled step per graph database — Cypher or Gremlin, in a read-only session
   D-->>E: rows per step, joined on identity links
   E-->>S: steps as they settle, then the answer
   S-->>P: the reply in the thread · drawings on the board
@@ -104,7 +104,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)). A question reads only what the agent it
 runs through may read.
 
-| Act | Who | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Ask in plain words · answer a question asked back | Anyone, through an agent they may use — the Assistant by default | No agent they may use: the composer disabled — *{person} may not use {agent} — ask an Admin* |
 | Type a Cypher or Gremlin query | Anyone who may use the Query console | The query kinds disabled — *{person} may not use Query console — ask an Admin* |
@@ -137,14 +137,15 @@ runs through may read.
 | The attachment is in words | What is attached is named in the composer, removable before asking, and goes into the question as words, so the thread records what was asked |
 | Through an agent the person may use | Every question runs as one agent — the Assistant by default, or another the person may use ([AG-F02](../../../agents/features/AG-F02-the-agents-catalogue/feature.md)); a typed query runs as the Query console. The agent's Access Policies decide what the question may read |
 | One question, one run | A follow-up is its own run in the same conversation; the last 20 turns go with it, so *only the top 5* means something. Nothing reaches an AI model or a graph database outside a run of a plan ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)) |
-| Recall before planning | The plan step reads what the thinking graph recalls for this intent — what served and what to avoid ([AG-F09](../../../agents/features/AG-F09-thinking-graph-and-memory/feature.md)); a conversation itself carries no memory beyond its last 20 turns |
+| Recall before planning | The plan step reads what the thinking graph recalls for this intent — what served and what to avoid ([AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md)); a conversation itself carries no memory beyond its last 20 turns |
 | A typed query plan, never a raw query | The agent's AI model writes a typed query plan — kinds, properties, filters, hops, aggregates — from the published model, never from records. The engine validates it against the model and the agent's Access Policies, then compiles one step per graph database in its own language. The AI model never writes Cypher or Gremlin |
 | Across graph databases | A question is asked of the Graph, not of one database: a plan whose kinds live in several graph databases runs one step in each and joins the steps' rows on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)). No record is copied between them |
 | A gap is said, never patched | A question the plan grammar cannot express is answered *I cannot ask this yet*, naming what the plan lacks, and offers a function from the catalogue that does it — or, when none does, *Write the query myself* for a person who may use the Query console. The agent never runs a query it wrote outside the grammar |
 | Checked before it runs | A kind, relationship or property the published model lacks, a Deny on `data/<graph database>/<kind>`, a graph database switched off or down, or a sensitive property bound for an external model ends the run as refused before any step reads ([EX-06](../EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-06-a-refusal-or-a-failure-that-says-why/story.md)); an Ask waits on the agent's named approvers |
 | Grounded in the published model | A question is read against the published model, its descriptions and its identity links; a kind the model lacks is never named in a plan |
 | Asked back, never assumed | An ambiguous question becomes a closed question with grounded options; only a person answers it |
-| Reads read | Every step of a question runs in the driver's read mode or Gremlin's `ReadOnlyStrategy` ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)). Only a typed query through the Query console may write, and it asks first |
+| Reads read | Every step of a question runs in a read-only session the graph database enforces ([GP-04](../../../../os/graph/features/GP-F01-data/stories/GP-04-trust-that-a-read-never-writes/story.md)). Only a typed query through the Query console may write, and it asks first |
+| A typed query passes four layers | A static check, a read-only session, a result filter, and — for Gremlin — steps only, no script, lambda or `eval`; what the agent may not read is refused before it runs or dropped and counted as withheld ([GP-05](../../../../os/graph/features/GP-F01-data/stories/GP-05-run-a-raw-query-within-what-the-agent-may-read/story.md)) |
 | The ask kind | One switch in the composer: Ask · Cypher · Gremlin. A query names its graph database, and the kinds offered are the languages that database speaks. In a query ⌘↵ runs and ↵ is a newline; in Ask ↵ sends. The keys are named in the status bar |
 | Small talk is answered | *Thanks*, *what can you do?* get a line or two in the agent's voice, never *cannot answer*; it claims nothing about the data |
 | Closing never cancels | A run goes on while the assistant is closed and is read in the thread on reopening |
@@ -186,7 +187,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | Which agents the person may use | [AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#engine) |
 | `decide(agent, person, verb, resource)` — every kind of a plan, every Write of a typed query | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | The built-in workflows `nl-single` · `ql-direct` · `board-open`, the function catalogue and the plan check | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
-| Recall — what served and what to avoid for an intent | [AG-F09](../../../agents/features/AG-F09-thinking-graph-and-memory/feature.md#engine) |
+| Recall — what served and what to avoid for an intent | [AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md#engine) |
 | Published model versions — kinds, relationship kinds, properties, descriptions, which graph database holds each kind | [SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Identity link rules and the links materialised in the system graph | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | Sensitive properties | [SE-F03](../../../semantics/features/SE-F03-meaning/feature.md#engine) |
@@ -228,6 +229,8 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | 422 | A typed query in a language its graph database does not speak | *{graph database} speaks {language}.* | API only — Studio offers only its languages (EX-08.1) |
 | refused | A plan naming a kind, relationship kind or property the published model lacks, still invalid after its one repair — never run | *The plan names {name}, which the model does not have.* | EX-01.13 |
 | refused | A plan reading a kind the agent's policies deny — before compile | *{agent} may not Read data/{graph database}/{kind} — {rule} on {policy}, set by {person}.* | EX-06.1 · EX-08.15 |
+| refused | A typed query with an unlabelled pattern, when the agent may not Read `data/<graph database>/*` ([GP-F01 › Engine](../../../../os/graph/features/GP-F01-data/feature.md#engine)) | *An unlabelled pattern reaches every kind — {agent} may not Read data/{graph database}/* — {rule} on {policy}, set by {person}.* | EX-08.17 |
+| 422 | A typed Gremlin query with a script, a lambda or `eval` | *{construct} is not allowed — a Gremlin query is steps only.* | EX-08.18 |
 | refused `plan_gap` | A question the plan grammar cannot express; outcome `cannot_answer`, never a raw query | *I cannot ask this yet — a plan cannot {what it lacks}.* | EX-01.16 |
 | refused | A plan needing a graph database switched off, or one that does not answer | *{name} is off — switched off by {person} {when}.* · *{name} is not answering.* | EX-01.18 |
 | 403 | A typed write by a person whose role does not hold *Edit on the board* | *Edit on the board needs the Modeller role.* | EX-08.13 |

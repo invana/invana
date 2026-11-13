@@ -10,7 +10,7 @@ boards: [inbox]
 # AC-32 · An unanswered ask reminds, escalates and expires
 
 **As** the person behind a run waiting on an ask **I want** an ask nobody answers to remind its approvers, then
-reach the agent's owners and the Admins, then end refused **so that** no ask waits unseen and nothing set to Ask is
+reach the Admins, then end refused **so that** no ask waits unseen and nothing set to Ask is
 ever allowed because nobody answered.
 
 Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
@@ -31,7 +31,7 @@ flowchart TD
   d -->|half the time gone| rem["A reminder to each approver who has not decided · Inbox and their channels"]
   rem --> d2{"Decided?"}
   d2 -->|yes| done
-  d2 -->|three quarters gone| esc["Escalated · the agent's owners and the Admins join · never the person it benefits"]
+  d2 -->|three quarters gone| esc["Escalated · the Admins join · never the person it benefits"]
   esc --> d3{"Decided?"}
   d3 -->|yes| done
   d3 -->|deadline passes| exp(["Expired — refused · the step ends refused · approvers and the person behind the run told"])
@@ -45,9 +45,9 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-32.1 | An ask nobody has decided | half the time to its deadline passes | one reminder reaches each approver who has not decided, in the Inbox and the channels they chose; the ask reads *Reminded* |
-| AC-32.2 | An ask still undecided | three quarters of its time passes | it is escalated: the agent's owners and the Admins are added to who it waits on, never the person it benefits; the named approvers stay; it reads *Escalated*, naming who was added |
-| AC-32.3 | An escalated ask | an Admin or an owner added by escalation opens it | they may decide it, held to every check a named approver is |
-| AC-32.4 | An ask whose owners and Admins are already among its approvers | it reaches three quarters | it is marked *Escalated* and nobody new is added |
+| AC-32.2 | An ask still undecided | three quarters of its time passes | it is escalated: the Admins are added to who it waits on, never the person it benefits; the named approvers stay; it reads *Escalated*, naming who was added |
+| AC-32.3 | An escalated ask | an Admin added by escalation opens it | they may decide it, held to every check a named approver is |
+| AC-32.4 | An ask whose Admins are already among its approvers | it reaches three quarters | it is marked *Escalated* and nobody new is added |
 | AC-32.5 | An ask nobody decides | its deadline passes | it reads *Expired — refused*; the step ends refused and nothing is done; the approvers and the person behind the run are told in the Inbox |
 | AC-32.6 | An expired ask | someone it was routed to allows or declines it | it is refused, reading *The deadline has passed; it expired, refused*; nothing runs |
 | AC-32.7 | The engine was down at the deadline | it comes back | the ask expires with the deadline as its time — never allowed late |

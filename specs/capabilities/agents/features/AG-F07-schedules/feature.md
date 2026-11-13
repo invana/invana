@@ -3,7 +3,7 @@ id: AG-F07
 title: Schedules
 product: AG
 status: idea
-personas: [analyst, decision-maker, owner]
+personas: [analyst, decision-maker, admin]
 stories: [AG-42]
 journeys: [J04]
 boards: [agents.schedules, inbox]
@@ -28,7 +28,7 @@ flowchart TD
   any -->|yes| list["AG-42 · Coming up over seven days · every schedule with its next run and last result"]
   empty --> new
   list --> new["AG-42 · New schedule: what to do · runs as · repeat · time zone · deliver to · if missed · if still going · outward approval"]
-  new -->|Operator| na["New schedule disabled, naming Can work on projects"]
+  new -->|an agent not granted to the person| na["Not offered to name · a schedule naming one reads, its acts disabled, naming the agent"]
   new --> valid{"Valid?"}
   valid -->|bad repeat · unknown zone · agent or channel missing| ref["Says which field, and why; nothing saved"] --> new
   valid -->|yes| saved["Saved · its next run shown"]
@@ -42,11 +42,11 @@ flowchart TD
   going -->|no, or run anyway| agent{"Its agent available?"}
   agent -->|paused| failed["Firing failed, naming the agent · the schedule stays on"]
   retire([AG-42 · Its agent is retired]) --> paused["The schedule is paused, naming the agent · a person points it at another agent and resumes it"]
-  agent -->|yes| run["A run opens, on behalf of the schedule's owner"]
+  agent -->|yes| run["A run opens as the agent · who set the schedule recorded"]
   cu --> run
   all --> run
   run --> settled["The run settles — served or failed"]
-  settled --> inbox(["Inbox rows for the owner and recipients — a failure says so and opens the run"])
+  settled --> inbox(["Inbox rows for who set it and the recipients — a failure says so and opens the run"])
   settled --> out{"Delivers outside Invana?"}
   out -->|outward approval on| ask["Inbox › Needs you — what will be sent"]
   ask -->|Send it| sent(["Sent to the channel"])
@@ -58,15 +58,15 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-  actor O as Schedule owner
+  actor O as Person who set it
   participant E as Engine clock
   participant A as Agent
   actor R as Approver (Inbox)
   O->>E: saves a schedule
   E->>E: at each firing — missed? overlapping? agent available?
-  E->>A: opens a run with the schedule's instructions, on the owner's behalf
+  E->>A: opens a run with the schedule's instructions, as the agent
   A-->>E: the run settles, with its trace
-  E-->>O: Inbox rows for the owner and recipients
+  E-->>O: Inbox rows for who set it and the recipients
   alt outward approval on
     E->>R: what will be sent, to which channel
     R-->>E: Send it · Not this time
@@ -82,12 +82,15 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+Schedules are *Acts* for every role in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); a schedule is the organisation's, and a person acts on it only through its agent, granted to them ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
+
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every schedule, its firings and their runs | Operator — every member | — |
-| Create, edit, pause, resume, run now or delete a schedule | `contributor` · shown as *Can work on projects* · Admin | The list and each schedule read; every act is disabled, naming *Can work on projects* |
-| Approve or decline an outward delivery | The schedule's approvers, else its owner (AC-F05) | The ask reads, naming who it waits on |
-| Read a delivered result | The owner and the named recipients, in their Inbox | — |
+| Read every schedule and its firings | Every signed-in person — Operator, Modeller, Admin | — |
+| Read a firing's run | As any run ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)) | That it ran, its agent, its status and its tokens |
+| Create, edit, pause, resume, run now or delete a schedule | Operator · Modeller · Admin, when the schedule's agent is granted to them | Only granted agents are offered to name; a schedule whose agent is not granted to the reader reads, every act disabled — *Uses {agent}, which is not granted to you* |
+| Approve or decline an outward delivery | The agent's named approvers, then the Admins ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, naming who it waits on |
+| Read a delivered result | Who set the schedule and the named recipients, in their Inbox | — |
 
 ## States
 
@@ -99,22 +102,23 @@ sequenceDiagram
 | Has data | *Coming up* over the next seven days; every schedule: what it does, who runs it, when as words, its next run, its last result, on or paused |
 | Failed | The list could not load, saying why, with *Try again*; a schedule refused at save names its field; a failed firing names why, and a schedule whose last run failed is marked, with *Open the last run* |
 | Agent working or proposing | A firing's run is running — its row reads *running*, and *Open run* follows it; an outward delivery waits in the Inbox |
-| No access | Schedules read; *New schedule* and each act are disabled, naming *Can work on projects* |
+| No access | Schedules read; a schedule whose agent is not granted to the reader has each act disabled, naming the agent; with no agent granted, *New schedule* is disabled, naming why |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
 | One kind of schedule | A schedule needs no project. It names an agent and plain instructions; whatever the run produces is delivered. Whether the run creates work is the run's business |
-| A firing is a run | A firing opens the same run a task opens, through the named agent, on behalf of the schedule's owner, and waits behind people's runs by the graph's runs-at-once rules |
+| A firing is a run | A firing opens the same run a task opens, through the named agent, as the agent, and waits behind people's runs by the runs-at-once limits ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) |
 | Every firing is kept | Queued · opened · skipped · failed, each with its reason, its run, and whether it was a catch-up or *Run now* |
 | Repeat in a time zone | Daily · weekdays · weekly on a day · monthly on a date · a custom cron, at a time, read in the schedule's zone — *08:00 Europe/Berlin* stays 08:00 across a clock change |
 | Missed firings | A firing reached more than five minutes late is missed. *Run once on recovery* (the default) runs the latest, marked catch-up, and keeps the rest as skipped · *Run every missed one* runs each, at most 24 · *Skip* runs none |
 | If the last run is still going | *Skip* (the default) skips the firing, saying so · *Run anyway* opens it |
-| Delivery follows the settled run | Inbox rows to the owner and recipients, and one delivery per channel. A failed run is delivered as a failure that opens the run, never dropped |
-| Outward deliveries ask | A delivery to a channel is Ask: it waits in the Inbox for the approvers, else the owner, until its deadline (a day by default) — then it is not sent. A person may set it to Allow ([the three modes](../../../../os/access/product.md#decisions)) after seeing what goes where; the schedule records who set it. An edit, or the setter losing the right to set Allow, returns it to Ask (AG-42.19) |
+| Delivery follows the settled run | Inbox rows to who set it and the recipients, and one delivery per channel. A failed run is delivered as a failure that opens the run, never dropped |
+| Outward deliveries ask | A delivery to a channel is Ask: it waits in the Inbox for the agent's named approvers, then the Admins ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)), until its deadline (a day by default) — then it is not sent. A person may set it to Allow ([the three modes](../../../../os/access/product.md#decisions)) after seeing what goes where; the schedule records who set it. An edit, or the setter losing the right to set Allow, returns it to Ask (AG-42.19) |
 | Pause and resume | Pausing keeps every firing; a run going when paused finishes and is delivered. Resuming fires from now — what fell while paused is not missed, because nobody wanted it |
-| On whose behalf | The owner is whoever created the schedule; editing it never changes on whose behalf it runs |
+| Runs as the agent | A firing's run acts as the schedule's agent, its Access Policies alone deciding each step ([the order of checks](../../../../os/access/features/AC-F02-access-policies/feature.md#the-order-of-checks)); no person bounds it. Who set the schedule and who last edited it are recorded, and neither narrows nor widens the run |
+| A setter who leaves | The schedule keeps running as its agent; who set it stays recorded ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#slots-and-fallbacks)) |
 | A paused agent | Its schedule's firings fail, naming the agent; the schedule stays on |
 | A retired agent | Retiring it pauses each schedule that starts it, naming the agent; the schedule fires again only once a person points it at another agent and resumes it (AG-F01) |
 | A channel in use | Removing a channel a schedule delivers to is refused, naming the schedule |
@@ -124,7 +128,7 @@ sequenceDiagram
 
 | Record | Read or write |
 |---|---|
-| Schedules — name, agent, instructions, repeat, zone, on or paused, missed and overlap choices, delivery, outward approval and who set it, approvers, owner, next run | Write · read |
+| Schedules — name, agent, instructions, repeat, zone, on or paused, missed and overlap choices, delivery, outward approval and who set it, who set the schedule and who last edited it, next run | Write · read |
 | Firings — when due, outcome, reason, catch-up or run now, the run, when delivered | Write · read |
 | The run each firing opens (CP-F10) | Write · read |
 | Inbox rows and outward-delivery asks (AC-F05) | Write · read |
@@ -139,7 +143,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `agents_schedules` | `graph_id` · `name` · `agent_id` · `instructions` · `trigger` (`time` · `event`) · `cron` · `timezone` · `event_pattern?` · `event_scope?` · `status` (`active` · `paused`) · `missed` (`catch_up` · `run_all` · `skip`) · `overlap` (`skip` · `allow`) · `deliver_in_app` · `recipient_ids[]` · `channel_ids[]` · `approve_outward` · `allow_set_by?` · `allow_set_at?` · `approver_ids[]` · `approval_deadline_s` (a day) · `editor_ids[]` · `next_fire_at` · `owner_id` · `created_at` · `updated_at` | `name` unique in the Graph. `owner_id` is whoever created it and never changes. `editor_ids` holds every member who edited it since the owner last saved it |
+| `agents_schedules` | `graph_id` · `name` · `agent_id` · `instructions` · `trigger` (`time` · `event`) · `cron` · `timezone` · `event_pattern?` · `event_scope?` · `status` (`active` · `paused`) · `missed` (`catch_up` · `run_all` · `skip`) · `overlap` (`skip` · `allow`) · `deliver_in_app` · `recipient_ids[]` · `channel_ids[]` · `approve_outward` · `allow_set_by?` · `allow_set_at?` · `approval_deadline_s` (a day) · `next_fire_at` · `made_by` · `updated_by` · `created_at` · `updated_at` | `name` unique in the Graph. Owned by the platform ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); `made_by` is who set it and never changes; `updated_by` who last edited it. Neither is an identity the run takes |
 | `agents_schedule_firings` | `schedule_id` · `graph_id` · `due_at` · `fired_at` · `outcome` (`queued` · `opened` · `skipped` · `failed`) · `catch_up` · `manual` · `run_id?` · `reason` · `delivered_at?` · `actor_id?` | Unique (`schedule_id`, `due_at`), so two engine processes never fire one occurrence twice |
 
 ### Reads
@@ -176,7 +180,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | 422 | An invalid repeat, an unknown time zone, or a missing agent or channel | *{field}: {why}.* | AG-42.3 |
-| 403 | Create, change, pause, resume, run now or delete without *Can work on projects* | *This needs Can work on projects.* | AG-42.18 |
+| 403 | Create, change, pause, resume, run now or delete a schedule whose agent is not granted to the person | *{agent} is not granted to you.* | AG-42.18 |
 | 409 | Removing a channel a schedule delivers to — on the channel's delete ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)) | *{schedule} delivers to this channel.* | AG-42.17 |
 | firing failed | Its agent is paused | *{agent} is paused.* | AG-42.6 |
 
@@ -186,21 +190,21 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | `invana schedules list` · `show` | Every schedule · one with its firings |
 | `invana schedules create --file` | Creates the schedule the file names, or changes the one with its name |
-| `invana schedules pause` · `resume` · `run-now` · `delete` | As the routes, with the same grant |
+| `invana schedules pause` · `resume` · `run-now` · `delete` | As the routes, with the same checks |
 
 ### Mechanisms
 
 | Mechanism | How |
 |---|---|
 | One clock per process | Every `INVANA_CLOCK_INTERVAL_S`, or woken after *Run now*, the loop opens a session, ticks, commits, and only then submits the runs the tick opened — a run starts from committed rows. A failed tick is logged and rolled back |
-| A tick | Due schedules — missed? overlapping? agent available? · firings kept and runs opened on the owner's behalf · settled runs delivered — Inbox rows and outward asks |
+| A tick | Due schedules — missed? overlapping? agent available? · firings kept and runs opened as the agent · settled runs delivered — Inbox rows and outward asks |
 | The clock is shared | A tick also runs work other features own — notification matching and sending (CP-F08), ask reminders and expiry (AC-F05), publish reviews, alert rules and the ledger's verification; each is that feature's |
 | Missed | A firing reached more than five minutes late is missed and handled by `missed`; `run_all` replays at most 24 |
 | Overlap | `skip` keeps the firing `skipped` while the last run is going; `allow` opens another |
 | A paused agent · a retired agent | Paused — the firing is `failed`, naming the agent, the schedule stays active · retired — every active schedule that starts it is paused, the event naming the agent |
 | Resume fires from now | `next_fire_at` is computed from now; what fell while paused is not missed |
-| On whose behalf | The run is opened on behalf of `owner_id`, bounded by the owner and every member in `editor_ids` — the strictest binds each step; the instructions are read as data |
-| Outward approval | `approve_outward` on — a delivery to a channel is an ask to `approver_ids`, else the owner, until `approval_deadline_s`. Off is Allow, set by a person — `allow_set_by` · `allow_set_at`; any edit, or the setter losing the right, returns it to Ask with `agents.schedules.approval_reset`. A *For everyone* Deny on sends holds whatever it says |
+| As the agent | The run is opened as `agent_id`, with no person behind it to narrow it; `made_by` is recorded on the run as who set the schedule. The agent's Access Policies decide each step; the instructions are read as data |
+| Outward approval | `approve_outward` on — a delivery to a channel is an ask routed as [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) routes any — the agent's named approvers, then the Admins — until `approval_deadline_s`. Off is Allow, set by a person — `allow_set_by` · `allow_set_at`; any edit, or the setter losing the right, returns it to Ask with `agents.schedules.approval_reset`. A Deny on sends in the agent's Access Policies holds whatever the schedule says |
 | Delete keeps the runs | The schedule and its firings go; the runs they opened stay |
 | Event triggers | `trigger = event` fires on a write matching `event_pattern` in `event_scope`, with the same overlap choice and the same firing record; no cron |
 
@@ -211,13 +215,13 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | § 6 Data and storage | Two tables in Invana's own store | — |
 | § 8 APIs and events | The routes, events and CLI above | — |
 | § 9 Distributed execution | A clock loop in every engine process; the firing's unique key keeps two processes from firing one occurrence twice | — |
-| § 12 Qualities | Security: outward deliveries ask by default, and a run is bounded by its owner and every editor since | — |
+| § 12 Qualities | Security: outward deliveries ask by default, and a run acts as its agent alone | — |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| Schedules sit in Agents | Agents › Schedules — routine work is an agent's run on a clock; anyone with *Can work on projects* schedules, from wherever they work |
+| Schedules sit in Agents | Agents › Schedules — routine work is an agent's run on a clock; anyone schedules an agent granted to them, from wherever they work |
 | A schedule carries instructions, not a plan | The agent plans each firing's run as it plans any run; a schedule never names a plan or a skill |
 | The list reads at a glance | What · who runs it · when as words · next run · last result · on — a failed last run is marked |
 | No sources, tools or project to pick | Sources are written in the instructions, tools are the agent's, and a schedule needs no project |
@@ -229,7 +233,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| The Schedules board draws a schedule paused by itself after three failed runs in a row; no rule says a schedule pauses itself. Add it? Recommend: not now — each failed firing already reaches the owner's Inbox, and a self-pausing schedule hides routine work silently | Ravi |
+| The Schedules board draws a schedule paused by itself after three failed runs in a row; no rule says a schedule pauses itself. Add it? Recommend: not now — each failed firing already reaches the Inbox of who set it, and a self-pausing schedule hides routine work silently | Ravi |
 
 ## Not building
 

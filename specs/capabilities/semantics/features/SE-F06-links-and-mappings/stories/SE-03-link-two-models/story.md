@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 ## Who can
 
+Linking models is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Link two published models, commit or discard staged links, and remove a link | — |
-| Operator | Read every link, its rule, its counts and its history | *Link models* disabled and a drag between models refused — *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin |
+| Operator | Read every link, its rule, its counts and its history. A Modeller links, commits and removes as an Admin does | *Link models* disabled and a drag between models refused — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -62,7 +64,7 @@ flowchart LR
 | SE-03.15 | An active link | the person picks *Remove link* and confirms | a run withdraws exactly the relationships it wrote, then the link goes and is listed under *Removed* with who removed it, when and what was withdrawn |
 | SE-03.16 | A relationship the link wrote | the person opens *How it got here* on it | it names the link, its rule and when it was written |
 | SE-03.17 | A model republished | its links show | they carry onto the new version; links on the version it replaced stay as history and are not counted twice |
-| SE-03.18 | An Operator without *Can shape the model* | they drag between models or reach *Link models* | it is refused with *Ask Priya (owner) to shape the model*; every link still reads |
+| SE-03.18 | An Operator | they drag between models or reach *Link models* | it is refused with *Needs the Modeller role — ask an Admin*; every link still reads |
 | SE-03.19 | Both keys named while no worker is free to count | the card counts | It reads that the count is waiting for a worker, with *Try again*; nothing is staged |
 
 ## Screens

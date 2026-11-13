@@ -79,7 +79,7 @@ The role each act needs is the role table's *Ontology* row
 ([AC-F02 › The role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); this
 table names the acts.
 
-| Act | Role | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read a model, its draft, its comparison and its reviews | Operator · Modeller · Admin | — |
 | Change in a draft · stage, discard · constrain a property | Modeller · Admin, through the Modeller agent | *Change in a draft* disabled — *Needs the Modeller role — ask an Admin* |

@@ -55,7 +55,7 @@ flowchart LR
 | PJ-06.2 | A finding cites a record, a load, a run or a run's step | it is added | each cite is kept: a record cite names its graph database and kind, a load cite reads its name and short content hash and opens the load (RC-F02), a run cite reads *run 8195c5e8* and a step cite *run 8195c5e8 · step 4*, each opening the run |
 | PJ-06.3 | A record, load, run or step cite that does not exist | the finding is added | it is refused, naming the cite; nothing is added |
 | PJ-06.4 | Any finding | someone opens it | the statement is its title; it shows stance, origin, version, who added it and who reviewed it, the same names *By* uses on Decisions |
-| PJ-06.5 | An agent | it adds a finding | the finding reads *Added by* the agent, *Unreviewed*, shows no reviewer, and links to the steps it came from in the thinking graph ([AG-F09](../../../../../agents/features/AG-F09-thinking-graph-and-memory/feature.md)) |
+| PJ-06.5 | An agent | it adds a finding | the finding reads *Added by* the agent, *Unreviewed*, shows no reviewer, and links to the steps it came from in the thinking graph ([AG-F09](../../../../../agents/features/AG-F09-learn-from-memory/feature.md)) |
 | PJ-06.6 | An agent's finding | a person who may read its run opens *How it got here* | it shows the run's steps and sources behind the statement, each marked *Challenge this* |
 | PJ-06.7 | An unreviewed finding | a person presses *Review* | it reads reviewed by that person, and a rule requiring person-reviewed evidence now accepts it |
 | PJ-06.8 | A finding cites a load since undone in Records | someone opens it | it is marked *a load undone*, with who undid it and why, and the finding stays |

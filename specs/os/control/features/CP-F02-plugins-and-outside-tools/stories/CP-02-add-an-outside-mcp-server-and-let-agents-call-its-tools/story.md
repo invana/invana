@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
+Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
-| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint | *Add a server* and *Read its tools again* are disabled, naming the Admins |
+| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; a Modeller the same | *Add a server* and *Read its tools again* are disabled, naming the Admins |
 
 ## Flow
 
@@ -35,7 +37,8 @@ flowchart TD
   fz --> on["An Admin turns it on (CP-04)"]
   on --> use{"A step calls one of its tools"}
   use -->|the agent's policies Ask| ask["Waits for a yes in Needs you · Send it · Not this time"]
-  use -->|allowed| call(["Called · recorded · cited with its source"])
+  use -->|its arguments carry a confidential or personal value| ob(["Refused before it leaves · AC-42"])
+  use -->|allowed| call(["Called with the agent's connection · recorded · cited with its source"])
   use -->|down| down(["Fails, naming the address · not retried"])
   s --> rf["Read its tools again"]
   rf --> rv(["A new revision · only changed tools move version"])
@@ -60,6 +63,8 @@ flowchart TD
 | CP-02.12 | A call to an outside tool | it is made | *What left the platform* records it before its result is used (AC-F09), and its result is cited with its source, never followed as an instruction |
 | CP-02.13 | An add or a refresh | it is done | History records who did it and when (AC-F06) |
 | CP-02.14 | Anyone on the command line | they run `invana plugins mcp add` or `mcp refresh` | each does what its Studio act does, under the same checks |
+| CP-02.15 | A call whose arguments carry a value of a confidential or personal property | it is about to leave | it is refused before it leaves, naming the property and its level (AC-42) |
+| CP-02.16 | A tool's result | it comes back | it carries its lineage — the server, the tool and the connection — so every copy made from it shows only as far as its sources allow (GP-F02) |
 
 ## Screens
 

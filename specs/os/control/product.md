@@ -33,7 +33,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 |---|---|
 | Admin | Read workloads by user, agent and team; act on ops alerts and stop a run; connect graph databases and set each one's mode and switch; AI models and whether each is local or external, plugins, outside servers and their credentials, the MCP server, channels, workers, limits per team, user and agent |
 | Analyst · Decision maker | See which graph databases and plugins are on and healthy; switch one off for their own runs; connect their own outside accounts; find anything with ⌘K; read what needs them in the Inbox and choose where it reaches them |
-| Agent builder | Read their agents' runs and how they are doing; be told when an agent they own needs them and stop its run; test agents in the practice graph database; pin a model version; see why a run waits and ask for more |
+| Agent builder | Read their agents' runs and how they are doing; be told when an agent they approve for needs them and stop a run they are behind; test agents in the practice graph database; pin a model version; see why a run waits and ask for more |
 | Modeller | See what each graph database holds before shaping the model across them |
 
 ## Goals
@@ -55,7 +55,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | CP-F02 | [Plugins and MCP](features/CP-F02-plugins-and-outside-tools/feature.md) | CP-04 · CP-44 · CP-02 · CP-42 · CP-43 · CP-03 · CP-20 | idea |
 | CP-F03 | [Workers and the queue](features/CP-F03-workers-and-the-queue/feature.md) | CP-05 · CP-06 · CP-07 · CP-08 · CP-09 · CP-10 | idea |
 | CP-F04 | [Limits](features/CP-F04-limits/feature.md) | CP-11 · CP-34 · CP-12 · CP-13 · CP-14 | idea |
-| CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 · CP-17 · CP-18 · CP-19 | idea |
+| CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 · CP-17 | idea |
 | CP-F06 | [Skill scripts](features/CP-F06-skill-scripts/feature.md) | CP-15 · CP-16 | idea |
 | CP-F07 | [Find your way — ⌘K and search](features/CP-F07-find-your-way/feature.md) | CP-30 | idea |
 | CP-F08 | [The Inbox — what needs me, and notifications](features/CP-F08-the-inbox/feature.md) | CP-36 · CP-37 · CP-45 · CP-46 | idea |
@@ -75,7 +75,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | Inbox — Needs you · Updates · Running · Done | modal | `inbox` |
 | Settings › Notifications — rules and channels | modal | `settings.notifications` |
 | Settings › You — outside accounts · where asks reach me | modal | `settings.me` |
-| Plugins — every plugin, a plugin, Domain packs | modal | `settings.plugins` |
+| Plugins — every plugin, a plugin, Team packs | modal | `settings.plugins` |
 | An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins.server` |
 | The deployment's MCP server — what it serves, recent calls | modal | `settings.mcp` |
 | AI models | modal | `settings.ai` |
@@ -91,7 +91,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | No credential in an environment variable | Graph database credentials, AI model keys, outside servers' secrets and accounts, and channel secrets are sealed under the install key, set with the password again, never read back |
 | Allow never passes a limit | Allow on a spend never passes a limit ([CP-F04](features/CP-F04-limits/feature.md)) |
 | One record of runs | Every run is one row of [CP-F10](features/CP-F10-runs-and-how-the-agents-are-doing/feature.md); the overview, Runs, the Inbox's Running and ops alerts all read it |
-| Those it costs can stop it | The person behind a run, its agent's owners and the Admins stop it; whoever acts on an ops alert closes it |
+| Those it costs can stop it | The person behind a run and the Admins stop it ([the role table](../access/features/AC-F02-access-policies/feature.md#the-role-table)); whoever acts on an ops alert closes it |
 | Everything later happens on one clock | Schedules, deliveries, rules and ask deadlines run on one clock that repeats nothing after a restart |
 | Tokens, never currency | Every budget, limit, usage figure and alert is in tokens ([glossary › Token budget](../../glossary.md#what-may-happen)) |
 

@@ -25,8 +25,8 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([A skill's or an agent's sheet › Evals]) --> may{"An owner with the Modeller role, or an Admin?"}
-  may -->|no| ro["Cases, results and alerts read; acts disabled, naming the role or the owners"]
+  start([A skill's or an agent's sheet › Evals]) --> may{"A Modeller or an Admin?"}
+  may -->|no| ro["Cases, results and alerts read; acts disabled, naming the role"]
   may -->|yes| set{"AG-56 · Has cases?"}
   set -->|no| pr["AG-56 · Write a case · Propose from the instructions"]
   pr -->|the Assistant proposes| pc["Proposed cases — accept one by one"]
@@ -45,7 +45,7 @@ flowchart TD
   w --> p
   nc --> p
   d([A model, rule or policy change, or nightly]) --> dr["AG-58 · The live version's evals again"]
-  dr -->|worse| al(["An alert in its owners' Inbox, naming what changed"])
+  dr -->|worse| al(["An alert in the Inbox of the agent's named approvers, then the Admins, naming what changed"])
   dr -->|same or better| ok(["Recorded, nothing raised"])
   ev -->|the eval token budget is spent| bz["AG-59 · Scheduled runs pause; a publish-time run runs with a warning"]
   dr -->|the eval token budget is spent| pz(["AG-59 · Paused: budget reached"])
@@ -83,13 +83,13 @@ sequenceDiagram
 ## Access
 
 *Test an agent and a skill* is *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
-*Acts* is on the agents and skills a person owns ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)), and an Admin acts on any.
+a built-in agent or skill is never edited, and making or owning one grants nothing ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)).
 
-| Act | Role | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read an eval set — cases, checks, judge, rubric — its eval runs, test runs, drift alerts and the eval token budget | Every signed-in person — Operator, Modeller, Admin | — |
-| Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | An owner of the agent or skill with the Modeller role · Admin. Never on a built-in agent or skill | Each act disabled, naming the role — *Needs the Modeller role — ask an Admin* — or the owners — *Only its owners or an Admin — ask Lee*; a built-in reads its set, with *Copy* |
-| Promote a run's answer to a case | An owner of the agent or skill with the Modeller role who may read the run's content ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) · Admin | *Promote to eval* disabled on the run, naming the role or the owners |
+| Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | Modeller · Admin. Never on a built-in agent or skill | Each act disabled — *Needs the Modeller role — ask an Admin*; a built-in reads its set, with *Copy* |
+| Promote a run's answer to a case | Modeller · Admin, who may read the run's content ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) | *Promote to eval* disabled on the run, naming the role |
 | Set the deployment's eval token budget | Admin | The budget and what is spent read; editing disabled — *Needs the Admin role* |
 | Name the practice graph database | Admin ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | Evals read *No practice graph database — reading in read mode* |
 
@@ -103,7 +103,7 @@ sequenceDiagram
 | Has data | The set's cases, each a question with its checks and *passing* or *failing*; the last eval run's tiles — hard checks passed, changed answers, time p95, tokens per case — against live; the test runs, newest first; the spent-of-budget line |
 | Failed | The gate's refusal where the act was, naming the case and the check; a read that failed names what, in the engine's words |
 | Agent working or proposing | The Assistant proposing cases; an eval run or a test with its cases filling in; drift running |
-| No access | Everything reads; every act is disabled, naming the role or the owners |
+| No access | Everything reads; every act is disabled, naming the role |
 
 ## Rules
 
@@ -119,12 +119,12 @@ sequenceDiagram
 | A test is a real run marked *test* | One question replayed on the draft as an eval case is; it counts in no agent's numbers |
 | Cases are a person's | The Assistant proposes up to five cases; each waits as *proposed* until a person accepts it. Promoting a run's answer is a person's act; an agent never promotes |
 | A case outlives its run | A retired case keeps the results it judged; a case whose run is gone keeps its question and checks |
-| Drift is checked, not guessed | The live version's evals run again when its model version moves, the model publishes, a rule or an Access Policy it reads changes, and nightly; fewer hard checks passing, or time or tokens past 1.5× the last run, raise an alert to its owners naming what changed |
+| Drift is checked, not guessed | The live version's evals run again when its model version moves, the model publishes, a rule or an Access Policy it reads changes, and nightly; fewer hard checks passing, or time or tokens past 1.5× the last run, raise an alert to the people the alert kind names — the agent's named approvers, then the Admins ([CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) — naming what changed |
 | Evals spend their own tokens | The deployment's eval token budget, set by an Admin, is apart from the limits per team, user and agent ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)); at its ceiling scheduled eval runs and drift pause and say so, and a publish-time run still runs with a warning |
 | Every call is in the ledger | Eval, judge and test calls are recorded like any run's ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)); a sensitive property never goes to an external judge |
 | Tokens, never currency | Every budget and count of spend is in tokens ([glossary › Token budget](../../../../glossary.md#what-may-happen)) |
 | The engine counts | Hard checks passed, changed answers, p95, tokens per case, *same as live* and every ratio are the engine's; Studio formats them |
-| Leans on | Building an agent (AG-F01) · skills (AG-F04) · runs (CP-F10) · the practice graph database (CP-F05) · AI models (CP-F01) · limits (CP-F04) · the Inbox (CP-F08) · ownership (AC-F07) · History (AC-F06) |
+| Leans on | Building an agent (AG-F01) · skills (AG-F04) · runs (CP-F10) · the practice graph database (CP-F05) · AI models (CP-F01) · limits (CP-F04) · the Inbox (CP-F08) · asks and named approvers (AC-F05) · History (AC-F06) |
 
 ## Data touched
 
@@ -135,7 +135,7 @@ sequenceDiagram
 | The deployment's eval token budget and what is spent | Write · read |
 | Runs a case was promoted from | Read |
 | The practice graph database standing in for each graph database | Read |
-| Drift alerts in the owners' Inbox · History rows of every case change and eval run | Write |
+| Drift alerts in the Inbox of the people the alert kind names · History rows of every case change and eval run | Write |
 
 ## Engine
 
@@ -157,7 +157,7 @@ sequenceDiagram
 | Skills — the draft version, its plan and `model_pin` | [AG-F04](../AG-F04-skills/feature.md#engine) |
 | Graph databases and the practice one standing in for each | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
 | AI models offered — the judge's and the subject's pins | [CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine) |
-| Owners of the agent or skill | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
+| An agent's named approvers — who an alert reaches | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | Who may read a run's content | [AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
 | The ledger of every call | [AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) |
 | Inbox rows | [CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine) |
@@ -195,10 +195,10 @@ sequenceDiagram
 | 409 `eval_warned` | It warned and no `why` was given | *This warns — say why to publish.* | AG-57.5 |
 | 422 | A judge set to the model version under test | *The judge cannot be the model it grades.* | AG-56.5 |
 | 422 | A case, set or run on a built-in agent or skill | *{subject} is built in — copy it to change it.* | AG-56.12 |
-| 403 | Promoting a run whose content the caller may not read | *Only who is behind this run, its agent's owners or an Admin read it.* | AG-56.9 |
+| 403 | Promoting a run whose content the caller may not read | *Only who is behind this run, or whose default agent may see a project run's sources, reads it.* | AG-56.9 |
 | 403 | The eval token budget changed by anyone but an Admin | *This needs the Admin role.* | AG-59.3 |
 | 403 | A write by someone whose role is not Modeller or Admin | *This needs the Modeller role — ask an Admin.* | AG-56.11 · AG-57.11 |
-| 403 | A write by a Modeller who is not one of the subject's owners | *Only its owners or an Admin — ask {owners}.* | AG-56.11 · AG-57.11 |
+| 403 | A write without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-56.11 · AG-57.11 |
 | run settles `paused: budget` | A scheduled eval run or drift with the eval token budget spent | *The eval token budget is spent for this month.* | AG-59.2 |
 
 ### CLI
@@ -222,7 +222,7 @@ sequenceDiagram
 | The judge | Reads the answer as text — prose verbatim, a table's first rows, a subgraph's counts — capped at 4,000 characters, and scores 0 to 5 against the rubric with one line of why; on the eval budget |
 | The starter set | One AI model call on the subject's own pin, else the deployment's default model, writes up to five cases with checks it can state without the data (`cites_records` · `cannot_answer` · `guardrail_holds`); not an eval run, so not on the eval budget |
 | A test | A one-question eval replay of the draft, `role = evaluate`, labelled the subject's test |
-| Drift | The set runs again on live when its model version moves, the model publishes, a rule or an Access Policy it reads changes, and nightly; a worse result emits `agents.evals.degraded` and an Inbox row for each of the subject's owners |
+| Drift | The set runs again on live when its model version moves, the model publishes, a rule or an Access Policy it reads changes, and nightly; a worse result emits `agents.evals.degraded` and an Inbox row for each person the alert kind names ([CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) |
 | The budget | `tokens_in + tokens_out` of every eval, test and judge call this calendar month, against `agents_eval_budgets.monthly_tokens`; a scheduled run or drift past it settles `paused: budget`; a publish-time run runs and carries the warning |
 
 ## System impact

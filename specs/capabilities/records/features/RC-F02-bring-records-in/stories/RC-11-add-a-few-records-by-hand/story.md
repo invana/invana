@@ -16,17 +16,19 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
+Adding records is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add records to any kind of a published model | — |
-| Operator | — | *Add records* absent, a line naming who may load. With *Can shape the model*: as Admin |
+| Operator | — A Modeller adds records as an Admin does | *Add records* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([Records › Add records by hand · Experimental]) --> g{Can shape the model?}
-  g -->|no| na["Absent — names who may load"]
+  a([Records › Add records by hand · Experimental]) --> g{Modeller or Admin?}
+  g -->|no| na["Disabled — Needs the Modeller role"]
   g -->|yes| k["Pick a model and a kind"]
   k --> rows["Records, one per line, the kind's properties"]
   rows -->|a key already there| kx["Refused — a new record never overwrites a key"]
@@ -38,12 +40,12 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| RC-11.1 | Records › Bring records in | it opens for a person with *Can shape the model* | *Add records by hand* carries an *Experimental* badge and offers the kinds of the Graph's published models |
+| RC-11.1 | Records › Bring records in | it opens for a Modeller or an Admin | *Add records by hand* carries an *Experimental* badge and offers the kinds of the Graph's published models |
 | RC-11.2 | A chosen kind | the person adds records | the form has the kind's properties; *Save records* waits until each record has its key |
 | RC-11.3 | Records saved | the load runs | they are one load, its source *by hand*, the person its author, each record checked against the kind's constraints like any load |
 | RC-11.4 | A new record whose key already exists | it is saved | it is refused naming the key; a new record never overwrites one |
 | RC-11.5 | More than 5,000 records | the form opens | it points to the load command instead |
-| RC-11.6 | An Operator without *Can shape the model* | they open Bring records in | *Add records by hand* is absent and a line names who may load |
+| RC-11.6 | An Operator | they open Bring records in | *Add records by hand* is disabled with *Needs the Modeller role — ask an Admin* |
 
 ## Screens
 

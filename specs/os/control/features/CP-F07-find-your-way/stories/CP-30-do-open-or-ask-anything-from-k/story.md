@@ -45,7 +45,7 @@ flowchart TD
 |---|---|---|---|
 | CP-30.1 | Nothing typed | ⌘K opens | it lists the open mode's sections and acts, and recent records |
 | CP-30.2 | Text typed | ⌘K matches | boards and conversations, models and kinds, agents, skills, workflows, projects and tasks, the last runs and the graph databases — grouped by where each lives, exact then prefix then contains |
-| CP-30.3 | A private project the person is not on | they search its name | it is never a hit |
+| CP-30.3 | A project the person's default agent may not Read | they search its name | it is a hit by name; opening it reads its head, the rest *Withheld — your agent may not read `project/{key}`* |
 | CP-30.4 | An agent the person may not use | they search its name | it is never a hit |
 | CP-30.5 | A hit with no address of its own | the person picks it | its section opens with it selected |
 | CP-30.6 | Conversations and runs with one title | they are listed | each carries its age beside its kind |
@@ -55,7 +55,7 @@ flowchart TD
 | CP-30.10 | Nothing matches | the list draws | it says *Nothing found*, with *Ask the Assistant* |
 | CP-30.11 | A list ⌘K could not read | it matches | that group says it could not be read; the others still match |
 | CP-30.12 | No graph database on yet | ⌘K opens | it lists Home's set-up and Settings; *Ask the Assistant* says it opens when set-up is done |
-| CP-30.13 | A person at the command line | they run `invana search "<text>"` | each hit reads its kind, name and id, closest first — the records ⌘K finds; a private project they are not on is never a hit |
+| CP-30.13 | A person at the command line | they run `invana search "<text>"` | each hit reads its kind, name and id, closest first — the records ⌘K finds; a project is a hit by its name only |
 
 ## Screens
 

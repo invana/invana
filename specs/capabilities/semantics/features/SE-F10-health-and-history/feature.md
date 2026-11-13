@@ -32,7 +32,7 @@ flowchart TD
   db -->|Add it in a draft| draft(["The draft — SE-05"])
   h -->|hot and slow · failed questions| perf["Performance: per kind — failed questions, slow query shapes, suggested indexes"]
   perf -->|Add index to draft| may{An Admin?}
-  may -->|no| na["Ask an Admin"]
+  may -->|no| na["Needs the Admin role — ask an Admin"]
   may -->|yes| draft
   h -->|Save report| rep(["A saved report · frozen · Back to live"])
   h -->|History| hist["SE-09 · Who changed what, why, the effect after"]
@@ -52,13 +52,13 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read health — Overview, Database, Usage, Performance, Growth — and history | Operator — every member | — |
-| Save a report · open saved reports | Operator — every member | — |
-| Read the database · *Add it in a draft* | `modeller` · shown as *Can shape the model* | Absent; the reading stays — *Ask Priya (owner) to shape the model* on the drift rows |
-| *Add index to draft* — apply a suggested index | Admin | Absent; the suggestion reads — *Ask an Admin* |
-| Archive, restore or delete a model | `modeller` · shown as *Can shape the model* | Absent from the model's `⋯` |
+| Read health — Overview, Database, Usage, Performance, Growth — and history | Every signed-in person — Operator, Modeller, Admin | — |
+| Save a report · open saved reports | Every signed-in person — Operator, Modeller, Admin | — |
+| Read the database · *Add it in a draft* | Modeller · Admin | Absent; the reading stays — *Needs the Modeller role — ask an Admin* on the drift rows |
+| *Add index to draft* — apply a suggested index | Admin | Absent; the suggestion reads — *Needs the Admin role — ask an Admin* |
+| Archive, restore or delete a model | Modeller · Admin | Absent from the model's `⋯`; *Needs the Modeller role — ask an Admin* |
 
 ## States
 

@@ -45,7 +45,7 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read records, their provenance and history | Operator — every member | — |
 | Open a record on a board | Operator — every member | — |

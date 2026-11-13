@@ -22,7 +22,7 @@ depends_on: [RC-F01]
 flowchart TD
   start([Two records of one kind]) --> side["RC-04 · Side by side · pick each value"]
   side --> rel["RC-04 · Relationships of both, moved to the survivor"]
-  rel --> g{Can work on projects · the connection writes?}
+  rel --> g{Modeller or Admin · the connection writes?}
   g -->|no| na["Merge disabled — the reason"]
   g -->|yes| run{Merge}
   run -->|written| done(["One record · History names the merge and both keys"])
@@ -45,10 +45,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Compare two records | Operator — every member | — |
-| Merge them | `contributor` · shown as *Can work on projects*, on a connection that writes | Disabled — *Ask Priya (owner)*; a read-only connection gives its own reason |
+| Compare two records | Every role — Operator, Modeller, Admin | — |
+| Merge them | Modeller · Admin, through an agent granted to them, on a connection that writes | Disabled — *Needs the Modeller role — ask an Admin*; a read-only connection gives its own reason |
 
 ## States
 

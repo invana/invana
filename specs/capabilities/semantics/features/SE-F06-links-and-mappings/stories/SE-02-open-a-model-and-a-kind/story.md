@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 ## Who can
 
+Changing a model or a kind is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open a model and a kind, and from a kind change it in a draft; rename a model and change its description | — |
-| Operator | Open a model and a kind and read them | *Change in a draft* and *Rename* disabled — *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin |
+| Operator | Open a model and a kind and read them. A Modeller changes a model or a kind as an Admin does | *Change in a draft* and *Rename* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -32,7 +34,7 @@ flowchart LR
   a -->|a model| m["The model · its kinds, relationships, links"]
   m -->|breadcrumb| a
   k -->|Mappings · Map to a standard| ms(["Staged in the draft — SE-05"])
-  k -->|no Can shape the model| na["Reads · Ask Priya (owner) to shape the model"]
+  k -->|not a Modeller or an Admin| na["Reads · Needs the Modeller role — ask an Admin"]
 ```
 
 ## Acceptance criteria
@@ -44,11 +46,11 @@ flowchart LR
 | SE-02.3 | A model in the left section | the person picks it | the model opens with its kinds of node, its relationships and the links touching it from either side, each with its count; an empty list says what would go there |
 | SE-02.4 | A kind's peek with constraints that records break | it shows | it names how many records break each, and whether new ones are rejected |
 | SE-02.5 | A kind | the person presses Esc or picks the breadcrumb | they are back on the map as they left it |
-| SE-02.6 | A model with a draft | its kind opens | the page shows the draft's chip and, with *Can shape the model*, *Add property* |
-| SE-02.7 | An Operator without *Can shape the model* | they open a kind | it reads; *Change in a draft* is disabled with *Ask Priya (owner) to shape the model* |
-| SE-02.8 | A model's head and a person with *Can shape the model* | they rename it or change its description | It saves at once, outside the draft — a name and a description are not part of a version — and History names who changed it |
-| SE-02.9 | A kind's Mappings and a person with *Can shape the model* | they pick *Map to a standard* and a property, a standard and a term or value | the mapping — same as · broader · narrower — is staged on the model's draft and publishes with it |
-| SE-02.10 | A kind's Mappings | it opens | each mapping lists its property, the standard's term or value and version, and who declared it; an Operator without *Can shape the model* reads them with *Map to a standard* absent |
+| SE-02.6 | A model with a draft | its kind opens | the page shows the draft's chip and, for a Modeller or an Admin, *Add property* |
+| SE-02.7 | An Operator | they open a kind | it reads; *Change in a draft* is disabled with *Needs the Modeller role — ask an Admin* |
+| SE-02.8 | A model's head and a Modeller or an Admin | they rename it or change its description | It saves at once, outside the draft — a name and a description are not part of a version — and History names who changed it |
+| SE-02.9 | A kind's Mappings and a Modeller or an Admin | they pick *Map to a standard* and a property, a standard and a term or value | the mapping — same as · broader · narrower — is staged on the model's draft and publishes with it |
+| SE-02.10 | A kind's Mappings | it opens | each mapping lists its property, the standard's term or value and version, and who declared it; an Operator reads them with *Map to a standard* absent |
 
 ## Screens
 

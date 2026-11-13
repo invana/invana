@@ -25,7 +25,7 @@ two lenses (below).
 | Data modeler | **Modeller**, or **Data curator** when the work is gathering data | two jobs, two personas |
 | Operator, as a job (*see what ran, what it touched, what it cost*) | **Agent builder** or **Admin**, reading Runs | *Operator* is a role — a person who looks, asks and decides — never a job |
 | Evaluator | **Agent builder** | proving a skill change is not worse is part of building it |
-| Graph owner · Install admin · Platform engineer | **Admin** | there is one deployment, run by its Admins; no part of it has an owner of its own |
+| Install admin · Platform engineer · an owner of one part of the deployment | **Admin** | there is one deployment, run by its Admins; no part of it has an owner of its own |
 
 ## How someone arrives
 

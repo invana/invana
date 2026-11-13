@@ -63,7 +63,7 @@ flowchart LR
 | EX-03.11 | A template whose definition names a field the shape lacks | it is saved | it is refused, naming the field |
 | EX-03.12 | An Operator | they open the projection templates | they read them; *+* and every authoring act are disabled — *Needs the Modeller role — ask an Admin*; the engine refuses an authoring call — *Skills needs the Modeller role.* |
 | EX-03.13 | An HTML template | it draws | it runs no script, reaches no network and loads no outside asset |
-| EX-03.14 | A published template, or a built-in one | a Modeller or an Admin changes it | a published custom template's change is a new draft version and answers keep reading the published one; a built-in one is not changed — *{template} is built in — copy it to change it*, and *Copy* makes a custom draft they own |
+| EX-03.14 | A published template, or a built-in one | a Modeller or an Admin changes it | a published custom template's change is a new draft version and answers keep reading the published one; a built-in one is not changed — *{template} is built in — copy it to change it*, and *Copy* makes a custom draft made by them |
 | EX-03.15 | A template | a Modeller or an Admin deletes it | a draft that never published is deleted; a published or built-in one is refused, saying answers read it |
 | EX-03.16 | The projection templates | anyone reads them | each shows how many answers it drew |
 | EX-03.17 | A projection template | a person opens its usage | every answer it drew that they may read is listed, each opening the conversation it is in; the rest are counted, content withheld |

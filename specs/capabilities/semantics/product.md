@@ -82,7 +82,7 @@ terms and standards it follows, what must always hold and what may be derived �
 | The whole model is derived | Every published model, its meaning and its active links, computed when read and never stored — it is what every question is grounded in. What the database holds is compared against it and never grounds an answer |
 | Declared, never guessed | A link or a mapping is declared by a person, or proposed by an agent and accepted by a person; linking never merges records |
 | Reading the database only drafts | It never writes a published version |
-| A breaking publish needs a review | A change that only adds publishes; one that breaks goes through a preview, another owner's yes, then the run that publishes (SE-F02) |
+| A breaking publish needs a review | A change that only adds publishes; one that breaks goes through a preview, an approver's yes, never the requester's, then the run that publishes (SE-F02) |
 | What bounds what | A *constraint* refuses data that breaks it, checked when a record is loaded or changed · a *derivation* adds facts · an *act rule* blocks, warns on or reports what people and agents do, enforced by Access · an *alert* notices a pattern and opens a lead in a project · a *view of the graph* narrows what a run may see, picked per question (SE-F07 · SE-F09) |
 | Rule scope | A rule is scoped to the install, a Graph or a project; the install is the widest scope |
 | Standards are install-wide | A standard is kept once in the install's library and held by a kind or a property of any Graph's model (SE-F05) |
@@ -98,7 +98,7 @@ terms and standards it follows, what must always hold and what may be derived �
 | A plan names a role, the view names the model | A plan says *decide* or *extract*; the view says which AI model plays it, checked against the rules |
 | A refusal is an answer | A refused source is recorded and the run carries on without it; a run refused the AI model it thinks with, or the model version it is grounded on, ends *cannot answer* naming the rule — never an error |
 | A write is governed like a read | Loading into a model is checked against the same rules before it writes; one rule decides both, and a refused target writes nothing |
-| Who edits | *Can shape the model* — which an owner has — so every Graph has someone who may; *Everywhere* rules, the standards library and index suggestions are the install Admin's |
+| Who edits | Shaping a model is the Modeller's and the Admin's ([the role table](../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); an *Everywhere* rule, a shipped pack and an index suggestion are the Admin's alone |
 | Outside formats are imported | Invana keeps its own contract and every import maps into it: SKOS, OWL/RDFS with schema.org, SHACL and CSV code lists, each by its own importer (SE-F05 · SE-15). Import only — source addresses kept on every kind and term make export cheap later |
 
 ## Depends on

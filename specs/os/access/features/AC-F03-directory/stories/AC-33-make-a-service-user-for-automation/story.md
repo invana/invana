@@ -35,7 +35,7 @@ flowchart TD
   pw -->|right| made(["Made · History"])
   made --> grant["AC-22 · Grant it agents · put it on teams (AC-09)"]
   made --> key["AC-10 · An owner mints its key"]
-  key --> run(["The job runs as the service user · what it makes is owned by its owners"])
+  key --> run(["The job runs as the service user · what it makes is the organisation's, made by the service user"])
   made -->|sign in is tried as it| no(["Could not sign in — it never signs in"])
 ```
 
@@ -49,7 +49,7 @@ flowchart TD
 | AC-33.4 | A service user | a sign-in is tried with its username | it is refused as *Could not sign in*; it has no password and never signs in (AC-01.9) |
 | AC-33.5 | An owner of a service user | they open *Settings › You › Keys* | the service user is offered as *Owner* on *New key*, and its keys list beside their own (AC-10.7) |
 | AC-33.6 | A key of a service user | a script calls with it | it acts as the service user — its role, the agents granted to it and to its teams — narrowed by the key; History names the service user as who acted |
-| AC-33.7 | A run a service user is behind | it makes an agent, a board or any owned resource | the service user's owners own it; the service user owns nothing (AC-F07) |
+| AC-33.7 | A run a service user is behind | it makes an agent, a board or any owned resource | it is the organisation's, made by the service user through the agent; the service user owns nothing (AC-F07) |
 | AC-33.8 | A service user's row | it is read | it shows its owners, role, teams, the agents it may use, its live keys' count and *Never signs in* |
 | AC-33.9 | The last owner of a service user | they are deactivated | what they own alone is handed over with the rest (AC-23.2); the service user keeps working under its new owner |
 | AC-33.10 | An Operator or a Modeller | they open *Service users* | everything reads; *New service user* is disabled, naming the Admin role and the Admins; the API refuses it |

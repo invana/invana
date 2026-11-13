@@ -45,7 +45,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-05.1 | A published model and a person with *Can shape the model* | they pick *Change in a draft* on the map or a kind | the model's draft opens full-bleed on its canvas with the crumb `Model › <model> vN · draft` and the draft bar `n staged · Discard · Publish vN` |
+| SE-05.1 | A published model and a Modeller or an Admin | they pick *Change in a draft* on the map or a kind | the model's draft opens full-bleed on its canvas with the crumb `Model › <model> vN · draft` and the draft bar `n staged · Discard · Publish vN` |
 | SE-05.2 | An open draft | the person adds a kind, adds a relationship between two kinds, adds or removes a property, or deletes | each joins the draft as a staged change, sorted first with a *staged* chip; nothing reaches the model yet |
 | SE-05.3 | A staged delete with dependents | the person confirms it | the confirm says it goes when published and names what depends on it |
 | SE-05.4 | Staged changes | the person discards one, or all | that change, or every change, leaves the draft; the model is as published |

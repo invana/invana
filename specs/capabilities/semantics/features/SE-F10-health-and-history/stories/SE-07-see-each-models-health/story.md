@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F10](../../feature.md)
 
 ## Who can
 
+Acting on what Health finds is the Modeller's and the Admin's; a suggested index is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every tab for all models or one, save a report, and act on what it finds — read the database, add a drift to a draft, add a suggested index to a draft (an Admin alone), archive a model | — |
-| Operator | Read every tab for all models or one, and save a report | The acts are absent; drift rows read *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin, but a suggested index stays an Admin's — *Ask an Admin* |
+| Operator | Read every tab for all models or one, and save a report. A Modeller acts on drift, archives and restores as an Admin does; a suggested index stays an Admin's | The acts are absent; drift rows read *Needs the Modeller role — ask an Admin*; a suggested index reads *Needs the Admin role — ask an Admin* |
 
 ## Flow
 
@@ -45,7 +47,7 @@ flowchart LR
 | SE-07.3 | Health | the person picks 7, 30 or 90 days | every number re-reads over that window; Database greys the window and says it does not use it |
 | SE-07.4 | The Database tab | it opens | kinds of node, relationships, indexes and constraints each show *in both*, *model only* or *database only* with the database's count, unmodelled ones first, and the time the database was read |
 | SE-07.5 | A database never read, or read before the last load | Database opens | it reads *Not read yet*, or the read time in the warning tone, with *Read the database* |
-| SE-07.6 | A *database only* row and a person with *Can shape the model* | they pick *Add it in a draft* | the kind or property is staged on the model's draft |
+| SE-07.6 | A *database only* row and a Modeller or an Admin | they pick *Add it in a draft* | the kind or property is staged on the model's draft |
 | SE-07.7 | The Usage tab with 50 or more queries in the window | it opens | each kind carries its signals — Unused · Empty · Cold property · Hot · Hot and slow · Supernode — by the fixed rules, with queries split by agent · plan · Explore · API, last touched, and the links between models each query crossed |
 | SE-07.8 | Fewer than 50 queries in the window | Usage opens | it reads *n queries in 7 days — too few to call anything unused* and shows counts without signals |
 | SE-07.9 | The Performance tab | it opens | tiles — queries · p50 · p95 · errors · slow shapes · advice — p95 a day, and a row per query shape with callers, calls, p50, p95, rows, kinds touched and advice; a row opens its slowest calls, each linking to its run |
@@ -56,13 +58,13 @@ flowchart LR
 | SE-07.14 | No published model | Overview opens | it says so with *From an ontology* and *New model*; Usage, Performance and Growth say why they are empty |
 | SE-07.15 | A reading the engine does not measure yet | its tab opens | it reads *Not measured yet*, naming what it reads from |
 | SE-07.16 | Any tab | the person picks *Save report* | the tab's tiles and tables are kept at its scope and window; opened later it reads *Saved report · <what> · kept by <who> on <date> · it will not change* with *Back to live*, and a link lands on it |
-| SE-07.17 | A published model with no active link and a person with *Can shape the model* | they archive it | it leaves the map and Health; its versions still resolve for every answer and load that used them; *Show archived* lists it with *Restore*. With an active link, archiving is refused, naming each link |
+| SE-07.17 | A published model with no active link and a Modeller or an Admin | they archive it | it leaves the map and Health; its versions still resolve for every answer and load that used them; *Show archived* lists it with *Restore*. With an active link, archiving is refused, naming each link |
 | SE-07.18 | Any number on the page | it shows | it is the engine's, as stored; Studio formats it |
-| SE-07.19 | An Operator without *Can shape the model* | they open Health | every tab reads; *Add it in a draft*, *Add index to draft*, *Read the database* and Archive are absent, and drift and advice rows read *Ask Priya (owner) to shape the model* |
-| SE-07.20 | A model never published and a person with *Can shape the model* | they delete it from its `⋯` | It is gone after a confirm; deleting a model that was ever published is refused, offering *Archive* |
+| SE-07.19 | An Operator | they open Health | every tab reads; *Add it in a draft*, *Add index to draft*, *Read the database* and Archive are absent, and drift and advice rows read *Needs the Modeller role — ask an Admin* |
+| SE-07.20 | A model never published and a Modeller or an Admin | they delete it from its `⋯` | It is gone after a confirm; deleting a model that was ever published is refused, offering *Archive* |
 | SE-07.21 | An active link | the Database tab lists the relationship it writes | The row is *in both*, naming the link's two models — never *database only* |
-| SE-07.22 | An archived model and a person with *Can shape the model* | they restore it | It is back on the map with its versions; History records who restored it |
-| SE-07.23 | Someone who is not an Admin, with *Can shape the model* | they open a suggested index | *Add index to draft* is absent and the row reads *Ask an Admin* |
+| SE-07.22 | An archived model and a Modeller or an Admin | they restore it | It is back on the map with its versions; History records who restored it |
+| SE-07.23 | A Modeller | they open a suggested index | *Add index to draft* is absent and the row reads *Needs the Admin role — ask an Admin* |
 | SE-07.24 | Questions that failed in the window — *cannot answer*, refused, or erroring | Performance opens for a model | each kind shows its failed questions with their reason, counted by the engine, each linking to its run |
 
 ## Screens

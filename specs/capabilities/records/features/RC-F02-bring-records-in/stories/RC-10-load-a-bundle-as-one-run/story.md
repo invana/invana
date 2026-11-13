@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
+Loading a bundle is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Check and load any bundle; read its run | — |
-| Operator | Check a bundle offline; read a bundle's run | Loading is refused before anything is written, naming who may load. With *Can shape the model*: loads it |
+| Operator | Check a bundle offline; read a bundle's run. A Modeller loads it as an Admin does | Loading refused before anything is written — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -34,7 +36,7 @@ flowchart LR
   ld --> bad["posts ✗ — breaks its model"]
   ok1 --> lk["Links between models resolve once, over everything that landed"]
   ok2 --> lk
-  bad --> tk["A task: posts broke its model — for its owner"]
+  bad --> tk["A task: posts broke its model"]
   lk --> rep(["One run: 2 of 3 files loaded · counts per file"])
   tk --> rep
   ld -->|every file fails| all["Links skipped · the run fails with a diagnosis"]
@@ -48,7 +50,7 @@ flowchart LR
 | RC-10.2 | A rule between files that leaves values unresolved | it is checked | it fails, unless the rule says it is meant to overlap only partly; an end the bundle does not carry is reported as deferred, never failed |
 | RC-10.3 | A bundle whose manifest names a folder that is not there, or a malformed file | it is loaded | it fails before anything is written, naming the file and the check |
 | RC-10.4 | A clean bundle | it is loaded | it is one run and one load per file, each with its content hash; files load in parallel, up to the bundle's ceiling and the Graph's capacity |
-| RC-10.5 | One file of three that fails | the run ends | the other two stand, the failed one is reported with its reason, links between models resolve over what landed, and a task naming the file is raised for its owner — or left unassigned |
+| RC-10.5 | One file of three that fails | the run ends | the other two stand, the failed one is reported with its reason, links between models resolve over what landed, and a task naming the file is raised, assigned to the person who started the bundle — or left unassigned |
 | RC-10.6 | Every file that fails | the run ends | resolving links is skipped and the run fails with a diagnosis, never an empty success |
 | RC-10.7 | A bundle's run | it is listed in *Loads* | it is one row; opening it shows each file's load with its counts, and the task it raised links to its project |
 | RC-10.8 | A cancelled bundle | the run stops | each file keeps what it wrote and the report says which had finished |

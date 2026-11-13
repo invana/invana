@@ -25,8 +25,8 @@ flowchart TD
   v -->|loading| sk["Skeleton rows"]
   v -->|failed| f["The views could not be read"]
   v -->|none yet| v0["Everything — only the rules on properties narrow a run"]
-  v -->|New view · Edit| ed{Can shape the model?}
-  ed -->|no| na["Absent — Ask Priya (owner) to shape the model"]
+  v -->|New view · Edit| ed{Modeller or Admin?}
+  ed -->|no| na["Absent — Needs the Modeller role — ask an Admin"]
   ed -->|yes| pick["Pick models, slices, what is hidden, which AI model decides, what may leave"]
   pick --> val{Checked against the rules on properties at save}
   val -->|widens a rule| vr["Refused, naming the rule"]
@@ -60,12 +60,12 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every view | Operator — every member | — |
-| Pick a view for a question · compare two runs | Operator — every member | — |
-| Retune from their own run into a view kept private to that run | Operator — every member | — |
-| Name a view (it joins the Graph's views) · create, edit, duplicate or delete a view | `modeller` · shown as *Can shape the model* | Absent; *Ask Priya (owner) to shape the model* under the list |
+| Read every view | Every signed-in person — Operator, Modeller, Admin | — |
+| Pick a view for a question · compare two runs | Every signed-in person — Operator, Modeller, Admin | — |
+| Retune from their own run into a view kept private to that run | Every signed-in person — Operator, Modeller, Admin | — |
+| Name a view (it joins the Graph's views) · create, edit, duplicate or delete a view | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* under the list |
 
 ## States
 
@@ -77,7 +77,7 @@ sequenceDiagram
 | Has data | Views with what they hide and who uses them |
 | Failed | The section says it could not load and why; a save the engine refused names the rule, model, axis or view behind it |
 | Agent working or proposing | — |
-| No access | Every view reads; authoring acts are absent, and a line names who may act |
+| No access | Every view reads; authoring acts are absent, and a line reads *Needs the Modeller role — ask an Admin* |
 
 ## Rules
 
@@ -89,7 +89,7 @@ sequenceDiagram
 | Five layers | A view narrows along graph data · AI models · outside services · cache · people; worker capacity is not a layer |
 | Hidden is structural | A hidden property does not exist for the run — a query naming it is refused, and a whole record comes back without it. Nothing is filtered afterwards |
 | Only declared axes slice | A published model declares which property carries time, which carries place and which are selectable dimensions; it declares none until a person does. A view slices only along declared axes — any other is refused naming the model and the axis. The axes travel with the model's file, and a declared axis naming a property the model lacks is refused at import |
-| Default is the widest | A Graph with no view and no rule sees every published model, every AI model its owner configured and every outside service its agents may use |
+| Default is the widest | A Graph with no view and no rule sees every published model, every AI model configured and every outside service its agents may use |
 | Naming shares | A view made by retuning a run is private to that run. Naming it adds it to the Graph's views; the name field reads *Name it to add it to Views*. The name is unique in the Graph; only the first naming shares, a rename renames |
 | One view per run | A run composes the rules on properties, its agent's own bound and its view once, when it opens, and keeps that; a later edit reaches only the next run |
 | A view is picked, never typed | Every control offers what the Graph declares — published model versions, their axes, configured AI models, caches — with *any version* beside each exact version |
@@ -162,7 +162,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | An agent's own bound | [AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md#engine) |
 | Schedules that pin a view | [AG-F07](../../../agents/features/AG-F07-schedules/feature.md#engine) |
 | Configured AI model providers and models — `llm/<provider>/<model>` | [CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine) |
-| Who holds *Can shape the model* | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
+| Who holds the Modeller role | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes
@@ -192,7 +192,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Naming, creating, editing, duplicating or deleting a view without *Can shape the model* | *This needs Can shape the model — ask {owner}.* | SE-10.16 |
+| 403 | Naming, creating, editing, duplicating or deleting a view without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-10.16 |
 | 422 | A view that would widen a rule on a property | *{view} would widen {rule}.* | SE-10.6 |
 | 422 | A slice on an axis the model never declared | *{model} declares no {axis} axis.* | SE-10.7 |
 | 422 | A view that matches nothing, or whose cast names an AI model its rules deny | *{view}: {why}.* | SE-10.20 |
@@ -215,9 +215,9 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 
 | Mechanism | How |
 |---|---|
-| Resolution | `effective = agent ∩ plan ∩ todo`, computed once at run open and frozen on the run as `lens_snapshot` — the whole record, all five layers, each contributor named `{id, kind, key, name, version}`; never recomputed mid-run |
+| Resolution | `effective = agent ∩ plan ∩ todo`, computed once at run open and frozen on the run as `lens_snapshot` — the whole record, all five layers, each contributing view named `{id, kind, key, name, version}`; never recomputed mid-run |
 | Composition | Allows intersect, denies accumulate, selectors intersect per model, `closed_layers` union, the strictest `max_age_s` and the smallest `max_rounds` hold, the cast's innermost wins (task over plan over agent) and is then checked against the effective rules. Every operation narrows, so no level can widen another in any layer |
-| `closed_layers` | A layer named admits only what this lens's rules allow; a layer not named is permitted whole. Each contributor's closure is kept whole and frozen with its name, so another level's broader allow never satisfies it. Narrowing to a set is a closed layer and the allows that name it — never a broad deny with allows punched through |
+| `closed_layers` | A layer named admits only what this lens's rules allow; a layer not named is permitted whole. Each contributing view's closure is kept whole and frozen with its name, so another level's broader allow never satisfies it. Narrowing to a set is a closed layer and the allows that name it — never a broad deny with allows punched through |
 | Matching | `match` is a glob; a deny wins over any allow at any specificity; a participant no rule matches takes the default, the widest. A refused participant reads *outside the lens* whatever its layer — an endpoint, a link and a year alike |
 | A closed layer refuses by name | A step needing a layer a lens closes is refused naming which view closed which layer; its touch's `rule_matched` stays empty, because the closure refused it, not a rule |
 | The grounding version | A lens binds on the Graph's introspected `global` version — the one version whose types cover every type a query can reach; `open_graph` checks it and the connector's `QueryLens` compiles over its types |
@@ -274,7 +274,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | A view's key is frozen at its first naming | A rename changes the name alone; a key that moved would break every schedule that pinned it |
 | A default cast ships with the distribution | AI model providers carry no default, so a Graph with providers and no cast could run nothing; the shipped cast runs a role nobody cast |
 | Declared and recorded are one loop | A lens with no touches is a rule nobody can check; touches with no lens have nothing to check against. Their difference tunes the view: allowed and never read → narrow · refused again and again → widen, or accept *outside this view* on purpose · a slice clipping what a query wanted → widen it or confirm it · `decide` resolved to a small model on the step that wrote the number → retune the cast and compare · values sent where not expected → tighten what may leave, the runs listed · every AI model call hosted → move a role to a local model. Touched and undeclared cannot happen while enforcement holds |
-| A rule on a property stays editable | It is a row a person with *Can shape the model* edits; a bound nobody can reach would be a second record |
+| A rule on a property stays editable | It is a row a Modeller or an Admin edits; a bound nobody can reach would be a second record |
 | Nothing is its own table that could be a key | A rule is an element of the view's rules, the cast is four keys, usage is a grouped read of runs; the touches are the one projection kept as rows |
 
 ## Open questions

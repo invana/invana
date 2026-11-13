@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F10](../../feature.md)
 
 ## Who can
 
+Restoring an earlier version is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every version's history, compare two versions, and restore an earlier one as a draft | — |
-| Operator | Read every version's history and compare two versions | *Restore* disabled — *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin |
+| Operator | Read every version's history and compare two versions. A Modeller restores as an Admin does | *Restore* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -43,8 +45,8 @@ flowchart LR
 | SE-09.5 | History | the person picks *Compare vA and vB* or a row's *Compare* | the map opens with the Comparing bar on that pair |
 | SE-09.6 | History at all models | it opens | every model's versions are listed newest first, with a model column |
 | SE-09.7 | A version | the person opens *How it got here* from its row | it shows who published it, why, the review and its approver if it broke anything, and the runs that published it |
-| SE-09.8 | A person with *Can shape the model* | they pick *Restore* on an earlier version | a new draft opens with that version's kinds, listing what returns and what goes (SE-16) |
-| SE-09.9 | An Operator without *Can shape the model* | they open History | it reads; *Restore* is disabled with *Ask Priya (owner) to shape the model* |
+| SE-09.8 | A Modeller or an Admin | they pick *Restore* on an earlier version | a new draft opens with that version's kinds, listing what returns and what goes (SE-16) |
+| SE-09.9 | An Operator | they open History | it reads; *Restore* is disabled with *Needs the Modeller role — ask an Admin* |
 
 ## Screens
 

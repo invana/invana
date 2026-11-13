@@ -22,7 +22,7 @@ on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Draft from the records, edit and save the draft, publish a version, read and export every version, on any project they can see | On an archived project, *Draft from the records*, *Edit* and *Publish* are off |
-| Operator | The same; a Modeller the same | On an archived project, *Draft from the records*, *Edit* and *Publish* are off; a private project they are not on is absent |
+| Operator | The same; a Modeller the same | On an archived project, *Draft from the records*, *Edit* and *Publish* are off; a project their default agent may not Read: its reports list, their content withheld |
 
 ## Flow
 
@@ -35,6 +35,9 @@ flowchart LR
   sv --> p{"Publish version n"}
   p -->|empty| r["Refused"]
   p --> v(["Version n · frozen · cites its loads"])
+  p --> ob["The outbound check · confidential and personal values left out, and named"] --> v
+  d --> w{"Does the person's agent read every source?"}
+  w -->|no| red["Listed · content Withheld, naming the resource"]
   v --> x["Markdown · Print to PDF"]
   v -->|a cited load undone| n["A load undone notice names it"]
 ```
@@ -55,7 +58,11 @@ flowchart LR
 | PJ-14.10 | The draft or a version | it is read | it reads rendered, its cites numbered and listed once under *Cites*, a run as *run 8195c5e8* linking to the run |
 | PJ-14.11 | A version | the person presses *Markdown* · *Print* | the body downloads as Markdown, as it reads · the browser prints the rendered version to PDF |
 | PJ-14.12 | An archived project | its Report tab is opened | the draft and versions read; *Draft from the records*, *Edit* and *Publish* are off |
-| PJ-14.13 | A private project | a person not on it asks for its report | it reads *Not found* |
+| PJ-14.13 | A project the person's default agent may not Read | they ask for its report | the report lists — its version, who published it and when — and its content reads *Withheld — your agent may not read `project/{key}`*; nothing reads *Not found* |
+| PJ-14.14 | A draft or a version | it is made | it records the resources it was read from — kind, graph database and level — as its sources, and its level is the highest of them |
+| PJ-14.15 | A report with a source the person's default agent may not Read | the person opens it | it lists — the report, its version, who published it and when — and its content reads *Withheld — your agent may not read {resource}*, naming each resource; a report whose sources the agent reads shows in full |
+| PJ-14.16 | A draft that carries a confidential or personal value | the person publishes | the value is left out of the frozen version, and the version's notice names each property and level left out; the draft is untouched |
+| PJ-14.17 | A version | the person presses *Markdown* | the file passes the same check — confidential and personal values are left out and the file names them — and the export is recorded with its sources |
 
 ## Screens
 
@@ -67,3 +74,7 @@ flowchart LR
 | Editing the draft | Operator | — | — | — | projects.report · Edit | projects.report · Unsaved edits | — | projects.report · Archived |
 | A published version | Admin | — | — | projects.report · Version · Loading | projects.report · Version | projects.report · Version · Retracted source | — | — |
 | A published version | Operator | — | — | projects.report · Version · Loading | projects.report · Version | projects.report · Version · Retracted source | — | — |
+| A report with sources withheld | Admin | — | — | — | projects.report · Redacted | — | — | — |
+| A report with sources withheld | Operator | — | — | — | projects.report · Redacted | — | — | projects.report · Redacted |
+| A published version · values left out | Admin | — | — | — | projects.report · Version · Redacted | — | — | — |
+| A published version · values left out | Operator | — | — | — | projects.report · Version · Redacted | — | — | — |

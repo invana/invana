@@ -9,8 +9,8 @@ boards: [settings.access, access.locked, agents.run]
 
 # AC-12 · See why an agent can or cannot
 
-**As** an Admin **I want** every agent's access, read for a person, with why each act is allowed or refused **so that**
-I see why an agent can or cannot for that person, and a refusal never surprises anyone in a run.
+**As** an Admin **I want** every agent's access, with why each act is allowed or refused **so that** I see why an agent
+can or cannot — the same for everyone who uses it — and a refusal never surprises anyone in a run.
 
 Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
@@ -18,19 +18,19 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every agent's access for any person; attach a policy to it (AC-11) | — |
-| Operator | Read every agent's access for any person, its policies and its refusals | *Attach a policy* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Admin | Read every agent's access; attach a policy to it (AC-11) | — |
+| Operator | Read every agent's access, its policies and its refusals; a Modeller reads the same | *Attach a policy* disabled — *Needs the Admin role — ask Priya or Lee* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  t([People and access › Agents]) --> l["Every agent: its policies · what it may reach · needs missing · refused in 7 days · owners"]
+  t([People and access › Agents]) --> l["Every agent: its policies · what it may reach · needs missing · refused in 7 days · made by · granted to"]
   l -->|kind| k["All · Built in · Made here · Outside"]
   l --> a["An agent: What it can do · Its policies · Refusals"]
-  a --> as["For a person · called by an agent"]
-  as --> m["Each row: verb · resource · effect · the rule, its policy and team · why"]
-  m -->|a refused row| why(["Why names the first check: the role · may not use the agent · switched off · read-only · a rule · a caller · no rule"])
+  a --> as["Optionally: called by an agent · in a project · under a key"]
+  as --> m["Each row: verb · resource · effect · the rule and its policy · any ceiling · why"]
+  m -->|a refused row| why(["Why names the first check: switched off · a rule · a caller · a ceiling · read-only · no rule"])
   a --> dg["Who it may hand work to · and outside agents, Ask by default"]
   a -->|Open in Agents| ag(["AG-F01 · the agent's sheet"])
   a -->|What it may touch| wt(["AC-13 · each resource and each declared need"])
@@ -44,21 +44,21 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-12.1 | The deployment's agents | *Agents* is read | one row per built-in, made-here and outside agent — its policies, how many resources it may reach, needs missing, refused in 7 days, its owners; helpers are counted on their maker, not listed |
+| AC-12.1 | The deployment's agents | *Agents* is read | one row per built-in, made-here and outside agent — its policies, how many resources it may reach, needs missing, refused in 7 days, who made it and how many people it is granted to; helpers are counted on their maker, not listed |
 | AC-12.2 | The tab | it is read | it says *An agent holds every Read, Write and Run through the Access Policies attached to it. Workers hold none — they only run steps* |
 | AC-12.3 | An agent | it is opened | tabs *What it can do · Its policies · Refusals*, and *Open in Agents* |
-| AC-12.4 | *What it can do* | the reader picks *For* a person, and optionally *Called by* an agent | each row reads verb · resource · effect · the rule, its policy and the team it holds for · why, for that person and that chain; the reader is the person by default |
-| AC-12.5 | Rules that name a team | *For* changes to a person on another team | the effects change to those that hold for that person; a rule for a team they are not on reads *Not for {person} — {team} only* |
-| AC-12.6 | A refused row | *Why* is read | it names the first check that refuses — *{person}'s role does not hold {feature}* · *{person} may not use {agent}* · *{database} is switched off by {person}* · *{database} is read-only* · *{rule} on {policy}* · *{caller} may not* · *No rule — denied* |
+| AC-12.4 | *What it can do* | it is read, optionally *Called by* an agent, *In* a project or *Under* a key | each row reads verb · resource · effect · the rule and its policy · any ceiling that narrows it · why, for that chain and those ceilings |
+| AC-12.5 | Two readers on different teams, or with different roles | they read the same agent's *What it can do* | they read the same rows: no rule depends on the person behind a run |
+| AC-12.6 | A refused row | *Why* is read | it names the first check that refuses — *{database} is switched off by {person}* · *{rule} on {policy}* · *{caller} may not* · *{ceiling} keeps it from this* · *{database} is read-only* · *No rule — denied* |
 | AC-12.7 | An agent with no policy attached | *What it can do* is read | every row reads *Denied · holds no policy*, and for an Admin *Attach a policy* leads |
 | AC-12.8 | A resource a rule allows that no declared need uses | it is listed | it reads *Nothing it uses needs it* |
 | AC-12.9 | A helper an agent made | its access is read | it holds its maker's access, narrowed, and lists no policy of its own |
 | AC-12.10 | A run's step | a check refuses it | the step fails *refused* before it runs and nothing is spent, naming the rule, its policy and the agent in the chain that refused; the refusal is in *Refusals* and History (AC-F06) |
 | AC-12.11 | *Who it may hand work to* | it is read | each agent it may run, the rule that allows it, and its effect; an outside agent reads *Ask* unless a rule allows it |
-| AC-12.12 | A callee run by a caller for a person | its access is read with *Called by* | each row reads the strictest of the callee, every caller and the person's teams, and names which one narrowed it |
+| AC-12.12 | A callee run by a caller | its access is read with *Called by* | each row reads the strictest of the callee and every caller, and names which one narrowed it |
 | AC-12.13 | An Admin | they attach a policy from here or from the agent's sheet in Agents | it is one attachment (AC-11); it holds from the agent's next step |
 | AC-12.14 | An Operator or a Modeller | they open an agent | everything reads; *Attach a policy* is disabled, naming the Admin role and the Admins |
-| AC-12.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it, the rule, its policy and version, the team it held for and who saved it, as they were when the step ran |
+| AC-12.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it, the rule, its policy and version, any ceiling that narrowed it and who saved the rule, as they were when the step ran |
 | AC-12.16 | The list of agents | it fails to load | it says what could not load, with *Try again* |
 
 ## Screens

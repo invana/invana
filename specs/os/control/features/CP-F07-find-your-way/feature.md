@@ -62,7 +62,7 @@ flowchart TD
 
 | Rule | Detail |
 |---|---|
-| ⌘K reads only what may be opened | Every list it reads is scoped by the engine to the person: the agents they may use, the private projects they are on |
+| ⌘K reads only what may be opened | Every list it reads is scoped by the engine to the person: the agents granted to them; a project's name is a hit for everyone, opening it reads as far as their default agent may Read it |
 | ⌘K ranks names | Exact, then prefix, then contains; meaning-based matches wait for a vector index and then show as *Related* |
 | ⌘K never sends | *Ask the Assistant* puts the text in the composer and focuses it; the person still sends it before any tokens are spent |
 | The Graph's own records are found by asking | A customer or an order is reached through Explore and the Assistant, not ⌘K |
@@ -93,7 +93,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The lists each mode serves — ⌘K matches them in the browser | Each mode's own feature |
 | The reader's role and who holds each role | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
 | The agents the reader may use | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
-| Private projects the reader is not on | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
+| Projects and reading one through the default agent | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Models · agents · skills · projects · graph databases — the names search reads | [SE-F02](../../../../capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) · [AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md#engine) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) · [CP-F05](../CP-F05-graph-databases/feature.md#engine) |
 
 ### Routes
@@ -125,7 +125,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Mechanism | How |
 |---|---|
-| Access before match | Each name query is handed what the reader may open — the agents they may use, the private projects they are on — before it matches |
+| Access before match | Each name query is handed what the reader may open — the agents granted to them — before it matches; every project's name is a hit |
 | Ranking | Exact, then prefix, then contains on the name, case-insensitive; ties by name |
 | Not searched | Runs, schedules, findings and branches — a run is found through Runs, not by name |
 | ⌘K | Matches in the browser over the lists each mode already serves, read once per opening; it never calls the search route |
@@ -136,7 +136,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | HLD section | Change | NFRs |
 |---|---|---|
 | § 8 APIs and events | One search route, for the command line | NFR-PERF-3 |
-| § 12 Qualities | Privacy: access is applied before a name is matched — an agent the reader may not use or a private project they are not on is never a hit | NFR-SEC-1 |
+| § 12 Qualities | Privacy: access is applied before a name is matched — an agent not granted to the reader is never a hit; a project's content is never matched, only its name | NFR-SEC-1 |
 
 ## Decisions
 

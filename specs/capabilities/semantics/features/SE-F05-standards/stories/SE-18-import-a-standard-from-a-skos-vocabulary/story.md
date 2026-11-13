@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F05](../../feature.md)
 
 ## Who can
 
+Importing a standard is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Import a vocabulary as a new standard, or as the next version of any | — |
-| Operator | Import a vocabulary as a new standard, or as the next version of one they created | Importing over someone else's standard is refused, naming its creator |
+| Operator | Read the standards. A Modeller imports a vocabulary as an Admin does | *Import* absent — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -34,9 +36,9 @@ flowchart LR
   p -->|one| pv["Preview: scheme · concepts · levels · name · mapping · terms · notes and skips"]
   pv -->|Import as a standard| r{Already a standard by that name?}
   r -->|no| new(["Created with v1 — its page opens"])
-  r -->|terms differ · its creator| nv(["The next version"])
+  r -->|terms differ| nv(["The next version"])
   r -->|terms identical| un(["Nothing changed"])
-  r -->|not its creator| rx["Refused, naming the creator"]
+  a -->|an Operator| rx["Needs the Modeller role — ask an Admin"]
 ```
 
 ## Acceptance criteria
@@ -52,8 +54,8 @@ flowchart LR
 | SE-18.7 | A hierarchical scheme | it previews | each top concept with narrower ones is a term, its descendants its values, each naming its broader code; leaf top concepts are the values of one term named after the scheme |
 | SE-18.8 | Concepts | they map | the preferred label is the name or label, the notation the code (the IRI's local name when none), and each term and value keeps its source IRI |
 | SE-18.9 | Related concepts, mappings, alternative labels or collections | it previews | they are listed as not imported, with their counts; a second concept with the same code in a term is skipped and listed |
-| SE-18.10 | A preview | the person imports | a new name creates the standard with v1; an existing one the person created gets its next version; identical terms read *Nothing changed* — and the standard's page opens |
-| SE-18.11 | A standard another person created | the person imports over it | it is refused, naming its creator |
+| SE-18.10 | A preview | the person imports | a new name creates the standard with v1; an existing one gets its next version; identical terms read *Nothing changed* — and the standard's page opens |
+| SE-18.11 | An Operator | they open Standards | *Import* is absent and a line reads *Needs the Modeller role — ask an Admin*; the API refuses the import |
 | SE-18.12 | The name | the dialog shows it | it defaults to the slug of the scheme's title and is editable; the publisher is the person |
 
 ## Screens

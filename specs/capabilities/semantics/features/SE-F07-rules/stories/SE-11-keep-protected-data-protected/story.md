@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 ## Who can
 
+Writing a rule on a property is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every rule on a property, its refusals and history; create, edit and delete one | — |
-| Operator | Read every rule on a property, its refusals and history | *New rule*, *Edit rule* and *Delete* absent, not disabled; one line names who may edit. With *Can shape the model*: as Admin |
+| Operator | Read every rule on a property, its refusals and history. A Modeller writes rules as an Admin does | *New rule*, *Edit rule* and *Delete* absent, not disabled; one line reads *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -44,7 +46,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | SE-11.1 | A Graph with no rule on a property | the person opens Rules | the list reads *No rules on properties — every property may be read and may leave* |
-| SE-11.2 | A person with *Can shape the model* | they pick *New rule* and *A property* | the dialog offers *When a run touches* (a pick over the published kinds' properties, either side may be *any*) · *It may* Read · Read in counts only · Never read · *And the result* May leave · Stays in the Graph |
+| SE-11.2 | A Modeller or an Admin | they pick *New rule* and *A property* | the dialog offers *When a run touches* (a pick over the published kinds' properties, either side may be *any*) · *It may* Read · Read in counts only · Never read · *And the result* May leave · Stays in the Graph |
 | SE-11.3 | The dialog with a target chosen | it changes | the engine counts the views and schedules that read the property today and shows it before saving; *Save rule* waits while it reads *Counting…* |
 | SE-11.4 | *Read* with *May leave* | the rule is saved | it is refused: *this rule narrows nothing* |
 | SE-11.5 | A property another rule already holds | the rule is saved | it is refused naming that rule |
@@ -56,8 +58,8 @@ flowchart LR
 | SE-11.11 | A run in progress | the rule is edited | that run keeps what it was frozen with; the next run gets the new rule |
 | SE-11.12 | A rule allowed in a view | that view is deleted | the view leaves the rule's exceptions; the rule binds everywhere else unchanged |
 | SE-11.13 | A refused run | the person opens *How it got here* | the step names the rule and the property it refused |
-| SE-11.14 | An Operator without *Can shape the model* | they open a rule on a property | it reads; *New rule*, *Edit rule* and *Delete* are absent and a line says the rules are edited by people who can shape the model |
-| SE-11.15 | A rule on a property and a person with *Can shape the model* | they delete it | A confirm names the views it is allowed in; deleted, no next run carries it, runs in flight keep theirs, and History records it |
+| SE-11.14 | An Operator | they open a rule on a property | it reads; *New rule*, *Edit rule* and *Delete* are absent and a line reads *Needs the Modeller role — ask an Admin* |
+| SE-11.15 | A rule on a property and a Modeller or an Admin | they delete it | A confirm names the views it is allowed in; deleted, no next run carries it, runs in flight keep theirs, and History records it |
 
 ## Screens
 

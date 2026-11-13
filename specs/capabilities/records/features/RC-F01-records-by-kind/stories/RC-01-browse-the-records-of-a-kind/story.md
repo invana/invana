@@ -15,6 +15,8 @@ Tasks: [task.md](task.md) · Feature: [RC-F01](../../feature.md)
 
 ## Who can
 
+Every role browses records ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse, filter and open the records of any kind | — |

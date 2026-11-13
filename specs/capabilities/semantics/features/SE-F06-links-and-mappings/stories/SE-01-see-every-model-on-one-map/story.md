@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 ## Who can
 
+Starting a link or a new model is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the map, pick what it shows and its detail, and start a link or a new model from it | — |
-| Operator | Read the map, pick what it shows and its detail | *Link models* and *New model* disabled — *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin |
+| Operator | Read the map, pick what it shows and its detail. A Modeller starts a link or a new model as an Admin does | *Link models* and *New model* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -47,7 +49,7 @@ flowchart LR
 | SE-01.8 | The map | the person hovers a kind or a link | a kind shows its properties and a link its rule |
 | SE-01.9 | The dark theme | the map draws | frames, hues and titles follow the theme |
 | SE-01.10 | A Graph with no model | the person opens Model | the map says *No model yet* with *New model* |
-| SE-01.11 | An Operator without *Can shape the model* | they open the map | it reads in full; *Link models* and *New model* are disabled with *Ask Priya (owner) to shape the model* |
+| SE-01.11 | An Operator | they open the map | it reads in full; *Link models* and *New model* are disabled with *Needs the Modeller role — ask an Admin* |
 | SE-01.12 | Published models and active links | the person opens the whole model's list | Each kind and relationship is listed with the models that contribute it and whether a link joins it as the same thing, counted by the engine |
 
 ## Screens

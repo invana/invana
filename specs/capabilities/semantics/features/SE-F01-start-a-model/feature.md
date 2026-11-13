@@ -76,7 +76,7 @@ The role each act needs is the role table's *Ontology* row
 ([AC-F02 › The role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); this
 table names the acts.
 
-| Act | Role | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | See the models, the drafts and what each graph database holds | Operator · Modeller · Admin | — |
 | Read a graph database · start a model from it | Modeller · Admin, through the Modeller agent | *Read the database* disabled — *Needs the Modeller role — ask an Admin* |
@@ -231,7 +231,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Publishing a model by itself | A schema nobody chose is not a model |
 | Guessing property types from sampled values | The database's own type report is the honest input |
 | Free-form property bags | A model that allows anything grounds nothing |
-| Reserved kinds, a starter marketplace | Naming kinds forces one vocabulary on every domain; files and git are the registry, and a domain's starter ships in its Domain pack (CP-F02) |
+| Reserved kinds, a starter marketplace | Naming kinds forces one vocabulary on every domain; files and git are the registry, and a team's starter ships in its Team pack (CP-F02) |
 | GQL graph types, OWL export | Later, in that order; source addresses make export cheap. SHACL shapes import as a standard (SE-F05) |
 | OWL restrictions as constraints | Listed as skipped; derived facts come from derivations (SE-F08) |
 | Fetching URLs or following `owl:imports` on the engine | The engine never fetches |

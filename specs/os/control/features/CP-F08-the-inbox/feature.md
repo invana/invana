@@ -24,9 +24,9 @@ Journeys this feature is a step of: [J03 · Give an agent work and decide on the
 ```mermaid
 flowchart TD
   ev([A person or an agent wants to send, change or spend · an event happens]) --> kind{"What is it?"}
-  kind -->|an ask| route(["AC-15 · Routed to whoever owns what is asked for"])
+  kind -->|an ask| route(["AC-15 · Routed to the agent's named approvers, then the Admins"])
   route --> cnt["CP-36 · A count on the Inbox icon · a toast while Studio is open"]
-  kind -->|an ops alert| oa(["CP-59 · To the agent's owners and the Admins"])
+  kind -->|an alert| oa(["CP-59 · To whom its kind names, then the Admins"])
   oa --> cnt
   oa --> mine
   kind -->|an event a rule matches| rule["CP-37 · The rule names who hears it, in the Inbox and on which channels"]
@@ -64,12 +64,12 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 |---|---|---|
 | Read one's own Inbox — Needs you and Updates | Operator · Modeller · Admin | — |
 | Decide an ask | As AC-F05 | As AC-F05 |
-| Read rules, History alerts and channels | Operator · Modeller · Admin | — |
+| Read rules and channels | Operator · Modeller · Admin | — |
 | Write, change or remove a notification rule that reaches only oneself | Operator · Modeller · Admin, for their own rules | Another person's rule reads; its switch and *Edit* are disabled, naming its creator and the Admins |
-| Write a notification rule that reaches other people, a team, a role or a channel; write a History alert | Admin | Those recipients and *New History alert* disabled — *Needs the Admin role — ask {admins}* |
+| Write a notification rule that reaches other people, a team, a role or a channel | Admin | Those recipients disabled — *Needs the Admin role — ask {admins}* |
 | Add, test or remove a channel | Admin, in a session, with the password again | *Add channel*, *Test* and *Remove* disabled — *Needs the Admin role — ask {admins}* |
 | Choose where one's own asks and alerts reach one | Every signed-in person, for themselves | Another person's choices are absent |
-| Answer project work in Needs you — accept or send back a task in review, start a task an agent asks to pick up, accept or reject an agent's proposal, read a new lead | Operator · Modeller · Admin, on a project they can see ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) · [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) · [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) | Work on a private project they are not on is absent |
+| Answer project work in Needs you — accept or send back a task in review, start a task an agent asks to pick up, accept or reject an agent's proposal, read a new lead | Operator · Modeller · Admin, on a project they can see ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) · [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) · [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) | Work on a project their default agent may not Read lists its line, its content *Withheld*; *Accept* and *Send back* are its reviewers', a proposal's *Accept* its members' |
 
 ## States
 
@@ -81,15 +81,15 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Has data | Needs you — asks first, nearest deadline first (AC-F05); Updates newest first, unread marked. Rules one row each; channels with their masked target and *ready* |
 | Failed | The list could not load, saying why, with *Try again*. A channel that failed a send names the error on its delivery |
 | Agent working or proposing | An agent's ask in Needs you, as AC-F05 shows it |
-| No access | An ask routed to someone else reads, as AC-F05 says. Rules and channels read; a rule for others, a History alert and every channel write are disabled for everyone but an Admin, naming the Admins |
+| No access | An ask routed to someone else reads, as AC-F05 says. Rules and channels read; a rule for others and every channel write are disabled for everyone but an Admin, naming the Admins |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
 | One Inbox for the deployment | Each person has one Inbox; there is no other place an ask, an alert or an update waits |
-| One list of what waits | Needs you holds every ask a person, an agent or a run makes of a person — access · budget · delegation · send · question · more than a policy allows (AC-14) · a person's act set to Ask — a held delivery of a finished run, a breaking model publish, project work — a task in review, to its author and the person behind its run (PJ-12); *Start this task?* (PJ-15), an agent's open proposal (PJ-05) and a new lead (PJ-19), each to the project's owners and people — and each open ops alert sent to the reader ([CP-F11](../CP-F11-ops-alerting/feature.md)). The Inbox icon and the header carry one count: unread updates + asks waiting on the reader + runs waiting on the reader's answer + open ops alerts sent to the reader |
-| An ops alert leaves Needs you when it closes | It reads closed, naming what closed it, and moves to Updates |
+| One list of what waits | Needs you holds every ask a person, an agent or a run makes of a person — access · budget · delegation · send · question · more than a policy allows (AC-14) · a person's act set to Ask — a held delivery of a finished run, a breaking model publish, project work — a task in review, to its author and the person behind its run (PJ-12); *Start this task?* (PJ-15), an agent's open proposal (PJ-05) and a new lead (PJ-19), each to the project's members — and each open alert sent to the reader ([CP-F11](../CP-F11-ops-alerting/feature.md)). The Inbox icon and the header carry one count: unread updates + asks waiting on the reader + runs waiting on the reader's answer + open ops alerts sent to the reader |
+| An alert leaves Needs you when it closes | It reads closed, naming what closed it, and moves to Updates |
 | A stopped run tells the person behind it | When someone else stops a run, the person behind it gets an update naming who stopped it ([CP-58](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 | Questions lead Needs you | A question asked back of the person sits first: it holds a run until it is answered. Then every other ask and each open ops alert, oldest first |
 | Only asks toast | A new ask or question for the reader shows a toast with *Review*; updates never toast |
@@ -101,10 +101,10 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Channel secrets are write-only | Sealed under the install key, never read back; the read shows a masked target; setting one asks for the password again |
 | Addresses are checked | A channel address that is not `https`, or resolves to a loopback, link-local or the deployment's own address, is refused, at add and at every delivery |
 | A failed send retries | Three tries, then *failed* with the error; the Inbox row is written first and never depends on a channel |
-| Recipients resolve when a rule matches | Named users still active, members of named teams, people with a named role, *the person behind the run* and *the agent's owners*. An event on a private project reaches only its people; an event about a run reaches only those who may read it in a line and a link, never its content ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Recipients resolve when a rule matches | Named users still active, members of named teams, people with a named role, *the person behind the run* and *the agent's named approvers*. An event about a run reaches only those who may read it in a line and a link, never its content ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 | A person's own rules | A rule an Operator or a Modeller writes reaches only them, in the Inbox and on their own channels; rules for others, teams, roles or a channel are an Admin's |
-| Alerts over History | A History alert matches acts — what was done, what it touched, allowed or refused and why, optionally a count in a window — and tells named users or teams in the Inbox only. It sees only what happens after it exists; an Admin writes it |
-| Leans on | Runs and stopping (CP-F10) · ops alerts (CP-F11) · project work in Needs you (PJ-F01 · PJ-F03 · PJ-F06) · suggested changes (AG-F09) · schedules and their deliveries (AG-F07) · asks and approvals (AC-F05) · History (AC-F06) · users, teams and roles (AC-F03) · owners (AC-F07) |
+| Alerts are CP-F11's | Every alert — its kinds, History alerts, whom it reaches and what closes it — is [CP-F11](../CP-F11-ops-alerting/feature.md#the-alert-kinds)'s; the Inbox holds it in Needs you and delivers it |
+| Leans on | Runs and stopping (CP-F10) · ops alerts (CP-F11) · project work in Needs you (PJ-F01 · PJ-F03 · PJ-F06) · suggested changes (AG-F09) · schedules and their deliveries (AG-F07) · asks and approvals (AC-F05) · History (AC-F06) · users, teams and roles (AC-F03) |
 
 ## Data touched
 
@@ -112,7 +112,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 |---|---|
 | Notifications — one Inbox row per person, read or not, its target | Write · read |
 | Deliveries — one send to one channel, exactly what was sent, status, tries, the error | Write · read |
-| Notification rules · History alerts · channels | Write · read |
+| Notification rules · channels | Write · read |
 | Runs waiting on the reader's answer (CP-F10) | Read |
 | History rows of every decision and every rule change (AC-F06) | Write |
 
@@ -126,28 +126,27 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Table | Columns | Notes |
 |---|---|---|
 | `control_notifications` | `user_id` · `kind` (`event` · `approval` · `reminder` · `expired` · `delivery` · `ops_alert` · `run_stopped`) · `title` · `body` (a line, never content) · `event_id?` · `rule_id?` · `approval_id?` · `ops_alert_id?` · `run_id?` · `target_kind?` · `target_id?` · `read_at?` · `done_at?` · `created_at` | One Inbox row. Unique (`user_id`, `event_id`, `rule_id`) |
-| `control_notification_rules` | `name` · `events[]` · `match{}` (an optional finished run's status, agent or ops alert kind) · `user_ids[]` · `team_ids[]` · `roles[]` · `behind` (the person behind the run) · `agent_owners` · `in_app` · `channel_ids[]` · `enabled` · `created_by_id` | Unique (`created_by_id`, `name`). A rule whose only recipient is its creator is theirs; any other recipient or a channel needs an Admin |
+| `control_notification_rules` | `name` · `events[]` · `match{}` (an optional finished run's status, agent or ops alert kind) · `user_ids[]` · `team_ids[]` · `roles[]` · `behind` (the person behind the run) · `agent_approvers` (the agent's named approvers) · `in_app` · `channel_ids[]` · `enabled` · `created_by_id` | Unique (`created_by_id`, `name`). A rule whose only recipient is its creator is theirs; any other recipient or a channel needs an Admin |
 | `control_channels` | `name` (unique) · `kind` (`email` · `slack` · `teams` · `webhook`) · `target` (masked when read) · `secret_sealed?` · `ready` · `not_ready_why?` · `created_by_id` · `created_at` | Created, its secret replaced, and removed — never otherwise updated |
 | `control_channel_choices` | `user_id` · `kind` (`email` · `slack`) · `on` · `slack_user_id?` · `changed_at` | A person's own; unique (`user_id`, `kind`) |
 | `control_deliveries` | `channel_id` · `user_id?` (a person's own delivery) · `rule_id?` · `event_id?` · `firing_id?` · `approval_id?` · `notification_id?` · `status` (`pending` · `held` · `sent` · `failed`) · `payload` (exactly what is sent) · `attempts` · `error?` · `sent_at?` | One send to one channel |
 | `control_notification_cursors` | `name` · `event_id` · `created_at` | How far the clock has matched the event store |
-| `control_history_alerts` | `name` (unique) · `enabled` · `match{}` (act pattern · touched pattern · verdicts · refusal reasons · optional `count` in `window_s`) · `notify_user_ids[]` · `notify_team_ids[]` · `last_seq` · `last_fired_at?` · `created_by_id` | A History alert, an Admin's |
 
 ### Reads
 
 | Record | Owner |
 |---|---|
-| The event store a rule matches, and History rows an alert matches | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |
+| The event store a rule matches | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |
 | Asks waiting on the reader, and the ask a held delivery waits for | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | Runs waiting on the reader's answer, the person behind a run, and a stop | [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | Schedules, their firings, the deliveries they make, and the shared clock | [AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#engine) |
 | Project work in Needs you — tasks and their results | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Project work in Needs you — agents' proposals | [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md#engine) |
 | Project work in Needs you — new leads | [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md#engine) |
-| Private projects a recipient is not on | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
+| A project's members and reviewers | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Users, teams and their roles — who a rule's recipients are | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
-| An agent's owners | [AC-F07](../../../access/features/AC-F07-ownership/feature.md#engine) |
-| Open ops alerts sent to the reader, and their closing | [CP-F11](../CP-F11-ops-alerting/feature.md#engine) |
+| An agent's named approvers — a rule's *the agent's named approvers* | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
+| Open alerts sent to the reader, and their closing | [CP-F11](../CP-F11-ops-alerting/feature.md#engine) |
 
 ### Routes
 
@@ -157,7 +156,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /notifications/read` | Mark rows read — `{ids[]}` or `{all: true}` | CP-36 |
 | `GET /notifications/rules` · `POST /notifications/rules` | Notification rules, each with `may_edit` · write one | CP-37 |
 | `GET /notifications/rules/{id}` · `PATCH /notifications/rules/{id}` · `DELETE /notifications/rules/{id}` | Read · change, switch on or off · remove one | CP-37 |
-| `GET /history-alerts` · `POST /history-alerts` · `PATCH /history-alerts/{id}` · `DELETE /history-alerts/{id}` | History alerts — `?q=` the name · `?enabled=`, sorted by name; each read adds `match_line` and `notify_line` | CP-37 |
 | `GET /channels` · `POST /channels` | Channels with `ready` or why not, by the list contract · add one `{name, kind, target, secret?, sender?, password}` after a passing test; the secret is never read back | CP-45 |
 | `PUT /channels/{name}/secret` · `POST /channels/{name}/test` · `DELETE /channels/{name}` | Replace its secret `{secret, password}` · send a test to the caller · remove `{password}` | CP-45 |
 | `GET /channels/mine` · `PUT /channels/mine/{kind}` | The caller's own choices — `email` · `slack`, each `on` and `available` with why not · `{on}` | CP-46 |
@@ -170,14 +168,13 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `control.channels.create` · `control.channels.secret` · `control.channels.delete` | A channel is added · its secret replaced · removed — never the secret |
 | `control.channels.choice` | A person turns one of their own channels on or off — `{kind, on}` |
 | `control.deliveries.fail` | A delivery fails for good — `{channel_id, attempts, error}` |
-| `control.history_alerts.create` · `control.history_alerts.update` · `control.history_alerts.delete` | A History alert is written · changed · removed |
 
 ### Refusals
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 422 | A rule or alert with no recipient, naming a channel that does not exist, or matching an event a rule may not match | *{field}: {why}.* | CP-37.5 · CP-37.6 |
-| 403 | A rule reaching anyone but its creator, or naming a channel, a team or a role, or a History alert, by anyone but an Admin; changing another person's rule | *Needs the Admin role — ask {admins}.* | CP-37.18 |
+| 422 | A rule with no recipient, naming a channel that does not exist, or matching an event a rule may not match | *{field}: {why}.* | CP-37.5 · CP-37.6 |
+| 403 | A rule reaching anyone but its creator, or naming a channel, a team or a role, by anyone but an Admin; changing another person's rule | *Needs the Admin role — ask {admins}.* | CP-37.18 |
 | 409 | Removing a channel a rule or a schedule names | *{rules and schedules} use this channel.* | CP-37.13 · CP-45.9 · AG-42.17 |
 | 403 | Adding, testing, replacing or removing a channel by anyone but an Admin | *This needs an Admin — ask {admins}.* | CP-45.11 |
 | 401 | A channel change without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-45.10 |
@@ -199,7 +196,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Rules read the record | On the shared clock tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)) the matcher reads the event store after its cursor, taken `FOR UPDATE SKIP LOCKED`, after commit — a write is never slowed or failed by a rule |
 | No rule feeds itself | Notification, delivery and reminder events and rule and channel changes are never matched |
-| Recipients resolve at match | Named users still active · members of named teams · people with a named role · *the person behind the run* · *the agent's owners*, as they are now; an event on a private project reaches only its people |
+| Recipients resolve at match | Named users still active · members of named teams · people with a named role · *the person behind the run* · *the agent's named approvers*, as they are now |
 | The Inbox row first | Each recipient's row is written before any delivery, and never depends on a channel |
 | A person's own deliveries | An ask, reminder, escalation or expiry ([AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#mechanisms)) and an alert naming a person write their Inbox row, then one delivery per channel in their `control_channel_choices` that is `on` — email to their account address through the email channel, a Slack direct message to `slack_user_id` |
 | The payload | `{kind, title, agent?, waits_on?, deadline?, link}` — the link is Studio's address of the ask or alert with `?from=<channel kind>`; nothing else. Opening it records `opened_from` on the ask |
@@ -207,28 +204,27 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Channel bodies | Email: through the channel's own mail server, user and sealed password, from its sender, STARTTLS · Slack: a Slack app's sealed bot token — `chat.postMessage` to a channel a rule names or to a person's direct message; a person is matched once by `users.lookupByEmail` on their account email · Teams: the payload as a message card to the channel's incoming webhook · Webhook: the payload as JSON, signed `X-Invana-Signature: sha256=<hmac>` when it has a secret |
 | The address check | Every channel host is resolved at add and at each delivery; loopback, link-local and the deployment's own addresses are refused, and the connection goes to the address checked |
 | A channel's test | Adding a channel sends one test to the adding Admin — an email to them, a Slack `auth.test`, a Teams message, a webhook ping — and saves only when it passes |
-| History alerts | Each tick reads History after each enabled alert's `last_seq`; a match writes an Inbox row to each of `notify_user_ids` and the members of `notify_team_ids`, sets `last_fired_at` and advances `last_seq`. A new alert starts at History's head |
-| Ops alerts | CP-F11's checker writes an `ops_alert` row in *Needs you* per recipient, then their own deliveries; its close sets `done_at` and moves the row to Updates |
-| The count | Unread notifications + asks waiting on the reader + runs waiting on their answer + open ops alerts sent to them; a run held on an ask counts once, as the ask |
+| Alerts | CP-F11's checker writes an `ops_alert` row in *Needs you* per recipient, then their own deliveries; its close sets `done_at` and moves the row to Updates |
+| The count | Unread notifications + asks waiting on the reader + runs waiting on their answer + open alerts sent to them; a run held on an ask counts once, as the ask |
 | Read state | Per row, `read_at` |
 
 ## System impact
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | Seven tables in Postgres; channel secrets sealed under the install key | — |
+| § 6 Data and storage | Six tables in Postgres; channel secrets sealed under the install key | — |
 | § 7 Components | The notification matcher and the delivery sender run on the shared clock | — |
-| § 8 APIs and events | The Inbox, rules, channels and History alerts routes under `/api/v1/control` and `control.notification_rules.*` · `control.history_alerts.*` · `control.channels.*` events | — |
+| § 8 APIs and events | The Inbox, rules and channels routes under `/api/v1/control` and `control.notification_rules.*` · `control.channels.*` events | — |
 | § 9 Distributed execution | The cursor taken `FOR UPDATE SKIP LOCKED` and unique Inbox rows keep two engine processes from matching an event twice | — |
 | § 11 Failure modes and the outside boundary | Email, Slack, Teams and webhooks: a channel down fails its delivery after three tries; the Inbox row never depends on it | — |
-| § 12 Qualities | Security: webhook bodies signed, channel secrets sealed and write-only, addresses checked, decisions only signed in; Privacy: a delivery carries a line and a link, never content; a private project's events reach only its people | NFR-SEC-2 |
+| § 12 Qualities | Security: webhook bodies signed, channel secrets sealed and write-only, addresses checked, decisions only signed in; Privacy: a delivery carries a line and a link, never content | NFR-SEC-2 |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
 | Needs you is the one queue | Every ask, every held send and project work wait in one list; there is no queue per product |
-| Rules live in Settings › Notifications | Notification rules, History alerts and channels sit in one place, *What reaches whom* over *Where it can go* |
+| Rules live in Settings › Notifications | Notification rules and channels sit in one place, *What reaches whom* over *Where it can go* |
 | Anyone writes rules for themselves | A rule that reaches only its creator needs no one's yes; reaching other people, a team, a role or a place is an Admin's |
 | Channels are the Admin's | A channel holds a credential, so adding, testing and removing one is an Admin's act with the password again; reading them is everyone's |
 | A person picks their own channels | Asks and alerts for a person follow that person's choices; Teams and webhooks reach a place, so they are a rule's, never a person's |

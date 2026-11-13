@@ -15,10 +15,12 @@ Tasks: [task.md](task.md) · Feature: [RC-F04](../../feature.md)
 
 ## Who can
 
+Running a fix is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Preview and run a fix | — |
-| Operator | Preview a fix | *Run* disabled — *Ask Priya (owner)*. *With Can work on projects: as Admin* |
+| Operator | Preview a fix. A Modeller runs it as an Admin does | *Run* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -29,7 +31,7 @@ flowchart LR
   d -->|Run| r{The model checks}
   r -->|written| ok([One run · in each record's History])
   r -->|refused| no[Refused · nothing written]
-  d -->|no access| x["Ask Priya (owner)"]
+  d -->|an Operator| x["Needs the Modeller role — ask an Admin"]
 ```
 
 ## Acceptance criteria
@@ -40,7 +42,7 @@ flowchart LR
 | RC-03.2 | A preview the model fully allows | the person runs it | it writes as one run and each record's History names it |
 | RC-03.3 | A change the model refuses | the person runs it | nothing is written and the refusal names the constraint |
 | RC-03.4 | A Gremlin database refusing part way | the fix runs | it says what was written and what was not, with *Try the rest* |
-| RC-03.5 | An Operator without the grant | they reach *Run* | it is disabled with *Ask Priya (owner)* |
+| RC-03.5 | An Operator | they reach *Run* | it is disabled with *Needs the Modeller role — ask an Admin* |
 
 ## Screens
 

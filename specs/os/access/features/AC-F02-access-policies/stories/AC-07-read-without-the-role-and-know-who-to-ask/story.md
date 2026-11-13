@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every act; this story is what the others see | — |
-| Operator | Read every surface their role reaches; look, ask, open boards, re-run their own runs, through the agents they may use. A Modeller also acts on the model and records | Each act the role does not hold disabled — *Needs the Modeller role — ask Priya or Lee*; a detail sheet says *You can read this. Changing it needs …* |
+| Operator | Read every surface their role reaches; look, ask, open boards, re-run their own runs, through the agents granted to them. A Modeller also acts on the model and records | Each act the role does not hold disabled — *Needs the Modeller role — ask Priya or Lee*; a detail sheet says *You can read this. Changing it needs …* |
 
 ## Flow
 
@@ -27,10 +27,10 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 flowchart TD
   o([An Operator opens any surface]) --> r["Everything the role reaches reads"]
   r --> a{"An act"}
-  a -->|the role holds it| u{"An agent they may use reaches it?"}
+  a -->|the role holds it| u{"An agent granted to them reaches it?"}
   u -->|yes| d(["It runs"])
   u -->|no| na["Refused · names what is missing and who grants agents"]
-  u -->|a rule for a team they are not on| tn["Refused · names the rule and its team"]
+  u -->|a rule refuses it| tn["Refused · names the rule, its policy and the Admins"]
   a -->|the role does not hold it| x["Disabled · Needs the Modeller role — ask Priya or Lee"]
   x -->|Ask an Admin| inb(["AC-F05 · an ask in the Admins' Needs you · Asked"])
   inb -->|allowed| g(["The role changes · the act works without signing in again"])
@@ -54,8 +54,8 @@ flowchart TD
 | AC-07.8 | An Operator | they look, ask, open boards, or re-run their own run | it works, as for an Admin |
 | AC-07.9 | A write whose role was taken away after the screen loaded | it is tried | the engine refuses it, naming the role and who holds it, and the act turns disabled |
 | AC-07.10 | Studio has not yet learned the reader's role, or could not | an act is drawn | it is enabled; the engine still checks every act and its refusal names the role |
-| AC-07.11 | A person whose role holds the act, but no agent they may use reaches it | they try it | it is refused before anything runs, naming what is missing and who grants agents |
-| AC-07.12 | A person not on the team a rule names | the rule would have allowed their act | the rule does not hold for them; the refusal names the rule and its team |
+| AC-07.11 | A person whose role holds the act, but no agent granted to them reaches it | they try it | it is refused before anything runs, naming what is missing and who grants agents |
+| AC-07.12 | A person whose act an agent's rule refuses | they read the refusal | it names the rule, its policy and the Admins who can change it |
 | AC-07.13 | A person who lacks the role an act needs | they press *Ask an Admin* | one ask for that role appears in the Admins' Needs you (AC-F05); never decided by the asker; the act reads *Asked*, and pressing again joins the open ask |
 | AC-07.14 | A person given a role | they reach an act it holds | it works, without signing in again |
 

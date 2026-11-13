@@ -7,7 +7,7 @@ personas: [analyst, curator]
 stories: [RC-05, RC-06]
 journeys: [J02]
 boards: []
-nfrs: [NFR-SEC-5]
+nfrs: [NFR-SEC-5, NFR-SEC-11]
 depends_on: [RC-F01, RC-F02, AC-F06]
 ---
 
@@ -56,13 +56,15 @@ flowchart TD
 | One event store | Provenance and history read the Graph's one append-only History ([AC-F06](../../../../os/access/features/AC-F06-history/feature.md)), filtered to the record — never a second log |
 | Every write lands there | A load, a board's save, a fix, a merge and a derivation each write their changes to History |
 | The database's own records | A value Invana never wrote reads *Present in the graph database before Invana wrote to it* — never a guess |
+| Provenance is not lineage | Provenance is *where a value came from* — a load, an edit, a person, an agent. Lineage is *what a copy was read from* — an answer, a finding, a report, a snapshot, a note, an export. Provenance feeds lineage: a copy's sources are resources in [Access Policies' grammar](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms), and a record's provenance is what tells which load or run a source was ([GP-F02 › Engine](../../../../os/graph/features/GP-F02-memory/feature.md#engine)) |
+| A value shows as far as the reader's agent reads | A value whose level the person's default agent may not Read shows in provenance and history as *Withheld — your agent may not read {resource}*; what wrote it and when stay readable |
 | An undone load says so | A value whose load was undone and that nothing changed since is gone; one kept because a later write changed it names both |
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and history | Operator — every member | — |
+| Read records, their provenance and history | Every signed-in person — Operator, Modeller, Admin — as far as their default agent reads each value | A value at a level their agent may not Read: *Withheld — your agent may not read {resource}* |
 
 ## States
 
@@ -74,7 +76,7 @@ flowchart TD
 | Has data | Each value with what wrote it and when; changes newest first: when · who · run · before → after · why |
 | Failed | *Could not load provenance* or *Could not load history*, and *Try again* |
 | Agent working or proposing | — |
-| No access | A run or member the person may not see is named, not opened: *a run by an agent you cannot see* · *a member you cannot see* |
+| No access | A run or member the person may not see is named, not opened: *a run by an agent you cannot see* · *a member you cannot see*; a value their agent may not read: *Withheld — your agent may not read {resource}* |
 
 ## Data touched
 
@@ -101,6 +103,7 @@ flowchart TD
 | Derived facts, their rule version and premises | [SE-F08 › Engine](../../../semantics/features/SE-F08-inference/feature.md#engine) |
 | Runs, and whether the reader may open one | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
 | The record's kind and its values in the published version | [RC-F01](../RC-F01-records-by-kind/feature.md) |
+| A property's level · the lineage that copies of a record carry | [SE-F03 › Engine](../../../semantics/features/SE-F03-meaning/feature.md#engine) · [GP-F02 › Engine](../../../../os/graph/features/GP-F02-memory/feature.md#engine) |
 
 ### Routes
 
@@ -136,13 +139,14 @@ flowchart TD
 | Derived | A value from a derived fact names its rule version and premises; a value from a `source = run` load names that run and the loads it was pinned to (`record_load_inputs`) |
 | An undone load | A value its undone load wrote that a later write kept names the later write and flags the load *load undone* |
 | What the reader may open | A run or a member the reader may not read is named, never opened — *a run by an agent you cannot see* · *a member you cannot see* |
+| Values the reader may not read | Both routes read each value through the person's default agent: a property whose level `decide()` does not Allow is returned as *withheld*, with the resource, and counted; the load, run, person and time stay |
 | One set of rows | `/history` and History filtered to the record are one query on the event store |
 
 ## System impact
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| — | None — two read routes over History and the loads | — |
+| § 12 Qualities | Privacy: a value reads only as far as the person's default agent reads its level; two read routes over History and the loads | NFR-SEC-11 |
 
 ## Decisions
 

@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 ## Who can
 
+Writing a rule is the Modeller's and the Admin's; an *Everywhere* rule is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every rule and its evidence; create, edit, stop offering and offer again rules at every scope — *Everywhere* only as the install's Admin | *Everywhere* disabled in the scope with its reason, for an owner who is not the install's Admin |
-| Operator | Read every rule in force and its evidence | *New rule*, *Save rule* and *Stop offering it* disabled — *Ask Priya (owner) to shape the model*. With *Can shape the model*: as Admin on *This graph* and *A project* |
+| Admin | Read every rule and its evidence; create, edit, stop offering and offer again rules at every scope, *Everywhere* included | — |
+| Operator | Read every rule in force and its evidence. A Modeller acts as an Admin on *This graph* and *A project*; *Everywhere* is the Admin's alone | *New rule*, *Save rule* and *Stop offering it* disabled — *Needs the Modeller role — ask an Admin*; for a Modeller, *Everywhere* is disabled — *Needs the Admin role — ask an Admin* |
 
 ## Flow
 
@@ -47,7 +49,7 @@ flowchart LR
 | SE-12.1 | No rule in force | the person opens Rules | one line says what a rule is, with *New rule* |
 | SE-12.2 | Rules in force | the person opens Rules | one list in the order a step is given them — *Everywhere*, then *This graph*, then each project's the reader can see — each row the statement over scope · checked on · when broken (a badge) · broken in 30 days, counted by the engine |
 | SE-12.3 | The list | the person filters by *Scope* or *Checked on* | the engine returns the matching rules and the filter is kept in the URL; nothing matching names the filter and how to clear it |
-| SE-12.4 | A person with *Can shape the model* | they pick *New rule* and *A statement* | the dialog offers statement · scope (*This graph* · *A project*, which picks the project) · check · *Checked on* read off the check · *When broken* Block · Warn · Report · *Because* |
+| SE-12.4 | A Modeller or an Admin | they pick *New rule* and *A statement* | the dialog offers statement · scope (*This graph* · *A project*, which picks the project) · check · *Checked on* read off the check · *When broken* Block · Warn · Report · *Because* |
 | SE-12.5 | A long statement | it is typed | it is accepted, with a nudge that a rule reads better as one sentence |
 | SE-12.6 | A check chosen | the dialog changes | the impact line shows what the rule would have stopped, warned on or reported in the last 30 days, with the newest five acts, each naming its subject, time and reason |
 | SE-12.7 | A check no act at that scope reads, or a standard that does not exist | the rule is saved | the dialog names the field and nothing is saved |
@@ -58,10 +60,10 @@ flowchart LR
 | SE-12.12 | A rule | someone picks *Stop offering it* | it is dimmed in place, offered and checked nowhere, its versions and past citations kept; *Offer it again* reverses it |
 | SE-12.13 | A step in the rule's scope | it runs | *How it got here* lists the rules it was offered, each as its statement, with the ones it cited marked |
 | SE-12.14 | A statement in *How it got here* | the person clicks it | it closes and the rule's evidence opens: offered · cited · never cited, each version with its own cited count, and where each was cited |
-| SE-12.15 | A Graph owner who is not the install's Admin | they set the scope | *Everywhere* is disabled with its reason, and an *Everywhere* rule opens read-only |
-| SE-12.16 | An Operator without *Can shape the model* | they open a rule | it reads; *Save rule* and *Stop offering it* are disabled with *Ask Priya (owner) to shape the model* |
-| SE-12.17 | A person with *Can shape the model* | they list, show or apply rules from a file on the command line | The same scopes, checks and modes as the dialog; an *Everywhere* rule needs the install's Admin, and a refusal names the field |
-| SE-12.18 | A person with *Can shape the model* | they pick *New rule* | it asks what the rule holds — *A property* (SE-11) · *A statement* · *A standard* (SE-19) · *A derivation* (SE-22) · *An alert* — and opens that rule's dialog |
+| SE-12.15 | A Modeller | they set the scope | *Everywhere* is disabled, naming *Needs the Admin role — ask an Admin*, and an *Everywhere* rule opens read-only |
+| SE-12.16 | An Operator | they open a rule | it reads; *Save rule* and *Stop offering it* are disabled with *Needs the Modeller role — ask an Admin* |
+| SE-12.17 | A Modeller or an Admin | they list, show or apply rules from a file on the command line | The same scopes, checks and modes as the dialog; an *Everywhere* rule needs the Admin role, and a refusal names the field |
+| SE-12.18 | A Modeller or an Admin | they pick *New rule* | it asks what the rule holds — *A property* (SE-11) · *A statement* · *A standard* (SE-19) · *A derivation* (SE-22) · *An alert* — and opens that rule's dialog |
 
 ## Screens
 

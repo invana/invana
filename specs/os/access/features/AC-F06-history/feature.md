@@ -8,7 +8,7 @@ stories: [AC-16, AC-17]
 journeys: [J09]
 boards: [inbox.history, agents.run]
 nfrs: [NFR-REL-4, NFR-SEC-2, NFR-PERF-3]
-depends_on: [AC-F05, AC-F09, CP-F10]
+depends_on: [AC-F05, AC-F09, AC-F12, CP-F10]
 ---
 
 # History — what people and agents did, and every change
@@ -41,6 +41,10 @@ flowchart TD
   ch -->|first version| one["Nothing to compare"]
   s -->|Operator · Modeller| op["Own acts and the runs they may read · the rest counted, not shown"]
   s -->|the chain fails to verify| bk["History unedited? No — broken at row N; rows still read"]
+  pr([An Admin's retention period passes · AC-F12]) --> hold{"History on hold?"}
+  hold -->|yes| none(["No prune"])
+  hold -->|no| cut["AC-16 · A whole window removed · a signed checkpoint of the last row removed"]
+  cut --> ver(["The chain verifies from the checkpoint"])
 ```
 
 ```mermaid
@@ -69,8 +73,9 @@ sequenceDiagram
 
 | Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every row and its arguments, the counts over the deployment, by actor, by record and refusals | Admin | — |
-| Read their own acts, the rows of runs they are behind and of agents they own | Every signed-in person — Operator, Modeller | The rest is counted, not shown — a line says how many |
+| Read every row, the counts over the deployment, by actor, by record and refusals | Admin | — |
+| Read a row's arguments | Whoever may read its run ([AC-31](../AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) — an Admin included, by the same rule | Who, the act, the verdict and the rule; arguments *withheld* |
+| Read their own acts and the rows of runs they may read | Every signed-in person — Operator, Modeller | The rest is counted, not shown — a line says how many |
 | Export the rows the reader can see | Every signed-in person | — |
 | Read every change and compare two versions of a record the reader can open | Every signed-in person | A record the reader cannot open reads as absent |
 | Restore an earlier version | Not here — the record's own page, by its own role | — |
@@ -82,7 +87,7 @@ sequenceDiagram
 | First use | *No acts yet — a run or a person's act writes the first row*. Changes with nothing versioned: *No changes yet* |
 | Empty after a filter | *0 of N match*, with *Clear all*; *Export* disabled, *no rows match* |
 | Loading | The head, filters and table drawn at once; rows load in place |
-| Has data | Rows newest first, today unless a window is chosen; the head says History is unedited, when that was last checked and how long rows are kept |
+| Has data | Rows newest first, today unless a window is chosen; the head says History is unedited, when that was last checked, how long rows are kept and whether History is on hold |
 | Failed | The rows could not load, saying why, with *Try again*. The chain failing to verify: *broken at row N*, in red; rows still read |
 | Agent working or proposing | Rows arrive as acts happen; an agent's rows name the person it acted for |
 | No access | An Operator or a Modeller reads their own acts and the rows of runs they may read, a line counting the rest; the counts over the deployment are not shown |
@@ -95,14 +100,15 @@ sequenceDiagram
 | One row per act | A step an agent took, a refusal, a helper it started, an ask and its decision, and every act of a person — publish, stop a run, save a policy, attach it, set a role, switch a graph database — is a row |
 | Nothing is unrecorded | Every write in the product — a graph database, the model, a skill, a workflow, a policy, an agent, a task, a load — is in History; there is no silent write |
 | Never edited | Rows are never edited or deleted one by one; a correction is a new row |
-| Provably unedited | Each row is hashed with the one before; the chain is re-checked every 10 minutes and the head says when it last held. An export carries each row's hash and the previous one |
-| The actor and on whose behalf | Who acted and for whom are two names, never one — *Sam ▸ Reporting agent ▸ Order checker*; names are as they were when the row was written |
+| Provably unedited | Each row is hashed with the one before; the chain is re-checked every 10 minutes from the latest checkpoint and the head says when it last held. An export carries each row's hash and the previous one |
+| The actor and on whose behalf | Who acted and for whom are two names, never one — *Sam ▸ Reporting agent ▸ Order checker*; names are as they were when the row was written, and a departed person's read as their code when names are pseudonymised ([AC-F12](../AC-F12-leaving-and-keeping/feature.md)) |
 | What caused what | A row links to the act that caused it, so a chain is followed up to the person who started it |
 | Secrets never enter | A credential is removed before the row is written, not hidden when read |
-| Arguments follow run privacy | A row's arguments read to the person behind its run, the agent's owners and Admins ([AC-31](../AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); anyone else who may see the row reads who, the act, the verdict and the rule |
+| Arguments follow run privacy | A row's arguments read to whoever may read its run ([AC-31](../AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) — the role grants none; anyone else who may see the row reads who, the act, the verdict and the rule |
 | A row about a deleted record | Still reads, with the record's name as it was |
 | A refusal names its reason and its rule apart | The reason — the role · may not use the agent · an Access Policy rule · switched off · a read-only graph database · a sensitive property · over a limit · the site's robots.txt — and the rule in words (*Deny reading Order in sales, for Finance*) |
-| Kept for a year | Rows are kept 365 days. Removing old rows removes a whole window, never chosen rows, and the removal is itself a row |
+| Kept until an Admin sets a period | Rows are kept until an Admin sets History's period ([AC-F12](../AC-F12-leaving-and-keeping/feature.md)); none is removed while History is on legal hold. Removing old rows removes a whole window, never chosen rows, and the removal is itself a row |
+| A prune leaves a signed checkpoint | Each prune keeps a checkpoint — the last removed row's number and hash, signed — so the chain that stays still proves it follows on from what was removed |
 | Every number is the engine's | Counts, per-day bars and top lists are counted over the stored rows, over the whole window |
 | A change is the act that made a version | Changes are History narrowed to the acts that made a new version of a skill, rule, workflow, agent, model or Access Policy, and every load; the versions stay where they are kept |
 | Why is never invented | A reason given when a version is made is kept (500 characters); none given reads empty, never inferred |
@@ -118,6 +124,8 @@ sequenceDiagram
 | Record | Read or write |
 |---|---|
 | History rows — when, the actor chain, the act, what it touched, allowed or refused and why, the rule, the run and step, where it ran, its hash and the previous one | Read |
+| Checkpoints — the last row each prune removed, its hash and its signature | Write · read |
+| History's period and hold ([AC-F12](../AC-F12-leaving-and-keeping/feature.md#engine)) | Read |
 | Writes and their causes — actor, on whose behalf, what, the act that caused it | Read |
 | The chain's last check — when, whether it held, where it broke | Read |
 | Exports — who, the filters, the format, how many rows | Write · read |
@@ -135,8 +143,9 @@ store: every feature's *Events* table names what it writes here, and links this 
 | Table | Columns | Notes |
 |---|---|---|
 | `events` | `id` · `created_at` · `actor_kind` (`user` · `agent` · `system` · `external` — a key's or an MCP client's call · `anonymous`) · `actor_id?` · `on_behalf_of_user_id?` · `key_id?` · `client_id?` · `parent_event_id?` · `action` (`<package>.<records>.<verb>`) · `target_kind?` · `target_id?` · `database_id?` · `project_id?` · `task_id?` · `run_id?` · `node_run_id?` · `skill_ids[]` · `details` (redacted at write) · `trace_id?` · `span_id?` | The event store: one append-only record of every write in the deployment |
-| `access_history_rows` | `seq` (from 1, gapless) · `at` · `actor_kind` (`person` · `agent` · `system` · `external`) · `actor_user_id?` · `actor_agent_id?` · `actor_key_id?` · `actor_client_id?` · `actor_chain` (names as they were) · `behind_user_id?` · `caused_by_seq?` · `act` · `layer` (`data` · `skill` · `workflow` · `agent` · `plugin` · `tool` · `model` · `access` · `run`) · `touched` · `verdict` (`allowed` · `refused` · `asked` · `held`) · `refused_by?` (`role` · `agent_not_granted` · `policy` · `switched_off` · `read_only` · `sensitive` · `limit` · `robots`) · `rule?` · `effect?` · `policy_id?` · `policy_version?` · `team_id?` · `set_by_id?` · `run_id?` · `step_run_id?` · `run_number?` · `where` · `args` (redacted) · `hash` · `prev_hash` | One History row per act; unique `seq` |
-| `access_history_checks` | `verified_at` · `ok` · `last_seq` · `broken_seq?` | The chain's checks |
+| `access_history_rows` | `seq` (from 1, gapless) · `at` · `actor_kind` (`person` · `agent` · `system` · `external`) · `actor_user_id?` · `actor_agent_id?` · `actor_key_id?` · `actor_client_id?` · `actor_chain` (user ids, in order) · `actor_names` (names as they were — outside the hash) · `behind_user_id?` · `caused_by_seq?` · `act` · `layer` (`data` · `skill` · `workflow` · `agent` · `plugin` · `tool` · `model` · `access` · `run`) · `touched` · `verdict` (`allowed` · `refused` · `asked` · `held`) · `refused_by?` (`role` · `agent_not_granted` · `policy` · `switched_off` · `read_only` · `sensitive` · `limit` · `robots`) · `rule?` · `effect?` · `policy_id?` · `policy_version?` · `set_by_id?` · `run_id?` · `step_run_id?` · `run_number?` · `where` · `args` (redacted) · `hash` · `prev_hash` | One History row per act; unique `seq` |
+| `access_history_checks` | `verified_at` · `ok` · `last_seq` · `broken_seq?` · `from_checkpoint_seq?` | The chain's checks |
+| `access_history_checkpoints` | `at` · `last_removed_seq` · `last_removed_hash` · `rows_removed` · `signature` (HMAC-SHA-256 under the ledger key) · `key_version` | One row per prune; never removed |
 | `access_history_exports` | `requested_by_id` · `filters` · `format` (`csv` · `jsonl`) · `rows` · `created_at` | One row per export |
 
 ### Reads
@@ -153,7 +162,8 @@ store: every feature's *Events* table names what it writes here, and links this 
 | Runs, their steps and tokens — the effect after a version, *Open the step* | [CP-F10](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | Which agents may read a record's kind now — Access Policies and the one evaluator | [AC-F02](../AC-F02-access-policies/feature.md#engine) |
 | Asks and their decisions | [AC-F05](../AC-F05-asks-and-approvals/feature.md#engine) |
-| Who may read a run's content — `may_read_run()` | [AC-F09](../AC-F09-what-left-the-platform/feature.md#mechanisms) |
+| Who may read a run's content — `may_read_run()` · the ledger key | [AC-F09](../AC-F09-what-left-the-platform/feature.md#mechanisms) |
+| History's period, its hold, a departed person's pseudonym | [AC-F12](../AC-F12-leaving-and-keeping/feature.md#engine) |
 
 ### Routes
 
@@ -164,9 +174,9 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `GET /rows/{seq}` | The row · its chain of custody · `args` (withheld unless the reader may read its run) · `hash` · `prev_hash` · `verified` · `verified_at` · `around[]` (two rows before and two after in its run) | AC-16 |
 | `GET /actor?actor=agent:<id> \| person:<id>&since=` | `acts` · `writes` · `writes_refused` · `outside` · `secrets` · `secret_names` · `refused_by` · `data` · `tools` · `models` · `acted_through` | AC-16 |
 | `GET /record?address=&since=` | `reads` · `writes` · `refused` · `people` · `agents` · `rows` · `readable_by {agents, teams}` | AC-16 |
-| `GET /refusals` | `refused_today` · `acts_today` · `share_pct` · by reason · `by_day[30]` · `top_functions[]` · `by_rule[]` (`refused_by` · `rule` · `policy` · `team` · `refused` · `today`) | AC-16 |
+| `GET /refusals` | `refused_today` · `acts_today` · `share_pct` · by reason · `by_day[30]` · `top_functions[]` · `by_rule[]` (`refused_by` · `rule` · `policy` · `refused` · `today`) | AC-16 |
 | `GET /export?format=csv \| jsonl` · `GET /exports` | Stream the filtered rows, each with its hash and the previous one, and write an exports row · the exports, newest first | AC-16 |
-| `GET /integrity?full=` | `{verified_at, ok, last_seq, broken_seq?, retention_days, rows}`; `full` re-verifies from row 1 | AC-16 |
+| `GET /integrity?full=` | `{verified_at, ok, last_seq, broken_seq?, keep_days?, held, checkpoint?, rows}`; `full` re-verifies from the latest checkpoint, or row 1 when none | AC-16 |
 | `GET /changes/{kind}/{id}` | One record's changes: `{record_kind, record_id, name, items[ChangeEntry]}` | AC-17 |
 | `GET /changes/{kind}/{id}/compare?a=&b=` | Two versions; `a` omitted compares `b` with the one before | AC-17 |
 | `GET /events` · `GET /events/stream` | The deployment's events by the list contract, every filter composing with `?changes=true` · the live tail | AC-17 |
@@ -176,7 +186,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | Event | When |
 |---|---|
 | `access.history.export` | An export is made |
-| `access.history.prune` | Rows older than the retention are removed, a whole window — itself a History row |
+| `access.history.prune` | Rows older than History's period are removed, a whole window — itself a History row, naming its checkpoint |
 | `access.history.broken` | A check finds the chain broken, naming the row |
 
 ### Refusals
@@ -203,12 +213,13 @@ store: every feature's *Events* table names what it writes here, and links this 
 | The live tail | A database trigger notifies every insert into `events`; the engine fans it out to the streams Studio holds open |
 | Who reads `events` | The change list and the live tail, notification rules ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#engine)), provenance ([RC-F06](../../../../capabilities/records/features/RC-F06-provenance/feature.md#engine)), a task's tree ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)), the outbox relay that rebuilds the system graph, and traces — each a reading; none copies it |
 | One writer of History | `record()` takes the last row under a row lock, sets `seq` and the hash, inserts. The Control Plane calls it for each step it settles and each refusal; delegation for each helper and refusal; every manager for each act a person, an agent, a key or an MCP client causes. Nothing updates or deletes a row |
-| The hash chain | `hash = sha256(prev_hash ‖ canonical JSON of the row)`; the first `prev_hash` is 64 zeros. The shared clock tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)) re-verifies every 10 minutes from the last verified row into `access_history_checks`; `?full=` re-verifies from the first |
-| What a reader sees | An Admin every row; anyone else their own acts and the rows of runs `may_read_run()` allows; the rest is counted as `hidden`. `args` is withheld on a row the reader sees but whose run they may not read. Counts over the whole deployment are an Admin's |
+| The hash chain | `hash = sha256(prev_hash ‖ canonical JSON of the row without actor_names)`; the first `prev_hash` is 64 zeros. Names live outside the hash, so pseudonymising a departed person changes `actor_names` and every row still verifies; who acted is proven by `actor_chain`'s ids. The shared clock tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)) re-verifies every 10 minutes from the last verified row into `access_history_checks`; `?full=` re-verifies from the latest checkpoint |
+| What a reader sees | An Admin every row; anyone else their own acts and the rows of runs `may_read_run()` allows; the rest is counted as `hidden`. `args` is withheld on a row the reader sees but whose run they may not read — an Admin's too. Counts over the whole deployment are an Admin's |
 | Counts | Counts, per-day bars and top lists are SQL over the whole window; table rows read from the newest 20,000 |
 | A change with no percentage | `acts_change_pct` is absent while the 7-day daily mean is under 10 acts |
 | Export | `csv` or `jsonl` of the filtered rows with each row's hash and the previous one; a CSV cell that would run as a formula is written as text |
-| Retention | 365 days; a prune removes whole windows and writes its own row; `events` keeps the same window |
+| Retention | History's period from [AC-F12](../AC-F12-leaving-and-keeping/feature.md#engine), none by default; skipped while History is on hold. A prune removes every row older than the period, a whole window, and in the same transaction writes an `access_history_checkpoints` row — the last removed `seq` and `hash`, signed — and its own History row; `events` keeps the same window |
+| Verifying past a prune | A check starts from the latest checkpoint: its signature must verify under the ledger key of its `key_version`, and the first kept row's `prev_hash` must equal `last_removed_hash`; then the chain runs as before. A checkpoint that fails reads *broken at the checkpoint of {date}* |
 | What a change is | A version-minting event of a skill, rule, workflow, agent, model or Access Policy, or a load — the versions stay where their owner keeps them; there is no change table. `?changes=true` narrows the event list to those events |
 | Each kind's versions | `skill` — published versions, a number, `why` from the publish event, effect pinned (runs offered that version) · `rule` — its versions, a number, pinned · `workflow` — by name, a number, `why` from the approval event, pinned · `agent` — its create and update events, `details.diff {field: {before, after}}`, a number, pinned · `model` — published versions, a number, effect over the window it was published · `policy` — its saved versions, a number, `why` from the save · `load` — the load, its records added · removed · changed and rows failing |
 | `ChangeEntry` | `version` (a string) · `version_id?` (null for an agent) · `at` · `action` · `event_id` · `actor_id` · `actor_kind` · `actor_name` · `why` · `summary` · `effect` |
@@ -221,10 +232,10 @@ store: every feature's *Events* table names what it writes here, and links this 
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | The event store `events` and three History tables in Postgres; History is kept 365 days | — |
+| § 6 Data and storage | The event store `events` and four History tables in Postgres; History kept until an Admin sets a period, each prune leaving a signed checkpoint | NFR-REL-4 |
 | § 8 APIs and events | The `…/access/history` routes; the event store is where every feature's events land | — |
 | § 9 Distributed execution | The one chain is re-verified on the shared clock tick; one writer under a row lock keeps `seq` gapless | NFR-PERF-3 |
-| § 12 Qualities | Security: append-only, hash-chained, verified every 10 minutes, credentials redacted before the write; arguments read only as run privacy allows | NFR-REL-4 · NFR-SEC-2 |
+| § 12 Qualities | Security: append-only, hash-chained, verified every 10 minutes from a signed checkpoint, credentials redacted before the write; arguments read only as run privacy allows; names outside the hash, so pseudonymising edits no proof | NFR-REL-4 · NFR-SEC-2 |
 
 ## Decisions
 
@@ -250,7 +261,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 
 | Item | Why not |
 |---|---|
-| Editing or deleting a row | A correction is a new row |
+| Editing or deleting a row | A correction is a new row; a whole window goes only by retention |
 | Scheduled exports and an archive to the blob store | An export on demand is the proof now |
 | A History CLI | The export is the portable form |
 | A change table or a copy of versions | The versions already exist; a copy drifts |

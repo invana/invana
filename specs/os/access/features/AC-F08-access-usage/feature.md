@@ -47,8 +47,8 @@ flowchart TD
 | Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read every agent's usage — every resource, count and person behind | Admin | — |
-| Read an agent's usage over the runs the reader may read — runs they are behind, agents they own | Every signed-in person — Operator, Modeller | The rest is counted, not shown — *N runs are not yours to read* |
-| Read access an agent never uses | Admin · the agent's owners | Hidden for others; the agent's access reads in [AC-F04](../AC-F04-what-an-agent-may-touch/feature.md) |
+| Read an agent's usage over the runs the reader may read — runs they are behind and runs of a project their default agent may see | Every signed-in person — Operator, Modeller | The rest is counted, not shown — *N runs are not yours to read* |
+| Read access an agent never uses | Modeller · Admin | Hidden for an Operator; the agent's access reads in [AC-F04](../AC-F04-what-an-agent-may-touch/feature.md) |
 | Draft a narrower policy from unused access | Admin, in a session ([AC-06](../AC-F02-access-policies/stories/AC-06-draft-a-policy-and-see-who-it-changes/story.md)) | Disabled, naming the Admin role and the Admins |
 
 ## States
@@ -102,7 +102,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | History rows | [AC-F06](../AC-F06-history/feature.md#engine) |
 | Access Policies, attachments and `decide()` | [AC-F02](../AC-F02-access-policies/feature.md#engine) |
 | Who may read a run's content — `may_read_run()` | [AC-F09](../AC-F09-what-left-the-platform/feature.md#mechanisms) |
-| Owners of an agent | [AC-F07](../AC-F07-ownership/feature.md#engine) |
 
 ### Routes
 
@@ -110,7 +109,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | `GET /agents?since=` | A page by the list contract (`?q=` · `?kind=` · `?person=` · `?team=`): per agent `reads` · `writes` · `runs` · `people` · `refused` · `last_used_at` · `hidden_runs` | AC-28 |
 | `GET /agents/{name}?since=&person=&team=` | One agent: per resource `{resource, verb, calls, records, people[], teams[], last_used_at, last_run_id}`; per graph database its reads and writes; `hidden_runs` | AC-28 |
-| `GET /agents/{name}/unused?days=30 · 90` | Each resource a rule on an attached policy allows or asks for that no step used in the window: `{resource, verb, rule, policy, team?, last_used_at?}` | AC-29 |
+| `GET /agents/{name}/unused?days=30 · 90` | Each resource a rule on an attached policy allows or asks for that no step used in the window: `{resource, verb, rule, policy, last_used_at?}` | AC-29 |
 
 ### Events
 
@@ -122,7 +121,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 404 | Unused access read by someone who neither owns the agent nor is an Admin | *Not found.* | AC-29.8 |
+| 404 | Unused access read by an Operator | *Not found.* | AC-29.8 |
 | 422 | A window beyond the 365 days the ledger is kept | *Calls are kept 365 days.* | AC-28.9 |
 
 ### CLI

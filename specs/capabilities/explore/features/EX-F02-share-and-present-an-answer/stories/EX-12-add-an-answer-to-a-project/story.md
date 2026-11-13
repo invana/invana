@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add any settled answer they may read to a branch of any project | — |
-| Operator | Add a settled answer whose run they may read to a branch of a project they may add findings to ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)); a Modeller the same | A project they may not add to is not offered; with none, *Add to a project* is disabled, naming the project's owners |
+| Operator | Add a settled answer whose run they may read to a branch of a project they may add findings to ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)); a Modeller the same | A project they may not add to is not offered; with none, *Add to a project* is disabled, naming the project's members |
 
 ## Flow
 

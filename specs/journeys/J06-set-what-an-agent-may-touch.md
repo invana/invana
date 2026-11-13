@@ -27,7 +27,7 @@ flowchart TD
   H -->|Allow| I(["It acts"])
   H -->|Ask| J["AC-15 · CP-36 · Waits for the agent's named approvers, showing exactly what will happen"]
   J -->|Allow · Send it| I
-  J -->|unanswered| J1["Reminds · goes to the agent's owners and the Admins"] --> J
+  J -->|unanswered| J1["Reminds · goes to the other approvers, then the Admins, with a no-approver alert"] --> J
   J -->|Decline · expires| K(["Not done · nothing it held went"])
   H -->|Deny · no rule reaches it| L["AC-14 · Refused · the agent asks for more"]
   L --> M{"A named approver decides"}
@@ -48,7 +48,7 @@ sequenceDiagram
   L->>E: writes a rule on an Access Policy, attaches it to agents
   E-->>L: who it changes, then saved, naming Lee, in History
   A->>E: a step wants to Read, Write or Run a resource, for a person
-  E->>E: every rule on the agent's policies, narrowed to the person's teams and the caller chain — default deny, the strictest wins
+  E->>E: every rule on the agent's policies, narrowed by the caller chain — default deny, the strictest wins
   alt Allow
     E->>A: it acts
   else Ask
@@ -68,7 +68,7 @@ sequenceDiagram
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
 | 1 | Read every Access Policy and what it is attached to | Access Plane · Access Policies | AC-03 | `settings.access` |
-| 2 | Write a rule — effect, verb, resource, and a team when it holds for one | Access Plane · Access Policies | AC-04 | `settings.access` |
+| 2 | Write a rule — effect, verb, resource | Access Plane · Access Policies | AC-04 | `settings.access` |
 | 3 | See who it changes before saving | Access Plane · Access Policies | AC-06 | `settings.access` |
 | 4 | Attach the policy to agents | Access Plane · Access Policies | AC-11 | `settings.access` |
 | 5 | Check whether a person, through an agent, may do something | Access Plane · Access Policies | AC-08 | `settings.access` |
@@ -84,9 +84,8 @@ sequenceDiagram
 | It needs permission | Ask waits for the agent's named approvers — never the person it benefits; Deny refuses and the agent asks for more | AC-15 · AC-14 | `inbox` |
 | It fails | A rule naming a resource that does not exist, or a built-in policy edited in place, is refused, naming why | AC-04 | `settings.access` |
 | The person has no access | Every policy and rule reads; writing, attaching and deciding name the Admins or the named approvers | AC-03 · AC-13 | `settings.access` |
-| Nobody decides the ask | It reminds, goes to the agent's owners and the Admins, then expires refused; the step ends not done, and *How it got here* says so | AC-15 · AC-14 | `inbox` |
-| A rule names a team | It applies only to runs whose person is on that team | AC-04 · AC-12 | `settings.access` |
-| The agent delegates | The helper runs with what both agents may do and what the person's teams allow, never more | AC-13 | `settings.access` |
+| Nobody decides the ask | It reminds, goes to the agent's other approvers, then the Admins with a *no approver* alert, then expires refused; the step ends not done, and *How it got here* says so | AC-15 · AC-14 | `inbox` |
+| The agent delegates | The helper runs with what both agents may do, never more | AC-13 | `settings.access` |
 
 ## Done when
 

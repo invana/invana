@@ -113,7 +113,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 Access Policies allow. A run's content — a refusal, a diagnosis, a prediction — is its run's: run privacy is
 [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md).
 
-| Act | Who | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read a cannot answer, a plan gap, a refusal or a diagnosis, and follow its next step | The person behind the run; an Admin reads every one | Another person's run: that it ran, its status and its tokens |
 | Pick an approach with *Act as* · remove an assumption before the run · drop one and re-run · ask *what if* | Operator · Modeller · Admin, on their own runs | — |
@@ -151,7 +151,7 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 | A diagnosis is built from evidence | The step, the error and the query — never an invented cause — and its one action is its next step |
 | Repair once | A plan that fails the check against the model goes back once with the error; a second failure stops |
 | The agent's voice, the same facts | A cannot answer and a refusal are worded in the agent's voice, still name what is missing, and end with something the person can ask instead |
-| Recall is the thinking graph's | A plan that failed before is recalled as *avoid*, and a plan that served is preferred, from the [thinking graph](../../../agents/features/AG-F09-thinking-graph-and-memory/feature.md); *How it got here* names the run recalled |
+| Recall is the thinking graph's | A plan that failed before is recalled as *avoid*, and a plan that served is preferred, from the [thinking graph](../../../agents/features/AG-F09-learn-from-memory/feature.md); *How it got here* names the run recalled |
 | An approach is a method, not an actor | It brings a method, a declared set of assumptions and an answer shape. The agent still acts, with its own Access Policies, budget and model |
 | An approach never changes what runs | It reaches understanding, planning and the answer's shape; it never reaches checking, compiling or running the plan. The policy check is the same with or without one |
 | One run, one approach | Two at once are refused; an agent carries no default approach ([AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md)) |
@@ -206,7 +206,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The agent, its budget and its Access Policies · the built-in agents | [AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md#engine) · [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | An Ask and its approvers | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | The functions a plan may call, the workflows `nl-outside` and `simulate` | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
-| Recall — plans that served, plans to avoid | [AG-F09](../../../agents/features/AG-F09-thinking-graph-and-memory/feature.md#engine) |
+| Recall — plans that served, plans to avoid | [AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md#engine) |
 | Plugins, their switches and declared needs · the web tools `web.search` · `web.read_url` and their setting · plugins of kind `simulator` | [CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) |
 | A graph database's mode — read-only or read + write — and its switch | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
 | The AI model's local or external mark · sensitive properties | [CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine) · [SE-F03](../../../semantics/features/SE-F03-meaning/feature.md#engine) |
@@ -313,7 +313,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Approaches are authored with skills | Same shape — named, described, *when to use*, offered to a step, reused by many agents — so they sit in Agents › Skills, not a second authoring place |
 | No default approach | The plain path has no assumptions list; an approach is picked for one question |
 | Assumptions say what changes without them | Each assumption carries what the answer becomes if it does not hold, authored with the approach — so dropping one is predictable, and a re-run proves it |
-| What-if is an approach, not a product | It is picked like any approach or read from the question; its science is a simulator's, shipped in a Domain pack; Explore runs it and labels it |
+| What-if is an approach, not a product | It is picked like any approach or read from the question; its science is a simulator's, shipped in a Team pack; Explore runs it and labels it |
 | Predicted stands apart | A predicted part is its own card, never merged with a table or drawing of records; a claim citing it is marked *Predicted* |
 | Saving a prediction is a load | Saving derived records is RC-F02's load of `source = run`, so undoing an input flags the derived records like any other citation |
 | Outside facts run their own workflow | A question that needs outside facts runs a workflow with Search and Fetch in its steps, so the steps a person reads say up front that it looked outside |
@@ -342,7 +342,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Tone or character on an approach | Who speaks is the agent's; an approach is a method |
 | Blended approaches · approaches applied by question type | A blend has no statable assumptions; applying one unasked hides the method again |
 | An approach that adds a step kind | The steps a plan may use are the runtime's; a method chooses among them |
-| A simulator in the core | The science is a domain's; a simulator ships in a Domain pack |
+| A simulator in the core | The science is a team's; a simulator ships in a Team pack |
 | Parameter sweeps | One change per what-if; a sweep is several questions |
 | Editing or deleting a simulation | It is the record of a run; ask again |
 | Crawling or scheduled scraping | A search serves one question; collecting the web is the customer's pipeline, loaded through Records |

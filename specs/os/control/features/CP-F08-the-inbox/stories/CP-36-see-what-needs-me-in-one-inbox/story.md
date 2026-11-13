@@ -59,7 +59,7 @@ flowchart LR
 | CP-36.12 | The Inbox opening | its lists are still loading | it opens at once, rows loading in place, the count the last one read |
 | CP-36.13 | The engine cannot read the Inbox | it opens | it says what it could not read, with *Try again* |
 | CP-36.14 | A row | its product is shown | it is where the thing lives — a load Records', a task's run Projects', a link between models Model's, a typed query Explore's, any other agent run Agents' |
-| CP-36.15 | An event on a private project | a rule matches it | only that project's people are told |
+| CP-36.15 | An event on a project a recipient's default agent may not Read | a rule matches it | they are told in a line and a link; opening it reads *Withheld — your agent may not read `project/{key}`* |
 | CP-36.16 | An Operator or a Modeller | they open the Inbox | they read their own items; acts they may not take are disabled with their reason |
 | CP-36.17 | An open ops alert sent to the reader (CP-59) | Needs you is read | it is listed until it closes; when it closes it reads closed, naming what closed it, and moves to Updates |
 | CP-36.18 | A run the reader is behind | someone else stops it (CP-58) | the reader gets an update naming who stopped it, which opens the run |

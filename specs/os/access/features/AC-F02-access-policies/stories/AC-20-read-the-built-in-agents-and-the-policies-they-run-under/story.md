@@ -30,7 +30,7 @@ flowchart TD
   a -->|Copy the built-in policy| cp(["AC-04 · a custom draft, owned by the Admin"])
   a -->|Attach a custom policy| at(["AC-11 · narrows it — the strictest rule wins"])
   a -->|Edit · Take off| no["None · built in, owned by the system user"]
-  p([A person's own act in Studio]) --> b{"May the person use the built-in agent for it?"}
+  p([A person's own act in Studio]) --> b{"Is the built-in agent for it granted to the person?"}
   b -->|yes| run(["It runs as that agent, for the person · History names both"])
   b -->|no| ref(["AC-07 · Refused · names the agent and who grants agents"])
 ```
@@ -41,7 +41,7 @@ flowchart TD
 |---|---|---|---|
 | AC-20.1 | A deployment | *Built-in agents* is read | six agents read, one of each — Assistant · Query console · Modeller · Coordinator · Record editor · Loader — each owned by the system user, with what it acts for and its built-in policy |
 | AC-20.2 | A built-in agent | it is opened | its built-in policy's rules read as sentences, then each custom policy attached to it, then *What it may do* — every rule at once (AC-F04) |
-| AC-20.3 | A built-in agent or its built-in policy | an edit, rename, delete or take-off is tried, from any path | it is refused, naming it as built in; *Copy* makes a custom draft owned by the person who copied it |
+| AC-20.3 | A built-in agent or its built-in policy | an edit, rename, delete or take-off is tried, from any path | it is refused, naming it as built in; *Copy* makes a custom draft |
 | AC-20.4 | A custom policy with a Deny attached to a built-in agent | a step of that agent is checked | the Deny holds — the strictest rule wins — and the refusal names the custom policy |
 | AC-20.5 | A person's own act in Studio — a question to the Assistant, a query in the Console, a change to the model, a plan run, an edit on the board, a load | it runs | it runs as the built-in agent for it, for that person; History and *How it got here* name the person and the agent |
 | AC-20.6 | A person not granted the built-in agent an act runs as | they try the act | it is refused before it runs, naming the agent and who grants agents (AC-07) |

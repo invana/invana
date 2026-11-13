@@ -19,10 +19,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
+Proposing and reading are every signed-in person's, on a run they are behind ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Propose the plan of any run that served; read where every workflow and function comes from | — |
-| Operator | Propose the plan of a run they are behind, or of a run of an agent they own; read where every workflow and function comes from; a Modeller the same | On a run they are not behind and whose agent they do not own: *Propose as a workflow* is not shown |
+| Admin | Propose the plan of a run they are behind that served; read where every workflow and function comes from | On a run they are not behind: *Propose as a workflow* is not shown |
+| Operator | Propose the plan of a run they are behind; read where every workflow and function comes from; a Modeller the same | On a run they are not behind: *Propose as a workflow* is not shown |
 
 ## Flow
 
@@ -32,14 +34,14 @@ flowchart TD
   v -->|no| nc(["Kept as avoid · not a candidate"])
   v -->|yes, rung 1 or 2| nc2(["Already a function or a workflow · not a candidate"])
   v -->|yes, composed or drafted| c["Propose as a workflow — on the run"]
-  c --> who{"Behind it, or owns its agent?"}
+  c --> who{"Behind it?"}
   who -->|no| cx["Not shown"]
   who -->|yes| n["Key · name · intent · each literal as an argument"]
   n -->|a record ID or a value as a default| dx["Refused — data is never a default"]
-  n -->|a key someone else owns| kx["Refused — propose a new key, or ask its owner"]
+  n -->|a key another workflow holds| kx["Refused — propose a new key, or ask an Admin"]
   n --> ask["An ask to the agent's named approvers — AG-47"]
   ask -->|waiting| w(["Waiting on {approvers} · shown on the run"])
-  ask -->|approved| v1(["Workflow key@1 · the proposer its first owner"])
+  ask -->|approved| v1(["Workflow key@1 · the platform's, made by the proposer"])
   ask -->|declined · expired| d(["Stays a one-off · the note on the run"])
   ev([The same intent drafted and served again and again]) --> sc["A suggested change in Needs you, with its runs — AG-51"] --> c
   t([Agents › Skills · Functions]) --> src["Grouped by where each comes from — a plugin, a library"]
@@ -50,18 +52,18 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-31.1 | A run whose plan was drafted or composed for it, and Verify judged it served | the person behind it, or an owner of its agent, reads the run | it shows *Propose as a workflow*; a run that did not serve, or that took rung 1 or 2, does not |
+| AG-31.1 | A run whose plan was drafted or composed for it, and Verify judged it served | the person behind it reads the run | it shows *Propose as a workflow*; a run that did not serve, or that took rung 1 or 2, does not |
 | AG-31.2 | *Propose as a workflow* | it is opened | a modal asks for a key, a name and the intent future runs are matched on, and lists every literal value the plan ran with as an argument to name and label |
 | AG-31.3 | A literal that is a record ID or a property value | the proposer names it | it becomes a required argument; *Use as default* is not offered for it |
 | AG-31.4 | A literal that is a count, a window or a flag | the proposer names it | they may keep the run's value as its default |
 | AG-31.5 | A complete proposal | it is sent | an ask goes to the agent's named approvers (AG-47); the run reads *Waiting on {approvers}*, with when it reminds and when it expires |
-| AG-31.6 | A proposal the approvers approve | the decision lands | the run links the new workflow `key@1`; the proposer is its first owner; the next run with that intent may choose it on rung 2 |
+| AG-31.6 | A proposal the approvers approve | the decision lands | the run links the new workflow `key@1`; it is the platform's, made by the proposer; the next run with that intent may choose it on rung 2 |
 | AG-31.7 | A proposal declined or expired | the decision lands | the plan stays a one-off; the run shows who declined it and their note, or that it expired |
 | AG-31.8 | A plan with the same intent drafted and served again and again | the threshold is crossed | a suggested change in *Needs you* proposes making it a workflow, with the runs that drafted it (AG-51); nothing is proposed until a person does |
 | AG-31.9 | Any workflow | it is read | it says where it comes from — *built-in* (with its plugin) · *approved* (linking the run it came from and who approved it) · *copied from* `key@n` |
 | AG-31.10 | Functions | anyone opens it | functions group by where they come from — each plugin with its version and whether it is on, each library (AG-40) — and a function from a plugin switched off says so, naming who switched it off |
-| AG-31.11 | A run that did not serve, a plan already a workflow, or a run the proposer is not behind and whose agent they do not own | a proposal for it reaches the engine | it is refused: *Only a plan drafted or composed for a run that served can be proposed — by the person behind it or its agent's owners.* |
-| AG-31.12 | A key another person's workflow holds | the proposer names it | it is refused: *{key} is {owner}'s — propose a new key, or ask them.*; proposing its next version is for its owners (AG-48) |
+| AG-31.11 | A run that did not serve, a plan already a workflow, or a run the proposer is not behind | a proposal for it reaches the engine | it is refused: *Only a plan drafted or composed for a run that served can be proposed — by the person behind it.* |
+| AG-31.12 | A key another workflow holds | the proposer names it | it is refused: *{key} is taken — propose a new key, or ask an Admin.*; proposing its next version is for a Modeller or an Admin (AG-48) |
 | AG-31.13 | A proposal already waiting on the same run | *Propose as a workflow* is pressed again | it reads *This plan is already waiting on {approvers}* and sends nothing |
 | AG-31.14 | A proposal that keeps a record ID or property value as a default | it reaches the engine | it is refused: *{argument} holds a value from the data — it cannot be a default.* |
 | AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Control Plane › Plugins, where an Admin switches it (CP-F02); nothing here switches it |

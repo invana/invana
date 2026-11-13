@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | *Improve this skill* from any failed run | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): *Improve this skill* from a failed run they may read, when they own the skill | *Request a change* stands where *Improve this skill* would, sent to the skill's owners with the run attached; a failed run whose content they may not read shows neither ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | A Modeller: *Improve this skill* from a failed run they may read. An Operator: read the failed run they may read | An Operator sees *Request a change* where *Improve this skill* would stand, sent to the Modellers and the Admins with the run attached ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table): skills are the Modeller's and the Admin's); a failed run whose content they may not read shows neither ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 
@@ -32,7 +32,7 @@ flowchart LR
   d --> t["Tests run on the draft (AG-F04)"]
   t -->|publish| b(["Back to the run — re-run it on the new version"])
   t -->|a test fails| d
-  s -->|not the skill's owner, not an Admin| q["Request a change"] --> i(["The skill's owners, in Inbox › Needs you"])
+  s -->|an Operator| q["Request a change"] --> i(["The Modellers and Admins, in Inbox › Needs you"])
 ```
 
 ## Acceptance criteria
@@ -41,10 +41,10 @@ flowchart LR
 |---|---|---|---|
 | CP-56.1 | A failed run | a step that failed opens | it reads its input, output and the skill it applied, with *Improve this skill* |
 | CP-56.2 | A failed step | the Assistant reads it | it proposes why it failed and a fix to the skill, citing the step; *How it got here* shows its steps and sources |
-| CP-56.3 | An owner of the skill, or an Admin | they press *Improve this skill* | the skill's draft opens with this run added as a test, and a way back to the run |
-| CP-56.4 | The draft published | its owner goes back | the run reads that a newer version of its skill exists, with *Re-run* on it (CP-54) |
+| CP-56.3 | A Modeller or an Admin | they press *Improve this skill* | the skill's draft opens with this run added as a test, and a way back to the run |
+| CP-56.4 | The draft published | the person who published it goes back | the run reads that a newer version of its skill exists, with *Re-run* on it (CP-54) |
 | CP-56.5 | A run whose skill already has a draft | *Improve this skill* is pressed | the run is added as a test to that draft; a second draft is never made |
-| CP-56.6 | Someone who does not own the skill and is not an Admin | they read a failed run | *Request a change* is in its place; it sends the skill's owners a request with the run attached, to *Needs you* |
+| CP-56.6 | An Operator | they read a failed run they may read | *Request a change* is in its place; it sends the Modellers and the Admins a request with the run attached, to *Needs you* |
 | CP-56.7 | A failed run that applied no skill | the step opens | *Improve this skill* is absent |
 | CP-56.8 | A proposed change to a skill from a failed run | it is shown | it names the change it recommends and why, beside the alternatives it weighed |
 | CP-56.9 | A failed run whose content the reader may not read | they open it | its steps read *withheld*; neither *Improve this skill* nor *Request a change* is offered |

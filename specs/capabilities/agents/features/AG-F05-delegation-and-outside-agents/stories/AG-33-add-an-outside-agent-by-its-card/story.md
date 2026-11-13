@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 ## Who can
 
+Adding an outside agent is the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add an outside agent, choose its credential, turn it on or off, read its card again, set its limits, remove one no run reached | — |
-| Modeller | Read every outside agent, its skills, owners and limits, never its secret | *Add an outside agent* and every act disabled — *Needs the Admin role* |
+| Modeller | Read every outside agent, its skills, who added it and limits, never its secret | *Add an outside agent* and every act disabled — *Needs the Admin role* |
 | Operator | As Modeller | As Modeller |
 
 ## Flow
@@ -38,7 +40,7 @@ flowchart LR
   c --> n["A name · shared secret or each person's own account · workers · limits"]
   n -->|a secret| pw["The password again"]
   pw --> off
-  n --> off(["Added, off — its owner the Admin"])
+  n --> off(["Added, off — the platform's, made by the Admin"])
   off -->|Turn on| on(["On — Ask for every agent until a rule names it"])
   on -->|Read the card again| c
 ```
@@ -49,10 +51,10 @@ flowchart LR
 |---|---|---|---|
 | AG-33.1 | An Admin | they give an outside agent's A2A card address, or its domain | the card is read — from `/.well-known/agent-card.json` when a domain is given — and its name, version, interfaces, how it signs in and the skills on its card are shown before it is added |
 | AG-33.2 | A card that cannot be read | they add it | it says why, and nothing is added |
-| AG-33.3 | A card read or an MCP server picked | the Admin names it, chooses a shared secret — with the password again — or each person's own account, and the workers it calls from | it is added *off*, owned by the Admin, the card kept as it was read |
+| AG-33.3 | A card read or an MCP server picked | the Admin names it, chooses a shared secret — with the password again — or each person's own account, and the workers it calls from | it is added *off*, the platform's and made by the Admin, the card kept as it was read |
 | AG-33.4 | An outside agent | the Admin turns it on | it can be named in rules on Run `agent/<name>`; with no rule naming it, a hand-off to it asks first |
 | AG-33.5 | A card changed on the other side | nothing is done | nothing changes until an Admin presses *Read the card again*; a skill the card has dropped refuses, naming the card's date |
-| AG-33.6 | An outside agent | it is read | it shows its protocol, endpoint or server, skills, credential choice (never a secret's value), workers it calls from, limits — time, attempts, tasks at once — owners, and on or off with who switched it |
+| AG-33.6 | An outside agent | it is read | it shows its protocol, endpoint or server, skills, credential choice (never a secret's value), workers it calls from, limits — time, attempts, tasks at once — who added it, and on or off with who switched it |
 | AG-33.7 | An outside agent | it is listed in Agents | it reads *Outside*, is granted to nobody, is never given a task by a person, and holds no limits of Invana's own |
 | AG-33.8 | An Operator or Modeller | they open Outside agents | everything reads; *Add an outside agent*, *Turn on*, *Read the card again* and *Remove* are disabled — *Needs the Admin role* |
 | AG-33.9 | A document that is not an A2A agent card, or one whose interfaces offer no A2A version Invana speaks | they add it | it is refused, naming the version it found and the one Invana speaks; nothing is added |

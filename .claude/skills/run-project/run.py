@@ -431,7 +431,11 @@ def session(p: Project, text: str, pid: str, step: str, part: int, agent: str,
 
 
 def until_handoffs_end(p: Project, pid: str, first: str, step: str, agent: str, model: str, max_handoffs: int) -> None:
-    """Run a step; while it ends `partial` (a hand-off), continue in a fresh session from the note."""
+    """Run a step; while it ends `partial` (a hand-off), continue in a fresh session from the note.
+
+    A continuing session that commits nothing and leaves the tree clean found nothing left to do; it cannot always
+    clear `partial` itself (a headless session may not edit the project file), so the runner counts the step built.
+    """
     claude(p, first, pid, step, 1, agent, model)
     reclaim(p, pid)
     checkpoint(p, pid, f"{step} session 1")
@@ -439,8 +443,13 @@ def until_handoffs_end(p: Project, pid: str, first: str, step: str, agent: str, 
         if p.status_of(pid) != "partial":
             return
         print(f"  {pid} handed off — part {n}", flush=True)
+        before = sh(["git", "rev-parse", "HEAD"]).stdout.strip()
         claude(p, p.prompt("continue", ID=pid), pid, step, n, agent, model)
         reclaim(p, pid)
+        if p.status_of(pid) == "partial" and git_clean() and sh(["git", "rev-parse", "HEAD"]).stdout.strip() == before:
+            print(f"  {pid} part {n} changed nothing — {step} counted as built", flush=True)
+            p.set_status(pid, "in progress")
+            return
         checkpoint(p, pid, f"{step} session {n}")
     if p.status_of(pid) == "partial":
         raise RuntimeError(f"still partial after {max_handoffs} hand-offs")

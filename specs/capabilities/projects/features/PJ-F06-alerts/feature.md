@@ -17,8 +17,8 @@ depends_on: [SE-F07, PJ-F01, PJ-F03, RC-F02, CP-F08]
 > a Supplier linked to more Products than it should be — and opens a lead in a project: a task, or a branch to weigh.
 > The decision it helps make: *is this pattern worth pursuing, and by whom?*
 >
-> What goes wrong with the platform — denials, spend, stuck runs, a graph database that cannot be reached — is not an
-> alert here: it is [ops alerting](../../../../os/control/features/CP-F11-ops-alerting/feature.md) in the Control Plane.
+> What goes wrong with the platform is not an alert here: it is an alert kind of
+> [ops alerting](../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds) in the Control Plane.
 
 ## User journey
 
@@ -31,13 +31,13 @@ flowchart TD
   open -->|no| proj{"The rule's project can take it?"}
   proj -->|archived or gone| nf["PJ-19 · Nothing opens · the rule's author is told in the Inbox"]
   proj -->|yes| lead["PJ-19 · A lead opens — a task or a branch — citing the records and the rule"]
-  lead --> nyou["Inbox › Needs you of the project's owners and people"]
+  lead --> nyou["Inbox › Needs you of the project's members"]
   nyou --> tri{"A person who can see the project triages"}
   tri -->|take it| work(["Worked as any task or branch (PJ-F01 · PJ-F03)"])
   tri -->|dismiss, with a reason| dis(["Dismissed · the reason kept · the rule's counts move"])
   tri -->|project archived| ro["Reads · Take and Dismiss disabled, saying it is archived"]
   lead -->|a matched record of a kind the reader's agents may not read| wr["Withheld"]
-  ops([A denial, spend, a stuck run, an unreachable graph database]) -.->|not a lead| cp(["Ops alerting — CP-F11"])
+  ops([Something goes wrong with the platform]) -.->|not a lead| cp(["An alert kind — CP-F11"])
 ```
 
 ```mermaid
@@ -66,10 +66,10 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 *Alerts* is *Acts* for Operator, Modeller and Admin — on every project the person can see
 ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)). Writing an alert rule is the Ontology's.
 
-| Act | Who | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Write an alert rule and the project it opens leads in | Modeller · Admin ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) | As SE-F07 |
-| Read a project's leads and the rule behind each | Anyone who can see the project | A private project's leads are absent for anyone not on it |
+| Read a project's leads and the rule behind each | Anyone whose default agent may Read the project | A project their default agent may not Read: its leads count, their content *Withheld — your agent may not read `project/{key}`* |
 | Read the records a lead matched | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A record of a kind the reader's agents may not read reads *Withheld* |
 | Take or dismiss a lead | Anyone who can see the project — Operator · Modeller · Admin | On an archived project, *Take* and *Dismiss* are disabled, saying it is archived |
 | Open a lead | The engine, on a rule's match — never an agent's own act | — |
@@ -84,22 +84,22 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 | Has data | Leads newest first: the rule, the records matched, how many matches, opened when, open · taken · dismissed |
 | Failed | The list could not load, saying why, with *Try again*; a dismissal with no reason is refused |
 | Agent working or proposing | An agent assigned a taken lead works it as any task (PJ-F01) |
-| No access | A private project's leads are absent; a matched record the reader's agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
+| No access | A project the reader's default agent may not Read shows its leads' count only; a matched record the reader's agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
 | An alert is a rule | Its condition, the kinds it watches, the project it opens leads in and whether a lead is a task or a branch are SE-F07's; Projects only receives the match and opens the lead |
-| A pattern in the records | A rule watches the records — counts, thresholds, links between kinds — never the platform. Denials, spend, stuck runs, unreachable graph databases and skipped schedules are [ops alerts](../../../../os/control/features/CP-F11-ops-alerting/feature.md) |
+| A pattern in the records | A rule watches the records — counts, thresholds, links between kinds — never the platform; what goes wrong with the platform is an [alert kind of CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds) |
 | A lead is a task or a branch | The lead is an ordinary task (PJ-F01) or branch (PJ-F03) with the rule, the load or change and the matched records as its cites |
 | One open lead per pattern | A match on the same records while a lead from the same rule is open adds to it and counts, never a second lead |
 | Evaluated after the write | Alert rules run on a queue worker after a load or change settles; they never block or slow the write |
-| A lead waits in the Inbox | A new lead is listed in the Inbox › Needs you of the project's owners and people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)); a rule whose project is archived or gone tells its author instead |
+| A lead waits in the Inbox | A new lead is listed in the Inbox › Needs you of the project's members ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)); a rule whose project is archived or gone tells its author instead |
 | Take | A task lead is assigned as the taker picks — a person, or an agent they may use — and worked as any task; a branch lead is worked as any branch |
 | Dismiss | Needs a reason. A task lead is cancelled with the reason as its note; a branch lead is dropped by a *drop* decision in the dismisser's name, the reason its rationale, checked by the rules like any decision (PJ-F03) |
 | Records read as the reader | A lead stores record IDs; opening one reads it through the agents the reader may use |
-| Generic | The rule names kinds and conditions; no pattern is built into the platform — Domain packs ship ready alert rules (CP-F02) |
+| Generic | The rule names kinds and conditions; no pattern is built into the platform — Team packs ship ready alert rules (CP-F02) |
 | The engine counts | Matches per lead, leads per rule, taken and dismissed are stored by the engine |
 | Leans on | Rules and their evaluation (SE-F07) · tasks (PJ-F01) · branches and decisions (PJ-F03) · loads (RC-F02) · the Inbox (CP-F08) |
 
@@ -129,7 +129,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | Alert rules, their versions, and the match their evaluation hands over | [SE-F07](../../../semantics/features/SE-F07-rules/feature.md#engine) |
-| Projects, their owners and people, the private-project filter · tasks | [PJ-F01](../PJ-F01-projects-and-tasks/feature.md#engine) |
+| Projects, their members and reviewers, reading a project through the default agent · tasks | [PJ-F01](../PJ-F01-projects-and-tasks/feature.md#engine) |
 | Branches and the *drop* decision a dismissal records | [PJ-F03](../PJ-F03-branches-findings-and-decisions/feature.md#engine) |
 | Loads | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | The Inbox items a lead raises | [CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine) |
@@ -157,11 +157,11 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 404 | A private project the caller is not on | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-19.8 |
+| 403 | A project the caller's default agent may not Read | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-19.8 |
 | 422 | A dismissal with no reason | *Say why this lead is dismissed.* | PJ-19.6 |
 | 409 | Take or dismiss on an archived project | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-19.11 |
 | 409 | Take or dismiss a lead not open | *{lN} is already {state}.* | API only — Studio offers each act only on an open lead |
-| 403 | Taking a task lead for an agent the taker may not use | *You may not use {agent} — ask {owner}.* | PJ-19.5 |
+| 403 | Taking a task lead for an agent the taker may not use | *You may not use {agent} — ask an Admin.* | PJ-19.5 |
 | 409 | A rule blocks the *drop* decision a branch lead's dismissal records | PJ-F03's rule refusal | PJ-19.12 |
 
 ### CLI
@@ -176,12 +176,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Receiving a match | SE-F07's worker calls `projects.leads.open(rule_id, rule_version, source, records[])`. The engine computes `match_key`; an open lead with the same `rule_id` and `match_key` gets `matches + 1` and `projects.leads.matched`; otherwise a lead row and its task or branch are written in one transaction, citing the rule, the source and the records, `projects.leads.opened` |
 | A project that cannot take it | An archived or deleted project writes no lead; `projects.leads.not_opened` raises an Inbox item to the rule's author naming the project |
-| Needs you | A new lead raises one Needs you item to the project's owners and people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)); taking or dismissing it closes the item for everyone |
+| Needs you | A new lead raises one Needs you item to the project's members ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)); taking or dismissing it closes the item for everyone |
 | Take | A task lead writes its assignee through PJ-F01's assign — an agent opens its run with the taker behind it; `state = taken` |
 | Dismiss | A task lead is cancelled through PJ-F01 with `reason` as its note; a branch lead records a *drop* decision through PJ-F03 as the dismisser, `reason` its rationale; a rule that blocks it leaves the lead open. `state = dismissed` only once that write succeeds |
 | Rule counts | Leads per rule, taken and dismissed are counted from `projects_leads` and served to SE-F07's rule page |
 | Records read as the reader | `records[]` are opened through the agents the reader may use; a kind their policies deny is returned as `withheld` |
-| Hidden projects | Every read here applies the private-project filter of [PJ-F01 › Mechanisms](../PJ-F01-projects-and-tasks/feature.md#mechanisms) |
+| Reading a project | Every read here reads the project through the caller's default agent, as [PJ-F01 › Mechanisms](../PJ-F01-projects-and-tasks/feature.md#mechanisms) says |
 
 ## System impact
 
@@ -197,7 +197,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Leads land in a project | An alert never stands alone: it opens work where the decision about it will be made |
 | A dismissal keeps its reason | So a rule that only makes noise shows it in its counts |
-| Records, not the platform | A lead is about the customer's records; what goes wrong with Invana itself is an ops alert in the Control Plane |
+| Records, not the platform | A lead is about the customer's records; what goes wrong with Invana itself is an alert in the Control Plane ([CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md)) |
 | Dismissing a branch is a decision | A branch is closed only by a decision, so a dismissed branch lead is a *drop* the rules check like any other |
 
 ## Open questions
@@ -211,6 +211,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Item | Why not |
 |---|---|
 | A separate alerts place | Leads are project work; Inbox › Needs you already says what waits |
-| Platform alerts — denials, spend, stuck runs, unreachable graph databases | Ops alerting in the Control Plane ([CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md)) |
+| Platform alerts | Every alert about the platform is a kind of [CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds) |
 | Alerts sent outside Invana | A send is an agent's act under its Access Policies; a schedule's delivery covers it (AG-F07) |
 | Real-time streaming detection | Rules run after a write settles; Invana is not a monitoring platform |

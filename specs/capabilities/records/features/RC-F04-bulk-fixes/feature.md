@@ -23,7 +23,7 @@ flowchart TD
   start([Records or a Quality rule]) --> sel["RC-03 · The records to change"]
   sel --> ch["RC-03 · Set · clear · map one property"]
   ch --> pv["RC-03 · Preview: before → after, record by record · what the model refuses"]
-  pv --> g{Can work on projects · the connection writes?}
+  pv --> g{Modeller or Admin · the connection writes?}
   g -->|no| na["Run disabled — the reason"]
   g -->|yes| run{"Run the fix"}
   run -->|written| done(["One run · each record's History names it"])
@@ -48,10 +48,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Preview a fix | Operator — every member | — |
-| Run a fix | `contributor` · shown as *Can work on projects*, on a connection that writes | Disabled — *Ask Priya (owner)*; a read-only connection gives its own reason |
+| Preview a fix | Every role — Operator, Modeller, Admin | — |
+| Run a fix | Modeller · Admin, through an agent granted to them, on a connection that writes | Disabled — *Needs the Modeller role — ask an Admin*; a read-only connection gives its own reason |
 
 ## States
 
@@ -93,8 +93,6 @@ flowchart TD
 | Question | Who answers |
 |---|---|
 | EX-F06 › Not building says bulk changes are an upload in Records; here a fix sets, clears or maps one property, with no upload. Recommend: a fix as written here, and EX-F06's row reads *bulk changes are a fix in Data (RC-F04)* | Ravi |
-| Writing records needs *Can work on projects* in the engine, as a board's save does (EX-F06); the personas put *loading data* under *Can shape the model*. Recommend: *Can work on projects* for every write here, as the engine enforces | Ravi |
-
 ## Not building
 
 | Item | Why not |

@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
+Loading and undoing a load are the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); every role reads the loads.
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Load into any model; read and export every load; undo any load | — |
-| Operator | Read and export every load in the Graph — its outcome, what was rejected, its log and what landed | Loading is refused before anything is written, naming who may load; *Undo load* absent on loads they did not run. With *Can shape the model*: loads from the command line or the API, and undoes their own loads |
+| Operator | Read and export every load in the Graph — its outcome, what was rejected, its log and what landed. A Modeller also loads from the command line or the API and undoes loads, as an Admin does | Loading refused before anything is written — *Needs the Modeller role — ask an Admin*; *Undo load* disabled with the same reason |
 
 ## Flow
 
@@ -65,8 +67,8 @@ flowchart LR
 | RC-09.17 | A run past retention | it is opened | its counts stay and it says the rows are gone |
 | RC-09.18 | A finished load | the person opens *How it got here* | the run's steps show what each one checked, wrote and rejected |
 | RC-09.19 | A finished load | the person picks *Export* | the load's records download with their provenance — the load's id, content hash, licence, file and run on each |
-| RC-09.20 | A load the person ran, or any load for an Admin | they pick *Undo load* and confirm | the records it created are removed, values it wrote that nothing changed since are reverted, and every finding, report and simulation that cites it carries a *load undone* notice; a bulk load or one already undone is refused, saying why |
-| RC-09.21 | An Operator who did not run the load | they open it | *Undo load* is absent, naming who ran it |
+| RC-09.20 | A Modeller or an Admin, and a load | they pick *Undo load* and confirm | the records it created are removed, values it wrote that nothing changed since are reverted, and every finding, report and simulation that cites it carries a *load undone* notice; a bulk load or one already undone is refused, saying why |
+| RC-09.21 | An Operator | they open a load | *Undo load* is disabled with *Needs the Modeller role — ask an Admin* |
 
 ## Screens
 

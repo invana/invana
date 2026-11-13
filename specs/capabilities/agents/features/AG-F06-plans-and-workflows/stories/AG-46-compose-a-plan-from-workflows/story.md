@@ -18,10 +18,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
+Reading is every signed-in person's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read the composed plan of any run, its composites and their pins, and the check over the tree | — |
-| Operator | Read the composed plan of a run they are behind or whose agent they own; a Modeller the same | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
+| Admin | Read the composed plan of a run they are behind or, for a project's run, whose sources their default agent may see — its composites and their pins, and the check over the tree | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
+| Operator | Read the composed plan of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
 
 ## Flow
 

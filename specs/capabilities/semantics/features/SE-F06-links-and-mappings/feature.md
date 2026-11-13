@@ -7,7 +7,7 @@ personas: [modeller]
 stories: [SE-01, SE-02, SE-03, SE-16]
 journeys: []
 boards: [model.board, model.board.kind, model.new]
-nfrs: [NFR-PERF-4]
+nfrs: [NFR-PERF-4, NFR-SEC-11]
 depends_on: [SE-F01, SE-F02]
 ---
 
@@ -24,11 +24,11 @@ flowchart TD
   start([Model]) --> map["SE-01 · The map: every published model, links between models dashed"]
   map -->|a model with nothing published| empty["An empty frame that says so"]
   map -->|a kind| k["SE-02 · The kind: its properties, records, key · Open it"]
-  k -->|Mappings · Map to a standard| mp{Can shape the model?}
-  mp -->|no| na2["Reads · Ask Priya (owner) to shape the model"]
+  k -->|Mappings · Map to a standard| mp{Modeller or Admin?}
+  mp -->|no| na2["Reads · Needs the Modeller role — ask an Admin"]
   mp -->|yes| ms(["SE-02 · Staged in the draft: this property is that standard's term"])
-  map -->|drag from one model to another · Link models| may{Can shape the model?}
-  may -->|no| na["Disabled — Ask Priya (owner) to shape the model"]
+  map -->|drag from one model to another · Link models| may{Modeller or Admin?}
+  may -->|no| na["Disabled — Needs the Modeller role — ask an Admin"]
   may -->|yes| dec["SE-03 · Link two models: same thing, or a relationship · a key on each side"]
   dec --> cnt{Records joined?}
   cnt -->|none match| fix["Matches nothing — Try another key"] --> dec
@@ -41,7 +41,7 @@ flowchart TD
   run -->|refused by a rule · no connection| rf["Refused — the reason · the link stays staged"]
   run --> act(["Active · questions cross both models · every later load joins new records"])
   act -->|Remove link| rm["A run withdraws what it wrote"] --> map
-  map -->|Export| ex1(["One file: the model, or the model and its records"])
+  map -->|Export| ex1(["One file: the model, or the model and its records · confidential and personal values left out, and named"])
   ex1 --> imp["SE-16 · Import into another Graph"]
   imp -->|name taken| nt["Named — another name, or a new version · Restore an earlier version"]
   imp -->|kinds this database cannot hold| np["A draft that cannot publish, naming them"]
@@ -75,13 +75,13 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read the map, a model, a kind, the links between models and their history | Operator — every member | — |
-| Link two models · commit or discard staged links · remove a link | `modeller` · shown as *Can shape the model* | *Link models* disabled — *Ask Priya (owner) to shape the model*; a drag between models does nothing and says why |
-| Rename a model · change its description | `modeller` · shown as *Can shape the model* | *Rename* disabled — *Ask Priya (owner) to shape the model* |
-| Export a model, with or without its records | Operator — every member — a read; carrying confidential or personal data, or made by a key or an agent, a send ([An export](../../../../os/access/product.md#decisions)) | — |
-| Import a model · restore an earlier version | `modeller` · shown as *Can shape the model* | *Import a model file* disabled — *Ask Priya (owner) to shape the model* |
+| Read the map, a model, a kind, the links between models and their history | Every signed-in person — Operator, Modeller, Admin | — |
+| Link two models · commit or discard staged links · remove a link | Modeller · Admin | *Link models* disabled — *Needs the Modeller role — ask an Admin*; a drag between models does nothing and says why |
+| Rename a model · change its description | Modeller · Admin | *Rename* disabled — *Needs the Modeller role — ask an Admin* |
+| Export a model, with or without its records | Every signed-in person — Operator, Modeller, Admin; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
+| Import a model · restore an earlier version | Modeller · Admin | *Import a model file* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## States
 
@@ -93,7 +93,7 @@ sequenceDiagram
 | Has data | Frames per model in their own hue, links dashed, the left section listing models, kinds and links |
 | Failed | A refused link names the side, kind or key; a commit or removal refused by a rule or a missing connection keeps the link as it was; an unreadable file says why |
 | Agent working or proposing | A run counting, writing or withdrawing a link's relationships; an ontology's equivalences offered as links to confirm |
-| No access | The map, kinds and links read; linking, committing, removing and importing are disabled with *Ask Priya (owner) to shape the model* |
+| No access | The map, kinds and links read; linking, committing, removing and importing are disabled with *Needs the Modeller role — ask an Admin* |
 
 ## Rules
 
@@ -110,6 +110,7 @@ sequenceDiagram
 | A link's relationships say so | Each is marked as made by its link, with the rule and when; removing the link removes exactly those, and only once they are gone does the link go |
 | Every read and write is a run, under the Graph's rules | Counting, committing and removing a link; a rule that denies either model refuses it, with the reason — never counted around |
 | A model travels as one file | A published version exports with its kinds, keys and constraints; links travel only when both ends are in the same file. Its identity is its package and its content, not its name, so a later import is recognised as a new version. Files and git are the registry |
+| An export is a send | A model file with its records leaves the platform, so it passes the outbound check ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) with lineage: confidential and personal values are left out and the file names what was left out; the records are only those the person's default agent may read |
 | Three kinds of mapping | *Model to model* — a link between models, above · *Model to standard* — a kind or property means a standard's term or value, staged in the model's draft and published with it; a question may then be asked in the standard's words · *Standard to standard* — a term or value in one standard is the same as, broader than or narrower than one in another, kept on the newer standard's version |
 | A mapping is declared | Like a link, a mapping is a person's, or an agent's proposal a person accepts; never inferred |
 | Leans on | SE-F01 · SE-F02 — the versions links and mappings bind · SE-F05 — the standards mapped · RC-F02 — loads that bring a relationship's rows · Explore — questions that cross links |
@@ -148,6 +149,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | The Graph's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
 | Loads that join new records and bring a relationship's rows · record stamps | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Standards a mapping names | [SE-F05](../SE-F05-standards/feature.md#engine) |
+| Committing and withdrawing a link's relationships · identity links and the join across graph databases | [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md#engine) |
 | Runs and the packaged plans they run | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
@@ -177,7 +179,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A link, commit, removal or import by someone without *Can shape the model* | *This needs Can shape the model — ask {owner}.* | SE-03.18 · SE-16.12 |
+| 403 | A link, commit, removal or import by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-03.18 · SE-16.12 |
 | 422 | A side's kind its published version does not declare (`type_not_in_version`) | *{model} v{n} has no kind {kind}.* | API only — the card offers only declared kinds |
 | 422 | A side that is a draft, the same model on both sides, or a model with nothing published (`version_is_draft`) | *A link joins two published models — {why}.* | SE-03.8 |
 | 422 | A key not on its kind, or a kind with no properties | *{side}: {kind} has no property {key}.* | SE-03.6 |
@@ -200,19 +202,14 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | Mechanism | How |
 |---|---|
 | Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the Graph's rules on properties, awaited; a rule naming a kind or key the rules deny comes back refused, never counted around |
-| Committing is a run, whoever commits | `stitch-commit@1`, no agent and no view, the Graph's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
-| What each kind writes | *Same thing* writes `SAME_AS` source → target, read undirected; a keyed relationship writes its `edge_type`; a row-sourced relationship writes nothing at commit — committing loads its rows, the files' place read back from the load's run |
-| Nothing written says so | A link that wrote nothing — a side the rules refuse — commits, says why, and never reports success; the others still solve |
-| Every later load joins | A load's link step runs the same `MERGE`, scoped to that load's stamp; writing again never writes twice |
-| A loaded row carries both marks | A relationship a row-sourced link loads carries the link's marks and the load's record stamps (`_inv_model_id` · `_inv_record_id` · `_inv_file` · `_inv_run_id`) |
-| `edges` is counted | Re-counted after every solve that writes, never summed — a `MERGE` re-matches |
+| Committing and removing write through Data | *Commit* starts `stitch-commit@1` and *Remove link* `stitch-withdraw@1`; what each kind writes, the marks on every relationship, joining later loads, counting `edges` and withdrawing exactly what a link wrote — with the identity links and the join across graph databases — are [GP-F01 › Mechanisms](../../../../os/graph/features/GP-F01-data/feature.md#mechanisms). A staged link's row is deleted with no run |
 | A touch per side | Counting, committing and withdrawing record one touch per model with the relationships written into it; a side a rule refuses skips that link only; a model checked but not written gets no touch |
-| Removal withdraws | An active link runs `stitch-withdraw@1`, deleting exactly the relationships marked with its id; the row goes only once they are gone. A rule denying either model refuses the whole removal. A staged link's row is deleted with no run |
 | A new version carries its links | Publishing re-binds active links to the new version; links on the replaced version stay as history, not counted twice |
 | The whole model | Computed on each read of `GET /global-model`; the database's own label count is compared, never added |
 | Identity | A file's identity is `package_id` plus `content_hash`: a later file of the same package is a new version, opened by `upgrade` as a draft |
 | What a file carries | Kinds, keys, constraints and axes; a link only when both models are in the file, else dropped naming the missing model; a kind the target cannot hold arrives as an unpublishable draft |
 | A bundle's records | Load as an ordinary load once the model is published; a restore loads none unless asked |
+| An export is checked | `GET /models/{id}/export` builds the file from the person's default agent's reads, then passes it through `outbound.check(payload, target)` ([AC-F09 › Mechanisms](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) with lineage: a confidential or personal value is left out, the response names each property and level left out, and the export is a ledger row naming its sources |
 | Packaged plans | `stitch-preview@1` · `stitch-apply@1` · `stitch-commit@1` · `stitch-withdraw@1` |
 
 ## System impact
@@ -221,7 +218,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 |---|---|---|
 | § 6 Data and storage | `model_links` in Invana's own store; the whole model is derived on read, never stored | — |
 | § 8 APIs and events | The routes and events above, under `model` | — |
-| § 11 Failure modes and the outside boundary | Commit and removal write and delete relationships in the customer's graph database, each marked with its link | — |
+| § 11 Failure modes and the outside boundary | Commit and removal write and delete relationships in the customer's graph database through [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md), each marked with its link | — |
 
 ## Decisions
 

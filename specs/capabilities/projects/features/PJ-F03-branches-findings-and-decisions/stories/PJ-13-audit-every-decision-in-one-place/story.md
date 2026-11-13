@@ -21,8 +21,8 @@ on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read the Decisions page across every project they can see; open a decision, its project and its lineage; export the rows | Decisions of a private project they are not on are absent — Admins are not exempt |
-| Operator | The same, and export the rows; a Modeller the same | Decisions of a private project they are not on are absent. Nothing on the page is an act to refuse |
+| Admin | Read the Decisions page across every project they can see; open a decision, its project and its lineage; export the rows | A decision of a project their default agent may not Read lists its project, number and date; its content reads *Withheld* — Admins are not exempt |
+| Operator | The same, and export the rows; a Modeller the same | A decision of a project their default agent may not Read lists, its content *Withheld*. Nothing on the page is an act to refuse |
 
 ## Flow
 
@@ -34,7 +34,7 @@ flowchart LR
   load --> l["Newest first · 2 current · 5 recorded · project · branch · decision · verdict · by · when · cited · rules passed"]
   l --> o["Open a decision → its branch · its project · Lineage (PJ-11)"]
   l --> x["Export for audit → a CSV of the rows shown"]
-  l -->|a project is private and the reader is not on it| h["Its decisions are not listed"]
+  l -->|the reader's default agent may not Read a project| h["Its decisions list, content Withheld"]
 ```
 
 ## Acceptance criteria
@@ -46,7 +46,7 @@ flowchart LR
 | PJ-13.3 | The page header | the list is drawn | it reads *2 current · 5 recorded*, as the engine counted them — current is the decisions no later one supersedes; it reads *5* alone when the two match |
 | PJ-13.4 | A decision | the person opens it | it opens its branch in its project, and its lineage (PJ-11) |
 | PJ-13.5 | A decision | the list names *By* | it names the person who decided — never an agent; a decision from a proposal also names the agent that proposed it |
-| PJ-13.6 | A private project the reader is not on | the list is drawn | none of its decisions appear — for an Admin as for anyone |
+| PJ-13.6 | A project the reader's default agent may not Read | the list is drawn | each of its decisions lists its project, number and date, and its verdict, choice and rationale read *Withheld — your agent may not read `project/{key}`* — for an Admin as for anyone |
 | PJ-13.7 | The list | the person chooses *Export for audit* | a CSV of the rows shown downloads |
 | PJ-13.8 | No decision in any project the reader can see | the page opens | it reads *No decisions yet* and says decisions are recorded on a branch |
 | PJ-13.9 | The engine cannot return the list | the page loads | it says *Could not load* with the reason and *Try again* |

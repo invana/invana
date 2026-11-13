@@ -53,11 +53,10 @@ flowchart TD
 | When | What happens | Story | Board |
 |---|---|---|---|
 | Tom has no account | An Admin makes it first; putting him on a team before then is refused in place | AC-18 · AC-09 | `settings.access` |
-| It needs permission | An act an agent's rule sets to Ask waits for its named approvers; unanswered, it reminds, goes to the agent's owners and the Admins, then expires refused | AC-15 · CP-36 | `inbox` |
+| It needs permission | An act an agent's rule sets to Ask waits for its named approvers; unanswered, it reminds, goes to the other approvers, then the Admins with a *no approver* alert, then expires refused | AC-15 · CP-36 | `inbox` |
 | It fails | Explore names what it could not read and offers *Try again* | EX-11 | `explore.ask` |
 | The person has no access | Every surface his role reaches reads; each act it does not hold names the role it needs and the Admins | AC-07 | `access.locked` |
 | No agent he may use reaches it | Refused, naming what is missing and who grants agents; nothing runs | AC-07 | `access.locked` |
-| A rule names a team he is not on | That rule does not apply to his runs; the refusal names it | AC-07 | `access.locked` |
 
 ## Done when
 

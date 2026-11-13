@@ -17,11 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md) · Its evals: [
 
 ## Who can
 
+Publishing and rolling back is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Publish a version of any agent not built in, roll back to an earlier one | A built-in agent has no *Publish* — *Built in — copy it to change it* |
-| Modeller | Publish and roll back the agents they own | On an agent they do not own, *Publish* and *Roll back* are disabled, naming its owners — *Only its owners or an Admin — ask Lee* |
-| Operator | Read every version, its reason and its eval result | *Publish* and *Roll back* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| Operator | Read every version, its reason and its eval result. A Modeller does what an Admin does | *Publish* and *Roll back* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -52,10 +53,10 @@ flowchart LR
 | AG-36.10 | An earlier version | the builder presses *Roll back* | it becomes a draft of the next version and passes the evals before it publishes, like any other |
 | AG-36.11 | A draft | anyone asks it, gives it a task, schedules it, delegates to it or makes it the default | it is refused, naming that it is a draft |
 | AG-36.14 | An Operator | they open a draft or Versions | the results and every version read; *Publish* and *Roll back* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
-| AG-36.17 | The command line | `invana agents push` writes a draft's instructions from a file and `invana agents publish` publishes it | each passes the same gate as Studio and needs the same role and ownership, refused naming what is missing |
+| AG-36.17 | The command line | `invana agents push` writes a draft's instructions from a file and `invana agents publish` publishes it | each passes the same gate as Studio and needs the same role, refused naming it |
 | AG-36.18 | A draft with active eval cases and no settled eval run over its exact text and model version, or one still running | the builder presses *Create*, *Publish* or *Roll back* | it is refused where the act was, naming the case count, with *Run the evals*; Studio never predicts the gate |
 | AG-36.19 | A draft with no Access Policy attached | the builder presses *Create* or *Publish* | it is refused — *may touch nothing — ask an Admin to attach an Access Policy* — and nothing goes live |
-| AG-36.20 | A Modeller on an agent they do not own | they open Versions | every version reads; *Publish* and *Roll back* are disabled, naming its owners |
+| AG-36.20 | An Operator | they open Versions | every version reads; *Publish* and *Roll back* are disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Screens
 

@@ -16,17 +16,19 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
+Loading records is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Upload a file into any published model of the Graph and load it | — |
-| Operator | Read the loads | *Upload* absent, a line naming who may load. With *Can shape the model*: as Admin |
+| Operator | Read the loads. A Modeller uploads as an Admin does | *Upload* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([Records › Bring records in · Upload]) --> g{Can shape the model?}
-  g -->|no| na["Upload absent — names who may load"]
+  a([Records › Bring records in · Upload]) --> g{Modeller or Admin?}
+  g -->|no| na["Upload disabled — Needs the Modeller role"]
   g -->|yes| f["Drop a file"]
   f --> m["Pick the model · the key column · the licence"]
   m --> p["What it becomes: each column, the kind and property it maps to, an example"]
@@ -47,7 +49,7 @@ flowchart LR
 | RC-08.6 | A file whose content hash matches an earlier load into the same model | it is previewed | it reads *Unchanged — loading it updates nothing*, naming the earlier load |
 | RC-08.7 | Columns that map to no property of the model | the preview shows | they are listed as *not loaded*, never silently dropped |
 | RC-08.8 | A file the browser cannot read | it is dropped | it says why, with *Choose another* |
-| RC-08.9 | An Operator without *Can shape the model* | they open Bring records in | *Upload* is absent and a line names who may load |
+| RC-08.9 | An Operator | they open Bring records in | *Upload* is disabled with *Needs the Modeller role — ask an Admin* |
 | RC-08.10 | A document, a paper or any file that is not rows with a header | it is dropped | it is refused before anything is read: *Only rows that fit a kind can be loaded — extract them first*; nothing is written |
 
 ## Screens

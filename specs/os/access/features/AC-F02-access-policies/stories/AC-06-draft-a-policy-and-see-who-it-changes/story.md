@@ -31,8 +31,8 @@ flowchart TD
   a -->|no| r["Refused, naming the rule · nothing saved"]
   a -->|yes| d["Draft from the assistant · Not saved"]
   e([Edit a saved policy · New policy · Copy]) --> d
-  d --> imp["Who it changes: agents that gain · agents that lose, with 30-day use · skills and workflows that would break"]
-  imp -->|nobody loses| sv(["Save · password again · a new version"])
+  d --> imp["Who it changes: agents that gain · agents that lose, with 30-day use · the people and teams granted each · skills and workflows that would break"]
+  imp -->|nobody loses| sv(["Save · sign in again · a new version"])
   imp -->|something lost| warn{"Save anyway?"}
   warn -->|Save anyway| sv
   warn -->|Cancel| d
@@ -46,11 +46,11 @@ flowchart TD
 | AC-06.1 | An Admin | they give *Draft with the assistant* a sentence | a draft policy appears, marked *Draft from the assistant · Not saved*, named from the sentence |
 | AC-06.2 | The assistant's reply | a rule falls outside the policy grammar | nothing is saved; it says which rule was refused |
 | AC-06.3 | A draft | any step is checked | it decides nothing until saved |
-| AC-06.4 | A draft, or an edit of a saved policy | *Save* is pressed | *Who it changes* shows first: each agent it is attached to, and what it gains or loses — for everyone, and per team where a rule names one |
+| AC-06.4 | A draft, or an edit of a saved policy | *Save* is pressed | *Who it changes* shows first: each agent it is attached to, what it gains or loses, and the people and teams granted that agent — the same change for each of them |
 | AC-06.5 | A change that removes access an agent used | *Who it changes* is read | each loss names the verb and resource and how often the agent used it in the last 30 days |
 | AC-06.6 | A change that removes what a skill or workflow needs | *Who it changes* is read | each skill and workflow that would break is named, with its version, its agent and the need it loses |
 | AC-06.7 | A change to a rule's effect | *Who it changes* is read | each agent whose effect moves is named, with the resource, the effect before and after, and its uses in the last 30 days |
-| AC-06.8 | *Who it changes* | the Admin presses *Save anyway* | it saves as the version it names, after the password again, and takes effect on the next check |
+| AC-06.8 | *Who it changes* | the Admin presses *Save anyway* | it saves as the version it names, after signing in again, and takes effect on the next check — or, with a second Admin's yes set, once another Admin approves (AC-04.18) |
 | AC-06.9 | *Who it changes* | the Admin presses *Cancel* | nothing changes; the draft stays |
 | AC-06.10 | A draft | the Admin presses *Discard* | it is gone; nothing changed |
 | AC-06.11 | A draft attached to agents before it is saved | *Who it changes* is read | it is drawn against those agents; the attachment takes effect when it is saved |

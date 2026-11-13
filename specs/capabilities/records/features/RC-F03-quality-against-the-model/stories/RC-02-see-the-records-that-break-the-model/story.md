@@ -15,6 +15,8 @@ Tasks: [task.md](task.md) · Feature: [RC-F03](../../feature.md)
 
 ## Who can
 
+Every role runs a check and reads what breaks the model ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run a check and read every record that breaks the model | — |

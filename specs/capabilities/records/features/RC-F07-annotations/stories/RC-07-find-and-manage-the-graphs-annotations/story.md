@@ -15,10 +15,12 @@ Tasks: [task.md](task.md) · Feature: [RC-F07](../../feature.md)
 
 ## Who can
 
+Every role reads annotations and changes its own; an Admin deletes any ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *annotations*).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every annotation; edit or delete any, with a reason kept | — |
-| Operator | Read every annotation; edit or delete their own | Off on others' — *Only Priya Nair can change it* |
+| Operator | Read every annotation; edit or delete their own; a Modeller the same | Off on others' — *Only Priya Nair can change it* |
 
 ## Flow
 

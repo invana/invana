@@ -33,7 +33,7 @@ flowchart TD
   O3 --> H
   H --> C["AC-17 · Compare two versions of the policy, agent or workflow"]
   C --> E(["An export of the History rows, with their hashes, for the auditor"])
-  A -.->|without the Admin role| NA(["An agent's owners read its usage and calls · an Operator reads those of runs they are behind"])
+  A -.->|without the Admin role| NA(["Each person reads the usage and calls of runs they may read · a Modeller reads unused access"])
 ```
 
 ## Steps
@@ -54,9 +54,9 @@ flowchart TD
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | Run content is readable by the person behind it, the agent's owners and the Admins; everyone else sees that it ran, its status and its cost | CP-50 | `agents.run` |
+| It needs permission | Run content is readable by the person behind it and, for a project's run, by anyone whose default agent may see its sources — a role adds nothing; everyone else sees that it ran, its status and its tokens | CP-50 | `agents.run` |
 | It fails | A History chain that does not verify names the first row that breaks it | AC-16 | `settings.access` |
-| The person has no access | An Operator reads the usage and calls of runs they are behind; an agent's owners read its own | AC-13 | `settings.access` |
+| The person has no access | An Operator or a Modeller reads the usage and calls of runs they may read; only an Admin reads every run's | AC-13 | `settings.access` |
 | A sensitive property met an external model | The call was refused before it left, naming the property; the refusal is in the ledger and History | — | — |
 | A schema-only workflow sent data | An ops alert names the run and what it carried | — | — |
 

@@ -27,8 +27,9 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  t([People and access › Agents › an agent]) --> w["What it may touch · for a person · grouped: data · skills · workflows · agents · plugins · tools"]
-  w --> row["Each resource: Read · Write · Run — Allow · Ask · Deny · the rule, its policy, its team, who saved it"]
+  t([People and access › Agents › an agent]) --> w["What it may touch · grouped: data · memory · projects · skills · workflows · agents · plugins · tools · on a worker"]
+  w --> row["Each resource: Read · Write · Run — Allow · Ask · Deny · the rule, its policy, who saved it"]
+  w --> cl["Ceilings a run adds: key · run scope · graph database mode"]
   w --> nd["Declared needs · each skill, plugin and workflow it uses · met or missing"]
   nd -->|missing| mis["Names the need and what refuses it — a rule · a read-only database · a switch"]
   w -->|filter by effect or group| f{"Anything matches?"}
@@ -44,8 +45,8 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-13.1 | An agent | *What it may touch* opens | every resource reads, grouped — data by graph database and kind · skills · workflows · agents · plugins · tools — each with Read, Write or Run and its effect for the person chosen |
-| AC-13.2 | A resource's effect | it is read | it names the rule that sets it, its policy and version, the team it holds for or *Everyone*, and who saved it |
+| AC-13.1 | An agent | *What it may touch* opens | every resource reads, grouped — data by graph database and kind · memory · projects · skills · workflows · agents · plugins · tools · files, programs and hosts on a worker — each with Read, Write or Run and its effect, the same for everyone who may use the agent |
+| AC-13.2 | A resource's effect | it is read | it names the rule that sets it, its policy and version, and who saved it |
 | AC-13.3 | Rules that disagree | the effect is read | it is the strictest — Deny over Ask over Allow — and the rule that set it is marked |
 | AC-13.4 | A resource no rule reaches | it is read | it reads *No rule — denied* |
 | AC-13.5 | A kind with a sensitive property | it is read | the property reads *Never to an external model*, linking to Meaning |
@@ -57,8 +58,10 @@ flowchart TD
 | AC-13.11 | A resource | an Admin presses *Change* | the policy opens at that rule as a draft; nothing changes here |
 | AC-13.12 | An Operator or a Modeller | they press *Change* | the policy opens read-only; editing is disabled, naming the Admin role and the Admins |
 | AC-13.13 | A policy saved while a run is going | the run's next step runs | it is held to the saved version, checked when it runs; an open ask on an act it now denies closes refused, naming the rule |
-| AC-13.14 | An agent's step | it runs | the engine keeps with it the effect, the rule, its policy and version, the team and who saved it; *How it got here* reads these, never today's policies |
+| AC-13.14 | An agent's step | it runs | the engine keeps with it the effect, the rule, its policy and version, any ceiling that narrowed it and who saved the rule; *How it got here* reads these, never today's policies |
 | AC-13.15 | *What it may touch* | it fails to load | it says what could not load, with *Try again* |
+| AC-13.16 | A step its rules allow | the key it runs under, its run scope or a credential's scope does not | it is refused before it runs, naming the ceiling — *{ceiling} keeps {agent} from {verb} {resource}*; no ceiling ever lets a step its rules refuse |
+| AC-13.17 | A run inside a project whose agent may read `memory/project/*` | it reads another project's memory that is not related to its own | it is refused, naming the run scope; its own project, the projects related to it and its task read as the rules allow |
 
 ## Screens
 

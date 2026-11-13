@@ -28,14 +28,14 @@ flowchart TD
   how -->|a file in the browser| up["RC-08 · Upload: a file, the model it goes into, its key, licence"]
   up --> prev["What it becomes — columns, the kinds and properties each maps to, examples"]
   prev -->|missing or repeated keys| upx["Refused — names the first five rows"]
-  prev -->|no grant| una["Upload absent — names who may load"]
+  prev -->|an Operator| una["Upload disabled — Needs the Modeller role"]
   prev -->|Load| run
   how -->|a pipeline · the command line or the API| cli["RC-09 · A load into a model"]
   cli -->|no such model · read-only connection| clx["Refused before anything is written"]
   cli -->|a rule refuses the model| clr["Cannot answer — names the rule"]
   cli --> run["One run: every record checked against the model and its rules"]
   how -->|a bundle of files| bun["RC-10 · One command · one run · each file loaded, links between models resolved once"]
-  bun -->|a file breaks its model| tk["That file reported · a task raised for its owner"]
+  bun -->|a file breaks its model| tk["That file reported · a task raised"]
   bun --> run
   how -->|a few records by hand| obs["RC-11 · Add records · Experimental"]
   obs --> run
@@ -59,12 +59,12 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Load into a model — upload, command line, API, a bundle, records by hand | `modeller` · shown as *Can shape the model* · Admin | *Upload* and *Add records* absent, naming who may load; the command line and API refuse before anything is written |
-| Read the loads, what each rejected and what landed | Operator — every member of the Graph | — |
-| Export a load with its provenance | Operator — every member of the Graph | — |
-| Undo a load | Who ran it · Admin | *Undo load* absent, naming who ran it |
+| Load into a model — upload, command line, API, a bundle, records by hand | Modeller · Admin, through an agent granted to them | *Upload* and *Add records* disabled — *Needs the Modeller role — ask an Admin*; the command line and API refuse before anything is written |
+| Read the loads, what each rejected and what landed | Every role — Operator, Modeller, Admin | — |
+| Export a load with its provenance | Every role — Operator, Modeller, Admin | — |
+| Undo a load | Modeller · Admin | *Undo load* disabled — *Needs the Modeller role — ask an Admin* |
 | Cancel a load | Who started it, where they started it | Studio offers no cancel: a load is stopped where it was started |
 
 ## States
@@ -77,7 +77,7 @@ flowchart TD
 | Has data | A preview of what the file becomes; loads newest first with records written and rejected; a run's outcome, steps, what was rejected, its log and what landed |
 | Failed | A refused upload names the rows or the reason; a failed load shows its diagnosis and the next step where its counts are |
 | Agent working or proposing | — |
-| No access | Loading acts are absent with a line naming who may load; every load still reads |
+| No access | Loading acts are disabled — *Needs the Modeller role — ask an Admin*; every load still reads |
 
 ## Rules
 
@@ -96,7 +96,7 @@ flowchart TD
 | Loading again updates | Records are matched by the model's keys; the same file twice updates, never duplicates, and the report says updated versus created |
 | The same file twice is one hash | A file whose content hash matches an earlier load into the same model reads *Unchanged* in the preview; loading it anyway updates nothing |
 | Undoing a load flags what cites it | *Undo load* removes the records it created and reverts the values it wrote that nothing has changed since; every finding, report and simulation that cites it carries a *load undone* notice |
-| A bundle is one run | A bundle's files load together, links between models resolve once over everything that landed, and a broken file raises a task for its owner without discarding the others |
+| A bundle is one run | A bundle's files load together, links between models resolve once over everything that landed, and a broken file raises a task without discarding the others |
 | A bundle is checked before it loads | Each file against its own model, then the rules between them — offline, before anything is written |
 | The fast path is marked | A bulk load writes without checking and without provenance; it is listed among loads as *bulk load*, saying what it did not do, and it cannot be cited |
 | Two ways in, one load | *Upload* in the browser and the load command make the same load; every dialog prints its command twin |
@@ -110,7 +110,7 @@ flowchart TD
 | A load's run — steps, who ran it, the command | Write · read |
 | The load's rejections — per record, with field and reason | Write · read |
 | Nodes, relationships and values in the graph, with their provenance | Write |
-| A task for the owner of a broken file | Write |
+| A task naming a broken file | Write |
 | The run a saved result came from, and the loads it was pinned to | Read · write (as the load's inputs) |
 
 ## Engine
@@ -168,7 +168,7 @@ flowchart TD
 | 404 | The load names no model, or one the Graph lacks | *No model `{name}` in this graph — it has {models}.* | RC-09.1 |
 | 409 | The Graph's connection is read-only | *This graph's connection is read-only — loading needs a writable connection.* | RC-09.2 |
 | 403 | A rule refuses writing into the model | *Cannot answer — `{rule}` refuses writing into `{model}`.* | RC-09.3 |
-| 403 | The caller lacks *Can shape the model* | *Loading needs Can shape the model — ask {owner}.* | RC-08.9 |
+| 403 | The caller is an Operator | *Needs the Modeller role — ask an Admin.* | RC-08.9 |
 | 415 | A file that is not rows with a header — a document, a paper, free text | *Only rows that fit a kind can be loaded — extract them first.* | RC-08.10 |
 | 422 | Rows without a key, or two rows with one key, in an upload | *{n} rows have no key or repeat one — the first five: {rows}.* | RC-08.4 |
 | 409 | A record added by hand whose key already exists | *`{key}` already exists — a new record never overwrites one.* | RC-11.4 |
@@ -205,7 +205,7 @@ flowchart TD
 | Content hash | SHA-256 over the file's bytes, computed as it streams, or over the records' canonical JSON (sorted keys, compact separators, ordered by key) when there is no file; a match with an earlier load into the same model is *Unchanged* |
 | The bundle manifest | `stitches.json` at the folder's root: `name` · `datasets[]` (folders, each declaring its model in `graph-model.json`, by `package_id` then `name`; two may declare one model) · `stitches[]` — `id` (a label for the report) · `kind` (`anchor` · `relationship`) · `source` · `target` (`<folder>:<Kind>.<property>`) · `identity_match` (`exact` · `case_insensitive`) · `edge_type` · `rows` (a rows file when there is no key pair) · `partial` (the sides overlap, not match fully) |
 | The offline check | `data.bundle.check`, before anything is written: `node_ids_unique` · `identity_key_present` · `identity_key_unique` · `node_type_declared` · `edge_type_declared` · `property_declared` · `property_type` · `enum_value` · `endpoint_types`; each rule between files resolves and is counted by distinct key values, failing when it leaves values unresolved unless `partial`; `endpoint_resolves` is reported deferred, never failed |
-| `bundle-import@1` | **check** (the offline check) · **load** — one lane per file, up to 4 at once, each inlining `model-import@1` by `uses` so a lane and a single load never drift; a failed lane does not stop the others · **stitch** — once, over everything that landed; skipped when every lane failed, and the run fails with a diagnosis · **report** — each file's counts rolled into the run · **triage** — a task naming a failed file for its owner, or left unassigned. Lanes and events are the runtime's; no table of its own |
+| `bundle-import@1` | **check** (the offline check) · **load** — one lane per file, up to 4 at once, each inlining `model-import@1` by `uses` so a lane and a single load never drift; a failed lane does not stop the others · **stitch** — once, over everything that landed; skipped when every lane failed, and the run fails with a diagnosis · **report** — each file's counts rolled into the run · **triage** — a task naming a failed file, assigned to the person who started the bundle or left unassigned. Lanes and events are the runtime's; no table of its own |
 | `bulk-load@1` | A run of kind `bulk`, one step `graph.write.bulk` through the connector's bulk write — counts, log and who ran it, no report and no provenance. With no model version to pin, the Graph's grounding version governs it |
 | A Python call | `load_records(...)` for an orchestrator that holds the records in memory: the same load, returning its run to wait on, with an `on_progress` callback |
 | A saved result | `POST /loads` with `from_run_id` and a kind: one `source = run` load of that kind, keyed by each row's label, one property per figure; `record_load_inputs` copies the run's pinned loads. Every value it writes reads *derived*, its provenance the run and those loads |
@@ -232,7 +232,7 @@ flowchart TD
 | The browser reads the file | Rows left out for having no key are listed in the load's report |
 | Records by hand are a load | The new records are one load, its source *by hand*, the person its author; a new record never overwrites a key; above 5,000 records the form points to the command |
 | A bulk load is listed when it names its Graph | The Graph supplies the connection and the load is listed; a connection typed on the command line runs direct and is not listed, because credentials never ride a run — the command says so |
-| Loading needs the model grant | Writing records into a Graph's model is *Can shape the model* or Admin, in the browser, the CLI and the API alike |
+| Loading needs the Modeller role | Writing records into a Graph's model is the Modeller's and the Admin's, in the browser, the CLI and the API alike; which records a load reaches is the agent's Access Policies |
 | Experimental | Records by hand carry an *Experimental* badge on their act and page head |
 | A saved result is a load | Records saved from a run's result are one load, its source *run*, naming that run and the loads it was pinned to; its records read *derived*, and undoing an input flags it like any other citation |
 

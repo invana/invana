@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
+The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); saving edits is *Edit on the board*.
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every mode, every tool, every menu item on any board | — |
-| Operator | Look, pick a mode, open every menu on a board they own or that is shared with them; a Modeller the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs the Modeller role — ask an Admin*. A board neither theirs nor shared: *Not found* |
+| Operator | Look, pick a mode, open every menu on any board; a Modeller the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs the Modeller role — ask an Admin*. A link to a board that does not exist: *Not found* |
 
 ## Flow
 
@@ -29,7 +31,7 @@ flowchart LR
   q -->|no| e["What it is for · Ask your first question"]
   q -->|yes| b["The row · the rail · the dock · the footer"]
   b -->|right-click a thing| m["Its menu: node · relationship · selection · board · minimap"]
-  m -->|an item the person may not take| dis["Disabled, naming the role, the owners or the rule"]
+  m -->|an item the person may not take| dis["Disabled, naming the role, the missing agent or the rule"]
   b -->|mode picker| md{Mode}
   md -->|Focus| f["The drawing alone · the picker fades"]
   md -->|Edit · Annotate| w["The board ringed · the mode's tools"]
@@ -53,7 +55,7 @@ flowchart LR
 | EX-18.9 | The board is slow to draw a large answer | the solve runs past 400 ms | the footer counts it and one toast says the graph appears when it settles, with *Cancel* |
 | EX-18.10 | An Operator | they open every menu | every look and arrange item works; an item their role does not hold is disabled, naming the role it needs |
 | EX-18.11 | An answer of 100,000 nodes | it draws | the count shows first, and pan and zoom keep answering while it draws |
-| EX-18.12 | A board the person neither owns nor is shared with, and they are not an Admin | they open its address | it reads *Not found* |
+| EX-18.12 | A board that does not exist, or was deleted | a person opens its address | it reads *Not found* |
 
 ## Screens
 

@@ -50,7 +50,7 @@ flowchart TD
 | 5 | Open *Why?* on a citation | Evidence · The answer | EX-04 | `explore.board.why` |
 | 5a | When a cited record looks wrong: open it — what wrote it, and every change to it | Intelligence · Records by kind · Provenance | RC-05 · RC-06 | `data.record` |
 | 6 | Share it, or add it to a project | Evidence · Board · Share · Projects | EX-15 · EX-12 | `explore.share` |
-| 7 | Ask again later; the run recalls the last, cited | Agents · Thinking graph and memory | AG-50 | `explore.board` |
+| 7 | Ask again later; the run recalls the last, cited | Agents · Learn from memory | AG-50 | `explore.board` |
 
 ## Branches
 

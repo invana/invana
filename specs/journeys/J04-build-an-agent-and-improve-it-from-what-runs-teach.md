@@ -57,13 +57,13 @@ flowchart TD
 | 7 | Put the work on a schedule | Agents · Schedules | AG-42 | `agents.schedules` |
 | 8 | A named approver decides what it asks before sending | Access Plane · Asks and approvals · Control Plane · Inbox | AC-15 · CP-36 | `inbox` |
 | 9 | Read how it is doing | Control Plane · Runs | CP-49 | `agents.runs` |
-| 10 | Accept or decline a change its runs suggest | Agents · Thinking graph and memory · Control Plane · Runs | AG-49 · AG-51 · AG-52 · CP-56 | `agents.run` |
+| 10 | Accept or decline a change its runs suggest | Agents · Learn from memory · Control Plane · Runs | AG-49 · AG-51 · AG-52 · CP-56 | `agents.run` |
 
 ## Branches
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | A firing that would send outside asks the agent's named approvers in the Inbox; *Not this time* sends nothing. Approving a plan as a workflow is theirs too; Sam, who asked, becomes its first owner | AC-15 · AG-31 | `inbox` |
+| It needs permission | A firing that would send outside asks the agent's named approvers in the Inbox; *Not this time* sends nothing. Approving a plan as a workflow is theirs too; the workflow is the organisation's, made by Sam, who asked | AC-15 · AG-31 | `inbox` |
 | It fails | A failed run reads why; *Turn it into a better skill* drafts the fix for Sam to accept | CP-56 | `agents.run` |
 | The person has no access | Without the role building needs, Sam reads every agent, skill and workflow; building names the role it needs | AG-21 | `agents.agent` |
 | A hard check fails | Publishing the skill is blocked, naming the check | AG-20 | `agents.skills` |

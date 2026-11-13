@@ -29,7 +29,7 @@ flowchart TD
   rows -->|fix them| fix(["A fix across records (RC-F04)"])
   sum -->|To decide| q["RC-12 · The fix queue: each record that breaks a constraint or a standard"]
   q -->|a value and a reason| one(["One fix, one run — the item leaves"])
-  q -->|no grant| qna["Fix disabled — Ask Priya (owner)"]
+  q -->|the agent may not write it| qna["Fix disabled — names the Access Policy"]
   run -->|could not check| f["Could not check · Try again"] --> run
 ```
 
@@ -52,11 +52,11 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and the fix queue | Operator — every member | — |
-| Run a check | Operator — every member | — |
-| Fix a problem from the queue | `contributor` · shown as *Can work on projects*, on a connection that writes | Disabled — *Ask Priya (owner)* |
+| Read records, their provenance and the fix queue | Every role — Operator, Modeller, Admin | — |
+| Run a check | Every role — Operator, Modeller, Admin | — |
+| Fix a problem from the queue | Every role — Operator, Modeller, Admin, through an agent granted to them, on a connection that writes | Disabled, naming the Access Policy of the agent that may not write the record |
 
 ## States
 
@@ -122,7 +122,7 @@ flowchart TD
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A fix by someone without *Can work on projects* | *Fixing needs Can work on projects — ask {owner}.* | RC-12.9 |
+| 403 | A fix on a record the person's agent may not write | *`{policy}` does not let this agent write `{kind}`.* | RC-12.9 |
 | 409 | The record changed since the problem was opened | *`{record}` changed since you opened it — reload and fix again.* | RC-12.6 |
 | 409 | A fix on a read-only connection | *This graph's connection is read-only — a fix needs a writable connection.* | RC-12.10 |
 | 422 | A fix whose value still breaks the rule, or with no reason | *`{value}` still breaks `{rule}`* · *A fix needs a reason.* | RC-12.11 |

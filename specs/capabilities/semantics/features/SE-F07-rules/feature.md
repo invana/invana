@@ -34,10 +34,10 @@ flowchart TD
   kind -->|A standard| std["SE-19 · A kind or property holds publisher/name@v"]
   kind -->|A derivation| der(["SE-22 · Inference"])
   kind -->|An alert| al(["Opens a lead in a project — PJ-F06"])
-  prop --> may{May write at that scope?}
+  prop --> may{Modeller or Admin — Admin for Everywhere?}
   dlg --> may
   std --> may
-  may -->|no Can shape the model · Everywhere without Admin| na["Acts disabled, the reason named"]
+  may -->|an Operator · Everywhere without the Admin role| na["Acts disabled, the reason named"]
   may -->|yes| imp["What it would have stopped, counted by the engine"]
   imp -->|narrows nothing · unknown standard · a check no act reads| bad["The dialog names the field"]
   imp -->|Save rule| saved(["The next version · in force on the next run, load or act"])
@@ -48,7 +48,7 @@ flowchart TD
   chk -->|report| rep(["Goes through; recorded"])
   run([A run asks for a protected property]) --> ca["Cannot answer — names the rule"] --> file["A request is filed"]
   file --> q["SE-13 · Requests · Allow · Draft it · Decline"]
-  q -->|no Can shape the model| qr["The rows read; no acts"]
+  q -->|an Operator| qr["The rows read; no acts"]
 ```
 
 ## Stories
@@ -62,13 +62,13 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every rule in force, its evidence and every request | Operator — every member | — |
-| Create, edit, stop offering or offer again a rule on *This graph* or *A project* · hold a kind or property to a standard | `modeller` · shown as *Can shape the model* | Acts disabled, the reason named — *Ask Priya (owner) to shape the model* |
-| Create, edit, stop offering or offer again a rule *Everywhere* | Admin — the install's | *Everywhere* disabled in the scope, the reason named; an *Everywhere* rule opens read-only |
-| Allow, Draft it or Decline a request | `modeller` · shown as *Can shape the model* | The rows read; no acts |
-| File a request — *Ask for a change* | Operator — every member | — |
+| Read every rule in force, its evidence and every request | Every signed-in person — Operator, Modeller, Admin | — |
+| Create, edit, stop offering or offer again a rule on *This graph* or *A project* · hold a kind or property to a standard | Modeller · Admin | Acts disabled, the reason named — *Needs the Modeller role — ask an Admin* |
+| Create, edit, stop offering or offer again a rule *Everywhere* | Admin | *Everywhere* disabled in the scope — *Needs the Admin role — ask an Admin*; an *Everywhere* rule opens read-only |
+| Allow, Draft it or Decline a request | Modeller · Admin | The rows read; no acts — *Needs the Modeller role — ask an Admin* |
+| File a request — *Ask for a change* | Every signed-in person — Operator, Modeller, Admin | — |
 
 ## States
 
@@ -88,7 +88,7 @@ flowchart TD
 |---|---|
 | Four kinds of rule | **Constraint** — refuses data that breaks it, closed-world: what is not allowed is refused, checked when a record is loaded or changed — a property's range (SE-08) or a standard a kind or property holds (SE-19) · **Derivation** — adds facts, run by Inference (SE-F08) · **Act rule** — blocks, warns on or reports what people and agents do: a rule on a property (SE-11) or a checked statement (SE-12); Access enforces it · **Alert** — notices a pattern in the records and opens a lead in a project (PJ-F06) |
 | One statement | A statement rule is one sentence; a long one is accepted, with a nudge that it reads better as two |
-| Three scopes, fixed once saved | *Everywhere* — every Graph on the install, the install Admin's · *This graph* · *A project* |
+| Three scopes, fixed once saved | *Everywhere* — every Graph on the install, an Admin's alone · *This graph* · *A project* |
 | Inherited, in order | A step is given the *Everywhere* rules, then the Graph's, then its project's — each by itself, with its id, never run together. A project shows its Graph's and the install's above its own, read-only |
 | Offered and cited | A step records the rules it was offered and the ones it says it followed; a citation is never enforcement |
 | A check is picked, never written | A statement may carry one check from a fixed list, and the check names the acts it is read at — *A load* · *Project decision*. A statement with no check is offered only |
@@ -186,8 +186,8 @@ A rule on a property writes [SE-F09](../SE-F09-views-of-the-graph/feature.md#eng
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A rule, a rule on a property or a resolve by someone without *Can shape the model* | *This needs Can shape the model — ask {owner}.* | SE-11.14 · SE-12.16 · SE-13.14 |
-| 403 | An *Everywhere* rule written by someone who is not the install's Admin | *Everywhere rules are the install Admin's.* | SE-12.15 · SE-12.17 |
+| 403 | A rule, a rule on a property or a resolve by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-11.14 · SE-12.16 · SE-13.14 |
+| 403 | An *Everywhere* rule written by someone without the Admin role | *Needs the Admin role — ask an Admin.* | SE-12.15 · SE-12.17 |
 | 422 | A rule on a property that narrows nothing — *Read* with *May leave* | *This rule narrows nothing.* | SE-11.4 |
 | 409 | A rule on a property another rule already holds | *{rule} already holds {target}.* | SE-11.5 |
 | 409 | An act a `block` rule refuses — on the act's route; every blocking rule in one refusal, nothing written | *{act} is blocked: {rule} — {because} ({reason}).* | SE-12.9 |
@@ -265,7 +265,7 @@ A rule on a property writes [SE-F09](../SE-F09-views-of-the-graph/feature.md#eng
 | An approval for a rule change | The event is the record |
 | Rules that expire | A bound with a timer is a bound nobody watches |
 | Applying a rule to past runs | A run keeps what it was frozen with, so its answer can be rebuilt |
-| Starter sets of rules | A set that fits nobody is edited blindly; a Domain pack's rules are a person's choice to apply |
+| Starter sets of rules | A set that fits nobody is edited blindly; a Team pack's rules are a person's choice to apply |
 | Assigning a request to a person | One list for the Graph's modellers; the event names who resolved it |
 | Reopening a done request | Asking again files a new one |
 | A notification per request | The open count carries it |

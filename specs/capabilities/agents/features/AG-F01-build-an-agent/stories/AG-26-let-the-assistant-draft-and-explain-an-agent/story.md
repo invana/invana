@@ -17,10 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 ## Who can
 
+Drafting and changing an agent follow building one ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); explaining is every signed-in person's.
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask the Assistant to draft an agent, propose changes to any agent not built in, run its evals in the practice graph database and explain; apply or discard every proposal | — |
-| Modeller | Ask for drafts and proposals on the agents they own, and apply or discard them; ask for an explanation of any agent | On an agent they do not own, a request to change it is answered with an explanation and *I can't change this agent — only its owners or an Admin*, naming them |
+| Modeller | Ask for drafts and proposals on any agent not built in, and apply or discard them; ask for an explanation of any agent | On a built-in agent, a request to change it is answered with an explanation and *I can't change this agent — it is built in; copy it* |
 | Operator | Ask the Assistant to explain an agent — a setting, a skill's need, a refusal | A request to draft or change an agent is answered with an explanation and *I can't change this agent — that needs the Modeller role* |
 
 ## Flow
@@ -53,7 +55,7 @@ flowchart LR
 | AG-26.8 | No AI model offered in the deployment | the builder asks for a draft | the Assistant says it cannot draft, linking Control Plane › AI models; the form still saves by hand |
 | AG-26.9 | A draft that fails | it ends | the Assistant says why in a sentence; the form is untouched |
 | AG-26.10 | A proposal | the builder opens *How it got here* | its steps and the sources it read are shown, each assumption marked *Challenge this* |
-| AG-26.11 | An Operator, or a Modeller on an agent they do not own | they ask the Assistant to draft or change an agent | it explains instead and says it cannot change the agent, naming the role or the owners |
+| AG-26.11 | An Operator | they ask the Assistant to draft or change an agent | it explains instead and says it cannot change the agent, naming the role |
 | AG-26.12 | A drafted part of an agent | it is proposed | it names the option the Assistant recommends and why, beside *Apply* |
 
 ## Screens

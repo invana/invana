@@ -9,7 +9,7 @@ boards: [settings.me, inbox]
 
 # CP-46 · Choose where my asks and alerts reach me
 
-**As** a named approver or an agent's owner **I want** asks and alerts for me to reach me by email or a Slack message
+**As** a named approver or a person an alert names **I want** asks and alerts for me to reach me by email or a Slack message
 as well as in the Inbox, and the link in each to take me straight to the decision
 **so that** an agent waiting on me is not held because I was not in Studio, and every decision is still mine,
 signed in, in History.

@@ -22,7 +22,7 @@ an impact reach is a read through the Assistant, under its Access Policies, with
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Trace any option's impact on a project they can see, pick its hops, open any record reached | A kind the Assistant's policies deny is never reached |
-| Operator | The same; a Modeller the same | A kind the Assistant's policies deny for them is never reached; without the Assistant, *Trace* is disabled, naming its owners — *Ask {owner}* |
+| Operator | The same; a Modeller the same | A kind the Assistant's policies deny for them is never reached; without the Assistant, *Trace* is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 
@@ -30,7 +30,7 @@ an impact reach is a read through the Assistant, under its Access Policies, with
 flowchart LR
   s([A project › Impact]) --> o["Pick the option · 1, 2 or 3 hops"]
   o -->|no record cites| e["Add a finding that cites a record"]
-  o -->|may not use the Assistant| nu["Trace disabled, naming its owners"]
+  o -->|may not use the Assistant| nu["Trace disabled — ask an Admin"]
   o --> t["Tracing · hop n of N — a run, the reader behind it"]
   t -->|a graph database unreachable or off| x["Goes on without it · names it, and who switched it off"]
   t --> r["Rings by hop · grouped by kind, across graph databases"]
@@ -55,7 +55,7 @@ flowchart LR
 | PJ-10.10 | Impact with an option and hops picked | the page is reloaded | the same option and hops are traced again |
 | PJ-10.11 | A traced reach | it is read | every group and link is also listed in words, and no figure in any currency appears; every count is the engine's |
 | PJ-10.12 | A traced reach | its run is read | it is a run of the Assistant with the reader behind it, and every read it made is listed in *What left the platform* ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
-| PJ-10.13 | A reader who may not use the Assistant | they open Impact | *Trace* is disabled, naming the Assistant's owners — *Ask {owner}* |
+| PJ-10.13 | A reader who may not use the Assistant | they open Impact | *Trace* is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Screens
 

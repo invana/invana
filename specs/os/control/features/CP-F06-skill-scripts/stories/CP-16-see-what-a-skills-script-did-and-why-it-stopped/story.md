@@ -16,10 +16,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 ## Who can
 
+Running a test is the Modeller's and the Admin's ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); a script step reads as the run's content does (AC-31), the role adding none.
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every script step on any run; run a test of a draft that calls a script | — |
-| Operator | Read the script steps of a run whose content they may read — one they are behind, or of an agent they own (AC-31) | *Run a test* disabled — *Needs the Modeller role — ask Priya or Lee*; with the Modeller role, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
+| Admin | Read the script steps of a run whose content they may read; run a test of a draft that calls a script | A run whose content they may not read: a script step shows only that it ran, its status and its time |
+| Operator | Read the script steps of a run whose content they may read — one they are behind, or a project's run whose sources their default agent may read (AC-31) | *Run a test* disabled — *Needs the Modeller role — ask Priya or Lee*; with the Modeller role, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
 
 ## Flow
 

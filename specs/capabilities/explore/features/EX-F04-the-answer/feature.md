@@ -85,7 +85,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 Skills, so authoring them follows *skills* — *Acts* for Modeller and Admin, *Reads* for Operator. An answer's content
 is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md).
 
-| Act | Who | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read an answer, watch its steps, cancel or re-run their own run | The person behind the run; those an answer is shared with read it; an Admin reads every one | Another person's run: that it ran, its status and its tokens — content withheld |
 | Load an answer to the board · switch its template | The person behind the run | — |

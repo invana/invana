@@ -22,7 +22,8 @@ Invana is in **beta**. ✅ available · 🟡 usable, with parts still being buil
 | **Annotations** | Note what you found on the records themselves, for the next person to read | Intelligence | 🟡 |
 | **Decisions with a trail** | Projects keep the evidence for and against, and decisions are append-only | Evidence | ✅ |
 | **Simulation** | Run a simulator on a project branch over pinned loads, reproducible from its seed | Evidence | ✅ |
-| **General-purpose** | Nothing in the platform is domain-specific: a domain is its ontology, its agents and its project types, shipped together as a Domain pack | Operating system | 🟡 |
+| **General-purpose** | Nothing in the platform is domain-specific: a team's ontology, its agents and skills and its project types ship together as a Team pack | Operating system | 🟡 |
+| **Read in place, remembered with lineage** | Every graph database is read where it lives, in its own language, and joined into one Graph; what the work leaves — runs, findings, decisions — is kept in Memory, each traced to its sources | Operating system | 🟡 |
 | **Self-hosted** | One Docker Compose stack on your own machines. Your graph and your keys stay with you, and with Ollama the LLM can run on your network too | Operating system | ✅ |
 | **Roles and access** | Graph roles are enforced on every route, and search shows only what you can open | Operating system | ✅ |
 | **Plugins** | Every task comes from a plugin. Core plugins are always on; tool, MCP and simulator plugins extend what agents can do ([below](#plugins)) | Operating system | 🟡 |

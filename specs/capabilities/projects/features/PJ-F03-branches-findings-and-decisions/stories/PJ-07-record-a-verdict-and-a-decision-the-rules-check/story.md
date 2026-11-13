@@ -22,7 +22,7 @@ on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Record a verdict and a decision on any branch they can see; supersede the current decision | Nobody edits, deletes or owns a decision; on an archived project *Decide* is disabled |
+| Admin | Record a verdict and a decision on any branch they can see; supersede the current decision | Nobody edits or deletes a decision; on an archived project *Decide* is disabled |
 | Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
 
 ## Flow
@@ -52,7 +52,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | PJ-07.1 | A branch and a person who can see the project | they press *Decide* | the dialog asks for a verdict and a decision in the words of the project's type, a rationale, and shows the findings the decision will weigh |
-| PJ-07.2 | The dialog | the person records a verdict (supported · refuted · inconclusive, or the type's words) and a decision (pursue · park · drop · merge) with a rationale | decision *dN* is recorded in their name with its rationale and the rules it was checked against, and becomes a node in the thinking graph weighing each finding it cites — through them, the steps, runs and records behind it ([AG-F09](../../../../../agents/features/AG-F09-thinking-graph-and-memory/feature.md)) |
+| PJ-07.2 | The dialog | the person records a verdict (supported · refuted · inconclusive, or the type's words) and a decision (pursue · park · drop · merge) with a rationale | decision *dN* is recorded in their name with its rationale and the rules it was checked against, and becomes a node in the thinking graph weighing each finding it cites — through them, the steps, runs and records behind it ([AG-F09](../../../../../agents/features/AG-F09-learn-from-memory/feature.md)) |
 | PJ-07.3 | A decision recorded | it settles | the branch's status moves with it: pursue to pursuing, park to parked, drop to dropped, merge to merged; a fork alone never moves it |
 | PJ-07.4 | A branch with contradicting findings | the person decides | the verdict addresses every one of them, the dialog listing each; the recorded decision names them |
 | PJ-07.5 | A rule in force that blocks the decision | it is recorded | it is refused, naming the rule and the evidence that broke it, with *Remove fN from the cites*; nothing is recorded |

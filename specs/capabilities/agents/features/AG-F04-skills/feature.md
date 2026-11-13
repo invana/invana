@@ -28,11 +28,10 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 flowchart TD
   start([Agents › Skills]) --> may{"Modeller or Admin?"}
   may -->|no| ro["Every skill reads; acts disabled, naming the Modeller role — ask an Admin"]
-  may -->|yes| new["AG-37 · New skill — a draft opens on its instructions; its maker is its first owner"]
+  may -->|yes| new["AG-37 · New skill — a draft opens on its instructions; the platform's, made by its maker"]
   new -->|name already in the catalogue| nx["Refused, linking the skill that has it"]
   start -->|a built-in skill| bi["AG-37 · Reads Built in, owned by System — no Edit"]
   bi -->|Copy| new
-  start -->|a skill they do not own| no["Reads; acts disabled, naming its owners — ask one, or an Admin"]
   start -->|Delete a skill| del{"AG-37 · Ever published, or built in?"}
   del -->|no| dg(["Deleted — taken off its agents"])
   del -->|yes| dx["Refused — remove it from its agents"]
@@ -128,17 +127,16 @@ sequenceDiagram
 ## Access
 
 Skills are *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
-*Acts* is on the skills a person owns ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)), and an Admin acts on any.
+A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)): making it grants nothing over it.
 
-| Act | Role | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every skill — instructions, Flow, what it needs, owners, agents, usage, exceptions, evals, tests, history | Every signed-in person — Operator, Modeller, Admin | — |
-| Create a skill — its maker is its first owner; copy a built-in skill — the copier owns the copy | Modeller · Admin | *New skill* and *Copy* are disabled, naming the role — *Needs the Modeller role — ask an Admin*; the command line refuses, naming it |
-| Edit a draft, set its model version, choose guided or planned, answer the drawing's questions, discard the draft, publish, roll back, delete a skill that never published — in Studio or on the command line | An owner of the skill with the Modeller role · Admin. Never on a built-in skill | The editor reads; each act is disabled, naming the role, or the owners on a skill the reader does not own — *Only its owners or an Admin — ask Lee*; a built-in skill offers *Copy* instead |
-| Adopt a handler | An owner of the skill with the Modeller role · Admin | Exceptions read; *Adopt* is disabled, naming the role or the owners |
+| Read every skill — instructions, Flow, what it needs, who made it, agents, usage, exceptions, evals, tests, history | Every signed-in person — Operator, Modeller, Admin | — |
+| Create a skill; copy a built-in skill — the platform's, made by the copier | Modeller · Admin | *New skill* and *Copy* are disabled, naming the role — *Needs the Modeller role — ask an Admin*; the command line refuses, naming it |
+| Edit a draft, set its model version, choose guided or planned, answer the drawing's questions, discard the draft, publish, roll back, delete a skill that never published — in Studio or on the command line | Modeller · Admin. Never on a built-in skill | The editor reads; each act is disabled — *Needs the Modeller role — ask an Admin*; a built-in skill offers *Copy* instead |
+| Adopt a handler | Modeller · Admin | Exceptions read; *Adopt* is disabled — *Needs the Modeller role — ask an Admin* |
 | Keep its evals, run a test, run the evals | As [AG-F10](../AG-F10-test-an-agent-and-a-skill/feature.md#access) | As AG-F10 |
-| Add a skill to an agent, remove it | An owner of the skill or of the agent, with the Modeller role · Admin | The agents read; *Add to an agent* and *Remove* are disabled, naming the role or the owners |
-| Add a co-owner, hand a skill over | Its owners · Admin ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | The owners read |
+| Add a skill to an agent, remove it | Modeller · Admin | The agents read; *Add to an agent* and *Remove* are disabled — *Needs the Modeller role — ask an Admin* |
 | Approve a function a skill needs from a library | Admin (AG-40) | The need reads *Waiting for an Admin* |
 | Approve a script in a skill's `scripts/` | Admin ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md)) | The script reads *Waiting for an Admin* |
 | Allow what a skill needs — a rule on an Access Policy attached to the agent | Admin ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The need reads, naming the resource and verb a rule would have to allow |
@@ -150,10 +148,10 @@ Skills are *Reads* for Operator and *Acts* for Modeller and Admin in [the role t
 | First use | Skills with only the default skills, each marked *Built in*, owned by *System*; *New skill* and a line on what a skill is; a new draft with the four headings, *Nothing needed yet* and *Nothing to draw yet*; Usage, Exceptions and Tests read *Not run yet*; Evals reads *No eval set — nothing checked* |
 | Empty after a filter | — |
 | Loading | The sheet's head and tabs drawn at once; the body loads in place; the Plan preview reads *Drawing…* over the last plan drawn |
-| Has data | A skill as a sheet: its head, its owners, its state and *Guided* or *Planned*, then Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History |
+| Has data | A skill as a sheet: its head, who made it, its state and *Guided* or *Planned*, then Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History |
 | Failed | The tab names what it could not read, in the engine's words; a refused publish, draw or add names its check where the act was |
 | Agent working or proposing | The plan being drawn; the planner asking which reading a sentence means; the assistant proposing eval cases; an eval run with its cases filling in; an *Adopt* proposal |
-| No access | Every tab reads; the editor is read-only and each act is disabled, naming the Modeller role — or, for a Modeller on a skill they do not own, its owners — *ask Lee*; a built-in skill offers *Copy* |
+| No access | Every tab reads; the editor is read-only and each act is disabled, naming the Modeller role; a built-in skill offers *Copy* |
 
 ## Rules
 
@@ -163,8 +161,9 @@ Skills are *Reads* for Operator and *Acts* for Modeller and Admin in [the role t
 | Invana's fields ride under `metadata:` | When to use, how it runs, model version and, for a guided skill, its `needs` list — every field the open format lacks sits under `metadata:` in `SKILL.md`; plans, evals and usage are kept beside the folder, never in it |
 | A skill is a resource | `skill/<name>`. An agent runs a skill only when the Access Policies attached to it allow Run `skill/<name>` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | A skill declares needs, never grants | Each need is a verb and a resource: Run `plugin/<name>` or `tool/<plugin>/<tool>` for each function it calls · Run `workflow/<key>` for each workflow it names · Read or Write `data/<graph database>/<kind>`. A planned version's needs are read from its plan, with the needs of each function and workflow on it; a guided version's from the `needs` list under `metadata:`. A rule allows a need; a need no rule allows is refused before anything runs ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
+| An outside runtime gets the folder | On an agent that runs with Claude Code or Codex ([AG-F01](../AG-F01-build-an-agent/feature.md#rules)), each added skill reaches the runtime as its folder — `SKILL.md` and its files, the version the run opened with — copied into the session's workspace; the runtime follows it as a guided skill would. What the folder declares — files, programs, hosts, functions — grants nothing: the session's allow list and the worker's sandbox come only from the agent's Access Policies ([AC-37](../../../../os/access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)) |
 | Adding checks the agent | Adding a skill to an agent checks Run `skill/<name>` and every declared need against the agent's Access Policies, and every Write against the graph database's mode — a read-only graph database refuses it. A refusal names the need missing; each run checks again, for the person behind it |
-| Owned by people | A skill has one or more owners, people only ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)). Whoever creates it is its first owner; a skill an agent creates in a run is owned by the person behind the run |
+| Owned by the platform | A skill is owned by the platform and keeps who made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)): the person who creates it, or for a skill an agent creates in a run, the person behind the run through the agent. Making it grants nothing over it |
 | Built-in skills are copied, never edited | The default skills below and every skill a plugin ships ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)) are owned by the system user, ship with their plan drawn, and are never edited or deleted; *Copy* makes a custom skill, under a new name, owned by the person who copied it |
 | Guided or planned | *Planned* draws the instructions into a plan before anything runs, each step a function or a workflow; *guided* draws none, and the model follows the instructions with the functions its agent may use, each call checked as it is made. A new skill is planned |
 | The plan is a cache | A planned version's plan is compiled from its text, its answers to the planner's questions and the function and workflow versions it named; the same inputs compile the same plan. It is kept so runs reproduce, never edited, never exported, and never the source |
@@ -215,7 +214,7 @@ The default skills — built in, owned by the system user, each added to its bui
 | Skill version — its `SKILL.md` folder (name, description, instructions, `metadata:` with when to use, how it runs, model version and a guided skill's needs), its declared needs, plan, published or draft | Write · read |
 | A drawing's questions and their answers, on the version | Write · read |
 | The plan of a planned version — a cache: steps, each tied to its line; handlers; the workflows it pins; the inputs it was compiled from | Write (by the draw only) · read |
-| Owners of a skill ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | Write the first owner at creation and copy · read |
+| Who made a skill ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | Write at creation and copy · read |
 | Which agents a skill is added to — who added it, when | Write · read |
 | The Access Policies attached to an agent and each graph database's mode — for adding | Read |
 | Runs — skills offered and applied on each step, by version | Read |
@@ -227,7 +226,7 @@ The default skills — built in, owned by the system user, each added to its bui
 
 | Table | Columns | Notes |
 |---|---|---|
-| `agents_skills` | `name` · `origin` (`custom` · `builtin` — Invana or a plugin ships it) · `plugin?` · `copied_from_id?` · `copied_from_version?` · `current_version_id?` | `name` unique across the deployment. `current_version_id` is null while the skill has only a draft. Owners live in `access_owners` ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)), never a column here |
+| `agents_skills` | `name` · `origin` (`custom` · `builtin` — Invana or a plugin ships it) · `plugin?` · `copied_from_id?` · `copied_from_version?` · `current_version_id?` | `name` unique across the deployment. `current_version_id` is null while the skill has only a draft. A skill is the platform's — no `access_owners` row ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); `made_by_id` and `made_via_agent_id?` sit on this row |
 | `agents_skill_versions` | `skill_id` · `version` · `description` · `content` (the instructions) · `when_to_use` · `mode` (`planned` · `guided`) · `folder` (`references/`, `scripts/`, `assets/`, stored whole) · `metadata` (Invana's fields under `metadata:` in `SKILL.md`) · `needs` (a JSON list of `{verb, resource}`) · `model_pin?` · `plan_id?` · `drawn_digest` · `restored_from_version?` · `published_by_id?` · `published_at?` | `version` is assigned when the draft opens. `published_at` null is the draft — at most one per skill, the only row that changes. `plan_id` is unique, null on a guided version. `drawn_digest` is the sha256 of the text the plan was last drawn from. `needs` is written by each draw, or from `metadata.needs` on a guided save |
 | `agents_skill_version_clarifications` | `skill_version_id` · `span` (the sentence) · `question` · `options` · `answer?` · `answered_by_id?` · `answered_at?` | Kept, so a redraw never asks again |
 | `agents_skill_bindings` | `skill_id` · `agent_id` · `bound_by_id` · `bound_at` | Unique on the pair. A row the skill owns, never a list on the agent; it follows the current version and pins none |
@@ -241,7 +240,7 @@ The default skills — built in, owned by the system user, each added to its bui
 | Plans — a version's plan, its steps, `origin = generated`, `uses`; workflows, their versions, arguments and needs; the function catalogue | [AG-F06](../AG-F06-plans-and-workflows/feature.md#engine) |
 | The Access Policies attached to an agent and the one evaluator, `decide` | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Declared needs and the gate before each step | [AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
-| Owners of a skill and of an agent; a copy of a built-in | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
+| Who made a skill; a copy of a built-in | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
 | Plugins, their switches, the skills they ship and each function's declared needs | [CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) |
 | Graph databases and their mode | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
 | Eval sets, eval runs, test runs and the eval gate | [AG-F10](../AG-F10-test-an-agent-and-a-skill/feature.md#engine) |
@@ -255,8 +254,8 @@ The default skills — built in, owned by the system user, each added to its bui
 
 | Route, after `/api/v1/agents` | Does | Story |
 |---|---|---|
-| `GET /skills` · `POST /skills` | List · create a draft, its first owner the caller | AG-37 |
-| `GET /skills/{id}` | The current version's text flattened onto the skill, with `version` · `current_version_id` · `origin` · `built_in` · `owners[]` · `needs[]` · `is_draft` · `draft_version_id` · `plan` (a summary) | AG-37 · AG-19 |
+| `GET /skills` · `POST /skills` | List · create a draft, `made_by` the caller | AG-37 |
+| `GET /skills/{id}` | The current version's text flattened onto the skill, with `version` · `current_version_id` · `origin` · `built_in` · `made_by` · `needs[]` · `is_draft` · `draft_version_id` · `plan` (a summary) | AG-37 · AG-19 |
 | `PATCH /skills/{id}` · `DELETE /skills/{id}` | Change · delete a skill that never published | AG-37 |
 | `GET /skills/{id}/draft` · `PATCH /skills/{id}/draft` · `DELETE /skills/{id}/draft` | The draft — `version` · `plan` · `needs` · `clarifications` · `open_clarification` · `drawing_run_id` · `refusal {run_id, reasons}` · `unmapped` · `drawn` · write it · discard it | AG-19 |
 | `POST /skills/{id}/draft/draw` | `202 {run_id, stream_url}` — the drawing run | AG-19 |
@@ -270,7 +269,7 @@ The default skills — built in, owned by the system user, each added to its bui
 | `GET /skills/{id}/exceptions?window=7d·30d·90d` | `days` · `since` · `runs` · `replanned` · `replans_p95` · `max_replans` (null) · `hit_limit` · `items[]` | AG-20 |
 | `POST /agents/{id}/skills/{skill}` · `DELETE /agents/{id}/skills/{skill}` | Add a skill to an agent · remove it | AG-30 · AG-21 |
 
-A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#routes)'s `POST /copies`; owners are read and changed there.
+A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#routes)'s `POST /copies`; the copy is the platform's, made by the copier.
 
 ### Events
 
@@ -298,7 +297,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 | 409 `skill_binding_refused` | Adding a skill that needs to write to a read-only graph database | *{database} is read-only — {skill} needs to write.* | AG-30.24 |
 | — | A draw that does not hold together — a duplicate key, a binding to a step that does not run first, an output nothing declares, a function the catalogue lacks, a named workflow that is retired, given an argument it does not declare or a value of the wrong type, or that would nest past the depth limit or into a cycle, or no steps | Settles on the drawing run's result with each reason by name; nothing is written and the last plan stays | AG-19.9 · AG-19.10 · AG-19.27 |
 | 403 | A write by someone whose role is not Modeller or Admin | *This needs the Modeller role — ask an Admin.* | AG-37.14 · AG-19.26 |
-| 403 | A write on a skill by a Modeller who is not one of its owners — adding to or removing from an agent, by one who owns neither the skill nor the agent | *Only its owners or an Admin — ask {owners}.* | AG-37.20 · AG-19.28 · AG-30.26 |
+| 403 | A write on a skill without the Modeller role — including adding to or removing from an agent | *Needs the Modeller role — ask an Admin.* | AG-37.20 · AG-19.28 · AG-30.26 |
 
 ### CLI
 
@@ -312,7 +311,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Mechanism | How |
 |---|---|
-| Owned at birth | `POST /skills` writes the caller's `access_owners` row (`via = made`) in the same transaction; a skill made in a run is owned by the person behind it; a built-in is the system user's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#mechanisms)) |
+| Made at birth | `POST /skills` writes `made_by_id` — the caller, or the person behind the run with `made_via_agent_id` — in the same transaction; the skill is the platform's, and a built-in the system user's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#mechanisms)) |
 | Built-in skills | Written from code and plugins at start, `origin = builtin`, owned by the system user, each with its plan drawn and its default agent added; a built-in planned skill whose text does not draw clean stops the start, naming it. A write to one is refused |
 | A copy | `POST /copies` copies the built-in's current version — folder, answers, model pin and plan — into a new custom skill named by the copier, `copied_from_id` and `copied_from_version` set, owned `via = copied`, added to no agent |
 | A draft opens over the current version | Its text, answers, model pin, plan, needs and `drawn_digest` are copied from it, so a redraw reads as a revision; a roll back carries that version's digest |
@@ -326,10 +325,11 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 | Handlers are read, never drawn | Every non-empty line under a *When things go wrong* heading, to the next level-one or level-two heading, list marker dropped, is a handler. It guards the first step whose dotted function it names as a whole word — the full name tried across every step first — else the first whose function's last segment it names; a line naming none is drawn under the last step with a null `step_id` |
 | Unmapped | The sentences the last settled draw's `plan.draft` step could not map, verbatim; empty while a draw is in flight |
 | A guided version | `plan_id` null; its needs are its `metadata.needs`; each call a run makes is checked as it is made |
+| A skill on an outside runtime | At each session start the worker copies each added skill's published folder — `SKILL.md`, `references/`, `scripts/`, `assets/`, the version the run opened with — into the session's workspace where the runtime reads skills ([CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#mechanisms)); a script in `scripts/` runs only when its content hash is approved ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md#rules)) and a `cmd/` rule allows it. A skill's plan is not sent: the runtime follows the instructions. Every file copied is sent to the runtime and passes the outbound check when its model runs outside ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)) |
 | What reaches a step | In a fixed order — rules in scope, widest first → the agent's added and published skills — each its own item with its id, never concatenated, so it is cited, counted and diffed. A step reports `applied` skill version ids and cites rule version ids |
-| Adding checks | Run `skill/<name>` and each of the current version's `needs` go through `decide(agent, person, verb, resource)` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)) with the rules that hold for everyone; each Write need on `data/<graph database>/…` is also held to that graph database's mode, and on `data/*/…` to every graph database the kind lives in. Deny, or no rule, refuses; Ask adds, the need marked *asks first*; a need a rule allows only for a team adds, marked *only for {team}*. Each step checks again for the person behind the run ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#mechanisms)) |
-| A binding refusal | `409` · `error: skill_binding_refused` · `skill_id` · `skill_version_id` · `agent_id` · `needs[{verb, resource, met, effect?, rule?, policy?, team?, why (no_rule · denied · read_only)}]` · `message` naming the first need missing |
-| Never refused at adding | A skill with no published version · a `form: human` step · a need under Ask or allowed for a team · a helper's skills named at spawn — its own policies refuse the call at the step |
+| Adding checks | Run `skill/<name>` and each of the current version's `needs` go through `decide(agent, person, verb, resource)` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)) with the rules that hold for everyone; each Write need on `data/<graph database>/…` is also held to that graph database's mode, and on `data/*/…` to every graph database the kind lives in. Deny, or no rule, refuses; Ask adds, the need marked *asks first*. Each step checks again for the person behind the run ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#mechanisms)) |
+| A binding refusal | `409` · `error: skill_binding_refused` · `skill_id` · `skill_version_id` · `agent_id` · `needs[{verb, resource, met, effect?, rule?, policy?, why (no_rule · denied · read_only)}]` · `message` naming the first need missing |
+| Never refused at adding | A skill with no published version · a `form: human` step · a need under Ask · a helper's skills named at spawn — its own policies refuse the call at the step |
 | *Standings* | `GET /skills/{id}/agents` runs the same checks per agent without adding; an agent already added carries no refusal, and its needs read met or missing |
 | `skill_ids` on an agent | `POST /agents` adds each through the same checks; `PATCH /agents/{id}` does not take it; `AgentRead` carries it read only |
 | Usage is stored per version | Offered and applied are counted onto the version as each step settles; `enough_to_read` is a floor of 5 offers. `by_agent` (the run's agent) and `by_outcome` (`answered` · `conversed` · `cannot_answer` · `failed` · `cancelled`, null while running) are the current version's; counts are over every step in the deployment, never a page |
@@ -340,7 +340,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | Eight tables in Postgres; a version's `SKILL.md` folder stored whole; owners in `access_owners` | — |
+| § 6 Data and storage | Eight tables in Postgres; a version's `SKILL.md` folder stored whole; `made_by_id` on each skill | — |
 | § 8 APIs and events | The routes, events and CLI above, under `/api/v1/agents` | — |
 | § 9 Distributed execution | Draws are queued runs | — |
 | § 10 AI and agents | A skill is offered, never enforced; it declares needs and grants nothing; a planned skill compiles to one plan per version, a workflow pinned as one composite step; the eval gate (AG-F10) guards every publish | — |
@@ -349,9 +349,9 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Decision | Detail |
 |---|---|
-| How it runs is in the head | *Guided* or *Planned* beside the state; an owner switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
+| How it runs is in the head | *Guided* or *Planned* beside the state; a Modeller or an Admin switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
 | A skill is a sheet | Opened from Agents › Skills; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
-| The head says its state and owners | The name, then *draft · empty*, *draft vN*, or *vN · published* with *draft vN+1* beside it, and its owners — *System* on a built-in; acts are *Run a test* and *Publish* on a draft, *Edit instructions* on a published skill with no draft, *Copy* on a built-in |
+| The head says its state and its owner | The name, then *draft · empty*, *draft vN*, or *vN · published* with *draft vN+1* beside it, and its owner — *Platform*, or *System* on a built-in — with who made it; acts are *Run a test* and *Publish* on a draft, *Edit instructions* on a published skill with no draft, *Copy* on a built-in |
 | A skill is a document | Instructions is one editor (Edit · Preview) with two cards beside it — *What it needs* and *Plan preview* — over a console (Tests · Evals · Problems · Log) that folds to its tab strip |
 | New skill opens on its instructions | An *untitled* draft with the four headings — Goal · Arguments · Steps · When things go wrong — since a draft has nothing else to show |
 | Saving draws | Saving the draft draws the plan again; *Draw this* reads *Redraw* once the plan has been drawn, and neither asks to confirm |
@@ -375,7 +375,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 | The gap is the headline | Usage reads offered · applied · the gap for the current version, captioned *vN · all time*, then per version, by agent and by run outcome, every row opening its runs |
 | The four readings are drawn | Wrong agents → remove it · wrong trigger → rewrite *when to use* · wrong content → rewrite the instructions · it fits → leave it; drawn on the tab, not behind a hover |
 | Neither empty reads as zero | *No data yet* reads `0 · 0 · —`; below the engine's floor a count reads *too few to read* with the gap `—`; both keep their caption, since a gap of 0 claims *applied every time* |
-| Built-in skills are copied | The default skills and every skill a plugin ships read *Built in*, owned by *System*, with *Copy* in place of every edit; the copy is a custom skill the copier owns, added to no agent |
+| Built-in skills are copied | The default skills and every skill a plugin ships read *Built in*, owned by *System*, with *Copy* in place of every edit; the copy is a custom skill, the platform's and made by the copier, added to no agent |
 | Discarding is the draft's | *Discard draft* drops the draft, its answers and its plan; the published version is untouched, so nothing any agent is offered changes |
 | Delete is for a skill that never published | *Delete* removes a draft-only skill and takes it off its agents; on a published or built-in skill it is refused, pointing to its Agents tab or *Copy* |
 
@@ -399,7 +399,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 | Generating instructions from a plan | Two generators pointing at each other drift |
 | A free-text answer to a question | It is a second way to write the playbook, outside the playbook |
 | Skill categories, tags or groups added as a set | The deployment's skills are few enough to read and to choose one by one |
-| Skills written from runs by themselves | Invana suggests a change ([AG-F09](../AG-F09-thinking-graph-and-memory/feature.md)); a person writes and publishes |
+| Skills written from runs by themselves | Invana suggests a change ([AG-F09](../AG-F09-learn-from-memory/feature.md)); a person writes and publishes |
 | Editing a built-in skill | What Invana ships stays as shipped; *Copy* makes one to change |
 | Priority between skills | Offering is not ranking |
 | Adding a skill by relevance | Who is offered what is a decision worth making by hand |

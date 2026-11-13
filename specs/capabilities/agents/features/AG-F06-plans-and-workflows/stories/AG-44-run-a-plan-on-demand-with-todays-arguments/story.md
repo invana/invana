@@ -17,17 +17,19 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
+Starting a workflow is every role's, through the agents granted to the person ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Run or dry run a published workflow version with arguments, through any agent whose policies allow Run `workflow/<key>`; stop the run as any run | — |
-| Operator | The same, through an agent they may use whose policies allow Run `workflow/<key>`; a Modeller the same | No agent they may use is allowed: *Run* disabled — *No agent you may use may run {key} — ask {agent owner}* |
+| Admin | Run or dry run a published workflow version with arguments, through an agent granted to them whose policies allow Run `workflow/<key>`; stop the run as any run | — |
+| Operator | The same; a Modeller the same | No agent granted to them is allowed: *Run* disabled — *No agent you may use may run {key} — ask an Admin* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
   a([A workflow's row or page]) --> who{"An agent the person may use, allowed Run workflow/key?"}
-  who -->|no| nx["Run disabled, naming the rule and the agent's owner"]
+  who -->|no| nx["Run disabled, naming the rule and an Admin"]
   who -->|yes| d["Run · version, current by default · the agent, the Assistant by default"]
   d --> args{"Does it declare arguments?"}
   args -->|yes| f["Arguments, with their defaults"]
@@ -63,7 +65,7 @@ flowchart TD
 | AG-44.11 | A run that asks first or has a question | it reaches that step | it waits in *Needs you* for the agent's named approvers, naming what it will do, or asks the person with its options |
 | AG-44.12 | A running workflow | the person stops it | it stops as any run does (CP-58); this adds no control of its own |
 | AG-44.13 | A built-in workflow | it is run by name, from the command line, or composed by a plan | each opens the same kind of run through the same check |
-| AG-44.14 | No agent the person may use is allowed Run on the workflow | they open it | *Run* is disabled: *No agent you may use may run {key} — ask {agent owner}*; a start through an agent they may not use is refused: *You may not use {agent} — ask an Admin.* |
+| AG-44.14 | No agent the person may use is allowed Run on the workflow | they open it | *Run* is disabled: *No agent you may use may run {key} — ask an Admin*; a start through an agent they may not use is refused: *You may not use {agent} — ask an Admin.* |
 | AG-44.15 | A run started by name | a person who may read its content opens *How it got here* | its steps show `key@version`, the resolved arguments, who started it and the check's result |
 | AG-44.16 | A workflow needing a plugin or graph database that is switched off, at the install or by the person | the person presses *Run* | it is refused before it starts: *{name} is off — switched off by {person}*; nothing runs |
 

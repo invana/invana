@@ -58,7 +58,7 @@ tagline does not need it.
 |---|---|---|
 | **Graph databases** | The customer's records — Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune, TinkerGraph — each reached through its connector, read-only or read + write | Invana's own state |
 | **The Graph** | Nothing of its own: the stitched model and data read in place across the graph databases | A copy of a record |
-| **The system graph** | Invana's own graph, governed by the system ontology: the thinking graph, the ledger's edges, identity links and lineage | Customer data; it is never part of the Graph |
+| **The system graph** | Invana's own graph, governed by the system ontology: Memory with its lineage, the ledger's edges and identity links | Customer data; it is never part of the Graph |
 | **Postgres** | The source of truth for everything Invana records — users, agents, policies, runs, History; the system graph follows it and is rebuilt from it | — |
 | **The blob store** | Files — uploads, load batches, reports — over the S3 API, each encrypted with its own key | — |
 
@@ -98,12 +98,13 @@ It governs the system graph and is never part of the Graph's.
 
 The layer under every pillar: what runs the platform for people and agents alike. It is not a pillar and never a
 product — it is how Invana works, in every deployment. It enforces the ontology; the Ontology pillar owns it. It has
-two planes.
+three planes.
 
 | Plane | Answers | Holds | Spec |
 |---|---|---|---|
 | **Control Plane** | What runs, where, and within which limits? | The overview of workloads by user, agent and team · every run, and stopping one · ops alerting · the Inbox and its channels · graph databases — connecting one, its mode, switching it on or off, its health · finding the way — ⌘K and search · workers and the queue · limits per team, user and agent · AI models, local or external · plugins, the deployment's MCP server and outside tools · skill scripts | `os/control/` — `CP` |
 | **Access Plane** | Who may act, through which agent, and what did they do? | Sign-in, sessions, keys and connected MCP clients · Access Policies — Allow · Ask · Deny on Read · Write · Run — and the one role table · the Directory — users, teams, the agents each may use · ownership · asks and approvals · access usage · what left the platform · History | [os/access/product.md](os/access/product.md) — `AC` |
+| **Graph Plane** | What does Invana read, and what does it remember? | **Data** — the customer's Graph, read in place through a connector per graph database, in its own language, joined on identity links · **Memory** — Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their relations, each with its lineage | [os/graph/product.md](os/graph/product.md) — `GP` |
 
 | An OS has | Invana has | Plane |
 |---|---|---|
@@ -111,19 +112,21 @@ two planes.
 | **A type system** | The ontology — every record has a kind, every kind its rules; owned by the Ontology pillar, enforced here | — |
 | **Permissions** | Access Policies on agents, whose every rule is Allow · Ask · Deny on Read · Write · Run of a named resource; default deny, the strictest wins | Access |
 | **Mounts** | Graph databases, each connected read-only or read + write and switched on or off, stitched into the one Graph | Control |
-| **Drivers** | Connectors — one package per graph database type | Control |
+| **Drivers** | Connectors — one package per graph database type | Graph |
 | **Processes** | Runs — every execution of a plan or a workflow, by an agent for a person, in one journal, executed on workers | Control |
 | **A scheduler** | Workers and the queue; Agents sets the schedules that feed it | Control |
 | **Resource limits** | Token budgets, and limits per team, user and agent | Control |
-| **Extensions** | Plugins — tools, MCP servers and Domain packs that add what agents can do, each switched on by an Admin | Control |
+| **Extensions** | Plugins — tools, MCP servers and Team packs that add what agents can do, each switched on by an Admin | Control |
+| **A journal of the work** | Memory — what every run, task, finding and decision left, linked to what it came from | Graph |
 | **System calls, audited** | The ledger — every call to an AI model, a tool or a graph database, what it carried and where it went | Access |
 | **Logs** | History, the change log and provenance — who did what, through which agent, to which record | Access |
 | **A shell** | The frame — modes, crumbs, ⌘K — and the Inbox, where what needs a person waits | Control |
 
 | Decision | Detail |
 |---|---|
-| The Control Plane runs the work | Workers, the queue, limits and the journal of every run are the Control Plane's; anyone behind a run, its agent's owners and an Admin read and stop it there |
+| The Control Plane runs the work | Workers, the queue, limits and the journal of every run are the Control Plane's; the person behind a run reads and stops it there, and an Admin stops any |
 | The Access Plane decides and records | Every act is checked against Access Policies before it runs and lands in History after; the ledger is read there |
+| The Graph Plane reads and remembers | Every read and write of a graph database goes through its connector; what the work leaves is Memory. Connecting a graph database, its mode and switches stay the Control Plane's |
 | Agents builds and schedules | Building agents, skills and workflows, testing them, and setting schedules are Agents' (AG) |
 | The Assistant is a built-in agent | The Assistant is one of the agents every deployment ships; its conversation is a feature of Explore (EX) |
 
@@ -138,8 +141,8 @@ two planes.
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
 | **Acts only as far as the person allows** | Every act runs through an agent, and each Read, Write and Run is Allow, Ask or Deny by the Access Policies on that agent; what no rule reaches is denied, and the strictest rule wins. An Ask waits for the agent's named approvers, showing exactly what will happen, and is never decided by the one it benefits ([Access Plane](os/access/product.md#decisions)) |
 | **Nothing leaves unseen** | Every call to a model, tool or graph database is in the ledger; a sensitive property never goes to an external model |
-| **Learns from outcomes** | Every plan, run, finding and decision is kept in the thinking graph; what served is recalled first, and what failed is kept as what to avoid |
-| **General-purpose** | Nothing in the platform is domain-specific. A domain is its ontology, its agents and its project types, shipped together as a Domain pack |
+| **Learns from outcomes** | Every plan, run, finding and decision is kept in Memory; what served is recalled first, and what failed is kept as what to avoid |
+| **General-purpose** | Nothing in the platform is domain-specific. A team's ontology, its agents and skills and its project types ship together as a Team pack |
 | **Split by role** | An Operator asks and decides; a Modeller shapes the model; an Admin runs the deployment — each sees the acts their role holds ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
@@ -162,13 +165,13 @@ all of them run on [the operating system](#the-operating-system). How each looks
 |---|---|---|---|---|
 | `SE` | [Semantics](capabilities/semantics/product.md) | Ontology | mode · sheet | Say what the data means across every graph database — models, meaning and sensitive properties, taxonomies, standards, links and identity match rules, rules, inference — drafted, reviewed and published |
 | `RC` | [Records](capabilities/records/product.md) | Intelligence | modal · sheet | Know the records in the graph databases and how each got there — loads, quality against the model, fixes, merges, provenance, annotations |
-| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal · sheet | Build agents and skills, test them, turn plans into workflows, schedule them, and recall what they learned in the thinking graph |
+| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal · sheet | Build agents and skills, test them, turn plans into workflows, schedule them, and recall what they learned from Memory |
 | `EX` | [Explore](capabilities/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, what-if reasoning labelled predicted |
 | `PJ` | [Projects](capabilities/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports, alerts |
 
 | Decision | Detail |
 |---|---|
-| One platform | Invana is offered whole. Pillars and capabilities are how it is explained, never sold apart; every deployment has all four pillars and both planes |
+| One platform | Invana is offered whole. Pillars and capabilities are how it is explained, never sold apart; every deployment has all four pillars and every plane |
 | Pillars group the capabilities; the operating system runs them | These are the only two groupings. A capability belongs to one pillar; the operating system belongs to none |
 | Decision intelligence is the category, evidence the difference | Invana shows the evidence and the person decides; it never decides for them |
 | Decision Graphs is a story, not a pillar | A decision cites the findings, runs and steps behind it in the thinking graph — the story Agents and Evidence tell together |
@@ -181,7 +184,7 @@ The deployment defines, limits and uses; a project narrows.
 
 | Scope | Holds |
 |---|---|
-| **Deployment** | Graph databases and their connections · the Graph — one stitched model and its data · the system graph · standards, Domain packs and rules that must always hold · users, teams and the agents each may use · agents, skills, workflows and Access Policies · workers, AI models, plugins and limits · runs and History |
+| **Deployment** | Graph databases and their connections · the Graph — one stitched model and its data · the system graph · standards, Team packs and rules that must always hold · users, teams and the agents each may use · agents, skills, workflows and Access Policies · workers, AI models, plugins and limits · runs and History |
 | **Project** | Branches, tasks, findings, decisions, project rules |
 
 | Rule | Detail |
@@ -189,7 +192,7 @@ The deployment defines, limits and uses; a project narrows.
 | One deployment, one organisation | No multi-tenancy, no workspaces and no Organisation record; the deployment is the widest scope |
 | Hosted means single-tenant | A hosted Invana is one deployment per customer, never shared tenancy |
 | One Graph per deployment | Every graph database the deployment connects is part of its one Graph; the system graph never is |
-| A person uses agents | A person is granted the agents they may use; an agent's Access Policies say what it may Read, Write and Run, and a rule may narrow it to a team |
+| A person uses agents | A person is granted the agents they may use; an agent's Access Policies say what it may Read, Write and Run, the same for everyone who may use it |
 
 ## What it is used for
 
@@ -203,7 +206,7 @@ The same records host different kinds of work; none is a special case.
 | **Knowledge management** | Several graph databases, stitched on identity links, answered as one |
 | **Compliance and audit** | The append-only History, the ledger of what left the platform, criteria checked per task, and provenance from every value back to its load |
 | **Domain intelligence** | A model of the entities that matter, and agents staffed on a project working tasks against criteria |
-| **Domain memory** | The thinking graph: every plan, run and decision kept, recalled by its outcome |
+| **Domain memory** | Memory: every plan, run and decision kept, recalled by its outcome |
 | **Decisions under uncertainty** | A project's branches, findings for and against, what-if reasoning labelled predicted, and a decision checked by the rules |
 
 ## Not building
@@ -215,7 +218,7 @@ The same records host different kinds of work; none is a special case.
 | A copy of the customer's records | The Graph is read in place; a load is a batch written to a graph database, never a second store of records |
 | Fuzzy entity resolution · node merge on an anchor | Identity links come from match rules a Modeller declares, never guessed silently; an anchor links, it never merges. Two records merge only when a person picks them ([Records](capabilities/records/product.md)) |
 | Multi-tenancy · workspaces · an Organisation record | One deployment is one organisation |
-| Proprietary data · pricing · a marketplace | Records, standards and Domain packs are reusable knowledge first |
+| Proprietary data · pricing · a marketplace | Records, standards and Team packs are reusable knowledge first |
 | Soft deletes · a trash tier · undo | Deletes are hard and cascade downward; retiring and undoing a load exist where history must stay resolvable |
 | Parameter sweeps · game theory | After 1.0. What-if is a reasoning method whose evidence is labelled predicted |
 | Authoring a plan by hand | Plans are drafted by agents from instructions, or reuse and compose published workflows |

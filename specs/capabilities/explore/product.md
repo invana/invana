@@ -75,10 +75,10 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 | One question, one run | A conversation is a thread of runs, not a run. The run is what is governed — its agent's Access Policies, its tokens and its asks — so two questions in one thread can be grounded differently and spend separately |
 | A conversation carries defaults | Its agent and its tokens per run, capped by the agent's limits ([CP-F04](../../os/control/features/CP-F04-limits/feature.md)); one question may narrow the tokens, and the run keeps what it started with |
 | The agent names the AI model | The composer offers how to ask and the agents the person may use, never a model; a sensitive property never reaches an external model |
-| A conversation is private to its runs | Its content reads for the person behind its runs, the agent's owners and Admins; anyone else sees that it ran, its status and its tokens |
+| A conversation is private to its runs | Its content reads for the person behind its runs, and, for a run of a project, anyone whose default agent may see every source ([AC-F09](../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)); anyone else sees that it ran, its status and its tokens |
 | Steps show as they happen | Nothing waits for the end of a run to appear |
 | An answer's part reads the same everywhere | Its kind, template and citation look the same in the thread, on a task and in a scheduled answer |
-| An agent has no memory of its own | What it knows next time is recalled from the thinking graph with a planned, cited step, or a change a person accepted on the evidence of what happened ([AG-F09](../agents/features/AG-F09-thinking-graph-and-memory/feature.md)) |
+| An agent has no memory of its own | What it knows next time is recalled from the thinking graph with a planned, cited step, or a change a person accepted on the evidence of what happened ([AG-F09](../agents/features/AG-F09-learn-from-memory/feature.md)) |
 | Improvement is a version a person accepts | Never a weight that shifts; each accepted change predicts what it improves and is measured against it |
 | Explore hands on | *Schedule this* → Agents › Schedules · *Add to a project* → Projects · *Ask for a change* → Model · *Annotate* → [RC-F07](../records/features/RC-F07-annotations/feature.md) |
 | Edits need a read + write graph database | Saving the board's edits writes to the customer's graph database; on a read-only one Save is refused, naming the database and its mode (EX-F06) |

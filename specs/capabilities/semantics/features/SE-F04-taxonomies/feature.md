@@ -26,8 +26,8 @@ flowchart TD
   t -->|loading| ld["The tree holds its shape"]
   t -->|failed| fl["Could not load · Try again"]
   t -->|none yet| e["Nothing placed yet — Set a broader kind · Add a value hierarchy"]
-  t -->|Set a broader kind · Add a hierarchy| may{Can shape the model?}
-  may -->|no| na["Reads · Ask Priya (owner) to shape the model"]
+  t -->|Set a broader kind · Add a hierarchy| may{Modeller or Admin?}
+  may -->|no| na["Reads · Needs the Modeller role — ask an Admin"]
   may -->|yes| d["Staged in the draft"]
   d -->|a cycle| cy["Refused, naming the loop"]
   d -->|from a standard's broader and narrower| std["The standard's levels — SE-F05"] --> d
@@ -42,10 +42,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read broader kinds and value hierarchies | Operator — every member | — |
-| Set a broader kind · add or change a value hierarchy, in a draft | `modeller` · shown as *Can shape the model* | Absent; *Ask Priya (owner) to shape the model* |
+| Read broader kinds and value hierarchies | Every signed-in person — Operator, Modeller, Admin | — |
+| Set a broader kind · add or change a value hierarchy, in a draft | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |
 
 ## States
 

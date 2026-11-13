@@ -33,12 +33,12 @@ flowchart TD
   fmt -->|OWL/RDFS · SHACL · CSV code list| ot["The same preview, by that format's importer"]
   sk -->|several schemes| pk["Pick a concept scheme"] --> sk
   sk -->|not readable| skx["Says why — download it and choose File"]
-  sk -->|Import as a standard| own{Its creator, or new?}
+  sk -->|Import as a standard| own{Modeller or Admin?}
   ot --> own
-  own -->|no| ox["Refused, naming the creator"]
+  own -->|no| ox["Needs the Modeller role — ask an Admin"]
   own -->|yes| sv
   cli([The command line · a pack's file]) -->|Admin| sv
-  cli -->|not Admin| px["Refused — only an install Admin adds a pack"]
+  cli -->|not Admin| px["Refused — only an Admin adds a pack"]
   sv --> held(["Held by kinds and properties — SE-19"])
   sv -->|a newer version| pin["Each holder stays on its version · reads v2 is newer"]
 ```
@@ -52,12 +52,11 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every standard, its versions and who holds it | Operator — every member of the install | — |
-| Write a standard or import one — the person becomes its creator | Operator — every member of the install | — |
-| Publish the next version of a standard | Its creator · Admin | *New version* absent, naming the creator |
-| Apply a pack | Admin | Refused, naming the reason |
+| Read every standard, its versions and who holds it | Every signed-in person — Operator, Modeller, Admin | — |
+| Write a standard or import one · publish the next version of a standard | Modeller · Admin | *Write a standard*, *Import* and *New version* absent; *Needs the Modeller role — ask an Admin* |
+| Apply a pack | Admin | Refused — *Needs the Admin role* |
 
 ## States
 
@@ -69,7 +68,7 @@ flowchart TD
 | Has data | Standards with their origin, current version and how many kinds and properties hold them |
 | Failed | A refused publish or import names why; a library that cannot be read says so, with *Try again* |
 | Agent working or proposing | — |
-| No access | Writes on someone else's standard are absent, naming the creator |
+| No access | Every standard reads; the writes are absent, naming the Modeller role |
 
 ## Rules
 
@@ -80,7 +79,7 @@ flowchart TD
 | A term | Name (unique in the version) · type `text · integer · number · boolean · date` · required · allowed values, each a code with a label · description · its source address when imported |
 | Importers per format | SKOS (SE-18) · OWL/RDFS — classes and their properties as terms, named individuals as values · SHACL — shapes as terms, `sh:in` as values, `sh:minCount` as required · CSV code lists — one column of codes, one of labels. Each previews before it imports, and keeps every source address |
 | A SKOS scheme is a standard | Concepts become terms and values: `prefLabel` the names and labels, `notation` the codes, `broader` the levels; each keeps its source address. A value hierarchy a model's property follows is SE-F04's |
-| Packs per standard | A pack is one standard's file — IAB Content Taxonomy, ISO 3166, Darwin Core — applied by an Admin from the command line, marked *pack*; a Domain pack may carry several (CP-F02) |
+| Packs per standard | A pack is one standard's file — IAB Content Taxonomy, ISO 3166, Darwin Core — applied by an Admin from the command line, marked *pack*; a Team pack may carry several (CP-F02) |
 | A holder pins a version | A newer standard version never moves a kind or property that holds one; the holder reads that a newer one exists |
 | The engine never fetches | The browser or the CLI reads a file or URL and sends its text; the engine reads only what it is sent |
 | The engine counts | Holders per standard and the library's totals are the engine's |
@@ -110,7 +109,7 @@ flowchart TD
 | Packs are applied, not browsed | A pack is a standard file an Admin applies; there is no registry to check for newer packs |
 | Import previews first | Reading a file previews at once — the source, its terms and values, the name it publishes under, the mapping, notes and skips; *Import as a standard* waits for a preview |
 | Several schemes are a choice | A file with several schemes offers a picker; one import is one scheme |
-| The imported name is editable | It defaults to the slug of the source's title; the publisher is the person |
+| The imported name is editable | It defaults to the slug of the source's title; the publisher is the person who imports it, shown as a fact — it grants nothing |
 | Experimental | Standards and their importers carry an *Experimental* badge; constraints on a model's properties stay core |
 
 ## Open questions

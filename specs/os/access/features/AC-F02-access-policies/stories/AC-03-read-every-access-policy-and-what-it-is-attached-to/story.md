@@ -40,7 +40,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-03.1 | A signed-in person | they open *People and access* | it opens as a sheet over the work, on *Access Policies*, beside *Roles* and the Directory's tabs |
-| AC-03.2 | The deployment's policies | the list is read | one row per policy — its title, *Built in* or *Custom*, its rules in a line, the agents it is attached to, its owners, when it changed; a built-in policy has no *changed* |
+| AC-03.2 | The deployment's policies | the list is read | one row per policy — its title, *Built in* or *Custom*, its rules in a line, the agents it is attached to, its owner and who made it, when it changed; a built-in policy has no *changed* |
 | AC-03.3 | The list | it is filtered | tabs *All · Built in · Custom* each carry the engine's count; *Attached to* filters by an agent and *Reaches* by a resource |
 | AC-03.4 | The list | the reader types in *Find a policy* | only matching policies show; with none, *Nothing matches* and *Clear filters* |
 | AC-03.5 | A deployment with no custom policy | the list is read | the built-in policies show, each attached to its built-in agent; *New policy* leads |

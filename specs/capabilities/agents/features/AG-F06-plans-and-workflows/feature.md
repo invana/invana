@@ -16,7 +16,8 @@ depends_on: [AG-F01, AG-F02, AG-F04, AG-F09, CP-F02, CP-F10, AC-F02, AC-F05, AC-
 > How an agent carries one piece of work out. It climbs a ladder — one function, a workflow reused with new
 > arguments, a plan composed from workflows, a new plan drafted — and every plan is checked against the agent's Access
 > Policies before its first step. A plan that served becomes a **workflow** when the agent's named approvers approve
-> it: read-only, versioned, owned by the person who asked for it, and reusable by every agent allowed to run it. The
+> it: read-only, versioned, owned by the platform, made by the person who asked for it, and reusable by every agent
+> allowed to run it. The
 > decisions it helps make: *should this plan be kept for reuse, is this workflow still fit to run or should a version
 > retire, may this agent run it, and what can agents do at all?*
 
@@ -48,16 +49,16 @@ flowchart TD
   run --> verify{"Did it serve?"}
   verify -->|a composed or drafted plan served| prop["AG-31 · Propose as a workflow · literals become arguments"]
   prop --> appr{"AG-47 · The agent's named approvers"}
-  appr -->|approve| wf(["A workflow v1 — the asker its first owner"])
+  appr -->|approve| wf(["A workflow v1 — the platform's, made by the asker"])
   appr -->|a workflow with this key exists| nv(["AG-48 · Its next version"])
   appr -->|decline · expires| dc(["Stays a one-off plan · the note kept"])
   appr -->|the approver is the asker| self["Not theirs to answer — routed on"]
   verify -->|did not serve| avoid(["Kept as avoid for recall (AG-F09)"])
   lib([Agents › Skills · Workflows]) --> page["AG-18 · A workflow: Overview · Layers · Flow · Runs · Versions · Arguments"]
   page -->|Retire a version| ret["AG-48 · Not chosen or started again · pins keep running it, marked"]
-  page -->|Copy a built-in| cp(["AG-48 · A custom workflow the copier owns"])
+  page -->|Copy a built-in| cp(["AG-48 · A custom workflow — the platform's, made by the copier"])
   page -->|a step| fn["AG-38 · A function: its contract, what it needs, what calls it"]
-  page -->|not an owner or an Admin| ro["Reads · Retire and Propose a version disabled, naming the owners"]
+  page -->|not a Modeller or an Admin| ro["Reads · Retire and Propose a version disabled, naming the Modeller role"]
 ```
 
 ```mermaid
@@ -82,7 +83,7 @@ sequenceDiagram
     P->>E: Propose as a workflow — key, intent, arguments
     E->>N: an ask — the plan, its arguments, its needs
     N-->>E: Approve · Decline with a note
-    E-->>P: workflow key@n, P its first owner — or declined
+    E-->>P: workflow key@n, made by P — or declined
   end
 ```
 
@@ -101,22 +102,22 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
-*Plans and workflows* is *Acts* for Operator, Modeller and Admin — within the agents the person may use, those agents'
-Access Policies, and what the person owns ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)).
+*Plans and workflows* is *Acts* for Operator, Modeller and Admin — within the agents granted to the person and those
+agents' Access Policies. A workflow is the platform's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)):
+making it grants nothing over it.
 
-| Act | Who | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Read workflows, a workflow's page, its versions and arguments, and functions | Every signed-in person | — |
-| Read a run's plan — its rung, why, the check's result | Whoever may read the run's content — the person behind it, its agent's owners, an Admin (run privacy, [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | That it ran, its status and its tokens; the plan reads *Content withheld* |
-| Run a workflow by name · dry run | Anyone, through an agent they may use whose Access Policies allow Run `workflow/<key>` | *Run* disabled, naming the rule that denies it and *Ask {agent owner}* |
-| Propose a plan that served as a workflow | The person behind the run, or an owner of its agent | *Propose as a workflow* hidden |
-| Approve or decline a plan into a workflow | The agent's named approvers — else its owners, else for a built-in agent the Admins — never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads; *Approve* and *Decline* absent — *Not yours to answer* |
-| Propose a workflow's next version · retire a version · move a pin | The workflow's owners · Admin | Disabled, naming the owners — *Ask {owner}* |
-| Copy a built-in workflow | Modeller · Admin ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | *Copy* disabled, naming *Modeller* |
-| Add owners · hand a workflow over | Its owners · Admin ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | Owners read |
+| Read a run's plan — its rung, why, the check's result | Whoever may read the run's content — the person behind it, and for a project's run anyone whose default agent may see its sources (run privacy, [AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) | That it ran, its status and its tokens; the plan reads *Content withheld* |
+| Run a workflow by name · dry run | Operator · Modeller · Admin, through an agent granted to them whose Access Policies allow Run `workflow/<key>` | *Run* disabled, naming the rule that denies it and *ask an Admin* |
+| Propose a plan that served as a workflow | The person behind the run | *Propose as a workflow* hidden |
+| Approve or decline a plan into a workflow | The agent's named approvers — else the other approvers, else the Admins — never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads; *Approve* and *Decline* absent — *Not yours to answer* |
+| Propose a workflow's next version · retire a version · move a pin | Modeller · Admin | Disabled — *Needs the Modeller role — ask an Admin* |
+| Copy a built-in workflow | Modeller · Admin ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | *Copy* disabled — *Needs the Modeller role — ask an Admin* |
 | Switch a plugin on or off | Admin ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) | The plugin reads; its switch disabled, naming *Admin* |
 | Approve a library's functions | Admin ([AG-F08](../AG-F08-portable-agents-and-skills/feature.md)) | Proposals read *Waiting for an Admin* |
-| Decide a suggested change to a workflow | Its owners · Admin ([AG-52](../AG-F09-thinking-graph-and-memory/stories/AG-52-decide-on-a-suggested-change/story.md)) | Read only — *Ask {owner}* |
+| Decide a suggested change to a workflow | Modeller · Admin ([AG-52](../AG-F09-learn-from-memory/stories/AG-52-decide-on-a-suggested-change/story.md)) | Read only — *Needs the Modeller role — ask an Admin* |
 
 ## States
 
@@ -125,17 +126,17 @@ Access Policies, and what the person owns ([AC-F07](../../../../os/access/featur
 | First use | Only the built-in workflows, each *built-in*; a workflow never run lists its steps with every measure *—*; a function nothing calls reads *not used yet* |
 | Empty after a filter | No workflow or function matches — the filter named, *Clear* |
 | Loading | The list's head and filters drawn at once; rows and a page's numbers load in place |
-| Has data | Workflows with where each comes from, version, what it touches, its owners and what composes it; a workflow's page over its window; functions grouped by what they touch |
+| Has data | Workflows with where each comes from, version, what it touches, who made it and what composes it; a workflow's page over its window; functions grouped by what they touch |
 | Failed | Could not load, with *Try again*; a refused plan names what refused it and spends nothing; a workflow flagged because a plugin or graph database it needs is off names it and who switched it off |
 | Agent working or proposing | A run climbing the ladder; a workflow running from *Run*; a proposal waiting on the named approvers; a suggested change to retire a version or move a pin |
-| No access | Everything reads; a run's plan whose content the person may not read reads *Content withheld*; acts they may not take are disabled, naming the owners, the role or the rule |
+| No access | Everything reads; a run's plan whose content the person may not read reads *Content withheld*; acts they may not take are disabled, naming the role or the rule |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
 | The ladder | For each piece of work an agent tries, in order: **1** one function · **2** a workflow with new arguments · **3** a plan composed from workflows · **4** a new plan drafted. It takes the lowest rung that fits; the run records the rung and why each lower one did not fit |
-| Recall comes first | Before choosing a rung, the plan step reads recall from the thinking graph — what served for this intent and what to avoid ([AG-F09](../AG-F09-thinking-graph-and-memory/feature.md)) |
+| Recall comes first | Before choosing a rung, the plan step reads recall from the thinking graph — what served for this intent and what to avoid ([AG-F09](../AG-F09-learn-from-memory/feature.md)) |
 | The function catalogue is rung one | Every step of every plan calls one function, or composes one workflow; the functions are a closed set from plugins switched on and approved libraries; nothing in Studio adds, edits or switches one |
 | A composite step pins a version | A plan calls a published workflow as a `composite` step naming `key@version`; a new version of that workflow never changes the plan |
 | Composites nest, never loop | At most three levels deep; a workflow that would contain itself, at any depth, is refused |
@@ -145,8 +146,8 @@ Access Policies, and what the person owns ([AC-F07](../../../../os/access/featur
 | A plan holds no data | A drafted plan's literal values are kept on its run; proposing it as a workflow turns every literal into a declared argument. A record ID or a property value never becomes a default; a count, a window or a flag may |
 | Approval is for reuse | A one-off plan runs without approval; only making it a workflow waits on the agent's named approvers |
 | A workflow is read-only | A change is a new version, approved the same way; a published version never changes, so every run of it still opens |
-| Owned by the asker | A new workflow's first owner is the person who proposed it; co-owners may be added; an agent never owns one ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) |
-| Built-ins are copied, never edited | A built-in workflow is owned by the system user; *Copy* makes a workflow the copier owns, under a new key |
+| The platform's, made by the asker | A workflow is owned by the platform; a new one is made by the person who proposed it, which grants nothing over it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) |
+| Built-ins are copied, never edited | A built-in workflow is owned by the system user; *Copy* makes a workflow the platform's, made by the copier, under a new key |
 | Only workflows are listed | A one-off plan is read from its run; a skill's plan under its skill ([AG-F04](../AG-F04-skills/feature.md)); the list holds what can be chosen or run again |
 | Origin is a badge | *Built-in* · *approved* · *copied* — one list, one filter |
 | Retire stops choosing, never a pin | A retired version is not chosen on rung 2 or 3 and not started by name; runs in flight finish; a published workflow that pins it keeps running it and reads *pins a retired version*; past runs still open |
@@ -204,7 +205,7 @@ plugin it comes from. The default kit's plugins are [CP-F02](../../../../os/cont
 | A run's plan — rung, why, the plans recalled and considered, the check's result | Write · read |
 | Runs of a workflow — every run that ran or composed it | Read |
 | Functions — contract, plugin and version, what each touches and needs | Read |
-| Owners of a workflow | Read ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) |
+| Who made a workflow | Read ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) |
 | History rows — proposed, approved, declined, retired, copied, started, flagged | Write · read |
 
 ## Engine
@@ -216,7 +217,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `agents_workflows` | `key` · `name` · `description` · `intent[]` · `origin` (`packaged` — built-in · `promoted` — approved · `copied`) · `copied_from_key?` · `current_version` · `flagged?` (`{reason, resource, switched_by_id}`) | `key` unique across the deployment, kebab case. Owners are rows of `access_owners` ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); a built-in's owner is the system user |
+| `agents_workflows` | `key` · `name` · `description` · `intent[]` · `origin` (`packaged` — built-in · `promoted` — approved · `copied`) · `copied_from_key?` · `current_version` · `flagged?` (`{reason, resource, switched_by_id}`) · `made_by_id` · `made_via_agent_id?` | `key` unique across the deployment, kebab case. A workflow is the platform's — no `access_owners` row ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); a built-in's `made_by` is the system user |
 | `agents_plans` | `workflow_id?` · `version?` · `kind` (`import` · `ask` · `enrich` · `model` · `stitch` · `bulk`) · `rung` (`function` · `workflow` · `composed` · `drafted`) · `args_schema` · `literals?` · `uses[]` · `run_id?` · `skill_version_id?` · `status` (`one_off` · `published` · `retired`) · `retired_at?` · `approved_from_run_id?` · `approval_id?` · `created_by_kind` · `created_by_id` · `behind_user_id?` · `created_at` | A workflow version is a row with `workflow_id` and `version` — `key@n`; a published row never changes. A one-off plan carries its `run_id` and its `literals`; a skill's plan its `skill_version_id`. Exactly one of `workflow_id` · `run_id` · `skill_version_id` |
 | `agents_plan_steps` | `plan_id` · `parent_id?` · `ordinal` · `key` · `form` (`callable` · `composite` · `human`) · `step_key?` (a function) · `workflow_key?` · `workflow_version?` · `role?` (`extract` · `decide` · `judge` · `embed`) · `title` · `body` · `args` · `assignee_kind?` · `assignee_id?` · `depends_on[]` · `when` · `map_over` · `loop` · `approval` · `optional` · `timeout_s` · `retry` · `pool` · `max_parallel` · `on_lane_failure` · `source_span?` | Unique (`plan_id`, `parent_id`, `key`). A `composite` step names `workflow_key` and `workflow_version`, never a function; a `callable` step names `step_key` |
 
@@ -225,24 +226,24 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | Runs — `plan_snapshot` · `plan_revision` · `replans` · `rung`, the step rows a workflow's numbers read, an eval run left out; run privacy | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
-| An agent, its budget, `effort.max_replans`, its owners; the default agent (the Assistant) | [AG-F01](../AG-F01-build-an-agent/feature.md#engine) |
+| An agent, its budget, `effort.max_replans`; the default agent (the Assistant) | [AG-F01](../AG-F01-build-an-agent/feature.md#engine) |
 | Helper bounds — depth, fan-out | [AG-F05](../AG-F05-delegation-and-outside-agents/feature.md#engine) |
 | A skill version's plan and its draw | [AG-F04](../AG-F04-skills/feature.md#engine) |
-| Recall — what served and what to avoid for an intent; outcome labels | [AG-F09](../AG-F09-thinking-graph-and-memory/feature.md#engine) |
+| Recall — what served and what to avoid for an intent; outcome labels | [AG-F09](../AG-F09-learn-from-memory/feature.md#engine) |
 | Access Policies and the policy check | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) · [AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
 | The ask a proposal raises, its named approvers, reminders and expiry | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) |
-| Owners of a workflow, hand-over, copying a built-in | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
+| Who made a workflow, copying a built-in | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
 | Plugins, their switches, functions' manifests and built-in workflow files | [CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) |
 | Graph databases, their mode and switch | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
 | Approved library functions | [AG-F08](../AG-F08-portable-agents-and-skills/feature.md#engine) |
-| Suggested changes to a workflow | [AG-F09](../AG-F09-thinking-graph-and-memory/feature.md#engine) |
+| Suggested changes to a workflow | [AG-F09](../AG-F09-learn-from-memory/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes
 
 | Route, after `/api/v1/agents/workflows` | Does | Story |
 |---|---|---|
-| `GET /` | The workflows — `key` · `name` · `version` · `origin` · `intent` · `layers` · step count · runs · served · last ran · owners · `composed_by` count · `flagged` — with `total` and `packaged`; filters `origin` · `kind` · `owner` · `flagged` | AG-18 |
+| `GET /` | The workflows — `key` · `name` · `version` · `origin` · `intent` · `layers` · step count · runs · served · last ran · `made_by` · `composed_by` count · `flagged` — with `total` and `packaged`; filters `origin` · `kind` · `made_by` · `flagged` | AG-18 |
 | `GET /{key}` | One version (the newest unless `version` is named): the row, its steps and edges, `layers`, `args_schema`, its composite steps with their pins, the workflows that compose it with the version each pins | AG-18 · AG-46 |
 | `GET /{key}/versions` · `GET /{key}/diff?version=` | Every version with status · this version against the one before: `summary` · `added` · `removed` · `moved` · `changed` · `unchanged` · `arguments` · `pins`; `against_version` null for v1 | AG-48 |
 | `GET /{key}/performance?window=7d·30d·90d&version=` | `tiles` · `daily[]` · `publishes[]` · `steps[]` · `failures[]` · `bounds[]` · `slowest` (Mechanisms) | AG-18 |
@@ -250,9 +251,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /{key}/export` | The version as read-only YAML | AG-18 |
 | `POST /{key}/runs` · `POST /{key}/runs?dry_run=true` | Run a published version — `{version?, args, agent_id?, idem_key}` → the run, or the existing run for a repeated `idem_key` · a dry run returns the steps of the tree, the resolved arguments and the projected tokens and opens no run | AG-44 |
 | `POST /{key}/versions/{v}/retire` | Retire a version | AG-48 |
-| `POST /{key}/copy` | `{key, name}` — a built-in or any workflow copied to a new key, v1, the copier its owner | AG-48 |
+| `POST /{key}/copy` | `{key, name}` — a built-in or any workflow copied to a new key, v1, `made_by` the copier | AG-48 |
 | `POST /{key}/pins` | `{step_key, version}` — propose the composing workflow's next version with one pin moved; it waits on approval like any version | AG-48 |
-| `POST /proposals` | `{run_id, key?, name, description, intent[], args[{literal_path, name, label, default?}]}` — a served one-off plan proposed as v1 of a new key, or as the next version of `key` (its owners only); raises an ask (`kind = workflow`) → `202 {approval_id}` | AG-31 · AG-48 |
+| `POST /proposals` | `{run_id, key?, name, description, intent[], args[{literal_path, name, label, default?}]}` — a served one-off plan proposed as v1 of a new key, or as the next version of `key` (a Modeller · Admin only); raises an ask (`kind = workflow`) → `202 {approval_id}` | AG-31 · AG-48 |
 | `GET /proposals?run_id=` | The proposal on a run and the state of its ask | AG-31 · AG-47 |
 
 | Route, after `/api/v1/agents` | Does | Story |
@@ -271,7 +272,7 @@ the version.
 | Event | When |
 |---|---|
 | `agents.workflows.propose` | A plan is proposed as a workflow or a next version |
-| `agents.workflows.approve` · `agents.workflows.decline` | Its ask is approved — the version publishes, the proposer its first owner on v1 — or declined or expired |
+| `agents.workflows.approve` · `agents.workflows.decline` | Its ask is approved — the version publishes, made by the proposer on v1 — or declined or expired |
 | `agents.workflows.retire` | A version is retired |
 | `agents.workflows.copy` | A workflow is copied to a new key |
 | `agents.workflows.flag` · `agents.workflows.unflag` | A plugin or graph database it needs is switched off · back on |
@@ -294,13 +295,13 @@ the version.
 | 422 | A start's argument unknown, missing or of the wrong type | *{argument}: {why}.* | AG-44.3 |
 | 409 | A start of a retired version | *{key}@{v} is retired — the current version is {key}@{n}.* | AG-44.6 |
 | 403 | A start through an agent the person may not use | *You may not use {agent} — ask an Admin.* | AG-44.14 |
-| 409 | Proposing a plan that did not serve, a plan already a workflow, or a run the proposer is not behind and whose agent they do not own | *Only a plan drafted or composed for a run that served can be proposed — by the person behind it or its agent's owners.* | AG-31.11 |
-| 409 | A proposal naming a key another workflow holds, by someone not its owner | *{key} is {owner}'s — propose a new key, or ask them.* | AG-31.12 · AG-47.10 |
+| 409 | Proposing a plan that did not serve, a plan already a workflow, or a run the proposer is not behind | *Only a plan drafted or composed for a run that served can be proposed — by the person behind it.* | AG-31.11 |
+| 409 | A proposal naming a key another workflow holds, by someone who is not a Modeller or an Admin | *{key} is taken — propose a new key, or ask an Admin.* | AG-31.12 · AG-47.10 |
 | 409 | A proposal while one waits on the same run | *This plan is already waiting on {approvers}.* | AG-31.13 |
 | 422 | A proposal keeping a record ID or a property value as a default | *{argument} holds a value from the data — it cannot be a default.* | AG-31.14 |
 | 403 | Answering a proposal one is not a named approver of, or one that benefits them | *Not yours to answer — it waits on {approvers}.* | AG-47.6 |
-| 403 | Retiring, proposing a version or moving a pin by someone who is not an owner or an Admin | *Only {owners} or an Admin may change {key}.* | AG-48.9 |
-| 403 | Copying without the Modeller role | *Copying a workflow needs Modeller — ask an Admin.* | AG-48.10 |
+| 403 | Retiring, proposing a version or moving a pin without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-48.9 |
+| 403 | Copying without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-48.10 |
 | 409 | Editing a built-in workflow | *{key} is built in — copy it to change it.* | AG-48.11 |
 | 422 | `window` other than `7d` · `30d` · `90d` | *window: one of 7d, 30d, 90d.* | API only — Studio offers the three |
 | 404 | An unknown workflow, version, plan or function | *Not found.* | API only — Studio links only what exists |
@@ -309,7 +310,7 @@ the version.
 
 | Command | Does |
 |---|---|
-| `invana workflows list` · `invana workflows show <key> [--version N]` | Every workflow — origin, key and version, name, owners · one workflow's steps in order, composites with their pins |
+| `invana workflows list` · `invana workflows show <key> [--version N]` | Every workflow — origin, key and version, name, made by · one workflow's steps in order, composites with their pins |
 | `invana workflows run <key> [--version N] [--arg name=value] [--agent] [--dry-run]` | Start a workflow by name, through the same check as `POST /{key}/runs` |
 | `invana workflows retire <key> --version N` · `invana workflows copy <key> --to <new-key>` | Retire a version · copy a workflow |
 
@@ -317,18 +318,18 @@ the version.
 
 | Mechanism | How |
 |---|---|
-| Climbing the ladder | The plan step reads recall for the intent ([AG-F09](../AG-F09-thinking-graph-and-memory/feature.md#engine)), then tries each rung in order: one function whose contract answers the intent · a published workflow whose `intent` fits, its arguments bound from the ask · a composition of published workflows, each a `composite` step pinned to its current version · `plan-a-todo` drafts a plan. It writes `rung`, the workflows considered, what recall offered and avoided, and why each lower rung did not fit onto the run's Plan step |
+| Climbing the ladder | The plan step reads recall for the intent ([AG-F09](../AG-F09-learn-from-memory/feature.md#engine)), then tries each rung in order: one function whose contract answers the intent · a published workflow whose `intent` fits, its arguments bound from the ask · a composition of published workflows, each a `composite` step pinned to its current version · `plan-a-todo` drafts a plan. It writes `rung`, the workflows considered, what recall offered and avoided, and why each lower rung did not fit onto the run's Plan step |
 | The planner is a workflow | `plan-a-todo` (`nl.understand` → `plan.draft`) and `check-criteria` are built-in workflows; there is no planner service, and a drafted plan never drafts another |
 | The check | A pure function of the plan tree × the agent's Access Policies × switches × graph database modes, run before any step is dispatched — on every rung, a start and a replan alike: each `step_key` and each composite's `workflow/<key>` allowed (Run) · each `data/…` touched allowed (Read or Write) and every graph database written in read + write mode · every plugin and graph database needed switched on, at the install and by the person behind the run · composite depth at most 3 and no key twice on any path · projected tokens (recorded history per function) within the ceiling · depth and fan-out within the parent's · every function's `requires` ordered before it. Each composite is expanded at its pinned version, so the check covers the tree. Nothing is dispatched on a refusal |
 | An Ask in the check | A rule set to Ask on any step raises one ask for the run before dispatch ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine)); a yes for the run lets it start, a no refuses it |
 | A refusal is an outcome | The run ends refused with the check's result on its Plan step — which check, which resource or bound, what was proposed — and `agents.plans.refused`; recall keeps it as *avoid* |
 | Literals to arguments | A drafted or composed plan keeps the values it ran with in `literals` (a path per value). A proposal names each literal's argument; on approval every `literal_path` becomes `${args.<name>}` in the version's steps and the literal is dropped. A record ID or property value is never a default; the engine tells them apart by the step's argument type in the function's manifest (`record_id` · `value` · `count` · `window` · `flag`) |
-| Approval publishes | On *approve* the engine writes the `agents_plans` row as `workflow_id`'s next `version` (v1 for a new key, the `agents_workflows` row created), `status: published`, `approved_from_run_id`, `approval_id`; the proposer becomes the first owner of a new key (`access_owners.via = made`). On *decline* or expiry the plan stays `one_off` and the note is kept on the run |
-| Who answers | The ask is routed to the named approvers of the agent that ran the plan, else its owners, else for a built-in agent the Admins; the proposer never answers it ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine)) |
+| Approval publishes | On *approve* the engine writes the `agents_plans` row as `workflow_id`'s next `version` (v1 for a new key, the `agents_workflows` row created), `status: published`, `approved_from_run_id`, `approval_id`; the row is the platform's, `made_by_id` the proposer. On *decline* or expiry the plan stays `one_off` and the note is kept on the run |
+| Who answers | The ask is routed to the named approvers of the agent that ran the plan, else the other approvers, else the Admins, with a *no approver* alert; the proposer never answers it ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine)) |
 | Pins | A `composite` step's `workflow_version` is fixed at the draft or the approval. A newer version of a pinned workflow reads *vN exists* on the composing workflow; *Move the pin* proposes the composing workflow's next version with the new pin, approved like any version |
 | Retire | Sets `status: retired` and `retired_at`; rungs 2 and 3 and starts skip it; a published workflow pinning it keeps running it, its page marking *pins a retired version*; runs in flight finish |
 | Flag | When a plugin or graph database is switched off, every workflow whose tree needs it is flagged with the resource and who switched it; switched back on, the flag clears. Flagged workflows are skipped on rungs 2 and 3 |
-| Copy | Writes a new `agents_workflows` row, `origin: copied`, `copied_from_key`, its v1 the copied version's steps; the copier is its owner. No approval: a copy changes no agent's reach until a policy allows Run on its key |
+| Copy | Writes a new `agents_workflows` row, `origin: copied`, `copied_from_key`, its v1 the copied version's steps; `made_by_id` is the copier. No approval: a copy changes no agent's reach until a policy allows Run on its key |
 | Built-in workflows are rows | Each is one file in its plugin's `flows/` folder, seeded at migrate as `origin: packaged`, owned by the system user; a new Invana version reseeds a changed shape as a new version |
 | Replan | Only ahead of the cursor: settled and in-flight steps are untouchable; each revision overwrites `plan_snapshot`, adds one to `plan_revision` and `replans`, and passes the check in full; at most `effort.max_replans` a run (three by default); an ambiguous replan asks. The run's stream says `plan.proposed` for the first revision, `plan.revised` for each after |
 | `back(step)` versus replan | `back(id)` reruns `id` and every step after it as a new attempt, unchecked, for a transient failure; a replan changes what is ahead and is checked |
@@ -345,7 +346,7 @@ the version.
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | Three tables in Postgres; built-in workflows seeded from plugin files; every plan and workflow mirrored as a node of the thinking graph through the outbox ([AG-F09](../AG-F09-thinking-graph-and-memory/feature.md)) | NFR-PERF-2 |
+| § 6 Data and storage | Three tables in Postgres; built-in workflows seeded from plugin files; every plan and workflow mirrored as a node of the thinking graph through the outbox ([AG-F09](../AG-F09-learn-from-memory/feature.md)) | NFR-PERF-2 |
 | § 8 APIs and events | The routes, events and CLI above, under `agents` | — |
 | § 10 AI and agents | The ladder; the model proposes a plan, the engine checks the whole tree against Access Policies, needs and switches before dispatch; approval into a workflow is the named approvers' | NFR-PERF-3 |
 | § 12 Qualities | Security: a plan outside its policies spends nothing; a plan holds no data | — |
@@ -355,7 +356,7 @@ the version.
 | Decision | Detail |
 |---|---|
 | Workflows live under Agents › Skills | *Workflows* and *Functions* are sections of Skills, beside *Answer templates*; a workflow opens as its own page (`agents.workflow`), a function as its own page |
-| A workflow's page answers *how has it behaved* | Overview · Layers · Flow · Runs, over 7 · 30 · 90 days; what it is sits in its head — version, steps, intent, what it touches, its owners, what composes it, the agents allowed to run it |
+| A workflow's page answers *how has it behaved* | Overview · Layers · Flow · Runs, over 7 · 30 · 90 days; what it is sits in its head — version, steps, intent, what it touches, who made it, what composes it, the agents allowed to run it |
 | *Composed by* means pinned | The workflows whose steps compose it, each with the version it pins; an agent allowed to run it is a permission, read in the head |
 | What changed is step by step | Each version against the one before: steps added, removed, moved or changed, pins moved, declared arguments; v1 reads *the first version* |
 | Export is for review | A version exports as read-only YAML with *Copy* and *Download*; nothing imports a workflow from YAML |

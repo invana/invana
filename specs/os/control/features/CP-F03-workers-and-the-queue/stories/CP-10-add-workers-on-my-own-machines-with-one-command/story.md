@@ -27,15 +27,16 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 flowchart TD
   s([Control Plane › Workers › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
   wh --> g{"Group"}
-  g -->|existing| ge["Its labels · slots · plugins · secret names · outbound domains"]
-  g -->|new| gn["Name · labels · slots a worker · plugins · secret names · outbound domains"]
+  g -->|existing| ge["Its labels · slots · plugins · runtimes · secret names · outbound domains"]
+  g -->|new| gn["Name · labels · slots a worker · plugins · runtimes · secret names · outbound domains"]
+  gn -->|a runtime not installed| ri(["Offered disabled · CP-64 · Install it in Plugins"])
   ge --> k["Join key: expiry · cap · shown once"]
   gn --> k
   k --> run["Run it: the command or the manifest"]
   run --> chk{"Joining checks"}
   chk -->|key expired or used up| k
   chk -->|engine not reached| net["Check outbound 443 to the engine"]
-  chk -->|plugins or labels do not fit| ge
+  chk -->|plugins, runtimes or labels do not fit| ge
   chk -->|nothing after 2 minutes| cl["What to check"]
   chk -->|first heartbeat| j(["Joined · takes work"])
 ```
@@ -46,7 +47,7 @@ flowchart TD
 |---|---|---|---|
 | CP-10.1 | An Admin | they press *Add workers* | a modal opens on *Where*, Docker first, then *Group*, *Join key*, *Run it*, *Joined* |
 | CP-10.2 | *Add workers* from a short group | it opens | that group is chosen |
-| CP-10.3 | A new group | it is made | it has a name unique for the deployment, labels from `cpu · llm · egress · gpu · code`, slots a worker, plugins, secret names and outbound domains |
+| CP-10.3 | A new group | it is made | it has a name unique for the deployment, labels from `cpu · llm · egress · gpu · code`, slots a worker, plugins, the runtimes it carries, secret names and outbound domains |
 | CP-10.4 | A join key | it is minted | it is scoped to the group, with an expiry and a cap; its secret shows once, in the command; afterwards only its prefix reads |
 | CP-10.5 | *Run it* | it is read | Docker reads one `docker run` line; Python an install and one command, and a service install; Kubernetes three lines and a manifest to download — each carrying the group, labels and slots |
 | CP-10.6 | A worker joining | each check passes or fails | key used · engine reached · plugins loaded · labels fit · first heartbeat show as they happen, each failure with what to check |
@@ -57,6 +58,8 @@ flowchart TD
 | CP-10.11 | A key minted or a worker joined | it is done | History records who and when (AC-F06) |
 | CP-10.12 | An Admin | they change a worker group — its labels, slots a worker, plugins, secret names or outbound domains | the change is stored and History records who and when (AC-F06); workers that join afterwards take it |
 | CP-10.13 | An Operator | they open *Join keys* | every key reads its group, prefix, expiry, how many joined of its cap, and whether it is revoked — never its secret |
+| CP-10.14 | A group's runtimes | an Admin picks them | only runtimes installed as runtime plugins are offered; one not installed reads disabled, naming *Install it in Plugins* (CP-64); a group that carries an outside runtime needs the `code` label, or the change is refused, naming it |
+| CP-10.15 | A worker joining a group that carries a runtime | the joining checks run | *runtimes loaded* passes only when the worker loaded each runtime the group carries, at a version its plugin allows; else the join is refused, naming the runtime |
 
 ## Screens
 

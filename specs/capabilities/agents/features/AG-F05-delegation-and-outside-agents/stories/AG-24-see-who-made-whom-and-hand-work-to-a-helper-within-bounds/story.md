@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read who made whom on any run; write the rules on Run `agent/<name>` that let an agent hand work on; answer any delegation ask that escalates to Admins | — |
+| Admin | Read who made whom on any run; write the rules on Run `agent/<name>` that let an agent hand work on; answer a delegation ask that falls or escalates to Admins | — |
 | Modeller | Read who made whom on the runs whose content they may read; answer a delegation ask they are a named approver for | The rules read; changing them reads *Ask an Admin*; an ask routed to someone else reads, naming who it waits on |
 | Operator | As Modeller | As Modeller |
 
@@ -29,13 +29,14 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 flowchart LR
   a([An agent mid-run]) --> r{"Run agent/name on every caller's policies"}
   r -->|Deny, no rule or a loop| x["Refused before it starts, naming the rule or the loop"]
+  r -->|the callee is not granted to the person behind the run| xg["Refused before it starts, naming the agent and who grants agents"]
   r --> b{"Within depth · helpers · tokens a run?"}
   b -->|no| x2["Refused, naming the limit and the count"]
   b -->|at runs at once| q["Queued until a slot frees"]
-  r -->|Ask| ask["Needs you — the caller's named approvers"]
+  r -->|Ask| ask["Needs you — the caller's named approvers, else the Admins"]
   ask -->|approved| h
   ask -->|declined or expired| d["Declined; the agent carries on"]
-  b -->|yes| h["The helper or agent runs — callee ∩ caller ∩ the person's teams, tokens set aside"]
+  b -->|yes| h["The helper or agent runs — callee ∩ caller, tokens set aside"]
   h --> v["Its verdict returns, cited · unspent tokens back"]
   v --> t(["Who did what: who made whom, depth, tokens, on whose behalf"])
 ```
@@ -52,17 +53,18 @@ flowchart LR
 | AG-24.6 | A helper's verdict | it returns | the agent cites it; *How it got here* shows the hand-off, its steps and sources |
 | AG-24.7 | A helper that fails | its run settles | the failure is the agent's evidence, named in its answer, never a silent gap |
 | AG-24.8 | A helper that asks a question | it asks | the question reaches the person behind the run, naming the helper |
-| AG-24.9 | A Run `agent/<name>` the caller's rules set to Ask | the agent delegates to it | an ask waits in *Needs you* for the caller's named approvers — else its owners — never the person it benefits, and the step waits on it |
+| AG-24.9 | A Run `agent/<name>` the caller's rules set to Ask | the agent delegates to it | an ask waits in *Needs you* for the caller's named approvers — else the Admins, with a *no approver* alert — never the person it benefits, and the step waits on it; a yes allows this hand-off only |
 | AG-24.10 | No rule allowing Run `agent/<name>`, a Deny rule, or an agent already in the run's chain | the agent delegates to it | it is refused before it starts, naming the rule and policy, *no rule* or *loop* |
-| AG-24.11 | An approver | they press *Allow always* on a delegation ask | this hand-off runs, and a proposed rule allowing Run `agent/<name>` waits for an Admin to save on the caller's policy |
+| AG-24.11 | A delegation ask | it is decided | only *Allow* — this hand-off — or *Decline* is offered; an Admin may also *Draft a rule* allowing Run `agent/<name>`, which opens a draft on the caller's policy for them to save |
 | AG-24.12 | A run with helpers | *Who did what* opens | who made whom is drawn — each helper and delegated agent with its depth, state, tokens against what it was given, and on whose behalf; retired helpers stay drawn, marked |
 | AG-24.13 | A helper or delegated agent picked | its card opens | what it may touch and its tokens read beside its caller's, with the rule that narrowed each; it is never wider |
 | AG-24.14 | Many helpers under one agent | *Who did what* opens | they collapse to a count, opened on a click |
 | AG-24.15 | A run stopped | it stops | every helper and delegated run beneath it ends *stopped with its parent* |
 | AG-24.16 | An agent's Flow | it opens | it draws the agents it may hand work to — Allow · Ask · Deny, from its rules on `agent/…` — and whether it may make helpers |
 | AG-24.17 | A person who may not read a run's content | they open *Who did what* | each hand-off reads *ran*, its state and its cost; what was asked and returned is not shown |
-| AG-24.18 | A helper or a delegated agent | it takes a step | its own policies ∩ every caller's ∩ the rules for the person's teams bind; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose rule denied it |
-| AG-24.19 | A helper an agent makes | it is made | it lives only for the work, is owned by the person behind the run, and may make helpers only if its policies allow Run `agent/*` |
+| AG-24.18 | A helper or a delegated agent | it takes a step | its own policies ∩ every caller's bind, the same whoever is behind the run; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose rule denied it |
+| AG-24.19 | A helper an agent makes | it is made | it lives only for the work, holds no grant of its own, is in its run's delegation chain, and may make helpers only if its policies allow Run `agent/*` |
+| AG-24.21 | An agent of the deployment not granted to the person behind the run, and not already in its chain | the agent delegates to it | it is refused before it starts, naming the agent and who grants agents; an outside agent is reached only by a rule on Run `agent/<name>` and is Ask by default |
 | AG-24.20 | An agent's sheet | its helpers are read | every helper it made in the last 7, 30 or 90 days lists with the run it was made in, its state and its tokens against what it was given; a retired helper stays listed |
 
 ## Screens

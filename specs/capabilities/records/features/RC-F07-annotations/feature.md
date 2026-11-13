@@ -60,10 +60,11 @@ flowchart TD
 
 ## Access
 
-| Act | Role (`.claude/team/TEAM.md` §7) | Everyone else sees |
+| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read every annotation | Operator — every member | — |
-| Edit or delete an annotation | Its author | Off — *Only Priya Nair can change it* |
+| Read every annotation | Every role — Operator, Modeller, Admin | — |
+| Edit or delete one's own annotation | Every role — an *Own* act on what the person wrote | Off on another person's — *Only Priya Nair can change it* |
+| Delete any annotation, with a reason | Admin | Off — *Only its author or an Admin can change it* |
 
 ## States
 

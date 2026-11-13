@@ -48,7 +48,7 @@ flowchart LR
 | CP-51.8 | Agents waiting for workers | the numbers read | they say the run waits on workers, naming which |
 | CP-51.9 | A big run still going | its sheet is open | the numbers refresh every few seconds |
 | CP-51.10 | A big run whose content the reader may not read | its sheet opens | that it ran, its agent, the person behind it, its status and its tokens read; who did what and *By role* read *withheld* |
-| CP-51.11 | A big run still going | the reader is not behind it, not an owner of its agent and not an Admin | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
+| CP-51.11 | A big run still going | the reader is not behind it and not an Admin | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 
 ## Screens
 
