@@ -274,6 +274,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
+| Installed connectors read in the Library | Library › Connectors (`settings.connectors`, CP-17) lists each installed graph connector with *Used by n graph databases*; installing one is a package, never an act in Studio |
 | Graph databases are the deployment's | Settings › Connections › Graph databases; one list, Admin acts, everyone reads |
 | Connecting is one modal of sections | Name (optional) · the type as a grouped card grid · its details once a type is picked · Shape once the test passes — one page and one act, *Connect*; it shows a person's own data back to them before anything is saved |
 | A blank name takes the type's | The engine names it after its type, made unique (`neo4j`, `neo4j_2`), and shows that name before *Connect*, so every graph database still has the fixed name rules use |

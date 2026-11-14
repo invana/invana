@@ -55,7 +55,7 @@ flowchart TD
   pk -->|its Access Policy files| pkp(["Drafts · Waiting for an Admin to apply · decide nothing until then (AC-04)"])
   pk -->|its agents| pka(["In the catalogue as Team pack agents · granted to nobody until an Admin grants them (AG-35)"])
   pk -->|its .mcp.json names a server| pks(["Listed for an Admin to add — CP-02 · never started"])
-  m([Settings › Invana › MCP server]) --> sv["CP-03 · Address · what it serves · how to connect · recent calls"]
+  m([Settings › Connections › MCP server]) --> sv["CP-03 · Address · what it serves · how to connect · recent calls"]
   sv -->|Admin| sw(["Serve or stop serving an agent or a record tool"])
   out([Claude Code · an IDE · a script]) --> tok{"A connected client (AC-F11) or a key (AC-F10)?"}
   tok -->|neither| rj(["401 · where to find the metadata"])
@@ -396,6 +396,7 @@ The code changes are [migrations.md](../../../../migrations.md) M15 (work and pe
 
 | Decision | Detail |
 |---|---|
+| Where its places sit | Library › Plugins (`settings.plugins`) and Library › Packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`); a person's personal connections under Settings › You (`settings.me.connections`) |
 | Plugins live in the Library | The Library sheet's *Plugins* lists every plugin and outside server, each server with its work connections, and *Packs* the Team packs; each row reads *Used by n agents*. *MCP server* is its own entry in Settings; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
 | An outside server is a plugin | One kind of list, one pair of switches, one resource name `tool/<server>/<tool>` for every tool, shipped or added |
 | Per server, one way to sign in | An Admin chooses none, a token or OAuth for each outside server, and whether people may connect their own over OAuth; a shipped tool's settings are the deployment's secrets |

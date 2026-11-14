@@ -61,7 +61,7 @@ flowchart TD
   oask -->|approved| sent["Sent from a worker · working · a ledger row"]
   sent -->|asks back| qq["A question to the person behind the run"] --> sent
   sent --> back(["A verdict and what it returned — a person applies it"])
-  admin([Agents › Outside agents]) --> add["AG-33 · Add an outside agent — an A2A card or an outside MCP server — added off"]
+  admin([Agents › Agents · the Outside filter]) --> add["AG-33 · Add an outside agent — an A2A card or an outside MCP server — added off"]
   add --> son["Turned on · its approvers · its credential · its limits"]
   son --> on
 ```
@@ -351,7 +351,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Calls go out from workers | From workers that can reach it; nothing passes through a hosted service |
 | A helper lives for the work | It retires when the work closes; a helper makes helpers only when its own policies allow Run `agent/*` |
 | An agent's helpers read over a window | Its sheet lists the helpers it made in 7, 30 or 90 days, each with its run; who made whom inside one run is the run's |
-| Outside agents live in Agents | *Agents › Outside agents* lists and adds them; it is the board `agents.external` |
+| Outside agents are a filter of the Agents list | The Agents sheet's *Agents* list filtered to *Outside* lists them, and *Add an outside agent* sits on that filter; it is the board `agents.external`. There is no separate Outside agents place in the sheet's nav |
 | Continuation is the run going on | At its session budget a run continues in a fresh session from a hand-off note — body in the blob store, row in Postgres. It is not an ask, not an exit reason and not a new run; the run's number, agent version, runtime and person behind it stay |
 | A note is read on the run | Between two sessions on the run's sheet; its head always reads, its body as far as the reader's agent may see its sources |
 | A fork is a person's act | Only a person forks, from a note they may read; an agent never forks its own run |

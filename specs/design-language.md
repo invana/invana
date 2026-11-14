@@ -206,9 +206,9 @@ every one.
 | Sheet | Nav | Rule |
 |---|---|---|
 | Records | Kinds, grouped by model · then Loads · Quality · Annotations | A write is checked against the model; no free-edit grid ([RC-F01](capabilities/records/features/RC-F01-records-by-kind/feature.md)) |
-| Agents | Agents · Runs · Schedules | One Schedules list; each mode's Schedules view is a filter of it ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
+| Agents | Agents · Runs · Schedules | One Schedules list; each mode's Schedules view is a filter of it ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)). Outside agents are a filter of Agents ([AG-F05](capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#decisions)) |
 | Library | Skills · Plugins · Connectors · Packs | Each item shows *Used by n agents* ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
-| Settings | Invana (General · Appearance) · You · Connections (Graph databases · AI models) · Operations (Workers · Workloads · Limits · Alerts) · Access (People · Roles · Policies · Agents · Usage · What left · History · Leaving and keeping) · Notifications | Preference rows and tables; a place an act needs a role for reads, its act reading *Ask {Admin}* |
+| Settings | Invana (General · Appearance) · You · Connections (Graph databases · AI models · MCP server) · Operations (Workers · Workloads · Limits · Alerts) · Access (People · Roles · Policies · Agents · Usage · What left · History · Leaving and keeping) · Notifications | Preference rows and tables; a place an act needs a role for reads, its act reading *Ask {Admin}* |
 | Inbox | Needs you · Running · Updates · Done | Opened from the Inbox dropdown's *Open the Inbox*; an Admin also filters *All open alerts* ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) |
 
 ### The header dropdowns
@@ -279,8 +279,8 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 | Was | Now | Tier |
 |---|---|---|
 | Home · Graphs · Onboarding | **Home** — *What are you trying to decide?*, the set-up steps until the deployment is ready (*n of 4*), then the first answer | page |
-| Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; tools on right-click | mode |
-| Modeller | **Model** mode — the Semantics capability: Models · Kinds · Relationships · Standards · Health; rules as a sheet | mode · sheet |
+| Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
+| Modeller | **Model** mode — the Semantics capability: Models · Kinds · Relationships · Standards · Health; rules and views as a sheet | mode · sheet |
 | Datasets · Imports | **Records** — kinds grouped by model, then Loads · Quality · Annotations; a record and a load as detail pages | sheet |
 | Agent Builder | **Agents** — Agents · Runs · Schedules; an agent and a run as detail pages | sheet |
 | Skills · Plugins · Connectors · Team packs | **Library** — Skills · Plugins · Connectors · Packs, each with *Used by n agents* | sheet |

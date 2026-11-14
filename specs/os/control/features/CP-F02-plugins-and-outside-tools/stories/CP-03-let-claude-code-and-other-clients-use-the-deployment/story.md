@@ -29,7 +29,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › MCP server]) --> w["Address · what it serves · how to connect"]
+  s([Settings › Connections › MCP server]) --> w["Address · what it serves · how to connect"]
   w -->|Admin| on(["Serve or stop serving an agent · Check records · Load records"])
   w -->|not an Admin| dis["Switches read · naming the Admins"]
   c([A client]) --> v{"A connected client or a key?"}

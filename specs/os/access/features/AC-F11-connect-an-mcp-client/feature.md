@@ -228,6 +228,7 @@ The code change is [migrations.md](../../../../migrations.md) M16.
 
 | Decision | Detail |
 |---|---|
+| The MCP server sits under Connections | Settings › Connections › MCP server (`settings.mcp`, [CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md)) shows its address, what it serves and how to connect; a person's own connected clients are under Settings › You |
 | Invana is its own authorization server | No outside identity provider is needed, since sign-in is password only; one deployment, one issuer |
 | Dynamic registration, names shown as unverified | Any MCP client can connect without an Admin pre-registering it; the consent page says the name is the client's own word and shows where it returns |
 | Consent asks for the password | Connecting a client makes a credential; it signs in again like keys and access |
