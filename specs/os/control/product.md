@@ -65,7 +65,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | Surface | Tier | Board |
 |---|---|---|
 | Home — first use and set-up | page | `start.home` · `start.setup` |
-| Overview — workloads by user, agent and team | page | `control.overview` |
+| Workloads — by user, agent and team, in Settings › Operations | page | `settings.workloads` |
 | Runs — how the agents are doing, every run | modal | `agents` · `agents.runs` · `agents.agent` |
 | A run | sheet | `agents.run` · `agents.run.answer` |
 | Ops alerts — the list, an alert, thresholds | modal | `control.alerts` · `control.alerts.alert` · `control.alerts.settings` |

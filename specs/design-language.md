@@ -206,9 +206,9 @@ every one.
 | Sheet | Nav | Rule |
 |---|---|---|
 | Records | Kinds, grouped by model · then Loads · Quality · Annotations | A write is checked against the model; no free-edit grid ([RC-F01](capabilities/records/features/RC-F01-records-by-kind/feature.md)) |
-| Agents | Agents · Runs · Schedules | One Schedules list for tasks, loads and reports, with a *Kind* filter; each mode's Schedules view is a filter of it ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
+| Agents | Agents · Runs · Schedules | One Schedules list; each mode's Schedules view is a filter of it ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
 | Library | Skills · Plugins · Connectors · Packs | Each item shows *Used by n agents* ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
-| Settings | Invana (General · Appearance) · You · Connections (Graph databases · AI models) · Operations (Workers · Limits · Alerts) · Access (People · Policies · History) · Notifications | Preference rows and tables; a place an act needs a role for reads, its act reading *Ask {Admin}* |
+| Settings | Invana (General · Appearance) · You · Connections (Graph databases · AI models) · Operations (Workers · Workloads · Limits · Alerts) · Access (People · Roles · Policies · Agents · Usage · What left · History · Leaving and keeping) · Notifications | Preference rows and tables; a place an act needs a role for reads, its act reading *Ask {Admin}* |
 | Inbox | Needs you · Running · Updates · Done | Opened from the Inbox dropdown's *Open the Inbox*; an Admin also filters *All open alerts* ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) |
 
 ### The header dropdowns

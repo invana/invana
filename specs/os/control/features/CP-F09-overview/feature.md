@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst]
 stories: [CP-47, CP-70]
 journeys: [J08]
-boards: [control.overview, shell.operations]
+boards: [settings.workloads, shell.operations]
 nfrs: [NFR-PERF-3, NFR-COST-2, NFR-PERF-7, NFR-UX-2]
 depends_on: [CP-F10, CP-F04, CP-F11, AC-F09, CP-F03, CP-F01, CP-F05, CP-F08]
 ---
@@ -29,7 +29,8 @@ flowchart TD
   od -->|Operator| odo["CP-70 · My runs and agents · one line of health"]
   od -->|All runs| runs(["Agents › Runs (CP-F10)"])
   od -->|Settings| set(["Settings › Operations"])
-  s([The workloads page]) --> o["CP-47 · Tiles: running · waiting · failed today · tokens today and this month against the deployment's limit"]
+  od -->|Workloads| s
+  s([Settings › Operations › Workloads]) --> o["CP-47 · Tiles: running · waiting · failed today · tokens today and this month against the deployment's limit"]
   o -->|nothing ran yet| e["What a run is, and that a question, a task or a schedule starts one"]
   o --> g{"Group by"}
   g -->|User| u["Each person behind runs: running · waiting · failed · tokens against their limit"]
@@ -178,7 +179,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Operations is the header's glance | The deployment's state is one dropdown from every screen, never a page or a summoner; the workloads page is the depth behind it |
+| Operations is the header's glance | The deployment's state is one dropdown from every screen, never a page or a summoner; Workloads is the depth behind it |
+| Workloads lives in Settings › Operations › Workloads | A page beside Workers and Limits; the Operations dropdown links to it as *Workloads*, for everyone who opens the dropdown |
 | An Operator sees their own | Their runs and agents in full; the deployment as one line of health |
 | A run counts under each of its teams | Teams are flat and a person may be on several; splitting a run across them would invent a share nobody set |
 | Everyone reads the counts | Counts and tokens are never content; who may read a run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s |
@@ -187,8 +189,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| Where the workloads page (CP-47) opens from now that Overview is the Operations dropdown — recommend: *Workloads* under Settings › Operations, linked from the dropdown | Ravi |
-| An agent's meter: the approved boards name a daily budget, and limits are monthly — recommend: meter against *Tokens a month*, tokens today printed beside it; no new daily limit | Ravi |
 
 ## Not building
 

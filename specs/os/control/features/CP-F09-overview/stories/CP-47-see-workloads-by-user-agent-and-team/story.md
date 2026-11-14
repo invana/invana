@@ -4,7 +4,7 @@ title: See workloads by user, agent and team
 feature: CP-F09
 status: idea
 personas: [admin, builder, analyst]
-boards: [control.overview]
+boards: [settings.workloads]
 ---
 
 # CP-47 · See workloads by user, agent and team
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Overview]) --> l{"Loaded?"}
+  s([Settings › Operations › Workloads · or the Operations dropdown's Workloads]) --> l{"Loaded?"}
   l -->|no| f["What could not be read · Retry"]
   l -->|nothing ran| e["Nothing ran yet · what starts a run"]
   l -->|yes| t["Tiles: running · waiting · failed · tokens · this month against the deployment's limit · ops alerts open"]
@@ -59,5 +59,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Overview | Admin | control.overview · Nothing ran yet | control.overview · No one ran | control.overview · Loading | control.overview | control.overview · Could not load | control.overview · Live | — |
-| Overview | Operator | control.overview · Nothing ran yet | control.overview · No one ran | control.overview · Loading | control.overview | control.overview · Could not load | control.overview · Live | — |
+| Workloads | Admin | settings.workloads · Nothing ran yet | settings.workloads · No one ran | settings.workloads · Loading | settings.workloads | settings.workloads · Could not load | settings.workloads · Live | — |
+| Workloads | Operator | settings.workloads · Nothing ran yet | settings.workloads · No one ran | settings.workloads · Loading | settings.workloads | settings.workloads · Could not load | settings.workloads · Live | — |

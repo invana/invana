@@ -3,7 +3,7 @@ id: J08
 title: Watch agent workloads and act on an alert
 personas: [admin, builder]
 stories: [CP-47, CP-60, CP-37, CP-59, CP-67, CP-36, CP-57, CP-50, CP-66, CP-58, CP-12, CP-05, CP-34, CP-11, CP-40, CP-39, CP-62, CP-49, CP-53]
-boards: [control.overview, control.alerts, inbox, agents.runs, agents.run, settings.workers, settings.usage, settings.databases, settings.plugins, projects.task]
+boards: [settings.workloads, control.alerts, inbox, agents.runs, agents.run, settings.workers, settings.usage, settings.databases, settings.plugins, projects.task]
 ---
 
 # Watch agent workloads and act on an alert
@@ -64,7 +64,7 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Read workloads by user, agent and team | Control Plane · Overview | CP-47 | `control.overview` |
+| 1 | Read workloads by user, agent and team | Settings › Operations › Workloads | CP-47 | `settings.workloads` |
 | 2 | Say which ops alerts reach whom, and on which channels | Control Plane · Inbox and notifications | CP-37 | `inbox` |
 | 3 | An ops alert fires — a task failed, blocked, needing input or stopped moving, a connection failed, a security event, or a platform kind — and reaches the people its kind names and the Admins | Control Plane · Ops alerting · Inbox | CP-59 · CP-67 · CP-36 | `control.alerts` · `inbox` |
 | 4 | See what is running and what just ran | Control Plane · Runs | CP-57 | `agents.runs` |

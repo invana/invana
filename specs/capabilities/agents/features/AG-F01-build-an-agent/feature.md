@@ -327,7 +327,7 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Decision | Detail |
 |---|---|
-| New agent is a create modal of numbered sections | One page — **1** Name (optional) · **2** the type as a grouped card grid · **3** its details once a type is picked — and one act ([design-language › Overlays](../../../../design-language.md#3-overlays--four-tiers)) |
+| New agent is a create modal of numbered sections | One page — **1** Name (optional) · **2** the type as a grouped card grid, one card per runtime — Invana's, Claude Code, Codex, as *Runs with* offers them · **3** its details once a type is picked — and one act ([design-language › Overlays](../../../../design-language.md#3-overlays--four-tiers)) |
 | New agent is a modal, the agent a sheet | *New agent* asks for a name and what it should do in plain words, and suggests which Access Policies to ask an Admin for; *Create agent* saves a draft and opens it as a sheet |
 | The sheet's tabs | Setup · Flow · Versions. Setup holds instructions, voice, skills, runs with, model version and effort, access, limits, where it runs and lifecycle |
 | Runs with is three choices | Invana · Claude Code · Codex, on Setup beside the model version; one is chosen, Invana by default. A runtime that is not installed reads disabled with why and the Admins to ask; each reads where its model runs |

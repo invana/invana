@@ -41,6 +41,7 @@ flowchart TD
   t -->|needs a person| ib(["The Inbox (CP-69)"])
   run -->|All runs| ar(["Agents › Runs (CP-50)"])
   wk -->|Settings| so(["Settings › Operations"])
+  t -->|Workloads| wl(["Settings › Operations › Workloads (CP-47)"])
   d -->|Operator| op["My runs and my agents · one line of system health"]
   d -->|outside click · Esc| x(["Closed · nothing moves"])
 ```
@@ -60,7 +61,7 @@ flowchart TD
 | CP-70.9 | Graph databases | the section is read | each with its health ([CP-40](../../../CP-F05-graph-databases/stories/CP-40-see-every-graph-database-and-its-health/story.md)) |
 | CP-70.10 | Alerts | the section is read | open alerts, then those closed in the last day, each opening its alert (CP-59) |
 | CP-70.11 | *Needs a person* above zero | the person picks it | the Inbox dropdown opens (CP-69); the asks themselves stay in the Inbox |
-| CP-70.12 | The dropdown | the person follows *All runs* or *Settings* | Agents › Runs (CP-50) or Settings › Operations opens; Operations is never a summoner of its own |
+| CP-70.12 | The dropdown | the person follows *All runs*, *Workloads* or *Settings* | Agents › Runs (CP-50), Settings › Operations › Workloads (CP-47) or Settings › Operations opens; Operations is never a summoner of its own |
 | CP-70.13 | An Operator | the dropdown opens | it lists their own runs and the agents they own, and one line of system health — *Workers, AI models and graph databases are healthy* or what is not |
 | CP-70.14 | Any figure | it is read | it is a count or tokens — never currency |
 | CP-70.15 | Runs start and end while it is open | it is read | the figures move in place, at most once a second |
