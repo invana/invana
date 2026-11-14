@@ -4,7 +4,7 @@ title: Stop sensitive data at every exit
 feature: AC-F09
 status: idea
 personas: [admin, analyst, builder]
-boards: [access.ledger, agents.run, settings.ai, access.locked]
+boards: [access.ledger, agents.runs, settings.ai]
 ---
 
 # AC-42 · Stop sensitive data at every exit
@@ -69,7 +69,7 @@ flowchart TD
 | Targets and their locality | Operator | access.ledger · Targets | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Targets | access.ledger · Could not load | — | access.ledger · Targets |
 | Refused and left-out exits | Admin | access.ledger · No calls yet | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Left out | access.ledger · Call · Refused | access.ledger · Waiting on the result | — |
 | Refused and left-out exits | Operator | access.ledger · No calls yet | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Left out | access.ledger · Call · Refused | access.ledger · Waiting on the result | access.ledger · Withheld rows |
-| A step stopped by the check | Admin | — | — | — | agents.run · Stopped at the exit | — | agents.run · Stopped at the exit | — |
-| A step stopped by the check | Operator | — | — | — | agents.run · Stopped at the exit | — | agents.run · Stopped at the exit | agents.run · Content withheld |
+| A step stopped by the check | Admin | — | — | — | agents.runs · Detail · Stopped at the exit | — | agents.runs · Detail · Stopped at the exit | — |
+| A step stopped by the check | Operator | — | — | — | agents.runs · Detail · Stopped at the exit | — | agents.runs · Detail · Stopped at the exit | agents.runs · Detail · Content withheld |
 | A model's locality | Admin | settings.ai · Locality not set | — | settings.ai · Loading | settings.ai · Locality | settings.ai · Could not load | — | — |
-| A model's locality | Operator | settings.ai · Locality · Read only | — | settings.ai · Loading | settings.ai · Locality · Read only | settings.ai · Could not load | — | access.locked |
+| A model's locality | Operator | settings.ai · Locality · Read only | — | settings.ai · Loading | settings.ai · Locality · Read only | settings.ai · Could not load | — | settings.ai · Locked |

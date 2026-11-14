@@ -68,5 +68,5 @@ flowchart LR
 | Requests | Operator | model.rules · No requests | — | model.rules · Requests loading | model.rules · Requests | model.rules · Could not load | — | model.rules · Requests read only |
 | Allow in a view | Admin | — | — | — | model.rules · Allow in a view | model.rules · Request refused | — | — |
 | Allow in a view | Operator | — | — | — | — | — | — | model.rules · Requests read only |
-| A rule from a request | Admin | — | — | model.rules · Property rule loading | model.rules · Property rule from a request | model.rules · Request refused | — | — |
-| A rule from a request | Operator | — | — | model.rules · Property rule loading | model.rules · Property rule from a request | model.rules · Could not load | — | model.rules · Property rule read only |
+| A rule from a request | Admin | — | — | model.rules · Detail · Property rule · Loading | model.rules · Detail · Property rule · From a request | model.rules · Request refused | — | — |
+| A rule from a request | Operator | — | — | model.rules · Detail · Property rule · Loading | model.rules · Detail · Property rule · From a request | model.rules · Could not load | — | model.rules · Detail · Property rule · Read only |

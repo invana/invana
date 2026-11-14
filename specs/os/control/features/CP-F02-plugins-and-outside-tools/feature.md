@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst, curator]
 stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-20, CP-64]
 journeys: [J07, J10]
-boards: [settings.plugins, settings.plugins.server, settings.mcp, settings.people, settings.access, agents.agent, access.sign_in_again, access.locked, settings.packs, settings.me.connections, agents.run, settings.workers]
+boards: [settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-PERF-3]
 depends_on: [AC-F02, AC-F04, AC-F05, AC-F09, AC-F10, AC-F11, CP-F03, AG-F06, RC-F02]
 ---
@@ -396,7 +396,7 @@ The code changes are [migrations.md](../../../../migrations.md) M15 (work and pe
 
 | Decision | Detail |
 |---|---|
-| Where its places sit | Library › Plugins (`settings.plugins`) and Library › Packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`); a person's personal connections under Settings › You (`settings.me.connections`) |
+| Where its places sit | Library › Plugins (`settings.plugins`) and Library › Packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`); a person's personal connections under Settings › You (`settings.me · Connections`) |
 | Plugins live in the Library | The Library sheet's *Plugins* lists every plugin and outside server, each server with its work connections, and *Packs* the Team packs; each row reads *Used by n agents*. *MCP server* is its own entry in Settings; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
 | An outside server is a plugin | One kind of list, one pair of switches, one resource name `tool/<server>/<tool>` for every tool, shipped or added |
 | Per server, one way to sign in | An Admin chooses none, a token or OAuth for each outside server, and whether people may connect their own over OAuth; a shipped tool's settings are the deployment's secrets |

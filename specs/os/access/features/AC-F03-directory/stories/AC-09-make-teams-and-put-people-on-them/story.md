@@ -4,7 +4,7 @@ title: Make teams and put people on them
 feature: AC-F03
 status: idea
 personas: [admin, analyst]
-boards: [settings.access, access.locked]
+boards: [settings.people]
 ---
 
 # AC-09 · Make teams and put people on them
@@ -62,9 +62,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Teams and a team | Admin | settings.access · No teams yet | settings.access · Nothing matches | settings.access · Loading | settings.access · A team | settings.access · Could not load | — | — |
-| Teams and a team | Operator | access.locked · No teams yet | access.locked · Nothing matches | access.locked · Loading | access.locked · A team | access.locked · Could not load | — | access.locked · A team |
-| New team | Admin | — | — | — | settings.access · New team | settings.access · Name taken | — | — |
-| New team | Operator | — | — | — | — | — | — | access.locked · A team |
-| Delete a team | Admin | — | — | — | settings.access · Delete a team | settings.access · Team in use | — | — |
-| Delete a team | Operator | — | — | — | — | — | — | access.locked · A team |
+| Teams and a team | Admin | settings.people · Teams · No teams yet | settings.people · Teams · Nothing matches | settings.people · Teams · Loading | settings.people · Teams · A team | settings.people · Teams · Could not load | — | — |
+| Teams and a team | Operator | settings.people · Teams · Locked · No teams yet | settings.people · Teams · Locked · Nothing matches | settings.people · Teams · Locked · Loading | settings.people · Teams · Locked · A team | settings.people · Teams · Locked · Could not load | — | settings.people · Teams · Locked · A team |
+| New team | Admin | settings.people · Teams · New | — | — | settings.people · Teams · New · Filled | settings.people · Teams · New · Name taken | — | — |
+| New team | Operator | — | — | — | — | — | — | settings.people · Teams · New · Locked · A team |
+| Delete a team | Admin | — | — | — | settings.people · Teams · Delete a team | settings.people · Teams · Team in use | — | — |
+| Delete a team | Operator | — | — | — | — | — | — | settings.people · Teams · Locked · A team |

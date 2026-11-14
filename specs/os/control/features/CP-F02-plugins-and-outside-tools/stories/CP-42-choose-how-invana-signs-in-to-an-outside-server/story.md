@@ -4,7 +4,7 @@ title: Choose how Invana signs in to an outside server
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.plugins.server, settings.plugins, access.sign_in_again]
+boards: [settings.plugins, access.signin]
 ---
 
 # CP-42 · Choose how Invana signs in to an outside server
@@ -63,9 +63,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| How a server signs in | Admin | settings.plugins.server · Sign-in not set | — | settings.plugins.server · Loading | settings.plugins.server · Sign-in | settings.plugins.server · Sign-in refused | — | — |
-| How a server signs in | Operator | settings.plugins.server · Sign-in · Read only | — | settings.plugins.server · Loading | settings.plugins.server · Sign-in · Read only | settings.plugins.server · Could not load | — | settings.plugins.server · Sign-in · Read only |
+| How a server signs in | Admin | settings.plugins · Servers · Sign-in not set | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Sign-in | settings.plugins · Servers · Sign-in refused | — | — |
+| How a server signs in | Operator | settings.plugins · Servers · Sign-in · Read only | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Sign-in · Read only | settings.plugins · Servers · Could not load | — | settings.plugins · Servers · Sign-in · Read only |
 | A shipped tool's settings | Admin | settings.plugins · Secret not set | — | settings.plugins · Loading | settings.plugins · Secret set | settings.plugins · Could not load | — | — |
 | A shipped tool's settings | Operator | settings.plugins · Secret not set · Read only | — | settings.plugins · Loading | settings.plugins · Secret set · Read only | settings.plugins · Could not load | — | settings.plugins · Secret set · Read only |
-| Password again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Password again | Operator | — | — | — | — | — | — | — |

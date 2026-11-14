@@ -6,7 +6,7 @@ status: idea
 personas: [builder, analyst, admin]
 stories: [AG-18, AG-31, AG-38, AG-44, AG-46, AG-47, AG-48]
 journeys: [J04]
-boards: [agents.skills, agents.skill, agents.workflow, agents.run, agents.runs, inbox]
+boards: [agents.skills, agents.runs, inbox]
 nfrs: [NFR-PERF-2, NFR-PERF-3]
 depends_on: [AG-F01, AG-F02, AG-F04, AG-F09, CP-F02, CP-F10, AC-F02, AC-F05, AC-F07]
 ---
@@ -355,7 +355,7 @@ the version.
 
 | Decision | Detail |
 |---|---|
-| Workflows live under Library › Skills | *Workflows* and *Functions* are sections of Skills, beside *Answer templates*; a workflow opens as its own page (`agents.workflow`), a function as its own page |
+| Workflows live under Library › Skills | *Workflows* and *Functions* are sections of Skills, beside *Answer templates*; a workflow opens as its own page (`agents.skills · Workflow`), a function as its own page |
 | A workflow's page answers *how has it behaved* | Overview · Layers · Flow · Runs, over 7 · 30 · 90 days; what it is sits in its head — version, steps, intent, what it touches, who made it, what composes it, the agents allowed to run it |
 | *Composed by* means pinned | The workflows whose steps compose it, each with the version it pins; an agent allowed to run it is a permission, read in the head |
 | What changed is step by step | Each version against the one before: steps added, removed, moved or changed, pins moved, declared arguments; v1 reads *the first version* |

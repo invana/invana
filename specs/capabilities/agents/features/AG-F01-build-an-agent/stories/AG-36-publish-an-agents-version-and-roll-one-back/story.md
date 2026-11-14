@@ -4,7 +4,7 @@ title: Publish an agent's version and roll one back
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.agent, agents]
+boards: [agents.agents]
 ---
 
 # AG-36 · Publish an agent's version and roll one back
@@ -62,9 +62,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A draft's head and Lifecycle | Admin | agents.agent · Unchecked draft | — | agents.agent · Loading | agents.agent | agents.agent · Publish refused | agents.agent · Evals running | — |
-| A draft's head and Lifecycle | Operator | agents.agent · Unchecked draft | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Publish refused | agents.agent · Evals running | agents.agent · Read only |
-| Versions | Admin | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | — |
-| Versions | Operator | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | agents.agent · Versions |
-| Agents — a draft in the list | Admin | — | agents · No agents match | agents · Loading | agents · Draft | — | — | — |
-| Agents — a draft in the list | Operator | — | agents · No agents match | agents · Loading | agents · Draft | — | — | agents · Draft |
+| A draft's head and Lifecycle | Admin | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Publish refused | agents.agents · Detail · Evals running | — |
+| A draft's head and Lifecycle | Operator | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Publish refused | agents.agents · Detail · Evals running | agents.agents · Detail · Read only |
+| Versions | Admin | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | — |
+| Versions | Operator | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | agents.agents · Detail · Versions |
+| Agents — a draft in the list | Admin | — | agents.agents · No agents match | agents.agents · Loading | agents.agents · Draft | — | — | — |
+| Agents — a draft in the list | Operator | — | agents.agents · No agents match | agents.agents · Loading | agents.agents · Draft | — | — | agents.agents · Draft |

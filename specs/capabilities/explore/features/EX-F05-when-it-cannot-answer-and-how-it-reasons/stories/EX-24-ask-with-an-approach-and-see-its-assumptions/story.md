@@ -4,7 +4,7 @@ title: Ask with an approach, with the assumptions shown
 feature: EX-F05
 status: idea
 personas: [analyst, decision-maker, builder]
-boards: [explore.ask, explore.board, agents.skills, agents.run.answer]
+boards: [explore.board, agents.skills, agents.runs]
 ---
 
 # EX-24 · Ask with an approach, with the assumptions shown
@@ -67,11 +67,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Act as, in the composer | Admin | explore.ask · Act as, built-in only | — | — | explore.ask · Act as | — | explore.ask · Assumptions before the run | — |
-| Act as, in the composer | Operator | explore.ask · Act as, built-in only | — | — | explore.ask · Act as | — | explore.ask · Assumptions before the run | — |
+| Act as, in the composer | Admin | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · Act as | — | explore.board · Ask · Assumptions before the run | — |
+| Act as, in the composer | Operator | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · Act as | — | explore.board · Ask · Assumptions before the run | — |
 | The assumptions on an answer | Admin | — | — | explore.board · Working | explore.board · Assumptions | explore.board · Two approaches refused | explore.board · Working | — |
 | The assumptions on an answer | Operator | — | — | explore.board · Working | explore.board · Assumptions | explore.board · Two approaches refused | explore.board · Working | — |
 | Approaches in Skills | Admin | agents.skills · Approaches, built-in only | agents.skills · Approaches filtered | agents.skills · Loading | agents.skills · Approaches | agents.skills · Failed | — | — |
 | Approaches in Skills | Operator | agents.skills · Approaches, built-in only | agents.skills · Approaches filtered | agents.skills · Loading | agents.skills · Approaches | agents.skills · Failed | — | agents.skills · Approaches read only |
-| The run's trace | Admin | — | — | agents.run.answer · Loading | agents.run.answer · Approach | agents.run.answer · Step failed | agents.run.answer · Running | — |
-| The run's trace | Operator | — | — | agents.run.answer · Loading | agents.run.answer · Approach | agents.run.answer · Step failed | agents.run.answer · Running | agents.run.answer · Content withheld |
+| The run's trace | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Approach | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | — |
+| The run's trace | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Approach | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |

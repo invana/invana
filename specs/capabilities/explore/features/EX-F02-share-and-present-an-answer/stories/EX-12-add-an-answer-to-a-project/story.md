@@ -4,7 +4,7 @@ title: Add an answer to a project
 feature: EX-F02
 status: idea
 personas: [analyst, decision-maker]
-boards: [explore.board, projects.finding]
+boards: [explore.board, projects.branches]
 ---
 
 # EX-12 · Add an answer to a project
@@ -49,5 +49,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Add to a project | Admin | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | — |
 | Add to a project | Operator | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | explore.board · No access |
-| The finding | Admin | — | — | projects.finding · Loading | projects.finding | — | — | — |
-| The finding | Operator | — | — | projects.finding · Loading | projects.finding | — | — | — |
+| The finding | Admin | — | — | projects.branches · Finding · Loading | projects.branches · Finding | — | — | — |
+| The finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | — | — | — |

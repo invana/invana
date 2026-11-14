@@ -6,7 +6,7 @@ status: idea
 personas: [builder, analyst, modeller, admin]
 stories: [AG-50, AG-53, AG-55, AG-49, AG-51, AG-52]
 journeys: [J02, J04]
-boards: [explore.board, agents.run.answer, agents.run.thinking, agents.thinking, agents.skills, agents.skill, inbox]
+boards: [explore.board, agents.runs, graph.memory, agents.skills, inbox]
 nfrs: [NFR-REL-6, NFR-UX-2, NFR-SEC-5, NFR-PERF-3]
 depends_on: [GP-F02, AG-F06, AG-F04, AG-F01, CP-F10, CP-F08, PJ-F03, AC-F05, AC-F06, AC-F07, AC-F09]
 ---

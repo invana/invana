@@ -24,15 +24,46 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 
 | # | Decision |
 |---|---|
-| D1 | One canvas: *Invana design* — `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX`. One page per place in the app, one board per named surface (`design-story` §3, §4b) |
+| D1 | One canvas: *Invana design* — `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX`. One page per place in the app, one board per place a feature lives (D11) |
 | D2 | Pages, in this order: *Index* · *Components* · *Shell* · *Sign-in & Home* · *Explore* · *Model* · *Projects* · *Inbox* · *Records* · *Agents* · *Library* · *Settings · You & Invana* · *Settings · Connections* · *Settings · Operations* · *Settings · Access* · *Reference designs* |
 | D3 | Boards are Full HD, 1920×1080; the leftSection is 260 px by default; the assistant is 420 px |
 | D4 | The shell is components on the *Components* page — `ShellHeader` · `ShellRail` · `ShellLeftSection` · `ShellFooter` · `SheetFrame` · `AssistantPanel` — mounted by every board with `<dc-import>`; no board copies shell markup |
 | D5 | The 8 boards on the canvas today (Workbench, 1 Welcome … 7 Access dropdown) move to *Reference designs* unchanged. `Main.dc.html` becomes the *Index* board; the Workbench keeps its content as `ref.workbench.dc.html` |
 | D6 | The canvas's kit bundle (`project/ds/invana-kit/`) is refreshed from the design-kit artifact `https://claude.ai/artifact/PovTcmwPkgKDrxdrcA5TBD` in P01 |
-| D7 | Placements: the memory graphs (GP-F02 `graph.memory.*`) on *Explore*; outside agents (AG-F05) a filter of the Agents list, on *Agents*; MCP server (AC-F11 `settings.mcp`) under Settings › Connections; `control.alerts*` on *Settings · Operations*; `agents.skills` · `agents.skill` · `settings.plugins*` on *Library* |
-| D8 | Whole app first: P03–P04 draw the parent board of every row (has data · Admin) linked end to end; P05–P16 then draw every variant, state and lens, page by page |
+| D7 | Placements: memory (GP-F02 `graph.memory`) on *Explore*; outside agents (AG-F05) the *Outside* filter of `agents.agents`, on *Agents*; MCP server (`settings.mcp`) under Settings › Connections; `control.alerts` on *Settings · Operations*; `agents.skills` (skills, workflows, functions, templates) · `settings.plugins` · `settings.packs` · `settings.connectors` on *Library* |
+| D8 | Whole app first: P01 and P03–P04b draw every board's List (has data · Admin) linked end to end; P05–P16 then draw every view, overlay, edit, create, state and lens, page by page. Each board is in exactly one List phase and exactly one state phase (*Boards by page*) |
 | D9 | Only P01 waits for Ravi's review. Every other phase is approved on its gates; no QA review |
+| D10 | Every create the specs name is a modal **state of its feature's board** (D11) — `<board> · New`, or the act's own word (`· Connect` · `· Upload` · `· Install` · `· Import` · `· Attach` · `· Add workers` …) — drawn over that board, never a board of its own. The wizard is `design-language.md` §3: one modal of numbered sections that open in order (1 Name · 2 the type as a grouped card grid · 3 its details) and one filled act. The step strip is only `settings.workers · Add workers`, whose worker joins after the person acts. Each create's State switch runs through every section, the validation error on its field, working and done, in both lenses. A board, a conversation and a dashboard from *Pin* are made on the click; roles are fixed and have no create; a kind and a relationship are made in the model's draft (`model.models · Draft`). Each place phase (P09–P16) draws the creates on its own boards |
+| D11 | **One board per place, showing the whole feature** (`specs/design-language.md` §7). A board is a canvas page, a mode's view, a sheet's section, a header dropdown or a page outside the shell, named for its feature. It opens on the List; a View switch moves List · Detail; its modals (create, edit, confirm, *Sign in again*), peeks, menus, panels, the console and collapsed regions are its states; the Operator's locked reading is its Operator lens (`· Locked`), never a separate board. Each `## Screens` cell reads `<board> · <view or overlay> · <state>`. 56 boards cover all 235 stories (151 before) |
+
+## Boards by page
+
+This table is the project's coverage list: every board the canvas must hold, on its D2 page, with the views, creates
+and edits the phases name. Each board is drawn by one List phase and one state phase; every other state its stories'
+`## Screens` cells name comes with its board's state phase. P17 audits the canvas against it. `· Locked` is each
+board's Operator lens (D11); creates and edits are modal states of their board (D10).
+
+| Page | Boards (views · creates · edits) | Phase that draws them | Count |
+|---|---|---|---|
+| Index | `Main.dc.html` — one card per page (not a board) | P01 | 0 |
+| Components | `ShellHeader` · `ShellRail` · `ShellLeftSection` · `ShellFooter` · `SheetFrame` · `AssistantPanel` (components, not boards) | P01 | 0 |
+| Shell | `shell.switcher` · `shell.command` · `shell.operations` · `shell.access` (edit · Revoke) · `shell.avatar.access` · `inbox.dropdown` (· Confirm) | P03 List · P05 every state | 6 |
+| Sign-in & Home | `access.signin` (· Sign in again · Locked) · `access.consent` · `start.home` (· Set-up) | P03 List · P06 every state | 3 |
+| Explore | `explore.board` (· Boards · Conversations · Queries · Ask · Left closed · Menu · Why · Chart · Cannot · Share · Save derived · Annotate · Console · Present; edits · Edit · New conversation · Fork from here · Add to a project · Share · Export) · `explore.dashboards` (· Detail; edit · Detail · Pin · New dashboard) · `graph.memory` (· Thinking · Lineage · Project map · Org knowledge) | P01 List of `explore.board` · P03 List of the other two · P07 `explore.board` · P08 `explore.dashboards`, `graph.memory` | 3 |
+| Model | `model.models` (map · Detail; create · New; edits · Draft · Publish · Export · Import) · `model.kinds` (· Detail: Properties · Meaning · Standards; edit · Detail · Edit) · `model.relationships` (· Detail) · `model.standards` (· Detail; create · New; edit · Write a standard) · `model.taxonomies` · `model.rules` (· Detail; create · New) · `model.views` (· Detail; create · New; edit · Detail · Edit) · `model.inference` (· Detail; create · New) · `model.health` (· Usage) | P03b List · P09 every state, create and edit | 9 |
+| Projects | `projects.projects` (· Detail tabs · Assistant; creates · New · Ask for help) · `projects.tasks` (My tasks · Reviews · Detail · How it got here; create · New) · `projects.branches` (tree · Finding; create · Finding · New; edits · Fork · Merge · Decide) · `projects.report` (edit · Edit) · `projects.alerts` | P03b List · P10 every state, create and edit | 5 |
+| Inbox | `inbox` | P04 List · P11 every state | 1 |
+| Records | `data.records` (· Detail; edits · Fix · Merge) · `data.loads` (creates · Upload · Add by hand) · `data.quality` (· Checks) · `data.annotations` | P04 List · P11 every state, create and edit | 4 |
+| Agents | `agents.agents` (· Detail · Outside; creates · New · Outside · Add; edits · Draft · Detail · Export) · `agents.runs` (· Detail: Answer · Thinking · Sessions · Compare) · `agents.schedules` (create · New) | P04 List · P12 every state, create and edit | 3 |
+| Library | `agents.skills` (· Detail · Workflow; creates · New · Import · Add a library; edits · Author template · Detail · Draft · Detail · New draft · Detail · Add functions · Detail · Publish · Detail · Export) · `settings.plugins` (· Servers · Runtimes; creates · Servers · Add · Servers · Connect · Runtimes · Install) · `settings.packs` (create · Install) · `settings.connectors` | P04 List · P13 every state, create and edit | 4 |
+| Settings · You & Invana | `settings.me` (· Connections · Owners; creates · New key · Connections · Connect) · `settings.notifications` (creates · New channel · New rule) · `settings.general` (· Appearance) | P04b List · P14 every state and create | 3 |
+| Settings · Connections | `settings.databases` (· Detail; create · Connect · Shape · Files · Ready) · `settings.ai` (· Locked; create · New) · `settings.mcp` | P04b List · P14 every state and create | 3 |
+| Settings · Operations | `settings.workers` (create · Add workers, the only step strip; edit · Edit rate limit) · `settings.workloads` · `settings.limits` (· Usage; edit · Edit limits) · `control.alerts` (· Detail · Settings; create · Settings · New) | P04b List · P15 every state, create and edit | 4 |
+| Settings · Access | `settings.people` (People · Service users · Teams · Locked; creates · New person · New service user · Teams · New · Teams · Grant; edits · Deactivate · Export their data) · `settings.roles` · `settings.policies` (· Locked; creates · New · Attach; edit · Draft) · `settings.agent_access` (· Locked) · `access.usage` (· Locked) · `access.ledger` (· Locked; edit · Export) · `settings.history` (edit · Export) · `settings.keeping` (· Forget · Locked) | P04b List · P16 every state, create and edit | 8 |
+| Reference designs | The 8 boards on the canvas before this project, unchanged (the Workbench as `ref.workbench.dc.html`) — reference, not coverage | P01 | 0 |
+| **Total** | | | **56** |
+
+Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:` key against the phases' Boards lists, both ways: 56 boards · List phases 0 uncovered, 0 duplicated · state phases 0 uncovered, 0 duplicated · every create and edit a `## Screens` cell names in exactly one phase · 0 phase names absent from the specs.
 
 ## Rules for every session
 
@@ -44,7 +75,7 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | One publisher | Only the phase's lead publishes. Sub-agents write board files into the mirror, each its own files; the lead publishes once they are done |
 | Never stop | Nobody answers questions. A gap the spec does not settle: draw the reading `specs/design-language.md` and the D-decisions support, write it in the hand-off notes, raise a recommendation (`recommend`), go on. A component the kit lacks: compose the nearest kit components, raise a `component` recommendation, go on |
 | Kit only, tokens only | Components from `InvanaUI` in the canvas's bundle; tokens only; 13 px base, 12 px meta; budgets in tokens, never currency; runs show pinned exact model versions |
-| Leave the rest alone | Never edit *Reference designs* boards after P01, another page's boards, or a component outside P01 — a component change a page needs is a hand-off note and a recommendation, applied by the next phase that owns *Components* (none after P01: raise it) |
+| Leave the rest alone | Never edit *Reference designs* boards after P01, another page's boards, or a component outside P01 — a component change a page needs is a hand-off note and a recommendation, applied by the next phase that owns *Components* (none after P01: raise it). |
 | No screenshots | `design-story` §5 step 2 is skipped: the canvas renders only live. Checks are §5 steps 1 and 3 and the link check in *Gates* |
 
 ## Gates
@@ -85,91 +116,121 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | Budget | |
 | Steps | 1. For each place, find the story that owns it; add its board to `## Screens` (`design-language.md` §7 naming). 2. A place with no owning story gets one at `idea`. 3. Write D7's placements. 4. Take up R394 and close it. 5. `check.py` |
 
-### P03 · Prototype I — Shell, Sign-in & Home, Explore, Model, Projects
+### P03 · Prototype I — Shell, Sign-in & Home, Explore
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's and P02's hand-off notes · `design-story` · the stories citing each board |
+| Read | P01's and P02's hand-off notes · `design-story` · D11 · `specs/design-language.md` §7 · the stories citing each board |
 | Stories | — |
-| Done when | On each of the five pages, the parent board of every row (has data · Admin) is drawn on the components and linked: the header's switcher, dropdowns and modes, Home → Explore → Model → Projects, and every row's parent to the boards it opens. Variants and other states are not required yet |
-| Lands | The canvas: about 20 board files and `canvas.json` |
-| Boards | shell.switcher · shell.command · shell.operations · shell.access · inbox.dropdown · access.signin · start.home · explore.ask · explore.share · model.board · model.new · model.meaning · model.rules · model.taxonomies · model.inference · model.health · projects.list · projects.project · projects.task · projects.report · and the P02 boards for these pages |
+| Done when | On the *Shell*, *Sign-in & Home* and *Explore* pages, every board below is drawn on the components in its List (has data · Admin), with its View, State and Lens switches present, and linked: the header's switcher, dropdowns and modes, Home → Explore (P01's `explore.board`), Explore's views on the leftNav, and every List to its Detail. Other states are not required yet |
+| Lands | The canvas: 11 board files and `canvas.json` |
+| Boards | shell.switcher · shell.command · shell.operations · shell.access · shell.avatar.access · inbox.dropdown · access.signin · access.consent · start.home · explore.dashboards · graph.memory |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. Shell and Home first (every other page links from them). 2. Explore, Model, Projects. 3. Link check. 4. Publish; `check.py` |
+| Steps | 1. Shell and Home first (every other page links from them). 2. Explore. 3. Link check. 4. Publish; `check.py` |
 
-### P04 · Prototype II — Inbox, Records, Agents, Library, Settings
+### P03b · Prototype I — Model, Projects
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | P03's hand-off notes · `design-story` · the stories citing each board |
+| Read | P03's hand-off notes · `design-story` · D11 · `specs/design-language.md` §7 · the stories citing each board |
 | Stories | — |
-| Done when | The parent board of every row on *Inbox*, *Records*, *Agents*, *Library* and the four *Settings* pages is drawn (has data · Admin), in its sheet frame, linked from the rail summoners and the *Index*; the whole canvas plays from *Index* to every page and back |
-| Lands | The canvas: about 25 board files and `canvas.json` |
-| Boards | inbox · data.records · data.record · data.quality · data.annotations · agents.agent · agents.runs · agents.run · agents.schedules · agents.skills · settings.plugins · settings.me · settings.notifications · settings.databases · settings.ai · settings.mcp · settings.workers · settings.workloads · control.alerts · settings.people · settings.roles · settings.access · and the P02 boards for these pages |
+| Done when | On the *Model* and *Projects* pages, every board below is drawn on the components in its List (has data · Admin), with its View, State and Lens switches present, and linked: Explore → Model → Projects through the header's modes, each mode's views on the leftNav, and every List to its Detail. Other states are not required yet |
+| Lands | The canvas: 14 board files and `canvas.json` |
+| Boards | model.models · model.kinds · model.relationships · model.standards · model.taxonomies · model.rules · model.views · model.inference · model.health · projects.projects · projects.tasks · projects.branches · projects.report · projects.alerts |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. The sheets in rail order. 2. Settings, group by group. 3. Link the *Index*. 4. Link check. 5. Publish; `check.py` |
+| Steps | 1. Model. 2. Projects. 3. Link check. 4. Publish; `check.py` |
+
+### P04 · Prototype II — Inbox, Records, Agents, Library
+
+| | |
+|---|---|
+| Agent | designer |
+| Read | P03b's hand-off notes · `design-story` · D11 · the stories citing each board |
+| Stories | — |
+| Done when | Every board below is drawn in its sheet frame in its List (has data · Admin), with its View, State and Lens switches present, linked from the rail summoners, the sheet nav and the *Index* |
+| Lands | The canvas: 12 board files and `canvas.json` |
+| Boards | inbox · data.records · data.loads · data.quality · data.annotations · agents.agents · agents.runs · agents.schedules · agents.skills · settings.plugins · settings.packs · settings.connectors |
+| Review | |
+| Approve | |
+| Budget | |
+| Steps | 1. The sheets in rail order. 2. Link the *Index*. 3. Link check. 4. Publish; `check.py` |
+
+### P04b · Prototype II — Settings
+
+| | |
+|---|---|
+| Agent | designer |
+| Read | P04's hand-off notes · `design-story` · D11 · the stories citing each board |
+| Stories | — |
+| Done when | Every board below is drawn in its sheet frame in its List (has data · Admin), with its View, State and Lens switches present, linked from the avatar's Settings, the sheet nav and the *Index*; the whole canvas plays from *Index* to every page and back |
+| Lands | The canvas: 18 board files and `canvas.json` |
+| Boards | settings.me · settings.notifications · settings.general · settings.databases · settings.ai · settings.mcp · settings.workers · settings.workloads · settings.limits · control.alerts · settings.people · settings.roles · settings.policies · settings.agent_access · access.usage · access.ledger · settings.history · settings.keeping |
+| Review | |
+| Approve | |
+| Budget | |
+| Steps | 1. Settings, group by group: You & Invana · Connections · Operations · Access. 2. Link the *Index*. 3. Link check. 4. Publish; `check.py` |
 
 ### P05 · Shell — every state and lens
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · CP-68 · CP-30 · CP-69 · CP-36 · CP-70 · AC-48 |
+| Read | `design-story` · D11 · CP-68 · CP-30 · CP-69 · CP-36 · CP-70 · AC-48 |
 | Stories | — |
-| Done when | Every board below has every state its stories name, both lenses, its overlays on its row; the components are untouched |
+| Done when | Every board below has every view, overlay and state its stories' `## Screens` cells name, in both lenses; the components are untouched |
 | Lands | The canvas: *Shell* page |
-| Boards | shell.switcher · shell.command · shell.operations · shell.access · shell.avatar.access · inbox.dropdown · inbox.dropdown.confirm |
+| Boards | shell.switcher · shell.command · shell.operations · shell.access · shell.avatar.access · inbox.dropdown (with `· Confirm`) · and the edits: shell.access · Revoke |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. Each row in turn: parent states, then variants and overlays. 2. Row stickies. 3. Publish; `check.py` |
+| Steps | 1. Each board in turn: List states, then Detail, then overlays. 2. Row stickies. 3. Publish; `check.py` |
 
 ### P06 · Sign-in & Home — every state and lens
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · AC-F01 · AC-F11 · CP-22 · CP-24 · the stories citing `access.locked` and `access.sign_in_again` |
+| Read | `design-story` · D11 · AC-F01 · AC-F11 · CP-22 · CP-24 · every story citing `access.signin · Sign in again` |
 | Stories | — |
-| Done when | As P05, for the boards below; `access.locked` and `access.sign_in_again` show the refusal and re-authentication every citing story names, as one board each with a variant switch |
+| Done when | As P05, for the boards below; `access.signin · Sign in again` is drawn once, over a dimmed generic sheet, with every state its citing stories name (checking, wrong password, SSO) |
 | Lands | The canvas: *Sign-in & Home* page |
-| Boards | access.signin · access.locked · access.sign_in_again · access.consent · start.setup · start.home |
+| Boards | access.signin · access.consent · start.home (with `· Set-up`) |
 | Review | |
 | Approve | |
 | Budget | |
 | Steps | As P05 |
 
-### P07 · Explore I — ask and the board
+### P07 · Explore I — the board
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · EX-F01 – EX-F06 and their stories |
+| Read | `design-story` · D11 · EX-F01 – EX-F06 · GP-F01 · RC-13 · SE-10 · AG-50 and their stories |
 | Stories | — |
-| Done when | As P05, for the boards below |
+| Done when | As P05, for `explore.board`: its leftSection views (`· Boards` · `· Conversations` · `· Queries`), `· Ask`, `· Left closed`, the overlays (`· Menu` · `· Why` · `· Chart` · `· Cannot` · `· Share` · `· Save derived`), the panels (`· Annotate` · `· Edit`), `· Console` and `· Present` |
 | Lands | The canvas: *Explore* page |
-| Boards | explore.ask · explore.board · explore.board.annotate · explore.board.cannot · explore.board.chart · explore.board.console · explore.board.edit · explore.board.left_closed · explore.board.menu · explore.board.present · explore.board.save_derived · explore.board.why · explore.share |
+| Boards | explore.board · and the edits: explore.board · Edit · explore.board · New conversation · explore.board · Fork from here · explore.board · Add to a project · explore.board · Share · Export |
 | Review | |
 | Approve | |
 | Budget | |
 | Steps | As P05 |
 
-### P08 · Explore II — views, compare and memory
+### P08 · Explore II — dashboards and memory
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · GP-F02 and its stories · SE-F09 · the stories P02 named for Explore's views |
+| Read | `design-story` · D11 · EX-34 · GP-F02 and its stories · AG-55 |
 | Stories | — |
-| Done when | As P05, for the boards below |
+| Done when | As P05, for the boards below; `graph.memory` has the views Thinking · Lineage · Project map · Org knowledge |
 | Lands | The canvas: *Explore* page |
-| Boards | graph.memory.lineage · graph.memory.org_knowledge · graph.memory.project_map · explore.compare · and P02's Explore boards (Boards list · Conversations · Dashboards · Queries) |
+| Boards | explore.dashboards · graph.memory · and the edits: explore.dashboards · Detail · Pin · New dashboard |
 | Review | |
 | Approve | |
 | Budget | |
@@ -180,11 +241,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · SE-F01 – SE-F10 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · SE-F01 – SE-F10 and their stories · the creates' stories: SE-F01 (SE-04 · SE-06 · SE-15) · SE-F05 (SE-17 · SE-18) · SE-F07 (SE-11 · SE-12) · SE-F08 (SE-22) · SE-F09 (SE-10) |
 | Stories | — |
-| Done when | As P05, for the boards below |
+| Done when | As P05, for the boards below; `model.models` carries the map, `· Detail` (one model, its links, Comparing), `· Draft`, `· Publish`, `· Export` and `· Import`; `model.kinds · Detail` carries Properties · Meaning · Standards and `· Edit`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens |
 | Lands | The canvas: *Model* page |
-| Boards | model.board · model.board.kind · model.board.draft · model.board.draft.publish · model.new · model.meaning · model.rules · model.taxonomies · model.inference · model.health · and P02's Model boards (Models · Kinds · Relationships · Standards · Lenses) |
+| Boards | model.models · model.kinds · model.relationships · model.standards · model.taxonomies · model.rules · model.views · model.inference · model.health · and the creates: model.models · New · model.standards · New · model.rules · New · model.views · New · model.inference · New · and the edits: model.models · Draft · model.models · Publish · model.models · Export · model.models · Import · model.kinds · Detail · Edit · model.views · Detail · Edit · model.standards · Write a standard |
 | Review | |
 | Approve | |
 | Budget | |
@@ -195,11 +256,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · PJ-F01 · PJ-F03 · PJ-F05 · PJ-F06 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · PJ-F01 · PJ-F03 · PJ-F05 · PJ-F06 and their stories · the creates' stories: PJ-02 · PJ-12 · PJ-20 · PJ-23 · PJ-24 · PJ-06 |
 | Stories | — |
-| Done when | As P05, for the boards below |
+| Done when | As P05, for the boards below; `projects.projects · Detail` carries the project's tabs and `· Assistant`; `projects.tasks` carries My tasks, `· Reviews` and a task's `· Detail · How it got here`; `projects.branches` carries the tree, `· Finding` and `· Decide`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens |
 | Lands | The canvas: *Projects* page |
-| Boards | projects.list · projects.new · projects.project · projects.task · projects.task.thinking · projects.decide · projects.finding · projects.options · projects.report · projects.alerts · projects.asks.create · projects.ask_help · projects.assistant · and P02's Projects boards (My tasks · Reviews) |
+| Boards | projects.projects · projects.tasks · projects.branches · projects.report · projects.alerts · and the creates: projects.projects · New · projects.projects · Ask for help · projects.tasks · New · projects.branches · Finding · New · and the edits: projects.report · Edit · projects.branches · Fork · projects.branches · Merge · projects.branches · Decide |
 | Review | |
 | Approve | |
 | Budget | |
@@ -210,11 +271,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · CP-F08 · AC-F06 · RC-F01 – RC-F07 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · CP-F08 · AC-F05 · RC-F01 – RC-F07 and their stories · the creates' stories: RC-08 · RC-11 |
 | Stories | — |
-| Done when | As P05, for the boards below |
+| Done when | As P05, for the boards below; `data.records` carries a record's `· Detail`, `· Fix` and `· Merge`; `data.quality` carries `· Checks`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens |
 | Lands | The canvas: *Inbox* and *Records* pages |
-| Boards | inbox · inbox.history · data.records · data.record · data.upload · data.collect · data.checks · data.quality · data.fix · data.merge · data.annotations · and P02's Records board (Loads) |
+| Boards | inbox · data.records · data.loads · data.quality · data.annotations · and the creates: data.loads · Upload · data.loads · Add by hand · and the edits: data.records · Fix · data.records · Merge |
 | Review | |
 | Approve | |
 | Budget | |
@@ -225,11 +286,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · AG-F01 · AG-F05 – AG-F07 · AG-F09 · AG-F10 · CP-F10 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AG-F01 · AG-F02 · AG-F05 · AG-F07 · AG-F10 · CP-F10 and their stories · the creates' stories: AG-21 · AG-26 · AG-33 · AG-42 |
 | Stories | — |
-| Done when | As P05, for the boards below; outside agents are a filter of the Agents list (D7) |
+| Done when | As P05, for the boards below; outside agents are the `· Outside` filter of `agents.agents` (D7); `agents.runs · Detail` carries `· Answer`, `· Thinking`, Sessions and `· Compare`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; `agents.agents · New` carries the assistant's draft (AG-26); `agents.schedules · New` shows *Confirm Allow* as a section, never a second modal |
 | Lands | The canvas: *Agents* page |
-| Boards | agents.agent · agents.new · agents.runs · agents.run · agents.run.answer · agents.run.thinking · agents.schedules · agents.workflow · agents.external · agents.thinking |
+| Boards | agents.agents · agents.runs · agents.schedules · and the creates: agents.agents · New · agents.agents · Outside · Add · agents.schedules · New · and the edits: agents.agents · Draft · agents.agents · Detail · Export |
 | Review | |
 | Approve | |
 | Budget | |
@@ -240,11 +301,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · AG-F04 · AG-F08 · CP-F02 · CP-F05 · CP-F06 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AG-F04 · AG-F06 · AG-F08 · AG-F09 · CP-F02 · CP-F05 · CP-F06 and their stories · the creates' stories: AG-37 · AG-39 · AG-40 · AG-63 · CP-02 · CP-20 · CP-62 · CP-64 |
 | Stories | — |
-| Done when | As P05, for the boards below; every item shows *Used by n agents* |
+| Done when | As P05, for the boards below; every item shows *Used by n agents*; `agents.skills` carries skills, workflows (`· Workflow`), functions and answer templates; `settings.plugins` carries `· Servers` and `· Runtimes`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; `agents.skills · Import` lists what came in before *Import n* |
 | Lands | The canvas: *Library* page |
-| Boards | agents.skills · agents.skill · settings.plugins · settings.plugins.server · and P02's Library boards (Connectors · Packs) |
+| Boards | agents.skills · settings.plugins · settings.packs · settings.connectors · and the creates: agents.skills · New · agents.skills · Import · agents.skills · Add a library · settings.plugins · Servers · Add · settings.plugins · Servers · Connect · settings.plugins · Runtimes · Install · settings.packs · Install · and the edits: agents.skills · Author template · agents.skills · Detail · Draft · agents.skills · Detail · New draft · agents.skills · Detail · Add functions · agents.skills · Detail · Publish · agents.skills · Detail · Export |
 | Review | |
 | Approve | |
 | Budget | |
@@ -255,11 +316,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · AC-F01 · CP-F01 · CP-F02 · CP-F05 · CP-F08 · AC-F11 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AC-F01 · AC-F07 · AC-F10 · AC-F11 · CP-F01 · CP-F02 · CP-F05 · CP-F07 · CP-F08 and their stories · the creates' stories: CP-17 · CP-22 · CP-25 · CP-26 · CP-27 · CP-01 · AC-10 · CP-43 · CP-37 · CP-45 |
 | Stories | — |
-| Done when | As P05, for the boards below; create flows are one-page modals with numbered sections (D17) |
+| Done when | As P05, for the boards below; `settings.me` carries `· Connections` and `· Owners`; `settings.general` carries `· Appearance`; `settings.databases` carries `· Detail`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; a key's secret shows once in the same modal |
 | Lands | The canvas: *Settings · You & Invana* and *Settings · Connections* pages |
-| Boards | settings.me · settings.notifications · settings.ai · settings.mcp · settings.databases · settings.databases.database · settings.databases.connect · settings.databases.connect.shape · settings.databases.connect.files · settings.databases.connect.ready · and P02's boards (General · Appearance · Personal connections) |
+| Boards | settings.me · settings.notifications · settings.general · settings.databases · settings.ai · settings.mcp · and the creates: settings.databases · Connect (· Shape · Files · Ready) · settings.ai · New · settings.me · New key · settings.me · Connections · Connect · settings.notifications · New channel · settings.notifications · New rule |
 | Review | |
 | Approve | |
 | Budget | |
@@ -270,11 +331,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · CP-F03 · CP-F04 · CP-F09 · CP-F11 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · CP-F03 · CP-F04 · CP-F09 · CP-F11 and their stories · the creates' stories: CP-10 · CP-60 |
 | Stories | — |
-| Done when | As P05, for the boards below; Add workers is the 720 px step-strip modal (D17) |
+| Done when | As P05, for the boards below; `settings.limits` carries `· Usage`; `control.alerts` carries `· Detail` and `· Settings`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; `settings.workers · Add workers` is the 720 px step-strip modal — Where · Group · Join key · Run it · Joined — and the only step strip on the canvas (D10) |
 | Lands | The canvas: *Settings · Operations* page |
-| Boards | settings.workers · settings.workloads · settings.usage · control.alerts · control.alerts.alert · control.alerts.settings · and P02's board (Limits) |
+| Boards | settings.workers · settings.workloads · settings.limits · control.alerts · and the creates: settings.workers · Add workers · control.alerts · Settings · New · and the edits: settings.workers · Edit rate limit · settings.limits · Edit limits |
 | Review | |
 | Approve | |
 | Budget | |
@@ -285,11 +346,11 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | designer |
-| Read | `design-story` · AC-F02 – AC-F12 and their stories |
+| Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AC-F02 – AC-F12 and their stories · the creates' stories: AC-18 · AC-04 · AC-06 · AC-11 · AC-09 · AC-33 · AC-39 |
 | Stories | — |
-| Done when | As P05, for the boards below |
+| Done when | As P05, for the boards below; every Operator reading the stories name is the board's Operator lens (`· Locked`); `settings.people` carries People, Service users, `· Teams` and `· Export their data`; `settings.keeping` carries `· Forget`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; a create that changes access shows who it changes before Save, then `access.signin · Sign in again`, then saved or *Waiting for a second Admin* where its story names it |
 | Lands | The canvas: *Settings · Access* page |
-| Boards | settings.people · settings.roles · settings.access · settings.keeping · access.ledger · access.owners · access.forget · access.subject_export · access.usage · and P02's boards (Policies · an agent's access · History) |
+| Boards | settings.people · settings.roles · settings.policies · settings.agent_access · access.usage · access.ledger · settings.history · settings.keeping · and the creates: settings.people · New person · settings.people · New service user · settings.people · Teams · New · settings.people · Teams · Grant · settings.policies · New · settings.policies · Attach · and the edits: settings.policies · Draft · settings.people · Deactivate · settings.people · Export their data · access.ledger · Export · settings.history · Export |
 | Review | |
 | Approve | |
 | Budget | |
@@ -300,15 +361,15 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | | |
 |---|---|
 | Agent | qa |
-| Read | This file · `design-story` §3–§5 · the local mirror `.design/canvas-invana/project/` |
+| Read | This file · D11 · `design-story` §3–§5 · `specs/design-language.md` §7 · the local mirror `.design/canvas-invana/project/` |
 | Stories | — |
-| Done when | A report `.agent-reports/qa/design-redesign-P17.md` lists: every board a story names and whether it is in the mirror; every `href` and `dc-import` that does not resolve; every board that copies shell markup instead of the components; every board missing a State or Lens switch; hex colours or non-kit look-alikes. Each gap is a recommendation |
+| Done when | A report `.agent-reports/qa/design-redesign-P17.md` lists: every board a story names and whether it is in the mirror; every view, overlay and state a `## Screens` cell names (`<board> · <view> · <state>`) that its board's switches cannot reach; every `href` and `dc-import` that does not resolve; every board that copies shell markup instead of the components; every board missing a View, State or Lens switch; every create (D10) whose State switch misses a section, its validation error or done, or whose board's act does not link to it; hex colours or non-kit look-alikes. Each gap is a recommendation |
 | Lands | The report and recommendations |
 | Boards | — |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. List cited boards from every `## Screens`. 2. Compare with the mirror. 3. Scan links, imports, switches, tokens. 4. Report; recommendations |
+| Steps | 1. List cited boards and states from every `## Screens`. 2. Compare with the mirror. 3. Scan links, imports, switches, tokens. 4. Report; recommendations |
 
 ## Log
 
@@ -317,14 +378,16 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Foundation — reference page, kit, shell components, pages |  | done | 2026-11-15 | gates green · reviews passed |
+| P01 | Foundation — reference page, kit, shell components, pages |  | pending | 2026-11-15 | reset — canvas access was missing (R403) |
 | P02 | Name the missing boards | P01 | done | 2026-11-15 | gates green · reviews passed |
-| P03 | Prototype I — Shell, Sign-in & Home, Explore, Model, Projects | P02 | done | 2026-11-15 | gates green · reviews passed |
-| P04 | Prototype II — Inbox, Records, Agents, Library, Settings | P03 | done | 2026-11-15 | gates green · reviews passed |
-| P05 | Shell — every state and lens | P04 | done | 2026-11-15 | gates green · reviews passed |
-| P06 | Sign-in & Home — every state and lens | P05 | pending |  |  |
-| P07 | Explore I — ask and the board | P06 | pending |  |  |
-| P08 | Explore II — views, compare and memory | P07 | pending |  |  |
+| P03 | Prototype I — Shell, Sign-in & Home, Explore | P02 | pending | 2026-11-15 | reset — canvas access was missing (R403) |
+| P03b | Prototype I — Model, Projects | P03 | pending |  |  |
+| P04 | Prototype II — Inbox, Records, Agents, Library | P03b | pending | 2026-11-15 | reset — canvas access was missing (R403) |
+| P04b | Prototype II — Settings | P04 | pending |  |  |
+| P05 | Shell — every state and lens | P04b | pending | 2026-11-15 | reset — canvas access was missing (R403) |
+| P06 | Sign-in & Home — every state and lens | P05 | pending | 2026-11-15 | reset — canvas access was missing (R403) |
+| P07 | Explore I — the board | P06 | pending |  |  |
+| P08 | Explore II — dashboards and memory | P07 | pending |  |  |
 | P09 | Model — every state and lens | P08 | pending |  |  |
 | P10 | Projects — every state and lens | P09 | pending |  |  |
 | P11 | Inbox and Records — every state and lens | P10 | pending |  |  |
@@ -341,6 +404,8 @@ What a later phase must know that the canvas does not say. One row per note, new
 
 | ID | Note |
 |---|---|
+| H1 | The creates in P09–P16 (D10, product-manager 2026-11-15): each create board's states are named in its stories' `## Screens`, step rows reading `<create> · <n> <section>`. A create board mounts a dimmed copy of its parent, drawn by the place phase, and never edits it. P03 drew `model.new` (has data · Admin) as a parent; P17 owns its every state. If `InvanaUI` has no step strip or numbered-section component, compose the nearest kit parts and raise a `component` recommendation |
+| H2 | D11 (product-manager 2026-11-15): 151 boards became 56. Every retired name now reads `<board> · <view or overlay> · <state>` in the stories' `## Screens`. H1's create boards are states of their feature's board (D10), drawn by the place phase that owns the board (P09–P16); the create phases are gone and the audit is P17 |
 
 ## Questions for Ravi
 
@@ -348,3 +413,7 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 
 | Date | Phase | Question | Options | Recommend | Answer |
 |---|---|---|---|---|---|
+| 2026-11-15 | P01, P03–P06 | Designer sessions cannot reach the canvas (no `Artifact` tool in headless runs); P01, P03–P05 were logged done with nothing drawn. How do we unblock? | (a) grant runner designer sessions Artifact read/list/publish (R395) · (b) draw interactively in a session you start, then run the rest · (c) park the project | (a), then reset P01 and P03–P06 to pending and restart | (a) — Ravi, 2026-11-15; waits on the run.py edit (R403) |
+| 2026-11-15 | P09–P16 | What shape is a "wizard"? | (a) one-page modal with numbered sections, step strip only for Add workers · (b) step strip everywhere · (c) step strip for 4+ sections | (a) | (a) — Ravi, 2026-11-15 |
+| 2026-11-15 | P16 | New person in Studio (AC-18) | (a) Admin sets a first password, no email · (b) invite by email · (c) drop | (a) | (a) — Ravi, 2026-11-15 |
+| 2026-11-15 | P13 | New skill is a modal (AG-37) | (a) keep the modal · (b) revert | (a) | (a) — Ravi, 2026-11-15 |

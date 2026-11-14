@@ -4,7 +4,7 @@ title: Relate a project to another or start one from it
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.project, projects.new]
+boards: [projects.projects]
 ---
 
 # PJ-23 · Relate a project to another or start one from it
@@ -62,9 +62,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Related | Admin | projects.project · Related · None yet | — | projects.project · Related · Loading | projects.project · Related | projects.project · Related · Refused | — | — |
-| Related | Operator | projects.project · Related · None yet | — | projects.project · Related · Loading | projects.project · Related | projects.project · Related · Refused | — | projects.project · Related · Not a member |
-| A related project withheld | Admin | — | — | — | projects.project · Related · Withheld | — | — | projects.project · Related · Withheld |
-| A related project withheld | Operator | — | — | — | projects.project · Related · Withheld | — | — | projects.project · Related · Withheld |
-| Start a project from this | Admin | projects.new · Started from | — | projects.new · Loading people | projects.new · Started from · Filled | projects.new · Refused | — | — |
-| Start a project from this | Operator | projects.new · Started from | — | projects.new · Loading people | projects.new · Started from · Filled | projects.new · Refused | — | — |
+| Related | Admin | projects.projects · Detail · Related · None yet | — | projects.projects · Detail · Related · Loading | projects.projects · Detail · Related | projects.projects · Detail · Related · Refused | — | — |
+| Related | Operator | projects.projects · Detail · Related · None yet | — | projects.projects · Detail · Related · Loading | projects.projects · Detail · Related | projects.projects · Detail · Related · Refused | — | projects.projects · Detail · Related · Not a member |
+| A related project withheld | Admin | — | — | — | projects.projects · Detail · Related · Withheld | — | — | projects.projects · Detail · Related · Withheld |
+| A related project withheld | Operator | — | — | — | projects.projects · Detail · Related · Withheld | — | — | projects.projects · Detail · Related · Withheld |
+| Start a project from this | Admin | projects.projects · New · Started from | — | projects.projects · New · Loading people | projects.projects · New · Started from · Filled | projects.projects · New · Refused | — | — |
+| Start a project from this | Operator | projects.projects · New · Started from | — | projects.projects · New · Loading people | projects.projects · New · Started from · Filled | projects.projects · New · Refused | — | — |

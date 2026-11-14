@@ -4,7 +4,7 @@ title: Read how one agent is doing
 feature: CP-F10
 status: idea
 personas: [builder, admin]
-boards: [agents, agents.agent, agents.runs]
+boards: [agents.agents, agents.runs]
 ---
 
 # CP-49 · Read how one agent is doing
@@ -57,9 +57,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Agents — an agent picked | Admin | agents · Draft | — | agents · Loading | agents | agents · Could not load | agents · Running | — |
-| Agents — an agent picked | Operator | agents · Draft | — | agents · Loading | agents | agents · Could not load | agents · Running | agents |
-| An agent's numbers on its sheet | Admin | agents.agent · Untested draft | — | agents.agent · Loading | agents.agent | agents.agent · Could not load | — | — |
-| An agent's numbers on its sheet | Operator | agents.agent · Untested draft | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Content withheld |
+| Agents — an agent picked | Admin | agents.agents · Draft | — | agents.agents · Loading | agents.agents | agents.agents · Could not load | agents.agents · Running | — |
+| Agents — an agent picked | Operator | agents.agents · Draft | — | agents.agents · Loading | agents.agents | agents.agents · Could not load | agents.agents · Running | agents.agents |
+| An agent's numbers on its sheet | Admin | agents.agents · Detail · Untested draft | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Could not load | — | — |
+| An agent's numbers on its sheet | Operator | agents.agents · Detail · Untested draft | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Content withheld |
 | Runs filtered to the agent | Admin | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | — |
 | Runs filtered to the agent | Operator | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |

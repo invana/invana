@@ -4,7 +4,7 @@ title: Write a task, hand it on and accept the result
 feature: PJ-F01
 status: idea
 personas: [analyst, decision-maker]
-boards: [projects.task, projects.task.thinking, inbox, projects.my_tasks, projects.reviews]
+boards: [projects.tasks, inbox]
 ---
 
 # PJ-12 · Write a task, hand it on and accept the result
@@ -80,7 +80,7 @@ flowchart TD
 | PJ-12.6 | A task with no assignee | its page opens | it reads *Open*, and the assignee picker explains that the project's members fill the picker and membership grants nothing |
 | PJ-12.7 | A task | it is assigned to a person | it reads *Assigned* and names them; nothing runs |
 | PJ-12.8 | A task | it is assigned to an agent granted to the assigner, a member of the project or not | exactly one run opens through that agent, the assigner behind it, and the task reads *In progress* |
-| PJ-12.9 | A task whose run is going | a person who may read the run opens its page | the steps stream in `projects.task.thinking`, and *How it got here* shows the steps and sources so far |
+| PJ-12.9 | A task whose run is going | a person who may read the run opens its page | the steps stream in `projects.tasks · Detail · How it got here`, and *How it got here* shows the steps and sources so far |
 | PJ-12.10 | A run asks a question | it is read | the task reads *Needs input* with the question on its thread; answering resumes the run |
 | PJ-12.11 | A task waiting on an unmet dependency, a paused agent, an exhausted token budget or an open sub-task | its page opens | it reads *Blocked*, naming exactly what it waits on, with *Reassign* offered when the agent is paused |
 | PJ-12.12 | A run that has posted a result on a task with no checks, or whose checks all passed | the task is read | it reads *In review* and shows the result; for a reader who may read the run, *How it got here* shows its steps, sources and assumptions |
@@ -113,19 +113,19 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Tasks | Admin | projects.my_tasks · No tasks yet | projects.my_tasks · No tasks match | projects.my_tasks · Loading tasks | projects.my_tasks · Tasks | projects.my_tasks · Could not load tasks | projects.my_tasks · Tasks running | — |
-| Tasks | Operator | projects.my_tasks · No tasks yet | projects.my_tasks · No tasks match | projects.my_tasks · Loading tasks | projects.my_tasks · Tasks | projects.my_tasks · Could not load tasks | projects.my_tasks · Tasks running | — |
-| New task | Admin | projects.task · New | — | — | projects.task · Assign | projects.task · New refused | — | — |
-| New task | Operator | projects.task · New | — | — | projects.task · Assign | projects.task · New refused | — | projects.task · Assign · Agent not granted |
-| A task | Admin | projects.task · Open | — | projects.task · Loading | projects.task · In review | projects.task · Could not load | projects.task.thinking | — |
-| A task | Operator | projects.task · Open | — | projects.task · Loading | projects.task · In review | projects.task · Could not load | projects.task.thinking | projects.task.thinking · Content withheld |
-| A task that cannot go on | Admin | — | — | — | projects.task · Blocked | projects.task · Failed | projects.task · Needs input | projects.task · Withheld |
-| A task that cannot go on | Operator | — | — | — | projects.task · Blocked | projects.task · Failed | projects.task · Needs input | projects.task · Archived |
-| A closed task | Admin | — | — | — | projects.task · Done | — | — | projects.task · In review · Not a reviewer |
-| A closed task | Operator | — | — | — | projects.task · Done | — | — | projects.task · In review · Not a reviewer |
+| Tasks | Admin | projects.tasks · No tasks yet | projects.tasks · No tasks match | projects.tasks · Loading tasks | projects.tasks · Tasks | projects.tasks · Could not load tasks | projects.tasks · Tasks running | — |
+| Tasks | Operator | projects.tasks · No tasks yet | projects.tasks · No tasks match | projects.tasks · Loading tasks | projects.tasks · Tasks | projects.tasks · Could not load tasks | projects.tasks · Tasks running | — |
+| New task | Admin | projects.tasks · New | — | — | projects.tasks · New · Assign | projects.tasks · New · Refused | — | — |
+| New task | Operator | projects.tasks · New | — | — | projects.tasks · New · Assign | projects.tasks · New · Refused | — | projects.tasks · New · Assign · Agent not granted |
+| A task | Admin | projects.tasks · Detail · Open | — | projects.tasks · Detail · Loading | projects.tasks · Detail · In review | projects.tasks · Detail · Could not load | projects.tasks · Detail · How it got here | — |
+| A task | Operator | projects.tasks · Detail · Open | — | projects.tasks · Detail · Loading | projects.tasks · Detail · In review | projects.tasks · Detail · Could not load | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Content withheld |
+| A task that cannot go on | Admin | — | — | — | projects.tasks · Detail · Blocked | projects.tasks · Detail · Failed | projects.tasks · Detail · Needs input | projects.tasks · Detail · Withheld |
+| A task that cannot go on | Operator | — | — | — | projects.tasks · Detail · Blocked | projects.tasks · Detail · Failed | projects.tasks · Detail · Needs input | projects.tasks · Detail · Archived |
+| A closed task | Admin | — | — | — | projects.tasks · Detail · Done | — | — | projects.tasks · Detail · In review · Not a reviewer |
+| A closed task | Operator | — | — | — | projects.tasks · Detail · Done | — | — | projects.tasks · Detail · In review · Not a reviewer |
 | A result in Needs you | Admin | — | — | inbox · Loading | inbox · A result to accept | inbox · Could not load | — | — |
 | A result in Needs you | Operator | — | — | inbox · Loading | inbox · A result to accept | inbox · Could not load | — | — |
-| A task's History | Admin | projects.task · History · Nothing yet | — | projects.task · Loading | projects.task · History | projects.task · Could not load | projects.task · History | — |
-| A task's History | Operator | projects.task · History · Nothing yet | — | projects.task · Loading | projects.task · History | projects.task · Could not load | projects.task · History | projects.task · History · Content withheld |
-| Reviews on the left | Admin | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |
-| Reviews on the left | Operator | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |
+| A task's History | Admin | projects.tasks · Detail · History · Nothing yet | — | projects.tasks · Detail · Loading | projects.tasks · Detail · History | projects.tasks · Detail · Could not load | projects.tasks · Detail · History | — |
+| A task's History | Operator | projects.tasks · Detail · History · Nothing yet | — | projects.tasks · Detail · Loading | projects.tasks · Detail · History | projects.tasks · Detail · Could not load | projects.tasks · Detail · History | projects.tasks · Detail · History · Content withheld |
+| Reviews on the left | Admin | projects.tasks · Reviews · Nothing to review | projects.tasks · Reviews · No review matches | projects.tasks · Reviews · Loading | projects.tasks · Reviews | projects.tasks · Reviews · Could not load | — | — |
+| Reviews on the left | Operator | projects.tasks · Reviews · Nothing to review | projects.tasks · Reviews · No review matches | projects.tasks · Reviews · Loading | projects.tasks · Reviews | projects.tasks · Reviews · Could not load | — | — |

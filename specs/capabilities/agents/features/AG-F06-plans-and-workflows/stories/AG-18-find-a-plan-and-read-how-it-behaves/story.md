@@ -4,7 +4,7 @@ title: Find a workflow, and read which rung a run took
 feature: AG-F06
 status: idea
 personas: [builder, analyst]
-boards: [agents.skills, agents.workflow, agents.run, agents.runs, inbox]
+boards: [agents.skills, agents.runs, inbox]
 ---
 
 # AG-18 · Find a workflow, and read which rung a run took
@@ -86,18 +86,18 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Workflows | Admin | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Workflows | agents.skills · Could not load | — | — |
 | Workflows | Operator | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Workflows | agents.skills · Could not load | — | — |
-| A workflow — Overview and Layers | Admin | agents.workflow · Never run | — | agents.workflow · Loading | agents.workflow · Overview | agents.workflow · Flagged | agents.workflow · Running | — |
-| A workflow — Overview and Layers | Operator | agents.workflow · Never run | — | agents.workflow · Loading | agents.workflow · Overview | agents.workflow · Flagged | agents.workflow · Running | — |
-| A workflow — Flow | Admin | agents.workflow · Flow | — | agents.workflow · Loading | agents.workflow · Flow | agents.workflow · Could not load | — | — |
-| A workflow — Flow | Operator | agents.workflow · Flow | — | agents.workflow · Loading | agents.workflow · Flow | agents.workflow · Could not load | — | — |
-| A workflow — Runs | Admin | agents.workflow · Runs, none | agents.workflow · Runs, none match | agents.workflow · Loading | agents.workflow · Runs | agents.workflow · Could not load | agents.workflow · Runs | — |
-| A workflow — Runs | Operator | agents.workflow · Runs, none | agents.workflow · Runs, none match | agents.workflow · Loading | agents.workflow · Runs | agents.workflow · Could not load | agents.workflow · Runs | agents.workflow · Runs, content withheld |
-| A workflow — Export and Arguments | Admin | agents.workflow · Arguments, none | — | agents.workflow · Loading | agents.workflow · Arguments | agents.workflow · Could not load | — | — |
-| A workflow — Export and Arguments | Operator | agents.workflow · Arguments, none | — | agents.workflow · Loading | agents.workflow · Arguments | agents.workflow · Could not load | — | — |
-| A workflow — Replanned runs | Admin | agents.workflow · Replanned runs, none | — | agents.workflow · Loading | agents.workflow · Replanned runs | agents.workflow · Could not load | — | — |
-| A workflow — Replanned runs | Operator | agents.workflow · Replanned runs, none | — | agents.workflow · Loading | agents.workflow · Replanned runs | agents.workflow · Could not load | — | agents.workflow · Runs, content withheld |
-| A run's Plan step | Admin | agents.run · Plan drafted | — | agents.run · Loading | agents.run · Plan workflow | agents.run · Plan refused | agents.run · Running | — |
-| A run's Plan step | Operator | agents.run · Plan drafted | — | agents.run · Loading | agents.run · Plan workflow | agents.run · Plan refused | agents.run · Running | agents.run · Content withheld |
+| A workflow — Overview and Layers | Admin | agents.skills · Workflow · Never run | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Overview | agents.skills · Workflow · Flagged | agents.skills · Workflow · Running | — |
+| A workflow — Overview and Layers | Operator | agents.skills · Workflow · Never run | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Overview | agents.skills · Workflow · Flagged | agents.skills · Workflow · Running | — |
+| A workflow — Flow | Admin | agents.skills · Workflow · Flow | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Flow | agents.skills · Workflow · Could not load | — | — |
+| A workflow — Flow | Operator | agents.skills · Workflow · Flow | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Flow | agents.skills · Workflow · Could not load | — | — |
+| A workflow — Runs | Admin | agents.skills · Workflow · Runs, none | agents.skills · Workflow · Runs, none match | agents.skills · Workflow · Loading | agents.skills · Workflow · Runs | agents.skills · Workflow · Could not load | agents.skills · Workflow · Runs | — |
+| A workflow — Runs | Operator | agents.skills · Workflow · Runs, none | agents.skills · Workflow · Runs, none match | agents.skills · Workflow · Loading | agents.skills · Workflow · Runs | agents.skills · Workflow · Could not load | agents.skills · Workflow · Runs | agents.skills · Workflow · Runs, content withheld |
+| A workflow — Export and Arguments | Admin | agents.skills · Workflow · Arguments, none | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Arguments | agents.skills · Workflow · Could not load | — | — |
+| A workflow — Export and Arguments | Operator | agents.skills · Workflow · Arguments, none | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Arguments | agents.skills · Workflow · Could not load | — | — |
+| A workflow — Replanned runs | Admin | agents.skills · Workflow · Replanned runs, none | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Replanned runs | agents.skills · Workflow · Could not load | — | — |
+| A workflow — Replanned runs | Operator | agents.skills · Workflow · Replanned runs, none | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Replanned runs | agents.skills · Workflow · Could not load | — | agents.skills · Workflow · Runs, content withheld |
+| A run's Plan step | Admin | agents.runs · Detail · Plan drafted | — | agents.runs · Detail · Loading | agents.runs · Detail · Plan workflow | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | — |
+| A run's Plan step | Operator | agents.runs · Detail · Plan drafted | — | agents.runs · Detail · Loading | agents.runs · Detail · Plan workflow | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
 | Runs of a workflow | Admin | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | — |
 | Runs of a workflow | Operator | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |
 | Refused again and again | Admin | — | — | inbox · Loading | inbox · Ops alert | — | — | — |

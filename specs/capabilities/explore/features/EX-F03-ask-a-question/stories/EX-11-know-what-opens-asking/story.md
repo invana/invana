@@ -4,7 +4,7 @@ title: Know what opens asking
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.ask, start.setup]
+boards: [explore.board, start.home]
 ---
 
 # EX-11 · Know what opens asking
@@ -52,5 +52,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The lock | Admin | explore.ask · Locked | — | explore.ask · Loading | start.setup | explore.ask · Set-up not finished | — | — |
-| The lock | Operator | explore.ask · Locked | — | explore.ask · Loading | start.setup | explore.ask · Set-up not finished | — | explore.ask · Locked, ask the owner |
+| The lock | Admin | explore.board · Ask · Locked | — | explore.board · Ask · Loading | start.home · Set-up | explore.board · Ask · Set-up not finished | — | — |
+| The lock | Operator | explore.board · Ask · Locked | — | explore.board · Ask · Loading | start.home · Set-up | explore.board · Ask · Set-up not finished | — | explore.board · Ask · Locked, ask the owner |

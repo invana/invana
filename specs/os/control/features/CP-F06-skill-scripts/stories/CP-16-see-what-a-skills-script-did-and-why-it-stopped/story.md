@@ -4,7 +4,7 @@ title: See what a skill's script did and why it stopped
 feature: CP-F06
 status: idea
 personas: [builder, admin]
-boards: [agents.run, agents.skill]
+boards: [agents.runs, agents.skills]
 ---
 
 # CP-16 · See what a skill's script did and why it stopped
@@ -59,9 +59,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A script step on a run | Admin | — | — | agents.run · Loading | agents.run · Script step | agents.run · Script stopped | agents.run · Script running | — |
-| A script step on a run | Operator | — | — | agents.run · Loading | agents.run · Script step | agents.run · Script stopped | agents.run · Script running | agents.run · Content withheld |
-| A refused script step | Admin | — | — | — | agents.run · Script refused | agents.run · Script refused | — | — |
-| A refused script step | Operator | — | — | — | agents.run · Script refused | agents.run · Script refused | — | agents.run · Content withheld |
-| A test that runs a script | Admin | — | — | agents.skill · Loading | agents.skill · Tests | agents.skill · Script refused | agents.skill · Testing | — |
-| A test that runs a script | Operator | — | — | agents.skill · Loading | agents.skill · Tests | agents.skill · Script refused | agents.skill · Testing | agents.skill · Tests |
+| A script step on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Script step | agents.runs · Detail · Script stopped | agents.runs · Detail · Script running | — |
+| A script step on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Script step | agents.runs · Detail · Script stopped | agents.runs · Detail · Script running | agents.runs · Detail · Content withheld |
+| A refused script step | Admin | — | — | — | agents.runs · Detail · Script refused | agents.runs · Detail · Script refused | — | — |
+| A refused script step | Operator | — | — | — | agents.runs · Detail · Script refused | agents.runs · Detail · Script refused | — | agents.runs · Detail · Content withheld |
+| A test that runs a script | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Script refused | agents.skills · Detail · Testing | — |
+| A test that runs a script | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Script refused | agents.skills · Detail · Testing | agents.skills · Detail · Tests |

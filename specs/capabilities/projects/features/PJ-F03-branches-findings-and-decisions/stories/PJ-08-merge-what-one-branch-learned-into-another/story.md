@@ -4,7 +4,7 @@ title: Merge what one branch learned into another
 feature: PJ-F03
 status: idea
 personas: [decision-maker]
-boards: [projects.options]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-08 · Merge what one branch learned into another
@@ -61,7 +61,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Merge | Admin | projects.options · Merge · Nothing to carry | — | projects.options · Merging | projects.options · Merge | projects.options · Merge refused | projects.options · Merge · From a proposal | — |
-| Merge | Operator | projects.options · Merge · Nothing to carry | — | projects.options · Merging | projects.options · Merge | projects.options · Merge refused | projects.options · Merge · From a proposal | projects.options · Archived |
-| A merged branch | Admin | — | — | projects.options · A branch · Loading | projects.options · A branch · Merged | projects.options · A branch · Could not load | — | projects.project · Not found |
-| A merged branch | Operator | — | — | projects.options · A branch · Loading | projects.options · A branch · Merged | projects.options · A branch · Could not load | — | projects.project · Not found |
+| Merge | Admin | projects.branches · Merge · Nothing to carry | — | projects.branches · Merging | projects.branches · Merge | projects.branches · Merge refused | projects.branches · Merge · From a proposal | — |
+| Merge | Operator | projects.branches · Merge · Nothing to carry | — | projects.branches · Merging | projects.branches · Merge | projects.branches · Merge refused | projects.branches · Merge · From a proposal | projects.branches · Archived |
+| A merged branch | Admin | — | — | projects.branches · A branch · Loading | projects.branches · A branch · Merged | projects.branches · A branch · Could not load | — | projects.projects · Detail · Not found |
+| A merged branch | Operator | — | — | projects.branches · A branch · Loading | projects.branches · A branch · Merged | projects.branches · A branch · Could not load | — | projects.projects · Detail · Not found |

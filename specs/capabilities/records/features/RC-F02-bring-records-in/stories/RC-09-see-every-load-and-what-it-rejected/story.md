@@ -4,7 +4,7 @@ title: See every load and what it rejected
 feature: RC-F02
 status: idea
 personas: [curator, modeller]
-boards: [agents.run, explore.board.menu, data.loads]
+boards: [data.loads, agents.runs, explore.board]
 ---
 
 # RC-09 · See every load and what it rejected
@@ -76,9 +76,9 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Loads | Admin | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
 | Loads | Operator | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
-| A load's run | Admin | — | — | agents.run · Load running | agents.run · Load | agents.run · Load failed | — | — |
-| A load's run | Operator | — | — | agents.run · Load running | agents.run · Load | agents.run · Load failed | — | agents.run · Undo not theirs |
-| What was rejected | Admin | — | — | agents.run · Load running | agents.run · Load rejected | agents.run · Load failed | — | — |
-| What was rejected | Operator | — | — | agents.run · Load running | agents.run · Load rejected | agents.run · Load failed | — | — |
-| A node's provenance | Admin | — | — | — | explore.board.menu · Provenance | explore.board.menu · No provenance | — | — |
-| A node's provenance | Operator | — | — | — | explore.board.menu · Provenance | explore.board.menu · No provenance | — | — |
+| A load's run | Admin | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load | agents.runs · Detail · Load failed | — | — |
+| A load's run | Operator | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load | agents.runs · Detail · Load failed | — | agents.runs · Detail · Undo not theirs |
+| What was rejected | Admin | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load rejected | agents.runs · Detail · Load failed | — | — |
+| What was rejected | Operator | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load rejected | agents.runs · Detail · Load failed | — | — |
+| A node's provenance | Admin | — | — | — | explore.board · Menu · Provenance | explore.board · Menu · No provenance | — | — |
+| A node's provenance | Operator | — | — | — | explore.board · Menu · Provenance | explore.board · Menu · No provenance | — | — |

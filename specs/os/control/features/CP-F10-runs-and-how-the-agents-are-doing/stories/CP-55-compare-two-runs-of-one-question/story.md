@@ -4,7 +4,7 @@ title: Compare two runs of one question
 feature: CP-F10
 status: idea
 personas: [analyst, builder]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-55 · Compare two runs of one question
@@ -47,5 +47,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Two runs compared | Admin | — | — | agents.run · Loading | agents.run · Compare | agents.run · Could not load | agents.run · Running | — |
-| Two runs compared | Operator | — | — | agents.run · Loading | agents.run · Compare | agents.run · Could not load | agents.run · Running | agents.run · Compare disabled |
+| Two runs compared | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Could not load | agents.runs · Detail · Running | — |
+| Two runs compared | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Could not load | agents.runs · Detail · Running | agents.runs · Detail · Compare disabled |

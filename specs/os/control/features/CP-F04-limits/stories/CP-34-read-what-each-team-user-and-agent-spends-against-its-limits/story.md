@@ -4,7 +4,7 @@ title: Read what each team, user and agent spends against its limits
 feature: CP-F04
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.usage]
+boards: [settings.limits]
 ---
 
 # CP-34 · Read what each team, user and agent spends against its limits
@@ -57,7 +57,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Usage | Admin | settings.usage · Nothing run yet | settings.usage · Nothing matches | settings.usage · Loading | settings.usage | settings.usage · Could not load | — | — |
-| Usage | Operator | settings.usage · Nothing run yet | settings.usage · Nothing matches | settings.usage · Loading | settings.usage · Read only | settings.usage · Could not load | — | settings.usage · Read only |
-| Near or at a limit | Admin | — | — | — | settings.usage · Near a limit | — | — | — |
-| Near or at a limit | Operator | — | — | — | settings.usage · Near a limit | — | — | — |
+| Usage | Admin | settings.limits · Usage · Nothing run yet | settings.limits · Usage · Nothing matches | settings.limits · Usage · Loading | settings.limits · Usage | settings.limits · Usage · Could not load | — | — |
+| Usage | Operator | settings.limits · Usage · Nothing run yet | settings.limits · Usage · Nothing matches | settings.limits · Usage · Loading | settings.limits · Usage · Read only | settings.limits · Usage · Could not load | — | settings.limits · Usage · Read only |
+| Near or at a limit | Admin | — | — | — | settings.limits · Usage · Near a limit | — | — | — |
+| Near or at a limit | Operator | — | — | — | settings.limits · Usage · Near a limit | — | — | — |

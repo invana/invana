@@ -4,7 +4,7 @@ title: Connect an MCP client as me
 feature: AC-F11
 status: idea
 personas: [analyst, builder, admin]
-boards: [access.consent, access.signin, access.sign_in_again]
+boards: [access.consent, access.signin]
 ---
 
 # AC-35 · Connect an MCP client as me
@@ -91,7 +91,7 @@ sequenceDiagram
 |---|---|---|---|---|---|---|---|---|
 | Consent | Admin | access.consent | — | access.consent · Loading | access.consent | access.consent · Bad request | — | — |
 | Consent | Operator | access.consent | — | access.consent · Loading | access.consent | access.consent · Bad request | — | access.signin · No account |
-| Sign in again to allow | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
-| Sign in again to allow | Operator | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Sign in again to allow | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
+| Sign in again to allow | Operator | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Connected — back to the client | Admin | — | — | — | access.consent · Connected | access.consent · Denied | — | — |
 | Connected — back to the client | Operator | — | — | — | access.consent · Connected | access.consent · Denied | — | — |

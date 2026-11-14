@@ -4,7 +4,7 @@ title: A refusal or a failure that says why and what next
 feature: EX-F05
 status: idea
 personas: [analyst]
-boards: [explore.board.cannot, agents.run.answer]
+boards: [explore.board, agents.runs]
 ---
 
 # EX-06 · A refusal or a failure that says why and what next
@@ -68,9 +68,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A refusal in the thread | Admin | — | — | — | explore.board.cannot · Refused | — | explore.board.cannot · Waiting for approvers | — |
-| A refusal in the thread | Operator | — | — | — | explore.board.cannot · Refused | — | explore.board.cannot · Waiting for approvers | explore.board.cannot · Refused, ask an Admin |
-| A diagnosis in the thread | Admin | — | — | — | — | explore.board.cannot · Diagnosis | — | — |
-| A diagnosis in the thread | Operator | — | — | — | — | explore.board.cannot · Diagnosis | — | explore.board.cannot · Diagnosis, ask an Admin |
-| The run | Admin | — | — | agents.run.answer · Loading | agents.run.answer · Refused | agents.run.answer · Step failed | — | — |
-| The run | Operator | — | — | agents.run.answer · Loading | agents.run.answer · Refused | agents.run.answer · Step failed | — | agents.run.answer · Content withheld |
+| A refusal in the thread | Admin | — | — | — | explore.board · Cannot · Refused | — | explore.board · Cannot · Waiting for approvers | — |
+| A refusal in the thread | Operator | — | — | — | explore.board · Cannot · Refused | — | explore.board · Cannot · Waiting for approvers | explore.board · Cannot · Refused, ask an Admin |
+| A diagnosis in the thread | Admin | — | — | — | — | explore.board · Cannot · Diagnosis | — | — |
+| A diagnosis in the thread | Operator | — | — | — | — | explore.board · Cannot · Diagnosis | — | explore.board · Cannot · Diagnosis, ask an Admin |
+| The run | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Refused | agents.runs · Detail · Answer · Step failed | — | — |
+| The run | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Refused | agents.runs · Detail · Answer · Step failed | — | agents.runs · Detail · Answer · Content withheld |

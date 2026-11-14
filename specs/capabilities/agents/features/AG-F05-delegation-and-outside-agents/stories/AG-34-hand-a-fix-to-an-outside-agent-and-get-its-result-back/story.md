@@ -4,7 +4,7 @@ title: Hand a fix to an outside agent and get its result back
 feature: AG-F05
 status: idea
 personas: [builder, analyst]
-boards: [inbox, agents.run]
+boards: [inbox, agents.runs]
 ---
 
 # AG-34 · Hand a fix to an outside agent and get its result back
@@ -68,5 +68,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The ask to send to an outside agent | Admin | — | — | inbox · Loading | inbox · Outside agent ask | — | — | — |
 | The ask to send to an outside agent | Operator | — | — | inbox · Loading | inbox · Not yours to answer | — | — | inbox · Not yours to answer |
-| The outside task on the run | Admin | — | — | agents.run · Loading | agents.run · Outside task done | agents.run · Outside task refused | agents.run · Outside task working | — |
-| The outside task on the run | Operator | — | — | agents.run · Loading | agents.run · Outside task done | agents.run · Outside task refused | agents.run · Outside task working | agents.run · Ran, content hidden |
+| The outside task on the run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Outside task done | agents.runs · Detail · Outside task refused | agents.runs · Detail · Outside task working | — |
+| The outside task on the run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Outside task done | agents.runs · Detail · Outside task refused | agents.runs · Detail · Outside task working | agents.runs · Detail · Ran, content hidden |

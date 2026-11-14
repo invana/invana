@@ -4,7 +4,7 @@ title: Version a workflow, retire one and move a pin
 feature: AG-F06
 status: idea
 personas: [builder, admin]
-boards: [agents.workflow, agents.run, inbox]
+boards: [agents.skills, agents.runs, inbox]
 ---
 
 # AG-48 · Version a workflow, retire one and move a pin
@@ -67,13 +67,13 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A workflow — Versions | Admin | agents.workflow · Versions, the first | — | agents.workflow · Loading | agents.workflow · Versions | agents.workflow · Could not load | agents.workflow · Version waiting on approvers | — |
-| A workflow — Versions | Operator | agents.workflow · Versions, the first | — | agents.workflow · Loading | agents.workflow · Versions | agents.workflow · Could not load | agents.workflow · Version waiting on approvers | agents.workflow · Acts disabled |
-| Retire a version | Admin | — | — | — | agents.workflow · Retire a version | agents.workflow · Built in | — | — |
-| Retire a version | Operator | — | — | — | agents.workflow · Retire a version | agents.workflow · Built in | — | agents.workflow · Acts disabled |
-| Move the pin | Admin | — | — | — | agents.workflow · vN exists | agents.workflow · Pins a retired version | agents.workflow · Version waiting on approvers | — |
-| Move the pin | Operator | — | — | — | agents.workflow · vN exists | agents.workflow · Pins a retired version | agents.workflow · Version waiting on approvers | agents.workflow · Acts disabled |
-| Copy a workflow | Admin | — | — | — | agents.workflow · Copy | agents.workflow · Could not load | — | — |
-| Copy a workflow | Operator | — | — | — | — | — | — | agents.workflow · Copy disabled |
-| Propose as a version, on a run | Admin | — | — | agents.run · Loading | agents.run · Propose as a version | agents.run · Propose refused | agents.run · Waiting on approvers | — |
-| Propose as a version, on a run | Operator | — | — | agents.run · Loading | agents.run · Propose as a version | agents.run · Propose refused | agents.run · Waiting on approvers | agents.run · Content withheld |
+| A workflow — Versions | Admin | agents.skills · Workflow · Versions, the first | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Versions | agents.skills · Workflow · Could not load | agents.skills · Workflow · Version waiting on approvers | — |
+| A workflow — Versions | Operator | agents.skills · Workflow · Versions, the first | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Versions | agents.skills · Workflow · Could not load | agents.skills · Workflow · Version waiting on approvers | agents.skills · Workflow · Acts disabled |
+| Retire a version | Admin | — | — | — | agents.skills · Workflow · Retire a version | agents.skills · Workflow · Built in | — | — |
+| Retire a version | Operator | — | — | — | agents.skills · Workflow · Retire a version | agents.skills · Workflow · Built in | — | agents.skills · Workflow · Acts disabled |
+| Move the pin | Admin | — | — | — | agents.skills · Workflow · vN exists | agents.skills · Workflow · Pins a retired version | agents.skills · Workflow · Version waiting on approvers | — |
+| Move the pin | Operator | — | — | — | agents.skills · Workflow · vN exists | agents.skills · Workflow · Pins a retired version | agents.skills · Workflow · Version waiting on approvers | agents.skills · Workflow · Acts disabled |
+| Copy a workflow | Admin | — | — | — | agents.skills · Workflow · Copy | agents.skills · Workflow · Could not load | — | — |
+| Copy a workflow | Operator | — | — | — | — | — | — | agents.skills · Workflow · Copy disabled |
+| Propose as a version, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a version | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | — |
+| Propose as a version, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a version | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | agents.runs · Detail · Content withheld |

@@ -60,14 +60,16 @@ terms and standards it follows, what must always hold and what may be derived �
 
 | Surface | Tier | Board |
 |---|---|---|
-| The model map — Map · Health · History | mode | `model.board` |
-| A kind — Properties · Meaning | peek | `model.board.kind` · `model.meaning` |
-| A draft and its publish | mode · modal | `model.board.draft` · `model.board.draft.publish` |
+| Models — the list and the map; one model · its links | mode | `model.models` · `model.models · Detail` |
+| Kinds — the list; a kind · Properties · Meaning · Standards | mode | `model.kinds` · `model.kinds · Detail` · `model.kinds · Detail · Meaning` |
+| Relationships — the list; a relationship on its model | mode | `model.relationships` · `model.relationships · Detail` |
+| A draft and its publish | mode · modal | `model.models · Draft` · `model.models · Publish` |
 | Taxonomies — broader kinds and value hierarchies | sheet | `model.taxonomies` |
-| Standards — the install's library | sheet | `data.checks` |
+| Standards — the install's library; a standard; a new one | mode · modal | `model.standards` · `model.standards · Detail` · `model.standards · New` |
 | Health and history | mode | `model.health` |
-| A new model · export and import | modal | `model.new` |
-| Rules and views | sheet | `model.rules` |
+| A new model · export and import | modal | `model.models · New` · `model.models · Export` · `model.models · Import` |
+| Rules — rules on kinds and properties, requests | sheet | `model.rules` |
+| Views — the list; a view; a new one | sheet · modal | `model.views` · `model.views · Detail` · `model.views · New` |
 | Derivations and derived facts | sheet | `model.inference` |
 
 ## Decisions

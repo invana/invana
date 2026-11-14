@@ -4,7 +4,7 @@ title: Annotate the records on a board
 feature: RC-F07
 status: idea
 personas: [analyst]
-boards: [explore.board.annotate]
+boards: [explore.board]
 ---
 
 # RC-13 · Annotate the records on a board
@@ -78,7 +78,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Annotations on the board | Admin | explore.board.annotate · Nothing annotated | explore.board.annotate · All hidden | explore.board.annotate · Loading | explore.board.annotate | explore.board.annotate · Could not save | explore.board.annotate · Assistant proposes | explore.board.annotate · Read-only database |
-| Annotations on the board | Operator | explore.board.annotate · Nothing annotated | explore.board.annotate · All hidden | explore.board.annotate · Loading | explore.board.annotate | explore.board.annotate · Could not save | explore.board.annotate · Assistant proposes | explore.board.annotate · Someone else's |
-| The Annotations panel | Admin | explore.board.annotate · Panel empty | explore.board.annotate · Panel hidden | explore.board.annotate · Loading | explore.board.annotate · Panel | — | explore.board.annotate · Evidence | — |
-| The Annotations panel | Operator | explore.board.annotate · Panel empty | explore.board.annotate · Panel hidden | explore.board.annotate · Loading | explore.board.annotate · Panel | — | explore.board.annotate · Evidence | — |
+| Annotations on the board | Admin | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Read-only database |
+| Annotations on the board | Operator | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Someone else's |
+| The Annotations panel | Admin | explore.board · Annotate · Panel empty | explore.board · Annotate · Panel hidden | explore.board · Annotate · Loading | explore.board · Annotate · Panel | — | explore.board · Annotate · Evidence | — |
+| The Annotations panel | Operator | explore.board · Annotate · Panel empty | explore.board · Annotate · Panel hidden | explore.board · Annotate · Loading | explore.board · Annotate · Panel | — | explore.board · Annotate · Evidence | — |

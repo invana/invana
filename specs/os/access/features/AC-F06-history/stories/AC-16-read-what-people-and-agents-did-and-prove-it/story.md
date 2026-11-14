@@ -4,7 +4,7 @@ title: Read what people and agents did, and prove it
 feature: AC-F06
 status: idea
 personas: [admin, builder, analyst]
-boards: [agents.run, settings.history]
+boards: [settings.history, agents.runs]
 ---
 
 # AC-16 · Read what people and agents did, and prove it
@@ -87,5 +87,5 @@ flowchart LR
 | By actor · by record · refusals | Operator | — | — | — | — | — | — | settings.history · Counted, not shown |
 | Export | Admin | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | — |
 | Export | Operator | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | settings.history · Export |
-| The step a row opens | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | — |
-| The step a row opens | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | agents.run · Not found |
+| The step a row opens | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | — |
+| The step a row opens | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | agents.runs · Detail · Not found |

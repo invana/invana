@@ -4,7 +4,7 @@ title: Draft a policy and see who it changes
 feature: AC-F02
 status: idea
 personas: [admin]
-boards: [settings.access, access.locked]
+boards: [settings.policies]
 ---
 
 # AC-06 · Draft a policy and see who it changes
@@ -62,7 +62,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A draft policy | Admin | settings.access · Draft with the assistant | — | settings.access · Drafting | settings.access · Draft | settings.access · Rule refused | settings.access · Draft from the assistant | — |
-| A draft policy | Operator | — | — | — | access.locked | — | — | access.locked |
-| Who it changes | Admin | — | — | settings.access · Working out who it changes | settings.access · Nobody loses | settings.access · What would break | — | — |
-| Who it changes | Operator | — | — | — | — | — | — | access.locked |
+| A draft policy | Admin | settings.policies · New · Draft with the assistant | — | settings.policies · New · Drafting | settings.policies · Draft | settings.policies · Rule refused | settings.policies · New · Draft from the assistant | — |
+| A draft policy | Operator | — | — | — | settings.policies · New · Locked | — | — | settings.policies · New · Locked |
+| Who it changes | Admin | — | — | settings.policies · Working out who it changes | settings.policies · Nobody loses | settings.policies · What would break | — | — |
+| Who it changes | Operator | — | — | — | — | — | — | settings.policies · Locked |
+| New policy · 4 Who it changes | Admin | — | — | settings.policies · New · Working out who it changes | settings.policies · New · Nobody loses | settings.policies · New · What would break | — | — |
+| New policy · 4 Who it changes | Operator | — | — | — | — | — | — | settings.policies · New · Locked |

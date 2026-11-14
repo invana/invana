@@ -4,7 +4,7 @@ title: Read a run of hundreds of agents like any run
 feature: CP-F10
 status: idea
 personas: [analyst, builder]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-51 · Read a run of hundreds of agents like any run
@@ -54,7 +54,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A big run — numbers and rates | Admin | — | — | agents.run · Loading | agents.run · Many agents | agents.run · Failed | agents.run · Many agents running | — |
-| A big run — numbers and rates | Operator | — | — | agents.run · Loading | agents.run · Many agents | agents.run · Failed | agents.run · Many agents running | agents.run · Content withheld |
-| A big run — by role | Admin | — | — | agents.run · Loading | agents.run · By role | agents.run · Could not load | agents.run · Many agents running | — |
-| A big run — by role | Operator | — | — | agents.run · Loading | agents.run · By role | agents.run · Could not load | agents.run · Many agents running | agents.run · Content withheld |
+| A big run — numbers and rates | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Many agents | agents.runs · Detail · Failed | agents.runs · Detail · Many agents running | — |
+| A big run — numbers and rates | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Many agents | agents.runs · Detail · Failed | agents.runs · Detail · Many agents running | agents.runs · Detail · Content withheld |
+| A big run — by role | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · By role | agents.runs · Detail · Could not load | agents.runs · Detail · Many agents running | — |
+| A big run — by role | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · By role | agents.runs · Detail · Could not load | agents.runs · Detail · Many agents running | agents.runs · Detail · Content withheld |

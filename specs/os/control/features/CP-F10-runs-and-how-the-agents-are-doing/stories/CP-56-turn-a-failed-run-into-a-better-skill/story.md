@@ -4,7 +4,7 @@ title: Turn a failed run into a better skill
 feature: CP-F10
 status: idea
 personas: [builder, analyst]
-boards: [agents.run, agents.skill, inbox]
+boards: [agents.runs, agents.skills, inbox]
 ---
 
 # CP-56 · Turn a failed run into a better skill
@@ -53,9 +53,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A failed step on the run | Admin | — | — | agents.run · Loading | agents.run · Step failed | agents.run · Could not load | agents.run · Proposing a fix | — |
-| A failed step on the run | Operator | — | — | agents.run · Loading | agents.run · Request a change | agents.run · Could not load | agents.run · Proposing a fix | agents.run · Content withheld |
-| The skill's draft, the run as a test | Admin | — | — | agents.skill · Loading | agents.skill · From a run | agents.skill · Test failed | agents.skill · Testing | — |
-| The skill's draft, the run as a test | Operator | — | — | agents.skill · Loading | agents.skill · Read only | agents.skill · Test failed | — | agents.skill · Read only |
+| A failed step on the run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step failed | agents.runs · Detail · Could not load | agents.runs · Detail · Proposing a fix | — |
+| A failed step on the run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Request a change | agents.runs · Detail · Could not load | agents.runs · Detail · Proposing a fix | agents.runs · Detail · Content withheld |
+| The skill's draft, the run as a test | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · From a run | agents.skills · Detail · Test failed | agents.skills · Detail · Testing | — |
+| The skill's draft, the run as a test | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Read only | agents.skills · Detail · Test failed | — | agents.skills · Detail · Read only |
 | The request in Needs you | Admin | — | — | inbox · Loading | inbox · Request a change | — | — | — |
 | The request in Needs you | Operator | — | — | inbox · Loading | inbox · Request sent | — | — | inbox · Request sent |

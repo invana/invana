@@ -4,7 +4,7 @@ title: See and revoke connected clients
 feature: AC-F11
 status: idea
 personas: [analyst, admin]
-boards: [settings.me, settings.people, access.sign_in_again, access.locked]
+boards: [settings.me, access.signin, settings.people]
 ---
 
 # AC-36 · See and revoke connected clients
@@ -61,7 +61,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Your connected clients | Admin | settings.me · No clients yet | — | settings.me · Loading | settings.me · Connected clients | settings.me · Could not load | — | — |
 | Your connected clients | Operator | settings.me · No clients yet | — | settings.me · Loading | settings.me · Connected clients | settings.me · Could not load | — | — |
-| Revoke | Admin | — | — | access.sign_in_again · Checking | settings.me · Revoked | access.sign_in_again · Wrong password | — | — |
-| Revoke | Operator | — | — | access.sign_in_again · Checking | settings.me · Revoked | access.sign_in_again · Wrong password | — | — |
+| Revoke | Admin | — | — | access.signin · Sign in again · Checking | settings.me · Revoked | access.signin · Sign in again · Wrong password | — | — |
+| Revoke | Operator | — | — | access.signin · Sign in again · Checking | settings.me · Revoked | access.signin · Sign in again · Wrong password | — | — |
 | Every connected client | Admin | settings.people · No clients yet | settings.people · Nothing matches | settings.people · Loading | settings.people · Connected clients | settings.people · Could not load | — | — |
-| Every connected client | Operator | — | — | — | — | — | — | access.locked · Connected clients |
+| Every connected client | Operator | — | — | — | — | — | — | settings.people · Locked · Connected clients |

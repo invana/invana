@@ -4,7 +4,7 @@ title: Mint a key that acts as its owner, narrowed
 feature: AC-F10
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.me, settings.people, access.sign_in_again, access.locked]
+boards: [settings.me, access.signin, settings.people]
 ---
 
 # AC-10 · Mint a key that acts as its owner, narrowed
@@ -91,7 +91,7 @@ sequenceDiagram
 |---|---|---|---|---|---|---|---|---|
 | Your keys | Admin | settings.me · No keys yet | — | settings.me · Loading | settings.me · Keys | settings.me · At the ceiling | — | — |
 | Your keys | Operator | settings.me · No keys yet | — | settings.me · Loading | settings.me · Keys | settings.me · At the ceiling | — | — |
-| New key — then its secret | Admin | — | — | access.sign_in_again | settings.me · Key created | settings.me · Name taken | — | — |
-| New key — then its secret | Operator | — | — | access.sign_in_again | settings.me · Key created | settings.me · Name taken | — | settings.me · Only you and your service users as owner |
+| New key — then its secret | Admin | settings.me · New key | — | access.signin · Sign in again | settings.me · New key · Secret once | settings.me · New key · Name taken | — | — |
+| New key — then its secret | Operator | settings.me · New key | — | access.signin · Sign in again | settings.me · New key · Secret once | settings.me · New key · Name taken | — | settings.me · New key · Only you and your service users as owner |
 | Every key | Admin | settings.people · No keys yet | settings.people · Nothing matches | settings.people · Loading | settings.people · Keys | settings.people · Could not load | — | — |
-| Every key | Operator | — | — | — | — | — | — | access.locked · Keys |
+| Every key | Operator | — | — | — | — | — | — | settings.people · Locked · Keys |

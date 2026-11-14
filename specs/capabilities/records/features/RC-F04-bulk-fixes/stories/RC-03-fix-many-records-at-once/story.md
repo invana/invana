@@ -4,7 +4,7 @@ title: Fix many records at once
 feature: RC-F04
 status: idea
 personas: [curator]
-boards: [data.fix]
+boards: [data.records]
 ---
 
 # RC-03 · Fix many records at once
@@ -48,5 +48,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A fix | Admin | data.fix · Nothing picked | data.fix · Nothing to change | data.fix · Building preview | data.fix | data.fix · Partly written | — | — |
-| A fix | Operator | data.fix · Nothing picked | data.fix · Nothing to change | data.fix · Building preview | data.fix · Preview only | — | — | data.fix · Run disabled |
+| A fix | Admin | data.records · Fix · Nothing picked | data.records · Fix · Nothing to change | data.records · Fix · Building preview | data.records · Fix | data.records · Fix · Partly written | — | — |
+| A fix | Operator | data.records · Fix · Nothing picked | data.records · Fix · Nothing to change | data.records · Fix · Building preview | data.records · Fix · Preview only | — | — | data.records · Fix · Run disabled |

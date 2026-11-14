@@ -4,7 +4,7 @@ title: Follow a decision back to the original authors
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.decide]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-11 · Follow a decision back to the original authors
@@ -60,7 +60,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Lineage | Admin | projects.decide · Lineage · Cites nothing | projects.decide · Lineage · Nothing from this source | projects.decide · Lineage · Loading | projects.decide · Lineage | projects.decide · Lineage · Could not load | — | projects.project · Withheld |
-| Lineage | Operator | projects.decide · Lineage · Cites nothing | projects.decide · Lineage · Nothing from this source | projects.decide · Lineage · Loading | projects.decide · Lineage | projects.decide · Lineage · Could not load | — | projects.decide · Lineage · Content withheld |
-| A load undone | Admin | — | — | — | projects.decide · Lineage · Load undone | — | — | — |
-| A load undone | Operator | — | — | — | projects.decide · Lineage · Load undone | — | — | — |
+| Lineage | Admin | projects.branches · Decide · Lineage · Cites nothing | projects.branches · Decide · Lineage · Nothing from this source | projects.branches · Decide · Lineage · Loading | projects.branches · Decide · Lineage | projects.branches · Decide · Lineage · Could not load | — | projects.projects · Detail · Withheld |
+| Lineage | Operator | projects.branches · Decide · Lineage · Cites nothing | projects.branches · Decide · Lineage · Nothing from this source | projects.branches · Decide · Lineage · Loading | projects.branches · Decide · Lineage | projects.branches · Decide · Lineage · Could not load | — | projects.branches · Decide · Lineage · Content withheld |
+| A load undone | Admin | — | — | — | projects.branches · Decide · Lineage · Load undone | — | — | — |
+| A load undone | Operator | — | — | — | projects.branches · Decide · Lineage · Load undone | — | — | — |

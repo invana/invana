@@ -4,7 +4,7 @@ title: Draft an agent and see what it will do
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents, agents.new, agents.agent]
+boards: [agents.agents]
 ---
 
 # AG-21 · Draft an agent and see what it will do
@@ -87,23 +87,23 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Agents | Admin | agents · Only the built-in agents | agents · No agents match | agents · Loading | agents | agents · Could not load | — | — |
-| Agents | Operator | agents · Only the built-in agents | agents · No agents match | agents · Loading | agents | agents · Could not load | — | agents · New agent disabled |
-| New agent | Admin | agents.new | — | agents.new · Saving | agents.new | agents.new · Name taken | — | — |
-| New agent | Operator | — | — | — | — | — | — | agents · New agent disabled |
-| The agent · Setup | Admin | agents.agent · No skills yet | — | agents.agent · Loading | agents.agent | agents.agent · Could not load | — | — |
-| The agent · Setup | Operator | agents.agent · No skills yet | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
-| A built-in agent and Copy | Admin | — | — | agents.agent · Loading | agents.agent · Built in | agents.agent · Name taken | — | — |
-| A built-in agent and Copy | Operator | — | — | agents.agent · Loading | agents.agent · Built in | agents.agent · Could not load | — | agents.agent · Built in |
-| Access | Admin | agents.agent · May touch nothing | — | agents.agent · Loading | agents.agent · Access | agents.agent · Could not load | — | — |
-| Access | Operator | agents.agent · May touch nothing | — | agents.agent · Loading | agents.agent · Access | agents.agent · Could not load | — | agents.agent · Access |
-| Limits and effort | Admin | agents.agent · No limits of its own | — | agents.agent · Loading | agents.agent · Limits | agents.agent · Could not load | — | — |
-| Limits and effort | Operator | agents.agent · No limits of its own | — | agents.agent · Loading | agents.agent · Limits | agents.agent · Could not load | — | agents.agent · Read only |
-| Skills and their needs | Admin | agents.agent · No skills yet | — | agents.agent · Loading | agents.agent · Skills | agents.agent · Need refused | — | — |
-| Skills and their needs | Operator | agents.agent · No skills yet | — | agents.agent · Loading | agents.agent · Skills | agents.agent · Could not load | — | agents.agent · Read only |
-| Runs with and the model set | Admin | agents.agent · Runs with Invana | — | agents.agent · Loading | agents.agent · Runs with | agents.agent · Could not load | — | — |
-| Runs with and the model set | Operator | agents.agent · Runs with Invana | — | agents.agent · Loading | agents.agent · Runs with | agents.agent · Could not load | — | agents.agent · Read only |
-| Where it runs | Admin | agents.agent · Nothing starts it | — | agents.agent · Loading | agents.agent · Where it runs | agents.agent · Runtime not installed | — | — |
-| Where it runs | Operator | agents.agent · Nothing starts it | — | agents.agent · Loading | agents.agent · Where it runs | agents.agent · Could not load | — | agents.agent · Read only |
-| Flow | Admin | agents.agent · Flow empty | — | agents.agent · Loading | agents.agent · Flow | agents.agent · Could not load | — | — |
-| Flow | Operator | agents.agent · Flow empty | — | agents.agent · Loading | agents.agent · Flow | agents.agent · Could not load | — | agents.agent · Flow |
+| Agents | Admin | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | — |
+| Agents | Operator | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | agents.agents · New agent disabled |
+| New agent | Admin | agents.agents · New | — | agents.agents · New · Saving | agents.agents · New | agents.agents · New · Name taken | — | — |
+| New agent | Operator | — | — | — | — | — | — | agents.agents · New agent disabled |
+| The agent · Setup | Admin | agents.agents · Detail · No skills yet | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Could not load | — | — |
+| The agent · Setup | Operator | agents.agents · Detail · No skills yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| A built-in agent and Copy | Admin | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Built in | agents.agents · Detail · Name taken | — | — |
+| A built-in agent and Copy | Operator | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Built in | agents.agents · Detail · Could not load | — | agents.agents · Detail · Built in |
+| Access | Admin | agents.agents · Detail · May touch nothing | — | agents.agents · Detail · Loading | agents.agents · Detail · Access | agents.agents · Detail · Could not load | — | — |
+| Access | Operator | agents.agents · Detail · May touch nothing | — | agents.agents · Detail · Loading | agents.agents · Detail · Access | agents.agents · Detail · Could not load | — | agents.agents · Detail · Access |
+| Limits and effort | Admin | agents.agents · Detail · No limits of its own | — | agents.agents · Detail · Loading | agents.agents · Detail · Limits | agents.agents · Detail · Could not load | — | — |
+| Limits and effort | Operator | agents.agents · Detail · No limits of its own | — | agents.agents · Detail · Loading | agents.agents · Detail · Limits | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| Skills and their needs | Admin | agents.agents · Detail · No skills yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Skills | agents.agents · Detail · Need refused | — | — |
+| Skills and their needs | Operator | agents.agents · Detail · No skills yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Skills | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| Runs with and the model set | Admin | agents.agents · Detail · Runs with Invana | — | agents.agents · Detail · Loading | agents.agents · Detail · Runs with | agents.agents · Detail · Could not load | — | — |
+| Runs with and the model set | Operator | agents.agents · Detail · Runs with Invana | — | agents.agents · Detail · Loading | agents.agents · Detail · Runs with | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| Where it runs | Admin | agents.agents · Detail · Nothing starts it | — | agents.agents · Detail · Loading | agents.agents · Detail · Where it runs | agents.agents · Detail · Runtime not installed | — | — |
+| Where it runs | Operator | agents.agents · Detail · Nothing starts it | — | agents.agents · Detail · Loading | agents.agents · Detail · Where it runs | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| Flow | Admin | agents.agents · Detail · Flow empty | — | agents.agents · Detail · Loading | agents.agents · Detail · Flow | agents.agents · Detail · Could not load | — | — |
+| Flow | Operator | agents.agents · Detail · Flow empty | — | agents.agents · Detail · Loading | agents.agents · Detail · Flow | agents.agents · Detail · Could not load | — | agents.agents · Detail · Flow |

@@ -4,7 +4,7 @@ title: Keep a board
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.share, explore.boards]
+boards: [explore.board]
 ---
 
 # EX-07 · Keep a board
@@ -65,9 +65,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Boards on the left | Admin | explore.ask | explore.boards · No board matches | explore.boards · Loading | explore.boards | explore.boards · Failed | — | — |
-| Boards on the left | Operator | explore.ask | explore.boards · No board matches | explore.boards · Loading | explore.boards | explore.boards · Failed | — | — |
+| Boards on the left | Admin | explore.board · Ask | explore.board · Boards · No board matches | explore.board · Boards · Loading | explore.board · Boards | explore.board · Boards · Failed | — | — |
+| Boards on the left | Operator | explore.board · Ask | explore.board · Boards · No board matches | explore.board · Boards · Loading | explore.board · Boards | explore.board · Boards · Failed | — | — |
 | History · Save a version · Rename | Admin | — | — | — | explore.board | explore.board · Failed | — | — |
 | History · Save a version · Rename | Operator | — | — | — | explore.board | explore.board · Failed | — | explore.board · Not an owner |
-| Schedule this | Admin | — | — | — | explore.share · Schedule | explore.share · Failed | — | — |
-| Schedule this | Operator | — | — | — | explore.share · Schedule | explore.share · Failed | — | explore.share · No access |
+| Schedule this | Admin | — | — | — | explore.board · Share · Schedule | explore.board · Share · Failed | — | — |
+| Schedule this | Operator | — | — | — | explore.board · Share · Schedule | explore.board · Share · Failed | — | explore.board · Share · No access |

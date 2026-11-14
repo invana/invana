@@ -4,7 +4,7 @@ title: Ask in plain words
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.board.cannot]
+boards: [explore.board]
 ---
 
 # EX-01 · Ask in plain words
@@ -74,11 +74,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The question box | Admin | explore.ask · Never asked | — | explore.ask · Loading | explore.ask | explore.ask · No AI model | — | — |
-| The question box | Operator | explore.ask · Never asked | — | explore.ask · Loading | explore.ask | explore.ask · No AI model | — | explore.ask · No agent to ask through |
-| The reply in the thread | Admin | — | — | explore.board · Working | explore.board | explore.board.cannot · Failed | explore.board · Working | — |
-| The reply in the thread | Operator | — | — | explore.board · Working | explore.board | explore.board.cannot · Failed | explore.board · Working | — |
-| A plan gap | Admin | — | — | — | explore.board.cannot · Plan gap | — | — | — |
-| A plan gap | Operator | — | — | — | explore.board.cannot · Plan gap | — | — | explore.board.cannot · Plan gap, function not allowed |
+| The question box | Admin | explore.board · Ask · Never asked | — | explore.board · Ask · Loading | explore.board · Ask | explore.board · Ask · No AI model | — | — |
+| The question box | Operator | explore.board · Ask · Never asked | — | explore.board · Ask · Loading | explore.board · Ask | explore.board · Ask · No AI model | — | explore.board · Ask · No agent to ask through |
+| The reply in the thread | Admin | — | — | explore.board · Working | explore.board | explore.board · Cannot · Failed | explore.board · Working | — |
+| The reply in the thread | Operator | — | — | explore.board · Working | explore.board | explore.board · Cannot · Failed | explore.board · Working | — |
+| A plan gap | Admin | — | — | — | explore.board · Cannot · Plan gap | — | — | — |
+| A plan gap | Operator | — | — | — | explore.board · Cannot · Plan gap | — | — | explore.board · Cannot · Plan gap, function not allowed |
 | Small talk | Admin | — | — | — | explore.board · Small talk | — | — | — |
 | Small talk | Operator | — | — | — | explore.board · Small talk | — | — | — |

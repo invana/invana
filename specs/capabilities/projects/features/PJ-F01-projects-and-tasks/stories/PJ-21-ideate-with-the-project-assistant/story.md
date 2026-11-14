@@ -4,7 +4,7 @@ title: Ideate with the project assistant
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.assistant, inbox]
+boards: [projects.projects, inbox]
 ---
 
 # PJ-21 · Ideate with the project assistant
@@ -83,11 +83,11 @@ sequenceDiagram
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The assistant's thread | Admin | projects.assistant · What is this project for? | — | projects.assistant · Loading | projects.assistant · Thread | projects.assistant · Could not load | projects.assistant · Thinking | projects.assistant · No assistant yet |
-| The assistant's thread | Operator | projects.assistant · What is this project for? | — | projects.assistant · Loading | projects.assistant · Thread | projects.assistant · Could not load | projects.assistant · Thinking | projects.assistant · Withheld |
-| Proposals | Admin | projects.assistant · No proposals | — | projects.assistant · Loading | projects.assistant · Proposals | projects.assistant · Proposal refused | projects.assistant · Proposals waiting | projects.assistant · Proposals · Not a member |
-| Proposals | Operator | projects.assistant · No proposals | — | projects.assistant · Loading | projects.assistant · Proposals | projects.assistant · Proposal refused | projects.assistant · Proposals waiting | projects.assistant · Proposals · Not a member |
-| A recommendation | Admin | — | — | — | projects.assistant · Recommendation | — | projects.assistant · Recommendation · Triaging | — |
-| A recommendation | Operator | — | — | — | projects.assistant · Recommendation | — | projects.assistant · Recommendation · Triaging | projects.assistant · Recommendation · Withheld |
+| The assistant's thread | Admin | projects.projects · Assistant · What is this project for? | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Thread | projects.projects · Assistant · Could not load | projects.projects · Assistant · Thinking | projects.projects · Assistant · No assistant yet |
+| The assistant's thread | Operator | projects.projects · Assistant · What is this project for? | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Thread | projects.projects · Assistant · Could not load | projects.projects · Assistant · Thinking | projects.projects · Assistant · Withheld |
+| Proposals | Admin | projects.projects · Assistant · No proposals | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Proposals | projects.projects · Assistant · Proposal refused | projects.projects · Assistant · Proposals waiting | projects.projects · Assistant · Proposals · Not a member |
+| Proposals | Operator | projects.projects · Assistant · No proposals | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Proposals | projects.projects · Assistant · Proposal refused | projects.projects · Assistant · Proposals waiting | projects.projects · Assistant · Proposals · Not a member |
+| A recommendation | Admin | — | — | — | projects.projects · Assistant · Recommendation | — | projects.projects · Assistant · Recommendation · Triaging | — |
+| A recommendation | Operator | — | — | — | projects.projects · Assistant · Recommendation | — | projects.projects · Assistant · Recommendation · Triaging | projects.projects · Assistant · Recommendation · Withheld |
 | A proposal in Needs you | Admin | — | — | inbox · Loading | inbox · A proposal | inbox · Could not load | — | — |
 | A proposal in Needs you | Operator | — | — | inbox · Loading | inbox · A proposal | inbox · Could not load | — | — |

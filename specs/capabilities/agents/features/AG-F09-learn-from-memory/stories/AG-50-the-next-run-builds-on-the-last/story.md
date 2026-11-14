@@ -4,7 +4,7 @@ title: The next run builds on the last
 feature: AG-F09
 status: idea
 personas: [analyst, builder]
-boards: [explore.board, agents.run.answer]
+boards: [explore.board, agents.runs]
 ---
 
 # AG-50 · The next run builds on the last
@@ -70,5 +70,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The recall step on the answer | Admin | explore.board · Nothing to recall | explore.board · Nothing to recall | explore.board · Recalling | explore.board · Recall | explore.board · Planned without recall | explore.board · Recall behind | — |
 | The recall step on the answer | Operator | explore.board · Nothing to recall | explore.board · Nothing to recall | explore.board · Recalling | explore.board · Recall | explore.board · Planned without recall | explore.board · Recall behind | — |
-| The recall step in the run's trace | Admin | agents.run.answer · Nothing to recall | — | agents.run.answer · Loading | agents.run.answer · Recall | agents.run.answer · Planned without recall | agents.run.answer · Recalling | — |
-| The recall step in the run's trace | Operator | agents.run.answer · Nothing to recall | — | agents.run.answer · Loading | agents.run.answer · Recall | agents.run.answer · Planned without recall | agents.run.answer · Recalling | agents.run.answer · Withheld |
+| The recall step in the run's trace | Admin | agents.runs · Detail · Answer · Nothing to recall | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Recall | agents.runs · Detail · Answer · Planned without recall | agents.runs · Detail · Answer · Recalling | — |
+| The recall step in the run's trace | Operator | agents.runs · Detail · Answer · Nothing to recall | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Recall | agents.runs · Detail · Answer · Planned without recall | agents.runs · Detail · Answer · Recalling | agents.runs · Detail · Answer · Withheld |

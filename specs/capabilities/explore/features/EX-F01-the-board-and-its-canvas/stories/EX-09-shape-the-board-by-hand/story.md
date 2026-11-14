@@ -4,7 +4,7 @@ title: Shape the board by hand
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board, explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-09 · Shape the board by hand
@@ -69,7 +69,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Right-click · Expand | Admin | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Failed | — | — |
-| Right-click · Expand | Operator | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Failed | — | — |
+| Right-click · Expand | Admin | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |
+| Right-click · Expand | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |
 | Legend · Styling · History | Admin | — | explore.board · Empty after a filter | — | explore.board | — | — | — |
 | Legend · Styling · History | Operator | — | explore.board · Empty after a filter | — | explore.board | — | — | — |

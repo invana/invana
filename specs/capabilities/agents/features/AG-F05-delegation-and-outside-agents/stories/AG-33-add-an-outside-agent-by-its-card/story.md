@@ -4,7 +4,7 @@ title: Add an outside agent by its card or its MCP server
 feature: AG-F05
 status: idea
 personas: [admin]
-boards: [agents.external]
+boards: [agents.agents]
 ---
 
 # AG-33 · Add an outside agent by its card or its MCP server
@@ -66,9 +66,13 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Outside agents | Admin | agents.external · No outside agents | agents.external · No outside agents match | agents.external · Loading | agents.external | agents.external · Could not load | — | — |
-| Outside agents | Operator | agents.external · No outside agents | agents.external · No outside agents match | agents.external · Loading | agents.external · Read only | agents.external · Could not load | — | agents.external · Read only |
-| Add an outside agent | Admin | agents.external · Add an outside agent | — | agents.external · Reading the card | agents.external · Card read | agents.external · Card unreadable | — | — |
-| Add an outside agent | Operator | — | — | — | — | — | — | agents.external · Read only |
-| A card Invana cannot speak | Admin | — | — | — | — | agents.external · Card version refused | — | — |
-| A card Invana cannot speak | Operator | — | — | — | — | — | — | agents.external · Read only |
+| Outside agents | Admin | agents.agents · Outside · No outside agents | agents.agents · Outside · No outside agents match | agents.agents · Outside · Loading | agents.agents · Outside | agents.agents · Outside · Could not load | — | — |
+| Outside agents | Operator | agents.agents · Outside · No outside agents | agents.agents · Outside · No outside agents match | agents.agents · Outside · Loading | agents.agents · Outside · Read only | agents.agents · Outside · Could not load | — | agents.agents · Outside · Read only |
+| Add an outside agent | Admin | agents.agents · Outside · Add | — | agents.agents · Outside · Add · Reading the card | agents.agents · Outside · Add · Card read | agents.agents · Outside · Add · Card unreadable | — | — |
+| Add an outside agent | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| Add an outside agent · 3 Name, credential, workers and limits | Admin | — | — | — | agents.agents · Outside · Add · Name and credential | agents.agents · Outside · Add · Wrong password | — | — |
+| Add an outside agent · 3 Name, credential, workers and limits | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| Add an outside agent · Added | Admin | — | — | — | agents.agents · Outside · Add · Added, off | — | — | — |
+| Add an outside agent · Added | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| A card Invana cannot speak | Admin | — | — | — | — | agents.agents · Outside · Add · Card version refused | — | — |
+| A card Invana cannot speak | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |

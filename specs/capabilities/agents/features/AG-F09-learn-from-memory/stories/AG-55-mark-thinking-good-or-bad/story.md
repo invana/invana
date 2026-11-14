@@ -4,7 +4,7 @@ title: Mark thinking good or bad
 feature: AG-F09
 status: idea
 personas: [analyst, builder]
-boards: [agents.run.thinking, agents.thinking]
+boards: [agents.runs, graph.memory]
 ---
 
 # AG-55 · Mark thinking good or bad
@@ -57,7 +57,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Mark on a run's Thinking tab | Admin | agents.run.thinking · Not marked | — | agents.run.thinking · Marking | agents.run.thinking · Marked | agents.run.thinking · Mark needs a note | — | — |
-| Mark on a run's Thinking tab | Operator | agents.run.thinking · Not marked | — | agents.run.thinking · Marking | agents.run.thinking · Marked | agents.run.thinking · Mark needs a note | — | agents.run.thinking · Mark disabled |
-| Marks on a node | Admin | agents.thinking · Not marked | — | agents.thinking · Node loading | agents.thinking · Node marks | agents.thinking · Mark needs a note | — | — |
-| Marks on a node | Operator | agents.thinking · Not marked | — | agents.thinking · Node loading | agents.thinking · Node marks | agents.thinking · Mark needs a note | — | agents.thinking · Mark disabled |
+| Mark on a run's Thinking tab | Admin | agents.runs · Detail · Thinking · Not marked | — | agents.runs · Detail · Thinking · Marking | agents.runs · Detail · Thinking · Marked | agents.runs · Detail · Thinking · Mark needs a note | — | — |
+| Mark on a run's Thinking tab | Operator | agents.runs · Detail · Thinking · Not marked | — | agents.runs · Detail · Thinking · Marking | agents.runs · Detail · Thinking · Marked | agents.runs · Detail · Thinking · Mark needs a note | — | agents.runs · Detail · Thinking · Mark disabled |
+| Marks on a node | Admin | graph.memory · Thinking · Not marked | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Node marks | graph.memory · Thinking · Mark needs a note | — | — |
+| Marks on a node | Operator | graph.memory · Thinking · Not marked | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Node marks | graph.memory · Thinking · Mark needs a note | — | graph.memory · Thinking · Mark disabled |

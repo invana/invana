@@ -4,7 +4,7 @@ title: Connect a graph database in one modal
 feature: CP-F05
 status: idea
 personas: [admin]
-boards: [settings.databases.connect, settings.databases.connect.shape, settings.databases.connect.ready]
+boards: [settings.databases]
 ---
 
 # CP-25 · Connect a graph database in one modal
@@ -60,9 +60,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Name and type | Admin | settings.databases.connect | — | — | settings.databases.connect · Type picked | settings.databases.connect · Name taken | — | — |
+| Name and type | Admin | settings.databases · Connect | — | — | settings.databases · Connect · Type picked | settings.databases · Connect · Name taken | — | — |
 | Name and type | Operator | — | — | — | — | — | — | settings.databases · Read only |
-| 4 · Shape | Admin | settings.databases.connect.shape · A starting point | — | settings.databases.connect.shape · Reading | settings.databases.connect.shape | settings.databases.connect.shape · Unreachable | settings.databases.connect.shape · Drafting | — |
+| 4 · Shape | Admin | settings.databases · Connect · Shape · A starting point | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape | settings.databases · Connect · Shape · Unreachable | settings.databases · Connect · Shape · Drafting | — |
 | 4 · Shape | Operator | — | — | — | — | — | — | — |
-| Ready | Admin | settings.databases.connect.ready | — | — | settings.databases.connect.ready | settings.databases.connect.ready · Could not connect | settings.databases.connect.ready · Drafting below | — |
+| Ready | Admin | settings.databases · Connect · Ready | — | — | settings.databases · Connect · Ready | settings.databases · Connect · Ready · Could not connect | settings.databases · Connect · Ready · Drafting below | — |
 | Ready | Operator | — | — | — | — | — | — | — |

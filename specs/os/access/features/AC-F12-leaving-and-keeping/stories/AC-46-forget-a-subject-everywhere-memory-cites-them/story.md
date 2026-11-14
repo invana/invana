@@ -4,7 +4,7 @@ title: Forget a subject everywhere memory cites them
 feature: AC-F12
 status: idea
 personas: [admin]
-boards: [access.forget, settings.keeping, access.locked]
+boards: [settings.keeping]
 ---
 
 # AC-46 · Forget a subject everywhere memory cites them
@@ -59,7 +59,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Forget a subject | Admin | access.forget · Nothing cites it | — | access.forget · Counting | access.forget · Preview | access.forget · Could not finish | — | access.forget · On hold |
-| Forget a subject | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Forget a subject | Admin | settings.keeping · Forget · Nothing cites it | — | settings.keeping · Forget · Counting | settings.keeping · Forget · Preview | settings.keeping · Forget · Could not finish | — | settings.keeping · Forget · On hold |
+| Forget a subject | Operator | — | — | — | — | — | — | settings.keeping · Forget · Locked · Keeping |
 | Subjects forgotten | Admin | settings.keeping · None forgotten | settings.keeping · Nothing matches | settings.keeping · Loading | settings.keeping · Forgotten | settings.keeping · Could not load | — | — |
-| Subjects forgotten | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Subjects forgotten | Operator | — | — | — | — | — | — | settings.keeping · Locked · Keeping |

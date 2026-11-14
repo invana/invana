@@ -4,7 +4,7 @@ title: Keep a kind or a sensitive property from agents
 feature: AC-F02
 status: idea
 personas: [modeller, admin, analyst]
-boards: [settings.access, access.locked]
+boards: [settings.policies, agents.runs, explore.board]
 ---
 
 # AC-27 · Keep a kind or a sensitive property from agents
@@ -64,9 +64,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Kept from agents | Admin | settings.access · Nothing kept | — | settings.access · Loading | settings.access · Kept from agents | settings.access · Could not load | — | — |
-| Kept from agents | Operator | access.locked · Nothing kept | — | access.locked · Loading | access.locked · Kept from agents | access.locked · Could not load | — | access.locked · Kept from agents |
-| A refused step | Admin | — | — | — | — | access.locked · Kept from agents | — | — |
-| A refused step | Operator | — | — | — | — | access.locked · Kept from agents | — | access.locked · Kept from agents |
-| An answer with withheld properties | Admin | — | — | — | access.locked · Withheld | — | — | — |
-| An answer with withheld properties | Operator | — | — | — | access.locked · Withheld | — | — | access.locked · Withheld |
+| Kept from agents | Admin | settings.policies · Nothing kept | — | settings.policies · Loading | settings.policies · Kept from agents | settings.policies · Could not load | — | — |
+| Kept from agents | Operator | settings.policies · Locked · Nothing kept | — | settings.policies · Locked · Loading | settings.policies · Locked · Kept from agents | settings.policies · Locked · Could not load | — | settings.policies · Locked · Kept from agents |
+| A refused step | Admin | — | — | — | — | agents.runs · Detail · Refused · Locked · Kept from agents | — | — |
+| A refused step | Operator | — | — | — | — | agents.runs · Detail · Refused · Locked · Kept from agents | — | agents.runs · Detail · Refused · Locked · Kept from agents |
+| An answer with withheld properties | Admin | — | — | — | explore.board · Locked · Withheld | — | — | — |
+| An answer with withheld properties | Operator | — | — | — | explore.board · Locked · Withheld | — | — | explore.board · Locked · Withheld |

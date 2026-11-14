@@ -4,7 +4,7 @@ title: Be asked back, not guessed for
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.board, explore.board.cannot]
+boards: [explore.board]
 ---
 
 # EX-23 · Be asked back, not guessed for
@@ -61,5 +61,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The question in the thread | Admin | — | explore.board.cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
-| The question in the thread | Operator | — | explore.board.cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
+| The question in the thread | Admin | — | explore.board · Cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
+| The question in the thread | Operator | — | explore.board · Cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |

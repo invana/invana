@@ -4,7 +4,7 @@ title: Change a model and publish it
 feature: SE-F02
 status: idea
 personas: [modeller]
-boards: [model.board, model.board.kind, model.board.draft, model.board.draft.publish, inbox]
+boards: [model.models, model.kinds, inbox]
 ---
 
 # SE-05 · Change a model and publish it
@@ -77,15 +77,15 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The map · Comparing | Admin | model.board | — | model.board · Comparing loading | model.board · Comparing | — | — | — |
-| The map · Comparing | Operator | model.board | — | model.board · Comparing loading | model.board · Comparing | — | — | model.board · Read only |
-| A kind | Admin | — | — | — | model.board.kind | — | — | — |
-| A kind | Operator | — | — | — | model.board.kind · Read only | — | — | model.board.kind · Read only |
-| The draft | Admin | model.board.draft · Nothing staged | — | model.board.draft · Saving | model.board.draft | model.board.draft · Change refused | model.board.draft · Agent staging | model.board.draft · Held by another |
-| The draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
-| Publish | Admin | — | — | model.board.draft.publish · Checking | model.board.draft.publish | model.board.draft.publish · Refused | model.board.draft.publish · Previewing | — |
+| The map · Comparing | Admin | model.models | — | model.models · Comparing loading | model.models · Comparing | — | — | — |
+| The map · Comparing | Operator | model.models | — | model.models · Comparing loading | model.models · Comparing | — | — | model.models · Read only |
+| A kind | Admin | — | — | — | model.kinds · Detail | — | — | — |
+| A kind | Operator | — | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Read only |
+| The draft | Admin | model.models · Draft · Nothing staged | — | model.models · Draft · Saving | model.models · Draft | model.models · Draft · Change refused | model.models · Draft · Agent staging | model.models · Draft · Held by another |
+| The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
+| Publish | Admin | — | — | model.models · Publish · Checking | model.models · Publish | model.models · Publish · Refused | model.models · Publish · Previewing | — |
 | Publish | Operator | — | — | — | — | — | — | — |
-| Publish · breaking | Admin | — | — | model.board.draft.publish · Breaking previewing | model.board.draft.publish · Breaking | model.board.draft.publish · Review failed | model.board.draft.publish · Waiting on approval | — |
+| Publish · breaking | Admin | — | — | model.models · Publish · Breaking previewing | model.models · Publish · Breaking | model.models · Publish · Review failed | model.models · Publish · Waiting on approval | — |
 | Publish · breaking | Operator | — | — | — | — | — | — | — |
 | The approval | Admin | — | — | inbox · Loading | inbox · Publish approval | inbox · Stale | — | — |
 | The approval | Operator | — | — | inbox · Loading | inbox · Publish approval | inbox · Stale | — | — |

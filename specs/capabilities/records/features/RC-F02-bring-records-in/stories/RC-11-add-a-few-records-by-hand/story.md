@@ -4,7 +4,7 @@ title: Add a few records by hand
 feature: RC-F02
 status: idea
 personas: [curator]
-boards: [data.collect]
+boards: [data.loads]
 ---
 
 # RC-11 · Add a few records by hand
@@ -51,5 +51,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Add records by hand | Admin | data.collect · No kind to add to | — | data.collect · Saving records | data.collect | data.collect · Records refused | — | — |
-| Add records by hand | Operator | data.collect · No kind to add to | — | data.collect · Saving records | data.collect | data.collect · Records refused | — | data.collect · Needs the model grant |
+| Add records by hand | Admin | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | — |
+| Add records by hand | Operator | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | data.loads · Add by hand · Needs the model grant |

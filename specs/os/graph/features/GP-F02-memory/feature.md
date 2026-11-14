@@ -6,7 +6,7 @@ status: idea
 personas: [builder, decision-maker, analyst, admin]
 stories: [GP-03, GP-06, GP-07, GP-08, GP-09]
 journeys: [J02, J04, J11]
-boards: [agents.thinking, graph.memory.lineage, graph.memory.project_map, graph.memory.org_knowledge]
+boards: [graph.memory]
 nfrs: [NFR-REL-6, NFR-SEC-5, NFR-SEC-11, NFR-PERF-4]
 depends_on: [CP-F10, AG-F06, AG-F09, PJ-F01, PJ-F03, AC-F02, AC-F06, AC-F09, SE-F03]
 ---
@@ -239,7 +239,7 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 
 | Decision | Detail |
 |---|---|
-| Memory opens in Explore | Lineage, a project as a map and org knowledge (`graph.memory.*`) open as board tabs in Explore, drawn on `@invana/canvas` like any board; an agent's or a run's thinking stays in Agents (`agents.thinking`) |
+| Memory opens in Explore | Lineage, a project as a map and org knowledge (`graph.memory.*`) open as board tabs in Explore, drawn on `@invana/canvas` like any board; an agent's or a run's thinking stays in Agents (`graph.memory · Thinking`) |
 | Memory is the store; learning is Agents' | Memory holds and serves the nodes; recall, outcome labels, marks, evidence and suggested changes are [AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)'s |
 | One store | No separate memory store and no memory kinds in a customer's model; a derived fact written to a customer's graph database is the records' own ([RC-F07](../../../../capabilities/records/features/RC-F07-annotations/feature.md) · [SE-F08](../../../../capabilities/semantics/features/SE-F08-inference/feature.md)), not memory |
 | Lineage is Memory's, shown by every surface | Recording a copy's sources and `lineage.may_see` live here; the answer, a finding, a report, a board, a hand-off note and an export each call it, and none keeps a rule of its own |

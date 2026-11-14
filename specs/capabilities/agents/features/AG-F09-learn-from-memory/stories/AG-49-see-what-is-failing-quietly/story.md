@@ -4,7 +4,7 @@ title: See what is failing quietly
 feature: AG-F09
 status: idea
 personas: [builder]
-boards: [agents.skills, agents.skill]
+boards: [agents.skills]
 ---
 
 # AG-49 · See what is failing quietly
@@ -68,5 +68,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Evidence | Admin | agents.skills · Evidence, no runs | agents.skills · Evidence, nothing wrong | agents.skills · Evidence loading | agents.skills · Evidence | agents.skills · Failed | agents.skills · Evidence, suggestion open | — |
 | Evidence | Operator | agents.skills · Evidence, no runs | agents.skills · Evidence, nothing wrong | agents.skills · Evidence loading | agents.skills · Evidence | agents.skills · Failed | agents.skills · Evidence, suggestion open | — |
-| Evidence on the item | Admin | agents.skill · Evidence, no runs | agents.skill · Evidence, too few | agents.skill · Loading | agents.skill · Evidence | agents.skill · Failed | — | — |
-| Evidence on the item | Operator | agents.skill · Evidence, no runs | agents.skill · Evidence, too few | agents.skill · Loading | agents.skill · Evidence | agents.skill · Failed | — | agents.skill · Read only |
+| Evidence on the item | Admin | agents.skills · Detail · Evidence, no runs | agents.skills · Detail · Evidence, too few | agents.skills · Detail · Loading | agents.skills · Detail · Evidence | agents.skills · Detail · Failed | — | — |
+| Evidence on the item | Operator | agents.skills · Detail · Evidence, no runs | agents.skills · Detail · Evidence, too few | agents.skills · Detail · Loading | agents.skills · Detail · Evidence | agents.skills · Detail · Failed | — | agents.skills · Detail · Read only |

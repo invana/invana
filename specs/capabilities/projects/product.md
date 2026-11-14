@@ -49,17 +49,17 @@ result was accepted, whether its checks ran, or pick the work up when the person
 
 | Surface | Tier | Board |
 |---|---|---|
-| Projects | mode | `projects.list` |
-| A project | mode | `projects.project` |
-| The project assistant | the assistant region | `projects.assistant` |
-| A new project | modal | `projects.new` |
-| Ask another project for help | modal | `projects.ask_help` |
-| A task | mode | `projects.task` · `projects.task.thinking` · `projects.task.from_board` |
-| Options and a decision | mode · modal | `projects.options` · `projects.decide` |
-| A finding | peek | `projects.finding` |
+| Projects | mode | `projects.projects` |
+| A project | mode | `projects.projects · Detail` |
+| The project assistant | the assistant region | `projects.projects · Assistant` |
+| A new project | modal | `projects.projects · New` |
+| Ask another project for help | modal | `projects.projects · Ask for help` |
+| A task | mode | `projects.tasks · Detail` · `projects.tasks · Detail · How it got here` |
+| Options and a decision | mode · modal | `projects.branches` · `projects.branches · Decide` |
+| A finding | peek | `projects.branches · Finding` |
 | A report | sheet | `projects.report` |
 | A project's alerts | mode | `projects.alerts` |
-| A project as a map | mode | `graph.memory.project_map` ([GP-08](../../os/graph/features/GP-F02-memory/stories/GP-08-see-a-project-as-a-map-and-what-is-moving-on-it/story.md)) |
+| A project as a map | mode | `graph.memory · Project map` ([GP-08](../../os/graph/features/GP-F02-memory/stories/GP-08-see-a-project-as-a-map-and-what-is-moving-on-it/story.md)) |
 
 ## Decisions
 

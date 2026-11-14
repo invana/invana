@@ -4,7 +4,7 @@ title: Name a practice graph database
 feature: CP-F05
 status: idea
 personas: [admin, builder]
-boards: [settings.databases.database, settings.databases]
+boards: [settings.databases]
 ---
 
 # CP-41 · Name a practice graph database
@@ -51,5 +51,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Practice | Admin | settings.databases.database · Make practice | — | settings.databases.database · Loading | settings.databases · Practice | settings.databases.database · Cannot be practice | — | — |
-| Practice | Operator | — | — | settings.databases.database · Loading | settings.databases · Practice · Read only | — | — | settings.databases.database · Read only |
+| Practice | Admin | settings.databases · Detail · Make practice | — | settings.databases · Detail · Loading | settings.databases · Practice | settings.databases · Detail · Cannot be practice | — | — |
+| Practice | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Practice · Read only | — | — | settings.databases · Detail · Read only |

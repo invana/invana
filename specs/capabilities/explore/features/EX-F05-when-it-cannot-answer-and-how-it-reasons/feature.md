@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, decision-maker, builder]
 stories: [EX-05, EX-06, EX-24, EX-26, EX-27, EX-33]
 journeys: [J02]
-boards: [explore.board, explore.board.cannot, explore.ask, explore.board.menu, explore.board.save_derived, agents.skills, agents.run.answer]
+boards: [explore.board, agents.runs, agents.skills]
 nfrs: [NFR-SEC-5, NFR-SEC-8]
 depends_on: [EX-F01, EX-F03, EX-F04, EX-F06, AC-F02, AC-F05, AC-F09, AG-F06, AG-F09, CP-F01, CP-F02, CP-F05, CP-F10, RC-F02, SE-F03, SE-F07]
 ---

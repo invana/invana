@@ -4,7 +4,7 @@ title: Copy a built-in to change it
 feature: AC-F07
 status: idea
 personas: [builder, admin]
-boards: [access.owners, access.locked]
+boards: [settings.me]
 ---
 
 # AC-25 · Copy a built-in to change it
@@ -55,7 +55,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A built-in's owner and Copy | Admin | — | — | access.owners · Loading | access.owners · Built in | access.owners · Could not copy | — | — |
-| A built-in's owner and Copy | Operator | — | — | access.owners · Loading | access.owners · Built in | — | — | access.locked · Copy needs a role |
-| The copy | Admin | — | — | — | access.owners · Copied | access.owners · Name taken | — | — |
-| The copy | Operator | — | — | — | — | — | — | access.locked · Copy needs a role |
+| A built-in's owner and Copy | Admin | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | settings.me · Owners · Could not copy | — | — |
+| A built-in's owner and Copy | Operator | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | — | — | settings.me · Owners · Locked · Copy needs a role |
+| The copy | Admin | — | — | — | settings.me · Owners · Copied | settings.me · Owners · Name taken | — | — |
+| The copy | Operator | — | — | — | — | — | — | settings.me · Owners · Locked · Copy needs a role |

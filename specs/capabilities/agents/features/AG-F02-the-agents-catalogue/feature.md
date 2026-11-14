@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, builder, admin]
 stories: [AG-35]
 journeys: [J05, J06]
-boards: [agents, agents.agent, settings.people]
+boards: [agents.agents, settings.people]
 nfrs: []
 depends_on: [AG-F01, AC-F02, AC-F03, AC-F07, CP-F02]
 ---

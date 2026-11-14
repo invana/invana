@@ -4,7 +4,7 @@ title: The answer in words
 feature: EX-F04
 status: idea
 personas: [analyst, decision-maker]
-boards: [explore.board, explore.board.why]
+boards: [explore.board]
 ---
 
 # EX-25 · The answer in words
@@ -65,5 +65,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The words | Admin | — | explore.board · Nothing held | explore.board · Writing the answer | explore.board | explore.board · Records only | explore.board · Writing the answer | — |
 | The words | Operator | — | explore.board · Nothing held | explore.board · Writing the answer | explore.board | explore.board · Records only | explore.board · Writing the answer | — |
-| A citation | Admin | — | — | — | explore.board.why | — | — | — |
-| A citation | Operator | — | — | — | explore.board.why | — | — | — |
+| A citation | Admin | — | — | — | explore.board · Why | — | — | — |
+| A citation | Operator | — | — | — | explore.board · Why | — | — | — |

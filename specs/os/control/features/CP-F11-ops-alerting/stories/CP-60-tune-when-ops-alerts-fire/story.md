@@ -4,7 +4,7 @@ title: Tune when ops alerts fire
 feature: CP-F11
 status: idea
 personas: [admin]
-boards: [control.alerts.settings]
+boards: [control.alerts]
 ---
 
 # CP-60 · Tune when ops alerts fire
@@ -62,9 +62,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Thresholds | Admin | control.alerts.settings · Defaults | — | control.alerts.settings · Loading | control.alerts.settings | control.alerts.settings · Out of range | — | — |
-| Thresholds | Operator | control.alerts.settings · Defaults | — | control.alerts.settings · Loading | control.alerts.settings | control.alerts.settings · Could not load | — | control.alerts.settings · Edit disabled |
-| History alerts | Admin | control.alerts.settings · No History alerts | — | control.alerts.settings · Loading | control.alerts.settings · History alerts | control.alerts.settings · Could not load | — | — |
-| History alerts | Operator | control.alerts.settings · No History alerts | — | control.alerts.settings · Loading | control.alerts.settings · History alerts · Read only | control.alerts.settings · Could not load | — | control.alerts.settings · History alerts · Read only |
-| A History alert — new or edit | Admin | control.alerts.settings · New History alert | — | — | control.alerts.settings · History alert | control.alerts.settings · History alert refused | — | — |
-| A History alert — new or edit | Operator | — | — | — | — | — | — | control.alerts.settings · History alerts · Read only |
+| Thresholds | Admin | control.alerts · Settings · Defaults | — | control.alerts · Settings · Loading | control.alerts · Settings | control.alerts · Settings · Out of range | — | — |
+| Thresholds | Operator | control.alerts · Settings · Defaults | — | control.alerts · Settings · Loading | control.alerts · Settings | control.alerts · Settings · Could not load | — | control.alerts · Settings · Edit disabled |
+| History alerts | Admin | control.alerts · Settings · No History alerts | — | control.alerts · Settings · Loading | control.alerts · Settings · History alerts | control.alerts · Settings · Could not load | — | — |
+| History alerts | Operator | control.alerts · Settings · No History alerts | — | control.alerts · Settings · Loading | control.alerts · Settings · History alerts · Read only | control.alerts · Settings · Could not load | — | control.alerts · Settings · History alerts · Read only |
+| New History alert | Admin | control.alerts · Settings · New | — | — | control.alerts · Settings · New · Filled | control.alerts · Settings · New · Refused | — | — |
+| New History alert | Operator | — | — | — | — | — | — | control.alerts · Settings · History alerts · Read only |
+| A History alert — edit | Admin | — | — | — | control.alerts · Settings · History alert | control.alerts · Settings · History alert refused | — | — |
+| A History alert — edit | Operator | — | — | — | — | — | — | control.alerts · Settings · History alerts · Read only |

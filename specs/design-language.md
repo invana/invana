@@ -271,8 +271,17 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 
 ## 7. Naming boards
 
-`area.feature.surface.variant`, lower snake, dots for depth — `agents.runs`, `projects.task.thinking`. The areas are
+`area.feature`, lower snake — `agents.runs`, `model.kinds`. The areas are
 `start · explore · model · data · agents · inbox · settings · projects · shell`. One canvas page per area, one row per name prefix.
+
+| Rule | Detail |
+|---|---|
+| One board per place | A board is one place a feature lives: a canvas page, a mode's view, a sheet's section, a header dropdown or a page outside the shell. It is named for that place's feature — `model.kinds`, `agents.runs`, `settings.people` |
+| The board shows the whole feature | It opens on the list; a **View** switch moves List · Detail; a modal it opens — a create, an edit, a confirm, Sign in again — is a state of the board, drawn over it; a peek, a menu, a panel, the console and a collapsed region are states too. **State** and **Lens** switches carry the rest |
+| A cell names board and state | A story's `## Screens` cell reads `<board> · <view or overlay> · <state>` — `model.kinds · Detail · Edit`, `agents.runs · Detail · Content withheld`. A cell with no view is the List |
+| The Operator lens is the board's | What an Operator reads without the role is the same board under the Operator lens, its gated act read as *Ask {Admin}* — `<board> · Locked` names that state; there is no separate locked board |
+| A modal many boards share is drawn once | *Sign in again* is `access.signin · Sign in again`; every story that asks for the password again cites it there |
+| A new board only for a new place | Two features in one place share its board; a feature in two places has a board in each |
 
 ## 8. Where every capability and operating-system part went
 

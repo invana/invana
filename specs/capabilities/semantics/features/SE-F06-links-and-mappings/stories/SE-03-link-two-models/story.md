@@ -4,7 +4,7 @@ title: Link two models
 feature: SE-F06
 status: idea
 personas: [modeller]
-boards: [model.board]
+boards: [model.models]
 ---
 
 # SE-03 · Link two models
@@ -71,9 +71,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Link two models | Admin | model.board · Link card | — | model.board · Link counting | model.board · Link joins | model.board · Link refused | — | — |
-| Link two models | Operator | — | — | — | — | — | — | model.board · Link refused |
-| Links between models | Admin | model.board · No links | model.board · No link matches | model.board · Links loading | model.board · Links | model.board · Commit refused | model.board · Committing | — |
-| Links between models | Operator | model.board · No links | model.board · No link matches | model.board · Links loading | model.board · Links | — | model.board · Committing | model.board · Read only |
-| A link | Admin | — | — | model.board · Link loading | model.board · Link | model.board · Remove refused | model.board · Withdrawing | — |
-| A link | Operator | — | — | model.board · Link loading | model.board · Link | — | — | model.board · Read only |
+| Link two models | Admin | model.models · Link card | — | model.models · Link counting | model.models · Link joins | model.models · Link refused | — | — |
+| Link two models | Operator | — | — | — | — | — | — | model.models · Link refused |
+| Links between models | Admin | model.models · No links | model.models · No link matches | model.models · Links loading | model.models · Links | model.models · Commit refused | model.models · Committing | — |
+| Links between models | Operator | model.models · No links | model.models · No link matches | model.models · Links loading | model.models · Links | — | model.models · Committing | model.models · Read only |
+| A link | Admin | — | — | model.models · Link loading | model.models · Link | model.models · Remove refused | model.models · Withdrawing | — |
+| A link | Operator | — | — | model.models · Link loading | model.models · Link | — | — | model.models · Read only |

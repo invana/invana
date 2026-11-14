@@ -4,7 +4,7 @@ title: Share an answer
 feature: EX-F02
 status: idea
 personas: [analyst]
-boards: [explore.share]
+boards: [explore.board]
 ---
 
 # EX-15 · Share an answer
@@ -74,11 +74,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Share | Admin | explore.share · Nothing drawn | explore.share · No one matches | explore.share · Keeping | explore.share | explore.share · Failed | — | — |
-| Share | Operator | explore.share · Nothing drawn | explore.share · No one matches | explore.share · Keeping | explore.share | explore.share · Failed | — | explore.share · Not an owner |
-| A shared link opened | Admin | — | — | explore.share · Opening | explore.share · Shared board | — | — | — |
-| A shared link opened | Operator | — | — | explore.share · Opening | explore.share · Shared board | — | — | explore.share · Not found |
-| A shared link opened, sources withheld | Admin | — | — | — | explore.share · Shared board · Redacted | — | — | — |
-| A shared link opened, sources withheld | Operator | — | — | — | explore.share · Shared board · Redacted | — | — | explore.share · Shared board · Redacted |
-| An export · values left out | Admin | — | — | — | explore.share · Export · Redacted | — | — | — |
-| An export · values left out | Operator | — | — | — | explore.share · Export · Redacted | — | — | — |
+| Share | Admin | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | — |
+| Share | Operator | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | explore.board · Share · Not an owner |
+| A shared link opened | Admin | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | — |
+| A shared link opened | Operator | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | explore.board · Share · Not found |
+| A shared link opened, sources withheld | Admin | — | — | — | explore.board · Share · Shared board · Redacted | — | — | — |
+| A shared link opened, sources withheld | Operator | — | — | — | explore.board · Share · Shared board · Redacted | — | — | explore.board · Share · Shared board · Redacted |
+| An export · values left out | Admin | — | — | — | explore.board · Share · Export · Redacted | — | — | — |
+| An export · values left out | Operator | — | — | — | explore.board · Share · Export · Redacted | — | — | — |

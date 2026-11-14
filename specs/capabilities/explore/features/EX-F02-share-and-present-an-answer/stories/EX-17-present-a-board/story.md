@@ -4,7 +4,7 @@ title: Present a board
 feature: EX-F02
 status: idea
 personas: [analyst]
-boards: [explore.board.present]
+boards: [explore.board]
 ---
 
 # EX-17 · Present a board
@@ -57,5 +57,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Presenting | Admin | explore.board.present · Too few steps | — | explore.board.present · Step settling | explore.board.present | explore.board.present · Step failed | — | — |
-| Presenting | Operator | explore.board.present · Too few steps | — | explore.board.present · Step settling | explore.board.present | explore.board.present · Step failed | — | — |
+| Presenting | Admin | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |
+| Presenting | Operator | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |

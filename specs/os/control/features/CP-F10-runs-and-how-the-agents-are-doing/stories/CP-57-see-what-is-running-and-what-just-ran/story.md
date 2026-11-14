@@ -4,7 +4,7 @@ title: See what is running and what just ran
 feature: CP-F10
 status: idea
 personas: [analyst, builder, admin]
-boards: [inbox, agents.run]
+boards: [inbox, agents.runs]
 ---
 
 # CP-57 · See what is running and what just ran
@@ -71,5 +71,5 @@ flowchart LR
 | Inbox › Running | Operator | inbox · Running · Nothing is running | inbox · Running · Nothing of yours | inbox · Loading | inbox · Running · Not yours to stop | inbox · Could not load | inbox · Running | inbox · Running · Content withheld |
 | Inbox › Done | Admin | inbox · Done · Nothing ended today | — | inbox · Loading | inbox · Done | inbox · Could not load | — | — |
 | Inbox › Done | Operator | inbox · Done · Nothing ended today | — | inbox · Loading | inbox · Done | inbox · Could not load | — | inbox · Done · Content withheld |
-| A run's sheet | Admin | — | — | agents.run · Loading | agents.run | agents.run · Failed | agents.run · Running | — |
-| A run's sheet | Operator | — | — | agents.run · Loading | agents.run · Not yours to stop | agents.run · Failed | agents.run · Running | agents.run · Content withheld |
+| A run's sheet | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
+| A run's sheet | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Not yours to stop | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |

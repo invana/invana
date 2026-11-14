@@ -4,7 +4,7 @@ title: See how the answer got here
 feature: EX-F04
 status: idea
 personas: [analyst, decision-maker]
-boards: [explore.board.why, agents.run.answer, projects.task.thinking]
+boards: [explore.board, agents.runs, projects.tasks]
 ---
 
 # EX-04 · See how the answer got here
@@ -65,9 +65,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Why? | Admin | — | — | explore.board.why · Loading | explore.board.why | explore.board.why · Purged | — | — |
-| Why? | Operator | — | — | explore.board.why · Loading | explore.board.why | explore.board.why · Purged | — | — |
-| The run's trace | Admin | — | — | agents.run.answer · Loading | agents.run.answer | agents.run.answer · Step failed | agents.run.answer · Running | — |
-| The run's trace | Operator | — | — | agents.run.answer · Loading | agents.run.answer | agents.run.answer · Step failed | agents.run.answer · Running | agents.run.answer · Content withheld |
-| The trace on a task | Admin | — | — | projects.task.thinking · Loading | projects.task.thinking | projects.task.thinking · Step failed | projects.task.thinking · Working | — |
-| The trace on a task | Operator | — | — | projects.task.thinking · Loading | projects.task.thinking | projects.task.thinking · Step failed | projects.task.thinking · Working | — |
+| Why? | Admin | — | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
+| Why? | Operator | — | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
+| The run's trace | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | — |
+| The run's trace | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |
+| The trace on a task | Admin | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Step failed | projects.tasks · Detail · How it got here · Working | — |
+| The trace on a task | Operator | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Step failed | projects.tasks · Detail · How it got here · Working | — |

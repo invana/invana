@@ -4,7 +4,7 @@ title: Fork a line of inquiry and see the tree
 feature: PJ-F03
 status: idea
 personas: [decision-maker]
-boards: [projects.options]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-04 · Fork a line of inquiry and see the tree
@@ -65,7 +65,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The tree | Admin | projects.options · Just the question | — | projects.options · Loading | projects.options | projects.options · Could not load | projects.options · Fork proposed | projects.project · Not found |
-| The tree | Operator | projects.options · Just the question | — | projects.options · Loading | projects.options | projects.options · Could not load | projects.options · Fork proposed | projects.project · Not found |
-| Fork | Admin | — | — | — | projects.options · Fork | projects.options · Fork refused | — | — |
-| Fork | Operator | — | — | — | projects.options · Fork | projects.options · Fork refused | — | projects.options · Archived |
+| The tree | Admin | projects.branches · Just the question | — | projects.branches · Loading | projects.branches | projects.branches · Could not load | projects.branches · Fork proposed | projects.projects · Detail · Not found |
+| The tree | Operator | projects.branches · Just the question | — | projects.branches · Loading | projects.branches | projects.branches · Could not load | projects.branches · Fork proposed | projects.projects · Detail · Not found |
+| Fork | Admin | — | — | — | projects.branches · Fork | projects.branches · Fork refused | — | — |
+| Fork | Operator | — | — | — | projects.branches · Fork | projects.branches · Fork refused | — | projects.branches · Archived |

@@ -4,7 +4,7 @@ title: Read what each role may do
 feature: AC-F02
 status: idea
 personas: [admin, analyst, modeller]
-boards: [settings.roles, access.locked]
+boards: [settings.roles]
 ---
 
 # AC-19 · Read what each role may do

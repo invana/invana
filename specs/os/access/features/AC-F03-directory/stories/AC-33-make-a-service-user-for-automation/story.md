@@ -4,7 +4,7 @@ title: Make a service user for automation
 feature: AC-F03
 status: idea
 personas: [admin, builder]
-boards: [settings.people, access.sign_in_again, access.locked]
+boards: [settings.people, access.signin]
 ---
 
 # AC-33 · Make a service user for automation
@@ -61,8 +61,8 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Service users | Admin | settings.people · No service users yet | settings.people · Nothing matches | settings.people · Loading | settings.people · Service users | settings.people · Could not load | — | — |
-| Service users | Operator | access.locked · No service users yet | access.locked · Nothing matches | access.locked · Loading | access.locked · Service users | access.locked · Could not load | — | access.locked · Service users |
-| New service user | Admin | — | — | access.sign_in_again | settings.people · New service user | settings.people · Needs an owner | — | — |
-| New service user | Operator | — | — | — | — | — | — | access.locked · New service user |
+| Service users | Operator | settings.people · Locked · No service users yet | settings.people · Locked · Nothing matches | settings.people · Locked · Loading | settings.people · Locked · Service users | settings.people · Locked · Could not load | — | settings.people · Locked · Service users |
+| New service user | Admin | settings.people · New service user | — | access.signin · Sign in again | settings.people · New service user · Filled | settings.people · New service user · Needs an owner | — | — |
+| New service user | Operator | — | — | — | — | — | — | settings.people · New service user · Locked · New service user |
 | A service user | Admin | — | — | settings.people · Loading | settings.people · A service user | settings.people · Could not load | — | — |
-| A service user | Operator | — | — | access.locked · Loading | access.locked · A service user | access.locked · Could not load | — | access.locked · A service user |
+| A service user | Operator | — | — | settings.people · Locked · Loading | settings.people · Locked · A service user | settings.people · Locked · Could not load | — | settings.people · Locked · A service user |

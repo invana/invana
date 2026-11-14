@@ -4,7 +4,7 @@ title: Audit every decision in one place
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.decide]
+boards: [projects.branches]
 ---
 
 # PJ-13 · Audit every decision in one place
@@ -56,5 +56,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Every decision | Admin | projects.decide · Every decision · None yet | — | projects.decide · Every decision · Loading | projects.decide · Every decision | projects.decide · Every decision · Could not load | — | — |
-| Every decision | Operator | projects.decide · Every decision · None yet | — | projects.decide · Every decision · Loading | projects.decide · Every decision | projects.decide · Every decision · Could not load | — | — |
+| Every decision | Admin | projects.branches · Decide · Every decision · None yet | — | projects.branches · Decide · Every decision · Loading | projects.branches · Decide · Every decision | projects.branches · Decide · Every decision · Could not load | — | — |
+| Every decision | Operator | projects.branches · Decide · Every decision · None yet | — | projects.branches · Decide · Every decision · Loading | projects.branches · Decide · Every decision | projects.branches · Decide · Every decision · Could not load | — | — |

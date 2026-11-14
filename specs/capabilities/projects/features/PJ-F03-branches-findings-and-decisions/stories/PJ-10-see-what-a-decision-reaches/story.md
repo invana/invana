@@ -4,7 +4,7 @@ title: See what a decision reaches
 feature: PJ-F03
 status: idea
 personas: [decision-maker]
-boards: [projects.decide]
+boards: [projects.branches]
 ---
 
 # PJ-10 · See what a decision reaches
@@ -61,5 +61,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A project › Impact | Admin | projects.decide · Impact · No record cites | — | projects.decide · Impact · Loading | projects.decide · Impact | projects.decide · Impact · Database unread | projects.decide · Impact · Tracing | — |
-| A project › Impact | Operator | projects.decide · Impact · No record cites | — | projects.decide · Impact · Loading | projects.decide · Impact | projects.decide · Impact · Database unread | projects.decide · Impact · Tracing | projects.decide · Impact · Assistant not usable |
+| A project › Impact | Admin | projects.branches · Decide · Impact · No record cites | — | projects.branches · Decide · Impact · Loading | projects.branches · Decide · Impact | projects.branches · Decide · Impact · Database unread | projects.branches · Decide · Impact · Tracing | — |
+| A project › Impact | Operator | projects.branches · Decide · Impact · No record cites | — | projects.branches · Decide · Impact · Loading | projects.branches · Decide · Impact | projects.branches · Decide · Impact · Database unread | projects.branches · Decide · Impact · Tracing | projects.branches · Decide · Impact · Assistant not usable |

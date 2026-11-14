@@ -4,7 +4,7 @@ title: See which agents a skill is added to and whether they use it
 feature: AG-F04
 status: idea
 personas: [builder]
-boards: [agents.skills, agents.skill, agents.agent, agents.run]
+boards: [agents.skills, agents.agents, agents.runs]
 ---
 
 # AG-30 · See which agents a skill is added to and whether they use it
@@ -77,15 +77,15 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Agents — added · refused · not added | Admin | agents.skill · Added to no agent | — | agents.skill · Loading | agents.skill · Agents | agents.skill · Add refused | — | — |
-| Agents — added · refused · not added | Operator | agents.skill · Added to no agent | — | agents.skill · Loading | agents.skill · Agents | agents.skill · Add refused | — | agents.skill · Agents |
-| The agent's skills | Admin | agents.agent · No skills yet | — | agents.agent · Loading | agents.agent · Skills offered | agents.agent · Skill refused | — | — |
-| The agent's skills | Operator | agents.agent · No skills yet | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Skill refused | — | agents.agent · Read only |
-| Usage | Admin | agents.skill · No data yet | — | agents.skill · Loading | agents.skill · Usage | agents.skill · Could not load | — | — |
-| Usage | Operator | agents.skill · No data yet | — | agents.skill · Loading | agents.skill · Usage | agents.skill · Could not load | — | agents.skill · Usage |
-| A count too few to read | Admin | — | — | — | agents.skill · Too few to read | — | — | — |
-| A count too few to read | Operator | — | — | — | agents.skill · Too few to read | — | — | agents.skill · Too few to read |
+| Agents — added · refused · not added | Admin | agents.skills · Detail · Added to no agent | — | agents.skills · Detail · Loading | agents.skills · Detail · Agents | agents.skills · Detail · Add refused | — | — |
+| Agents — added · refused · not added | Operator | agents.skills · Detail · Added to no agent | — | agents.skills · Detail · Loading | agents.skills · Detail · Agents | agents.skills · Detail · Add refused | — | agents.skills · Detail · Agents |
+| The agent's skills | Admin | agents.agents · Detail · No skills yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Skills offered | agents.agents · Detail · Skill refused | — | — |
+| The agent's skills | Operator | agents.agents · Detail · No skills yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Skill refused | — | agents.agents · Detail · Read only |
+| Usage | Admin | agents.skills · Detail · No data yet | — | agents.skills · Detail · Loading | agents.skills · Detail · Usage | agents.skills · Detail · Could not load | — | — |
+| Usage | Operator | agents.skills · Detail · No data yet | — | agents.skills · Detail · Loading | agents.skills · Detail · Usage | agents.skills · Detail · Could not load | — | agents.skills · Detail · Usage |
+| A count too few to read | Admin | — | — | — | agents.skills · Detail · Too few to read | — | — | — |
+| A count too few to read | Operator | — | — | — | agents.skills · Detail · Too few to read | — | — | agents.skills · Detail · Too few to read |
 | Skills — a skill added to no agent | Admin | — | — | agents.skills · Loading | agents.skills · Added to no agent | agents.skills · Could not load | — | — |
 | Skills — a skill added to no agent | Operator | — | — | agents.skills · Loading | agents.skills · Added to no agent | agents.skills · Could not load | — | agents.skills · Read only |
-| The step a count opens | Admin | — | — | agents.run · Loading | agents.run | agents.run · Failed | — | — |
-| The step a count opens | Operator | — | — | agents.run · Loading | agents.run | agents.run · Failed | — | agents.run · Not found |
+| The step a count opens | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | — | — |
+| The step a count opens | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | — | agents.runs · Detail · Not found |

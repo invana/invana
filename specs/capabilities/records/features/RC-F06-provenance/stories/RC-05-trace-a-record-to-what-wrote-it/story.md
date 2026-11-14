@@ -4,7 +4,7 @@ title: Trace a record to what wrote it
 feature: RC-F06
 status: idea
 personas: [analyst, curator]
-boards: [data.record]
+boards: [data.records]
 ---
 
 # RC-05 · Trace a record to what wrote it
@@ -53,7 +53,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A record · Provenance | Admin | — | — | data.record · Loading | data.record · Provenance | data.record · Could not load | — | — |
-| A record · Provenance | Operator | — | — | data.record · Loading | data.record · Provenance | data.record · Could not load | — | data.record · Run not readable |
-| A record · Provenance, a value withheld | Admin | — | — | — | data.record · Provenance · Redacted | — | — | — |
-| A record · Provenance, a value withheld | Operator | — | — | — | data.record · Provenance · Redacted | — | — | data.record · Provenance · Redacted |
+| A record · Provenance | Admin | — | — | data.records · Detail · Loading | data.records · Detail · Provenance | data.records · Detail · Could not load | — | — |
+| A record · Provenance | Operator | — | — | data.records · Detail · Loading | data.records · Detail · Provenance | data.records · Detail · Could not load | — | data.records · Detail · Run not readable |
+| A record · Provenance, a value withheld | Admin | — | — | — | data.records · Detail · Provenance · Redacted | — | — | — |
+| A record · Provenance, a value withheld | Operator | — | — | — | data.records · Detail · Provenance · Redacted | — | — | data.records · Detail · Provenance · Redacted |

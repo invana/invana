@@ -4,7 +4,7 @@ title: Find a run and see where it stands
 feature: CP-F10
 status: idea
 personas: [analyst, builder, admin]
-boards: [agents.runs, agents.run, inbox]
+boards: [agents.runs, inbox]
 ---
 
 # CP-50 · Find a run and see where it stands
@@ -89,11 +89,11 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Runs — the list | Admin | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs | agents.runs · Could not load | agents.runs · Running | — |
 | Runs — the list | Operator | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |
-| A run — head and numbers | Admin | — | — | agents.run · Loading | agents.run | agents.run · Failed | agents.run · Running | — |
-| A run — head and numbers | Operator | — | — | agents.run · Loading | agents.run · Not yours to stop | agents.run · Failed | agents.run · Running | agents.run · Content withheld |
-| A run — who did what, steps, a step | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Step failed | agents.run · Running | — |
-| A run — who did what, steps, a step | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Step failed | agents.run · Running | agents.run · Content withheld |
-| A run — produced, data touched, history | Admin | — | — | agents.run · Loading | agents.run · Touched | agents.run · Could not load | — | — |
-| A run — produced, data touched, history | Operator | — | — | agents.run · Loading | agents.run · Touched | agents.run · Could not load | — | agents.run · Content withheld |
+| A run — head and numbers | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
+| A run — head and numbers | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Not yours to stop | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A run — who did what, steps, a step | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Step failed | agents.runs · Detail · Running | — |
+| A run — who did what, steps, a step | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Step failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A run — produced, data touched, history | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Touched | agents.runs · Detail · Could not load | — | — |
+| A run — produced, data touched, history | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Touched | agents.runs · Detail · Could not load | — | agents.runs · Detail · Content withheld |
 | Waiting on you — the ask in Inbox | Admin | — | — | inbox · Loading | inbox | — | — | — |
 | Waiting on you — the ask in Inbox | Operator | — | — | inbox · Loading | inbox | — | — | inbox · Not yours to answer |

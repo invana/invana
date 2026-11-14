@@ -4,7 +4,7 @@ title: Save or discard the board's changes
 feature: EX-F06
 status: idea
 personas: [analyst, builder]
-boards: [explore.board.edit]
+boards: [explore.board]
 ---
 
 # EX-20 · Save or discard the board's changes
@@ -66,5 +66,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Changes | Admin | explore.board.edit · No changes | — | explore.board.edit · Saving | explore.board.edit | explore.board.edit · Save failed | explore.board.edit · Waiting for approvers | explore.board.edit · Read-only database |
-| Changes | Operator | explore.board.edit · No changes | — | — | explore.board.edit | — | — | explore.board.edit · Read only |
+| Changes | Admin | explore.board · Edit · No changes | — | explore.board · Edit · Saving | explore.board · Edit | explore.board · Edit · Save failed | explore.board · Edit · Waiting for approvers | explore.board · Edit · Read-only database |
+| Changes | Operator | explore.board · Edit · No changes | — | — | explore.board · Edit | — | — | explore.board · Edit · Read only |

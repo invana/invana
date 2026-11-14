@@ -4,7 +4,7 @@ title: Catch an agent or a skill getting worse
 feature: AG-F10
 status: idea
 personas: [builder, admin]
-boards: [agents.skill, agents.agent, inbox]
+boards: [agents.skills, agents.agents, inbox]
 ---
 
 # AG-58 · Catch an agent or a skill getting worse
@@ -54,9 +54,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Drift on a skill's Evals | Admin | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Drift | agents.skill · Could not load | agents.skill · Eval running | — |
-| Drift on a skill's Evals | Operator | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Drift | agents.skill · Could not load | agents.skill · Eval running | agents.skill · Drift |
-| Drift on an agent's Evals | Admin | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Drift | agents.agent · Could not load | agents.agent · Eval running | — |
-| Drift on an agent's Evals | Operator | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Drift | agents.agent · Could not load | agents.agent · Eval running | agents.agent · Drift |
+| Drift on a skill's Evals | Admin | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Drift | agents.skills · Detail · Could not load | agents.skills · Detail · Eval running | — |
+| Drift on a skill's Evals | Operator | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Drift | agents.skills · Detail · Could not load | agents.skills · Detail · Eval running | agents.skills · Detail · Drift |
+| Drift on an agent's Evals | Admin | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Drift | agents.agents · Detail · Could not load | agents.agents · Detail · Eval running | — |
+| Drift on an agent's Evals | Operator | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Drift | agents.agents · Detail · Could not load | agents.agents · Detail · Eval running | agents.agents · Detail · Drift |
 | The alert that it got worse | Admin | — | — | inbox · Loading | inbox · Got worse | — | — | — |
 | The alert that it got worse | Operator | — | — | inbox · Loading | inbox · Got worse | — | — | inbox · Got worse |

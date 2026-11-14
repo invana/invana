@@ -6,7 +6,7 @@ status: idea
 personas: [builder, admin, analyst]
 stories: [AG-24, AG-33, AG-34, AG-62]
 journeys: [J03, J09]
-boards: [agents.run, agents.agent, agents.external, inbox]
+boards: [agents.runs, agents.agents, inbox]
 nfrs: [NFR-PERF-2, NFR-COST-1, NFR-SEC-10, NFR-SEC-11]
 depends_on: [AG-F01, AC-F02, AC-F04, AC-F05, AC-F09, CP-F02, CP-F03, CP-F04, CP-F10, GP-F02]
 ---
@@ -351,7 +351,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Calls go out from workers | From workers that can reach it; nothing passes through a hosted service |
 | A helper lives for the work | It retires when the work closes; a helper makes helpers only when its own policies allow Run `agent/*` |
 | An agent's helpers read over a window | Its sheet lists the helpers it made in 7, 30 or 90 days, each with its run; who made whom inside one run is the run's |
-| Outside agents are a filter of the Agents list | The Agents sheet's *Agents* list filtered to *Outside* lists them, and *Add an outside agent* sits on that filter; it is the board `agents.external`. There is no separate Outside agents place in the sheet's nav |
+| Outside agents are a filter of the Agents list | The Agents sheet's *Agents* list filtered to *Outside* lists them, and *Add an outside agent* sits on that filter; it is the board `agents.agents · Outside`. There is no separate Outside agents place in the sheet's nav |
 | Continuation is the run going on | At its session budget a run continues in a fresh session from a hand-off note — body in the blob store, row in Postgres. It is not an ask, not an exit reason and not a new run; the run's number, agent version, runtime and person behind it stay |
 | A note is read on the run | Between two sessions on the run's sheet; its head always reads, its body as far as the reader's agent may see its sources |
 | A fork is a person's act | Only a person forks, from a note they may read; an agent never forks its own run |

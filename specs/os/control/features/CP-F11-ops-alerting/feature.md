@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-59, CP-60, CP-67]
 journeys: [J08, J09]
-boards: [control.alerts, control.alerts.alert, control.alerts.settings, inbox]
+boards: [control.alerts, inbox]
 nfrs: [NFR-OPS-3, NFR-REL-3, NFR-SEC-8]
 depends_on: [CP-F10, CP-F08, CP-F02, CP-F03, CP-F04, CP-F05, PJ-F01, AC-F01, AC-F02, AC-F03, AC-F05, AC-F06, AC-F09, AC-F11]
 ---

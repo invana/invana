@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-15, CP-16]
 journeys: []
-boards: [agents.skill, agents.run, inbox]
+boards: [agents.skills, inbox, agents.runs]
 nfrs: [NFR-REL-1, NFR-SEC-1]
 depends_on: [AG-F04, CP-F03, AC-F05]
 ---

@@ -4,7 +4,7 @@ title: Grant agents to a team and see who gains them
 feature: AC-F03
 status: idea
 personas: [admin]
-boards: [settings.people, settings.access, access.locked]
+boards: [settings.people]
 ---
 
 # AC-39 · Grant agents to a team and see who gains them
@@ -61,7 +61,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A team — its agents | Admin | settings.access · A team · No agents | — | settings.access · Loading | settings.access · A team · Agents | settings.access · Could not load | — | — |
-| A team — its agents | Operator | access.locked · A team · No agents | — | access.locked · Loading | access.locked · A team · Agents | access.locked · Could not load | — | access.locked · A team · Agents |
-| Preview of a grant | Admin | — | — | settings.people · Preview · Loading | settings.people · Preview | settings.people · Preview · Could not save | settings.people · Preview · Default falls back | — |
-| Preview of a grant | Operator | — | — | — | — | — | — | access.locked · A person |
+| A team — its agents | Admin | settings.people · Teams · A team · No agents | — | settings.people · Teams · Loading | settings.people · Teams · A team · Agents | settings.people · Teams · Could not load | — | — |
+| A team — its agents | Operator | settings.people · Teams · Locked · A team · No agents | — | settings.people · Teams · Locked · Loading | settings.people · Teams · Locked · A team · Agents | settings.people · Teams · Locked · Could not load | — | settings.people · Teams · Locked · A team · Agents |
+| Grant · 1 What changes | Admin | settings.people · Teams · Grant | — | — | settings.people · Teams · Grant · Agent picked | — | — | — |
+| Grant · 1 What changes | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |
+| Preview of a grant | Admin | — | — | settings.people · Teams · Grant · Preview · Loading | settings.people · Teams · Grant · Preview | settings.people · Teams · Grant · Preview · Could not save | settings.people · Teams · Grant · Preview · Default falls back | — |
+| Preview of a grant | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |

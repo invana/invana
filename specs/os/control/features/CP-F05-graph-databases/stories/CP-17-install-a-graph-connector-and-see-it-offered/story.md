@@ -4,7 +4,7 @@ title: Install a graph connector and see it offered
 feature: CP-F05
 status: idea
 personas: [admin]
-boards: [settings.databases.connect, settings.connectors]
+boards: [settings.databases, settings.connectors]
 ---
 
 # CP-17 · Install a graph connector and see it offered
@@ -55,7 +55,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The connector choice | Admin | settings.databases.connect · No connector installed | — | — | settings.databases.connect | settings.databases.connect · Connector failed | — | — |
+| The connector choice | Admin | settings.databases · Connect · No connector installed | — | — | settings.databases · Connect | settings.databases · Connect · Connector failed | — | — |
 | The connector choice | Operator | — | — | — | — | — | — | — |
 | Connectors in the Library | Admin | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | — |
 | Connectors in the Library | Operator | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | settings.connectors · Read only |

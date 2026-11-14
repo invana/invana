@@ -4,7 +4,7 @@ title: Deactivate a person who leaves
 feature: AC-F03
 status: idea
 personas: [admin]
-boards: [settings.people, access.locked]
+boards: [settings.people]
 ---
 
 # AC-23 · Deactivate a person who leaves
@@ -68,6 +68,6 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Deactivate — what they hold · successor | Admin | settings.people · Deactivate · Holds nothing | — | settings.people · Deactivate · Loading | settings.people · Deactivate | settings.people · Deactivate · Could not save | — | settings.people · Two Admins |
-| Deactivate — what they hold · successor | Operator | — | — | — | — | — | — | access.locked · A person |
+| Deactivate — what they hold · successor | Operator | — | — | — | — | — | — | settings.people · Locked · A person |
 | A deactivated person | Admin | — | — | — | settings.people · Deactivated | — | — | — |
-| A deactivated person | Operator | — | — | — | access.locked · Deactivated | — | — | access.locked · Deactivated |
+| A deactivated person | Operator | — | — | — | settings.people · Locked · Deactivated | — | — | settings.people · Locked · Deactivated |

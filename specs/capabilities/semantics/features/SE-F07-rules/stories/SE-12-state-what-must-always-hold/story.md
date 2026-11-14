@@ -71,7 +71,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Rules | Admin | model.rules · No rules | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | — |
 | Rules | Operator | model.rules · No rules | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | model.rules · Rules read only |
-| A rule | Admin | model.rules · New rule | — | model.rules · Rule counting | model.rules · Rule impact | model.rules · Rule refused | — | — |
-| A rule | Operator | — | — | model.rules · Rule counting | model.rules · Rule read only | model.rules · Could not load | — | model.rules · Rule read only |
-| A rule's evidence | Admin | model.rules · Rule never offered | — | model.rules · Rule evidence loading | model.rules · Rule evidence | model.rules · Could not load | — | — |
-| A rule's evidence | Operator | model.rules · Rule never offered | — | model.rules · Rule evidence loading | model.rules · Rule evidence | model.rules · Could not load | — | — |
+| A rule | Admin | model.rules · New | — | model.rules · Detail · Counting | model.rules · Detail · Impact | model.rules · Detail · Refused | — | — |
+| A rule | Operator | — | — | model.rules · Detail · Counting | model.rules · Detail · Read only | model.rules · Could not load | — | model.rules · Detail · Read only |
+| A rule's evidence | Admin | model.rules · Detail · Never offered | — | model.rules · Detail · Evidence loading | model.rules · Detail · Evidence | model.rules · Could not load | — | — |
+| A rule's evidence | Operator | model.rules · Detail · Never offered | — | model.rules · Detail · Evidence loading | model.rules · Detail · Evidence | model.rules · Could not load | — | — |

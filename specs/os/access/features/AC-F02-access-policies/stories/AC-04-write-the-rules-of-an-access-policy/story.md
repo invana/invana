@@ -4,7 +4,7 @@ title: Write the rules of an Access Policy
 feature: AC-F02
 status: idea
 personas: [admin]
-boards: [settings.access, access.locked]
+boards: [settings.policies]
 ---
 
 # AC-04 · Write the rules of an Access Policy
@@ -79,13 +79,17 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A policy — its rules | Admin | settings.access · New policy | — | settings.access · Loading | settings.access | settings.access · Rule refused | — | settings.access · Built in |
-| A policy — its rules | Operator | — | — | access.locked · Loading | access.locked | access.locked · Could not load | — | access.locked |
-| Sign in again | Admin | — | — | — | settings.access · Password again | settings.access · Password again · Wrong password | — | — |
-| Sign in again | Operator | — | — | — | — | — | — | access.locked |
-| Waiting for a second Admin | Admin | — | — | settings.access · Loading | settings.access · Waiting for a second Admin | settings.access · Approve refused | — | — |
-| Waiting for a second Admin | Operator | — | — | — | access.locked · Waiting for a second Admin | — | — | access.locked |
-| An imported policy file | Admin | — | — | — | settings.access · Waiting to apply | settings.access · Rule refused | — | — |
-| An imported policy file | Operator | — | — | — | access.locked · Waiting to apply | — | — | access.locked · Waiting to apply |
-| A policy — History | Admin | — | — | settings.access · Loading | settings.access · History | settings.access · Could not load | — | — |
-| A policy — History | Operator | — | — | access.locked · Loading | access.locked · History | access.locked · Could not load | — | access.locked · History |
+| A policy — its rules | Admin | settings.policies · New | — | settings.policies · Loading | settings.policies | settings.policies · Rule refused | — | settings.policies · Built in |
+| A policy — its rules | Operator | — | — | settings.policies · New · Locked · Loading | settings.policies · New · Locked | settings.policies · New · Locked · Could not load | — | settings.policies · New · Locked |
+| New policy · 1 Name · 2 Start from | Admin | settings.policies · New | — | — | settings.policies · New · Start from picked | settings.policies · New · Name taken | — | — |
+| New policy · 1 Name · 2 Start from | Operator | — | — | — | — | — | — | settings.policies · New · Locked |
+| New policy · 3 Rules | Admin | settings.policies · New · No rules yet | — | — | settings.policies · New · Rules | settings.policies · New · Rule refused | — | — |
+| New policy · 3 Rules | Operator | — | — | — | — | — | — | settings.policies · New · Locked |
+| Sign in again | Admin | — | — | — | settings.policies · Password again | settings.policies · Password again · Wrong password | — | — |
+| Sign in again | Operator | — | — | — | — | — | — | settings.policies · Locked |
+| Waiting for a second Admin | Admin | — | — | settings.policies · Loading | settings.policies · Waiting for a second Admin | settings.policies · Approve refused | — | — |
+| Waiting for a second Admin | Operator | — | — | — | settings.policies · Locked · Waiting for a second Admin | — | — | settings.policies · Locked |
+| An imported policy file | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
+| An imported policy file | Operator | — | — | — | settings.policies · Locked · Waiting to apply | — | — | settings.policies · Locked · Waiting to apply |
+| A policy — History | Admin | — | — | settings.policies · Loading | settings.policies · History | settings.policies · Could not load | — | — |
+| A policy — History | Operator | — | — | settings.policies · Locked · Loading | settings.policies · Locked · History | settings.policies · Locked · Could not load | — | settings.policies · Locked · History |

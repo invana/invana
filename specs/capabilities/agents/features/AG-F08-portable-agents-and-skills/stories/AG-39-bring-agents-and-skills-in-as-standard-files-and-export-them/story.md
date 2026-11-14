@@ -4,7 +4,7 @@ title: Bring agents and skills in as standard files, and export them
 feature: AG-F08
 status: idea
 personas: [builder, admin]
-boards: [agents.skills, agents.skill, agents.agent, settings.access, access.locked]
+boards: [agents.skills, settings.policies, agents.agents]
 ---
 
 # AG-39 · Bring agents and skills in as standard files, and export them
@@ -76,13 +76,13 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Import | Admin | agents.skills · Import | — | agents.skills · Reading the files | agents.skills · What came in | agents.skills · Refused line | agents.skills · Mapping | — |
+| Import | Admin | agents.skills · Import | — | agents.skills · Import · Reading the files | agents.skills · Import · What came in | agents.skills · Import · Refused line | agents.skills · Import · Mapping | — |
 | Import | Operator | — | — | — | — | — | — | agents.skills · Import disabled |
-| A converted file — AGENTS.md, Codex TOML, a Claude plugin | Admin | — | — | agents.skills · Reading the files | agents.skills · Converted | agents.skills · Refused file | agents.skills · Mapping | — |
+| A converted file — AGENTS.md, Codex TOML, a Claude plugin | Admin | — | — | agents.skills · Import · Reading the files | agents.skills · Import · Converted | agents.skills · Import · Refused file | agents.skills · Import · Mapping | — |
 | A converted file — AGENTS.md, Codex TOML, a Claude plugin | Operator | — | — | — | — | — | — | agents.skills · Import disabled |
-| A policy file brought in | Admin | — | — | — | settings.access · Waiting to apply | settings.access · Rule refused | — | — |
-| A policy file brought in | Operator | — | — | — | — | — | — | access.locked · Waiting to apply |
-| Export — a skill | Admin | — | — | — | agents.skill · Export | agents.skill · Could not export | — | — |
-| Export — a skill | Operator | — | — | — | — | — | — | agents.skill |
-| Export — an agent | Admin | — | — | — | agents.agent · Export | agents.agent · Could not export | — | — |
-| Export — an agent | Operator | — | — | — | — | — | — | agents.agent · Read only |
+| A policy file brought in | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
+| A policy file brought in | Operator | — | — | — | — | — | — | settings.policies · Locked · Waiting to apply |
+| Export — a skill | Admin | — | — | — | agents.skills · Detail · Export | agents.skills · Detail · Could not export | — | — |
+| Export — a skill | Operator | — | — | — | — | — | — | agents.skills · Detail |
+| Export — an agent | Admin | — | — | — | agents.agents · Detail · Export | agents.agents · Detail · Could not export | — | — |
+| Export — an agent | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |

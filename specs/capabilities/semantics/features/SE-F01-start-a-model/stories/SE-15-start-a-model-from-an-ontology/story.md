@@ -4,7 +4,7 @@ title: Start a model from an ontology
 feature: SE-F01
 status: idea
 personas: [modeller]
-boards: [model.new, model.board.draft]
+boards: [model.models]
 ---
 
 # SE-15 · Start a model from an ontology
@@ -61,7 +61,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New model · from an ontology | Admin | model.new · Ontology | model.new · Ontology no match | model.new · Reading the ontology | model.new · Ontology preview | model.new · Ontology unreadable | — | — |
-| New model · from an ontology | Operator | — | — | — | — | — | — | model.new · No access |
-| The draft | Admin | — | — | model.board.draft · Arriving | model.board.draft | model.board.draft · Cannot publish | — | — |
-| The draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
+| New model · from an ontology | Admin | model.models · New · Ontology | model.models · New · Ontology no match | model.models · New · Reading the ontology | model.models · New · Ontology preview | model.models · New · Ontology unreadable | — | — |
+| New model · from an ontology | Operator | — | — | — | — | — | — | model.models · New · No access |
+| The draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft | model.models · Draft · Cannot publish | — | — |
+| The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |

@@ -4,7 +4,7 @@ title: Run the evals before a change publishes
 feature: AG-F10
 status: idea
 personas: [builder, admin]
-boards: [agents.skill, agents.agent]
+boards: [agents.skills, agents.agents]
 ---
 
 # AG-57 · Run the evals before a change publishes
@@ -64,11 +64,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A skill's Tests — the console and the tab | Admin | agents.skill · Not run yet | — | agents.skill · Loading | agents.skill · Tests | agents.skill · Could not load | agents.skill · Testing | — |
-| A skill's Tests — the console and the tab | Operator | agents.skill · Not run yet | — | agents.skill · Loading | agents.skill · Tests | agents.skill · Could not load | agents.skill · Testing | agents.skill · Tests |
-| A skill's eval run and gate | Admin | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Evals | agents.skill · Gate blocked | agents.skill · Eval running | — |
-| A skill's eval run and gate | Operator | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Evals | agents.skill · Gate blocked | agents.skill · Eval running | agents.skill · Evals |
-| An agent's Tests | Admin | agents.agent · Not run yet | — | agents.agent · Loading | agents.agent · Tests | agents.agent · Could not load | agents.agent · Testing | — |
-| An agent's Tests | Operator | agents.agent · Not run yet | — | agents.agent · Loading | agents.agent · Tests | agents.agent · Could not load | agents.agent · Testing | agents.agent · Tests |
-| An agent's eval run and gate | Admin | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Evals | agents.agent · Gate blocked | agents.agent · Eval running | — |
-| An agent's eval run and gate | Operator | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Evals | agents.agent · Gate blocked | agents.agent · Eval running | agents.agent · Evals |
+| A skill's Tests — the console and the tab | Admin | agents.skills · Detail · Not run yet | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Could not load | agents.skills · Detail · Testing | — |
+| A skill's Tests — the console and the tab | Operator | agents.skills · Detail · Not run yet | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Could not load | agents.skills · Detail · Testing | agents.skills · Detail · Tests |
+| A skill's eval run and gate | Admin | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Gate blocked | agents.skills · Detail · Eval running | — |
+| A skill's eval run and gate | Operator | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Gate blocked | agents.skills · Detail · Eval running | agents.skills · Detail · Evals |
+| An agent's Tests | Admin | agents.agents · Detail · Not run yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Tests | agents.agents · Detail · Could not load | agents.agents · Detail · Testing | — |
+| An agent's Tests | Operator | agents.agents · Detail · Not run yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Tests | agents.agents · Detail · Could not load | agents.agents · Detail · Testing | agents.agents · Detail · Tests |
+| An agent's eval run and gate | Admin | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Evals | agents.agents · Detail · Gate blocked | agents.agents · Detail · Eval running | — |
+| An agent's eval run and gate | Operator | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Evals | agents.agents · Detail · Gate blocked | agents.agents · Detail · Eval running | agents.agents · Detail · Evals |

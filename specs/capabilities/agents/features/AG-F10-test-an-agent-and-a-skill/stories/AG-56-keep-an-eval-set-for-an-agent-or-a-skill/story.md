@@ -4,7 +4,7 @@ title: Keep an eval set for an agent or a skill
 feature: AG-F10
 status: idea
 personas: [builder, admin]
-boards: [agents.skill, agents.agent, agents.run]
+boards: [agents.skills, agents.agents, agents.runs]
 ---
 
 # AG-56 · Keep an eval set for an agent or a skill
@@ -65,9 +65,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A skill's Evals | Admin | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Evals | agents.skill · Judge refused | agents.skill · Proposing cases | — |
-| A skill's Evals | Operator | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Evals | agents.skill · Could not load | agents.skill · Proposing cases | agents.skill · Evals |
-| An agent's Evals | Admin | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Evals | agents.agent · Judge refused | agents.agent · Proposing cases | — |
-| An agent's Evals | Operator | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Evals | agents.agent · Could not load | agents.agent · Proposing cases | agents.agent · Evals |
-| Promote to eval, on a run | Admin | — | — | agents.run · Loading | agents.run · Promote to eval | agents.run · Failed | — | — |
-| Promote to eval, on a run | Operator | — | — | agents.run · Loading | agents.run | agents.run · Failed | — | agents.run |
+| A skill's Evals | Admin | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Judge refused | agents.skills · Detail · Proposing cases | — |
+| A skill's Evals | Operator | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Could not load | agents.skills · Detail · Proposing cases | agents.skills · Detail · Evals |
+| An agent's Evals | Admin | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Evals | agents.agents · Detail · Judge refused | agents.agents · Detail · Proposing cases | — |
+| An agent's Evals | Operator | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Evals | agents.agents · Detail · Could not load | agents.agents · Detail · Proposing cases | agents.agents · Detail · Evals |
+| Promote to eval, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Promote to eval | agents.runs · Detail · Failed | — | — |
+| Promote to eval, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | — | agents.runs · Detail |

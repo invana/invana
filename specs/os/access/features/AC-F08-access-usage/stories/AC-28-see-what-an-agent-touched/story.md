@@ -4,7 +4,7 @@ title: See what an agent touched
 feature: AC-F08
 status: idea
 personas: [admin, builder]
-boards: [access.usage, access.locked]
+boards: [access.usage]
 ---
 
 # AC-28 · See what an agent touched
@@ -62,4 +62,4 @@ flowchart TD
 | Usage — every agent | Admin | access.usage · No usage yet | access.usage · Nothing matches | access.usage · Loading | access.usage | access.usage · Could not load | access.usage · Running | — |
 | Usage — every agent | Operator | access.usage · No usage yet | access.usage · Nothing matches | access.usage · Loading | access.usage · Counted, not shown | access.usage · Could not load | access.usage · Running | access.usage · Counted, not shown |
 | Usage — one agent | Admin | access.usage · Agent · Never used | access.usage · Agent · Nothing matches | access.usage · Agent · Loading | access.usage · Agent | access.usage · Agent · Could not load | access.usage · Agent · Running | — |
-| Usage — one agent | Operator | access.usage · Agent · Never used | access.usage · Agent · Nothing matches | access.usage · Agent · Loading | access.usage · Agent · Counted, not shown | access.usage · Agent · Could not load | access.usage · Agent · Running | access.locked · Content withheld |
+| Usage — one agent | Operator | access.usage · Agent · Never used | access.usage · Agent · Nothing matches | access.usage · Agent · Loading | access.usage · Agent · Counted, not shown | access.usage · Agent · Could not load | access.usage · Agent · Running | access.usage · Locked · Content withheld |

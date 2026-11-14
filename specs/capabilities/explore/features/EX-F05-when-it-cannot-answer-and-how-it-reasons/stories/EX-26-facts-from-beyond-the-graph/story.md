@@ -4,7 +4,7 @@ title: Facts from outside Graph Data, marked as such
 feature: EX-F05
 status: idea
 personas: [analyst]
-boards: [explore.board, explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-26 · Facts from outside Graph Data, marked as such
@@ -86,5 +86,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Third-party in the answer | Admin | explore.board · Graph Data only | — | explore.board · Searching | explore.board · Third-party | explore.board · Search refused | explore.board · Working | — |
 | Third-party in the answer | Operator | explore.board · Graph Data only | — | explore.board · Searching | explore.board · Third-party | explore.board · Search refused | explore.board · Working | — |
-| Third-party nodes and Keep | Admin | — | — | explore.board.menu · Keeping | explore.board.menu · Keep | explore.board.menu · Keep refused | explore.board.menu · Third-party nodes | — |
-| Third-party nodes and Keep | Operator | — | — | — | explore.board.menu · Third-party nodes | — | explore.board.menu · Third-party nodes | explore.board.menu · Keep disabled |
+| Third-party nodes and Keep | Admin | — | — | explore.board · Menu · Keeping | explore.board · Menu · Keep | explore.board · Menu · Keep refused | explore.board · Menu · Third-party nodes | — |
+| Third-party nodes and Keep | Operator | — | — | — | explore.board · Menu · Third-party nodes | — | explore.board · Menu · Third-party nodes | explore.board · Menu · Keep disabled |

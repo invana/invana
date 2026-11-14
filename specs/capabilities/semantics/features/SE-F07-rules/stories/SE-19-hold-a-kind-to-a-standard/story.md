@@ -4,7 +4,7 @@ title: Hold a kind or property to a standard
 feature: SE-F07
 status: idea
 personas: [curator, modeller]
-boards: [model.board.kind, data.checks]
+boards: [data.quality, model.kinds]
 ---
 
 # SE-19 · Hold a kind or property to a standard
@@ -66,9 +66,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Hold to a standard | Admin | data.checks · Hold to a standard | — | data.checks · Loading | data.checks · Hold to a standard | data.checks · Hold refused | — | — |
-| Hold to a standard | Operator | — | — | — | — | — | — | model.board.kind · Standards read only |
-| A kind · Standards | Admin | model.board.kind · No standards held | — | model.board.kind · Standards loading | model.board.kind · Standards | model.board.kind · Could not load | — | — |
-| A kind · Standards | Operator | model.board.kind · No standards held | — | model.board.kind · Standards loading | model.board.kind · Standards | model.board.kind · Could not load | — | model.board.kind · Standards read only |
-| A record refused by a block hold | Admin | — | — | — | — | data.checks · Blocked by a standard | — | — |
-| A record refused by a block hold | Operator | — | — | — | — | data.checks · Blocked by a standard | — | — |
+| Hold to a standard | Admin | data.quality · Checks · Hold to a standard | — | data.quality · Checks · Loading | data.quality · Checks · Hold to a standard | data.quality · Checks · Hold refused | — | — |
+| Hold to a standard | Operator | — | — | — | — | — | — | model.kinds · Detail · Standards read only |
+| A kind · Standards | Admin | model.kinds · Detail · No standards held | — | model.kinds · Detail · Standards loading | model.kinds · Detail · Standards | model.kinds · Detail · Could not load | — | — |
+| A kind · Standards | Operator | model.kinds · Detail · No standards held | — | model.kinds · Detail · Standards loading | model.kinds · Detail · Standards | model.kinds · Detail · Could not load | — | model.kinds · Detail · Standards read only |
+| A record refused by a block hold | Admin | — | — | — | — | data.quality · Checks · Blocked by a standard | — | — |
+| A record refused by a block hold | Operator | — | — | — | — | data.quality · Checks · Blocked by a standard | — | — |

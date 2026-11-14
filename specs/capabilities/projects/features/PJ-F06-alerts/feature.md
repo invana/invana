@@ -6,7 +6,7 @@ status: idea
 personas: [investigator, decision-maker]
 stories: [PJ-19]
 journeys: []
-boards: [projects.alerts, projects.task]
+boards: [projects.alerts, projects.tasks]
 nfrs: []
 depends_on: [SE-F07, PJ-F01, PJ-F03, RC-F02, CP-F08]
 ---

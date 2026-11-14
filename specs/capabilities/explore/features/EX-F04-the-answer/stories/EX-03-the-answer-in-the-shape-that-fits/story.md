@@ -4,7 +4,7 @@ title: The answer in the shape that fits
 feature: EX-F04
 status: idea
 personas: [analyst, builder]
-boards: [explore.board, explore.board.chart, agents.skills]
+boards: [explore.board, agents.skills]
 ---
 
 # EX-03 · The answer in the shape that fits
@@ -74,10 +74,10 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The answer's card | Admin | — | explore.board · Nothing held | explore.board · Working | explore.board.chart | explore.board.chart · Shape refused | — | — |
-| The answer's card | Operator | — | explore.board · Nothing held | explore.board · Working | explore.board.chart | explore.board.chart · Shape refused | — | — |
-| The template picker | Admin | — | — | — | explore.board.chart · Picker | — | — | — |
-| The template picker | Operator | — | — | — | explore.board.chart · Picker | — | — | — |
+| The answer's card | Admin | — | explore.board · Nothing held | explore.board · Working | explore.board · Chart | explore.board · Chart · Shape refused | — | — |
+| The answer's card | Operator | — | explore.board · Nothing held | explore.board · Working | explore.board · Chart | explore.board · Chart · Shape refused | — | — |
+| The template picker | Admin | — | — | — | explore.board · Chart · Picker | — | — | — |
+| The template picker | Operator | — | — | — | explore.board · Chart · Picker | — | — | — |
 | Projection templates | Admin | agents.skills · Shipped templates | agents.skills · No template matches | agents.skills · Loading | agents.skills · Answer templates | agents.skills · Template refused | — | — |
 | Author a template | Admin | agents.skills · Author template | — | — | agents.skills · Author template | agents.skills · Template refused | — | — |
 | Author a template | Operator | — | — | — | — | — | — | agents.skills · Read only |

@@ -4,7 +4,7 @@ title: Read a record and every change to it
 feature: RC-F06
 status: idea
 personas: [curator, analyst]
-boards: [data.record]
+boards: [data.records]
 ---
 
 # RC-06 · Read a record and every change to it
@@ -51,9 +51,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A record · Values | Admin | — | — | data.record · Loading | data.record | data.record · Could not load | — | — |
-| A record · Values | Operator | — | — | data.record · Loading | data.record | data.record · Could not load | — | — |
-| A record · History | Admin | data.record · No changes | — | data.record · Loading | data.record · History | data.record · Could not load | — | — |
-| A record · History | Operator | data.record · No changes | — | data.record · Loading | data.record · History | data.record · Could not load | — | data.record · Member hidden |
-| A record · History, a value withheld | Admin | — | — | — | data.record · History · Redacted | — | — | — |
-| A record · History, a value withheld | Operator | — | — | — | data.record · History · Redacted | — | — | data.record · History · Redacted |
+| A record · Values | Admin | — | — | data.records · Detail · Loading | data.records · Detail | data.records · Detail · Could not load | — | — |
+| A record · Values | Operator | — | — | data.records · Detail · Loading | data.records · Detail | data.records · Detail · Could not load | — | — |
+| A record · History | Admin | data.records · Detail · No changes | — | data.records · Detail · Loading | data.records · Detail · History | data.records · Detail · Could not load | — | — |
+| A record · History | Operator | data.records · Detail · No changes | — | data.records · Detail · Loading | data.records · Detail · History | data.records · Detail · Could not load | — | data.records · Detail · Member hidden |
+| A record · History, a value withheld | Admin | — | — | — | data.records · Detail · History · Redacted | — | — | — |
+| A record · History, a value withheld | Operator | — | — | — | data.records · Detail · History · Redacted | — | — | data.records · Detail · History · Redacted |

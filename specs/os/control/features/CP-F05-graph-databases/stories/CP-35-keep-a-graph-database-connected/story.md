@@ -4,7 +4,7 @@ title: Keep a graph database connected
 feature: CP-F05
 status: idea
 personas: [admin]
-boards: [settings.databases.database, access.sign_in_again]
+boards: [settings.databases, access.signin]
 ---
 
 # CP-35 · Keep a graph database connected
@@ -74,11 +74,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Connection | Admin | — | — | settings.databases.database · Loading | settings.databases.database | settings.databases.database · Test failed | — | — |
-| Connection | Operator | — | — | settings.databases.database · Loading | settings.databases.database · Read only | settings.databases.database · Unreachable · Read only | — | settings.databases.database · Read only |
-| Server version | Admin | settings.databases.database · Declare version | — | settings.databases.database · Loading | settings.databases.database · Untested version | settings.databases.database · Test failed | — | — |
-| Server version | Operator | — | — | settings.databases.database · Loading | settings.databases.database · Untested version · Read only | settings.databases.database · Unreachable · Read only | — | settings.databases.database · Read only |
-| Remove | Admin | — | — | — | settings.databases.database · Remove | settings.databases.database · Named by rules | — | — |
-| Remove | Operator | — | — | — | — | — | — | settings.databases.database · Read only |
-| Sign in again | Admin | — | — | — | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Connection | Admin | — | — | settings.databases · Detail · Loading | settings.databases · Detail | settings.databases · Detail · Test failed | — | — |
+| Connection | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Detail · Read only | settings.databases · Detail · Unreachable · Read only | — | settings.databases · Detail · Read only |
+| Server version | Admin | settings.databases · Detail · Declare version | — | settings.databases · Detail · Loading | settings.databases · Detail · Untested version | settings.databases · Detail · Test failed | — | — |
+| Server version | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Detail · Untested version · Read only | settings.databases · Detail · Unreachable · Read only | — | settings.databases · Detail · Read only |
+| Remove | Admin | — | — | — | settings.databases · Detail · Remove | settings.databases · Detail · Named by rules | — | — |
+| Remove | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |
+| Sign in again | Admin | — | — | — | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Sign in again | Operator | — | — | — | — | — | — | — |

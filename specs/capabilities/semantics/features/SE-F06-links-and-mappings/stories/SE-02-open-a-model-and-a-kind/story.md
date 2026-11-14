@@ -4,7 +4,7 @@ title: Open a model and a kind
 feature: SE-F06
 status: idea
 personas: [modeller]
-boards: [model.board, model.board.kind, model.kinds, model.relationships]
+boards: [model.kinds, model.models, model.relationships]
 ---
 
 # SE-02 · Open a model and a kind
@@ -58,10 +58,14 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A kind | Admin | model.board.kind · No properties | — | model.board.kind · Loading | model.board.kind | model.board.kind · Could not load | — | — |
-| A kind | Operator | model.board.kind · No properties | — | model.board.kind · Loading | model.board.kind · Read only | model.board.kind · Could not load | — | model.board.kind · Read only |
-| A model | Admin | model.board · Model with nothing yet | — | model.board · Loading | model.board · One model | model.board · Could not load | — | — |
-| A model | Operator | model.board · Model with nothing yet | — | model.board · Loading | model.board · One model | model.board · Could not load | — | model.board · Read only |
+| A kind | Admin | model.kinds · Detail · No properties | — | model.kinds · Detail · Loading | model.kinds · Detail | model.kinds · Detail · Could not load | — | — |
+| A kind | Operator | model.kinds · Detail · No properties | — | model.kinds · Detail · Loading | model.kinds · Detail · Read only | model.kinds · Detail · Could not load | — | model.kinds · Detail · Read only |
+| A model | Admin | model.models · Model with nothing yet | — | model.models · Loading | model.models · Detail | model.models · Could not load | — | — |
+| A model | Operator | model.models · Model with nothing yet | — | model.models · Loading | model.models · Detail | model.models · Could not load | — | model.models · Read only |
+| A kind · Change in a draft | Admin | — | — | — | model.kinds · Detail · Edit | — | — | — |
+| A kind · Change in a draft | Operator | — | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Edit disabled |
+| A relationship | Admin | — | — | model.relationships · Detail · Loading | model.relationships · Detail | model.relationships · Detail · Could not load | — | — |
+| A relationship | Operator | — | — | model.relationships · Detail · Loading | model.relationships · Detail | model.relationships · Detail · Could not load | — | model.relationships · Detail · Read only |
 | Kinds on the left | Admin | model.kinds · No kinds yet | model.kinds · No kind matches | model.kinds · Loading | model.kinds | model.kinds · Could not load | — | — |
 | Kinds on the left | Operator | model.kinds · No kinds yet | model.kinds · No kind matches | model.kinds · Loading | model.kinds | model.kinds · Could not load | — | model.kinds · Read only |
 | Relationships on the left | Admin | model.relationships · No relationships yet | model.relationships · No relationship matches | model.relationships · Loading | model.relationships | model.relationships · Could not load | — | — |

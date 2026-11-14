@@ -80,5 +80,9 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | AI models | Admin | settings.ai · No endpoint | settings.ai · Nothing matches | settings.ai · Loading | settings.ai | settings.ai · Withdrawn | — | — |
 | AI models | Operator | settings.ai · No endpoint | settings.ai · Nothing matches | settings.ai · Loading | settings.ai · Read only | settings.ai · Withdrawn | — | settings.ai · Read only |
-| An endpoint | Admin | settings.ai · Add an endpoint | — | settings.ai · Pinging | settings.ai · Endpoint | settings.ai · Ping failed | — | — |
+| Add an endpoint · 1 Name · 2 Kind · 3 Its fields | Admin | settings.ai · New | — | — | settings.ai · New · Kind picked | — | — | — |
+| Add an endpoint · 1 Name · 2 Kind · 3 Its fields | Operator | — | — | — | — | — | — | settings.ai · Read only |
+| Add an endpoint · saved and pinged | Admin | — | — | settings.ai · New · Pinging | settings.ai · New · Proven | settings.ai · New · Ping failed | — | — |
+| Add an endpoint · saved and pinged | Operator | — | — | — | — | — | — | settings.ai · Read only |
+| An endpoint | Admin | — | — | settings.ai · Pinging | settings.ai · Endpoint | settings.ai · Ping failed | — | — |
 | An endpoint | Operator | — | — | settings.ai · Loading | settings.ai · Endpoint · Read only | settings.ai · Ping failed | — | settings.ai · Read only |

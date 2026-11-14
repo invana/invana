@@ -4,7 +4,7 @@ title: Promote a learning to org knowledge
 feature: GP-F02
 status: idea
 personas: [builder, modeller]
-boards: [graph.memory.org_knowledge]
+boards: [graph.memory]
 ---
 
 # GP-09 · Promote a learning to org knowledge
@@ -75,9 +75,9 @@ sequenceDiagram
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Org knowledge | Admin | graph.memory.org_knowledge · None yet | graph.memory.org_knowledge · Nothing matches | graph.memory.org_knowledge · Loading | graph.memory.org_knowledge | graph.memory.org_knowledge · Could not load | graph.memory.org_knowledge · Proposed | graph.memory.org_knowledge · Withheld |
-| Org knowledge | Operator | graph.memory.org_knowledge · None yet | graph.memory.org_knowledge · Nothing matches | graph.memory.org_knowledge · Loading | graph.memory.org_knowledge | graph.memory.org_knowledge · Could not load | graph.memory.org_knowledge · Proposed | graph.memory.org_knowledge · Not a Modeller |
-| A proposal | Admin | — | — | graph.memory.org_knowledge · Proposal loading | graph.memory.org_knowledge · Proposal | graph.memory.org_knowledge · Could not promote | graph.memory.org_knowledge · Proposal | graph.memory.org_knowledge · Proposal withheld |
-| A proposal | Operator | — | — | graph.memory.org_knowledge · Proposal loading | graph.memory.org_knowledge · Proposal | graph.memory.org_knowledge · Could not promote | graph.memory.org_knowledge · Proposal | graph.memory.org_knowledge · Not a Modeller |
-| Retired | Admin | — | — | — | graph.memory.org_knowledge · Retired | — | — | — |
-| Retired | Operator | — | — | — | graph.memory.org_knowledge · Retired | — | — | — |
+| Org knowledge | Admin | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | graph.memory · Org knowledge · Withheld |
+| Org knowledge | Operator | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | graph.memory · Org knowledge · Not a Modeller |
+| A proposal | Admin | — | — | graph.memory · Org knowledge · Proposal loading | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Could not promote | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Proposal withheld |
+| A proposal | Operator | — | — | graph.memory · Org knowledge · Proposal loading | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Could not promote | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Not a Modeller |
+| Retired | Admin | — | — | — | graph.memory · Org knowledge · Retired | — | — | — |
+| Retired | Operator | — | — | — | graph.memory · Org knowledge · Retired | — | — | — |

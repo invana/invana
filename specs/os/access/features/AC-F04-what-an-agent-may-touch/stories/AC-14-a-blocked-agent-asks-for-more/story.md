@@ -4,7 +4,7 @@ title: A denied agent asks for more
 feature: AC-F04
 status: idea
 personas: [admin, builder, analyst]
-boards: [inbox, agents.run]
+boards: [inbox, agents.runs]
 ---
 
 # AC-14 · A denied agent asks for more
@@ -70,5 +70,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | An ask for more | Admin | — | — | inbox · Loading | inbox · Asks for more | inbox · Already decided | inbox · An agent asks for more | — |
 | An ask for more | Operator | — | — | inbox · Loading | inbox · Asks for more | inbox · Already decided | inbox · An agent asks for more | inbox · Not yours to answer |
-| The denied step on its run | Admin | — | — | agents.run · Loading | agents.run · Refused by a rule | agents.run · Refused | agents.run · Waiting on an ask for more | — |
-| The denied step on its run | Operator | — | — | agents.run · Loading | agents.run · Refused by a rule | agents.run · Refused | agents.run · Waiting on an ask for more | agents.run · Content withheld |
+| The denied step on its run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Refused by a rule | agents.runs · Detail · Refused | agents.runs · Detail · Waiting on an ask for more | — |
+| The denied step on its run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Refused by a rule | agents.runs · Detail · Refused | agents.runs · Detail · Waiting on an ask for more | agents.runs · Detail · Content withheld |

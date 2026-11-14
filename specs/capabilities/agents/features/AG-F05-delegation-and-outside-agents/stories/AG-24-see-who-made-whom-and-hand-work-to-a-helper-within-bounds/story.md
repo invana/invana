@@ -4,7 +4,7 @@ title: See who made whom, and hand work to a helper within bounds
 feature: AG-F05
 status: idea
 personas: [builder, analyst]
-boards: [agents.run, agents.agent, inbox]
+boards: [agents.runs, agents.agents, inbox]
 ---
 
 # AG-24 · See who made whom, and hand work to a helper within bounds
@@ -71,11 +71,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Who did what on a run | Admin | agents.run · One agent | — | agents.run · Loading | agents.run · Who did what | agents.run · Refused at a bound | agents.run · Helpers running | — |
-| Who did what on a run | Operator | agents.run · One agent | — | agents.run · Loading | agents.run · Who did what | agents.run · Refused at a bound | agents.run · Helpers running | agents.run · Ran, content hidden |
-| Who it may hand work to | Admin | agents.agent · Hands work to nobody | — | agents.agent · Loading | agents.agent · Flow | agents.agent · Could not load | — | — |
-| Who it may hand work to | Operator | agents.agent · Hands work to nobody | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
+| Who did what on a run | Admin | agents.runs · Detail · One agent | — | agents.runs · Detail · Loading | agents.runs · Detail · Who did what | agents.runs · Detail · Refused at a bound | agents.runs · Detail · Helpers running | — |
+| Who did what on a run | Operator | agents.runs · Detail · One agent | — | agents.runs · Detail · Loading | agents.runs · Detail · Who did what | agents.runs · Detail · Refused at a bound | agents.runs · Detail · Helpers running | agents.runs · Detail · Ran, content hidden |
+| Who it may hand work to | Admin | agents.agents · Detail · Hands work to nobody | — | agents.agents · Detail · Loading | agents.agents · Detail · Flow | agents.agents · Detail · Could not load | — | — |
+| Who it may hand work to | Operator | agents.agents · Detail · Hands work to nobody | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
 | A delegation ask | Admin | — | — | inbox · Loading | inbox · Delegation ask | — | — | — |
 | A delegation ask | Operator | — | — | inbox · Loading | inbox · Not yours to answer | — | — | inbox · Not yours to answer |
-| An agent's helpers over time | Admin | agents.agent · No helpers | agents.agent · No helpers | agents.agent · Loading | agents.agent · Helpers | agents.agent · Could not load | — | — |
-| An agent's helpers over time | Operator | agents.agent · No helpers | agents.agent · No helpers | agents.agent · Loading | agents.agent · Helpers | agents.agent · Could not load | — | — |
+| An agent's helpers over time | Admin | agents.agents · Detail · No helpers | agents.agents · Detail · No helpers | agents.agents · Detail · Loading | agents.agents · Detail · Helpers | agents.agents · Detail · Could not load | — | — |
+| An agent's helpers over time | Operator | agents.agents · Detail · No helpers | agents.agents · Detail · No helpers | agents.agents · Detail · Loading | agents.agents · Detail · Helpers | agents.agents · Detail · Could not load | — | — |

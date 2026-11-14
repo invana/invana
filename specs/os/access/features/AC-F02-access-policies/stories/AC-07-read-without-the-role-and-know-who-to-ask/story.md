@@ -4,7 +4,7 @@ title: Read without the role and know who to ask
 feature: AC-F02
 status: idea
 personas: [analyst, builder]
-boards: [access.locked, model.board, agents.agent]
+boards: [settings.people, model.models, agents.agents, settings.agent_access]
 ---
 
 # AC-07 · Read without the role and know who to ask
@@ -64,12 +64,12 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | People and access, read only | Admin | — | — | — | — | — | — | — |
-| People and access, read only | Operator | access.locked · Built in only | access.locked · Nothing matches | access.locked · Loading | access.locked | access.locked · Role lost | — | access.locked |
+| People and access, read only | Operator | settings.people · Locked · Built in only | settings.people · Locked · Nothing matches | settings.people · Locked · Loading | settings.people · Locked | settings.people · Locked · Role lost | — | settings.people · Locked |
 | *Ask an Admin*, pressed | Admin | — | — | — | — | — | — | — |
-| *Ask an Admin*, pressed | Operator | — | — | — | access.locked · Asked | — | — | — |
-| A mode, read only | Admin | — | — | — | model.board | — | — | — |
-| A mode, read only | Operator | — | — | — | model.board · Read only | — | — | model.board · Read only |
-| A sheet, read only | Admin | — | — | — | agents.agent | — | — | — |
-| A sheet, read only | Operator | — | — | — | agents.agent · Read only | — | — | agents.agent · Read only |
-| An act no agent reaches | Admin | — | — | — | — | access.locked · No agent reaches it | — | — |
-| An act no agent reaches | Operator | — | — | — | — | access.locked · No agent reaches it | — | access.locked · No agent reaches it |
+| *Ask an Admin*, pressed | Operator | — | — | — | settings.people · Locked · Asked | — | — | — |
+| A mode, read only | Admin | — | — | — | model.models | — | — | — |
+| A mode, read only | Operator | — | — | — | model.models · Read only | — | — | model.models · Read only |
+| A sheet, read only | Admin | — | — | — | agents.agents · Detail | — | — | — |
+| A sheet, read only | Operator | — | — | — | agents.agents · Detail · Read only | — | — | agents.agents · Detail · Read only |
+| An act no agent reaches | Admin | — | — | — | — | settings.agent_access · Locked · No agent reaches it | — | — |
+| An act no agent reaches | Operator | — | — | — | — | settings.agent_access · Locked · No agent reaches it | — | settings.agent_access · Locked · No agent reaches it |

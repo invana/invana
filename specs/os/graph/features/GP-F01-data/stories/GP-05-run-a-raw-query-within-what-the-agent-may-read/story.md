@@ -4,7 +4,7 @@ title: Run a raw query within what the agent may read
 feature: GP-F01
 status: idea
 personas: [analyst, modeller]
-boards: [explore.board.console]
+boards: [explore.board]
 ---
 
 # GP-05 · Run a raw query within what the agent may read
@@ -64,5 +64,5 @@ this story adds its refusals and its withheld count.
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A raw query refused or filtered | Admin | — | — | explore.board.console · Running | explore.board.console · Withheld count | explore.board.console · Query refused | explore.board.console · Write waiting on approvers | — |
-| A raw query refused or filtered | Operator | — | — | explore.board.console · Running | explore.board.console · Withheld count | explore.board.console · Query refused | — | explore.board.console · Query console not granted |
+| A raw query refused or filtered | Admin | — | — | explore.board · Console · Running | explore.board · Console · Withheld count | explore.board · Console · Query refused | explore.board · Console · Write waiting on approvers | — |
+| A raw query refused or filtered | Operator | — | — | explore.board · Console · Running | explore.board · Console · Withheld count | explore.board · Console · Query refused | — | explore.board · Console · Query console not granted |

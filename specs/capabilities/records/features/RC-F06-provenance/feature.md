@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, curator]
 stories: [RC-05, RC-06]
 journeys: [J02]
-boards: []
+boards: [data.records]
 nfrs: [NFR-SEC-5, NFR-SEC-11]
 depends_on: [RC-F01, RC-F02, AC-F06]
 ---

@@ -4,7 +4,7 @@ title: Connect my own account to an outside server
 feature: CP-F02
 status: idea
 personas: [analyst, builder, admin]
-boards: [settings.people, access.sign_in_again, access.locked, settings.me.connections]
+boards: [settings.me, settings.people, access.signin]
 ---
 
 # CP-43 · Connect my own account to an outside server
@@ -62,11 +62,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Your personal connections | Admin | settings.me.connections · No accounts connected | — | settings.me.connections · Loading | settings.me.connections · Personal connections | settings.me.connections · Account expired | — | — |
-| Your personal connections | Operator | settings.me.connections · No accounts connected | — | settings.me.connections · Loading | settings.me.connections · Personal connections | settings.me.connections · Account expired | — | — |
-| Connect | Admin | — | — | settings.me.connections · Connecting | settings.me.connections · Account connected | settings.me.connections · Not connected | — | — |
-| Connect | Operator | — | — | settings.me.connections · Connecting | settings.me.connections · Account connected | settings.me.connections · Not connected | — | — |
+| Your personal connections | Admin | settings.me · Connections · No accounts connected | — | settings.me · Connections · Loading | settings.me · Connections · Personal connections | settings.me · Connections · Account expired | — | — |
+| Your personal connections | Operator | settings.me · Connections · No accounts connected | — | settings.me · Connections · Loading | settings.me · Connections · Personal connections | settings.me · Connections · Account expired | — | — |
+| Connect | Admin | settings.me · Connections · Connect | — | settings.me · Connections · Connect · Connecting | settings.me · Connections · Connect · Account connected | settings.me · Connections · Connect · Not connected | — | — |
+| Connect | Operator | settings.me · Connections · Connect | — | settings.me · Connections · Connect · Connecting | settings.me · Connections · Connect · Account connected | settings.me · Connections · Connect · Not connected | — | — |
 | Every person's personal connections | Admin | settings.people · No accounts connected | settings.people · Nothing matches | settings.people · Loading | settings.people · Personal connections | settings.people · Could not load | — | — |
-| Every person's personal connections | Operator | — | — | — | — | — | — | access.locked |
-| Password again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
-| Password again | Operator | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Every person's personal connections | Operator | — | — | — | — | — | — | settings.people · Locked |
+| Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
+| Password again | Operator | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |

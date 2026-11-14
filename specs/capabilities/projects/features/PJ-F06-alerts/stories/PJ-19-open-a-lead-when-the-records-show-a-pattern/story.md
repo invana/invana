@@ -4,7 +4,7 @@ title: Open a lead when the records show a pattern
 feature: PJ-F06
 status: idea
 personas: [investigator]
-boards: [projects.alerts, projects.task]
+boards: [projects.alerts, projects.tasks]
 ---
 
 # PJ-19 · Open a lead when the records show a pattern
@@ -67,5 +67,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Alerts | Admin | projects.alerts · No alerts yet | projects.alerts · No leads match | projects.alerts · Loading | projects.alerts | projects.alerts · Could not load | — | — |
 | Alerts | Operator | projects.alerts · No alerts yet | projects.alerts · No leads match | projects.alerts · Loading | projects.alerts | projects.alerts · Could not load | — | projects.alerts · Archived |
-| A lead | Admin | — | — | projects.task · Loading | projects.task · Lead | projects.task · Dismiss refused | projects.task.thinking | projects.task · Lead · Record withheld |
-| A lead | Operator | — | — | projects.task · Loading | projects.task · Lead | projects.task · Dismiss refused | projects.task.thinking | projects.task · Lead · Record withheld |
+| A lead | Admin | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Lead | projects.tasks · Detail · Dismiss refused | projects.tasks · Detail · How it got here | projects.tasks · Detail · Lead · Record withheld |
+| A lead | Operator | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Lead | projects.tasks · Detail · Dismiss refused | projects.tasks · Detail · How it got here | projects.tasks · Detail · Lead · Record withheld |

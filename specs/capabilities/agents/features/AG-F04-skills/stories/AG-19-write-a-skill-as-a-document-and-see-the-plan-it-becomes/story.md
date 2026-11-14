@@ -4,7 +4,7 @@ title: Write a skill as a document and see the plan it becomes
 feature: AG-F04
 status: idea
 personas: [builder]
-boards: [agents.skill, agents.run]
+boards: [agents.skills, agents.runs]
 ---
 
 # AG-19 · Write a skill as a document and see the plan it becomes
@@ -88,27 +88,27 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Instructions — editor, What it needs, Plan preview | Admin | agents.skill · New draft | — | agents.skill · Loading | agents.skill · Draft | agents.skill · Does not hold together | agents.skill · Drawing | — |
-| Instructions — editor, What it needs, Plan preview | Operator | agents.skill · Read only | — | agents.skill · Loading | agents.skill · Read only | agents.skill · Could not load | agents.skill · Drawing | agents.skill · Read only |
-| A question under a sentence | Admin | — | — | — | agents.skill · A question | — | agents.skill · A question | — |
-| A question under a sentence | Operator | — | — | — | agents.skill · Read only | — | agents.skill · Read only | agents.skill · Read only |
-| A flagged line | Admin | — | — | — | agents.skill · Unmapped line | agents.skill · Unmapped line | — | — |
-| A flagged line | Operator | — | — | — | agents.skill · Read only | agents.skill · Read only | — | agents.skill · Read only |
-| Add functions | Admin | — | — | agents.skill · Loading | agents.skill · Add functions | agents.skill · Could not load | — | — |
-| Add functions | Operator | — | — | — | — | — | — | agents.skill · Read only |
-| Flow | Admin | agents.skill · Nothing drawn | — | agents.skill · Loading | agents.skill · Flow | agents.skill · Flow gap | agents.skill · Drawing | — |
-| Flow — a guided skill | Admin | agents.skill · Guided | — | agents.skill · Loading | agents.skill · Guided | agents.skill · Could not load | — | — |
-| Flow — a guided skill | Operator | agents.skill · Guided | — | agents.skill · Loading | agents.skill · Guided | agents.skill · Could not load | — | agents.skill · Guided |
-| Flow | Operator | agents.skill · Nothing drawn | — | agents.skill · Loading | agents.skill · Flow | agents.skill · Flow gap | agents.skill · Drawing | agents.skill · Flow |
-| A step selected | Admin | — | — | — | agents.skill · Flow step | — | — | — |
-| A step selected | Operator | — | — | — | agents.skill · Flow step | — | — | agents.skill · Flow step |
-| Publish | Admin | — | — | — | agents.skill · Publish | agents.skill · Publish refused | agents.skill · Eval running | — |
-| Publish | Operator | — | — | — | — | — | — | agents.skill · Read only |
-| Discard draft | Admin | — | — | — | agents.skill · Discard draft | agents.skill · Could not load | — | — |
-| Discard draft | Operator | — | — | — | — | — | — | agents.skill · Read only |
-| Model version | Admin | agents.skill · New draft | — | agents.skill · Loading | agents.skill · Model version | agents.skill · Publish refused | agents.skill · Eval running | — |
-| Model version | Operator | agents.skill · Read only | — | agents.skill · Loading | agents.skill · Read only | agents.skill · Could not load | — | agents.skill · Read only |
-| History | Admin | agents.skill · History one version | — | agents.skill · Loading | agents.skill · History | agents.skill · Roll back refused | — | — |
-| History | Operator | agents.skill · History one version | — | agents.skill · Loading | agents.skill · History | agents.skill · Could not load | — | agents.skill · History |
-| The drawing as a run | Admin | — | — | agents.run · Loading | agents.run | agents.run · Failed | agents.run · Running | — |
-| The drawing as a run | Operator | — | — | agents.run · Loading | agents.run | agents.run · Failed | agents.run · Running | agents.run · Not found |
+| Instructions — editor, What it needs, Plan preview | Admin | agents.skills · Detail · New draft | — | agents.skills · Detail · Loading | agents.skills · Detail · Draft | agents.skills · Detail · Does not hold together | agents.skills · Detail · Drawing | — |
+| Instructions — editor, What it needs, Plan preview | Operator | agents.skills · Detail · Read only | — | agents.skills · Detail · Loading | agents.skills · Detail · Read only | agents.skills · Detail · Could not load | agents.skills · Detail · Drawing | agents.skills · Detail · Read only |
+| A question under a sentence | Admin | — | — | — | agents.skills · Detail · A question | — | agents.skills · Detail · A question | — |
+| A question under a sentence | Operator | — | — | — | agents.skills · Detail · Read only | — | agents.skills · Detail · Read only | agents.skills · Detail · Read only |
+| A flagged line | Admin | — | — | — | agents.skills · Detail · Unmapped line | agents.skills · Detail · Unmapped line | — | — |
+| A flagged line | Operator | — | — | — | agents.skills · Detail · Read only | agents.skills · Detail · Read only | — | agents.skills · Detail · Read only |
+| Add functions | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Add functions | agents.skills · Detail · Could not load | — | — |
+| Add functions | Operator | — | — | — | — | — | — | agents.skills · Detail · Read only |
+| Flow | Admin | agents.skills · Detail · Nothing drawn | — | agents.skills · Detail · Loading | agents.skills · Detail · Flow | agents.skills · Detail · Flow gap | agents.skills · Detail · Drawing | — |
+| Flow — a guided skill | Admin | agents.skills · Detail · Guided | — | agents.skills · Detail · Loading | agents.skills · Detail · Guided | agents.skills · Detail · Could not load | — | — |
+| Flow — a guided skill | Operator | agents.skills · Detail · Guided | — | agents.skills · Detail · Loading | agents.skills · Detail · Guided | agents.skills · Detail · Could not load | — | agents.skills · Detail · Guided |
+| Flow | Operator | agents.skills · Detail · Nothing drawn | — | agents.skills · Detail · Loading | agents.skills · Detail · Flow | agents.skills · Detail · Flow gap | agents.skills · Detail · Drawing | agents.skills · Detail · Flow |
+| A step selected | Admin | — | — | — | agents.skills · Detail · Flow step | — | — | — |
+| A step selected | Operator | — | — | — | agents.skills · Detail · Flow step | — | — | agents.skills · Detail · Flow step |
+| Publish | Admin | — | — | — | agents.skills · Detail · Publish | agents.skills · Detail · Publish refused | agents.skills · Detail · Eval running | — |
+| Publish | Operator | — | — | — | — | — | — | agents.skills · Detail · Read only |
+| Discard draft | Admin | — | — | — | agents.skills · Detail · Discard draft | agents.skills · Detail · Could not load | — | — |
+| Discard draft | Operator | — | — | — | — | — | — | agents.skills · Detail · Read only |
+| Model version | Admin | agents.skills · Detail · New draft | — | agents.skills · Detail · Loading | agents.skills · Detail · Model version | agents.skills · Detail · Publish refused | agents.skills · Detail · Eval running | — |
+| Model version | Operator | agents.skills · Detail · Read only | — | agents.skills · Detail · Loading | agents.skills · Detail · Read only | agents.skills · Detail · Could not load | — | agents.skills · Detail · Read only |
+| History | Admin | agents.skills · Detail · History one version | — | agents.skills · Detail · Loading | agents.skills · Detail · History | agents.skills · Detail · Roll back refused | — | — |
+| History | Operator | agents.skills · Detail · History one version | — | agents.skills · Detail · Loading | agents.skills · Detail · History | agents.skills · Detail · Could not load | — | agents.skills · Detail · History |
+| The drawing as a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
+| The drawing as a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Not found |

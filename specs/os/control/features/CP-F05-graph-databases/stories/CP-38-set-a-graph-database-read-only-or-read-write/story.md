@@ -4,7 +4,7 @@ title: Set a graph database read-only or read + write
 feature: CP-F05
 status: idea
 personas: [admin]
-boards: [settings.databases.database, access.sign_in_again]
+boards: [settings.databases, access.signin]
 ---
 
 # CP-38 · Set a graph database read-only or read + write
@@ -51,7 +51,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Mode | Admin | settings.databases.database · Read-only | — | settings.databases.database · Loading | settings.databases.database · Read + write | settings.databases.database · Could not change mode | — | — |
-| Mode | Operator | settings.databases.database · Read-only · Read only | — | settings.databases.database · Loading | settings.databases.database · Read + write · Read only | settings.databases.database · Could not load | — | settings.databases.database · Read + write · Read only |
-| Sign in again | Admin | — | — | — | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Mode | Admin | settings.databases · Detail · Read-only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write | settings.databases · Detail · Could not change mode | — | — |
+| Mode | Operator | settings.databases · Detail · Read-only · Read only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write · Read only | settings.databases · Detail · Could not load | — | settings.databases · Detail · Read + write · Read only |
+| Sign in again | Admin | — | — | — | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Sign in again | Operator | — | — | — | — | — | — | — |

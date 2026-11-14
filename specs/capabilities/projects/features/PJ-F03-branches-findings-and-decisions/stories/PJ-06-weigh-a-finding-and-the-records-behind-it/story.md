@@ -4,7 +4,7 @@ title: Weigh a finding and the records behind it
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.finding, projects.task.thinking]
+boards: [projects.branches, projects.projects, projects.tasks]
 ---
 
 # PJ-06 · Weigh a finding and the records behind it
@@ -71,11 +71,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A finding | Admin | — | — | projects.finding · Loading | projects.finding | projects.finding · Could not load | projects.finding · Added by an agent | projects.project · Not found |
-| A finding | Operator | — | — | projects.finding · Loading | projects.finding | projects.finding · Could not load | projects.finding · Added by an agent | projects.finding · Record withheld |
-| A load undone | Admin | — | — | — | projects.finding · Load undone | — | — | — |
-| A load undone | Operator | — | — | — | projects.finding · Load undone | — | — | — |
-| Add a finding | Admin | projects.finding · Add a finding | — | projects.finding · Adding | projects.finding · Add a finding | projects.finding · Add refused | — | — |
-| Add a finding | Operator | projects.finding · Add a finding | — | projects.finding · Adding | projects.finding · Add a finding | projects.finding · Add refused | — | projects.finding · Archived |
-| How it got here | Admin | — | — | projects.task.thinking · Loading | projects.task.thinking | projects.task.thinking · Could not load | — | — |
-| How it got here | Operator | — | — | projects.task.thinking · Loading | projects.task.thinking | projects.task.thinking · Could not load | — | projects.task.thinking · Content withheld |
+| A finding | Admin | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | projects.projects · Detail · Not found |
+| A finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | projects.branches · Finding · Record withheld |
+| A load undone | Admin | — | — | — | projects.branches · Finding · Load undone | — | — | — |
+| A load undone | Operator | — | — | — | projects.branches · Finding · Load undone | — | — | — |
+| Add a finding | Admin | projects.branches · Finding · New | — | projects.branches · Finding · New · Adding | projects.branches · Finding · New · Filled | projects.branches · Finding · New · Add refused | — | — |
+| Add a finding | Operator | projects.branches · Finding · New | — | projects.branches · Finding · New · Adding | projects.branches · Finding · New · Filled | projects.branches · Finding · New · Add refused | — | projects.branches · Finding · Archived |
+| How it got here | Admin | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Could not load | — | — |
+| How it got here | Operator | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Could not load | — | projects.tasks · Detail · How it got here · Content withheld |

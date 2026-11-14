@@ -6,7 +6,7 @@ status: idea
 personas: [modeller, analyst, investigator]
 stories: [SE-22]
 journeys: []
-boards: [model.inference, model.rules]
+boards: [model.inference]
 nfrs: [NFR-REL-1, NFR-REL-3, NFR-PERF-2, NFR-OPS-2, NFR-SEC-8]
 depends_on: [SE-F07, RC-F06, CP-F03]
 ---

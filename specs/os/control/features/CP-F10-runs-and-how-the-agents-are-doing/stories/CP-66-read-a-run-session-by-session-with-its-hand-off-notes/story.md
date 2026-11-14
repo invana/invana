@@ -4,7 +4,7 @@ title: Read a run session by session with its hand-off notes
 feature: CP-F10
 status: idea
 personas: [analyst, builder, admin]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-66 · Read a run session by session with its hand-off notes
@@ -72,7 +72,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A run — Sessions | Admin | agents.run · Sessions · One session | — | agents.run · Sessions · Loading | agents.run · Sessions | agents.run · Sessions · Could not load | agents.run · Sessions · Continuing | agents.run · Sessions · Content withheld |
-| A run — Sessions | Operator | agents.run · Sessions · One session | — | agents.run · Sessions · Loading | agents.run · Sessions | agents.run · Sessions · Could not load | agents.run · Sessions · Continuing | agents.run · Sessions · Content withheld |
-| A hand-off note | Admin | — | — | agents.run · Sessions · Loading | agents.run · Sessions · Hand-off note | agents.run · Sessions · Could not load | — | agents.run · Sessions · Note withheld |
-| A hand-off note | Operator | — | — | agents.run · Sessions · Loading | agents.run · Sessions · Hand-off note | agents.run · Sessions · Could not load | — | agents.run · Sessions · Note withheld |
+| A run — Sessions | Admin | agents.runs · Detail · Sessions · One session | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sessions · Could not load | agents.runs · Detail · Sessions · Continuing | agents.runs · Detail · Sessions · Content withheld |
+| A run — Sessions | Operator | agents.runs · Detail · Sessions · One session | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sessions · Could not load | agents.runs · Detail · Sessions · Continuing | agents.runs · Detail · Sessions · Content withheld |
+| A hand-off note | Admin | — | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions · Hand-off note | agents.runs · Detail · Sessions · Could not load | — | agents.runs · Detail · Sessions · Note withheld |
+| A hand-off note | Operator | — | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions · Hand-off note | agents.runs · Detail · Sessions · Could not load | — | agents.runs · Detail · Sessions · Note withheld |

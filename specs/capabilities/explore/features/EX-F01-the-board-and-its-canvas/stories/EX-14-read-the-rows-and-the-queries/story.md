@@ -4,7 +4,7 @@ title: Read the rows and the queries
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board.console]
+boards: [explore.board]
 ---
 
 # EX-14 · Read the rows and the queries
@@ -60,7 +60,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Console · Data | Admin | explore.board.console · Nothing drawn | — | explore.board.console · Loading | explore.board.console | — | explore.board.console · Running | — |
-| Console · Data | Operator | explore.board.console · Nothing drawn | — | explore.board.console · Loading | explore.board.console | — | explore.board.console · Running | — |
-| Console · Queries | Admin | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | — |
-| Console · Queries | Operator | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | explore.board.console · Content withheld |
+| Console · Data | Admin | explore.board · Console · Nothing drawn | — | explore.board · Console · Loading | explore.board · Console | — | explore.board · Console · Running | — |
+| Console · Data | Operator | explore.board · Console · Nothing drawn | — | explore.board · Console · Loading | explore.board · Console | — | explore.board · Console · Running | — |
+| Console · Queries | Admin | explore.board · Console · Nothing ran | — | explore.board · Console · Loading | explore.board · Console · Queries | explore.board · Console · Query failed | explore.board · Console · Running | — |
+| Console · Queries | Operator | explore.board · Console · Nothing ran | — | explore.board · Console · Loading | explore.board · Console · Queries | explore.board · Console · Query failed | explore.board · Console · Running | explore.board · Console · Content withheld |

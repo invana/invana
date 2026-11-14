@@ -4,7 +4,7 @@ title: A quiet board
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.board.left_closed, explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-18 · A quiet board
@@ -61,9 +61,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The board | Admin | explore.ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | — |
-| The board | Operator | explore.ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | explore.board · No access |
-| The left section collapsed | Admin | — | — | — | explore.board.left_closed | — | — | — |
-| The left section collapsed | Operator | — | — | — | explore.board.left_closed | — | — | — |
-| A right-click menu | Admin | — | — | — | explore.board.menu | — | — | — |
-| A right-click menu | Operator | — | — | — | explore.board.menu | — | — | explore.board.menu · No access |
+| The board | Admin | explore.board · Ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | — |
+| The board | Operator | explore.board · Ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | explore.board · No access |
+| The left section collapsed | Admin | — | — | — | explore.board · Left closed | — | — | — |
+| The left section collapsed | Operator | — | — | — | explore.board · Left closed | — | — | — |
+| A right-click menu | Admin | — | — | — | explore.board · Menu | — | — | — |
+| A right-click menu | Operator | — | — | — | explore.board · Menu | — | — | explore.board · Menu · No access |

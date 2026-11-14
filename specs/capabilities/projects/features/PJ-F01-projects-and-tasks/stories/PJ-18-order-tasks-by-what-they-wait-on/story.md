@@ -4,7 +4,7 @@ title: Order tasks by what they wait on
 feature: PJ-F01
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.project, projects.task]
+boards: [projects.projects, projects.tasks]
 ---
 
 # PJ-18 · Order tasks by what they wait on
@@ -87,9 +87,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Order | Admin | projects.project · Order · No tasks to order | — | projects.project · Order · Loading | projects.project · Order | projects.project · Order · Loop refused | projects.project · Order · Tasks running | — |
-| Order | Operator | projects.project · Order · No tasks to order | — | projects.project · Order · Loading | projects.project · Order | projects.project · Order · Loop refused | projects.project · Order · Tasks running | projects.project · Order · Archived |
-| A task and what it waits on | Admin | — | — | — | projects.task · Waiting on | projects.task · Will not run | projects.task · Never triggered | — |
-| A task and what it waits on | Operator | — | — | — | projects.task · Waiting on | projects.task · Will not run | projects.task · Never triggered | — |
-| Groups | Admin | projects.project · Order · No groups | — | projects.project · Order · Loading | projects.project · Order · Groups | projects.project · Order · Group loop refused | projects.project · Order · Groups · Tasks running | — |
-| Groups | Operator | projects.project · Order · No groups | — | projects.project · Order · Loading | projects.project · Order · Groups | projects.project · Order · Group loop refused | projects.project · Order · Groups · Tasks running | projects.project · Order · Groups · Other project withheld |
+| Order | Admin | projects.projects · Detail · Order · No tasks to order | — | projects.projects · Detail · Order · Loading | projects.projects · Detail · Order | projects.projects · Detail · Order · Loop refused | projects.projects · Detail · Order · Tasks running | — |
+| Order | Operator | projects.projects · Detail · Order · No tasks to order | — | projects.projects · Detail · Order · Loading | projects.projects · Detail · Order | projects.projects · Detail · Order · Loop refused | projects.projects · Detail · Order · Tasks running | projects.projects · Detail · Order · Archived |
+| A task and what it waits on | Admin | — | — | — | projects.tasks · Detail · Waiting on | projects.tasks · Detail · Will not run | projects.tasks · Detail · Never triggered | — |
+| A task and what it waits on | Operator | — | — | — | projects.tasks · Detail · Waiting on | projects.tasks · Detail · Will not run | projects.tasks · Detail · Never triggered | — |
+| Groups | Admin | projects.projects · Detail · Order · No groups | — | projects.projects · Detail · Order · Loading | projects.projects · Detail · Order · Groups | projects.projects · Detail · Order · Group loop refused | projects.projects · Detail · Order · Groups · Tasks running | — |
+| Groups | Operator | projects.projects · Detail · Order · No groups | — | projects.projects · Detail · Order · Loading | projects.projects · Detail · Order · Groups | projects.projects · Detail · Order · Group loop refused | projects.projects · Detail · Order · Groups · Tasks running | projects.projects · Detail · Order · Groups · Other project withheld |

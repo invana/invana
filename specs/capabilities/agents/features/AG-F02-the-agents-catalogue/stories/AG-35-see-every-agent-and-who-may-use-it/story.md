@@ -4,7 +4,7 @@ title: See every agent and who may use it
 feature: AG-F02
 status: idea
 personas: [analyst, admin]
-boards: [agents, agents.agent, settings.people]
+boards: [agents.agents, settings.people]
 ---
 
 # AG-35 · See every agent and who may use it
@@ -68,19 +68,19 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Agents — the catalogue | Admin | agents · Only the built-in agents | agents · No agents match | agents · Loading | agents | agents · Could not load | — | — |
-| Agents — the catalogue | Operator | agents · Only the built-in agents | agents · No agents match | agents · Loading | agents | agents · Could not load | — | agents · Not granted to you |
-| Who may use it, on the sheet | Admin | agents.agent · Granted by role | — | agents.agent · Loading | agents.agent · Who may use it | agents.agent · Could not load | — | — |
-| Who may use it, on the sheet | Operator | agents.agent · Granted by role | — | agents.agent · Loading | agents.agent · Who may use it | agents.agent · Could not load | — | agents.agent · Not granted to you |
+| Agents — the catalogue | Admin | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | — |
+| Agents — the catalogue | Operator | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | agents.agents · Not granted to you |
+| Who may use it, on the sheet | Admin | agents.agents · Detail · Granted by role | — | agents.agents · Detail · Loading | agents.agents · Detail · Who may use it | agents.agents · Detail · Could not load | — | — |
+| Who may use it, on the sheet | Operator | agents.agents · Detail · Granted by role | — | agents.agents · Detail · Loading | agents.agents · Detail · Who may use it | agents.agents · Detail · Could not load | — | agents.agents · Detail · Not granted to you |
 | Grant, in the Directory | Admin | settings.people · Agent grants | — | settings.people · Loading | settings.people · Agent grants | settings.people · Could not load | — | — |
 | Grant, in the Directory | Operator | — | — | — | — | — | — | settings.people · Read only |
-| Your default | Admin | — | — | — | agents · Default | — | — | — |
-| Your default | Operator | — | — | — | agents · Default | — | — | agents · Default |
-| Team pack agents | Admin | — | — | agents · Loading | agents · Team pack | agents · Could not load | — | — |
-| Team pack agents | Operator | — | — | agents · Loading | agents · Team pack | agents · Could not load | — | agents · Not granted to you |
-| Switched off | Admin | — | — | — | agents · Switched off | agents · Switched off | — | — |
-| Switched off | Operator | — | — | — | agents · Switched off | agents · Switched off | — | agents · Switched off |
-| Versions against the one before | Admin | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | — |
-| Versions against the one before | Operator | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | agents.agent · Versions |
-| Agents — the map | Admin | agents · Map empty | — | agents · Loading | agents · Map | agents · Could not load | — | — |
-| Agents — the map | Operator | agents · Map empty | — | agents · Loading | agents · Map | agents · Could not load | — | agents · Map |
+| Your default | Admin | — | — | — | agents.agents · Default | — | — | — |
+| Your default | Operator | — | — | — | agents.agents · Default | — | — | agents.agents · Default |
+| Team pack agents | Admin | — | — | agents.agents · Loading | agents.agents · Team pack | agents.agents · Could not load | — | — |
+| Team pack agents | Operator | — | — | agents.agents · Loading | agents.agents · Team pack | agents.agents · Could not load | — | agents.agents · Not granted to you |
+| Switched off | Admin | — | — | — | agents.agents · Switched off | agents.agents · Switched off | — | — |
+| Switched off | Operator | — | — | — | agents.agents · Switched off | agents.agents · Switched off | — | agents.agents · Switched off |
+| Versions against the one before | Admin | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | — |
+| Versions against the one before | Operator | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | agents.agents · Detail · Versions |
+| Agents — the map | Admin | agents.agents · Map empty | — | agents.agents · Loading | agents.agents · Map | agents.agents · Could not load | — | — |
+| Agents — the map | Operator | agents.agents · Map empty | — | agents.agents · Loading | agents.agents · Map | agents.agents · Could not load | — | agents.agents · Map |

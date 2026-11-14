@@ -4,7 +4,7 @@ title: Record a verdict and a decision the rules check
 feature: PJ-F03
 status: idea
 personas: [decision-maker]
-boards: [projects.decide]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-07 · Record a verdict and a decision the rules check
@@ -73,13 +73,13 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Decide | Admin | — | — | projects.decide · Recording | projects.decide | projects.decide · Could not record | projects.decide · From a proposal | — |
-| Decide | Operator | — | — | projects.decide · Recording | projects.decide | projects.decide · Could not record | projects.decide · From a proposal | projects.decide · Archived |
-| Refused by a rule | Admin | — | — | — | — | projects.decide · Refused by a rule | projects.decide · Refused by a rule · From a proposal | — |
-| Refused by a rule | Operator | — | — | — | — | projects.decide · Refused by a rule | projects.decide · Refused by a rule · From a proposal | — |
-| Recorded with a warning | Admin | — | — | — | projects.decide · Recorded with a warning | — | — | — |
-| Recorded with a warning | Operator | — | — | — | projects.decide · Recorded with a warning | — | — | — |
-| Supersede | Admin | — | — | — | projects.decide · Supersede | projects.decide · Supersede refused | — | — |
-| Supersede | Operator | — | — | — | projects.decide · Supersede | projects.decide · Supersede refused | — | projects.decide · Archived |
-| A branch's decisions | Admin | projects.decide · No decision yet | — | projects.decide · Loading | projects.decide · This branch | projects.decide · Could not load | — | projects.project · Not found |
-| A branch's decisions | Operator | projects.decide · No decision yet | — | projects.decide · Loading | projects.decide · This branch | projects.decide · Could not load | — | projects.project · Not found |
+| Decide | Admin | — | — | projects.branches · Decide · Recording | projects.branches · Decide | projects.branches · Decide · Could not record | projects.branches · Decide · From a proposal | — |
+| Decide | Operator | — | — | projects.branches · Decide · Recording | projects.branches · Decide | projects.branches · Decide · Could not record | projects.branches · Decide · From a proposal | projects.branches · Decide · Archived |
+| Refused by a rule | Admin | — | — | — | — | projects.branches · Decide · Refused by a rule | projects.branches · Decide · Refused by a rule · From a proposal | — |
+| Refused by a rule | Operator | — | — | — | — | projects.branches · Decide · Refused by a rule | projects.branches · Decide · Refused by a rule · From a proposal | — |
+| Recorded with a warning | Admin | — | — | — | projects.branches · Decide · Recorded with a warning | — | — | — |
+| Recorded with a warning | Operator | — | — | — | projects.branches · Decide · Recorded with a warning | — | — | — |
+| Supersede | Admin | — | — | — | projects.branches · Decide · Supersede | projects.branches · Decide · Supersede refused | — | — |
+| Supersede | Operator | — | — | — | projects.branches · Decide · Supersede | projects.branches · Decide · Supersede refused | — | projects.branches · Decide · Archived |
+| A branch's decisions | Admin | projects.branches · Decide · No decision yet | — | projects.branches · Decide · Loading | projects.branches · Decide · This branch | projects.branches · Decide · Could not load | — | projects.projects · Detail · Not found |
+| A branch's decisions | Operator | projects.branches · Decide · No decision yet | — | projects.branches · Decide · Loading | projects.branches · Decide · This branch | projects.branches · Decide · Could not load | — | projects.projects · Detail · Not found |

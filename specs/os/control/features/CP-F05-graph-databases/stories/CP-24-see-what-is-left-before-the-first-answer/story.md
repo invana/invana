@@ -4,7 +4,7 @@ title: See what is left before the first answer
 feature: CP-F05
 status: idea
 personas: [admin, analyst]
-boards: [start.setup, start.home]
+boards: [start.home]
 ---
 
 # CP-24 · See what is left before the first answer
@@ -58,7 +58,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Set-up | Admin | start.setup | — | start.setup · Loading | start.setup · Two of four | start.setup · Could not load | start.setup · Drafting below | — |
-| Set-up | Operator | start.setup | — | start.setup · Loading | start.setup · Two of four | start.setup · Could not load | start.setup · Drafting below | start.setup · Ask an Admin |
+| Set-up | Admin | start.home · Set-up | — | start.home · Set-up · Loading | start.home · Set-up · Two of four | start.home · Set-up · Could not load | start.home · Set-up · Drafting below | — |
+| Set-up | Operator | start.home · Set-up | — | start.home · Set-up · Loading | start.home · Set-up · Two of four | start.home · Set-up · Could not load | start.home · Set-up · Drafting below | start.home · Set-up · Ask an Admin |
 | Home mid set-up | Admin | — | — | start.home · Loading | start.home · Continue set-up | start.home · Could not load | — | — |
 | Home mid set-up | Operator | — | — | start.home · Loading | start.home · Continue set-up | start.home · Could not load | — | start.home · Continue set-up |

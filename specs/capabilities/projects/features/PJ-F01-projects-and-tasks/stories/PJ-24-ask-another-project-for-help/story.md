@@ -4,7 +4,7 @@ title: Ask another project for help
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.ask_help, projects.assistant, projects.task, inbox]
+boards: [projects.projects, projects.tasks, inbox]
 ---
 
 # PJ-24 · Ask another project for help
@@ -79,11 +79,11 @@ sequenceDiagram
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Ask another project | Admin | projects.ask_help | projects.ask_help · No project matches | projects.ask_help · Loading projects | projects.ask_help · Filled | projects.ask_help · Refused | — | — |
-| Ask another project | Operator | projects.ask_help | projects.ask_help · No project matches | projects.ask_help · Loading projects | projects.ask_help · Filled | projects.ask_help · Refused | — | projects.ask_help · Refused |
-| An ask in the asked project | Admin | — | — | projects.assistant · Loading | projects.assistant · Ask from a project | — | projects.assistant · Ask · Triaging | projects.assistant · Ask · Not a member |
-| An ask in the asked project | Operator | — | — | projects.assistant · Loading | projects.assistant · Ask from a project | — | projects.assistant · Ask · Triaging | projects.assistant · Ask · Not a member |
-| Asked of other projects | Admin | — | — | projects.task · Loading | projects.task · Asked of other projects | projects.task · Ask declined | projects.task · Asked · Waiting | — |
-| Asked of other projects | Operator | — | — | projects.task · Loading | projects.task · Asked of other projects | projects.task · Ask declined | projects.task · Asked · Waiting | projects.task · Asked · Withheld |
+| Ask another project | Admin | projects.projects · Ask for help | projects.projects · Ask for help · No project matches | projects.projects · Ask for help · Loading projects | projects.projects · Ask for help · Filled | projects.projects · Ask for help · Refused | — | — |
+| Ask another project | Operator | projects.projects · Ask for help | projects.projects · Ask for help · No project matches | projects.projects · Ask for help · Loading projects | projects.projects · Ask for help · Filled | projects.projects · Ask for help · Refused | — | projects.projects · Ask for help · Refused |
+| An ask in the asked project | Admin | — | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Ask from a project | — | projects.projects · Assistant · Ask · Triaging | projects.projects · Assistant · Ask · Not a member |
+| An ask in the asked project | Operator | — | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Ask from a project | — | projects.projects · Assistant · Ask · Triaging | projects.projects · Assistant · Ask · Not a member |
+| Asked of other projects | Admin | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Asked of other projects | projects.tasks · Detail · Ask declined | projects.tasks · Detail · Asked · Waiting | — |
+| Asked of other projects | Operator | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Asked of other projects | projects.tasks · Detail · Ask declined | projects.tasks · Detail · Asked · Waiting | projects.tasks · Detail · Asked · Withheld |
 | An ask in Needs you | Admin | — | — | inbox · Loading | inbox · An ask from a project | inbox · Could not load | — | — |
 | An ask in Needs you | Operator | — | — | inbox · Loading | inbox · An ask from a project | inbox · Could not load | — | — |

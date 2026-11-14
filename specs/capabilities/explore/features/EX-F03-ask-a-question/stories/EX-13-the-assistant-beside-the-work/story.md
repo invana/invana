@@ -4,7 +4,7 @@ title: The assistant beside the work
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.board.left_closed]
+boards: [explore.board]
 ---
 
 # EX-13 · The assistant beside the work
@@ -59,7 +59,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The docked assistant | Admin | explore.board · New conversation | — | explore.board · Working | explore.board | explore.board · Failed | explore.board · Working | — |
 | The docked assistant | Operator | explore.board · New conversation | — | explore.board · Working | explore.board | explore.board · Failed | explore.board · Working | — |
-| The board with it closed | Admin | — | — | — | explore.board.left_closed · Assistant closed | — | explore.board.left_closed · Running behind | — |
-| The board with it closed | Operator | — | — | — | explore.board.left_closed · Assistant closed | — | explore.board.left_closed · Running behind | — |
-| Assistant switched off | Admin | explore.ask · Assistant off | — | — | explore.ask · Assistant off | — | — | — |
-| Assistant switched off | Operator | explore.ask · Assistant off | — | — | explore.ask · Assistant off | — | — | — |
+| The board with it closed | Admin | — | — | — | explore.board · Left closed · Assistant closed | — | explore.board · Left closed · Running behind | — |
+| The board with it closed | Operator | — | — | — | explore.board · Left closed · Assistant closed | — | explore.board · Left closed · Running behind | — |
+| Assistant switched off | Admin | explore.board · Ask · Assistant off | — | — | explore.board · Ask · Assistant off | — | — | — |
+| Assistant switched off | Operator | explore.board · Ask · Assistant off | — | — | explore.board · Ask · Assistant off | — | — | — |

@@ -4,7 +4,7 @@ title: Adopt what runs improvise into a skill
 feature: AG-F04
 status: idea
 personas: [builder]
-boards: [agents.skill]
+boards: [agents.skills]
 ---
 
 # AG-20 · Adopt what runs improvise into a skill
@@ -49,5 +49,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Exceptions | Admin | agents.skill · No exceptions recorded | — | agents.skill · Loading | agents.skill · Exceptions | agents.skill · Could not load | agents.skill · Adopt | — |
-| Exceptions | Operator | agents.skill · No exceptions recorded | — | agents.skill · Loading | agents.skill · Exceptions | agents.skill · Could not load | agents.skill · Exceptions | agents.skill · Exceptions |
+| Exceptions | Admin | agents.skills · Detail · No exceptions recorded | — | agents.skills · Detail · Loading | agents.skills · Detail · Exceptions | agents.skills · Detail · Could not load | agents.skills · Detail · Adopt | — |
+| Exceptions | Operator | agents.skills · Detail · No exceptions recorded | — | agents.skills · Detail · Loading | agents.skills · Detail · Exceptions | agents.skills · Detail · Could not load | agents.skills · Detail · Exceptions | agents.skills · Detail · Exceptions |

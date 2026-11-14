@@ -4,7 +4,7 @@ title: Read a branch with its evidence and proposals
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.options]
+boards: [projects.branches, projects.projects, projects.tasks]
 ---
 
 # PJ-05 · Read a branch with its evidence and proposals
@@ -72,7 +72,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A branch | Admin | projects.options · A branch · No findings yet | — | projects.options · A branch · Loading | projects.options · A branch | projects.options · A branch · Could not load | projects.options · A branch · Proposal waiting | projects.project · Withheld |
-| A branch | Operator | projects.options · A branch · No findings yet | — | projects.options · A branch · Loading | projects.options · A branch | projects.options · A branch · Could not load | projects.options · A branch · Proposal waiting | projects.project · Withheld |
-| A proposal | Admin | — | — | — | projects.options · A branch · Proposal waiting | projects.options · A branch · Proposal refused | projects.options · A branch · Proposal waiting | projects.options · A branch · Proposal · Not a member |
-| A proposal | Operator | — | — | — | projects.options · A branch · Proposal waiting | projects.options · A branch · Proposal refused | projects.options · A branch · Proposal waiting | projects.task.thinking · Content withheld |
+| A branch | Admin | projects.branches · A branch · No findings yet | — | projects.branches · A branch · Loading | projects.branches · A branch | projects.branches · A branch · Could not load | projects.branches · A branch · Proposal waiting | projects.projects · Detail · Withheld |
+| A branch | Operator | projects.branches · A branch · No findings yet | — | projects.branches · A branch · Loading | projects.branches · A branch | projects.branches · A branch · Could not load | projects.branches · A branch · Proposal waiting | projects.projects · Detail · Withheld |
+| A proposal | Admin | — | — | — | projects.branches · A branch · Proposal waiting | projects.branches · A branch · Proposal refused | projects.branches · A branch · Proposal waiting | projects.branches · A branch · Proposal · Not a member |
+| A proposal | Operator | — | — | — | projects.branches · A branch · Proposal waiting | projects.branches · A branch · Proposal refused | projects.branches · A branch · Proposal waiting | projects.tasks · Detail · How it got here · Content withheld |

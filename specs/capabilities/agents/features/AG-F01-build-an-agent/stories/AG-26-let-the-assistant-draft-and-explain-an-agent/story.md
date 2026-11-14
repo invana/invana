@@ -4,7 +4,7 @@ title: Let the assistant draft and explain an agent
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.new, agents.agent]
+boards: [agents.agents]
 ---
 
 # AG-26 · Let the assistant draft and explain an agent
@@ -62,9 +62,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The Assistant's draft in New agent | Admin | agents.new | — | — | agents.new · Proposal | agents.new · Could not draft | agents.new · Drafting | — |
-| The Assistant's draft in New agent | Operator | — | — | — | — | — | — | agents · New agent disabled |
-| A proposed change on the sheet | Admin | — | — | — | agents.agent · Proposal | agents.agent · Could not draft | agents.agent · Drafting | — |
-| A proposed change on the sheet | Operator | — | — | — | — | — | — | agents.agent · Read only |
-| An explanation | Admin | — | — | — | agents.agent · Explained | agents.agent · Could not load | agents.agent · Drafting | — |
-| An explanation | Operator | — | — | — | agents.agent · Explained | agents.agent · Could not load | agents.agent · Drafting | — |
+| The Assistant's draft in New agent | Admin | agents.agents · New | — | — | agents.agents · New · Proposal | agents.agents · New · Could not draft | agents.agents · New · Drafting | — |
+| The Assistant's draft in New agent | Operator | — | — | — | — | — | — | agents.agents · New agent disabled |
+| A proposed change on the sheet | Admin | — | — | — | agents.agents · Detail · Proposal | agents.agents · Detail · Could not draft | agents.agents · Detail · Drafting | — |
+| A proposed change on the sheet | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |
+| An explanation | Admin | — | — | — | agents.agents · Detail · Explained | agents.agents · Detail · Could not load | agents.agents · Detail · Drafting | — |
+| An explanation | Operator | — | — | — | agents.agents · Detail · Explained | agents.agents · Detail · Could not load | agents.agents · Detail · Drafting | — |

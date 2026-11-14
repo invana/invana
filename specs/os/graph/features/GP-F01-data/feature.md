@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, builder, modeller]
 stories: [GP-01, GP-02, GP-04, GP-05]
 journeys: [J02]
-boards: [explore.board.console]
+boards: [explore.board]
 nfrs: [NFR-SEC-1, NFR-SEC-5, NFR-SEC-7, NFR-SEC-9, NFR-PERF-5, NFR-PERF-6]
 depends_on: [CP-F05, AC-F02, AC-F06, AC-F09, SE-F06, EX-F03]
 ---

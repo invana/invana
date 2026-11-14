@@ -4,7 +4,7 @@ title: Keep tests and evals within their token budget
 feature: AG-F10
 status: idea
 personas: [admin, builder]
-boards: [settings.usage, agents.skill, agents.agent]
+boards: [settings.limits, agents.skills, agents.agents]
 ---
 
 # AG-59 · Keep tests and evals within their token budget
@@ -52,9 +52,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The eval token budget | Admin | settings.usage · No eval budget | — | settings.usage · Loading | settings.usage · Eval token budget | settings.usage · Could not load | — | — |
-| The eval token budget | Operator | settings.usage · No eval budget | — | settings.usage · Loading | settings.usage · Read only | settings.usage · Could not load | — | settings.usage · Read only |
-| A skill's run paused on budget | Admin | — | — | — | agents.skill · Budget paused | agents.skill · Budget paused | — | — |
-| A skill's run paused on budget | Operator | — | — | — | agents.skill · Budget paused | agents.skill · Budget paused | — | agents.skill · Budget paused |
-| An agent's run paused on budget | Admin | — | — | — | agents.agent · Budget paused | agents.agent · Budget paused | — | — |
-| An agent's run paused on budget | Operator | — | — | — | agents.agent · Budget paused | agents.agent · Budget paused | — | agents.agent · Budget paused |
+| The eval token budget | Admin | settings.limits · Usage · No eval budget | — | settings.limits · Usage · Loading | settings.limits · Usage · Eval token budget | settings.limits · Usage · Could not load | — | — |
+| The eval token budget | Operator | settings.limits · Usage · No eval budget | — | settings.limits · Usage · Loading | settings.limits · Usage · Read only | settings.limits · Usage · Could not load | — | settings.limits · Usage · Read only |
+| A skill's run paused on budget | Admin | — | — | — | agents.skills · Detail · Budget paused | agents.skills · Detail · Budget paused | — | — |
+| A skill's run paused on budget | Operator | — | — | — | agents.skills · Detail · Budget paused | agents.skills · Detail · Budget paused | — | agents.skills · Detail · Budget paused |
+| An agent's run paused on budget | Admin | — | — | — | agents.agents · Detail · Budget paused | agents.agents · Detail · Budget paused | — | — |
+| An agent's run paused on budget | Operator | — | — | — | agents.agents · Detail · Budget paused | agents.agents · Detail · Budget paused | — | agents.agents · Detail · Budget paused |

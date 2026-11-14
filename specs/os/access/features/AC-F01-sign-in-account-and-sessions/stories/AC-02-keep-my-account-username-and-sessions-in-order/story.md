@@ -4,7 +4,7 @@ title: Keep my account and sessions in order
 feature: AC-F01
 status: idea
 personas: [analyst, admin, builder]
-boards: [settings.me, access.sign_in_again]
+boards: [settings.me, access.signin]
 ---
 
 # AC-02 · Keep my account and sessions in order
@@ -83,5 +83,5 @@ flowchart TD
 | Username | Operator | — | — | — | settings.me · Username | settings.me · Inside the cooldown | — | — |
 | Password and sessions | Admin | — | — | — | settings.me · Sessions | settings.me · Password refused | — | — |
 | Password and sessions | Operator | — | — | — | settings.me · Sessions | settings.me · Password refused | — | — |
-| Sign in again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
-| Sign in again | Operator | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Sign in again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
+| Sign in again | Operator | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |

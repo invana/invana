@@ -4,7 +4,7 @@ title: Attach a policy to agents
 feature: AC-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.access, access.locked]
+boards: [settings.policies]
 ---
 
 # AC-11 · Attach a policy to agents
@@ -53,7 +53,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Attached to | Admin | settings.access · Not attached | settings.access · Nothing matches | settings.access · Loading | settings.access | settings.access · Could not load | — | — |
-| Attached to | Operator | access.locked · Not attached | access.locked · Nothing matches | access.locked · Loading | access.locked | access.locked · Could not load | — | access.locked |
-| Attach to an agent | Admin | — | — | — | settings.access · Attach to an agent | settings.access · Could not attach | — | — |
-| Attach to an agent | Operator | — | — | — | — | — | — | access.locked |
+| Attached to | Admin | settings.policies · Not attached | settings.policies · Nothing matches | settings.policies · Loading | settings.policies | settings.policies · Could not load | — | — |
+| Attached to | Operator | settings.policies · Locked · Not attached | settings.policies · Locked · Nothing matches | settings.policies · Locked · Loading | settings.policies · Locked | settings.policies · Locked · Could not load | — | settings.policies · Locked |
+| Attach to an agent | Admin | settings.policies · Attach | — | — | settings.policies · Attach · Who it changes | settings.policies · Attach · Could not attach | — | — |
+| Attach to an agent | Operator | — | — | — | — | — | — | settings.policies · Attach · Locked |

@@ -4,7 +4,7 @@ title: Be told when Graph Data does not hold it
 feature: EX-F05
 status: idea
 personas: [analyst]
-boards: [explore.board, explore.board.cannot]
+boards: [explore.board]
 ---
 
 # EX-05 · Be told when Graph Data does not hold it
@@ -69,9 +69,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The reply in the thread | Admin | explore.board.cannot · Nothing loaded | explore.board.cannot | explore.board · Working | explore.board.cannot · Modelled but empty | explore.board.cannot · Stopped | — | — |
-| The reply in the thread | Operator | explore.board.cannot · Nothing loaded | explore.board.cannot | explore.board · Working | explore.board.cannot · Modelled but empty | explore.board.cannot · Stopped | — | explore.board.cannot · Load data disabled |
-| The plan gap | Admin | — | — | explore.board · Working | explore.board.cannot · Plan gap | — | explore.board.cannot · Plan gap, a function offered | — |
-| The plan gap | Operator | — | — | explore.board · Working | explore.board.cannot · Plan gap | — | explore.board.cannot · Plan gap, a function offered | — |
+| The reply in the thread | Admin | explore.board · Cannot · Nothing loaded | explore.board · Cannot | explore.board · Working | explore.board · Cannot · Modelled but empty | explore.board · Cannot · Stopped | — | — |
+| The reply in the thread | Operator | explore.board · Cannot · Nothing loaded | explore.board · Cannot | explore.board · Working | explore.board · Cannot · Modelled but empty | explore.board · Cannot · Stopped | — | explore.board · Cannot · Load data disabled |
+| The plan gap | Admin | — | — | explore.board · Working | explore.board · Cannot · Plan gap | — | explore.board · Cannot · Plan gap, a function offered | — |
+| The plan gap | Operator | — | — | explore.board · Working | explore.board · Cannot · Plan gap | — | explore.board · Cannot · Plan gap, a function offered | — |
 | A step retrying or repairing | Admin | — | — | explore.board · Retrying | explore.board · Repairing | explore.board · Retries exhausted | explore.board · Working | — |
 | A step retrying or repairing | Operator | — | — | explore.board · Retrying | explore.board · Repairing | explore.board · Retries exhausted | explore.board · Working | — |

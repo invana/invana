@@ -4,7 +4,7 @@ title: "Say what an agent may touch on a worker: files, commands, network"
 feature: AC-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.access, access.locked]
+boards: [settings.policies]
 ---
 
 # AC-37 · Say what an agent may touch on a worker: files, commands, network
@@ -62,5 +62,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Worker rules on a policy | Admin | settings.access · No worker rules | — | settings.access · Loading | settings.access · Worker rules | settings.access · Rule refused | — | — |
-| Worker rules on a policy | Operator | access.locked · No worker rules | — | access.locked · Loading | access.locked · Worker rules | access.locked · Could not load | — | access.locked · Worker rules |
+| Worker rules on a policy | Admin | settings.policies · No worker rules | — | settings.policies · Loading | settings.policies · Worker rules | settings.policies · Rule refused | — | — |
+| Worker rules on a policy | Operator | settings.policies · Locked · No worker rules | — | settings.policies · Locked · Loading | settings.policies · Locked · Worker rules | settings.policies · Locked · Could not load | — | settings.policies · Locked · Worker rules |

@@ -4,7 +4,7 @@ title: Browse memory and follow a decision to its sources
 feature: GP-F02
 status: idea
 personas: [builder, decision-maker, admin]
-boards: [agents.thinking]
+boards: [graph.memory]
 ---
 
 # GP-03 · Browse memory and follow a decision to its sources
@@ -63,7 +63,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The thinking graph | Admin | agents.thinking · Fills as runs settle | agents.thinking · Nothing matches | agents.thinking · Loading | agents.thinking | agents.thinking · Unavailable | agents.thinking · Behind | — |
-| The thinking graph | Operator | agents.thinking · Fills as runs settle | agents.thinking · Nothing matches | agents.thinking · Loading | agents.thinking | agents.thinking · Unavailable | agents.thinking · Behind | agents.thinking · Withheld node |
-| A node and its sources | Admin | — | — | agents.thinking · Node loading | agents.thinking · Decision sources | agents.thinking · Unavailable | — | — |
-| A node and its sources | Operator | — | — | agents.thinking · Node loading | agents.thinking · Decision sources | agents.thinking · Unavailable | — | agents.thinking · Withheld node |
+| The thinking graph | Admin | graph.memory · Thinking · Fills as runs settle | graph.memory · Thinking · Nothing matches | graph.memory · Thinking · Loading | graph.memory · Thinking | graph.memory · Thinking · Unavailable | graph.memory · Thinking · Behind | — |
+| The thinking graph | Operator | graph.memory · Thinking · Fills as runs settle | graph.memory · Thinking · Nothing matches | graph.memory · Thinking · Loading | graph.memory · Thinking | graph.memory · Thinking · Unavailable | graph.memory · Thinking · Behind | graph.memory · Thinking · Withheld node |
+| A node and its sources | Admin | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | — |
+| A node and its sources | Operator | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |

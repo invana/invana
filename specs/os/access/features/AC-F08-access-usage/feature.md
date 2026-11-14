@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [AC-28, AC-29]
 journeys: [J09]
-boards: [access.usage, access.locked]
+boards: [access.usage]
 nfrs: [NFR-SEC-1, NFR-SEC-7]
 depends_on: [AC-F02, AC-F04, AC-F06, AC-F09]
 ---

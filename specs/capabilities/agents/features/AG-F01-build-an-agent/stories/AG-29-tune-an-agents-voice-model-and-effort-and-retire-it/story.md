@@ -4,7 +4,7 @@ title: Tune an agent's voice, model and effort, and retire it
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.agent, settings.ai]
+boards: [agents.agents, settings.ai]
 ---
 
 # AG-29 · Tune an agent's voice, model and effort, and retire it
@@ -78,13 +78,13 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Voice | Admin | agents.agent · Default voice | — | agents.agent · Loading | agents.agent · Voice | agents.agent · Could not save | agents.agent · Previewing | — |
-| Voice | Operator | agents.agent · Default voice | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
-| Model version and effort | Admin | agents.agent · No pin | — | agents.agent · Loading | agents.agent | agents.agent · Version not offered | agents.agent · Evals running | — |
-| Model version and effort | Operator | agents.agent · No pin | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Version not offered | — | agents.agent · Read only |
+| Voice | Admin | agents.agents · Detail · Default voice | — | agents.agents · Detail · Loading | agents.agents · Detail · Voice | agents.agents · Detail · Could not save | agents.agents · Detail · Previewing | — |
+| Voice | Operator | agents.agents · Detail · Default voice | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| Model version and effort | Admin | agents.agents · Detail · No pin | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Version not offered | agents.agents · Detail · Evals running | — |
+| Model version and effort | Operator | agents.agents · Detail · No pin | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Version not offered | — | agents.agents · Detail · Read only |
 | Pinned by | Admin | settings.ai · No pins | — | settings.ai · Loading | settings.ai | settings.ai · Pin not offered | — | — |
 | Pinned by | Operator | settings.ai · No pins | — | settings.ai · Loading | settings.ai | settings.ai · Pin not offered | — | settings.ai · Read only |
-| Pause and Retire | Admin | — | — | agents.agent · Reading open work | agents.agent · Retire | agents.agent · Default cannot retire | — | — |
-| Pause and Retire | Operator | — | — | — | — | — | — | agents.agent · Read only |
-| A retired agent | Admin | — | — | — | agents.agent · Retired | — | — | — |
-| A retired agent | Operator | — | — | — | agents.agent · Retired | — | — | agents.agent · Retired |
+| Pause and Retire | Admin | — | — | agents.agents · Detail · Reading open work | agents.agents · Detail · Retire | agents.agents · Detail · Default cannot retire | — | — |
+| Pause and Retire | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |
+| A retired agent | Admin | — | — | — | agents.agents · Detail · Retired | — | — | — |
+| A retired agent | Operator | — | — | — | agents.agents · Detail · Retired | — | — | agents.agents · Detail · Retired |

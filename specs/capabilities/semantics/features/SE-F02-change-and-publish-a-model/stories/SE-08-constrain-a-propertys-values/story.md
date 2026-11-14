@@ -4,7 +4,7 @@ title: Constrain a property's values
 feature: SE-F02
 status: idea
 personas: [modeller]
-boards: [model.board.kind, model.board.draft]
+boards: [model.kinds, model.models]
 ---
 
 # SE-08 · Constrain a property's values
@@ -63,7 +63,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A kind · Must be | Admin | model.board.kind · No constraints | — | — | model.board.kind | — | — | — |
-| A kind · Must be | Operator | model.board.kind · No constraints | — | — | model.board.kind · Read only | — | — | model.board.kind · Read only |
-| The constraint | Admin | model.board.draft · Constraint | — | model.board.draft · Constraint counting | model.board.draft · Constraint breaks today | model.board.draft · Constraint refused | — | — |
+| A kind · Must be | Admin | model.kinds · Detail · No constraints | — | — | model.kinds · Detail | — | — | — |
+| A kind · Must be | Operator | model.kinds · Detail · No constraints | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Read only |
+| The constraint | Admin | model.models · Draft · Constraint | — | model.models · Draft · Constraint counting | model.models · Draft · Constraint breaks today | model.models · Draft · Constraint refused | — | — |
 | The constraint | Operator | — | — | — | — | — | — | — |

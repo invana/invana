@@ -4,7 +4,7 @@ title: See every user and set a person's role
 feature: AC-F03
 status: idea
 personas: [admin, analyst]
-boards: [settings.people, access.locked]
+boards: [settings.people]
 ---
 
 # AC-22 · See every user and set a person's role
@@ -63,6 +63,6 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Users | Admin | settings.people · First Admin | settings.people · Nothing matches | settings.people · Loading | settings.people | settings.people · Could not load | — | — |
-| Users | Operator | access.locked · Users · First Admin | access.locked · Users · Nothing matches | access.locked · Users · Loading | access.locked · Users | access.locked · Users · Could not load | — | access.locked · Users |
+| Users | Operator | settings.people · Locked · Users · First Admin | settings.people · Locked · Users · Nothing matches | settings.people · Locked · Users · Loading | settings.people · Locked · Users | settings.people · Locked · Users · Could not load | — | settings.people · Locked · Users |
 | A person — role and agents | Admin | settings.people · One Admin | — | — | settings.people · A person | settings.people · Two Admins | — | — |
-| A person — role and agents | Operator | — | — | — | access.locked · A person | — | — | access.locked · A person |
+| A person — role and agents | Operator | — | — | — | settings.people · Locked · A person | — | — | settings.people · Locked · A person |

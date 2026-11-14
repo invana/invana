@@ -4,7 +4,7 @@ title: Set how long memory and History are kept, and hold them
 feature: AC-F12
 status: idea
 personas: [admin]
-boards: [settings.keeping, access.locked]
+boards: [settings.keeping]
 ---
 
 # AC-44 · Set how long memory and History are kept, and hold them
@@ -63,8 +63,8 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Stores and holds | Admin | settings.keeping · Keep everything | — | settings.keeping · Loading | settings.keeping | settings.keeping · Could not load | settings.keeping · Waiting on a hold | — |
-| Stores and holds | Operator | access.locked · Keeping · Keep everything | — | access.locked · Keeping · Loading | access.locked · Keeping | access.locked · Keeping · Could not load | access.locked · Keeping · Waiting on a hold | access.locked · Keeping |
+| Stores and holds | Operator | settings.keeping · Locked · Keeping · Keep everything | — | settings.keeping · Locked · Keeping · Loading | settings.keeping · Locked · Keeping | settings.keeping · Locked · Keeping · Could not load | settings.keeping · Locked · Keeping · Waiting on a hold | settings.keeping · Locked · Keeping |
 | Set a period — preview | Admin | — | — | settings.keeping · Counting | settings.keeping · Preview | settings.keeping · Under a day | — | — |
-| Set a period — preview | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Set a period — preview | Operator | — | — | — | — | — | — | settings.keeping · Locked · Keeping |
 | Place or lift a hold | Admin | — | — | — | settings.keeping · Hold | settings.keeping · Already held | — | — |
-| Place or lift a hold | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Place or lift a hold | Operator | — | — | — | — | — | — | settings.keeping · Locked · Keeping |

@@ -4,7 +4,7 @@ title: Find access an agent never uses
 feature: AC-F08
 status: idea
 personas: [admin, builder]
-boards: [access.usage, access.locked]
+boards: [access.usage]
 ---
 
 # AC-29 · Find access an agent never uses
@@ -56,4 +56,4 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Unused access | Admin | access.usage · Unused · Everything used | — | access.usage · Unused · Loading | access.usage · Unused | access.usage · Unused · Could not load | — | — |
-| Unused access | Operator | access.usage · Unused · Everything used | — | access.usage · Unused · Loading | access.usage · Unused · Read only | access.usage · Unused · Could not load | — | access.locked · Not offered |
+| Unused access | Operator | access.usage · Unused · Everything used | — | access.usage · Unused · Loading | access.usage · Unused · Read only | access.usage · Unused · Could not load | — | access.usage · Locked · Not offered |

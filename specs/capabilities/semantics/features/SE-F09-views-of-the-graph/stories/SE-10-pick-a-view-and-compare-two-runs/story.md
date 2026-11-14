@@ -4,7 +4,7 @@ title: Pick a view and compare two runs
 feature: SE-F09
 status: idea
 personas: [modeller, analyst]
-boards: [model.rules.views, explore.board, explore.compare]
+boards: [model.views, explore.board, agents.runs]
 ---
 
 # SE-10 · Pick a view and compare two runs
@@ -78,13 +78,15 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Views | Admin | model.rules.views · Everything | model.rules.views · No view matches | model.rules.views · Loading | model.rules.views | model.rules.views · Could not load | — | — |
-| Views | Operator | model.rules.views · Everything | model.rules.views · No view matches | model.rules.views · Loading | model.rules.views | model.rules.views · Could not load | — | model.rules.views · Read only |
-| A view | Admin | — | — | model.rules.views · View · Loading | model.rules.views · View | model.rules.views · View · Unpublished version | — | — |
-| A view | Operator | — | — | model.rules.views · View · Loading | model.rules.views · View | model.rules.views · View · Unpublished version | — | model.rules.views · View · Read only |
-| New view · Edit | Admin | model.rules.views · New view | — | — | model.rules.views · Edit | model.rules.views · Edit · Refused | — | — |
-| New view · Edit | Operator | — | — | — | — | — | — | model.rules.views · Read only |
+| Views | Admin | model.views · Everything | model.views · No view matches | model.views · Loading | model.views | model.views · Could not load | — | — |
+| Views | Operator | model.views · Everything | model.views · No view matches | model.views · Loading | model.views | model.views · Could not load | — | model.views · Read only |
+| A view | Admin | — | — | model.views · Detail · Loading | model.views · Detail | model.views · Detail · Unpublished version | — | — |
+| A view | Operator | — | — | model.views · Detail · Loading | model.views · Detail | model.views · Detail · Unpublished version | — | model.views · Detail · Read only |
+| New view | Admin | model.views · New | — | — | model.views · New · Filled | model.views · New · Refused | — | — |
+| New view | Operator | — | — | — | — | — | — | model.views · Read only |
+| Edit a view | Admin | — | — | — | model.views · Detail · Edit | model.views · Detail · Edit · Refused | — | — |
+| Edit a view | Operator | — | — | — | — | — | — | model.views · Read only |
 | A view in the composer | Admin | explore.board · View · Everything | — | — | explore.board · View picked | explore.board · View · Cannot be cast | explore.board · View · Outside this view | — |
 | A view in the composer | Operator | explore.board · View · Everything | — | — | explore.board · View picked | explore.board · View · Cannot be cast | explore.board · View · Outside this view | — |
-| Compare | Admin | — | — | explore.compare · Loading | explore.compare | explore.compare · Could not load | explore.compare · Second run running | — |
-| Compare | Operator | — | — | explore.compare · Loading | explore.compare | explore.compare · Could not load | explore.compare · Second run running | explore.compare · Content withheld |
+| Compare | Admin | — | — | agents.runs · Detail · Compare · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Compare · Could not load | agents.runs · Detail · Compare · Second run running | — |
+| Compare | Operator | — | — | agents.runs · Detail · Compare · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Compare · Could not load | agents.runs · Detail · Compare · Second run running | agents.runs · Detail · Compare · Content withheld |

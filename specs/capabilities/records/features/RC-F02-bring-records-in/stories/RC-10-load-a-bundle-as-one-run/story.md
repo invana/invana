@@ -4,7 +4,7 @@ title: Load a bundle as one run
 feature: RC-F02
 status: idea
 personas: [modeller]
-boards: [data.upload, agents.run]
+boards: [data.loads, agents.runs]
 ---
 
 # RC-10 · Load a bundle as one run
@@ -62,7 +62,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A bundle in loads | Admin | data.upload · No loads yet | data.upload · No loads match | data.upload · Loads loading | data.upload · Bundle | data.upload · Loads could not load | — | — |
-| A bundle in loads | Operator | data.upload · No loads yet | data.upload · No loads match | data.upload · Loads loading | data.upload · Bundle | data.upload · Loads could not load | — | — |
-| A bundle's run | Admin | — | — | agents.run · Bundle running | agents.run · Bundle | agents.run · Bundle partly failed | — | — |
-| A bundle's run | Operator | — | — | agents.run · Bundle running | agents.run · Bundle | agents.run · Bundle partly failed | — | — |
+| A bundle in loads | Admin | data.loads · Upload · No loads yet | data.loads · Upload · No loads match | data.loads · Upload · Loads loading | data.loads · Upload · Bundle | data.loads · Upload · Loads could not load | — | — |
+| A bundle in loads | Operator | data.loads · Upload · No loads yet | data.loads · Upload · No loads match | data.loads · Upload · Loads loading | data.loads · Upload · Bundle | data.loads · Upload · Loads could not load | — | — |
+| A bundle's run | Admin | — | — | agents.runs · Detail · Bundle running | agents.runs · Detail · Bundle | agents.runs · Detail · Bundle partly failed | — | — |
+| A bundle's run | Operator | — | — | agents.runs · Detail · Bundle running | agents.runs · Detail · Bundle | agents.runs · Detail · Bundle partly failed | — | — |

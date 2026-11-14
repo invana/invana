@@ -61,7 +61,11 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Standards | Admin | model.standards · No standards yet | model.standards · No standard matches | model.standards · Loading | model.standards | model.standards · Could not load | — | — |
 | Standards | Operator | model.standards · No standards yet | model.standards · No standard matches | model.standards · Loading | model.standards | model.standards · Could not load | — | — |
-| A standard | Admin | — | — | model.standards · Loading | model.standards · Standard | model.standards · Could not load | — | — |
-| A standard | Operator | — | — | model.standards · Loading | model.standards · Standard | model.standards · Could not load | — | model.standards · Standard read only |
-| Write a standard | Admin | model.standards · Write a standard | — | — | model.standards · Write a standard | model.standards · Standard unchanged | — | — |
-| Write a standard | Operator | model.standards · Write a standard | — | — | model.standards · Write a standard | model.standards · Standard unchanged | — | model.standards · Standard read only |
+| A standard | Admin | — | — | model.standards · Loading | model.standards · Detail | model.standards · Could not load | — | — |
+| A standard | Operator | — | — | model.standards · Loading | model.standards · Detail | model.standards · Could not load | — | model.standards · Detail · Read only |
+| New standard · 1 Name · 2 Start from | Admin | model.standards · New | — | — | model.standards · New · Write picked | — | — | — |
+| New standard · 1 Name · 2 Start from | Operator | model.standards · New | — | — | model.standards · New · Write picked | — | — | model.standards · Detail · Read only |
+| New standard · 3 Write the terms | Admin | model.standards · New · No terms yet | — | — | model.standards · New · Terms | model.standards · New · Standard unchanged | — | — |
+| New standard · 3 Write the terms | Operator | model.standards · New · No terms yet | — | — | model.standards · New · Terms | model.standards · New · Standard unchanged | — | model.standards · Detail · Read only |
+| New version | Admin | — | — | — | model.standards · Write a standard | model.standards · Detail · Unchanged | — | — |
+| New version | Operator | — | — | — | model.standards · Write a standard | model.standards · Detail · Unchanged | — | model.standards · Detail · Read only |

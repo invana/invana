@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, builder, modeller, admin]
 stories: [AC-01, AC-34, AC-02, AC-18]
 journeys: [J01, J05, J07]
-boards: [access.signin, access.sign_in_again, settings.me]
+boards: [access.signin, settings.me, settings.people]
 nfrs: [NFR-SEC-2, NFR-SEC-4, NFR-SEC-6]
 depends_on: [AC-F02, AC-F03, AC-F06]
 ---
@@ -84,7 +84,7 @@ sequenceDiagram
 | Read and change one's own name, email, time zone and username | The person themselves, in a session | — |
 | Change one's own password | The person themselves, in a session, with the current password | — |
 | Sign out here · sign out everywhere | The person themselves, in a session | — |
-| Make an account · set a new password for one | Admin — from the command line, or signed in through the API with the password again; never with a key ([AC-18](stories/AC-18-give-a-person-an-account/story.md)) | Refused, naming the Admin role |
+| Make an account · set a new password for one | Admin — from the command line, or signed in from Settings › Access › People › *New person* or the API with the password again; never with a key ([AC-18](stories/AC-18-give-a-person-an-account/story.md)) | Refused, naming the Admin role |
 | Another person's profile, password or sessions | No one in Studio; an Admin deactivates a person ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)) | — |
 | Read who is signed in and when each last acted — coarse, from writes and runs only, never where or from which device ([AC-F06 › When one last acted](../AC-F06-history/feature.md#mechanisms)) | Admin, in the Access dropdown ([AC-48](../AC-F06-history/stories/AC-48-see-who-is-acting-and-what-was-blocked-from-the-header/story.md)) | Absent |
 

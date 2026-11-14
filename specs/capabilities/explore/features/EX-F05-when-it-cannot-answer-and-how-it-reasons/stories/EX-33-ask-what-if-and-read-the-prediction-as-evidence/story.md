@@ -4,7 +4,7 @@ title: Ask what if, and read the prediction as evidence
 feature: EX-F05
 status: idea
 personas: [decision-maker, analyst]
-boards: [explore.ask, explore.board, explore.board.save_derived, agents.run.answer]
+boards: [explore.board, agents.runs]
 ---
 
 # EX-33 · Ask what if, and read the prediction as evidence
@@ -71,11 +71,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| What-if in the composer | Admin | explore.ask · Act as, built-in only | — | — | explore.ask · What-if picked | — | explore.ask · Assumptions before the run | — |
-| What-if in the composer | Operator | explore.ask · Act as, built-in only | — | — | explore.ask · What-if picked | — | explore.ask · Assumptions before the run | — |
+| What-if in the composer | Admin | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · What-if picked | — | explore.board · Ask · Assumptions before the run | — |
+| What-if in the composer | Operator | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · What-if picked | — | explore.board · Ask · Assumptions before the run | — |
 | The predicted part | Admin | explore.board · No simulator | — | explore.board · Simulating | explore.board · Predicted | explore.board · Simulation failed | explore.board · Simulating | — |
 | The predicted part | Operator | explore.board · No simulator | — | explore.board · Simulating | explore.board · Predicted | explore.board · Simulation failed | explore.board · Simulating | explore.board · Save disabled |
-| Save as derived records | Admin | — | — | explore.board.save_derived · Saving | explore.board.save_derived | explore.board.save_derived · Refused | — | — |
+| Save as derived records | Admin | — | — | explore.board · Save derived · Saving | explore.board · Save derived | explore.board · Save derived · Refused | — | — |
 | Save as derived records | Operator | — | — | — | — | — | — | explore.board · Save disabled |
-| The run's trace | Admin | — | — | agents.run.answer · Loading | agents.run.answer · Simulation | agents.run.answer · Step failed | agents.run.answer · Running | — |
-| The run's trace | Operator | — | — | agents.run.answer · Loading | agents.run.answer · Simulation | agents.run.answer · Step failed | agents.run.answer · Running | agents.run.answer · Content withheld |
+| The run's trace | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Simulation | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | — |
+| The run's trace | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Simulation | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |

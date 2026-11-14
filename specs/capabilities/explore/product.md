@@ -50,12 +50,12 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 | Surface | Tier | Board |
 |---|---|---|
 | A board and its canvas | mode | `explore.board` |
-| Asking | mode | `explore.ask` |
+| Asking | mode | `explore.board · Ask` |
 | Dashboards | mode | `explore.dashboards` |
-| A dashboard | mode | `explore.dashboard` |
-| Why? | peek | `explore.board.why` |
-| Share | modal | `explore.share` |
-| Compare | sheet | `explore.compare` |
+| A dashboard | mode | `explore.dashboards · Detail` |
+| Why? | peek | `explore.board · Why` |
+| Share | modal | `explore.board · Share` |
+| Compare | sheet | `agents.runs · Detail · Compare` |
 
 ## Decisions
 

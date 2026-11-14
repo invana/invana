@@ -65,5 +65,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Add workers | Admin | settings.workers · Add workers | — | settings.workers · Waiting to join | settings.workers · Joined | settings.workers · Join failed | — | — |
-| Add workers | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 1 Where | Admin | settings.workers · Add workers | — | — | settings.workers · Add workers · Where picked | — | — | — |
+| Add workers · 1 Where | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 2 Group | Admin | settings.workers · Add workers · New group | — | — | settings.workers · Add workers · Existing group | settings.workers · Add workers · Runtime not installed | — | — |
+| Add workers · 2 Group | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 3 Join key · 4 Run it | Admin | — | — | — | settings.workers · Add workers · Run it | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 3 Join key · 4 Run it | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 5 Joined | Admin | — | — | settings.workers · Add workers · Waiting to join | settings.workers · Add workers · Joined | settings.workers · Add workers · Join failed | — | — |
+| Add workers · 5 Joined | Operator | — | — | — | — | — | — | settings.workers · Read only |

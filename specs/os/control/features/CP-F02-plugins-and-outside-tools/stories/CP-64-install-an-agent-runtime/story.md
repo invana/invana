@@ -65,6 +65,8 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Runtimes | Admin | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes | settings.plugins · Install refused | — | — |
 | Runtimes | Operator | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes · Read only | settings.plugins · Could not load | — | settings.plugins · Runtimes · Read only |
+| Install a runtime | Admin | settings.plugins · Runtimes · Install | — | — | settings.plugins · Runtimes · Install · Installed, off | settings.plugins · Runtimes · Install · Install refused | — | — |
+| Install a runtime | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |
 | A worker group's runtimes | Admin | — | — | settings.workers · Loading | settings.workers · Group | settings.workers · No worker carries the runtime | — | — |
 | A worker group's runtimes | Operator | — | — | settings.workers · Loading | settings.workers · Group · Read only | settings.workers · No worker carries the runtime | — | settings.workers · Read only |
 </content>

@@ -67,7 +67,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Rules | Admin | model.rules · No rules on properties | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | — |
 | Rules | Operator | model.rules · No rules on properties | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | model.rules · Rules read only |
-| A rule on a property | Admin | model.rules · Property rule never refused | — | model.rules · Property rule loading | model.rules · Property rule | model.rules · Could not load | — | — |
-| A rule on a property | Operator | model.rules · Property rule never refused | — | model.rules · Property rule loading | model.rules · Property rule | model.rules · Could not load | — | model.rules · Property rule read only |
-| New rule on a property | Admin | model.rules · New property rule | — | model.rules · Property rule counting | model.rules · Property rule impact | model.rules · Property rule refused | — | — |
+| A rule on a property | Admin | model.rules · Detail · Property rule · Never refused | — | model.rules · Detail · Property rule · Loading | model.rules · Detail · Property rule | model.rules · Could not load | — | — |
+| A rule on a property | Operator | model.rules · Detail · Property rule · Never refused | — | model.rules · Detail · Property rule · Loading | model.rules · Detail · Property rule | model.rules · Could not load | — | model.rules · Detail · Property rule · Read only |
+| New rule on a property | Admin | model.rules · New · Property rule | — | model.rules · Detail · Property rule · Counting | model.rules · Detail · Property rule · Impact | model.rules · Detail · Property rule · Refused | — | — |
 | New rule on a property | Operator | — | — | — | — | — | — | model.rules · Rules read only |

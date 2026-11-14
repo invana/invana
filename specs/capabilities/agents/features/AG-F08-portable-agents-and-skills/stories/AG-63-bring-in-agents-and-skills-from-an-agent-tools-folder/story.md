@@ -4,7 +4,7 @@ title: Bring in agents and skills from an agent tool's folder
 feature: AG-F08
 status: idea
 personas: [builder, admin]
-boards: [agents.skills, agents.agent, settings.access]
+boards: [agents.skills, settings.policies, agents.agents]
 ---
 
 # AG-63 · Bring in agents and skills from an agent tool's folder
@@ -71,11 +71,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Import — a project's folder | Admin | agents.skills · Import | — | agents.skills · Reading the files | agents.skills · Tool folders found | agents.skills · No agents found | agents.skills · Mapping | — |
+| Import — a project's folder | Admin | agents.skills · Import | — | agents.skills · Import · Reading the files | agents.skills · Import · Tool folders found | agents.skills · Import · No agents found | agents.skills · Import · Mapping | — |
 | Import — a project's folder | Operator | — | — | — | — | — | — | agents.skills · Import disabled |
-| An agent's declared needs and skills | Admin | — | — | agents.skills · Reading the files | agents.skills · Needs and skills mapped | agents.skills · Skill not found | agents.skills · Mapping | — |
+| An agent's declared needs and skills | Admin | — | — | agents.skills · Import · Reading the files | agents.skills · Import · Needs and skills mapped | agents.skills · Import · Skill not found | agents.skills · Import · Mapping | — |
 | An agent's declared needs and skills | Operator | — | — | — | — | — | — | agents.skills · Import disabled |
-| Policy files brought in | Admin | — | — | — | settings.access · Waiting to apply | settings.access · Rule refused | — | — |
-| Policy files brought in | Operator | — | — | — | — | — | — | settings.access · Waiting to apply |
-| An imported agent | Admin | — | — | agents.agent · Loading | agents.agent · Imported | agents.agent · Could not load | — | — |
-| An imported agent | Operator | — | — | agents.agent · Loading | agents.agent · Imported | agents.agent · Could not load | — | agents.agent · Read only |
+| Policy files brought in | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
+| Policy files brought in | Operator | — | — | — | — | — | — | settings.policies · Waiting to apply |
+| An imported agent | Admin | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Imported | agents.agents · Detail · Could not load | — | — |
+| An imported agent | Operator | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Imported | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |

@@ -4,7 +4,7 @@ title: Export and import a model
 feature: SE-F06
 status: idea
 personas: [modeller]
-boards: [model.new, model.board.draft]
+boards: [model.models]
 ---
 
 # SE-16 · Export and import a model
@@ -64,11 +64,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Export | Admin | model.new · Export | — | model.new · Exporting | model.new · Export | model.new · Export failed | — | — |
-| Export | Operator | model.new · Export | — | model.new · Exporting | model.new · Export | model.new · Export failed | — | — |
-| Export · values left out | Admin | — | — | — | model.new · Export · Redacted | — | — | — |
-| Export · values left out | Operator | — | — | — | model.new · Export · Redacted | — | — | — |
-| Import a model file | Admin | model.new · Import | — | model.new · Reading the file | model.new · Restore | model.new · Import unreadable | — | — |
-| Import a model file | Operator | — | — | — | — | — | — | model.new · No access |
-| The imported draft | Admin | — | — | model.board.draft · Arriving | model.board.draft · Restored | model.board.draft · Cannot publish | — | — |
-| The imported draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
+| Export | Admin | model.models · Export | — | model.models · Exporting | model.models · Export | model.models · Export failed | — | — |
+| Export | Operator | model.models · Export | — | model.models · Exporting | model.models · Export | model.models · Export failed | — | — |
+| Export · values left out | Admin | — | — | — | model.models · Export · Redacted | — | — | — |
+| Export · values left out | Operator | — | — | — | model.models · Export · Redacted | — | — | — |
+| Import a model file | Admin | model.models · Import | — | model.models · New · Reading the file | model.models · Restore | model.models · Import unreadable | — | — |
+| Import a model file | Operator | — | — | — | — | — | — | model.models · New · No access |
+| The imported draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft · Restored | model.models · Draft · Cannot publish | — | — |
+| The imported draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |

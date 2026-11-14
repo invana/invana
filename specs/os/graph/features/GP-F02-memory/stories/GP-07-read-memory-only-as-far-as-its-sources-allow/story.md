@@ -4,7 +4,7 @@ title: Read memory only as far as its sources allow
 feature: GP-F02
 status: idea
 personas: [builder, decision-maker, admin]
-boards: [agents.thinking]
+boards: [graph.memory]
 ---
 
 # GP-07 · Read memory only as far as its sources allow
@@ -59,5 +59,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A memory node | Admin | — | — | agents.thinking · Node loading | agents.thinking · Decision sources | agents.thinking · Unavailable | — | agents.thinking · Withheld node |
-| A memory node | Operator | — | — | agents.thinking · Node loading | agents.thinking · Decision sources | agents.thinking · Unavailable | — | agents.thinking · Withheld node |
+| A memory node | Admin | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |
+| A memory node | Operator | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |

@@ -4,7 +4,7 @@ title: Start a model from a description, a file or a starter
 feature: SE-F01
 status: idea
 personas: [modeller]
-boards: [model.new, model.board.draft, settings.databases.connect.shape]
+boards: [model.models, settings.databases]
 ---
 
 # SE-06 · Start a model from a description, a file or a starter
@@ -62,9 +62,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New model | Admin | model.new | — | model.new · Reading the file | model.new · Starters | model.new · Name taken | — | — |
-| New model | Operator | — | — | — | — | — | — | model.new · No access |
-| The draft | Admin | model.board.draft · Empty draft | — | model.board.draft · Arriving | model.board.draft | model.board.draft · Cannot publish | model.board.draft · Assistant drafting | — |
-| The draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
-| Connect a graph database · shape the model | Admin | settings.databases.connect.shape | — | settings.databases.connect.shape · Reading | settings.databases.connect.shape · Starters | settings.databases.connect.shape · Name taken | settings.databases.connect.shape · Drafting | — |
+| New model | Admin | model.models · New | — | model.models · New · Reading the file | model.models · New · Starters | model.models · New · Name taken | — | — |
+| New model | Operator | — | — | — | — | — | — | model.models · New · No access |
+| The draft | Admin | model.models · Draft · Empty draft | — | model.models · Draft · Arriving | model.models · Draft | model.models · Draft · Cannot publish | model.models · Draft · Assistant drafting | — |
+| The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
+| Connect a graph database · shape the model | Admin | settings.databases · Connect · Shape | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape · Starters | settings.databases · Connect · Shape · Name taken | settings.databases · Connect · Shape · Drafting | — |
 | Connect a graph database · shape the model | Operator | — | — | — | — | — | — | — |

@@ -4,7 +4,7 @@ title: Read the built-in agents and the policies they run under
 feature: AC-F02
 status: idea
 personas: [admin, analyst]
-boards: [settings.access, access.locked]
+boards: [settings.agent_access]
 ---
 
 # AC-20 · Read the built-in agents and the policies they run under
@@ -54,9 +54,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Built-in agents | Admin | — | — | settings.access · Loading | settings.access · Built-in agents | settings.access · Could not load | — | — |
-| Built-in agents | Operator | — | — | access.locked · Loading | access.locked · Built-in agents | access.locked · Could not load | — | access.locked · Built-in agents |
-| A built-in agent | Admin | — | — | settings.access · Loading | settings.access · Built-in agent | settings.access · Built in refused | — | — |
-| A built-in agent | Operator | — | — | access.locked · Loading | access.locked · Built-in agent | access.locked · Could not load | — | access.locked · Built-in agent |
-| A person's act, no grant | Admin | — | — | — | — | access.locked · Agent not granted | — | — |
-| A person's act, no grant | Operator | — | — | — | — | access.locked · Agent not granted | — | access.locked · Agent not granted |
+| Built-in agents | Admin | — | — | settings.agent_access · Loading | settings.agent_access · Built-in agents | settings.agent_access · Could not load | — | — |
+| Built-in agents | Operator | — | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Built-in agents | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Built-in agents |
+| A built-in agent | Admin | — | — | settings.agent_access · Loading | settings.agent_access · Built-in agent | settings.agent_access · Built in refused | — | — |
+| A built-in agent | Operator | — | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Built-in agent | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Built-in agent |
+| A person's act, no grant | Admin | — | — | — | — | settings.agent_access · Locked · Agent not granted | — | — |
+| A person's act, no grant | Operator | — | — | — | — | settings.agent_access · Locked · Agent not granted | — | settings.agent_access · Locked · Agent not granted |

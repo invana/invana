@@ -4,7 +4,7 @@ title: Accept, edit or reject a suggested change, then see if it helped
 feature: AG-F09
 status: idea
 personas: [builder, modeller]
-boards: [inbox, agents.skill]
+boards: [inbox, agents.skills]
 ---
 
 # AG-52 · Accept, edit or reject a suggested change, then see if it helped
@@ -71,5 +71,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Deciding a suggested change | Admin | inbox · Nothing suggested | — | inbox · Publishing | inbox · Suggested change | inbox · Stale base | inbox · Waits on approvers | — |
 | Deciding a suggested change | Operator | inbox · Nothing suggested | — | inbox · Loading | inbox · Suggested change | inbox · Stale base | inbox · Waits on approvers | inbox · Suggested change, read only |
-| The version's outcome | Admin | agents.skill · History, no outcomes | — | agents.skill · Watching | agents.skill · History | agents.skill · Worsened | agents.skill · Revert suggested | — |
-| The version's outcome | Operator | agents.skill · History, no outcomes | — | agents.skill · Watching | agents.skill · History | agents.skill · Worsened | agents.skill · Revert suggested | agents.skill · Read only |
+| The version's outcome | Admin | agents.skills · Detail · History, no outcomes | — | agents.skills · Detail · Watching | agents.skills · Detail · History | agents.skills · Detail · Worsened | agents.skills · Detail · Revert suggested | — |
+| The version's outcome | Operator | agents.skills · Detail · History, no outcomes | — | agents.skills · Detail · Watching | agents.skills · Detail · History | agents.skills · Detail · Worsened | agents.skills · Detail · Revert suggested | agents.skills · Detail · Read only |

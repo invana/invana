@@ -4,7 +4,7 @@ title: Watch the answers I rely on, on a dashboard
 feature: EX-F01
 status: idea
 personas: [analyst, decision-maker]
-boards: [explore.dashboards, explore.dashboard]
+boards: [explore.dashboards]
 ---
 
 # EX-34 · Watch the answers I rely on, on a dashboard
@@ -61,7 +61,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Dashboards on the left | Admin | explore.dashboards · No dashboards yet | explore.dashboards · No dashboard matches | explore.dashboards · Loading | explore.dashboards | explore.dashboards · Could not load | — | — |
 | Dashboards on the left | Operator | explore.dashboards · No dashboards yet | explore.dashboards · No dashboard matches | explore.dashboards · Loading | explore.dashboards | explore.dashboards · Could not load | — | explore.dashboards · No Assistant |
-| A dashboard | Admin | explore.dashboard · No tiles yet | — | explore.dashboard · Loading | explore.dashboard | explore.dashboard · Refresh failed | explore.dashboard · Refreshing | — |
-| A dashboard | Operator | explore.dashboard · No tiles yet | — | explore.dashboard · Loading | explore.dashboard | explore.dashboard · Refresh failed | explore.dashboard · Refreshing | explore.dashboard · Agent not theirs to use |
-| Pin to dashboard | Admin | explore.dashboard · Pin · New dashboard | — | — | explore.dashboard · Pin | explore.dashboard · Pin failed | — | — |
-| Pin to dashboard | Operator | explore.dashboard · Pin · New dashboard | — | — | explore.dashboard · Pin | explore.dashboard · Pin failed | — | explore.dashboard · No Assistant |
+| A dashboard | Admin | explore.dashboards · Detail · No tiles yet | — | explore.dashboards · Detail · Loading | explore.dashboards · Detail | explore.dashboards · Detail · Refresh failed | explore.dashboards · Detail · Refreshing | — |
+| A dashboard | Operator | explore.dashboards · Detail · No tiles yet | — | explore.dashboards · Detail · Loading | explore.dashboards · Detail | explore.dashboards · Detail · Refresh failed | explore.dashboards · Detail · Refreshing | explore.dashboards · Detail · Agent not theirs to use |
+| Pin to dashboard | Admin | explore.dashboards · Detail · Pin · New dashboard | — | — | explore.dashboards · Detail · Pin | explore.dashboards · Detail · Pin failed | — | — |
+| Pin to dashboard | Operator | explore.dashboards · Detail · Pin · New dashboard | — | — | explore.dashboards · Detail · Pin | explore.dashboards · Detail · Pin failed | — | explore.dashboards · Detail · No Assistant |

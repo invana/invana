@@ -4,7 +4,7 @@ title: Read a model's history
 feature: SE-F10
 status: idea
 personas: [modeller]
-boards: [model.health, model.board]
+boards: [model.health, model.models]
 ---
 
 # SE-09 · Read a model's history
@@ -54,5 +54,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | History | Admin | model.health · One version | model.health · No history in window | model.health · Loading | model.health · History | model.health · Could not load | — | — |
 | History | Operator | model.health · One version | model.health · No history in window | model.health · Loading | model.health · History | model.health · Could not load | — | model.health · History read only |
-| Compare | Admin | — | — | model.board · Comparing loading | model.board · Comparing | — | — | — |
-| Compare | Operator | — | — | model.board · Comparing loading | model.board · Comparing | — | — | — |
+| Compare | Admin | — | — | model.models · Comparing loading | model.models · Comparing | — | — | — |
+| Compare | Operator | — | — | model.models · Comparing loading | model.models · Comparing | — | — | — |

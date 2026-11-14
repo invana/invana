@@ -6,7 +6,7 @@ status: idea
 personas: [admin]
 stories: [AC-44, AC-45, AC-46, AC-47]
 journeys: [J12]
-boards: [settings.keeping, settings.people, access.forget, access.subject_export, access.locked]
+boards: [settings.keeping, settings.people]
 nfrs: [NFR-REL-4, NFR-SEC-2, NFR-SEC-10, NFR-SEC-12, NFR-SEC-13]
 depends_on: [AC-F03, AC-F06, AC-F07, AC-F09, GP-F02, CP-F02]
 ---

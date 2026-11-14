@@ -4,7 +4,7 @@ title: Tell a story in steps
 feature: EX-F02
 status: idea
 personas: [analyst]
-boards: [explore.board.present]
+boards: [explore.board]
 ---
 
 # EX-22 · Tell a story in steps
@@ -54,7 +54,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The walkthrough | Admin | explore.board.present · No annotations | — | — | explore.board.present · Authoring | explore.board.present · Refused | — | — |
-| The walkthrough | Operator | explore.board.present · No annotations | — | — | explore.board.present · Authoring | explore.board.present · Refused | — | explore.board.present · Read only |
-| Presenting an authored step | Admin | — | — | explore.board.present · Step settling | explore.board.present · Authored step | explore.board.present · Record gone | — | — |
-| Presenting an authored step | Operator | — | — | explore.board.present · Step settling | explore.board.present · Authored step | explore.board.present · Record gone | — | — |
+| The walkthrough | Admin | explore.board · Present · No annotations | — | — | explore.board · Present · Authoring | explore.board · Present · Refused | — | — |
+| The walkthrough | Operator | explore.board · Present · No annotations | — | — | explore.board · Present · Authoring | explore.board · Present · Refused | — | explore.board · Present · Read only |
+| Presenting an authored step | Admin | — | — | explore.board · Present · Step settling | explore.board · Present · Authored step | explore.board · Present · Record gone | — | — |
+| Presenting an authored step | Operator | — | — | explore.board · Present · Step settling | explore.board · Present · Authored step | explore.board · Present · Record gone | — | — |

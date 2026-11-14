@@ -4,7 +4,7 @@ title: Make a work connection and attach it to agents
 feature: CP-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.plugins.server, agents.agent, access.sign_in_again, access.locked]
+boards: [settings.plugins, agents.agents, access.signin]
 ---
 
 # CP-62 · Make a work connection and attach it to agents
@@ -70,11 +70,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A server's work connections | Admin | settings.plugins.server · No work connections | — | settings.plugins.server · Loading | settings.plugins.server · Work connections | settings.plugins.server · Connection expired | — | — |
-| A server's work connections | Operator | settings.plugins.server · No work connections · Read only | — | settings.plugins.server · Loading | settings.plugins.server · Work connections · Read only | settings.plugins.server · Connection expired | — | settings.plugins.server · Work connections · Read only |
-| Make a work connection | Admin | settings.plugins.server · Make a work connection | — | settings.plugins.server · Connecting | settings.plugins.server · Waiting for another Admin | settings.plugins.server · Sign-in refused | — | — |
-| Make a work connection | Operator | — | — | — | — | — | — | access.locked |
-| An agent's connections | Admin | agents.agent · No connections | — | agents.agent · Loading | agents.agent · Connections | agents.agent · Already attached | — | — |
-| An agent's connections | Operator | agents.agent · No connections · Read only | — | agents.agent · Loading | agents.agent · Connections · Read only | agents.agent · Could not load | — | agents.agent · Connections · Read only |
-| Password again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| A server's work connections | Admin | settings.plugins · Servers · No work connections | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Work connections | settings.plugins · Servers · Connection expired | — | — |
+| A server's work connections | Operator | settings.plugins · Servers · No work connections · Read only | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Work connections · Read only | settings.plugins · Servers · Connection expired | — | settings.plugins · Servers · Work connections · Read only |
+| Make a work connection | Admin | settings.plugins · Servers · Connect | — | settings.plugins · Servers · Connect · Connecting | settings.plugins · Servers · Connect · Waiting for another Admin | settings.plugins · Servers · Connect · Sign-in refused | — | — |
+| Make a work connection | Operator | — | — | — | — | — | — | settings.plugins · Servers · Connect · Locked |
+| An agent's connections | Admin | agents.agents · Detail · No connections | — | agents.agents · Detail · Loading | agents.agents · Detail · Connections | agents.agents · Detail · Already attached | — | — |
+| An agent's connections | Operator | agents.agents · Detail · No connections · Read only | — | agents.agents · Detail · Loading | agents.agents · Detail · Connections · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Connections · Read only |
+| Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Password again | Operator | — | — | — | — | — | — | — |

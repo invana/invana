@@ -67,7 +67,9 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | What reaches whom — rules | Admin | settings.notifications · No rules yet | — | settings.notifications · Loading | settings.notifications | settings.notifications · Could not load | — | — |
 | What reaches whom — rules | Operator | settings.notifications · No rules yet | — | settings.notifications · Loading | settings.notifications · Read only | settings.notifications · Could not load | — | settings.notifications · Read only |
-| A rule — new or edit | Admin | settings.notifications · New rule | — | — | settings.notifications · Rule | settings.notifications · Rule refused | — | — |
-| A rule — new or edit | Operator | settings.notifications · New rule · Just me | — | — | settings.notifications · Rule · Just me | settings.notifications · Rule refused | — | settings.notifications · Read only |
+| New rule | Admin | settings.notifications · New rule | — | — | settings.notifications · New rule · Filled | settings.notifications · New rule · Rule refused | — | — |
+| New rule | Operator | settings.notifications · New rule · Just me | — | — | settings.notifications · New rule · Just me · Filled | settings.notifications · New rule · Rule refused | — | settings.notifications · Read only |
+| A rule — edit | Admin | — | — | — | settings.notifications · Rule | settings.notifications · Rule refused | — | — |
+| A rule — edit | Operator | — | — | — | settings.notifications · Rule · Just me | settings.notifications · Rule refused | — | settings.notifications · Read only |
 | Where it can go — channels | Admin | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications | settings.notifications · Channel failed | — | — |
 | Where it can go — channels | Operator | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications · Read only | settings.notifications · Channel failed | — | settings.notifications · Read only |

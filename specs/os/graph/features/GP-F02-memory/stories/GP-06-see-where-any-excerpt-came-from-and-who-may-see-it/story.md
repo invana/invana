@@ -4,7 +4,7 @@ title: See where any excerpt came from and who may see it
 feature: GP-F02
 status: idea
 personas: [analyst, decision-maker, builder, admin]
-boards: [graph.memory.lineage]
+boards: [graph.memory]
 ---
 
 # GP-06 · See where any excerpt came from and who may see it
@@ -63,7 +63,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A copy's sources | Admin | — | — | graph.memory.lineage · Loading | graph.memory.lineage | graph.memory.lineage · Could not load | — | graph.memory.lineage · Withheld |
-| A copy's sources | Operator | — | — | graph.memory.lineage · Loading | graph.memory.lineage | graph.memory.lineage · Could not load | — | graph.memory.lineage · Withheld |
-| A redacted copy in a list | Admin | — | — | graph.memory.lineage · Loading | graph.memory.lineage · Redacted row | graph.memory.lineage · Could not load | — | graph.memory.lineage · Withheld |
-| A redacted copy in a list | Operator | — | — | graph.memory.lineage · Loading | graph.memory.lineage · Redacted row | graph.memory.lineage · Could not load | — | graph.memory.lineage · Withheld |
+| A copy's sources | Admin | — | — | graph.memory · Lineage · Loading | graph.memory · Lineage | graph.memory · Lineage · Could not load | — | graph.memory · Lineage · Withheld |
+| A copy's sources | Operator | — | — | graph.memory · Lineage · Loading | graph.memory · Lineage | graph.memory · Lineage · Could not load | — | graph.memory · Lineage · Withheld |
+| A redacted copy in a list | Admin | — | — | graph.memory · Lineage · Loading | graph.memory · Lineage · Redacted row | graph.memory · Lineage · Could not load | — | graph.memory · Lineage · Withheld |
+| A redacted copy in a list | Operator | — | — | graph.memory · Lineage · Loading | graph.memory · Lineage · Redacted row | graph.memory · Lineage · Could not load | — | graph.memory · Lineage · Withheld |

@@ -50,9 +50,9 @@ followed back. Without one home for both, every capability reads the databases i
 
 | Surface | Tier | Board |
 |---|---|---|
-| Memory — the thinking graph, a node and its sources | page | `agents.thinking` |
-| A copy's sources, and a copy redacted | panel | `graph.memory.lineage` |
-| A raw query refused or filtered | — | `explore.board.console` — the console is [EX-F03](../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)'s |
+| Memory — the thinking graph, a node and its sources | page | `graph.memory · Thinking` |
+| A copy's sources, and a copy redacted | panel | `graph.memory · Lineage` |
+| A raw query refused or filtered | — | `explore.board · Console` — the console is [EX-F03](../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)'s |
 | A step through a connector | — | No board: the asking surface — Explore, a board, a run — is its own story's |
 
 ## Decisions

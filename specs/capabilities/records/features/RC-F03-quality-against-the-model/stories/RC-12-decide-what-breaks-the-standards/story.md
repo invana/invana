@@ -4,7 +4,7 @@ title: Decide what breaks the standards
 feature: RC-F03
 status: idea
 personas: [curator]
-boards: [data.checks]
+boards: [data.quality]
 ---
 
 # RC-12 · Decide what breaks the standards
@@ -60,7 +60,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| To decide | Admin | data.checks · Nothing to decide | data.checks · Nothing for this kind | data.checks · Loading | data.checks | data.checks · Could not load | — | — |
-| To decide | Operator | data.checks · Nothing to decide | data.checks · Nothing for this kind | data.checks · Loading | data.checks | data.checks · Could not load | — | — |
-| A problem | Admin | — | — | data.checks · Loading | data.checks · Problem | data.checks · Fix refused | — | — |
-| A problem | Operator | — | — | data.checks · Loading | data.checks · Problem | data.checks · Fix refused | — | data.checks · Fix needs a grant |
+| To decide | Admin | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |
+| To decide | Operator | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |
+| A problem | Admin | — | — | data.quality · Checks · Loading | data.quality · Checks · Problem | data.quality · Checks · Fix refused | — | — |
+| A problem | Operator | — | — | data.quality · Checks · Loading | data.quality · Checks · Problem | data.quality · Checks · Fix refused | — | data.quality · Checks · Fix needs a grant |

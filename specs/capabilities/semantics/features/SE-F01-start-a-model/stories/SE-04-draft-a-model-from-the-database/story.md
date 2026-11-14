@@ -4,7 +4,7 @@ title: Draft a model from the database
 feature: SE-F01
 status: idea
 personas: [modeller]
-boards: [settings.databases.connect, settings.databases.connect.shape, model.board.draft, model.health]
+boards: [settings.databases, model.models, model.health]
 ---
 
 # SE-04 · Draft a model from the database
@@ -56,11 +56,11 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Connect a graph database · the database | Admin | settings.databases.connect | — | settings.databases.connect · Testing | settings.databases.connect · Connected | settings.databases.connect · Unreachable | — | — |
+| Connect a graph database · the database | Admin | settings.databases · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Unreachable | — | — |
 | Connect a graph database · the database | Operator | — | — | — | — | — | — | — |
-| Connect a graph database · shape the model | Admin | settings.databases.connect.shape · Nothing there yet | — | settings.databases.connect.shape · Reading | settings.databases.connect.shape | settings.databases.connect.shape · Unreachable | settings.databases.connect.shape · Drafting | — |
+| Connect a graph database · shape the model | Admin | settings.databases · Connect · Shape · Nothing there yet | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape | settings.databases · Connect · Shape · Unreachable | settings.databases · Connect · Shape · Drafting | — |
 | Connect a graph database · shape the model | Operator | — | — | — | — | — | — | — |
-| The draft | Admin | — | — | model.board.draft · Arriving | model.board.draft | — | model.board.draft · Assistant docked | — |
-| The draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
+| The draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft | — | model.models · Draft · Assistant docked | — |
+| The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
 | What a graph database holds | Admin | model.health · Database not read | — | model.health · Reading the database | model.health · Database | model.health · Unreachable | — | — |
 | What a graph database holds | Operator | model.health · Database not read | — | model.health · Reading the database | model.health · Database | model.health · Unreachable | — | model.health · Database read only |

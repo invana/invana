@@ -4,7 +4,7 @@ title: See what needs me in one inbox
 feature: CP-F08
 status: idea
 personas: [analyst, decision-maker, builder, admin]
-boards: [inbox, inbox.dropdown]
+boards: [inbox.dropdown, inbox]
 ---
 
 # CP-36 · See what needs me in one inbox

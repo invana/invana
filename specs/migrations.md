@@ -191,18 +191,3 @@ is an item whose home is not a spec — a team file or CI, raised as a recommend
 | Every tool plugin is an MCP server; `web`, `mail` and `science` stay | [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md#decisions) · [glossary.md](glossary.md) |
 | A link between models writes its relationships and withdraws them on removal | [SE-F06 › Engine](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) · [glossary.md](glossary.md) |
 | The generated admin | [System design § 13](system-design.md#13-delivery-and-operations) |
-| The `start.*` and `shell.*` boards take their package names, below | Every story's `## Screens`, every feature's `boards:`, journeys J01 · J02 · J05 |
-
-### The board rename
-
-| Old | New |
-|---|---|
-| `start.signin` | `access.signin` |
-| `shell.locked` | `access.locked` |
-| `start.home` | `graphs.home` |
-| `start.new_graph` · `.connect` · `.files` · `.shape` · `.invite` · `.ready` | `graphs.new_graph` · `.connect` · `.files` · `.shape` · `.invite` · `.ready` |
-| `start.graph_picker` | `graphs.graph_picker` |
-| `start.setup` | `graphs.setup` |
-| `shell.command` | `graphs.command` |
-| `shell.launcher` · `.open` · `.platform` | `graphs.launcher` · `.open` · `.platform` |
-| `shell.graph.new.*` · `.team` · `.review` | `graphs.new_graph.*` · `.team` · `.review` |

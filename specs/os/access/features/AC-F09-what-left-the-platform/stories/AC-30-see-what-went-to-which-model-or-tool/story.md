@@ -4,7 +4,7 @@ title: See what went to which model or tool
 feature: AC-F09
 status: idea
 personas: [admin, builder]
-boards: [access.ledger, access.locked, agents.run]
+boards: [access.ledger, agents.runs]
 ---
 
 # AC-30 · See what went to which model or tool
@@ -70,10 +70,10 @@ flowchart TD
 | What left — calls | Admin | access.ledger · No calls yet | access.ledger · Nothing matches | access.ledger · Loading | access.ledger | access.ledger · Could not load | access.ledger · Waiting on the result | — |
 | What left — calls | Operator | access.ledger · No calls yet | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Withheld rows | access.ledger · Could not load | access.ledger · Waiting on the result | access.ledger · Withheld rows |
 | A call | Admin | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | — |
-| A call | Operator | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | access.locked · Content withheld |
+| A call | Operator | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | access.ledger · Locked · Content withheld |
 | Verify a value | Admin | — | — | access.ledger · Verify · Checking | access.ledger · Verify · Matches | access.ledger · Verify · Does not match | — | — |
-| Verify a value | Operator | — | — | access.ledger · Verify · Checking | access.ledger · Verify · Matches | access.ledger · Verify · Does not match | — | access.locked · Content withheld |
+| Verify a value | Operator | — | — | access.ledger · Verify · Checking | access.ledger · Verify · Matches | access.ledger · Verify · Does not match | — | access.ledger · Locked · Content withheld |
 | Export | Admin | — | access.ledger · Nothing to export | — | access.ledger · Export | access.ledger · Could not load | — | — |
 | Export | Operator | — | access.ledger · Nothing to export | — | access.ledger · Export | access.ledger · Could not load | — | access.ledger · Export |
-| The run behind a call | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | — |
-| The run behind a call | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | agents.run · Content withheld |
+| The run behind a call | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | — |
+| The run behind a call | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | agents.runs · Detail · Content withheld |

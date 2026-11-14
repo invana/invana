@@ -4,7 +4,7 @@ title: See a project as a map and what is moving on it
 feature: GP-F02
 status: idea
 personas: [decision-maker, builder]
-boards: [graph.memory.project_map]
+boards: [graph.memory]
 ---
 
 # GP-08 · See a project as a map and what is moving on it
@@ -63,9 +63,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A project's map | Admin | graph.memory.project_map · Fills as work runs | graph.memory.project_map · Nothing in this window | graph.memory.project_map · Loading | graph.memory.project_map | graph.memory.project_map · Unavailable | graph.memory.project_map · Moving now | — |
-| A project's map | Operator | graph.memory.project_map · Fills as work runs | graph.memory.project_map · Nothing in this window | graph.memory.project_map · Loading | graph.memory.project_map | graph.memory.project_map · Unavailable | graph.memory.project_map · Moving now | graph.memory.project_map · Withheld |
-| A node on the map | Admin | — | — | graph.memory.project_map · Node loading | graph.memory.project_map · Node | graph.memory.project_map · Node could not load | graph.memory.project_map · Node running | graph.memory.project_map · Node withheld |
-| A node on the map | Operator | — | — | graph.memory.project_map · Node loading | graph.memory.project_map · Node | graph.memory.project_map · Node could not load | graph.memory.project_map · Node running | graph.memory.project_map · Node withheld |
-| Behind | Admin | — | — | — | graph.memory.project_map · Behind | — | — | — |
-| Behind | Operator | — | — | — | graph.memory.project_map · Behind | — | — | — |
+| A project's map | Admin | graph.memory · Project map · Fills as work runs | graph.memory · Project map · Nothing in this window | graph.memory · Project map · Loading | graph.memory · Project map | graph.memory · Project map · Unavailable | graph.memory · Project map · Moving now | — |
+| A project's map | Operator | graph.memory · Project map · Fills as work runs | graph.memory · Project map · Nothing in this window | graph.memory · Project map · Loading | graph.memory · Project map | graph.memory · Project map · Unavailable | graph.memory · Project map · Moving now | graph.memory · Project map · Withheld |
+| A node on the map | Admin | — | — | graph.memory · Project map · Node loading | graph.memory · Project map · Node | graph.memory · Project map · Node could not load | graph.memory · Project map · Node running | graph.memory · Project map · Node withheld |
+| A node on the map | Operator | — | — | graph.memory · Project map · Node loading | graph.memory · Project map · Node | graph.memory · Project map · Node could not load | graph.memory · Project map · Node running | graph.memory · Project map · Node withheld |
+| Behind | Admin | — | — | — | graph.memory · Project map · Behind | — | — | — |
+| Behind | Operator | — | — | — | graph.memory · Project map · Behind | — | — | — |

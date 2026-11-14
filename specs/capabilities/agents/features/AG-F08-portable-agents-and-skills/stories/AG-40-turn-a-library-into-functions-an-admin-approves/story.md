@@ -64,5 +64,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Tools they call | Admin | agents.skills · No libraries | — | agents.skills · Loading | agents.skills | agents.skills · Could not load | — | — |
 | Tools they call | Operator | agents.skills · No libraries | — | agents.skills · Loading | agents.skills | agents.skills · Could not load | — | agents.skills |
-| Add a library | Admin | agents.skills · Add a library | — | agents.skills · Reading the package | agents.skills · Proposed functions | agents.skills · Package not found | agents.skills · Proposing functions | — |
-| Add a library | Operator | — | — | — | agents.skills · Waiting for an Admin | — | — | agents.skills · Add a library disabled |
+| Add a library | Admin | agents.skills · Add a library | — | agents.skills · Add a library · Reading the package | agents.skills · Add a library · Proposed functions | agents.skills · Add a library · Package not found | agents.skills · Add a library · Proposing functions | — |
+| Add a library | Operator | — | — | — | agents.skills · Add a library · Waiting for an Admin | — | — | agents.skills · Add a library disabled |

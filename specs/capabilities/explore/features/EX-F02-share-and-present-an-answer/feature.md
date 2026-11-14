@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, decision-maker]
 stories: [EX-12, EX-15, EX-17, EX-22]
 journeys: [J02]
-boards: [explore.board, explore.share, explore.board.present, projects.finding]
+boards: [explore.board, projects.branches]
 nfrs: [NFR-SEC-8, NFR-SEC-11]
 depends_on: [EX-F01, AC-F03, AC-F07, CP-F10]
 ---

@@ -4,7 +4,7 @@ title: Read every function and what calls it
 feature: AG-F06
 status: idea
 personas: [admin, builder]
-boards: [agents.skills, agents.run]
+boards: [agents.skills, agents.runs]
 ---
 
 # AG-38 · Read every function and what calls it
@@ -75,5 +75,5 @@ flowchart TD
 | A function | Operator | agents.skills · A function, not used yet | — | agents.skills · Loading | agents.skills · A function | agents.skills · No such function | — | — |
 | A function's calls | Admin | agents.skills · A function's calls, none | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | — |
 | A function's calls | Operator | agents.skills · A function's calls, none | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | agents.skills · A function's calls, content withheld |
-| A step's contract, on a run | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Plan refused | agents.run · Running | — |
-| A step's contract, on a run | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Plan refused | agents.run · Running | agents.run · Content withheld |
+| A step's contract, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | — |
+| A step's contract, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |

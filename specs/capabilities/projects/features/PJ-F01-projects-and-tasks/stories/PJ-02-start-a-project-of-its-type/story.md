@@ -4,7 +4,7 @@ title: Start a project of its type
 feature: PJ-F01
 status: idea
 personas: [decision-maker, researcher, investigator, builder]
-boards: [projects.new, projects.project]
+boards: [projects.projects]
 ---
 
 # PJ-02 · Start a project of its type
@@ -61,9 +61,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New project | Admin | projects.new | — | projects.new · Loading people | projects.new · Filled | projects.new · Refused | — | — |
-| New project | Operator | projects.new | — | projects.new · Loading people | projects.new · Filled | projects.new · Refused | — | projects.new · Agent not granted |
-| The type's fields | Admin | projects.new · Type picked | — | projects.new · Loading types | projects.new · Fields | projects.new · Field refused | — | — |
-| The type's fields | Operator | projects.new · Type picked | — | projects.new · Loading types | projects.new · Fields | projects.new · Field refused | — | — |
-| A new project's page | Admin | projects.project · Just created | — | projects.project · Loading | projects.project · Details | projects.project · Could not load | — | — |
-| A new project's page | Operator | projects.project · Just created | — | projects.project · Loading | projects.project · Details | projects.project · Could not load | — | projects.project · Withheld |
+| New project | Admin | projects.projects · New | — | projects.projects · New · Loading people | projects.projects · New · Filled | projects.projects · New · Refused | — | — |
+| New project | Operator | projects.projects · New | — | projects.projects · New · Loading people | projects.projects · New · Filled | projects.projects · New · Refused | — | projects.projects · New · Agent not granted |
+| The type's fields | Admin | projects.projects · New · Type picked | — | projects.projects · New · Loading types | projects.projects · New · Fields | projects.projects · New · Field refused | — | — |
+| The type's fields | Operator | projects.projects · New · Type picked | — | projects.projects · New · Loading types | projects.projects · New · Fields | projects.projects · New · Field refused | — | — |
+| A new project's page | Admin | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | — |
+| A new project's page | Operator | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | projects.projects · Detail · Withheld |

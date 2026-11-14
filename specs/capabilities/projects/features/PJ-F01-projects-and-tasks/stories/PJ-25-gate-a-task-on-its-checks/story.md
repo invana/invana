@@ -4,7 +4,7 @@ title: Gate a task on its checks
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.task, projects.task.thinking, inbox]
+boards: [projects.tasks, inbox]
 ---
 
 # PJ-25 · Gate a task on its checks
@@ -83,11 +83,11 @@ sequenceDiagram
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A task's checks | Admin | projects.task · Checks · None | — | projects.task · Checks · Loading | projects.task · Checks | projects.task · Checks · Workflow refused | projects.task · Checking | — |
-| A task's checks | Operator | projects.task · Checks · None | — | projects.task · Checks · Loading | projects.task · Checks | projects.task · Checks · Workflow refused | projects.task · Checking | projects.task · Withheld |
-| Checks failed | Admin | — | — | — | projects.task · Checks failed | projects.task · Checks failed · Accept off | — | projects.task · Checks failed · Not a reviewer |
-| Checks failed | Operator | — | — | — | projects.task · Checks failed | projects.task · Checks failed · Accept off | — | projects.task · Checks failed · Not a reviewer |
-| A check's run | Admin | — | — | projects.task.thinking · Loading | projects.task.thinking · Check | projects.task.thinking · Check failed | projects.task.thinking · Check running | — |
-| A check's run | Operator | — | — | projects.task.thinking · Loading | projects.task.thinking · Check | projects.task.thinking · Check failed | projects.task.thinking · Check running | projects.task.thinking · Content withheld |
+| A task's checks | Admin | projects.tasks · Detail · Checks · None | — | projects.tasks · Detail · Checks · Loading | projects.tasks · Detail · Checks | projects.tasks · Detail · Checks · Workflow refused | projects.tasks · Detail · Checking | — |
+| A task's checks | Operator | projects.tasks · Detail · Checks · None | — | projects.tasks · Detail · Checks · Loading | projects.tasks · Detail · Checks | projects.tasks · Detail · Checks · Workflow refused | projects.tasks · Detail · Checking | projects.tasks · Detail · Withheld |
+| Checks failed | Admin | — | — | — | projects.tasks · Detail · Checks failed | projects.tasks · Detail · Checks failed · Accept off | — | projects.tasks · Detail · Checks failed · Not a reviewer |
+| Checks failed | Operator | — | — | — | projects.tasks · Detail · Checks failed | projects.tasks · Detail · Checks failed · Accept off | — | projects.tasks · Detail · Checks failed · Not a reviewer |
+| A check's run | Admin | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here · Check | projects.tasks · Detail · How it got here · Check failed | projects.tasks · Detail · How it got here · Check running | — |
+| A check's run | Operator | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here · Check | projects.tasks · Detail · How it got here · Check failed | projects.tasks · Detail · How it got here · Check running | projects.tasks · Detail · How it got here · Content withheld |
 | Checks failed in Needs you | Admin | — | — | inbox · Loading | inbox · Checks failed | inbox · Could not load | — | — |
 | Checks failed in Needs you | Operator | — | — | inbox · Loading | inbox · Checks failed | inbox · Could not load | — | — |

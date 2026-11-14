@@ -4,7 +4,7 @@ title: Read an answer's run like any run
 feature: CP-F10
 status: idea
 personas: [analyst, admin]
-boards: [agents.run.answer, agents.runs]
+boards: [agents.runs]
 ---
 
 # CP-52 · Read an answer's run like any run
@@ -51,7 +51,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| An answer's run | Admin | — | — | agents.run.answer · Loading | agents.run.answer | agents.run.answer · Failed | agents.run.answer · Running | agents.run.answer · Not their conversation |
-| An answer's run | Operator | — | — | agents.run.answer · Loading | agents.run.answer | agents.run.answer · Failed | agents.run.answer · Running | agents.run.answer · Content withheld |
+| An answer's run | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Not their conversation |
+| An answer's run | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |
 | Runs from Ask | Admin | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | — |
 | Runs from Ask | Operator | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |

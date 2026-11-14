@@ -64,23 +64,23 @@ can unblock; and an agent can only do what the models and tools offered to it al
 
 | Surface | Tier | Board |
 |---|---|---|
-| Home — first use and set-up | page | `start.home` · `start.setup` |
+| Home — first use and set-up | page | `start.home` · `start.home · Set-up` |
 | Workloads — by user, agent and team, in Settings › Operations | page | `settings.workloads` |
-| Runs — how the agents are doing, every run | modal | `agents` · `agents.runs` · `agents.agent` |
-| A run | sheet | `agents.run` · `agents.run.answer` |
-| Ops alerts — the list, an alert, thresholds | modal | `control.alerts` · `control.alerts.alert` · `control.alerts.settings` |
-| Graph databases — the list, one graph database | modal | `settings.databases` · `settings.databases.database` |
-| Connect a graph database | modal | `settings.databases.connect` · `settings.databases.connect.files` · `settings.databases.connect.shape` · `settings.databases.connect.ready` |
+| Runs — how the agents are doing, every run | sheet | `agents.agents` · `agents.runs` |
+| A run | sheet | `agents.runs · Detail` · `agents.runs · Detail · Answer` |
+| Ops alerts — the list, an alert, thresholds | modal | `control.alerts` · `control.alerts · Detail` · `control.alerts · Settings` |
+| Graph databases — the list, one graph database | modal | `settings.databases` · `settings.databases · Detail` |
+| Connect a graph database | modal | `settings.databases · Connect` · `settings.databases · Connect · Files` · `settings.databases · Connect · Shape` · `settings.databases · Connect · Ready` |
 | ⌘K | modal | `shell.command` |
 | Inbox — Needs you · Updates · Running · Done | modal | `inbox` |
 | Settings › Notifications — rules and channels | modal | `settings.notifications` |
 | Settings › You — outside accounts · where asks reach me | modal | `settings.me` |
 | Plugins — every plugin, a plugin, Team packs | modal | `settings.plugins` |
-| An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins.server` |
+| An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins · Servers` |
 | The deployment's MCP server — what it serves, recent calls | modal | `settings.mcp` |
 | AI models | modal | `settings.ai` |
 | Workers | modal | `settings.workers` |
-| Usage and limits | modal | `settings.usage` |
+| Usage and limits | modal | `settings.limits · Usage` |
 
 ## Decisions
 

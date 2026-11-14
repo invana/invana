@@ -4,7 +4,7 @@ title: Share and hand over what I own
 feature: AC-F07
 status: idea
 personas: [builder, analyst, admin]
-boards: [access.owners, settings.me, access.locked]
+boards: [settings.me]
 ---
 
 # AC-24 · Share and hand over what I own
@@ -67,9 +67,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Owner | Admin | access.owners · Made by you | — | access.owners · Loading | access.owners | access.owners · Last owner | — | — |
-| Owner | Operator | access.owners · Made by you | — | access.owners · Loading | access.owners | access.owners · Could not save | — | access.locked · Owners |
-| Share a personal agent | Admin | — | — | access.owners · Loading | access.owners · Share | access.owners · Could not save | — | — |
-| Share a personal agent | Operator | — | — | — | — | — | — | access.locked · Owners |
+| Owner | Admin | settings.me · Owners · Made by you | — | settings.me · Owners · Loading | settings.me · Owners | settings.me · Owners · Last owner | — | — |
+| Owner | Operator | settings.me · Owners · Made by you | — | settings.me · Owners · Loading | settings.me · Owners | settings.me · Owners · Could not save | — | settings.me · Owners · Locked · Owners |
+| Share a personal agent | Admin | — | — | settings.me · Owners · Loading | settings.me · Owners · Share | settings.me · Owners · Could not save | — | — |
+| Share a personal agent | Operator | — | — | — | — | — | — | settings.me · Owners · Locked · Owners |
 | What I own and made | Admin | settings.me · Own nothing yet | settings.me · Nothing matches | settings.me · Loading | settings.me · What I own | settings.me · Could not load | — | — |
 | What I own and made | Operator | settings.me · Own nothing yet | settings.me · Nothing matches | settings.me · Loading | settings.me · What I own | settings.me · Could not load | — | — |

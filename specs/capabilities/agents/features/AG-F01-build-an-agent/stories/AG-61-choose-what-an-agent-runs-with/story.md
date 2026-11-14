@@ -4,7 +4,7 @@ title: Choose what an agent runs with
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.agent]
+boards: [agents.agents]
 ---
 
 # AG-61 · Choose what an agent runs with
@@ -69,13 +69,13 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Runs with and the model set | Admin | agents.agent · Runs with Invana | — | agents.agent · Loading | agents.agent · Runs with | agents.agent · Runtime not installed | — | — |
-| Runs with and the model set | Operator | agents.agent · Runs with Invana | — | agents.agent · Loading | agents.agent · Runs with | agents.agent · Could not load | — | agents.agent · Read only |
-| A runtime that is not installed | Admin | — | — | — | agents.agent · Runtime not installed | — | — | — |
-| A runtime that is not installed | Operator | — | — | — | agents.agent · Runtime not installed | — | — | agents.agent · Read only |
-| Its model runs outside | Admin | — | — | — | agents.agent · Model runs outside | — | — | — |
-| Its model runs outside | Operator | — | — | — | agents.agent · Model runs outside | — | — | agents.agent · Read only |
-| Recent runs — model set and reported | Admin | agents.agent · No runs yet | — | agents.agent · Loading | agents.agent · Model reported | agents.agent · Could not load | agents.agent · Running | — |
-| Recent runs — model set and reported | Operator | agents.agent · No runs yet | — | agents.agent · Loading | agents.agent · Model reported | agents.agent · Could not load | agents.agent · Running | agents.agent · Read only |
-| A built-in agent | Admin | — | — | agents.agent · Loading | agents.agent · Built in | agents.agent · Could not load | — | — |
-| A built-in agent | Operator | — | — | agents.agent · Loading | agents.agent · Built in | agents.agent · Could not load | — | agents.agent · Built in |
+| Runs with and the model set | Admin | agents.agents · Detail · Runs with Invana | — | agents.agents · Detail · Loading | agents.agents · Detail · Runs with | agents.agents · Detail · Runtime not installed | — | — |
+| Runs with and the model set | Operator | agents.agents · Detail · Runs with Invana | — | agents.agents · Detail · Loading | agents.agents · Detail · Runs with | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| A runtime that is not installed | Admin | — | — | — | agents.agents · Detail · Runtime not installed | — | — | — |
+| A runtime that is not installed | Operator | — | — | — | agents.agents · Detail · Runtime not installed | — | — | agents.agents · Detail · Read only |
+| Its model runs outside | Admin | — | — | — | agents.agents · Detail · Model runs outside | — | — | — |
+| Its model runs outside | Operator | — | — | — | agents.agents · Detail · Model runs outside | — | — | agents.agents · Detail · Read only |
+| Recent runs — model set and reported | Admin | agents.agents · Detail · No runs yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Model reported | agents.agents · Detail · Could not load | agents.agents · Detail · Running | — |
+| Recent runs — model set and reported | Operator | agents.agents · Detail · No runs yet | — | agents.agents · Detail · Loading | agents.agents · Detail · Model reported | agents.agents · Detail · Could not load | agents.agents · Detail · Running | agents.agents · Detail · Read only |
+| A built-in agent | Admin | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Built in | agents.agents · Detail · Could not load | — | — |
+| A built-in agent | Operator | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Built in | agents.agents · Detail · Could not load | — | agents.agents · Detail · Built in |

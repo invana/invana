@@ -4,7 +4,7 @@ title: Approve a plan into a workflow
 feature: AG-F06
 status: idea
 personas: [builder, admin]
-boards: [inbox, agents.workflow]
+boards: [inbox, agents.skills]
 ---
 
 # AG-47 · Approve a plan into a workflow
@@ -68,5 +68,5 @@ flowchart TD
 | The proposal ask — content withheld | Operator | — | — | inbox · Loading | inbox · Make this a workflow, content withheld | — | — | — |
 | Declined or expired | Admin | — | — | — | inbox · Proposal declined | inbox · Proposal expired | — | — |
 | Declined or expired | Operator | — | — | — | inbox · Proposal declined | inbox · Proposal expired | — | — |
-| An approved workflow | Admin | — | — | agents.workflow · Loading | agents.workflow · Approved by | agents.workflow · Could not load | — | — |
-| An approved workflow | Operator | — | — | agents.workflow · Loading | agents.workflow · Approved by | agents.workflow · Could not load | — | — |
+| An approved workflow | Admin | — | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Approved by | agents.skills · Workflow · Could not load | — | — |
+| An approved workflow | Operator | — | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Approved by | agents.skills · Workflow · Could not load | — | — |

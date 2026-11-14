@@ -4,7 +4,7 @@ title: Propose a plan that served as a workflow, and see where each comes from
 feature: AG-F06
 status: idea
 personas: [analyst, builder]
-boards: [agents.run, agents.skills, inbox]
+boards: [agents.runs, agents.skills, inbox]
 ---
 
 # AG-31 · Propose a plan that served as a workflow, and see where each comes from
@@ -74,8 +74,8 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Propose as a workflow, on a run | Admin | — | — | agents.run · Loading | agents.run · Propose as a workflow | agents.run · Propose refused | agents.run · Waiting on approvers | — |
-| Propose as a workflow, on a run | Operator | — | — | agents.run · Loading | agents.run · Propose as a workflow | agents.run · Propose refused | agents.run · Waiting on approvers | agents.run · Content withheld |
+| Propose as a workflow, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a workflow | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | — |
+| Propose as a workflow, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a workflow | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | agents.runs · Detail · Content withheld |
 | Where it comes from — workflows and functions | Admin | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | Where it comes from — workflows and functions | Operator | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | Answer templates | Admin | agents.skills · Shipped templates | agents.skills · No template matches | agents.skills · Loading | agents.skills · Answer templates | agents.skills · Could not load | — | — |

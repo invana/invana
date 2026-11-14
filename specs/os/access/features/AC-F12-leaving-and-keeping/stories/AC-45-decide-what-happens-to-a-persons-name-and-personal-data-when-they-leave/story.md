@@ -4,7 +4,7 @@ title: Decide what happens to a person's name and personal data when they leave
 feature: AC-F12
 status: idea
 personas: [admin]
-boards: [settings.keeping, settings.people, access.locked]
+boards: [settings.keeping, settings.people]
 ---
 
 # AC-45 · Decide what happens to a person's name and personal data when they leave
@@ -61,8 +61,8 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A departed person's name | Admin | settings.keeping · Keep | — | settings.keeping · Loading | settings.keeping · Pseudonymise | settings.keeping · Could not save | — | — |
-| A departed person's name | Operator | access.locked · Keeping · Keep | — | access.locked · Keeping · Loading | access.locked · Keeping | — | — | access.locked · Keeping |
+| A departed person's name | Operator | settings.keeping · Locked · Keeping · Keep | — | settings.keeping · Locked · Keeping · Loading | settings.keeping · Locked · Keeping | — | — | settings.keeping · Locked · Keeping |
 | What leaving erases — in the deactivate modal | Admin | settings.people · Deactivate · Nothing personal | — | settings.people · Deactivate · Loading | settings.people · Deactivate · What goes | settings.people · Deactivate · Could not save | settings.people · Deactivate · Waiting on a hold | — |
-| What leaving erases — in the deactivate modal | Operator | — | — | — | — | — | — | access.locked · A person |
+| What leaving erases — in the deactivate modal | Operator | — | — | — | — | — | — | settings.people · Locked · A person |
 | A departed person's work | Admin | — | — | — | settings.people · Former member | — | — | — |
-| A departed person's work | Operator | — | — | — | access.locked · Former member | — | — | access.locked · Former member |
+| A departed person's work | Operator | — | — | — | settings.people · Locked · Former member | — | — | settings.people · Locked · Former member |

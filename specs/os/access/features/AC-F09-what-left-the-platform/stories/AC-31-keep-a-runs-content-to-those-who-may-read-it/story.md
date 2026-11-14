@@ -4,7 +4,7 @@ title: Keep a run's content to those who may read it
 feature: AC-F09
 status: idea
 personas: [analyst, builder, admin]
-boards: [agents.run, access.ledger, inbox, inbox.history, access.locked]
+boards: [agents.runs, access.ledger, settings.history, inbox]
 ---
 
 # AC-31 · Keep a run's content to those who may read it
@@ -62,11 +62,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A run | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | agents.run · Running | agents.run · Content withheld |
-| A run | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | agents.run · Running | agents.run · Content withheld |
+| A run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
 | A ledger call | Admin | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | — |
-| A ledger call | Operator | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | access.locked · Content withheld |
-| A History row | Admin | — | — | inbox.history · Loading | inbox.history · Row | inbox.history · Could not load | — | inbox.history · Arguments withheld |
-| A History row | Operator | — | — | inbox.history · Loading | inbox.history · Row | inbox.history · Could not load | — | inbox.history · Arguments withheld |
+| A ledger call | Operator | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | access.ledger · Locked · Content withheld |
+| A History row | Admin | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | settings.history · Arguments withheld |
+| A History row | Operator | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | settings.history · Arguments withheld |
 | An ask | Admin | — | — | inbox · Loading | inbox | inbox · Could not load | inbox · An agent asks to send | inbox · Content withheld |
 | An ask | Operator | — | — | inbox · Loading | inbox | inbox · Could not load | inbox · An agent asks to send | inbox · Content withheld |

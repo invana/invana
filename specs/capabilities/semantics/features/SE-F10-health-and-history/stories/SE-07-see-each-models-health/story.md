@@ -4,7 +4,7 @@ title: See each model's health
 feature: SE-F10
 status: idea
 personas: [modeller]
-boards: [model.health, model.board.draft]
+boards: [model.health, model.models]
 ---
 
 # SE-07 · See each model's health
@@ -83,5 +83,5 @@ flowchart LR
 | Health · Growth | Operator | model.health · Nothing loaded | model.health · Nothing in window | model.health · Loading | model.health · Growth | model.health · Not measured yet | — | model.health · Read only |
 | Saved report | Admin | — | — | model.health · Loading | model.health · Saved report | model.health · Could not load | — | — |
 | Saved report | Operator | — | — | model.health · Loading | model.health · Saved report | model.health · Could not load | — | — |
-| The draft · index or drift added | Admin | — | — | — | model.board.draft | — | — | — |
+| The draft · index or drift added | Admin | — | — | — | model.models · Draft | — | — | — |
 | The draft · index or drift added | Operator | — | — | — | — | — | — | — |

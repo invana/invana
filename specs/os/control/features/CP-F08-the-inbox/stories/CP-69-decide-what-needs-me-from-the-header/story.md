@@ -4,7 +4,7 @@ title: Decide what needs me from the header
 feature: CP-F08
 status: idea
 personas: [analyst, decision-maker, builder, admin]
-boards: [inbox.dropdown, inbox.dropdown.confirm]
+boards: [inbox.dropdown]
 ---
 
 # CP-69 · Decide what needs me from the header
@@ -70,5 +70,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The Inbox dropdown | Admin | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | inbox.dropdown · Could not load | inbox.dropdown · A proposal | — |
 | The Inbox dropdown | Operator | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | inbox.dropdown · Could not load | inbox.dropdown · A proposal | inbox.dropdown · Ask an approver |
-| Confirm what changes | Admin | — | — | — | inbox.dropdown.confirm | inbox.dropdown.confirm · Refused | — | — |
-| Confirm what changes | Operator | — | — | — | inbox.dropdown.confirm | inbox.dropdown.confirm · Refused | — | — |
+| Confirm what changes | Admin | — | — | — | inbox.dropdown · Confirm | inbox.dropdown · Confirm · Refused | — | — |
+| Confirm what changes | Operator | — | — | — | inbox.dropdown · Confirm | inbox.dropdown · Confirm · Refused | — | — |

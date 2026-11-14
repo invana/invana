@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, builder]
 stories: [EX-20]
 journeys: []
-boards: [explore.board.edit]
+boards: [explore.board]
 nfrs: []
 depends_on: [EX-F01, AC-F02, CP-F05, CP-F10, SE-F02, AG-F06]
 ---

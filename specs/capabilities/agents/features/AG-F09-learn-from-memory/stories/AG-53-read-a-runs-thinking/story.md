@@ -4,7 +4,7 @@ title: Read a run's thinking
 feature: AG-F09
 status: idea
 personas: [builder, analyst]
-boards: [agents.run.thinking]
+boards: [agents.runs]
 ---
 
 # AG-53 · Read a run's thinking
@@ -60,5 +60,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The run's Thinking tab | Admin | agents.run.thinking · Did not plan | agents.run.thinking · Nothing recalled | agents.run.thinking · Loading | agents.run.thinking | agents.run.thinking · Recall failed | agents.run.thinking · Recalling | — |
-| The run's Thinking tab | Operator | agents.run.thinking · Did not plan | agents.run.thinking · Nothing recalled | agents.run.thinking · Loading | agents.run.thinking | agents.run.thinking · Recall failed | agents.run.thinking · Recalling | agents.run.thinking · Withheld |
+| The run's Thinking tab | Admin | agents.runs · Detail · Thinking · Did not plan | agents.runs · Detail · Thinking · Nothing recalled | agents.runs · Detail · Thinking · Loading | agents.runs · Detail · Thinking | agents.runs · Detail · Thinking · Recall failed | agents.runs · Detail · Thinking · Recalling | — |
+| The run's Thinking tab | Operator | agents.runs · Detail · Thinking · Did not plan | agents.runs · Detail · Thinking · Nothing recalled | agents.runs · Detail · Thinking · Loading | agents.runs · Detail · Thinking | agents.runs · Detail · Thinking · Recall failed | agents.runs · Detail · Thinking · Recalling | agents.runs · Detail · Thinking · Withheld |

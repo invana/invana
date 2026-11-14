@@ -62,7 +62,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Import from SKOS | Admin | model.standards · Import SKOS | — | model.standards · Reading the vocabulary | model.standards · SKOS preview | model.standards · SKOS refused | — | — |
-| Import from SKOS | Operator | model.standards · Import SKOS | — | model.standards · Reading the vocabulary | model.standards · SKOS preview | model.standards · SKOS refused | — | model.standards · Not the creator |
-| Pick a concept scheme | Admin | — | — | model.standards · Reading the vocabulary | model.standards · Pick a scheme | model.standards · SKOS refused | — | — |
-| Pick a concept scheme | Operator | — | — | model.standards · Reading the vocabulary | model.standards · Pick a scheme | model.standards · SKOS refused | — | — |
+| Import from SKOS | Admin | model.standards · New · Import SKOS | — | model.standards · New · Reading the vocabulary | model.standards · New · SKOS preview | model.standards · New · SKOS refused | — | — |
+| Import from SKOS | Operator | model.standards · New · Import SKOS | — | model.standards · New · Reading the vocabulary | model.standards · New · SKOS preview | model.standards · New · SKOS refused | — | model.standards · Not the creator |
+| Pick a concept scheme | Admin | — | — | model.standards · New · Reading the vocabulary | model.standards · New · Pick a scheme | model.standards · New · SKOS refused | — | — |
+| Pick a concept scheme | Operator | — | — | model.standards · New · Reading the vocabulary | model.standards · New · Pick a scheme | model.standards · New · SKOS refused | — | — |

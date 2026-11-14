@@ -4,7 +4,7 @@ title: Merge two records that are one
 feature: RC-F05
 status: idea
 personas: [curator]
-boards: [data.merge]
+boards: [data.records]
 ---
 
 # RC-04 · Merge two records that are one
@@ -46,5 +46,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Merge | Admin | data.merge · Pick two | — | data.merge · Loading | data.merge | data.merge · Refused | — | — |
-| Merge | Operator | data.merge · Pick two | — | data.merge · Loading | data.merge · Compare only | — | — | data.merge · Merge disabled |
+| Merge | Admin | data.records · Merge · Pick two | — | data.records · Merge · Loading | data.records · Merge | data.records · Merge · Refused | — | — |
+| Merge | Operator | data.records · Merge · Pick two | — | data.records · Merge · Loading | data.records · Merge · Compare only | — | — | data.records · Merge · Merge disabled |

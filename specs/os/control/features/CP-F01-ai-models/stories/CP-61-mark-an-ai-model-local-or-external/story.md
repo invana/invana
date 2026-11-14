@@ -4,7 +4,7 @@ title: Mark an AI model local or external
 feature: CP-F01
 status: idea
 personas: [admin, builder]
-boards: [settings.ai, access.sign_in_again]
+boards: [settings.ai, access.signin]
 ---
 
 # CP-61 · Mark an AI model local or external
@@ -61,5 +61,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | AI models — local or external | Admin | settings.ai · No endpoint | settings.ai · No match | settings.ai · Loading | settings.ai · Local or external | settings.ai · Stays external | — | — |
 | AI models — local or external | Operator | settings.ai · No endpoint | settings.ai · No match | settings.ai · Loading | settings.ai · Local or external | settings.ai · Could not load | — | settings.ai · Read only |
-| The password again | Admin | — | — | — | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| The password again | Admin | — | — | — | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | The password again | Operator | — | — | — | — | — | — | — |

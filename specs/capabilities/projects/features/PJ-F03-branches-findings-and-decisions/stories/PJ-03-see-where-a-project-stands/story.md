@@ -4,7 +4,7 @@ title: See where a project stands
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.project]
+boards: [projects.projects]
 ---
 
 # PJ-03 · See where a project stands
@@ -62,7 +62,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Overview | Admin | projects.project · Just started | — | projects.project · Loading | projects.project | projects.project · Could not load | projects.project · Proposals waiting | projects.project · Withheld |
-| Overview | Operator | projects.project · Just started | — | projects.project · Loading | projects.project | projects.project · Could not load | projects.project · Proposals waiting | projects.project · Withheld |
-| An archived project | Admin | — | — | — | projects.project · Archived | — | — | — |
-| An archived project | Operator | — | — | — | projects.project · Archived | — | — | — |
+| Overview | Admin | projects.projects · Detail · Just started | — | projects.projects · Detail · Loading | projects.projects · Detail | projects.projects · Detail · Could not load | projects.projects · Detail · Proposals waiting | projects.projects · Detail · Withheld |
+| Overview | Operator | projects.projects · Detail · Just started | — | projects.projects · Detail · Loading | projects.projects · Detail | projects.projects · Detail · Could not load | projects.projects · Detail · Proposals waiting | projects.projects · Detail · Withheld |
+| An archived project | Admin | — | — | — | projects.projects · Detail · Archived | — | — | — |
+| An archived project | Operator | — | — | — | projects.projects · Detail · Archived | — | — | — |

@@ -4,7 +4,7 @@ title: Pick up a conversation
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.conversations]
+boards: [explore.board]
 ---
 
 # EX-10 · Pick up a conversation
@@ -80,8 +80,8 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Conversations | Admin | explore.ask · No conversations | explore.conversations · No conversation matches | explore.conversations · Loading conversations | explore.conversations · Conversations | explore.conversations · Conversations failed | — | — |
-| Conversations | Operator | explore.ask · No conversations | explore.conversations · No conversation matches | explore.conversations · Loading conversations | explore.conversations · Conversations | explore.conversations · Conversations failed | — | — |
+| Conversations | Admin | explore.board · Ask · No conversations | explore.board · Conversations · No conversation matches | explore.board · Conversations · Loading conversations | explore.board · Conversations · Conversations | explore.board · Conversations · Conversations failed | — | — |
+| Conversations | Operator | explore.board · Ask · No conversations | explore.board · Conversations · No conversation matches | explore.board · Conversations · Loading conversations | explore.board · Conversations · Conversations | explore.board · Conversations · Conversations failed | — | — |
 | The agent in the composer | Admin | explore.board · Default agent | — | — | explore.board · Agent picked | explore.board · Agent cannot read | — | — |
 | The agent in the composer | Operator | explore.board · Default agent | — | — | explore.board · Agent picked | explore.board · Agent cannot read | — | explore.board · Agent not theirs to use |
 | Opening a conversation | Admin | — | — | explore.board · Loading conversations | explore.board · Conversations | explore.board · Board not loaded | — | — |

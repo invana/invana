@@ -4,7 +4,7 @@ title: Switch the layout
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-16 · Switch the layout
@@ -59,5 +59,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The Layout card | Admin | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Too large | — | — |
-| The Layout card | Operator | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Too large | — | — |
+| The Layout card | Admin | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Too large | — | — |
+| The Layout card | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Too large | — | — |

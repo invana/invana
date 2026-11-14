@@ -4,7 +4,7 @@ title: Get told when work stops or a connection fails
 feature: CP-F11
 status: idea
 personas: [admin, builder]
-boards: [control.alerts, control.alerts.alert, inbox]
+boards: [control.alerts, inbox]
 ---
 
 # CP-67 · Get told when work stops or a connection fails
@@ -68,7 +68,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Ops alerts | Admin | control.alerts · No alerts | control.alerts · No match | control.alerts · Loading | control.alerts | control.alerts · Could not load | control.alerts · Counting | — |
 | Ops alerts | Operator | control.alerts · No alerts | control.alerts · No match | control.alerts · Loading | control.alerts | control.alerts · Could not load | control.alerts · Counting | — |
-| An alert | Admin | — | — | control.alerts.alert · Loading | control.alerts.alert | control.alerts.alert · Already closed | control.alerts.alert · Run still going | — |
-| An alert | Operator | — | — | control.alerts.alert · Loading | control.alerts.alert | control.alerts.alert · Could not load | control.alerts.alert · Run still going | control.alerts.alert · Close disabled |
+| An alert | Admin | — | — | control.alerts · Detail · Loading | control.alerts · Detail | control.alerts · Detail · Already closed | control.alerts · Detail · Run still going | — |
+| An alert | Operator | — | — | control.alerts · Detail · Loading | control.alerts · Detail | control.alerts · Detail · Could not load | control.alerts · Detail · Run still going | control.alerts · Detail · Close disabled |
 | Inbox — an ops alert | Admin | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |
 | Inbox — an ops alert | Operator | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |

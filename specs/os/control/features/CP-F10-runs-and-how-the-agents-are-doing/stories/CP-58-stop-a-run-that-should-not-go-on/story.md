@@ -4,7 +4,7 @@ title: Stop a run that should not go on
 feature: CP-F10
 status: idea
 personas: [admin, builder, analyst]
-boards: [agents.run, inbox]
+boards: [agents.runs, inbox]
 ---
 
 # CP-58 · Stop a run that should not go on
@@ -59,9 +59,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A run — Stop | Admin | — | — | agents.run · Stopping | agents.run · Stop confirm | agents.run · Could not stop yet | agents.run · Running | — |
-| A run — Stop | Operator | — | — | agents.run · Stopping | agents.run · Stop confirm | agents.run · Could not stop yet | agents.run · Running | agents.run · Stop disabled |
-| A run — stopped | Admin | — | — | — | agents.run · Stopped | agents.run · Already ended | — | — |
-| A run — stopped | Operator | — | — | — | agents.run · Stopped | agents.run · Already ended | — | agents.run · Content withheld |
+| A run — Stop | Admin | — | — | agents.runs · Detail · Stopping | agents.runs · Detail · Stop confirm | agents.runs · Detail · Could not stop yet | agents.runs · Detail · Running | — |
+| A run — Stop | Operator | — | — | agents.runs · Detail · Stopping | agents.runs · Detail · Stop confirm | agents.runs · Detail · Could not stop yet | agents.runs · Detail · Running | agents.runs · Detail · Stop disabled |
+| A run — stopped | Admin | — | — | — | agents.runs · Detail · Stopped | agents.runs · Detail · Already ended | — | — |
+| A run — stopped | Operator | — | — | — | agents.runs · Detail · Stopped | agents.runs · Detail · Already ended | — | agents.runs · Detail · Content withheld |
 | Inbox — your run was stopped | Admin | — | — | inbox · Loading | inbox · Run stopped | inbox · Could not load | — | — |
 | Inbox — your run was stopped | Operator | — | — | inbox · Loading | inbox · Run stopped | inbox · Could not load | — | — |

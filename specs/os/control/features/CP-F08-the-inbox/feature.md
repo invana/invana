@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst, decision-maker]
 stories: [CP-36, CP-37, CP-45, CP-46, CP-69]
 journeys: [J03, J04, J06, J08]
-boards: [inbox, inbox.dropdown, inbox.dropdown.confirm, settings.notifications, settings.me, access.sign_in_again]
+boards: [inbox.dropdown, inbox, settings.notifications, access.signin, settings.me]
 nfrs: [NFR-SEC-2, NFR-PERF-3, NFR-PERF-7, NFR-UX-2]
 depends_on: [AC-F05, CP-F11, PJ-F01, PJ-F03, PJ-F06]
 ---

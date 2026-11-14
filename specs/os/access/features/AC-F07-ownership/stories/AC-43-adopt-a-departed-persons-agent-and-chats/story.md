@@ -4,7 +4,7 @@ title: Adopt a departed person's agent and chats
 feature: AC-F07
 status: idea
 personas: [admin, builder, analyst]
-boards: [access.owners, settings.me, access.locked]
+boards: [settings.me]
 ---
 
 # AC-43 · Adopt a departed person's agent and chats
@@ -63,5 +63,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | What I took over | Admin | settings.me · Took over nothing | — | settings.me · Loading | settings.me · Took over | settings.me · Could not load | — | — |
 | What I took over | Operator | settings.me · Took over nothing | — | settings.me · Loading | settings.me · Took over | settings.me · Could not load | — | — |
-| Adopt a personal agent | Admin | — | — | — | access.owners · Adopt | access.owners · Already adopted | — | access.owners · Not the successor |
-| Adopt a personal agent | Operator | — | — | — | access.locked · Adopt | — | — | access.locked · Adopt |
+| Adopt a personal agent | Admin | — | — | — | settings.me · Owners · Adopt | settings.me · Owners · Already adopted | — | settings.me · Owners · Not the successor |
+| Adopt a personal agent | Operator | — | — | — | settings.me · Owners · Locked · Adopt | — | — | settings.me · Owners · Locked · Adopt |

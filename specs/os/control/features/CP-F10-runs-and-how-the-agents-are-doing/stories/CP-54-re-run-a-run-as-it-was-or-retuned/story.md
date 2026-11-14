@@ -4,7 +4,7 @@ title: Re-run a run as it was, or retuned
 feature: CP-F10
 status: idea
 personas: [analyst, builder]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-54 · Re-run a run as it was, or retuned
@@ -59,5 +59,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Re-run dialog | Admin | — | — | agents.run · Loading | agents.run · Re-run | agents.run · Re-run refused | agents.run · Running | — |
-| Re-run dialog | Operator | — | — | agents.run · Loading | agents.run · Re-run | agents.run · Re-run refused | agents.run · Running | agents.run · Not yours to re-run |
+| Re-run dialog | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Re-run | agents.runs · Detail · Re-run refused | agents.runs · Detail · Running | — |
+| Re-run dialog | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Re-run | agents.runs · Detail · Re-run refused | agents.runs · Detail · Running | agents.runs · Detail · Not yours to re-run |

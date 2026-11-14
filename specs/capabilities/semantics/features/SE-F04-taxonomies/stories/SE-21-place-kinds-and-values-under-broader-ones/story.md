@@ -4,7 +4,7 @@ title: Place kinds and values under broader ones
 feature: SE-F04
 status: idea
 personas: [modeller, curator]
-boards: [model.taxonomies, model.board.draft]
+boards: [model.taxonomies, model.models]
 ---
 
 # SE-21 · Place kinds and values under broader ones
@@ -58,5 +58,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Taxonomies | Admin | model.taxonomies · Nothing placed yet | model.taxonomies · No match | model.taxonomies · Loading | model.taxonomies | model.taxonomies · Could not load | — | — |
 | Taxonomies | Operator | model.taxonomies · Nothing placed yet | model.taxonomies · No match | model.taxonomies · Loading | model.taxonomies · Read only | model.taxonomies · Could not load | — | model.taxonomies · Read only |
-| The draft · placed | Admin | — | — | — | model.board.draft | model.taxonomies · Loop refused | — | — |
+| The draft · placed | Admin | — | — | — | model.models · Draft | model.taxonomies · Loop refused | — | — |
 | The draft · placed | Operator | — | — | — | — | — | — | — |

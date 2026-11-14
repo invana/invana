@@ -6,7 +6,7 @@ status: idea
 personas: [modeller]
 stories: [SE-07, SE-09]
 journeys: []
-boards: [model.health, model.board, model.board.draft]
+boards: [model.health, model.models]
 nfrs: [NFR-UX-2]
 depends_on: [SE-F01, SE-F02, SE-F06]
 ---

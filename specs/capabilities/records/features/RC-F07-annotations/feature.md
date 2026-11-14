@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, curator]
 stories: [RC-07, RC-13]
 journeys: []
-boards: []
+boards: [data.annotations, explore.board]
 nfrs: []
 depends_on: [EX-F01]
 ---

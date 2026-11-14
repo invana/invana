@@ -6,7 +6,7 @@ status: idea
 personas: [curator, modeller]
 stories: [RC-02, RC-12]
 journeys: []
-boards: [data.quality, data.checks]
+boards: [data.quality]
 nfrs: [NFR-REL-1]
 depends_on: [SE-F02, SE-F05, SE-F07, SE-F10]
 ---

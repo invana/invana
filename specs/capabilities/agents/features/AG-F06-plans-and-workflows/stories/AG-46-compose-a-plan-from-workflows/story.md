@@ -4,7 +4,7 @@ title: Compose a plan from workflows
 feature: AG-F06
 status: idea
 personas: [analyst, builder]
-boards: [agents.run, agents.workflow]
+boards: [agents.runs, agents.skills]
 ---
 
 # AG-46 · Compose a plan from workflows
@@ -62,9 +62,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A run's Plan step — composed | Admin | — | — | agents.run · Loading | agents.run · Plan composed | agents.run · Plan refused | agents.run · Composing | — |
-| A run's Plan step — composed | Operator | — | — | agents.run · Loading | agents.run · Plan composed | agents.run · Plan refused | agents.run · Composing | agents.run · Content withheld |
-| A run's Flow — composites | Admin | — | — | agents.run · Loading | agents.run · Flow, composites expanded | agents.run · Could not load | agents.run · Running | — |
-| A run's Flow — composites | Operator | — | — | agents.run · Loading | agents.run · Flow, composites expanded | agents.run · Could not load | agents.run · Running | agents.run · Content withheld |
-| A workflow — Composed by | Admin | agents.workflow · Composed by, none | — | agents.workflow · Loading | agents.workflow · Composed by | agents.workflow · Could not load | — | — |
-| A workflow — Composed by | Operator | agents.workflow · Composed by, none | — | agents.workflow · Loading | agents.workflow · Composed by | agents.workflow · Could not load | — | — |
+| A run's Plan step — composed | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Plan composed | agents.runs · Detail · Plan refused | agents.runs · Detail · Composing | — |
+| A run's Plan step — composed | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Plan composed | agents.runs · Detail · Plan refused | agents.runs · Detail · Composing | agents.runs · Detail · Content withheld |
+| A run's Flow — composites | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Flow, composites expanded | agents.runs · Detail · Could not load | agents.runs · Detail · Running | — |
+| A run's Flow — composites | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Flow, composites expanded | agents.runs · Detail · Could not load | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A workflow — Composed by | Admin | agents.skills · Workflow · Composed by, none | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Composed by | agents.skills · Workflow · Could not load | — | — |
+| A workflow — Composed by | Operator | agents.skills · Workflow · Composed by, none | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Composed by | agents.skills · Workflow · Could not load | — | — |

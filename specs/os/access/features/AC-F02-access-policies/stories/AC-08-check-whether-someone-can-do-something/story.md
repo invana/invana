@@ -4,7 +4,7 @@ title: Check whether someone can do something
 feature: AC-F02
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.access, access.locked]
+boards: [settings.policies]
 ---
 
 # AC-08 · Check whether someone can do something
@@ -58,5 +58,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Can someone do this? | Admin | settings.access · Ask a check | — | settings.access · Checking | settings.access · No, names the rule | settings.access · Could not check | — | — |
-| Can someone do this? | Operator | access.locked · Ask a check | — | access.locked · Checking | access.locked · No, names the rule | access.locked · Could not check | — | — |
+| Can someone do this? | Admin | settings.policies · Ask a check | — | settings.policies · Checking | settings.policies · No, names the rule | settings.policies · Could not check | — | — |
+| Can someone do this? | Operator | settings.policies · Locked · Ask a check | — | settings.policies · Locked · Checking | settings.policies · Locked · No, names the rule | settings.policies · Locked · Could not check | — | — |

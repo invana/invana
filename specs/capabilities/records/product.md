@@ -53,11 +53,11 @@ from.
 | Surface | Tier | Board |
 |---|---|---|
 | Records — by kind | modal | `data.records` |
-| A record — Values · Provenance · History · Annotations | sheet | `data.record` |
-| Bring records in — upload, add by hand, every load and what it rejected | modal | `data.upload` · `data.collect` |
+| A record — Values · Provenance · History · Annotations | sheet | `data.records · Detail` |
+| Bring records in — upload, add by hand, every load and what it rejected | modal | `data.loads · Upload` · `data.loads · Add by hand` |
 | Quality — what breaks the model and the standards | modal | `data.quality` |
-| A fix across records — preview and run | modal | `data.fix` |
-| Merge two records | modal | `data.merge` |
+| A fix across records — preview and run | modal | `data.records · Fix` |
+| Merge two records | modal | `data.records · Merge` |
 | Annotations — every annotation in Graph Data | modal | `data.annotations` |
 
 ## Rules

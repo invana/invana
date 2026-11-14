@@ -4,7 +4,7 @@ title: Connect a graph database that already holds data
 feature: CP-F05
 status: idea
 personas: [admin, modeller]
-boards: [settings.databases.connect, settings.databases.connect.shape]
+boards: [settings.databases]
 ---
 
 # CP-26 · Connect a graph database that already holds data
@@ -58,7 +58,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| 2 · Connect | Admin | settings.databases.connect · Connect | — | settings.databases.connect · Testing | settings.databases.connect · Connected | settings.databases.connect · Test failed | — | — |
+| 2 · Connect | Admin | settings.databases · Connect · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Test failed | — | — |
 | 2 · Connect | Operator | — | — | — | — | — | — | — |
-| 3 · Shape | Admin | settings.databases.connect.shape · Nothing there yet | — | settings.databases.connect.shape · Reading | settings.databases.connect.shape | settings.databases.connect.shape · Unreachable | settings.databases.connect.shape · Drafting | — |
+| 3 · Shape | Admin | settings.databases · Connect · Shape · Nothing there yet | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape | settings.databases · Connect · Shape · Unreachable | settings.databases · Connect · Shape · Drafting | — |
 | 3 · Shape | Operator | — | — | — | — | — | — | — |

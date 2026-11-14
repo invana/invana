@@ -4,7 +4,7 @@ title: See why an agent can or cannot
 feature: AC-F04
 status: idea
 personas: [admin, builder]
-boards: [settings.access, access.locked, agents.run]
+boards: [settings.agent_access, agents.runs]
 ---
 
 # AC-12 · See why an agent can or cannot
@@ -65,11 +65,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Agents — the list | Admin | settings.access · Built-in agents only | settings.access · Nothing matches | settings.access · Loading | settings.access · Agents | settings.access · Could not load | — | — |
-| Agents — the list | Operator | access.locked · Built-in agents only | access.locked · Nothing matches | access.locked · Loading | access.locked · Agents | access.locked · Could not load | — | access.locked · Agents |
-| An agent — what it can do | Admin | settings.access · Holds no policy | — | settings.access · Loading | settings.access · What it can do | settings.access · Could not load | — | — |
-| An agent — what it can do | Operator | access.locked · Holds no policy | — | access.locked · Loading | access.locked · What it can do | access.locked · Could not load | — | access.locked · What it can do |
-| An agent — refusals | Admin | settings.access · No refusals | — | settings.access · Loading | settings.access · Refusals | settings.access · Could not load | — | — |
-| An agent — refusals | Operator | access.locked · No refusals | — | access.locked · Loading | access.locked · Refusals | access.locked · Could not load | — | access.locked · Refusals |
-| The refused step on its run | Admin | — | — | agents.run · Loading | agents.run · Refused by a rule | agents.run · Failed | — | — |
-| The refused step on its run | Operator | — | — | agents.run · Loading | agents.run · Refused by a rule | agents.run · Failed | — | agents.run · Content withheld |
+| Agents — the list | Admin | settings.agent_access · Built-in agents only | settings.agent_access · Nothing matches | settings.agent_access · Loading | settings.agent_access · Agents | settings.agent_access · Could not load | — | — |
+| Agents — the list | Operator | settings.agent_access · Locked · Built-in agents only | settings.agent_access · Locked · Nothing matches | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Agents | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Agents |
+| An agent — what it can do | Admin | settings.agent_access · Holds no policy | — | settings.agent_access · Loading | settings.agent_access · What it can do | settings.agent_access · Could not load | — | — |
+| An agent — what it can do | Operator | settings.agent_access · Locked · Holds no policy | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · What it can do | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · What it can do |
+| An agent — refusals | Admin | settings.agent_access · No refusals | — | settings.agent_access · Loading | settings.agent_access · Refusals | settings.agent_access · Could not load | — | — |
+| An agent — refusals | Operator | settings.agent_access · Locked · No refusals | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Refusals | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Refusals |
+| The refused step on its run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Refused by a rule | agents.runs · Detail · Failed | — | — |
+| The refused step on its run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Refused by a rule | agents.runs · Detail · Failed | — | agents.runs · Detail · Content withheld |

@@ -4,7 +4,7 @@ title: Know why my run is held and ask for more
 feature: CP-F04
 status: idea
 personas: [builder]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-14 · Know why my run is held and ask for more
@@ -51,5 +51,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A held run | Admin | — | — | agents.run · Loading | agents.run · Held by a limit | agents.run · Ask declined | agents.run · Held by a limit | agents.run · Read only |
-| A held run | Operator | — | — | agents.run · Loading | agents.run · Held by a limit | agents.run · Ask declined | agents.run · Held by a limit | agents.run · Read only |
+| A held run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Held by a limit | agents.runs · Detail · Ask declined | agents.runs · Detail · Held by a limit | agents.runs · Detail · Read only |
+| A held run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Held by a limit | agents.runs · Detail · Ask declined | agents.runs · Detail · Held by a limit | agents.runs · Detail · Read only |

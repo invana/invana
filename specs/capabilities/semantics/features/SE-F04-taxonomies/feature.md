@@ -6,7 +6,7 @@ status: idea
 personas: [modeller, curator, researcher]
 stories: [SE-21]
 journeys: []
-boards: [model.taxonomies, model.board.draft]
+boards: [model.taxonomies, model.models]
 nfrs: []
 depends_on: [SE-F02, SE-F03, SE-F05]
 ---

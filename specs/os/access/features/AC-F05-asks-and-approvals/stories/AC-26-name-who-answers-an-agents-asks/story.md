@@ -4,7 +4,7 @@ title: Name who answers an agent's asks
 feature: AC-F05
 status: idea
 personas: [admin, builder]
-boards: [agents.agent, access.locked]
+boards: [agents.agents]
 ---
 
 # AC-26 · Name who answers an agent's asks
@@ -63,5 +63,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Approvers | Admin | agents.agent · Approvers · No approver | — | agents.agent · Approvers · Loading | agents.agent · Approvers | agents.agent · Approvers · Not a person | agents.agent · Approvers · One person warns | — |
-| Approvers | Operator | agents.agent · Approvers · No approver | — | agents.agent · Approvers · Loading | agents.agent · Approvers | agents.agent · Approvers · Could not load | — | access.locked · Approvers |
+| Approvers | Admin | agents.agents · Detail · Approvers · No approver | — | agents.agents · Detail · Approvers · Loading | agents.agents · Detail · Approvers | agents.agents · Detail · Approvers · Not a person | agents.agents · Detail · Approvers · One person warns | — |
+| Approvers | Operator | agents.agents · Detail · Approvers · No approver | — | agents.agents · Detail · Approvers · Loading | agents.agents · Detail · Approvers | agents.agents · Detail · Approvers · Could not load | — | agents.agents · Detail · Locked · Approvers |

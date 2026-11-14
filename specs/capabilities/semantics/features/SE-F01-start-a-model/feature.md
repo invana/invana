@@ -6,7 +6,7 @@ status: idea
 personas: [modeller]
 stories: [SE-04, SE-06, SE-15]
 journeys: [J01]
-boards: [settings.databases.connect, settings.databases.connect.shape, model.new, model.board.draft, model.health]
+boards: [settings.databases, model.models, model.health]
 nfrs: []
 depends_on: []
 ---

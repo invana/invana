@@ -4,7 +4,7 @@ title: Upload a file into a model
 feature: RC-F02
 status: idea
 personas: [curator]
-boards: [data.upload]
+boards: [data.loads]
 ---
 
 # RC-08 · Upload a file into a model
@@ -56,7 +56,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Upload | Admin | data.upload · Drop a file | — | data.upload · Reading the file | data.upload | data.upload · Refused rows | — | — |
-| Upload | Operator | data.upload · Drop a file | — | data.upload · Reading the file | data.upload | data.upload · Refused rows | — | data.upload · Needs the model grant |
-| What it becomes | Admin | — | — | data.upload · Reading the file | data.upload · Preview | data.upload · Unchanged | — | — |
-| What it becomes | Operator | — | — | data.upload · Reading the file | data.upload · Preview | data.upload · Unchanged | — | data.upload · Needs the model grant |
+| Upload | Admin | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | — |
+| Upload | Operator | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | data.loads · Upload · Needs the model grant |
+| What it becomes | Admin | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | — |
+| What it becomes | Operator | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | data.loads · Upload · Needs the model grant |

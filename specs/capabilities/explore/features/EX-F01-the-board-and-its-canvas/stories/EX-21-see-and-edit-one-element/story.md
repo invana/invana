@@ -4,7 +4,7 @@ title: See and edit one element
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board.menu, explore.board.edit]
+boards: [explore.board]
 ---
 
 # EX-21 · See and edit one element
@@ -60,7 +60,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Element panel · view | Admin | explore.board.menu · Nothing picked | — | explore.board.menu · Loading | explore.board.menu | — | — | — |
-| Element panel · view | Operator | explore.board.menu · Nothing picked | — | explore.board.menu · Loading | explore.board.menu | — | — | — |
-| Element panel · form | Admin | explore.board.edit · No model | — | explore.board.edit · Loading the model | explore.board.edit | explore.board.edit · Refused | — | — |
-| Element panel · form | Operator | explore.board.edit · No model | — | explore.board.edit · Loading the model | explore.board.edit | explore.board.edit · Refused | — | explore.board.edit · No access |
+| Element panel · view | Admin | explore.board · Menu · Nothing picked | — | explore.board · Menu · Loading | explore.board · Menu | — | — | — |
+| Element panel · view | Operator | explore.board · Menu · Nothing picked | — | explore.board · Menu · Loading | explore.board · Menu | — | — | — |
+| Element panel · form | Admin | explore.board · Edit · No model | — | explore.board · Edit · Loading the model | explore.board · Edit | explore.board · Edit · Refused | — | — |
+| Element panel · form | Operator | explore.board · Edit · No model | — | explore.board · Edit · Loading the model | explore.board · Edit | explore.board · Edit · Refused | — | explore.board · Edit · No access |

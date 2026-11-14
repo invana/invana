@@ -4,7 +4,7 @@ title: See every project and open one
 feature: PJ-F01
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.list, projects.project]
+boards: [projects.projects]
 ---
 
 # PJ-01 · See every project and open one
@@ -69,13 +69,13 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Projects | Admin | projects.list · No projects yet | projects.list · Nothing matches | projects.list · Loading | projects.list | projects.list · Could not load | projects.list · Tasks running | — |
-| Projects | Operator | projects.list · No projects yet | projects.list · Nothing matches | projects.list · Loading | projects.list | projects.list · Could not load | projects.list · Tasks running | — |
-| A project and its Details | Admin | projects.project · No purpose written | — | projects.project · Loading | projects.project · Details | projects.project · Could not load | projects.project · Tasks running | — |
-| A project the default agent may not read | Admin | — | — | — | — | — | — | projects.project · Withheld |
-| A project the default agent may not read | Operator | — | — | — | — | — | — | projects.project · Withheld |
-| A project and its Details | Operator | projects.project · No purpose written | — | projects.project · Loading | projects.project · Details | projects.project · Could not load | projects.project · Tasks running | projects.project · Details · Not a member |
-| Editing Details | Admin | — | — | — | projects.project · Details · Editing | projects.project · Details · Save refused | — | — |
-| Editing Details | Operator | — | — | — | projects.project · Details · Editing | projects.project · Details · Save refused | — | projects.project · Details · Not a member |
-| An archived project | Admin | — | — | — | projects.project · Archived | projects.project · Archived · Could not unarchive | — | — |
-| An archived project | Operator | — | — | — | projects.project · Archived | projects.project · Archived · Could not unarchive | — | projects.project · Archived · Not a member |
+| Projects | Admin | projects.projects · No projects yet | projects.projects · Nothing matches | projects.projects · Loading | projects.projects | projects.projects · Could not load | projects.projects · Tasks running | — |
+| Projects | Operator | projects.projects · No projects yet | projects.projects · Nothing matches | projects.projects · Loading | projects.projects | projects.projects · Could not load | projects.projects · Tasks running | — |
+| A project and its Details | Admin | projects.projects · Detail · No purpose written | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | projects.projects · Detail · Tasks running | — |
+| A project the default agent may not read | Admin | — | — | — | — | — | — | projects.projects · Detail · Withheld |
+| A project the default agent may not read | Operator | — | — | — | — | — | — | projects.projects · Detail · Withheld |
+| A project and its Details | Operator | projects.projects · Detail · No purpose written | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | projects.projects · Detail · Tasks running | projects.projects · Detail · Details · Not a member |
+| Editing Details | Admin | — | — | — | projects.projects · Detail · Details · Editing | projects.projects · Detail · Details · Save refused | — | — |
+| Editing Details | Operator | — | — | — | projects.projects · Detail · Details · Editing | projects.projects · Detail · Details · Save refused | — | projects.projects · Detail · Details · Not a member |
+| An archived project | Admin | — | — | — | projects.projects · Detail · Archived | projects.projects · Detail · Archived · Could not unarchive | — | — |
+| An archived project | Operator | — | — | — | projects.projects · Detail · Archived | projects.projects · Detail · Archived · Could not unarchive | — | projects.projects · Detail · Archived · Not a member |

@@ -4,7 +4,7 @@ title: Start from files with an empty graph database
 feature: CP-F05
 status: later
 personas: [admin, curator]
-boards: [settings.databases.connect.files, settings.databases.connect.shape, settings.databases.connect.ready]
+boards: [settings.databases]
 ---
 
 # CP-27 · Start from files with an empty graph database
@@ -55,9 +55,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| 2 · Drop files | Admin | settings.databases.connect.files · No files yet | — | settings.databases.connect.files · Reading | settings.databases.connect.files | settings.databases.connect.files · Cannot read | settings.databases.connect.files · A column asked | — |
+| 2 · Drop files | Admin | settings.databases · Connect · Files · No files yet | — | settings.databases · Connect · Files · Reading | settings.databases · Connect · Files | settings.databases · Connect · Files · Cannot read | settings.databases · Connect · Files · A column asked | — |
 | 2 · Drop files | Operator | — | — | — | — | — | — | — |
-| 3 · Shape | Admin | — | — | settings.databases.connect.shape · Reading | settings.databases.connect.shape · From files | — | settings.databases.connect.shape · Drafting | — |
+| 3 · Shape | Admin | — | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape · From files | — | settings.databases · Connect · Shape · Drafting | — |
 | 3 · Shape | Operator | — | — | — | — | — | — | — |
-| 4 · Ready | Admin | — | — | settings.databases.connect.ready · Loading below | settings.databases.connect.ready | settings.databases.connect.ready · Records refused | settings.databases.connect.ready · Loading below | — |
+| 4 · Ready | Admin | — | — | settings.databases · Connect · Ready · Loading below | settings.databases · Connect · Ready | settings.databases · Connect · Ready · Records refused | settings.databases · Connect · Ready · Loading below | — |
 | 4 · Ready | Operator | — | — | — | — | — | — | — |

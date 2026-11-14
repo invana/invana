@@ -4,7 +4,7 @@ title: Let agents pick up tasks by hand, by asking or on their own
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.project, projects.task, projects.task.thinking, inbox]
+boards: [projects.projects, projects.tasks, inbox]
 ---
 
 # PJ-15 · Let agents pick up tasks by hand, by asking or on their own
@@ -105,11 +105,11 @@ sequenceDiagram
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Pick-up | Admin | projects.project · Pick-up · No member agents | — | projects.project · Pick-up · Loading | projects.project · Pick-up | projects.project · Pick-up · Could not save | projects.project · Pick-up · Claims running | — |
-| Pick-up | Operator | projects.project · Pick-up · No member agents | — | projects.project · Pick-up · Loading | projects.project · Pick-up | projects.project · Pick-up · Could not save | projects.project · Pick-up · Claims running | projects.project · Pick-up · Not a member |
-| Choose Allow | Admin | — | — | projects.project · Pick-up · Loading | projects.project · Pick-up · Confirm Allow | projects.project · Pick-up · Agent not granted | — | — |
-| Choose Allow | Operator | — | — | projects.project · Pick-up · Loading | projects.project · Pick-up · Confirm Allow | projects.project · Pick-up · Agent not granted | — | projects.project · Pick-up · Not a member |
-| A claimed task | Admin | — | — | — | projects.task · Claimed | projects.task · Claim lapsed | projects.task.thinking | — |
-| A claimed task | Operator | — | — | — | projects.task · Claimed | projects.task · Claim lapsed | projects.task.thinking | projects.task.thinking · Content withheld |
+| Pick-up | Admin | projects.projects · Detail · Pick-up · No member agents | — | projects.projects · Detail · Pick-up · Loading | projects.projects · Detail · Pick-up | projects.projects · Detail · Pick-up · Could not save | projects.projects · Detail · Pick-up · Claims running | — |
+| Pick-up | Operator | projects.projects · Detail · Pick-up · No member agents | — | projects.projects · Detail · Pick-up · Loading | projects.projects · Detail · Pick-up | projects.projects · Detail · Pick-up · Could not save | projects.projects · Detail · Pick-up · Claims running | projects.projects · Detail · Pick-up · Not a member |
+| Choose Allow | Admin | — | — | projects.projects · Detail · Pick-up · Loading | projects.projects · Detail · Pick-up · Confirm Allow | projects.projects · Detail · Pick-up · Agent not granted | — | — |
+| Choose Allow | Operator | — | — | projects.projects · Detail · Pick-up · Loading | projects.projects · Detail · Pick-up · Confirm Allow | projects.projects · Detail · Pick-up · Agent not granted | — | projects.projects · Detail · Pick-up · Not a member |
+| A claimed task | Admin | — | — | — | projects.tasks · Detail · Claimed | projects.tasks · Detail · Claim lapsed | projects.tasks · Detail · How it got here | — |
+| A claimed task | Operator | — | — | — | projects.tasks · Detail · Claimed | projects.tasks · Detail · Claim lapsed | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Content withheld |
 | An agent asks to start a task | Admin | — | — | — | inbox · Start this task? | inbox · Start this task? · Not started | inbox · Start this task? | — |
 | An agent asks to start a task | Operator | — | — | — | inbox · Start this task? | inbox · Start this task? · Not started | inbox · Start this task? | inbox · Start this task? · Agent not granted |

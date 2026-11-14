@@ -4,7 +4,7 @@ title: Give a project its kinds of task
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.project, projects.task]
+boards: [projects.projects, projects.tasks]
 ---
 
 # PJ-20 · Give a project its kinds of task
@@ -59,7 +59,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Task kinds | Admin | projects.project · Task kinds · Only the two | — | projects.project · Task kinds · Loading | projects.project · Task kinds | projects.project · Task kinds · Kind in use | — | — |
-| Task kinds | Operator | projects.project · Task kinds · Only the two | — | projects.project · Task kinds · Loading | projects.project · Task kinds | projects.project · Task kinds · Kind in use | — | projects.project · Task kinds · Not a member |
-| New task by kind | Admin | projects.task · New · Pick a kind | — | — | projects.task · New · Kind fields | projects.task · New · Field refused | — | — |
-| New task by kind | Operator | projects.task · New · Pick a kind | — | — | projects.task · New · Kind fields | projects.task · New · Field refused | — | projects.task · Withheld |
+| Task kinds | Admin | projects.projects · Detail · Task kinds · Only the two | — | projects.projects · Detail · Task kinds · Loading | projects.projects · Detail · Task kinds | projects.projects · Detail · Task kinds · Kind in use | — | — |
+| Task kinds | Operator | projects.projects · Detail · Task kinds · Only the two | — | projects.projects · Detail · Task kinds · Loading | projects.projects · Detail · Task kinds | projects.projects · Detail · Task kinds · Kind in use | — | projects.projects · Detail · Task kinds · Not a member |
+| New task by kind | Admin | projects.tasks · New · Pick a kind | — | — | projects.tasks · New · Kind fields | projects.tasks · New · Field refused | — | — |
+| New task by kind | Operator | projects.tasks · New · Pick a kind | — | — | projects.tasks · New · Kind fields | projects.tasks · New · Field refused | — | projects.tasks · Detail · Withheld |

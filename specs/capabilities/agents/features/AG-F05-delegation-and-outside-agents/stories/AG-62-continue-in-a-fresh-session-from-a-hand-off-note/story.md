@@ -4,7 +4,7 @@ title: Continue in a fresh session from a hand-off note
 feature: AG-F05
 status: idea
 personas: [builder, admin]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # AG-62 · Continue in a fresh session from a hand-off note
@@ -72,11 +72,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The run's sessions and notes | Admin | agents.run · One session | — | agents.run · Loading | agents.run · Sessions | agents.run · Note sources not recorded | agents.run · Continuing | — |
-| The run's sessions and notes | Operator | agents.run · One session | — | agents.run · Loading | agents.run · Sessions | agents.run · Note sources not recorded | agents.run · Continuing | agents.run · Content withheld |
-| A hand-off note | Admin | — | — | agents.run · Loading | agents.run · Hand-off note | agents.run · Note could not load | agents.run · Writing the note | agents.run · Note withheld |
-| A hand-off note | Operator | — | — | agents.run · Loading | agents.run · Hand-off note | agents.run · Note could not load | agents.run · Writing the note | agents.run · Note withheld |
-| Stopped between sessions | Admin | — | — | — | agents.run · Stopped between sessions | — | — | — |
-| Stopped between sessions | Operator | — | — | — | agents.run · Stopped between sessions | — | — | agents.run · Content withheld |
-| Fork from a note | Admin | — | — | agents.run · Loading | agents.run · Forked | agents.run · Could not load | — | agents.run · Note withheld |
-| Fork from a note | Operator | — | — | agents.run · Loading | agents.run · Forked | agents.run · Could not load | — | agents.run · Fork disabled |
+| The run's sessions and notes | Admin | agents.runs · Detail · One session | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Note sources not recorded | agents.runs · Detail · Continuing | — |
+| The run's sessions and notes | Operator | agents.runs · Detail · One session | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Note sources not recorded | agents.runs · Detail · Continuing | agents.runs · Detail · Content withheld |
+| A hand-off note | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Hand-off note | agents.runs · Detail · Note could not load | agents.runs · Detail · Writing the note | agents.runs · Detail · Note withheld |
+| A hand-off note | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Hand-off note | agents.runs · Detail · Note could not load | agents.runs · Detail · Writing the note | agents.runs · Detail · Note withheld |
+| Stopped between sessions | Admin | — | — | — | agents.runs · Detail · Stopped between sessions | — | — | — |
+| Stopped between sessions | Operator | — | — | — | agents.runs · Detail · Stopped between sessions | — | — | agents.runs · Detail · Content withheld |
+| Fork from a note | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Forked | agents.runs · Detail · Could not load | — | agents.runs · Detail · Note withheld |
+| Fork from a note | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Forked | agents.runs · Detail · Could not load | — | agents.runs · Detail · Fork disabled |

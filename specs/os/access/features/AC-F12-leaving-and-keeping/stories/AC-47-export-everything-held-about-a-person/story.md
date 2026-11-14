@@ -4,7 +4,7 @@ title: Export everything held about a person
 feature: AC-F12
 status: idea
 personas: [admin]
-boards: [access.subject_export, settings.people, access.locked]
+boards: [settings.people]
 ---
 
 # AC-47 · Export everything held about a person
@@ -55,7 +55,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Export their data | Admin | access.subject_export · Nothing done yet | — | access.subject_export · Exporting | access.subject_export | access.subject_export · Could not export | — | — |
-| Export their data | Operator | — | — | — | — | — | — | access.locked · A person |
+| Export their data | Admin | settings.people · Export their data · Nothing done yet | — | settings.people · Export their data · Exporting | settings.people · Export their data | settings.people · Export their data · Could not export | — | — |
+| Export their data | Operator | — | — | — | — | — | — | settings.people · Export their data · Locked · A person |
 | Export first — in the deactivate modal | Admin | — | — | — | settings.people · Deactivate · Export first | — | — | — |
-| Export first — in the deactivate modal | Operator | — | — | — | — | — | — | access.locked · A person |
+| Export first — in the deactivate modal | Operator | — | — | — | — | — | — | settings.people · Locked · A person |

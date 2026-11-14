@@ -61,21 +61,21 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Surface | Tier | Board |
 |---|---|---|
 | Sign in — a password, or the company's SSO, then a second factor | page | `access.signin` |
-| Sign in again — the password or the SSO for a risky act | modal | `access.sign_in_again` |
+| Sign in again — the password or the SSO for a risky act | modal | `access.signin · Sign in again` |
 | Connect an MCP client — consent | page | `access.consent` |
-| Access Policies | sheet | `settings.access` |
+| Access Policies | sheet | `settings.policies` |
 | Roles — what each role may do | sheet | `settings.roles` |
 | Directory — users, service users, teams, the agents granted to each, every key and connected client | sheet | `settings.people` |
-| Owners of what a person owns | modal | `access.owners` |
+| Owners of what a person owns | modal | `settings.me · Owners` |
 | You — profile, default agent, sessions, keys, connected clients | modal | `settings.me` |
 | An ask in Needs you | modal | `inbox` |
 | Access usage — what each agent touched, access never used, the quarterly access review | sheet | `access.usage` |
 | What left the platform — the ledger | sheet | `access.ledger` |
-| History | modal | `inbox.history` |
+| History | modal | `settings.history` |
 | Leaving and keeping — retention per store, legal holds, a departed person's name, subjects forgotten | sheet | `settings.keeping` |
-| Forget a subject | modal | `access.forget` |
-| Export everything held about a person | modal | `access.subject_export` |
-| No access | every surface | `access.locked` — the act names the check that refused it: the role it needs, the rule and its policy, or the approver who decides |
+| Forget a subject | modal | `settings.keeping · Forget` |
+| Export everything held about a person | modal | `settings.people · Export their data` |
+| No access | every surface | The Operator lens of each board, `<board> · Locked` — the act names the check that refused it: the role it needs, the rule and its policy, or the approver who decides |
 
 ## Rules
 

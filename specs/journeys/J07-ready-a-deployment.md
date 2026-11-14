@@ -3,7 +3,7 @@ id: J07
 title: Ready a deployment
 personas: [admin]
 stories: [AC-18, CP-17, CP-25, CP-38, CP-39, CP-40, CP-41, CP-01, CP-04, AC-09, AG-35, AC-04, CP-10, CP-09, CP-11, CP-34]
-boards: [settings.databases.connect, settings.databases, settings.databases.database, settings.ai, settings.access, settings.workers, settings.usage]
+boards: [settings.databases, settings.ai, settings.policies, settings.workers, settings.limits]
 ---
 
 # Ready a deployment
@@ -49,23 +49,23 @@ flowchart TD
 |---|---|---|---|---|
 | 1 | Make the first Admin and each person's account, with one role | Access Plane · Directory · `invana users create` | AC-18 | — |
 | 2 | Install the connector package for each kind of graph database; read it in `invana version` | Control Plane · Graph databases · the engine's machine | CP-17 | — |
-| 3 | Connect each graph database, set its mode, switch it on and name a practice one | Control Plane · Graph databases | CP-25 · CP-38 · CP-39 · CP-41 | `settings.databases.connect` · `settings.databases.database` |
+| 3 | Connect each graph database, set its mode, switch it on and name a practice one | Control Plane · Graph databases | CP-25 · CP-38 · CP-39 · CP-41 | `settings.databases · Connect` · `settings.databases · Detail` |
 | 4 | Add AI models, each marked local or external | Control Plane · AI models | CP-01 | `settings.ai` |
 | 5 | Switch on the plugins agents may use | Control Plane · Plugins and MCP | CP-04 | — |
-| 6 | Make teams and put people on them | Access Plane · Directory | AC-09 | `settings.access` |
+| 6 | Make teams and put people on them | Access Plane · Directory | AC-09 | `settings.people` |
 | 7 | Grant agents to teams and people | Agents · The agents catalogue | AG-35 | — |
-| 8 | Write the Access Policies and attach them to agents | Access Plane · Access Policies | AC-04 | `settings.access` |
+| 8 | Write the Access Policies and attach them to agents | Access Plane · Access Policies | AC-04 | `settings.policies` |
 | 9 | Add workers on Lee's own machines and watch them join | Control Plane · Workers and the queue | CP-10 | `settings.workers` |
 | 10 | See every worker and where steps wait | Control Plane · Workers and the queue | CP-09 | `settings.workers` |
-| 11 | Set limits per team, user and agent | Control Plane · Limits | CP-11 | `settings.usage` |
-| 12 | Read what each spends against its limits | Control Plane · Limits | CP-34 | `settings.usage` |
+| 11 | Set limits per team, user and agent | Control Plane · Limits | CP-11 | `settings.limits · Usage` |
+| 12 | Read what each spends against its limits | Control Plane · Limits | CP-34 | `settings.limits · Usage` |
 
 ## Branches
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | Every set-up act is an Admin's; a person near a limit reads that an Admin sets it, and Lee raises it | CP-34 · CP-11 | `settings.usage` |
-| It fails | A failed connection test names the database's error; a failed ping shows the provider's message word for word; a refused join tells the worker why; a connector that fails to load is listed as failed, naming the package | CP-25 · CP-01 · CP-10 · CP-17 | `settings.databases.connect` · `settings.ai` · `settings.workers` |
+| It needs permission | Every set-up act is an Admin's; a person near a limit reads that an Admin sets it, and Lee raises it | CP-34 · CP-11 | `settings.limits · Usage` |
+| It fails | A failed connection test names the database's error; a failed ping shows the provider's message word for word; a refused join tells the worker why; a connector that fails to load is listed as failed, naming the package | CP-25 · CP-01 · CP-10 · CP-17 | `settings.databases · Connect` · `settings.ai` · `settings.workers` |
 | The person has no access | An Operator reads AI models, plugins, workers and graph databases; every act is disabled, naming the Admins; secrets never show | CP-01 · CP-04 · CP-09 · CP-10 · CP-40 | `settings.ai` · `settings.workers` |
 | A connector is not installed | Its kind of graph database cannot be connected; the step names the package that adds it | CP-17 | — |
 | A graph database or plugin stays off | Work that needs it is refused before it starts, naming who switched it off | CP-39 · CP-04 | — |

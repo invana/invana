@@ -4,7 +4,7 @@ title: Set up where asks and alerts can go
 feature: CP-F08
 status: idea
 personas: [admin]
-boards: [settings.notifications, access.sign_in_again]
+boards: [settings.notifications, access.signin]
 ---
 
 # CP-45 · Set up where asks and alerts can go
@@ -64,7 +64,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Where it can go | Admin | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications · Channels | settings.notifications · Channel failed | — | — |
 | Where it can go | Operator | settings.notifications · In app only · Read only | — | settings.notifications · Loading | settings.notifications · Channels · Read only | settings.notifications · Channel failed | — | settings.notifications · Channels · Read only |
-| Add channel | Admin | settings.notifications · Add channel | — | settings.notifications · Testing channel | settings.notifications · Channel ready | settings.notifications · Channel test failed | — | — |
+| Add channel | Admin | settings.notifications · New channel | — | settings.notifications · New channel · Testing channel | settings.notifications · New channel · Channel ready | settings.notifications · New channel · Channel test failed | — | — |
 | Add channel | Operator | — | — | — | — | — | — | settings.notifications · Channels · Read only |
-| Password again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Password again | Operator | — | — | — | — | — | — | — |

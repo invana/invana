@@ -4,7 +4,7 @@ title: Choose a person's default agent
 feature: AC-F03
 status: idea
 personas: [admin, analyst]
-boards: [settings.people, settings.me, access.locked]
+boards: [settings.people, settings.me]
 ---
 
 # AC-38 · Choose a person's default agent
@@ -54,6 +54,6 @@ flowchart TD
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A person — default agent | Admin | settings.people · Default is the Assistant | — | settings.people · Loading | settings.people · Default agent | settings.people · Not granted | — | — |
-| A person — default agent | Operator | access.locked · Default is the Assistant | — | access.locked · Loading | access.locked · Default agent | access.locked · Could not load | — | access.locked · Default agent |
+| A person — default agent | Operator | settings.people · Locked · Default is the Assistant | — | settings.people · Locked · Loading | settings.people · Locked · Default agent | settings.people · Locked · Could not load | — | settings.people · Locked · Default agent |
 | You — my default agent | Admin | settings.me · Default is the Assistant | — | settings.me · Loading | settings.me · Default agent | settings.me · Could not load | — | — |
 | You — my default agent | Operator | settings.me · Default is the Assistant | — | settings.me · Loading | settings.me · Default agent | settings.me · Could not load | — | — |

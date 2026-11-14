@@ -4,7 +4,7 @@ title: Derive facts from a rule
 feature: SE-F08
 status: idea
 personas: [modeller, analyst]
-boards: [model.inference, model.rules]
+boards: [model.inference]
 ---
 
 # SE-22 · Derive facts from a rule
@@ -66,7 +66,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Derivations | Admin | model.inference · No derivations | model.inference · No match | model.inference · Loading | model.inference | model.inference · Run failed | model.inference · Running | — |
 | Derivations | Operator | model.inference · No derivations | model.inference · No match | model.inference · Loading | model.inference · Read only | model.inference · Run failed | model.inference · Running | model.inference · Read only |
-| A derivation | Admin | model.rules · New derivation | — | model.inference · Counting | model.inference · Derivation | model.rules · Derivation refused | model.inference · Running | — |
-| A derivation | Operator | — | — | model.inference · Counting | model.inference · Derivation read only | model.inference · Could not load | model.inference · Running | model.inference · Derivation read only |
-| A derived fact | Admin | — | — | model.inference · Loading | model.inference · Derived fact | model.inference · Could not load | — | — |
-| A derived fact | Operator | — | — | model.inference · Loading | model.inference · Derived fact | model.inference · Could not load | — | model.inference · Not readable |
+| A derivation | Admin | model.inference · New | — | model.inference · Counting | model.inference · Detail | model.inference · New · Refused | model.inference · Running | — |
+| A derivation | Operator | — | — | model.inference · Counting | model.inference · Detail · Read only | model.inference · Could not load | model.inference · Running | model.inference · Detail · Read only |
+| A derived fact | Admin | — | — | model.inference · Loading | model.inference · Detail · Derived fact | model.inference · Could not load | — | — |
+| A derived fact | Operator | — | — | model.inference · Loading | model.inference · Detail · Derived fact | model.inference · Could not load | — | model.inference · Not readable |

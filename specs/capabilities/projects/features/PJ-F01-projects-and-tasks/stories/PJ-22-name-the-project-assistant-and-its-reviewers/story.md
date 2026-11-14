@@ -4,7 +4,7 @@ title: Name the project assistant and its reviewers
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.project]
+boards: [projects.projects]
 ---
 
 # PJ-22 · Name the project assistant and its reviewers
@@ -66,9 +66,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| People | Admin | projects.project · People · Only the creator | — | projects.project · People · Loading | projects.project · People | projects.project · People · Last reviewer refused | — | — |
-| People | Operator | projects.project · People · Only the creator | — | projects.project · People · Loading | projects.project · People | projects.project · People · Last reviewer refused | — | projects.project · People · Not a member |
-| Name the assistant | Admin | projects.project · People · No assistant | — | projects.project · People · Loading agents | projects.project · People · Assistant named | projects.project · People · Agent not granted | — | — |
-| Name the assistant | Operator | projects.project · People · No assistant | — | projects.project · People · Loading agents | projects.project · People · Assistant named | projects.project · People · Agent not granted | — | projects.project · People · Not a member |
-| Reviewers | Admin | — | — | — | projects.project · People · Reviewers | projects.project · People · One reviewer warning | — | — |
-| Reviewers | Operator | — | — | — | projects.project · People · Reviewers | projects.project · People · One reviewer warning | — | projects.project · People · Not a member |
+| People | Admin | projects.projects · Detail · People · Only the creator | — | projects.projects · Detail · People · Loading | projects.projects · Detail · People | projects.projects · Detail · People · Last reviewer refused | — | — |
+| People | Operator | projects.projects · Detail · People · Only the creator | — | projects.projects · Detail · People · Loading | projects.projects · Detail · People | projects.projects · Detail · People · Last reviewer refused | — | projects.projects · Detail · People · Not a member |
+| Name the assistant | Admin | projects.projects · Detail · People · No assistant | — | projects.projects · Detail · People · Loading agents | projects.projects · Detail · People · Assistant named | projects.projects · Detail · People · Agent not granted | — | — |
+| Name the assistant | Operator | projects.projects · Detail · People · No assistant | — | projects.projects · Detail · People · Loading agents | projects.projects · Detail · People · Assistant named | projects.projects · Detail · People · Agent not granted | — | projects.projects · Detail · People · Not a member |
+| Reviewers | Admin | — | — | — | projects.projects · Detail · People · Reviewers | projects.projects · Detail · People · One reviewer warning | — | — |
+| Reviewers | Operator | — | — | — | projects.projects · Detail · People · Reviewers | projects.projects · Detail · People · One reviewer warning | — | projects.projects · Detail · People · Not a member |
