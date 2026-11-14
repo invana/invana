@@ -70,7 +70,7 @@ TRAILER = "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 # Tools a headless session may use. Widen deliberately; never `--dangerously-skip-permissions`
 # outside a disposable container (set INVANA_RUNNER_SANDBOX=1 there).
 ALLOWED_TOOLS = [
-    "Read", "Edit", "Write", "Glob", "Grep", "Agent", "Skill",
+    "Read", "Edit", "Write", "Glob", "Grep", "Agent", "Skill", "Artifact", "ToolSearch",
     "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git mv *)", "Bash(git show *)",
     "Bash(git add *)", "Bash(git commit --no-verify *)", "Bash(git -C * add *)", "Bash(git -C * commit --no-verify *)",
     "Bash(pnpm *)", "Bash(node *)", "Bash(npx playwright *)", "Bash(uv run *)", "Bash(python3 *)", "Bash(make *)",
