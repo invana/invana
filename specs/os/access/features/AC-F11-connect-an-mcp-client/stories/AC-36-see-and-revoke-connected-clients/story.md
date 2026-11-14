@@ -52,6 +52,8 @@ flowchart TD
 | AC-36.8 | A revoke made with a key or a connected client's token | it is sent | it is refused — *This needs a person's session, not a key* |
 | AC-36.9 | The same client connected twice | the list is read | each connection reads as its own row and is revoked on its own |
 | AC-36.10 | The list could not load | it is opened | *Could not load connected clients* reads, with *Try again* |
+| AC-36.11 | A connected client with runs queued or running | it is revoked | those runs stop, each with a History row naming who revoked the client |
+| AC-36.12 | A connected client revoked by an Admin | its person opens the Inbox | an Update names the client and the Admin who revoked it |
 
 ## Screens
 

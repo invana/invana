@@ -82,6 +82,8 @@ sequenceDiagram
 | AC-10.20 | A name the owner already uses on a live key | a key is minted with it | it is refused in place, naming it |
 | AC-10.21 | A key | it calls | its *Last used* shows the day of the call |
 | AC-10.22 | A key minted, revoked or refused | History is read | each is a row naming the key, its owner and who acted — never the secret |
+| AC-10.23 | A key with runs queued or running | it is revoked | those runs stop, each with a History row naming who revoked the key |
+| AC-10.24 | A key revoked by an Admin, not its owner | the owner opens the Inbox | an Update names the key and the Admin who revoked it — for a service user's key, every owner of the service user |
 
 ## Screens
 

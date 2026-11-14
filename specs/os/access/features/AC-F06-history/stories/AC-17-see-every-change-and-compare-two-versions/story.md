@@ -57,6 +57,7 @@ flowchart LR
 | AC-17.16 | A compare | the reader wants an earlier version back | *Restore* is on the record's own page, makes a new version, and History keeps both |
 | AC-17.17 | A record the reader cannot open | its compare is followed | it reads as absent, not forbidden |
 | AC-17.18 | Changes filtered by product or person | nothing matches | it reads *0 of N match*, with *Clear all* |
+| AC-17.19 | The event list or its live tail | an Operator or a Modeller reads it | they get their own acts and the change events of records they can open; another person's sign-ins, keys, clients and refusals never arrive. An Admin gets every event |
 
 ## Screens
 

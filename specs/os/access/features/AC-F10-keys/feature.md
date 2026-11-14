@@ -166,7 +166,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Key ∩ owner | The call is checked as the owner — role, agents, teams ([AC-F02 › One evaluator](../AC-F02-access-policies/feature.md#mechanisms)) — and then against the key: `everything` passes, `read_only` passes Read only, `rules` passes only a verb and resource one of its rules matches. Both must pass; the stricter refusal is the one named |
 | Read at each call | Revocation, expiry, the owner's deactivation and every change to the owner's reach take effect on the next call; nothing is cached on the key |
 | Last used | `last_used_at` is written at most once a minute per key |
-| Revoking | Sets `revoked_at` and `revoked_by_id` and deletes the key's `access_key_rules` |
+| Revoking | Sets `revoked_at` and `revoked_by_id` and deletes the key's `access_key_rules`; in the same act stops every run with its `key_id` that is queued or running, as [a stop](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#mechanisms) does, `stopped_by_id` the revoker — a History row for the revoke and one per run. When the revoker is not the owner, an Update reaches the owner — a service user's owners — in the Inbox ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md)), naming the key and who revoked it |
 | Session-only | Every route here refuses a key and a connected client's token; mint and revoke verify `password` as [signing in again](../AC-F01-sign-in-account-and-sessions/feature.md#mechanisms) does |
 | Never in a log | The secret enters no event, log line, span or ledger row (NFR-SEC-2) |
 
@@ -189,6 +189,8 @@ The code change is [migrations.md](../../../../migrations.md) M14.
 | A key's rules only Allow | A key narrows; Ask and Deny are its owner's agents' policies' to say. What a key's rules do not name, it cannot do |
 | No key marked for agents | Every act already runs through an agent and its Access Policies; a key needs no mark of its own to be held to them |
 | Revoking asks for the password too | Every change to keys signs in again, the same as access and credentials |
+| Revoking stops its runs | A revoked key's queued and running runs stop with it, so ending a key ends what it set going |
+| The owner is told | A key revoked by someone else is an Update in its owner's Inbox, naming the key and who revoked it |
 
 ## Open questions
 

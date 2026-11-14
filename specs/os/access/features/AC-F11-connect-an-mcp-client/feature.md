@@ -211,6 +211,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Read at each call | The person's role, active state and agents are read at each MCP call; a deactivation revokes their connections with `revoked_why = deactivated` |
 | Who is behind the call | The person of the connection, and the connection's client name, are what the ledger and History record — never a name the client sends in a header |
 | Cleanup | Registrations with no connection after 24 hours, used and expired codes, and retired tokens past their expiry are removed by the deployment's housekeeping |
+| Revoking | Sets `revoked_at`, `revoked_by_id` and `revoked_why` and retires every token of the connection; in the same act stops every run with its `client_connection_id` that is queued or running, as [a stop](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#mechanisms) does, `stopped_by_id` the revoker — a History row for the revoke and one per run. When an Admin revokes another person's connection, an Update reaches that person in the Inbox ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md)), naming the client and the Admin |
 | Never in a log | Codes, verifiers and tokens enter no event, log line, span or ledger row (NFR-SEC-2) |
 
 ## System impact
@@ -232,6 +233,8 @@ The code change is [migrations.md](../../../../migrations.md) M16.
 | Consent asks for the password | Connecting a client makes a credential; it signs in again like keys and access |
 | One scope: act as me | A connected client acts as its person through the agents they may use; a client that should do less uses a narrowed key ([AC-F10](../AC-F10-keys/feature.md)) |
 | Consent each time | A client that connects again is asked again and becomes a new connection; nothing is remembered silently |
+| Revoking stops its runs | A revoked connection's queued and running runs stop with it, so ending a client ends what it set going |
+| The person is told | A connection an Admin revokes is an Update in its person's Inbox, naming the client and the Admin |
 | Connected clients sit beside keys | *Settings › You › Connected clients*, and for Admins *People and access › Connected clients* |
 
 ## Open questions

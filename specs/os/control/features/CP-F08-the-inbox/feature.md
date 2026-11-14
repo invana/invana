@@ -167,7 +167,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | `GET /notifications` | The reader's Inbox — `?view=needs_you · running · updates · done` · `?product=` · `?kind=` · `?unread=true` · `?alerts=all` (an Admin's *All open alerts*) — with `needs_you` and `updates_unread` | CP-36 · CP-69 |
 | `GET /counts` | The reader's counts: `needs_you` · `updates_unread` · `running` · `waiting` · `alerts_open` · `blocked_today` · `as_of` — scoped by role (below) | CP-36 · CP-69 · CP-70 · AC-48 |
-| `GET /counts/stream` | Server-sent events: the same body each time a count changes, at most once a second | CP-36 · CP-69 |
+| `GET /counts/stream` | Server-sent events: the same body each time a count changes, at most once a second; a person's session only, in the `Authorization` header | CP-36 · CP-69 · AC-48 |
 | `POST /notifications/read` | Mark rows read — `{ids[]}` or `{all: true}` | CP-36 |
 | `GET /notifications/rules` · `POST /notifications/rules` | Notification rules, each with `may_edit` · write one | CP-37 |
 | `GET /notifications/rules/{id}` · `PATCH /notifications/rules/{id}` · `DELETE /notifications/rules/{id}` | Read · change, switch on or off · remove one | CP-37 |
@@ -199,6 +199,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 404 | Reading another person's channel choices | *Not found.* | CP-46.10 |
 | 403 | `?alerts=all` by anyone but an Admin | *This needs the Admin role.* | CP-36.21 |
 | 422 | A rules file with a refused rule — nothing in it applied | *{rule} · {field}: {why}.* | CP-37.17 |
+| 403 | The counts stream opened with a key or a connected client's token | *This needs a person's session, not a key.* | AC-48.19 |
+| 401 | The counts stream opened with no `Authorization` header — a token in the address included | *This session has ended — sign in again.* | AC-48.19 |
+| 429 | An eleventh counts stream for a session, or a twenty-first for an account | *Too many open tabs — close one and try again.* | AC-48.20 |
 
 ### CLI
 
@@ -223,7 +226,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Alerts | CP-F11's checker writes an `ops_alert` row in *Needs you* per recipient, then their own deliveries; its close sets `done_at` and moves the row to Updates |
 | The counts | `needs_you` — asks waiting on the reader + runs waiting on their answer + open alerts sent to them; a run held on an ask counts once, as the ask · `updates_unread` — unread notifications · `running` — runs queued or running ([CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) · `waiting` — runs held on a person or a limit · `alerts_open` ([CP-F11](../CP-F11-ops-alerting/feature.md#engine)) · `blocked_today` — acts a policy refused today ([AC-F06](../../../access/features/AC-F06-history/feature.md#engine) `GET /refusals`) |
 | Counts by role | An Admin reads the deployment's `running`, `waiting`, `alerts_open` and `blocked_today`; an Operator or a Modeller reads `running` and `waiting` for runs they are behind, `alerts_open` for alerts sent to them, and no `blocked_today` — the field is absent, never `0` |
-| The counts stream | One stream per signed-in Studio tab. The stream listens to the event store's live tail ([AC-F06](../../../access/features/AC-F06-history/feature.md#engine)); an event that can move a count recomputes the subscriber's counts, coalesced to at most one send a second, sent only when a value changed. Each owner's count is a read through its manager — this feature stores no counter |
+| The counts stream | One stream per signed-in Studio tab. The stream listens to the event store's live tail ([AC-F06](../../../access/features/AC-F06-history/feature.md#engine)); an event that can move a count marks the subscriber dirty, and a dirty subscriber is recomputed at most once a second, sent only when a value changed. Each owner's count is a read through its manager — this feature stores no counter |
+| The deployment's counts, once | An Admin's deployment-wide `running`, `waiting`, `alerts_open` and `blocked_today` are computed once a second when dirty and shared by every Admin's stream; only each reader's own counts are computed per subscriber |
+| A stream lives as its session does | Opened by a person's session only — the access token in the `Authorization` header (a fetch-based stream), never a key, a connected client's token or a token in the address. Before each send the stream re-reads the account's role and active state and its refresh row; within 2 seconds of the refresh row retiring (*Sign out*, *Sign out everywhere*, a password change, reuse) or the account's deactivation it closes, and a role change re-scopes the counts or closes it. Studio reopens it with a renewed token |
+| Streams per session | At most 10 open per session and 20 per account; one more is refused `429` |
 | Read state | Per row, `read_at` |
 
 ## System impact

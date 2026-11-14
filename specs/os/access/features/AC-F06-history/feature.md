@@ -82,9 +82,10 @@ sequenceDiagram
 | Read their own acts and the rows of runs they may read | Every signed-in person — Operator, Modeller | The rest is counted, not shown — a line says how many |
 | Export the rows the reader can see | Every signed-in person | — |
 | Read every change and compare two versions of a record the reader can open | Every signed-in person | A record the reader cannot open reads as absent |
+| Read the event list and its live tail | Admin — every event; everyone else — their own acts and the change events of records they can open ([What a reader of `events` gets](#mechanisms)) | Another person's sign-ins, keys, clients and refusals are never sent |
 | Restore an earlier version | Not here — the record's own page, by its own role | — |
 | Read the Access dropdown — people signed in, agents acting now, blocked today, delegations in force, recent changes | Admin | No *Access* button in the header |
-| Revoke a client or a key acting for a person, from the dropdown | Admin, with the password again ([AC-F10](../AC-F10-keys/feature.md) · [AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) | — |
+| Revoke a client or a key acting for a person or a service user, from the dropdown | Admin, with the password again ([AC-F10](../AC-F10-keys/feature.md) · [AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) | — |
 | Read *Your access* — one's own role, agents and delegations — and revoke one's own | Every signed-in person, for themselves | Another person's is absent |
 
 ## States
@@ -185,10 +186,10 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `GET /refusals` | `refused_today` · `acts_today` · `share_pct` · by reason · `by_day[30]` · `top_functions[]` · `by_rule[]` (`refused_by` · `rule` · `policy` · `refused` · `today`) | AC-16 |
 | `GET /export?format=csv \| jsonl` · `GET /exports` | Stream the filtered rows, each with its hash and the previous one, and write an exports row · the exports, newest first | AC-16 |
 | `GET /integrity?full=` | `{verified_at, ok, last_seq, broken_seq?, keep_days?, held, checkpoint?, rows}`; `full` re-verifies from the latest checkpoint, or row 1 when none | AC-16 |
-| `GET /summary?tz=` | The Access dropdown, Admin only: `tiles` — `people_signed_in` · `agents_acting` · `requests_waiting` · `blocked_today`; `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `role?` · `run_id?` · `last_touched_at`; `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`client` · `key`) · `id` · `name` · `acts_for` · `role` · `ends_at?`; `recent_changes[]` — `seq` · `at` · `actor` · `act` (grants · invites · policy saves) | AC-48 |
+| `GET /summary?tz=` | The Access dropdown, Admin only; `tz` an IANA zone: `tiles` — `people_signed_in` · `agents_acting` · `requests_waiting` · `blocked_today`; `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `role?` · `run_id?` · `last_acted` (`now` · `within_15_min` · `today`); `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`client` · `key`) · `id` · `name` · `acts_for` (a person or a service user) · `owners[]` (a service user's) · `role` · `ends_at?` (none — never expires) · `verified` (`false` for a self-registered client) · `redirect_host?` (a client's); `recent_changes[]` — `seq` · `at` · `actor` · `act` (grants · invites · policy saves) | AC-48 |
 | `GET /changes/{kind}/{id}` | One record's changes: `{record_kind, record_id, name, items[ChangeEntry]}` | AC-17 |
 | `GET /changes/{kind}/{id}/compare?a=&b=` | Two versions; `a` omitted compares `b` with the one before | AC-17 |
-| `GET /events` · `GET /events/stream` | The deployment's events by the list contract, every filter composing with `?changes=true` · the live tail | AC-17 |
+| `GET /events` · `GET /events/stream` | The events the reader may read ([What a reader of `events` gets](#mechanisms)) by the list contract, every filter composing with `?changes=true` · the live tail, by the same rule | AC-17 |
 
 ### Events
 
@@ -197,6 +198,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `access.history.export` | An export is made |
 | `access.history.prune` | Rows older than History's period are removed, a whole window — itself a History row, naming its checkpoint |
 | `access.history.broken` | A check finds the chain broken, naming the row |
+| `access.history.summary_read` | An Admin reads the access summary — at most one per Admin per hour |
 
 ### Refusals
 
@@ -207,6 +209,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | 422 | A compare naming a version the record does not have | *{record} has no version {v}.* | API only — Studio offers only versions the record has |
 | 403 | The access summary by anyone but an Admin | *This needs the Admin role.* | AC-48.15 |
 | 401 | *Revoke* without the password, or a wrong one | *Enter your password again to do this.* | AC-48.10 |
+| 422 | The access summary with a `tz` that is not an IANA zone | *tz: {value} is not a time zone.* | AC-48.23 |
 
 ### CLI
 
@@ -222,12 +225,17 @@ store: every feature's *Events* table names what it writes here, and links this 
 | Redacted at write | Credentials never reach `details`, `args` or a row — not even encrypted; a secret is named, never its value |
 | Causality | `parent_event_id` links an event to the act that caused it; `caused_by_seq` does the same for a History row |
 | The live tail | A database trigger notifies every insert into `events`; the engine fans it out to the streams Studio holds open — the counts stream ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#mechanisms)) among them |
-| The access summary | Composed on read, storing nothing: *people signed in* — people with a live refresh row ([AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine)); *acting now* — those people and runs queued or running ([CP-F10](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)), each with its last event's time; *requests waiting* — open asks ([AC-F05](../AC-F05-asks-and-approvals/feature.md#engine)); *blocked today* — `GET /refusals`' `refused_today` and its rows; *delegations in force* — connected clients ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#engine)) and live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), each with the person it acts for and their role ([AC-F03](../AC-F03-directory/feature.md#engine)); *recent changes* — the newest History rows of grants, account creation and Access Policy saves |
+| The access summary | Composed on read, storing nothing: *people signed in* — people with a live refresh row ([AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine)); *acting now* — those people and runs queued or running ([CP-F10](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)), each with when it last acted (below); *requests waiting* — open asks ([AC-F05](../AC-F05-asks-and-approvals/feature.md#engine)); *blocked today* — `GET /refusals`' `refused_today` and its rows; *delegations in force* — connected clients ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#engine)) and live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), a service user's keys among them, each with the person or service user it acts for, a service user's owners, and the role ([AC-F03](../AC-F03-directory/feature.md#engine)); *recent changes* — the newest History rows of grants, account creation and Access Policy saves |
+| When one last acted | From that person's or run's writes and run starts only — never a sign-in, a token renewal or a read — as `now` (the last 2 minutes) · `within_15_min` · `today`. Nothing stores presence: no table, no event, never an address, a device or a user agent |
+| Names are untrusted | Client, key, agent and rule names and `touched` are sent as data; a self-registered client carries `verified: false` and its `redirect_host` ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#rules)) |
+| Reading the summary is recorded | The first read by an Admin in each clock hour writes `access.history.summary_read` and its History row; later reads in that hour write nothing |
+| `tz` | Checked against the IANA zone list before anything is read; *today* is midnight to now in that zone |
 | Revoke from the dropdown | Calls the owning feature's revoke — `DELETE /api/v1/access/clients/{id}` or `DELETE /api/v1/access/keys/{id}` — with its password check; nothing is revoked here |
 | *Your access* | The person's own role and agents from `GET /api/v1/access/auth/me`, and their own clients and keys from the owning routes |
 | Who reads `events` | The change list and the live tail, notification rules ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#engine)), provenance ([RC-F06](../../../../capabilities/records/features/RC-F06-provenance/feature.md#engine)), a task's tree ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)), the outbox relay that rebuilds the system graph, and traces — each a reading; none copies it |
 | One writer of History | `record()` takes the last row under a row lock, sets `seq` and the hash, inserts. The Control Plane calls it for each step it settles and each refusal; delegation for each helper and refusal; every manager for each act a person, an agent, a key or an MCP client causes. Nothing updates or deletes a row |
 | The hash chain | `hash = sha256(prev_hash ‖ canonical JSON of the row without actor_names)`; the first `prev_hash` is 64 zeros. Names live outside the hash, so pseudonymising a departed person changes `actor_names` and every row still verifies; who acted is proven by `actor_chain`'s ids. The shared clock tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)) re-verifies every 10 minutes from the last verified row into `access_history_checks`; `?full=` re-verifies from the latest checkpoint |
+| What a reader of `events` gets | An Admin every event. Anyone else: events whose actor or `on_behalf_of_user_id` is them, and the change events of records they can open. Another person's `access.auth.*`, `access.keys.*`, `access.clients.*` and refusal events are never sent to them — on `GET /events` or on any stream fed by the live tail |
 | What a reader sees | An Admin every row; anyone else their own acts and the rows of runs `may_read_run()` allows; the rest is counted as `hidden`. `args` is withheld on a row the reader sees but whose run they may not read — an Admin's too. Counts over the whole deployment are an Admin's |
 | Counts | Counts, per-day bars and top lists are SQL over the whole window; table rows read from the newest 20,000 |
 | A change with no percentage | `acts_change_pct` is absent while the 7-day daily mean is under 10 acts |
@@ -267,7 +275,10 @@ store: every feature's *Events* table names what it writes here, and links this 
 | A model's change names its loads | A model version's effect lists the loads it touched and how many records fail |
 | History lives in Settings › Access | History is read in Settings › Access › History; the Admin's glance at access now is the header's Access dropdown |
 | Access is an Admin's glance | The dropdown is an Admin's alone; an Operator reads their own access under *Your access* in the avatar menu, and has no *Access* button |
-| Delegations are clients and keys | What acts for a person until a time is a connected client or a key; the dropdown lists both and revokes through their own features |
+| Delegations are clients and keys | What acts for a person or a service user until a time is a connected client or a key; the dropdown lists both, a service user's keys with its owners, and revokes through their own features |
+| Events read as History does | The event list and its tail follow who may read what; presence and refusals are never rebuilt from them by anyone but an Admin |
+| Last acted is coarse | *Now · within 15 min · today*, from writes and runs only — enough to catch access going wrong, never a record of a person's day |
+| An Admin's look is recorded | Reading who is signed in leaves a History row, one per Admin per hour |
 | Requests stay in the Inbox | The dropdown counts asks waiting; deciding them is the Inbox's |
 
 ## Open questions
@@ -289,3 +300,5 @@ store: every feature's *Events* table names what it writes here, and links this 
 | Versions of boards and reports | A frozen reading, not a change to a definition |
 | A chain per team or per graph database | One deployment, one chain; a filter narrows it |
 | Sending History to an outside log tool | That belongs to the deployment's own platform |
+| A switch to hide who is signed in | No present need; reading it is Admin only and recorded |
+| A presence table or a presence event | Last acted is read from writes and runs already recorded |
