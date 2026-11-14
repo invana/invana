@@ -321,7 +321,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P02 | Name the missing boards | P01 | done | 2026-11-15 | gates green · reviews passed |
 | P03 | Prototype I — Shell, Sign-in & Home, Explore, Model, Projects | P02 | done | 2026-11-15 | gates green · reviews passed |
 | P04 | Prototype II — Inbox, Records, Agents, Library, Settings | P03 | done | 2026-11-15 | gates green · reviews passed |
-| P05 | Shell — every state and lens | P04 | in progress | 2026-11-15 |  |
+| P05 | Shell — every state and lens | P04 | done | 2026-11-15 | gates green · reviews passed |
 | P06 | Sign-in & Home — every state and lens | P05 | pending |  |  |
 | P07 | Explore I — ask and the board | P06 | pending |  |  |
 | P08 | Explore II — views, compare and memory | P07 | pending |  |  |
