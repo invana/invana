@@ -1,6 +1,6 @@
 ---
 name: design-redesign
-status: running
+status: ready
 branch: chore/specs-graph-data
 scope: design-redesign
 ---
@@ -29,12 +29,13 @@ Settled with Ravi on 2026-11-15. No phase reopens them.
 | D3 | Boards are Full HD, 1920×1080; the leftSection is 260 px by default; the assistant is 420 px |
 | D4 | The shell is components on the *Components* page — `ShellHeader` · `ShellRail` · `ShellLeftSection` · `ShellFooter` · `SheetFrame` · `AssistantPanel` — mounted by every board with `<dc-import>`; no board copies shell markup |
 | D5 | The 8 boards on the canvas today (Workbench, 1 Welcome … 7 Access dropdown) move to *Reference designs* unchanged. `Main.dc.html` becomes the *Index* board; the Workbench keeps its content as `ref.workbench.dc.html` |
-| D6 | The canvas's kit bundle (`project/ds/invana-kit/`) is refreshed from the design-kit artifact `https://claude.ai/artifact/PovTcmwPkgKDrxdrcA5TBD` in P01 |
+| D6 | The kit bundle is the one already in the mirror, `project/ds/invana-kit/` (design-kit release `1794604989-411c`); no phase refreshes it |
 | D7 | Placements: memory (GP-F02 `graph.memory`) on *Explore*; outside agents (AG-F05) the *Outside* filter of `agents.agents`, on *Agents*; MCP server (`settings.mcp`) under Settings › Connections; `control.alerts` on *Settings · Operations*; `agents.skills` (skills, workflows, functions, templates) · `settings.plugins` · `settings.packs` · `settings.connectors` on *Library* |
 | D8 | Whole app first: P01 and P03–P04b draw every board's List (has data · Admin) linked end to end; P05–P16 then draw every view, overlay, edit, create, state and lens, page by page. Each board is in exactly one List phase and exactly one state phase (*Boards by page*) |
-| D9 | Only P01 waits for Ravi's review. Every other phase is approved on its gates; no QA review |
+| D9 | No phase waits for Ravi; every phase is approved on its gates; no QA review. Ravi reviews the published canvas after the last phase |
 | D10 | Every create the specs name is a modal **state of its feature's board** (D11) — `<board> · New`, or the act's own word (`· Connect` · `· Upload` · `· Install` · `· Import` · `· Attach` · `· Add workers` …) — drawn over that board, never a board of its own. The wizard is `design-language.md` §3: one modal of numbered sections that open in order (1 Name · 2 the type as a grouped card grid · 3 its details) and one filled act. The step strip is only `settings.workers · Add workers`, whose worker joins after the person acts. Each create's State switch runs through every section, the validation error on its field, working and done, in both lenses. A board, a conversation and a dashboard from *Pin* are made on the click; roles are fixed and have no create; a kind and a relationship are made in the model's draft (`model.models · Draft`). Each place phase (P09–P16) draws the creates on its own boards |
 | D11 | **One board per place, showing the whole feature** (`specs/design-language.md` §7). A board is a canvas page, a mode's view, a sheet's section, a header dropdown or a page outside the shell, named for its feature. It opens on the List; a View switch moves List · Detail; its modals (create, edit, confirm, *Sign in again*), peeks, menus, panels, the console and collapsed regions are its states; the Operator's locked reading is its Operator lens (`· Locked`), never a separate board. Each `## Screens` cell reads `<board> · <view or overlay> · <state>`. 56 boards cover all 235 stories (151 before) |
+| D12 | Draw locally, publish once at the end. The mirror `.design/canvas-invana/project/` is seeded from the live canvas version `1794697037-3af0`; every phase draws in it. After P17 the project-lead publishes the whole mirror to `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX`, merging anything newer on the live canvas first, then reports to Ravi. Why: headless runner sessions have no Artifact tool |
 
 ## Boards by page
 
@@ -71,12 +72,13 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 |---|---|
 | Draw by `design-story` | The skill is the procedure: §2 kit mapping, §3 layout, §4 standards, §4b mechanics, §5 checks 1 and 3 |
 | Stories at `idea` are drawn | Ravi approved drawing every story at `idea` for this project. Statuses are not moved. No `task.md` rows: boards trace to stories by name, and the sticky under each row names the stories that cite it |
-| The local mirror | `.design/canvas-invana/project/` (flat). Before editing, `read` the live `canvas.json` and every file you will change into it; publish from it with `root` `.design/canvas-invana` and only the changed files; send `canvas.json` only when the layout changes, re-read right before. On a refused publish, re-read what it names and redo the edit |
-| One publisher | Only the phase's lead publishes. Sub-agents write board files into the mirror, each its own files; the lead publishes once they are done |
+| The mirror is the canvas | `.design/canvas-invana/project/` (flat) is the working copy and the deliverable (D12). No session publishes to or reads the live artifact; sessions edit the mirror's files directly. This overrides `design-story` §4b and §6 (publish, live read; R396) |
+| Who writes what | In `canvas.json` change only `pages`, boards, order and notes; keep every other key as it is. Sub-agents write their own board files; only the phase's lead edits `canvas.json` |
+| Checks, on the mirror | `design-story` §5 step 1 · `python3 scripts/specs/check.py` · the link check: every `href` and `dc-import` in the mirror resolves to a file in the mirror, except `./support.js` (the artifact supplies it at publish; no session creates it) — done with `grep` or `python3` |
 | Never stop | Nobody answers questions. A gap the spec does not settle: draw the reading `specs/design-language.md` and the D-decisions support, write it in the hand-off notes, raise a recommendation (`recommend`), go on. A component the kit lacks: compose the nearest kit components, raise a `component` recommendation, go on |
 | Kit only, tokens only | Components from `InvanaUI` in the canvas's bundle; tokens only; 13 px base, 12 px meta; budgets in tokens, never currency; runs show pinned exact model versions |
 | Leave the rest alone | Never edit *Reference designs* boards after P01, another page's boards, or a component outside P01 — a component change a page needs is a hand-off note and a recommendation, applied by the next phase that owns *Components* (none after P01: raise it). |
-| No screenshots | `design-story` §5 step 2 is skipped: the canvas renders only live. Checks are §5 steps 1 and 3 and the link check in *Gates* |
+| No screenshots | `design-story` §5 step 2 is skipped: the canvas renders only live. Checks are *Checks, on the mirror* |
 
 ## Gates
 
@@ -91,15 +93,15 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | | |
 |---|---|
 | Agent | designer |
-| Read | `.claude/skills/design-story/SKILL.md` · `specs/design-language.md` · `specs/glossary.md` · the canvas's `canvas.json` and its 8 boards · the design-kit artifact's README and file list |
+| Read | `.claude/skills/design-story/SKILL.md` · `specs/design-language.md` · `specs/glossary.md` · the mirror's `canvas.json`, its 8 reference boards and `ds/invana-kit/` |
 | Stories | — |
-| Done when | The 8 current boards sit on *Reference designs*, unchanged; the kit bundle is the design-kit artifact's current one; the six shell components are on *Components*, each with props for every D1–D20 variant (modes, counts, lenses, theme, open dropdown, sheet); the 16 pages exist; `Main.dc.html` is the *Index* (one card per page); `explore.board` is drawn on *Explore* on the components, has data and failed, Admin and Operator, as the proof that the shell works |
-| Lands | The canvas: `canvas.json` (pages, boards, notes) · `ShellHeader` · `ShellRail` · `ShellLeftSection` · `ShellFooter` · `SheetFrame` · `AssistantPanel` · `Main.dc.html` · `ref.workbench.dc.html` · `explore.board.dc.html` · `project/ds/invana-kit/**` |
+| Done when | The mirror holds the 16 pages; the 8 reference boards sit on *Reference designs* (page `ref`), unchanged, the Workbench as `ref.workbench.dc.html` with its boards entry on `ref` and every order and link to it updated; the six shell components are on *Components*, each with props for every D1–D20 variant (modes, counts, lenses, theme, open dropdown, sheet); `Main.dc.html` is the new *Index* (one card per page), first in order; `explore.board` is drawn on *Explore* on the components, has data and failed, Admin and Operator, as the proof that the shell works; the link check and `check.py` pass |
+| Lands | The mirror: `canvas.json` (pages, boards, order, notes) · `ShellHeader` · `ShellRail` · `ShellLeftSection` · `ShellFooter` · `SheetFrame` · `AssistantPanel` · `Main.dc.html` · `ref.workbench.dc.html` · `explore.board.dc.html` |
 | Boards | explore.board |
 | Review | |
-| Approve | Ravi — reviews the shell components, the page layout and `explore.board` before anything else is drawn |
+| Approve | |
 | Budget | |
-| Steps | 1. Mirror the live canvas into `.design/canvas-invana/project/`. 2. Add the 16 pages; move the 8 boards to *Reference designs* (Workbench → `ref.workbench.dc.html`). 3. Refresh the kit bundle from the design-kit artifact (server copy of its published files). 4. Build the six components from the reference boards' chrome, as props. 5. Draw `explore.board` on them. 6. Draw the *Index*. 7. Publish; `check.py` |
+| Steps | 1. Verify the mirror: `canvas.json`, the 16 pages, the 8 reference boards on `ref`, `ds/invana-kit/`. 2. Rename `Main.dc.html` (the Workbench) to `ref.workbench.dc.html`; keep its boards entry on `ref`; fix order and links. 3. Build the six components from the reference boards' chrome, as props. 4. Draw `explore.board` on them. 5. Write the new *Index* as `Main.dc.html`, first in order. 6. Link check; `check.py` |
 
 ### P02 · Name the missing boards
 
@@ -124,12 +126,12 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | P01's and P02's hand-off notes · `design-story` · D11 · `specs/design-language.md` §7 · the stories citing each board |
 | Stories | — |
 | Done when | On the *Shell*, *Sign-in & Home* and *Explore* pages, every board below is drawn on the components in its List (has data · Admin), with its View, State and Lens switches present, and linked: the header's switcher, dropdowns and modes, Home → Explore (P01's `explore.board`), Explore's views on the leftNav, and every List to its Detail. Other states are not required yet |
-| Lands | The canvas: 11 board files and `canvas.json` |
+| Lands | The mirror: 11 board files and `canvas.json` |
 | Boards | shell.switcher · shell.command · shell.operations · shell.access · shell.avatar.access · inbox.dropdown · access.signin · access.consent · start.home · explore.dashboards · graph.memory |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. Shell and Home first (every other page links from them). 2. Explore. 3. Link check. 4. Publish; `check.py` |
+| Steps | 1. Shell and Home first (every other page links from them). 2. Explore. 3. Link check; `check.py` |
 
 ### P03b · Prototype I — Model, Projects
 
@@ -139,12 +141,12 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | P03's hand-off notes · `design-story` · D11 · `specs/design-language.md` §7 · the stories citing each board |
 | Stories | — |
 | Done when | On the *Model* and *Projects* pages, every board below is drawn on the components in its List (has data · Admin), with its View, State and Lens switches present, and linked: Explore → Model → Projects through the header's modes, each mode's views on the leftNav, and every List to its Detail. Other states are not required yet |
-| Lands | The canvas: 14 board files and `canvas.json` |
+| Lands | The mirror: 14 board files and `canvas.json` |
 | Boards | model.models · model.kinds · model.relationships · model.standards · model.taxonomies · model.rules · model.views · model.inference · model.health · projects.projects · projects.tasks · projects.branches · projects.report · projects.alerts |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. Model. 2. Projects. 3. Link check. 4. Publish; `check.py` |
+| Steps | 1. Model. 2. Projects. 3. Link check; `check.py` |
 
 ### P04 · Prototype II — Inbox, Records, Agents, Library
 
@@ -154,12 +156,12 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | P03b's hand-off notes · `design-story` · D11 · the stories citing each board |
 | Stories | — |
 | Done when | Every board below is drawn in its sheet frame in its List (has data · Admin), with its View, State and Lens switches present, linked from the rail summoners, the sheet nav and the *Index* |
-| Lands | The canvas: 12 board files and `canvas.json` |
+| Lands | The mirror: 12 board files and `canvas.json` |
 | Boards | inbox · data.records · data.loads · data.quality · data.annotations · agents.agents · agents.runs · agents.schedules · agents.skills · settings.plugins · settings.packs · settings.connectors |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. The sheets in rail order. 2. Link the *Index*. 3. Link check. 4. Publish; `check.py` |
+| Steps | 1. The sheets in rail order. 2. Link the *Index*. 3. Link check; `check.py` |
 
 ### P04b · Prototype II — Settings
 
@@ -169,12 +171,12 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | P04's hand-off notes · `design-story` · D11 · the stories citing each board |
 | Stories | — |
 | Done when | Every board below is drawn in its sheet frame in its List (has data · Admin), with its View, State and Lens switches present, linked from the avatar's Settings, the sheet nav and the *Index*; the whole canvas plays from *Index* to every page and back |
-| Lands | The canvas: 18 board files and `canvas.json` |
+| Lands | The mirror: 18 board files and `canvas.json` |
 | Boards | settings.me · settings.notifications · settings.general · settings.databases · settings.ai · settings.mcp · settings.workers · settings.workloads · settings.limits · control.alerts · settings.people · settings.roles · settings.policies · settings.agent_access · access.usage · access.ledger · settings.history · settings.keeping |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. Settings, group by group: You & Invana · Connections · Operations · Access. 2. Link the *Index*. 3. Link check. 4. Publish; `check.py` |
+| Steps | 1. Settings, group by group: You & Invana · Connections · Operations · Access. 2. Link the *Index*. 3. Link check; `check.py` |
 
 ### P05 · Shell — every state and lens
 
@@ -184,12 +186,12 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · D11 · CP-68 · CP-30 · CP-69 · CP-36 · CP-70 · AC-48 |
 | Stories | — |
 | Done when | Every board below has every view, overlay and state its stories' `## Screens` cells name, in both lenses; the components are untouched |
-| Lands | The canvas: *Shell* page |
+| Lands | The mirror: *Shell* page |
 | Boards | shell.switcher · shell.command · shell.operations · shell.access · shell.avatar.access · inbox.dropdown (with `· Confirm`) · and the edits: shell.access · Revoke |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. Each board in turn: List states, then Detail, then overlays. 2. Row stickies. 3. Publish; `check.py` |
+| Steps | 1. Each board in turn: List states, then Detail, then overlays. 2. Row stickies. 3. Link check; `check.py` |
 
 ### P06 · Sign-in & Home — every state and lens
 
@@ -199,7 +201,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · D11 · AC-F01 · AC-F11 · CP-22 · CP-24 · every story citing `access.signin · Sign in again` |
 | Stories | — |
 | Done when | As P05, for the boards below; `access.signin · Sign in again` is drawn once, over a dimmed generic sheet, with every state its citing stories name (checking, wrong password, SSO) |
-| Lands | The canvas: *Sign-in & Home* page |
+| Lands | The mirror: *Sign-in & Home* page |
 | Boards | access.signin · access.consent · start.home (with `· Set-up`) |
 | Review | |
 | Approve | |
@@ -214,7 +216,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · D11 · EX-F01 – EX-F06 · GP-F01 · RC-13 · SE-10 · AG-50 and their stories |
 | Stories | — |
 | Done when | As P05, for `explore.board`: its leftSection views (`· Boards` · `· Conversations` · `· Queries`), `· Ask`, `· Left closed`, the overlays (`· Menu` · `· Why` · `· Chart` · `· Cannot` · `· Share` · `· Save derived`), the panels (`· Annotate` · `· Edit`), `· Console` and `· Present` |
-| Lands | The canvas: *Explore* page |
+| Lands | The mirror: *Explore* page |
 | Boards | explore.board · and the edits: explore.board · Edit · explore.board · New conversation · explore.board · Fork from here · explore.board · Add to a project · explore.board · Share · Export |
 | Review | |
 | Approve | |
@@ -229,7 +231,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · D11 · EX-34 · GP-F02 and its stories · AG-55 |
 | Stories | — |
 | Done when | As P05, for the boards below; `graph.memory` has the views Thinking · Lineage · Project map · Org knowledge |
-| Lands | The canvas: *Explore* page |
+| Lands | The mirror: *Explore* page |
 | Boards | explore.dashboards · graph.memory · and the edits: explore.dashboards · Detail · Pin · New dashboard |
 | Review | |
 | Approve | |
@@ -244,7 +246,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · SE-F01 – SE-F10 and their stories · the creates' stories: SE-F01 (SE-04 · SE-06 · SE-15) · SE-F05 (SE-17 · SE-18) · SE-F07 (SE-11 · SE-12) · SE-F08 (SE-22) · SE-F09 (SE-10) |
 | Stories | — |
 | Done when | As P05, for the boards below; `model.models` carries the map, `· Detail` (one model, its links, Comparing), `· Draft`, `· Publish`, `· Export` and `· Import`; `model.kinds · Detail` carries Properties · Meaning · Standards and `· Edit`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens |
-| Lands | The canvas: *Model* page |
+| Lands | The mirror: *Model* page |
 | Boards | model.models · model.kinds · model.relationships · model.standards · model.taxonomies · model.rules · model.views · model.inference · model.health · and the creates: model.models · New · model.standards · New · model.rules · New · model.views · New · model.inference · New · and the edits: model.models · Draft · model.models · Publish · model.models · Export · model.models · Import · model.kinds · Detail · Edit · model.views · Detail · Edit · model.standards · Write a standard |
 | Review | |
 | Approve | |
@@ -259,7 +261,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · PJ-F01 · PJ-F03 · PJ-F05 · PJ-F06 and their stories · the creates' stories: PJ-02 · PJ-12 · PJ-20 · PJ-23 · PJ-24 · PJ-06 |
 | Stories | — |
 | Done when | As P05, for the boards below; `projects.projects · Detail` carries the project's tabs and `· Assistant`; `projects.tasks` carries My tasks, `· Reviews` and a task's `· Detail · How it got here`; `projects.branches` carries the tree, `· Finding` and `· Decide`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens |
-| Lands | The canvas: *Projects* page |
+| Lands | The mirror: *Projects* page |
 | Boards | projects.projects · projects.tasks · projects.branches · projects.report · projects.alerts · and the creates: projects.projects · New · projects.projects · Ask for help · projects.tasks · New · projects.branches · Finding · New · and the edits: projects.report · Edit · projects.branches · Fork · projects.branches · Merge · projects.branches · Decide |
 | Review | |
 | Approve | |
@@ -274,7 +276,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · CP-F08 · AC-F05 · RC-F01 – RC-F07 and their stories · the creates' stories: RC-08 · RC-11 |
 | Stories | — |
 | Done when | As P05, for the boards below; `data.records` carries a record's `· Detail`, `· Fix` and `· Merge`; `data.quality` carries `· Checks`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens |
-| Lands | The canvas: *Inbox* and *Records* pages |
+| Lands | The mirror: *Inbox* and *Records* pages |
 | Boards | inbox · data.records · data.loads · data.quality · data.annotations · and the creates: data.loads · Upload · data.loads · Add by hand · and the edits: data.records · Fix · data.records · Merge |
 | Review | |
 | Approve | |
@@ -289,7 +291,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AG-F01 · AG-F02 · AG-F05 · AG-F07 · AG-F10 · CP-F10 and their stories · the creates' stories: AG-21 · AG-26 · AG-33 · AG-42 |
 | Stories | — |
 | Done when | As P05, for the boards below; outside agents are the `· Outside` filter of `agents.agents` (D7); `agents.runs · Detail` carries `· Answer`, `· Thinking`, Sessions and `· Compare`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; `agents.agents · New` carries the assistant's draft (AG-26); `agents.schedules · New` shows *Confirm Allow* as a section, never a second modal |
-| Lands | The canvas: *Agents* page |
+| Lands | The mirror: *Agents* page |
 | Boards | agents.agents · agents.runs · agents.schedules · and the creates: agents.agents · New · agents.agents · Outside · Add · agents.schedules · New · and the edits: agents.agents · Draft · agents.agents · Detail · Export |
 | Review | |
 | Approve | |
@@ -304,7 +306,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AG-F04 · AG-F06 · AG-F08 · AG-F09 · CP-F02 · CP-F05 · CP-F06 and their stories · the creates' stories: AG-37 · AG-39 · AG-40 · AG-63 · CP-02 · CP-20 · CP-62 · CP-64 |
 | Stories | — |
 | Done when | As P05, for the boards below; every item shows *Used by n agents*; `agents.skills` carries skills, workflows (`· Workflow`), functions and answer templates; `settings.plugins` carries `· Servers` and `· Runtimes`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; `agents.skills · Import` lists what came in before *Import n* |
-| Lands | The canvas: *Library* page |
+| Lands | The mirror: *Library* page |
 | Boards | agents.skills · settings.plugins · settings.packs · settings.connectors · and the creates: agents.skills · New · agents.skills · Import · agents.skills · Add a library · settings.plugins · Servers · Add · settings.plugins · Servers · Connect · settings.plugins · Runtimes · Install · settings.packs · Install · and the edits: agents.skills · Author template · agents.skills · Detail · Draft · agents.skills · Detail · New draft · agents.skills · Detail · Add functions · agents.skills · Detail · Publish · agents.skills · Detail · Export |
 | Review | |
 | Approve | |
@@ -319,7 +321,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AC-F01 · AC-F07 · AC-F10 · AC-F11 · CP-F01 · CP-F02 · CP-F05 · CP-F07 · CP-F08 and their stories · the creates' stories: CP-17 · CP-22 · CP-25 · CP-26 · CP-27 · CP-01 · AC-10 · CP-43 · CP-37 · CP-45 |
 | Stories | — |
 | Done when | As P05, for the boards below; `settings.me` carries `· Connections` and `· Owners`; `settings.general` carries `· Appearance`; `settings.databases` carries `· Detail`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; a key's secret shows once in the same modal |
-| Lands | The canvas: *Settings · You & Invana* and *Settings · Connections* pages |
+| Lands | The mirror: *Settings · You & Invana* and *Settings · Connections* pages |
 | Boards | settings.me · settings.notifications · settings.general · settings.databases · settings.ai · settings.mcp · and the creates: settings.databases · Connect (· Shape · Files · Ready) · settings.ai · New · settings.me · New key · settings.me · Connections · Connect · settings.notifications · New channel · settings.notifications · New rule |
 | Review | |
 | Approve | |
@@ -334,7 +336,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · CP-F03 · CP-F04 · CP-F09 · CP-F11 and their stories · the creates' stories: CP-10 · CP-60 |
 | Stories | — |
 | Done when | As P05, for the boards below; `settings.limits` carries `· Usage`; `control.alerts` carries `· Detail` and `· Settings`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; `settings.workers · Add workers` is the 720 px step-strip modal — Where · Group · Join key · Run it · Joined — and the only step strip on the canvas (D10) |
-| Lands | The canvas: *Settings · Operations* page |
+| Lands | The mirror: *Settings · Operations* page |
 | Boards | settings.workers · settings.workloads · settings.limits · control.alerts · and the creates: settings.workers · Add workers · control.alerts · Settings · New · and the edits: settings.workers · Edit rate limit · settings.limits · Edit limits |
 | Review | |
 | Approve | |
@@ -349,7 +351,7 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Read | `design-story` · `specs/design-language.md` §3 *Overlays* · D10 · D11 · AC-F02 – AC-F12 and their stories · the creates' stories: AC-18 · AC-04 · AC-06 · AC-11 · AC-09 · AC-33 · AC-39 |
 | Stories | — |
 | Done when | As P05, for the boards below; every Operator reading the stories name is the board's Operator lens (`· Locked`); `settings.people` carries People, Service users, `· Teams` and `· Export their data`; `settings.keeping` carries `· Forget`. Its creates (D10) are modal states drawn over their board — numbered sections that open in order and one filled act; each create's State switch runs through every section and state its stories' `## Screens` name — each section reached, the validation error on its field, working (testing · reading · counting), done — in both lenses, the Operator's as its *Who can* row says; the board's create act links to the modal and done links to what opens; a create that changes access shows who it changes before Save, then `access.signin · Sign in again`, then saved or *Waiting for a second Admin* where its story names it |
-| Lands | The canvas: *Settings · Access* page |
+| Lands | The mirror: *Settings · Access* page |
 | Boards | settings.people · settings.roles · settings.policies · settings.agent_access · access.usage · access.ledger · settings.history · settings.keeping · and the creates: settings.people · New person · settings.people · New service user · settings.people · Teams · New · settings.people · Teams · Grant · settings.policies · New · settings.policies · Attach · and the edits: settings.policies · Draft · settings.people · Deactivate · settings.people · Export their data · access.ledger · Export · settings.history · Export |
 | Review | |
 | Approve | |
@@ -369,7 +371,13 @@ Coverage diff (2026-11-15), every board in a story's `## Screens` or a `boards:`
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. List cited boards and states from every `## Screens`. 2. Compare with the mirror. 3. Scan links, imports, switches, tokens. 4. Report; recommendations |
+| Steps | 1. List cited boards and states from every `## Screens`. 2. Compare with the mirror. 3. Scan links, imports, switches, tokens. 4. Report; recommendations. 5. Link check; `check.py` |
+
+## After the audit
+
+Not a runner phase (D12). Once P17 is done, the project-lead publishes the whole mirror `.design/canvas-invana/project/`
+to `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX`, merging anything newer on the live canvas than `1794697037-3af0`
+first, then reports to Ravi, who reviews the published canvas.
 
 ## Log
 
