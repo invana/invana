@@ -1,12 +1,12 @@
 ---
 name: design-story
-description: Draw one Invana user story on its own canvas page — Product › Feature › <STORY-ID> Story name — from its spec (Who can · Flow · Acceptance criteria · Screens), every state for Admin and Operator, composed only from @invana/design-kit components. Use whenever a specified story needs its boards, or a story's boards change.
+description: Draw an Invana user story's boards on the one design canvas — one page per place in the app (Shell · Explore · Model · Projects · Inbox · Records · Agents · Library · Settings…), one board per named surface, built on the shared shell components — from its spec (Who can · Flow · Acceptance criteria · Screens), every state for Admin and Operator, composed only from @invana/design-kit components. Use whenever a specified story needs its boards, or a story's boards change.
 ---
 
-# Design a story — one page, every state, both lenses
+# Design a story — boards by place, every state, both lenses
 
 The procedure the **designer** follows, and anyone else drawing a story. Only stories at `specified` or later — their
-spec approved by Ravi — are drawn. The designer draws; it never edits a spec and never writes code — the one file in the repo it writes is its own rows
+spec approved by Ravi — are drawn, or stories a project Ravi approved names in a phase's *Stories*. The designer draws; it never edits a spec and never writes code — the one file in the repo it writes is its own rows
 of the story's `task.md`. How the team works around a design is `.claude/team/TEAM.md`; §0 says what Invana is — every board serves a person
 making a decision.
 
@@ -69,12 +69,18 @@ not in the kit yet.
 
 | Rule | Detail |
 |---|---|
-| **One page per user story** | Page name **`Product › Feature › <STORY-ID> Story name`** — `Records › Bring records in › RC-08 Upload a file into a model`. Page id: the story ID in lower case (`rc-08`) |
-| One canvas per product | *Invana Modeller*, *Invana Explorer*, … Pages in feature order, then story order. A canvas holds 40 pages: past that, split by feature group (*Invana Modeller — Data*). The index canvas links every product canvas |
-| The page follows the story's flow | Boards left to right in the order of `## Flow`; branches on the row below |
-| One board per surface | An interactive board with a **State** switch (first use · empty after a filter · loading · has data · failed · agent working or proposing · no access) and a **Lens** switch (Admin · Operator). A separate board only for a moment the flow must show on its own |
-| Board names | Exactly as the story's `## Screens` names them — `area.feature.surface.variant`, lower snake (`model.kind.load_data`). A board lives on exactly one story's page. The file and the frame title are the name. A name that does not fit is a `clarify` row, never a rename |
+| **One canvas** | Every board of the redesign lives on one canvas — **Invana design** (`https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX`). Shared shell components (`<dc-import>` mounts sibling files only) and links between boards work only inside one canvas |
+| **One page per place** | A page is where a board opens in the app, not its name's prefix: *Index* · *Components* · *Shell* · *Sign-in & Home* · *Explore* · *Model* · *Projects* · *Inbox* · *Records* · *Agents* · *Library* · *Settings · You & Invana* · *Settings · Connections* · *Settings · Operations* · *Settings · Access* · *Reference designs*. Set by each board's `page` key in `canvas.json`; 40 pages at most |
+| *Index* page | One card per page, linked to its first board; the D-decision legend; each page's status |
+| *Components* page | The shared shell components (§4b *The shell is components*) — the canvas's main components, like Figma's |
+| *Reference designs* page | Earlier explorations kept for reference; never cited by a story, never edited |
+| A row is a surface | One row per name prefix, the parent leftmost, its variants and overlays to its right; rows in the order a person meets them. A `title1` note over each row group; one sticky under each row naming the stories that cite its boards |
+| The flow | Boards left to right in the order of the stories' `## Flow`; a branch is a variant on the same row |
+| One board per surface | An interactive board with a **State** switch (first use · empty after a filter · loading · has data · failed · agent working or proposing · no access) and a **Lens** switch (Admin · Operator). A separate board only for a moment the flow must show on its own. A board several stories cite is drawn once |
+| Overlays | A dropdown, modal, peek or confirm is drawn over a dimmed copy of its parent board, on the parent's row |
+| Board names | Exactly as the stories' `## Screens` name them — `area.feature.surface.variant`, lower snake (`model.kind.load_data`). The file and the frame title are the name. A name that does not fit is a `clarify` row, never a rename |
 | One line per board | What it draws — the same string in its `<title>` and its frame title |
+| Links | Every act that opens another board links to it (`<a href="explore.board.dc.html">`), so the canvas plays as one prototype |
 
 ## 4. Draw to the standards
 
@@ -88,7 +94,7 @@ The kit rules — compose, tokens, density, the type ladder, where a component g
 | **Traceable on demand** | Every agent answer, proposal and act has *Why?* / *How it got here* one click away (peek), and the full run one more (sheet) |
 | **Asks before it acts** | An act that writes, sends, spends or changes access shows exactly what will happen before the person agrees |
 | **Every state, both lenses** | All seven states as the UI shows them — first use says why it is empty and offers the one act that starts it; failed says what failed and the next act. The Operator lens shows each act as its *Who can* row says |
-| **The shell** | One `AppLayoutV2`: header (wordmark *Invana Explore · Model · Projects*, Graph picker, ⌘K, Inbox, assistant), leftNav, collapsible leftSection, mainSection `Workbook`, the assistant on the right, the footer. A surface fills its regions; it never builds a layout |
+| **The shell** | As `specs/design-language.md` §2 draws it — header (☰ Invana / mode › view › item · ⌘K · n running · Access · Inbox · Assistant · avatar), leftNav (the mode's views on top, Records · Agents · Library · Settings below), a 260 px leftSection by default, mainSection, the 420 px assistant on the right, the footer — always from the shell components. A surface fills its regions; it never builds a layout |
 | **Overlays** | Peek for one fact · modal for one task or decision · sheet for heavy authoring; never a modal on a modal; Esc returns to the work |
 | **Plain words** | Glossary words only; roles as sentences (*Operator*, *Can shape the model*); no internal nouns |
 | **Only what a user sees** | No notes, rationale or annotations on a board. Copy a person would read — an empty state's instruction, a refusal's reason — is UI and stays |
@@ -98,18 +104,20 @@ The kit rules — compose, tokens, density, the type ladder, where a component g
 
 | Rule | Detail |
 |---|---|
-| **A canvas is one page per user story** | Every design canvas is one canvas per product, **one page per user story**, named `Product › Feature › <STORY-ID> Story name` — *Records › Bring records in › RC-08 Upload a file into a model*. The story's `## Who can`, `## Flow` and `## Screens` are the page's brief (`.claude/agents/designer.md`). Never one page per batch, per layer or per screen size |
-| **A page carries the whole story** | Every flow branch and state of that story lives on its page, for both lenses — the primary path · each drill-in · the decision the agent brings · **every refusal, with the reason it names** · first use, empty after a filter, loading, failed and no access, as Admin and as Operator. A story drawn only on its happy path is not drawn — but a *state* is drawn **as the UI shows it**, never as a table explaining it. The story's tables live in its `story.md`, not on the artboard |
+| **One canvas, a page per place** | §3. The stories' `## Who can`, `## Flow` and `## Screens` are the brief (`.claude/agents/designer.md`). Never one page per batch, per layer or per screen size |
+| **The shell is components** | The shell is drawn once, on the *Components* page, as sibling files every board mounts with `<dc-import>`: `ShellHeader` (mode · crumb · counts · lens · theme · open dropdown) · `ShellRail` (mode · active view · active summoner) · `ShellLeftSection` (title · items · width, 260 default) · `ShellFooter` (health · running · theme) · `SheetFrame` (sheet · nav groups · active item · crumb) · `AssistantPanel` (state). A board is a layout of these imports around its own main content; it owns theme, lens and state and passes them down as props (`dc-import` takes props, no children; never a prop called `name`). A change to the shell is an edit to one component, never to the boards. A board never copies shell markup |
+| **A board carries the whole story** | Every flow branch and state of a story lives on its boards, for both lenses — the primary path · each drill-in · the decision the agent brings · **every refusal, with the reason it names** · first use, empty after a filter, loading, failed and no access, as Admin and as Operator. A story drawn only on its happy path is not drawn — but a *state* is drawn **as the UI shows it**, never as a table explaining it. The story's tables live in its `story.md`, not on the artboard |
 | **An artboard draws only what the user sees** | No annotation cards, no "what this decided and why" panels, no rationale lines, no decision-id callouts. If it would not render in Studio for a real person, it does not go on the artboard. **Every note belongs in the feature file** — that is what `docs/for-developers/` is for, and a reviewer reads the two side by side. Copy a user would actually read (an empty state's instruction, a refusal's reason, a confirm card's consequences) **is** UI and stays. |
 | **An artboard is named for what it draws, and the name is the map** | `area.feature.surface.variant`, lower snake, dots for depth — `library.plans.list` · `library.plans.detail.overview` · `library.plans.detail.flow_canvas` · `library.plans.detail.flow_canvas.edit` · `library.plans.detail.flow_canvas.complex_variant1`. The **file** is that name (`library.plans.detail.overview.dc.html`) and so is the **frame title**, so an artboard, a row in `the-screens.md` and a Surfaces row in the feature file are all reachable from one string. A variant is a **deeper name, never a new surface**: two readings of one screen are `x` and `x.variant`, which is what keeps the count down. If you cannot name it this way, it is not a variant — it is a screen you have not justified. **Every board also carries one line saying what it draws**, and that line is the same string in three places: the artboard's `<title>`, its frame title in `canvas.json`, and its row in `the-screens.md`. Generate all three from one place; two descriptions of one board is a drift waiting to happen. The frame strip is canvas chrome, outside the artboard, so the line there is not a note *on* the design. |
 | **A row is a name prefix** | The canvas lays out **one row per prefix**, the parent leftmost and its variants to its right: `…flow_canvas` then `…flow_canvas.complex_variant1` then `…complex_variant2`. Columns are an accident of how many variants a surface has, never a layer or a batch. |
-| Where a canvas is built | `.design/canvas-<name>/` — Python generators over the shared kit (`_kit · _ui · _bpanel · _dash · _flow`, and `canvas-govern/_gov.py` for the governance vocabulary: the layer strip, participant addresses, world and rule rows). **Reuse the kit; never hand-write an artboard's HTML.** `.design/` is gitignored, so the canvas is the source and the generators are the build. |
-| Canvas mechanics | Artboards are 1440×900 on the shell contract (rail + 420px `leftSection` + `mainSection`), tokens only. Each `.dc.html` carries the `data-dc-script` block with `$preview: {width: 1440, height: 900}` — without it the frame is served clipped. In `project/canvas.json`, `boards` and `order` are keyed by the **bare filename** (`Main.dc.html`, not `project/Main.dc.html`), 80px between frames in a row, one `title1` note per page. |
-| The canvases | `docs/for-developers/the-screens.md` § *The design canvases* lists every canvas, what it draws and whether it supersedes another. A canvas nothing cites is a decision nobody made. |
+| Where the canvas is built | `.design/canvas-invana/project/` — the local mirror of the canvas, one flat folder (boards, components and `canvas.json`; `dc-import` and `check.py` need it flat). Read the live files into it before editing, edit there, publish from it with `root` `.design/canvas-invana`. A generator script is allowed when a page has many boards of one pattern; it writes into the mirror. `.design/` is gitignored, so the canvas is the source |
+| The kit | The canvas's `ds/invana-kit/` bundle is the design-kit artifact (`https://claude.ai/artifact/PovTcmwPkgKDrxdrcA5TBD`); boards mount its components from `InvanaUI`. A kit component the boards need and the bundle lacks is a component request (§2), never a look-alike |
+| Canvas mechanics | Artboards are Full HD, 1920×1080, on the shell contract (rail + 260px `leftSection` by default + `mainSection`), tokens only. Each `.dc.html` carries the `data-dc-script` block with `$preview: {width: 1920, height: 1080}` — without it the frame is served clipped. In `project/canvas.json`, `boards` and `order` are keyed by the **bare filename** (`Main.dc.html`, not `project/Main.dc.html`), 80px between frames in a row, one `title1` note per page. |
+| The canvases | *Invana design* supersedes every earlier canvas in `.design/`; they are reference only, never edited. `docs/for-developers/the-screens.md` § *The design canvases* lists them |
 
 ## 5. Check
 
-1. Every cell of the story's `## Screens` has its board on the page, under that name, showing that state for that lens. The story is drawn when every named board is and every designer task is `done`. You never write to `story.md`.
+1. Every cell of the story's `## Screens` has its board on its place's page, under that name, showing that state for that lens, on the shell components, its links resolving to boards that exist. The story is drawn when every named board is and every designer task is `done`. You never write to `story.md`.
 2. Screenshot every board and look at each: clipping, overlap, a state or lens that does not render.
 3. `python3 scripts/specs/check.py` — every board the story cites must exist on the canvas.
 

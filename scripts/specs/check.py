@@ -18,7 +18,7 @@ A spec area is a part of the operating system every capability uses (``os/<p>/``
 ``<area>/<p>/features/<CODE>-F<nn>-<slug>/feature.md``; each of its
 stories is a folder under
 ``stories/<CODE>-<nn>-<slug>/`` holding ``story.md`` and ``task.md``. A story's status may not run ahead of its tasks,
-and a feature's status is the lowest of its stories'. Boards are checked against the Agent version canvas when it is
+and a feature's status is the lowest of its stories'. Boards are checked against the Invana design canvas's local mirror when it is
 built locally (`.design/` is not in git); without it the board check is skipped and says so. A board is drawn once its
 story is designed, so an undrawn board is an error from `designed` up and a warning below it. A story or feature at
 `later` is parked, outside the ladder: a feature's status is the lowest of its stories that are not parked, or
@@ -31,7 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SPECS = ROOT / 'specs'
-CANVAS = ROOT / '.design' / 'canvas-agent-version' / 'project'
+CANVAS = ROOT / '.design' / 'canvas-invana' / 'project'
 
 STALE = '_stale'  # specs/_stale/: not live, never checked, never linked to
 # Index order: the operating system, then the capabilities.

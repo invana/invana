@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**362 recommendations** · 201 open · 112 taken · 21 declined · 28 done
+**363 recommendations** · 202 open · 112 taken · 21 declined · 28 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -405,3 +405,4 @@ flowchart LR
 | R391 | done | 2026-11-15 | security | session | security | low | Tell a person when an Admin revokes their key or connected client | AC-48.9 · AC-F10 DELETE /keys/{id} · AC-F11 DELETE /clients/{id}. Today the owner learns only from a failing script. Send an Update to the owner naming the Admin and the time; the Revoke confirm names what ends ('Claude Code acting for Lee — its calls stop now'). Criterion: Given an Admin revokes Lee's key, Then Lee's Inbox has an Update naming the key and the Admin | P2 | session |
 | R392 | done | 2026-11-15 | security | session | security | low | Validate the access summary's tz against the IANA zone list | AC-F06 feature.md:188 GET /summary?tz= — an unknown zone is 422, never passed to SQL or a date library unchecked. Criterion: Given tz=Mars/Base, Then 422 naming tz | P2 | session |
 | R393 | done | 2026-11-15 | security | session | security | low | Say whether service-user keys appear under Delegations in force | AC-48.8 · AC-F06 /summary delegations[] lists 'a key acting for a person'; keys owned by service users (AC-F10:56) act for no person and would be invisible on the Admin's glance. Recommend: list them with acts_for = the service user and its owner, and mark never-expiring keys. Criterion: Given a live service-user key, When Delegations in force is read, Then it is listed with its owner | P2 | session |
+| R394 | open | 2026-11-15 | ravi | session | docs | medium | Places in design-language with no board named by any story | specs/design-language.md §2 rail and §3 sheets name places no story's Screens table names a board for: Explore › Boards list · Conversations · Dashboards · Queries; Model › Models · Kinds · Relationships · Standards (SE-F05) · Lenses (SE-F09, no stories; explore.compare only in feature); Projects › My tasks · Reviews; Library › Connectors · Packs; Records › Loads; Settings › Invana (General · Appearance) · Operations › Limits (CP-F04) · Access › Policies (AC-F02) · Agents (AC-F04) · History (AC-F06); You › Personal connections (CP-F02). Add the boards to the owning stories' Screens (or a story) so the design phases can draw them. |  |  |
