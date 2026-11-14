@@ -53,7 +53,7 @@ terms and standards it follows, what must always hold and what may be derived �
 | SE-F06 | [Links and mappings](features/SE-F06-links-and-mappings/feature.md) | SE-01 · SE-02 · SE-03 · SE-16 | idea |
 | SE-F07 | [Rules](features/SE-F07-rules/feature.md) | SE-11 · SE-12 · SE-13 · SE-19 | idea |
 | SE-F08 | [Inference](features/SE-F08-inference/feature.md) | SE-22 | idea |
-| SE-F09 | [Views of the graph](features/SE-F09-views-of-the-graph/feature.md) | — | placeholder |
+| SE-F09 | [Views of the graph](features/SE-F09-views-of-the-graph/feature.md) | SE-10 | idea |
 | SE-F10 | [Health and history](features/SE-F10-health-and-history/feature.md) | SE-07 · SE-09 | idea |
 
 ## Surfaces

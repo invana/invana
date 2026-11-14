@@ -4,9 +4,9 @@ title: Find your way — the switcher, ⌘K and search
 product: CP
 status: idea
 personas: [analyst, builder, modeller]
-stories: [CP-30, CP-68]
+stories: [CP-30, CP-68, CP-71]
 journeys: [J05]
-boards: [shell.command, shell.switcher]
+boards: [shell.command, shell.switcher, settings.general, settings.appearance]
 nfrs: [NFR-SEC-1, NFR-PERF-3]
 depends_on: [AC-F02, AC-F01]
 ---
@@ -35,6 +35,10 @@ flowchart TD
   k -->|not mine to open| hid["Never a hit"]
   c([The command line]) --> se["CP-30 · invana search"]
   se --> hits(["Hits, closest first · access applied first"])
+  st([Settings › Invana]) --> gen["CP-71 · General: the deployment's name · its version"]
+  st --> app["CP-71 · Appearance: Light · Dark · As the deployment"]
+  gen -->|rename, not an Admin| ask(["Ask {Admin}"])
+  app -->|the default, not an Admin| ask
 ```
 
 ## Stories
@@ -43,6 +47,7 @@ flowchart TD
 |---|---|---|
 | CP-30 | [Do, open or ask anything from ⌘K](stories/CP-30-do-open-or-ask-anything-from-k/story.md) | idea |
 | CP-68 | [Switch mode and pick up where I left off](stories/CP-68-switch-mode-and-pick-up-where-i-left-off/story.md) | idea |
+| CP-71 | [Name the deployment and pick how Studio looks](stories/CP-71-name-the-deployment-and-pick-how-studio-looks/story.md) | idea |
 
 ## Access
 
@@ -52,6 +57,8 @@ flowchart TD
 | Run an act from ⌘K | The role the act's feature names ([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | The act listed disabled, naming the role |
 | Ask the Assistant from ⌘K | A person who may use the Assistant | Absent |
 | Open the switcher; read, search, pin and unpin one's own recent items | Every signed-in person, for themselves | Another person's recent and pinned items are absent |
+| Read the deployment's name and version · pick one's own theme | Every signed-in person | — |
+| Rename the deployment · set its default theme | Admin | The rows read; the act reads *Ask {Admin}* |
 | Start a conversation, a board or a project from the switcher | The role each create's feature names | Listed disabled, naming the role |
 
 ## States
@@ -176,6 +183,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | ⌘K is the one door | *Do, open or ask anything* — acts, records and sections in one palette, with no products to switch between |
 | ⌘K matches in the browser | It reads the lists each mode already serves, once per opening, and matches as the person types; a record with no address of its own opens its section |
 | The command line searches in the engine | One engine search applies the access first, then ranks by name as ⌘K does |
+| Settings › Invana is General and Appearance | General holds the deployment's name and version; Appearance the person's theme and, for an Admin, the deployment's default. The avatar menu's *Appearance* opens the same rows |
 | Ask is the last ⌘K entry | Whenever something is typed and the Assistant is among the agents the person may use |
 | Without the role reads, never hides | An act is disabled with the role it needs and who holds it |
 
@@ -183,7 +191,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| — | — |
+| What else Settings › Invana › General holds beyond the name and version — recommend nothing more until a story needs it | Ravi, at the spec review |
 
 ## Not building
 

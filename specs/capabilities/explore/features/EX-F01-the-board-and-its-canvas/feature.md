@@ -4,9 +4,9 @@ title: The board and its canvas
 product: EX
 status: idea
 personas: [analyst]
-stories: [EX-07, EX-09, EX-14, EX-16, EX-18, EX-21]
+stories: [EX-07, EX-09, EX-14, EX-16, EX-18, EX-21, EX-34]
 journeys: []
-boards: [explore.ask, explore.board, explore.board.left_closed, explore.board.menu, explore.board.console, explore.board.edit, explore.share, explore.boards]
+boards: [explore.ask, explore.board, explore.board.left_closed, explore.board.menu, explore.board.console, explore.board.edit, explore.share, explore.boards, explore.dashboards, explore.dashboard]
 nfrs: [NFR-PERF-4]
 depends_on: [AC-F02, AC-F07, CP-F05, CP-F10, SE-F06]
 ---
@@ -45,6 +45,8 @@ flowchart TD
   keep -->|went wrong| hist["History · restore makes a new version"]
   keep -->|Schedule this| sched(["Scheduled — Agents › Schedules"])
   keep --> done([Resumed tomorrow where it was left])
+  d -->|Pin to dashboard| dash["EX-34 · A tile on a dashboard · refreshed through its agent"]
+  dash -->|refresh fails| stale["The tile keeps its last answer and says why"]
 ```
 
 ```mermaid
@@ -76,6 +78,7 @@ sequenceDiagram
 | EX-21 | [See and edit one element](stories/EX-21-see-and-edit-one-element/story.md) | idea |
 | EX-14 | [Read the rows and the queries](stories/EX-14-read-the-rows-and-the-queries/story.md) | idea |
 | EX-07 | [Keep a board](stories/EX-07-keep-a-board/story.md) | idea |
+| EX-34 | [Watch the answers I rely on, on a dashboard](stories/EX-34-watch-the-answers-i-rely-on-on-a-dashboard/story.md) | idea |
 
 ## Access
 
@@ -90,6 +93,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | Open a board · look, pan, zoom, select | Every role — Operator, Modeller, Admin; what it draws reads through the person's default agent | *Not found* for a board that does not exist; a source the default agent may not Read: *Withheld — your agent may not read {resource}* |
 | Expand a node · count the kinds | Every role, through the Assistant, within its Access Policies | A kind a rule denies: refused, naming the rule · no Assistant: *{person} may not use Assistant — ask an Admin* |
 | Change the layout · style · hide · switch modes | Every role, with the Assistant; a change is kept on the board as a version naming who made it | No Assistant: *{person} may not use Assistant — ask an Admin* |
+| Create a dashboard · pin, refresh, unpin a tile | Every role, with the Assistant; a tile refreshes through the agent that answered it | Disabled — *{person} may not use Assistant — ask an Admin* |
 | Create a board · rename, delete, restore a version | Every role, with the Assistant; the board is the organisation's, made by the person | Disabled — *{person} may not use Assistant — ask an Admin* |
 | Read who made a board | Every role | — |
 | Read the console · re-run a query step | Whoever may read the conversation's runs — the person behind them ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules), [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | Steps of runs they may not read: that they ran, status and tokens |
@@ -269,7 +273,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| — | — |
+| Does a dashboard tile refresh only by hand (EX-34), or also on a schedule? Recommend by hand — a schedule is *Schedule this* (EX-07), and a tile that refreshes itself spends tokens nobody asked for | Ravi, at the spec review |
+| What a dashboard records in the engine — its tiles, their order and each tile's last run — is written into `## Engine` at the spec review of EX-34 | Product manager |
 
 ## Not building
 

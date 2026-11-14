@@ -38,7 +38,7 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| EX-F01 | [The board and its canvas](features/EX-F01-the-board-and-its-canvas/feature.md) | EX-07 · EX-09 · EX-14 · EX-16 · EX-18 · EX-21 | idea |
+| EX-F01 | [The board and its canvas](features/EX-F01-the-board-and-its-canvas/feature.md) | EX-07 · EX-09 · EX-14 · EX-16 · EX-18 · EX-21 · EX-34 | idea |
 | EX-F02 | [Share and present an answer](features/EX-F02-share-and-present-an-answer/feature.md) | EX-12 · EX-15 · EX-17 · EX-22 | idea |
 | EX-F03 | [Ask a question](features/EX-F03-ask-a-question/feature.md) | EX-01 · EX-08 · EX-10 · EX-11 · EX-13 · EX-23 · EX-28 | idea |
 | EX-F04 | [The answer](features/EX-F04-the-answer/feature.md) | EX-02 · EX-03 · EX-04 · EX-25 | idea |
@@ -51,6 +51,7 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 |---|---|---|
 | A board and its canvas | mode | `explore.board` |
 | Asking | mode | `explore.ask` |
+| Dashboards | mode | `explore.dashboards` |
 | A dashboard | mode | `explore.dashboard` |
 | Why? | peek | `explore.board.why` |
 | Share | modal | `explore.share` |

@@ -2,11 +2,11 @@
 id: SE-F09
 title: Views of the graph
 product: SE
-status: placeholder
+status: idea
 personas: [modeller, analyst]
-stories: []
+stories: [SE-10]
 journeys: []
-boards: [model.rules, explore.compare]
+boards: [model.rules, model.rules.views, explore.board, explore.compare]
 nfrs: [NFR-SEC-5]
 depends_on: [SE-F02, SE-F07]
 ---
@@ -21,7 +21,7 @@ depends_on: [SE-F02, SE-F07]
 ```mermaid
 flowchart TD
   kept(["AC-27 · What agents may not see is a Deny rule on data/‹graph database›/‹kind› and a sensitive property"])
-  start([Model › Rules and views › Views]) --> v["Each view: what it hides, who uses it, its runs"]
+  start([Model › Rules and views › Views]) --> v["SE-10 · Each view: what it hides, who uses it, its runs"]
   v -->|loading| sk["Skeleton rows"]
   v -->|failed| f["The views could not be read"]
   v -->|none yet| v0["Everything — only the rules on properties narrow a run"]
@@ -33,7 +33,7 @@ flowchart TD
   val -->|slices an axis the model never declared| va["Refused, naming the model and the axis"]
   val -->|holds| saved(["Saved — in the deployment's views"])
   v -->|a view| board["The view's own page: layers, its runs, who asked under it"]
-  runs([Two runs of one question]) -->|Compare| cmp["Side by side — what each read, and how"]
+  runs([Two runs of one question]) -->|Compare| cmp["SE-10 · Side by side — what each read, and how"]
 ```
 
 ```mermaid
@@ -56,6 +56,7 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
+| SE-10 | [Pick a view and compare two runs](stories/SE-10-pick-a-view-and-compare-two-runs/story.md) | idea |
 | — | What agents may not see is [AC-27 · Keep a kind or a sensitive property from agents](../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md) | — |
 
 ## Access
