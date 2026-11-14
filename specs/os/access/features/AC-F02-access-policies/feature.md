@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J05 · Join a team](../../../../journeys/J0
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › Access Policies]) --> list["AC-03 · Every Access Policy and the agents it is attached to"]
+  start([Settings › Access › Policies]) --> list["AC-03 · Every Access Policy and the agents it is attached to"]
   list --> who{"Is the reader an Admin?"}
   who -->|no| ro["AC-07 · Every policy reads · each write names the Admins"]
   who -->|yes| open["AC-04 · A policy's rules: effect · verb · resource"]
@@ -349,7 +349,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Access Policies are a tab of a sheet | *Settings › People and access* opens as a sheet; *Access Policies* is a tab, beside *Roles* and the Directory's tabs; a policy drills in and the crumb grows |
+| Access Policies are a tab of a sheet | *Settings › Access* opens as a sheet; *Access Policies* is a tab, beside *Roles* and the Directory's tabs; a policy drills in and the crumb grows |
 | Rules read as sentences | A rule reads as a sentence — *Allow reading Customer in every graph database*, *Ask before writing any data*, *Allow running git on a worker* — and its exact form is one click deeper |
 | Built-in agents are narrowed, never edited | A built-in policy stays attached to its built-in agent; an Admin narrows the agent by attaching a custom policy with a Deny, since the strictest rule wins |
 | A built-in agent is granted like any agent | A built-in agent starts granted to every person whose role holds the feature it acts for; an Admin may take the grant away in the Directory |

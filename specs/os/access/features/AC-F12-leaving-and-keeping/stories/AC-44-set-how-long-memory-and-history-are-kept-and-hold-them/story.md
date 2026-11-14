@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › People and access › Leaving and keeping]) --> l["Each store: period · set by · last pruned · held"]
+  s([Settings › Access › Leaving and keeping]) --> l["Each store: period · set by · last pruned · held"]
   l -->|not an Admin| ro(["Reads · acts disabled, naming the Admins"])
   l -->|Set| p{"Keep · or a number of days"}
   p -->|under a day| r1["Refused · keep at least a day"]

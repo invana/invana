@@ -26,7 +26,7 @@ Every role browses records ([the role table](../../../../../../os/access/feature
 
 ```mermaid
 flowchart LR
-  a([Records › Records]) --> k[Pick a model and a kind] --> l[Records in key order · total]
+  a([Records › a kind]) --> k[Pick a model and a kind] --> l[Records in key order · total]
   l -->|filter| fl{Matches?}
   fl -->|no| ef[Nothing matches · Clear]
   fl -->|yes| l

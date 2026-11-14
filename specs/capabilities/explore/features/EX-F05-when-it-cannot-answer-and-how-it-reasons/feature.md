@@ -117,7 +117,7 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 |---|---|---|
 | Read a cannot answer, a plan gap, a refusal or a diagnosis, and follow its next step | The person behind the run; an Admin reads every one | Another person's run: that it ran, its status and its tokens |
 | Pick an approach with *Act as* · remove an assumption before the run · drop one and re-run · ask *what if* | Operator · Modeller · Admin, on their own runs | — |
-| Author, change, copy and publish an approach | Modeller · Admin — *skills* | Listed read-only in Agents › Skills; *+* disabled — *Needs the Modeller role — ask an Admin* |
+| Author, change, copy and publish an approach | Modeller · Admin — *skills* | Listed read-only in Library › Skills; *+* disabled — *Needs the Modeller role — ask an Admin* |
 | Read third-party claims, nodes and predicted parts, with their references | Whoever may read the answer | Content withheld |
 | *Keep* a third-party node | Modeller · Admin — *Edit on the board* — on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/Source` | *Keep* disabled — *Needs the Modeller role — ask an Admin*; refused on a read-only graph database or by a rule, naming it |
 | Save a predicted part as derived records | Modeller · Admin — *bring records in* — on a read + write graph database, through the Loader, whose Access Policies allow Write on `data/<graph database>/<kind>` | *Save as derived records* disabled — *Needs the Modeller role — ask an Admin*; refused on a read-only graph database or by a rule, naming it |
@@ -193,7 +193,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `explore_approaches` | `name` · `origin` (`builtin` · `custom`) · `when_to_use` · `method` · `assumptions[]` (each `claim` · `without_it`) · `answer_shape` · `version` · `status` (`draft` · `published`) · `created_by_id` | Authored in Agents › Skills. A published version never changes. `what-if` is `builtin`, written from code, owned by the system user |
+| `explore_approaches` | `name` · `origin` (`builtin` · `custom`) · `when_to_use` · `method` · `assumptions[]` (each `claim` · `without_it`) · `answer_shape` · `version` · `status` (`draft` · `published`) · `created_by_id` | Authored in Library › Skills. A published version never changes. `what-if` is `builtin`, written from code, owned by the system user |
 | `explore_simulations` | `run_id` · `step_run_id` · `session_id` · `message_id` · `simulator` · `simulator_version` · `plugin` · `plugin_version` · `change` (the simulator's declared fields, as the agent filled them) · `seed` · `inputs` (`[{load_id, content_hash}]`, the pins) · `record_ids` (the records it started from) · `saved_load_id?` · `created_by_id` (the person behind the run) · `created_at` | One per simulate step. Its result is the step's `predicted` part. No route updates or deletes a row |
 
 ### Reads
@@ -310,7 +310,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Decision | Detail |
 |---|---|
 | A refusal is part of the answer | A search or a simulation a rule refuses is refused before it is sent and recorded; the run goes on from Graph Data and the words say it could not look |
-| Approaches are authored with skills | Same shape — named, described, *when to use*, offered to a step, reused by many agents — so they sit in Agents › Skills, not a second authoring place |
+| Approaches are authored with skills | Same shape — named, described, *when to use*, offered to a step, reused by many agents — so they sit in Library › Skills, not a second authoring place |
 | No default approach | The plain path has no assumptions list; an approach is picked for one question |
 | Assumptions say what changes without them | Each assumption carries what the answer becomes if it does not hold, authored with the approach — so dropping one is predictable, and a re-run proves it |
 | What-if is an approach, not a product | It is picked like any approach or read from the question; its science is a simulator's, shipped in a Team pack; Explore runs it and labels it |

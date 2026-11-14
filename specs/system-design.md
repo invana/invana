@@ -112,6 +112,7 @@ the recommendation that adds one. A feature names the NFRs it must meet in its `
 | NFR-PERF-4 | The board stays usable | Layouts up to 3,000 nodes; switching presets glides in ≤ 400 ms under 2,000 nodes; a solve past 400 ms shows a cancellable toast | `ui.canvas.layout.duration` | `review` | SE-F06 · EX-F01 |
 | NFR-PERF-5 | Reads on a person's behalf are bounded | A publish preview reads ≤ 1,000 records a kind; an answer speaks from ≤ 50 rows; an impact reach expands ≤ 12 records a hop, 50 neighbours each — and each says it is a sample | The criteria of SE-F02, EX-F04, PJ-F03 | test | SE-F02 · EX-F04 · PJ-F03 |
 | NFR-PERF-6 | Stitching costs little over its slowest step | Validating and compiling a typed query plan takes ≤ 50 ms p95; joining step results on identity links adds ≤ 200 ms p95 for up to 1,000 rows a step | Spans on a two-database question over the demo deployment | `review` | EX-F03 · GP-F01 · SE-F06 |
+| NFR-PERF-7 | Counts are live and agree | A change to any count — Needs you, running, waiting, open alerts, blocked today — reaches every open Studio tab within 2 s p95; one stream per tab, at most one send a second; the header badge, *n running*, the footer, the dropdowns and the browser title show the same value | An end-to-end test that raises an ask and an alert and times each surface against the counts stream | `review` | CP-F08 · CP-F09 · AC-F06 |
 | NFR-COST-1 | Spend stays inside its budget | Tokens are held before every AI model call; a run never passes its budget by more than the one held call; every limit is in tokens | CP-F04 admission and hold tests | `review` | CP-F01 · CP-F04 · AG-F01 · AG-F05 |
 | NFR-COST-2 | Spend is tokens, never currency | 0 currency amounts in any record, route, event or screen | A schema and string check | `review` | CP-F04 · CP-F10 |
 | NFR-COST-3 | Idle costs nothing extra | No telemetry endpoint: 0 exporters started; a worker idle 5 minutes above its group's minimum is drained; a parked run holds no worker | Start-up and drain tests | `review` | CP-F03 |
@@ -123,7 +124,7 @@ the recommendation that adds one. A feature names the NFRs it must meet in its `
 | NFR-SUS-2 | Every user-facing change is announced | 100% of user-facing changes carry a changeset | Changeset check | CI gate | Every feature |
 | NFR-SUS-3 | Files stay readable | No engine module or Studio file over 400 lines, but listed canvas files | Line counts | `review` | Every feature |
 | NFR-UX-1 | Studio is accessible | WCAG 2.2 AA; every control has an accessible name | axe in the end-to-end suite | `review` | Every feature |
-| NFR-UX-2 | Every number is the engine's | 100% of numbers on screen are stored or served by the engine; Studio computes no rate, share, change or percentile | Code review against CP-F10's stored figures | `review` | AC-F02 · CP-F03 · SE-F10 · CP-F10 · AG-F09 |
+| NFR-UX-2 | Every number is the engine's | 100% of numbers on screen are stored or served by the engine; Studio computes no rate, share, change or percentile | Code review against CP-F10's stored figures | `review` | AC-F02 · CP-F03 · SE-F10 · CP-F10 · AG-F09 · CP-F08 · CP-F09 |
 | NFR-UX-3 | Every screen states where it is | Every screen draws loading, empty and error; every write answers with the engine's sentence | One end-to-end spec per surface | `review` | Every feature |
 
 ## 4. Constraints
@@ -313,6 +314,8 @@ flowchart TB
 | Deletes are hard and cascade down | `409` while something still references it | Each feature's *Refusals* |
 | One list contract | Every list takes `q` (plain text, contains, over named fields) · named filters (values of one field OR, fields AND; an undeclared one is `422`) · `sort` · `cursor` (keyset, bound to its sort) · `limit` (default 50, at most 200) and answers `Page[T]`: `items` · `total` · `unfiltered_total` · `next_cursor` · `applied` (each filter with its label). Studio carries filters in the URL as `?f.<field>=` and never narrows rows itself | Each feature's *Routes* |
 | Streams are server-sent events | A `?token=` and `?traceparent=` fallback on a stream route only, where a header cannot be set; no other route reads a token from the URL | [CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [EX-F04](capabilities/explore/features/EX-F04-the-answer/feature.md#engine) |
+| One counts source | Every count Studio shows is one engine read and one server-sent events stream per tab, fed by the event store's live tail and coalesced to one send a second; Studio counts nothing | [CP-F08](os/control/features/CP-F08-the-inbox/feature.md#engine) · NFR-PERF-7 |
+| Summaries compose, never store | The header's Operations and Access dropdowns are reads composed from their owners' records, scoped by role; neither keeps a table | [CP-F09](os/control/features/CP-F09-overview/feature.md#engine) · [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
 | The generated client is the contract | Studio's types come from the API schema; nothing is hand-typed; the schema is a golden file | § 13 |
 | Events name the act | `<package>.<records>.<verb>` — imperative when a user did it (`projects.create`), past tense when the system observed it (`access.auth.login_failed`); an event carries the user, the person behind it and the agent it ran through | [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
 | One History chain | Every act in the deployment lands in one append-only, hash-chained History with a gapless `seq` | [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
@@ -594,6 +597,7 @@ record (§ 6).
 | NFR-PERF-4 | `@invana/canvas` layouts | at risk | SE-F06 · EX-F01 |
 | NFR-PERF-5 | Bounded reads in SE-F02, EX-F04, PJ-F03 | meets — criteria | SE-F02 · EX-F04 · PJ-F03 |
 | NFR-PERF-6 | § 10 stitched, never copied | gap — no stitching ([migrations.md](migrations.md) M7) | EX-F03 · GP-F01 · SE-F06 |
+| NFR-PERF-7 | § 8 one counts source over the event store's live tail | gap — not built (R382) | CP-F08 · CP-F09 · AC-F06 |
 | NFR-COST-1 | § 10 bounded four ways | at risk | CP-F01 · CP-F04 · AG-F01 · AG-F05 |
 | NFR-COST-2 | § 4 spend in tokens | at risk | CP-F04 · CP-F10 |
 | NFR-COST-3 | § 12 telemetry optional · § 9 idle drain | at risk | CP-F03 |
@@ -605,7 +609,7 @@ record (§ 6).
 | NFR-SUS-2 | § 13 changeset check | meets | Every feature |
 | NFR-SUS-3 | — | gap | Every feature |
 | NFR-UX-1 | § 12 accessible by the kit | gap — no check; kit controls lack names | Every feature |
-| NFR-UX-2 | § 6 the engine stores every number | at risk | AC-F02 · CP-F03 · SE-F10 · CP-F10 · AG-F09 |
+| NFR-UX-2 | § 6 the engine stores every number | at risk | AC-F02 · CP-F03 · SE-F10 · CP-F10 · AG-F09 · CP-F08 · CP-F09 |
 | NFR-UX-3 | § 12 three states | at risk | Every feature |
 
 ## 15. Decisions, risks and not building

@@ -34,7 +34,7 @@ flowchart LR
   n --> r["Runs a day · tokens a day · why runs ended · recent runs"]
   r -->|a run| s(["The run's sheet"])
   r -->|content not theirs to read| x["Its head · withheld"]
-  r -->|all runs| l(["Control Plane › Runs, filtered to this agent"])
+  r -->|all runs| l(["Agents › Runs, filtered to this agent"])
 ```
 
 ## Acceptance criteria

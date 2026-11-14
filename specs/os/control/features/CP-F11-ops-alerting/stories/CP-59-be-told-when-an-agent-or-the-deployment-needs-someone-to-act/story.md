@@ -65,7 +65,7 @@ flowchart TD
 | CP-59.12 | An alert about a limit or a graph database | the limit is changed, or the database is switched off or answers again | the alert closes naming the act and who, or *cleared* |
 | CP-59.13 | An Admin | they close an alert with a note | it closes naming them and the note |
 | CP-59.14 | An alert opening or closing | it is written | History holds a row naming who it reached, and what closed it and who |
-| CP-59.15 | Control Plane › Ops alerts | it is opened | open alerts first, most recently fired first — kind, what it is about, count, since when, who it reached; closed below with what closed them |
+| CP-59.15 | Settings › Operations › Alerts | it is opened | open alerts first, most recently fired first — kind, what it is about, count, since when, who it reached; closed below with what closed them |
 | CP-59.16 | No alert ever opened | the list is opened | *No ops alerts — the platform tells the people each kind names and the Admins when something needs them*, with each kind and its threshold |
 | CP-59.17 | A filter by kind or open/closed with no match | it is applied | *No {kind} alerts {open · closed}* and *Clear* |
 | CP-59.18 | The list fails to load | it is opened | what could not be read, in the engine's words, and *Retry* |

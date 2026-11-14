@@ -32,7 +32,7 @@ flowchart LR
   a([Agents]) --> n["New agent: name · what it should do · policies to ask an Admin for"]
   a -->|a built-in agent| bi["Built in · System"] -->|Copy| d
   n -->|name already used| x1["Refused, naming the agent that has it"]
-  n -->|no AI model offered| x3["Says so, links Control Plane › AI models — still saves"]
+  n -->|no AI model offered| x3["Says so, links Settings › Connections › AI models — still saves"]
   n -->|Create agent| d["A draft, as a sheet · Setup — the platform's, made by its maker"]
   d --> sk["Skills — add from the deployment's skills, suggested ones first"]
   sk -->|a need its policies do not allow| m["Refused under the skill, naming the need and the rule"]
@@ -56,7 +56,7 @@ flowchart LR
 | AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template, the platform's and made by its maker, and opens as a sheet on Setup with a *Draft* chip; the suggested policies wait on Access, marked *Suggested*, until an Admin attaches them |
 | AG-21.3 | A name another agent already has, retired or not, or one not lowercase and hyphenated | they save | it is refused, naming the agent that has it or the rule for a name |
 | AG-21.4 | A draft with no Access Policy attached | Access opens | it reads *May touch nothing yet*, with *Ask an Admin* — and for an Admin *Attach a policy* (AC-11) |
-| AG-21.5 | No AI model offered in the deployment | they create an agent | it saves and says it has no model to think with, linking Control Plane › AI models |
+| AG-21.5 | No AI model offered in the deployment | they create an agent | it saves and says it has no model to think with, linking Settings › Connections › AI models |
 | AG-21.6 | A draft | its Setup opens | it shows instructions, voice, skills, runs with, model version and effort, access, limits, where it runs and lifecycle; an agent with no skill says it answers with the built-in plans alone |
 | AG-21.7 | The deployment's skills | the builder presses *Add a skill* | the picker lists published and draft skills, the template's suggested skills first; the added skill shows its version, when to use it, what it needs, and offered against applied — *too few to read* below the threshold |
 | AG-21.8 | A skill whose declared need the agent's Access Policies do not allow | it is added | it is refused under that skill, naming the need, and the rule and policy that refuse it or *no rule* (AG-30.21) — before any run is refused |

@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
+  s([Settings › Operations › Workers › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
   wh --> g{"Group"}
   g -->|existing| ge["Its labels · slots · plugins · runtimes · secret names · outbound domains"]
   g -->|new| gn["Name · labels · slots a worker · plugins · runtimes · secret names · outbound domains"]
@@ -45,7 +45,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-10.1 | An Admin | they press *Add workers* | a modal opens on *Where*, Docker first, then *Group*, *Join key*, *Run it*, *Joined* |
+| CP-10.1 | An Admin | they press *Add workers* | a 720 px modal opens with a step strip — *Where*, Docker first, then *Group*, *Join key*, *Run it*, *Joined* — on *Where* |
 | CP-10.2 | *Add workers* from a short group | it opens | that group is chosen |
 | CP-10.3 | A new group | it is made | it has a name unique for the deployment, labels from `cpu · llm · egress · gpu · code`, slots a worker, plugins, the runtimes it carries, secret names and outbound domains |
 | CP-10.4 | A join key | it is minted | it is scoped to the group, with an expiry and a cap; its secret shows once, in the command; afterwards only its prefix reads |

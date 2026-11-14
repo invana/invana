@@ -221,7 +221,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Schedules sit in Agents | Agents › Schedules — routine work is an agent's run on a clock; anyone schedules an agent granted to them, from wherever they work |
+| One Schedules list, in Agents › Schedules | Routine work is an agent's run on a clock; anyone schedules an agent granted to them, from wherever they work. The list carries a *Kind* filter, and each mode's Schedules view — Projects › Schedules — is that list filtered, never a second list |
 | A schedule carries instructions, not a plan | The agent plans each firing's run as it plans any run; a schedule never names a plan or a skill |
 | The list reads at a glance | What · who runs it · when as words · next run · last result · on — a failed last run is marked |
 | No sources, tools or project to pick | Sources are written in the instructions, tools are the agent's, and a schedule needs no project |

@@ -35,6 +35,8 @@ flowchart TD
   open -->|no| a["CP-59 · A new alert · its kind, what it is about, since when"]
   a --> rc["To the people its kind names, then the Admins"]
   rc --> ib["Inbox › Needs you · and each person's own channels — a line and a link"]
+  ib --> ack(["CP-69 · Acknowledge in the Inbox dropdown · {person} is on it · stays open"])
+  rc --> ops(["CP-70 · Open and recently closed alerts in the Operations dropdown"])
   ib --> view["CP-59 · The alert: what fired, its counts, the run, agent, limit, graph database, ask or act"]
   view -->|a run| stop(["Stop the run (CP-58)"])
   view -->|a failed task| fix(["CP-67 · Make a fix task · never a re-run"])
@@ -55,7 +57,7 @@ flowchart TD
   view -->|the condition cleared| cl
   view -->|Close · an Admin| note["Close with a note"] --> cl
   view -->|Close · not an Admin| nc["Close disabled, naming the Admins"]
-  set([Control Plane › Ops alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
+  set([Settings › Operations › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
   t -->|not an Admin| ro["Reads · Edit disabled, naming the Admins"]
   set --> ha["CP-60 · History alerts — what in History tells whom"]
   ha -->|not an Admin| hro["Reads · New History alert disabled, naming the Admins"]
@@ -95,6 +97,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Receive an alert | Whom its kind names ([The alert kinds](#the-alert-kinds)), then the Admins | Not sent |
 | Read the ops alerts list and an alert | Operator · Modeller · Admin; a run's content inside it as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
 | Act on what an alert is about — stop a run, make a fix task, answer a question, renew a connection, change a limit, switch off | As [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#access) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#access) · [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#access) · [CP-F04](../CP-F04-limits/feature.md#access) · [CP-F05](../CP-F05-graph-databases/feature.md#access) | As there |
+| *Acknowledge* an alert — *{person} is on it* | The people it was sent to · Admin | Not offered on an alert not sent to them |
 | Close an alert with a note | Admin | *Close* disabled — *Needs the Admin role — ask {admins}* |
 | Set each kind's threshold | Admin | Thresholds read; *Edit* disabled, naming the Admins |
 | Read History alerts | Operator · Modeller · Admin | — |
@@ -178,7 +181,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Table | Columns | Notes |
 |---|---|---|
 | `control_ops_alert_kinds` | `kind` (unique: `task_failed` · `task_blocked` · `task_needs_input` · `stopped_moving` · `refusals` · `over_limit` · `unreachable` · `schedule_skipped` · `schema_only_data` · `recent_decider` · `history_match` · `no_approver` · `connection_failed` · `security`) · `threshold` · `window_s?` · `updated_by_id?` · `updated_at` | One row per built-in kind, seeded on install; only `threshold` and `window_s` change, and not for the fixed kinds — `task_failed`, `schema_only_data`, `recent_decider`, `history_match`, `no_approver`, `connection_failed` and `security` |
-| `control_ops_alerts` | `kind` · `subject_kind` (`task` · `agent` · `run` · `connection` · `team` · `user` · `graph_database` · `schedule` · `ask` · `access_policy` · `history_alert` · `deployment`) · `subject_id` · `run_id?` · `agent_id?` · `count` · `line` · `facts{}` (the counts and names it carries — never content; a security alert's `reason`: `chain_break` · `token_reuse` · `lockout` · `policy_widened` · `sandbox_refusal`; a connection's `connection_kind`: `work` · `personal`) · `recipient_ids[]` · `status` (`open` · `closed`) · `opened_at` · `last_seen_at` · `closed_at?` · `closed_by_kind?` (`person` · `act` · `cleared`) · `closed_by_id?` · `close_note?` | At most one `open` row per (`kind`, `subject_kind`, `subject_id`, `facts.reason`) — a partial unique index |
+| `control_ops_alerts` | `kind` · `subject_kind` (`task` · `agent` · `run` · `connection` · `team` · `user` · `graph_database` · `schedule` · `ask` · `access_policy` · `history_alert` · `deployment`) · `subject_id` · `run_id?` · `agent_id?` · `count` · `line` · `facts{}` (the counts and names it carries — never content; a security alert's `reason`: `chain_break` · `token_reuse` · `lockout` · `policy_widened` · `sandbox_refusal`; a connection's `connection_kind`: `work` · `personal`) · `recipient_ids[]` · `status` (`open` · `closed`) · `opened_at` · `last_seen_at` · `acknowledged_by_id?` · `acknowledged_at?` · `closed_at?` · `closed_by_kind?` (`person` · `act` · `cleared`) · `closed_by_id?` · `close_note?` | At most one `open` row per (`kind`, `subject_kind`, `subject_id`, `facts.reason`) — a partial unique index |
 | `control_history_alerts` | `name` (unique) · `enabled` · `match{}` (act pattern · touched pattern · verdicts · refusal reasons · optional `count` in `window_s`) · `notify_user_ids[]` · `notify_team_ids[]` · `last_seq` · `last_fired_at?` · `created_by_id` | A History alert, an Admin's |
 
 ### Reads
@@ -209,6 +212,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /ops-alerts` | By the list contract — `?status=open·closed` · `?kind=` · `?agent_id=` · `?mine=true` (sent to the reader); open first, newest activity first. A row: `id` · `kind` · `line` · `subject_kind` · `subject_id` · `run_id` · `agent_id` · `count` · `opened_at` · `last_seen_at` · `status` · `recipients` · `closed_by_line` · `may_close` | CP-59 |
 | `GET /ops-alerts/{id}` | The alert, its `facts`, and the link to what it is about | CP-59 |
 | `POST /ops-alerts/{id}/close` | `{note}` — an Admin closes it | CP-59 |
+| `POST /ops-alerts/{id}/acknowledge` | A person it was sent to, or an Admin, says they are on it; the alert stays open | CP-69 |
 | `GET /ops-alerts/kinds` · `PUT /ops-alerts/kinds/{kind}` | Each kind with its threshold, window and who it reaches · set `{threshold, window_s?}` | CP-60 |
 | `GET /ops-alerts/history-alerts` · `POST /ops-alerts/history-alerts` · `PATCH /ops-alerts/history-alerts/{id}` · `DELETE /ops-alerts/history-alerts/{id}` | History alerts — `?q=` the name · `?enabled=`, sorted by name; each read adds `match_line`, `notify_line` and `may_edit` · write · change or switch · remove one | CP-60 |
 
@@ -218,6 +222,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | `control.ops_alerts.open` | A new alert opens — kind, subject, recipients |
 | `control.ops_alerts.count` | An open alert counts a repeat |
+| `control.ops_alerts.acknowledge` | Someone says they are on it — who |
 | `control.ops_alerts.close` | It closes — by an act, the condition clearing, or an Admin with a note |
 | `control.ops_alert_kinds.update` | An Admin sets a kind's threshold — old and new |
 | `control.history_alerts.create` · `control.history_alerts.update` · `control.history_alerts.delete` | A History alert is written · changed · removed |
@@ -228,6 +233,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|---|
 | 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-59.9 · CP-60.4 · CP-60.11 |
 | 409 | Closing an alert that is already closed | *Already closed — {by}.* | CP-59.10 |
+| 403 | Acknowledging an alert not sent to the reader, by anyone but an Admin | *This alert was not sent to you.* | API only — the dropdown offers *Acknowledge* only on alerts sent to the reader |
+| 409 | Acknowledging a closed alert | *Already closed — {by}.* | CP-69.4 |
 | 422 | A threshold or window outside its range | *{field}: {min} to {max}.* | CP-60.3 |
 | 422 | A History alert with nothing to match or no one to tell | *{field}: {why}.* | CP-60.10 |
 
@@ -267,6 +274,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Built-in, tuned, never written | The kinds cover what an Admin acts on; an Admin tunes thresholds, and an act in History anyone should hear about is a History alert |
 | Named approvers, then the Admins | An alert about an agent reaches the people who answer its asks, and the Admins always — never a person because they made the agent |
 | Alerts wait in Needs you | An open alert needs someone to act, so it waits beside asks until it closes |
+| Acknowledging is not closing | *Acknowledge* tells everyone it reached who is on it; only the act its kind names, the condition clearing or an Admin's note closes it |
+| Where alerts show | In each recipient's Needs you (the Inbox dropdown and sheet); open and recently closed in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)); an Admin's *All open alerts* filter in the Inbox; thresholds and History alerts in Settings › Operations › Alerts |
 | Closed by acting | Stopping, a done fix task, an answer, a renewed connection, changing a limit or switching off is what closes an alert; *Close* with a note is for an alert no act settles |
 | A failure waits on a fix | A failed task is never re-run; its alert stays open until a fix task made from it is done, so a failure is looked at before work goes on |
 | A personal account stays its person's | A personal connection's failure reaches its person only; it is their account to renew |

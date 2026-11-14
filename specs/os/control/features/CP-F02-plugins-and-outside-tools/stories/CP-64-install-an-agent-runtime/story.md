@@ -28,7 +28,7 @@ The role × feature table is [AC-F02 › The role table](../../../../../access/f
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Plugins › Runtimes]) --> l["Invana · always · then each installed runtime: versions · model local or external · needs · groups · agents"]
+  s([Library › Plugins › Runtimes]) --> l["Invana · always · then each installed runtime: versions · model local or external · needs · groups · agents"]
   l -->|none installed| fu["Only Invana's runtime · Install a runtime"]
   fu --> i["Install: Claude Code or Codex"]
   l --> i

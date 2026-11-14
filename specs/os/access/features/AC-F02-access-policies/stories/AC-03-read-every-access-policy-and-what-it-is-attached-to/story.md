@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Settings › People and access › Access Policies]) --> l["Access Policies · N — All · Built in · Custom"]
+  s([Settings › Access › Policies]) --> l["Access Policies · N — All · Built in · Custom"]
   l -->|Find a policy| f{"Matches?"}
   f -->|no| e["Nothing matches · Clear filters"]
   f -->|yes| r["A policy: its rules as sentences, the agents it is attached to"]

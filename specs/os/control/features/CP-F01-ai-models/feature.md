@@ -23,7 +23,7 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  s([Control Plane › AI models]) --> l["CP-01 · Every version · its endpoint · local or external · who pins it · status · the default"]
+  s([Settings › Connections › AI models]) --> l["CP-01 · Every version · its endpoint · local or external · who pins it · status · the default"]
   l -->|none yet| e["No endpoint · Add an endpoint"]
   l --> add["CP-01 · Add an endpoint: kind · name · its own fields · key"]
   add --> loc["CP-61 · Local or external — an outside provider is external"]
@@ -193,7 +193,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| AI models are the Control Plane's | *AI models* lists every endpoint and version; an endpoint's detail and adding one are modals |
+| AI models live in Settings › Connections › AI models | It lists every endpoint and version; an endpoint's detail is a modal; adding one is a create modal of numbered sections — name (optional), the provider as a card grid, its details | 
+| Health shows in Operations | Each pinned exact version's latency and error rate over the last hour reads in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)), computed by the engine |
 | Local is a claim the engine checks | An Admin says local; the engine believes it only while the address resolves inside the deployment |
 | One default model | With no per-question picker and no view of the graph, the default is what answers when an agent pins nothing |
 | A ping is a run | Who proved an endpoint worked, when, and what it said, is a run like any other |

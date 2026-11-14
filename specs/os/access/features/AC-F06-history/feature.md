@@ -4,11 +4,11 @@ title: History — what people and agents did, and every change
 product: AC
 status: idea
 personas: [admin, modeller, builder, analyst]
-stories: [AC-16, AC-17]
+stories: [AC-16, AC-17, AC-48]
 journeys: [J09]
-boards: [inbox.history, agents.run]
-nfrs: [NFR-REL-4, NFR-SEC-2, NFR-PERF-3]
-depends_on: [AC-F05, AC-F09, AC-F12, CP-F10]
+boards: [inbox.history, agents.run, shell.access, shell.avatar.access]
+nfrs: [NFR-REL-4, NFR-SEC-2, NFR-PERF-3, NFR-PERF-7]
+depends_on: [AC-F05, AC-F09, AC-F12, CP-F10, AC-F01, AC-F03, AC-F10, AC-F11, CP-F08]
 ---
 
 # History — what people and agents did, and every change
@@ -25,7 +25,10 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  s([Inbox › History]) -->|nothing yet| e["No acts yet — a run or a person's act writes the first row"]
+  ad([The header lock · Admin only]) --> acc["AC-48 · The Access dropdown · acting now · blocked today · delegations in force · recent changes"]
+  acc -->|Recent changes · All| s
+  acc -->|Revoke · password again| rvk(["A client or key ends · History row"])
+  s([Settings › Access › History]) -->|nothing yet| e["No acts yet — a run or a person's act writes the first row"]
   s --> rows["AC-16 · Every act: when · who, through which agents · what · touched · allowed or refused · run"]
   rows -->|Everything · People · Agents · Refused · a window| f{"Matches?"}
   f -->|no| z["0 of N match · Clear all"]
@@ -68,6 +71,7 @@ sequenceDiagram
 |---|---|---|
 | AC-16 | [Read what people and agents did, and prove it](stories/AC-16-read-what-people-and-agents-did-and-prove-it/story.md) | idea |
 | AC-17 | [See every change and compare two versions](stories/AC-17-see-every-change-and-compare-two-versions/story.md) | idea |
+| AC-48 | [See who is acting and what was blocked, from the header](stories/AC-48-see-who-is-acting-and-what-was-blocked-from-the-header/story.md) | idea |
 
 ## Access
 
@@ -79,6 +83,9 @@ sequenceDiagram
 | Export the rows the reader can see | Every signed-in person | — |
 | Read every change and compare two versions of a record the reader can open | Every signed-in person | A record the reader cannot open reads as absent |
 | Restore an earlier version | Not here — the record's own page, by its own role | — |
+| Read the Access dropdown — people signed in, agents acting now, blocked today, delegations in force, recent changes | Admin | No *Access* button in the header |
+| Revoke a client or a key acting for a person, from the dropdown | Admin, with the password again ([AC-F10](../AC-F10-keys/feature.md) · [AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) | — |
+| Read *Your access* — one's own role, agents and delegations — and revoke one's own | Every signed-in person, for themselves | Another person's is absent |
 
 ## States
 
@@ -127,6 +134,7 @@ sequenceDiagram
 | Checkpoints — the last row each prune removed, its hash and its signature | Write · read |
 | History's period and hold ([AC-F12](../AC-F12-leaving-and-keeping/feature.md#engine)) | Read |
 | Writes and their causes — actor, on whose behalf, what, the act that caused it | Read |
+| Live sessions (AC-F01) · runs going (CP-F10) · connected clients (AC-F11) · keys (AC-F10) · roles (AC-F03) · asks waiting (AC-F05) | Read |
 | The chain's last check — when, whether it held, where it broke | Read |
 | Exports — who, the filters, the format, how many rows | Write · read |
 | Versions of skills, rules, workflows, agents, models and Access Policies, loads, and why each was made | Read |
@@ -177,6 +185,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `GET /refusals` | `refused_today` · `acts_today` · `share_pct` · by reason · `by_day[30]` · `top_functions[]` · `by_rule[]` (`refused_by` · `rule` · `policy` · `refused` · `today`) | AC-16 |
 | `GET /export?format=csv \| jsonl` · `GET /exports` | Stream the filtered rows, each with its hash and the previous one, and write an exports row · the exports, newest first | AC-16 |
 | `GET /integrity?full=` | `{verified_at, ok, last_seq, broken_seq?, keep_days?, held, checkpoint?, rows}`; `full` re-verifies from the latest checkpoint, or row 1 when none | AC-16 |
+| `GET /summary?tz=` | The Access dropdown, Admin only: `tiles` — `people_signed_in` · `agents_acting` · `requests_waiting` · `blocked_today`; `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `role?` · `run_id?` · `last_touched_at`; `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`client` · `key`) · `id` · `name` · `acts_for` · `role` · `ends_at?`; `recent_changes[]` — `seq` · `at` · `actor` · `act` (grants · invites · policy saves) | AC-48 |
 | `GET /changes/{kind}/{id}` | One record's changes: `{record_kind, record_id, name, items[ChangeEntry]}` | AC-17 |
 | `GET /changes/{kind}/{id}/compare?a=&b=` | Two versions; `a` omitted compares `b` with the one before | AC-17 |
 | `GET /events` · `GET /events/stream` | The deployment's events by the list contract, every filter composing with `?changes=true` · the live tail | AC-17 |
@@ -196,6 +205,8 @@ store: every feature's *Events* table names what it writes here, and links this 
 | 404 | A row the reader may not see is opened | *Not found.* | AC-16.21 |
 | 404 | A record's changes or compare, for a record the reader cannot open | *Not found.* | AC-17.17 |
 | 422 | A compare naming a version the record does not have | *{record} has no version {v}.* | API only — Studio offers only versions the record has |
+| 403 | The access summary by anyone but an Admin | *This needs the Admin role.* | AC-48.15 |
+| 401 | *Revoke* without the password, or a wrong one | *Enter your password again to do this.* | AC-48.10 |
 
 ### CLI
 
@@ -210,7 +221,10 @@ store: every feature's *Events* table names what it writes here, and links this 
 | One emitter | A manager emits the event of its write inside the write's transaction; `trace_id` and `span_id` are filled from the current span by the emitter, never by a caller |
 | Redacted at write | Credentials never reach `details`, `args` or a row — not even encrypted; a secret is named, never its value |
 | Causality | `parent_event_id` links an event to the act that caused it; `caused_by_seq` does the same for a History row |
-| The live tail | A database trigger notifies every insert into `events`; the engine fans it out to the streams Studio holds open |
+| The live tail | A database trigger notifies every insert into `events`; the engine fans it out to the streams Studio holds open — the counts stream ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#mechanisms)) among them |
+| The access summary | Composed on read, storing nothing: *people signed in* — people with a live refresh row ([AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine)); *acting now* — those people and runs queued or running ([CP-F10](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)), each with its last event's time; *requests waiting* — open asks ([AC-F05](../AC-F05-asks-and-approvals/feature.md#engine)); *blocked today* — `GET /refusals`' `refused_today` and its rows; *delegations in force* — connected clients ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#engine)) and live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), each with the person it acts for and their role ([AC-F03](../AC-F03-directory/feature.md#engine)); *recent changes* — the newest History rows of grants, account creation and Access Policy saves |
+| Revoke from the dropdown | Calls the owning feature's revoke — `DELETE /api/v1/access/clients/{id}` or `DELETE /api/v1/access/keys/{id}` — with its password check; nothing is revoked here |
+| *Your access* | The person's own role and agents from `GET /api/v1/access/auth/me`, and their own clients and keys from the owning routes |
 | Who reads `events` | The change list and the live tail, notification rules ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#engine)), provenance ([RC-F06](../../../../capabilities/records/features/RC-F06-provenance/feature.md#engine)), a task's tree ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)), the outbox relay that rebuilds the system graph, and traces — each a reading; none copies it |
 | One writer of History | `record()` takes the last row under a row lock, sets `seq` and the hash, inserts. The Control Plane calls it for each step it settles and each refusal; delegation for each helper and refusal; every manager for each act a person, an agent, a key or an MCP client causes. Nothing updates or deletes a row |
 | The hash chain | `hash = sha256(prev_hash ‖ canonical JSON of the row without actor_names)`; the first `prev_hash` is 64 zeros. Names live outside the hash, so pseudonymising a departed person changes `actor_names` and every row still verifies; who acted is proven by `actor_chain`'s ids. The shared clock tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)) re-verifies every 10 minutes from the last verified row into `access_history_checks`; `?full=` re-verifies from the latest checkpoint |
@@ -233,7 +247,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | HLD section | Change | NFRs |
 |---|---|---|
 | § 6 Data and storage | The event store `events` and four History tables in Postgres; History kept until an Admin sets a period, each prune leaving a signed checkpoint | NFR-REL-4 |
-| § 8 APIs and events | The `…/access/history` routes; the event store is where every feature's events land | — |
+| § 8 APIs and events | The `…/access/history` routes, the access summary among them; the event store is where every feature's events land, and its live tail feeds the counts stream | NFR-PERF-7 |
 | § 9 Distributed execution | The one chain is re-verified on the shared clock tick; one writer under a row lock keeps `seq` gapless | NFR-PERF-3 |
 | § 12 Qualities | Security: append-only, hash-chained, verified every 10 minutes from a signed checkpoint, credentials redacted before the write; arguments read only as run privacy allows; names outside the hash, so pseudonymising edits no proof | NFR-REL-4 · NFR-SEC-2 |
 
@@ -251,6 +265,10 @@ store: every feature's *Events* table names what it writes here, and links this 
 | A change shows no percentage on an empty week | The change in acts against the 7-day daily mean is absent while that mean is under 10 acts a day |
 | Compare carries tokens per run | The compare reads *Tokens per run* of one version against the other, as the engine counted it |
 | A model's change names its loads | A model version's effect lists the loads it touched and how many records fail |
+| History lives in Settings › Access | History is read in Settings › Access › History; the Admin's glance at access now is the header's Access dropdown |
+| Access is an Admin's glance | The dropdown is an Admin's alone; an Operator reads their own access under *Your access* in the avatar menu, and has no *Access* button |
+| Delegations are clients and keys | What acts for a person until a time is a connected client or a key; the dropdown lists both and revokes through their own features |
+| Requests stay in the Inbox | The dropdown counts asks waiting; deciding them is the Inbox's |
 
 ## Open questions
 

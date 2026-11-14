@@ -41,7 +41,7 @@ flowchart TD
   rd --> on["CP-39 · Turn it on"]
   on --> su["CP-24 · Set-up: what is left before the first answer"]
   su -->|all four done| ans(["The first answer"])
-  f -->|some| ls["CP-40 · Settings › Invana › Graph databases: mode · switch · health"]
+  f -->|some| ls["CP-40 · Settings › Connections › Graph databases: mode · switch · health"]
   ls --> md["CP-38 · Read-only or read + write · sign in again"]
   ls --> sw["CP-39 · On or off — for the deployment, or for my own runs"]
   ls --> one["CP-35 · One graph database: connection · test · reconnect · version · remove"]
@@ -79,7 +79,7 @@ sequenceDiagram
 | ID | Story | Status |
 |---|---|---|
 | CP-22 | [Start a fresh deployment from a question](stories/CP-22-start-a-fresh-deployment-from-a-question/story.md) | idea |
-| CP-25 | [Connect a graph database in one modal of steps](stories/CP-25-connect-a-graph-database-in-one-modal-of-steps/story.md) | idea |
+| CP-25 | [Connect a graph database in one modal](stories/CP-25-connect-a-graph-database-in-one-modal-of-steps/story.md) | idea |
 | CP-26 | [Connect a graph database that already holds data](stories/CP-26-connect-a-graph-database-that-already-holds-data/story.md) | idea |
 | CP-27 | [Start from files with an empty graph database](stories/CP-27-start-from-files-with-an-empty-graph-database/story.md) | later |
 | CP-24 | [See what is left before the first answer](stories/CP-24-see-what-is-left-before-the-first-answer/story.md) | idea |
@@ -199,7 +199,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /graph-databases/{name}/introspect` | *Read types again*, in the background | CP-35 |
 | `POST /graph-databases/{name}/acknowledge-version` · `PUT /graph-databases/{name}/version` | Accept an untested server version · declare one the connector cannot detect | CP-35 |
 | `GET /setup` · `POST /setup/{step}` | The four required steps and the offers, derived on every read — `{step, done, completed_at?, skipped_at?, required, gate?, blocked_by?, broken?}` · `{act: skip · reset}` on an offer | CP-24 |
-| `GET /connectors` | Every installed connector — `name` · `language` (`opencypher` · `gremlin`) · `package` · `version` · `state` (`loaded` · `failed`) · `error?` | CP-17 |
+| `GET /connectors` | Every installed connector — `name` · `language` (`opencypher` · `gremlin`) · `package` · `version` · `state` (`loaded` · `failed`) · `error?` · `graph_databases` (how many use it) · `used_by_agents` | CP-17 |
 
 ### Events
 
@@ -274,14 +274,18 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Graph databases are the deployment's | Settings › Invana › Graph databases; one list, Admin acts, everyone reads |
-| Connecting is a modal of steps | Name · Connect · Shape · Ready on a step strip; it shows a person's own data back to them and asks for a decision at each step |
+| Graph databases are the deployment's | Settings › Connections › Graph databases; one list, Admin acts, everyone reads |
+| Connecting is one modal of sections | Name (optional) · the type as a grouped card grid · its details once a type is picked · Shape once the test passes — one page and one act, *Connect*; it shows a person's own data back to them before anything is saved |
+| A blank name takes the type's | The engine names it after its type, made unique (`neo4j`, `neo4j_2`), and shows that name before *Connect*, so every graph database still has the fixed name rules use |
 | The model is shaped while connecting | The Modeller agent reads the schema and proposes a draft before anything is saved; publishing happens in Model |
 | The name is fixed | It is the resource segment every rule names; renaming would silently change what rules reach |
 | Read + write needs the password | It widens what agents can do to customer data — a change to access ([NFR-SEC-4](../../../../system-design.md#3-non-functional-requirements)) |
 | Reconnecting is an Admin's | It changes nothing the graph database holds, but the one role table gives Operators and Modellers reads only; an unreachable database raises an ops alert to the Admins |
 | Demo data is a graph database | The developer setup connects one, marked demo; *Try it on demo data* opens Explore on it. An Admin switches it off or removes it like any other |
+| Home is the only place before set-up | Until a graph database is connected or someone picks *Try it on demo data*, mode switches are disabled and the leftNav holds no views; an Operator is offered *Ask {Admin}* where an Admin sees *Connect a graph database* |
+| Connecting starts in two places | Settings › Connections › Graph databases and Home before set-up — never the switcher's *New* |
 | The first-run question carries into the first ask | *What are you trying to decide?* is kept in the browser and put in the Assistant's composer when set-up is done — never sent by itself |
+| Connectors live in the Library | The Library sheet's *Connectors* lists every installed connector with *Used by n agents*; the graph databases themselves are Settings › Connections › Graph databases |
 | Connectors need no switch | Installed is offered; a connector reaches a graph database, not the outside, so it is not a plugin |
 
 ## Open questions

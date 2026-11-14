@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Plugins]) --> pl["CP-04 · Every plugin: core · tool · outside server · pack · on or off · who switched it"]
+  s([Library › Plugins]) --> pl["CP-04 · Every plugin: core · tool · outside server · pack · on or off · who switched it"]
   pl -->|core| always(["Always on · no switch"])
   pl -->|Admin turns a plugin on| on(["On for the deployment · from the next step"])
   pl -->|not an Admin| ro["The deployment's switch reads · Ask an Admin"]
@@ -247,7 +247,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Route, after `/api/v1/control` | Does | Story |
 |---|---|---|
-| `GET /plugins` | By the list contract — `?f.kind=` · `?f.enabled=` · `?q=` name or title. Each: `name` · `kind` · `version` · `title` · `extra` · `installed` · `enabled` · `switched_by` · `switched_at` · `my_switch` (`on` · `off`) · `switchable` · counts of functions, skills and workflows | CP-04 · CP-20 |
+| `GET /plugins` | By the list contract — `?f.kind=` · `?f.enabled=` · `?q=` name or title. Each: `name` · `kind` · `version` · `title` · `extra` · `installed` · `enabled` · `switched_by` · `switched_at` · `my_switch` (`on` · `off`) · `switchable` · counts of functions, skills and workflows · `used_by_agents` — the agents that may use any of its functions | CP-04 · CP-20 |
 | `GET /plugins/{name}` | One plugin: the summary, each function's manifest with its `needs`, each workflow and skill, the secrets it declares (names, and whether each is set), and for a pack each piece with the product that offers it | CP-04 · CP-44 · CP-20 |
 | `GET /plugins/{name}/agents?person=` | Each agent and whether it may use each function for that person — missing needs named ([AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md#routes)) | CP-44 |
 | `PUT /plugins/{name}/switch` | `{enabled}` — the deployment's switch | CP-04 |
@@ -396,7 +396,7 @@ The code changes are [migrations.md](../../../../migrations.md) M15 (work and pe
 
 | Decision | Detail |
 |---|---|
-| Plugins and the MCP server are Settings › Invana | *Plugins* lists every plugin and outside server, each server with its work connections; *MCP server* is its own entry; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
+| Plugins live in the Library | The Library sheet's *Plugins* lists every plugin and outside server, each server with its work connections, and *Packs* the Team packs; each row reads *Used by n agents*. *MCP server* is its own entry in Settings; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
 | An outside server is a plugin | One kind of list, one pair of switches, one resource name `tool/<server>/<tool>` for every tool, shipped or added |
 | Per server, one way to sign in | An Admin chooses none, a token or OAuth for each outside server, and whether people may connect their own over OAuth; a shipped tool's settings are the deployment's secrets |
 | The work connection wins | When an agent has a work connection on a server, every call uses it — even in a person's own run — so an agent does the same thing for everyone who may use it; a personal connection serves only where the agent has none |

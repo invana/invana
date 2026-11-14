@@ -42,7 +42,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-59.1 | Control Plane › Usage and limits | anyone opens it | the deployment's monthly eval token budget reads beside what tests, evals and drift spent this month, apart from what agents spent; *No eval budget* when none is set; Evals on every sheet reads the same spent-of-budget line |
+| AG-59.1 | Settings › Operations › Limits | anyone opens it | the deployment's monthly eval token budget reads beside what tests, evals and drift spent this month, apart from what agents spent; *No eval budget* when none is set; Evals on every sheet reads the same spent-of-budget line |
 | AG-59.2 | The budget spent | a scheduled eval run or drift would start | it settles *paused: budget* and Evals says so; a publish-time run still runs, its result carrying the warning |
 | AG-59.3 | An Admin | they set or change the budget | it saves and a History row names the old and new value; anyone else reads it, editing disabled — *Needs the Admin role* |
 | AG-59.4 | A new month | it starts | what is spent reads from zero and paused scheduled runs take their next firing |

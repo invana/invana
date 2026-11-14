@@ -15,8 +15,13 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Read-only · Read + write** | A graph database's mode, set by an Admin: agents only read it · agents may also write to it — annotations, derived facts, loads, fixes. Reads always run in the database's read mode | connection mode |
 | **Practice graph database** | A graph database an Admin names for testing agents and skills, never the one people ask | practice graph database |
 | **Explore · Model · Projects** | The three modes of Studio, named in the wordmark | — |
-| **Records · Agents · Inbox · Settings** | What is summoned over the work, as a modal or a sheet | — |
-| **Invana · You** | The two parts of Settings: the deployment, the person's own account | deployment settings · profile |
+| **Records · Agents · Library · Settings** | The summoners at the foot of the leftNav — each opens its sheet over the work | — |
+| **Library** | The sheet of what agents are built from and reach out with — Skills · Plugins · Connectors · Packs — each with *Used by n agents* | skills · plugins · connector packages · Team packs |
+| **Operations** | What the deployment is doing now — runs, the queue, budgets, workers, AI models, graph databases, alerts — the dropdown behind the header's *● n running*; also the Settings group of Workers · Limits · Alerts | fleet · overview |
+| **Access** *(the header lock)* | An Admin's glance at who and which agents act now, what a policy blocked today and what acts for a person; also the Settings group of People · Policies · History | access summary |
+| **Switcher** | The dropdown behind ☰ and the mode name: Go to · New · Recent · Pinned | — |
+| **Recent · Pinned** | The items a person opened, newest first, kept for them by the engine · the ones they starred | recents · pins |
+| **Invana · You · Connections · Operations · Access · Notifications** | The groups of Settings: the deployment's general settings and appearance · the person's own account · graph databases and AI models · workers, limits and alerts · people, policies and History · what reaches whom | deployment settings · profile |
 | **Board** | A named, saved working surface — drawn on a canvas, or a dashboard of panels | Board (`renders: canvas · declared`) |
 | **canvas** | The pannable drawing of nodes and relationships on a board | canvas |
 | **Assistant** | The one conversational surface, on the right of every mode | Assistant |
@@ -212,7 +217,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Claimed** | A task an agent has taken by pick-up, for a while; a lapsed claim returns it | Claim |
 | **Order** | A project's tab of its groups and tasks in waves, by what each waits on | Plan canvas |
 | **Open · Assigned · In progress · Needs input · Blocked · Checking · Checks failed · In review · Done · Failed · Cancelled** | A task's state, read off its latest run and its checks; only the last three are written, by a person | Todo status (derived) |
-| **Needs you · Running · History** | The Inbox's three parts: what waits on the person, what runs, what people and agents did | Approvals and notifications · runs · ledger and events |
+| **Needs you · Running · Updates · Done** | The Inbox's parts: what waits on the person, what runs, what a rule sent them, what ended today. The header dropdown holds the first three | Approvals and notifications · runs · notifications · settled runs |
 | **Updates** | The notifications a rule sent the person, in the Inbox beside Needs you; they never toast | Notification |
 | **Done** | The Inbox's runs that ended today, beside Running | Settled runs |
 | **Send it · Not this time · Allow · Decline · Allow always · Decline for N days** | The acts on an ask: a send · access, budget or a delegation · a delegation for good · an ask for more, kept from coming back for up to 90 days | Approve · decline · scope always |
@@ -227,7 +232,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Not on screen | Say instead |
 |---|---|
-| Agent Builder · Fleet · IAM · Activity · Graph settings | Agents · Settings › Workers · Settings › People and access · Inbox · Settings › Invana — product names are never places |
+| Agent Builder · Fleet · IAM · Activity · Graph settings | Agents · Operations · Settings › Operations › Workers · Settings › Access · Inbox · Settings › Connections — product names are never places |
 | Policy statement · policy effect | A **rule** of an Access Policy · Allow, Ask or Deny |
 | viewer · contributor · iam-admin | *Operator* · the person's role — *Operator*, *Modeller* or *Admin* · *Admin* |
 | World | An Access Policy rule on `data/…` · a sensitive property |
@@ -287,7 +292,7 @@ names and the form each takes in every layer are
 | **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage, the ledger's edges and identity links, never customer data, and is never part of Graph Data. It follows Postgres, the source of truth, and is rebuilt from it |
 | **System ontology** | The read-only, versioned ontology Invana ships that governs the system graph |
 | **Identity link** | Two records in different graph databases that are the same entity, materialised in the system graph from a **match rule** a Modeller declares for a pair of kinds — agents may propose rules, never links. Never guessed |
-| **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown as *Settings › Invana*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
+| **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown in *Settings › Connections*, *Settings › Operations* and the *Library*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
 | **Operating system** | What runs every deployment: the **Control Plane**, the **Access Plane** and the **Graph Plane** — the packages `control` · `access` · `graph`. A vision and docs word; in code its parts are packages beside the capabilities |
 | **Control Plane** | What runs, where and within which limits — runs, workers and the queue, graph databases, limits, AI models, plugins and the MCP server, ops alerts, the Inbox. Product code `CP` |
 | **Access Plane** | Who may act, through which agent, and what they did — sign-in, keys, Access Policies, the Directory, ownership, asks, the ledger's views, History. Product code `AC` |
@@ -297,7 +302,7 @@ names and the form each takes in every layer are
 | **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Records** summoner. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
 | **Worker pool** | The deployment's workers, in groups that share labels — the Control Plane's, [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md). On screen *Workers*. How each agent is doing is Agents' (`agents`), never the pool's |
 | **Rule** | One statement that is always true, scoped `deployment` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. A **policy rule** is a line of an Access Policy, never this |
-| **Library** | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. One `leftNav` item, three sections. Never the journal — that is **Runs**. |
+| **Library** *(runtime)* | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. A code and docs word; on screen *Library* is the sheet of Skills · Plugins · Connectors · Packs. Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. On disk it is an **Agent Skills folder** — `SKILL.md` plus `references/`, `scripts/`, `assets/` — stored whole per version, and it is the source. It runs **planned** — drawn into a plan before anything runs, the plan a cache compiled from its text, never edited or exported — or **guided**, with no plan, the model following its instructions with the functions its agent may use. |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model, a standard. A draft is not a version. |
 | **Change log** | Every version of every versioned record — who, when, why, the diff, the effect after. It is the Events list narrowed to the events that mint a version, never a second record. A **change** is one such event. Never "audit log" for this narrower list, never "revision history". |

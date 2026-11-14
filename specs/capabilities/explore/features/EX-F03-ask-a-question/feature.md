@@ -109,7 +109,7 @@ runs through may read.
 | Ask in plain words · answer a question asked back | Anyone, through an agent they may use — the Assistant by default | No agent they may use: the composer disabled — *{person} may not use {agent} — ask an Admin* |
 | Type a Cypher or Gremlin query | Anyone who may use the Query console | The query kinds disabled — *{person} may not use Query console — ask an Admin* |
 | Write to a graph database from the composer | A typed write through the Query console asks first: its named approvers decide ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)); the person's role must hold *Edit on the board* (Modeller · Admin) and the graph database must be read + write | An Operator: refused — *Edit on the board needs the Modeller role.* A read-only graph database: *{name} is read-only — {why}.* |
-| Open, search, reopen, start, rename, pin, archive and delete their own conversations · pick the conversation's agent | The person who started it | Another person's conversations are not listed; an Admin reads their runs in Control Plane › Runs ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Open, search, reopen, start, rename, pin, archive and delete their own conversations · pick the conversation's agent | The person who started it | Another person's conversations are not listed; an Admin reads their runs in Agents › Runs ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Read a conversation's content | The person who started it, those an answer in it is shared with ([EX-15](../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and Admins — run privacy | That it ran, its status and its tokens; content withheld |
 | Set a conversation's token budget per run | The person who started it, up to the agent's own | Above the agent's: clamped, and the settings say so |
 | Switch the Assistant off for themselves | Anyone, per browser | — |
@@ -162,7 +162,7 @@ runs through may read.
 | Run — its steps, the plan's compiled step per graph database, a question asked back and the answer to it | Write · read ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | The published model, its descriptions, identity link rules and sensitive properties | Read |
 | Records — the option rows of a question asked back, the counts behind a list | Read, under the agent's Access Policies |
-| Lists — Runs · Agents · Inbox › Needs you · Inbox › History — and their filters | Read |
+| Lists — Runs · Agents · Inbox › Needs you · Settings › Access › History — and their filters | Read |
 | Ledger rows — every call to an AI model and a graph database | Write, by the engine ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
 
 ## Engine
@@ -292,7 +292,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | No model picker | The agent names which AI model answers; the composer never offers one |
 | A conversation has its own address | Opening, starting or leaving a conversation rewrites the Explore address in place, without redrawing the board; a reload or a shared link reopens the conversation with its answer. Crumbs: *Explore › Conversations › <title>* |
 | New is a blank thread | *New* in the header and in the history shows a blank thread with the composer focused on a question; no conversation exists until the first question |
-| Archiving hides, deleting removes | An archived conversation leaves the list and comes back with *Show archived*. Deleting removes the conversation and its turns; its runs stay in Control Plane › Runs and its forks stay whole |
+| Archiving hides, deleting removes | An archived conversation leaves the list and comes back with *Show archived*. Deleting removes the conversation and its turns; its runs stay in Agents › Runs and its forks stay whole |
 | A question asked back waits | Nobody answering parks the run as waiting, never failed and never expired; answering resumes the same run |
 | Options are described only when the label is not enough | Each option is one line; a second line only where the person would be unsure which to pick. Options read from Graph Data are their own label |
 | A list opens through its own filters | The assistant sets the same filters a person would; the list reads, reloads and clears like any other, and counts with its own query |

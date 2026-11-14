@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J06 · Set what an agent may touch](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › Agents]) --> ag["AC-12 · Every agent — what it can do, and why not"]
+  start([Settings › Access › Agents]) --> ag["AC-12 · Every agent — what it can do, and why not"]
   ag -->|Open in Agents| agx(["AG-F01 · the agent's sheet"])
   ag --> touch["AC-13 · What it may touch — each resource, its effect, the rule and policy that set it · each declared need, met or missing · its ceilings"]
   touch -->|Change · an Admin| pol(["AC-04 · the policy, at that rule"])

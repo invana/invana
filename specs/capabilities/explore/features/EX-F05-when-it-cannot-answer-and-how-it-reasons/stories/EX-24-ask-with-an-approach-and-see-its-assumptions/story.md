@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Pick an approach with *Act as*, remove an assumption before the run, drop one from an answer and re-run; author, copy and publish approaches in Agents › Skills | — |
-| Operator | Pick an approach, remove assumptions, drop one and re-run, on their own runs; read approaches in Agents › Skills. A Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *skills*) | *+* disabled — *Needs the Modeller role — ask an Admin* |
+| Admin | Pick an approach with *Act as*, remove an assumption before the run, drop one from an answer and re-run; author, copy and publish approaches in Library › Skills | — |
+| Operator | Pick an approach, remove assumptions, drop one and re-run, on their own runs; read approaches in Library › Skills. A Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *skills*) | *+* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 
@@ -59,8 +59,8 @@ flowchart TD
 | EX-24.11 | The same question on the same data | a different approach is picked | the plan or the assumptions differ |
 | EX-24.12 | The approach is changed mid-conversation | the next question is asked | it uses the new one; earlier answers keep the approach they ran under, named in *How it got here* |
 | EX-24.13 | An answer run with an approach | the person opens *How it got here* | it names the approach and its version, and its assumptions with the queries that checked them |
-| EX-24.14 | A Modeller or an Admin | they open approaches in Agents › Skills | they author one — name, when to use, method, assumptions each with what changes without it, answer shape — and publish it as a version |
-| EX-24.15 | An Operator | they open approaches in Agents › Skills | they read them; *+* and every edit are disabled — *Needs the Modeller role — ask an Admin* |
+| EX-24.14 | A Modeller or an Admin | they open approaches in Library › Skills | they author one — name, when to use, method, assumptions each with what changes without it, answer shape — and publish it as a version |
+| EX-24.15 | An Operator | they open approaches in Library › Skills | they read them; *+* and every edit are disabled — *Needs the Modeller role — ask an Admin* |
 | EX-24.16 | The built-in *What-if* | a Modeller opens it | it reads, owned by *System*; it cannot be changed in place, and *Copy* makes a custom draft owned by them |
 
 ## Screens

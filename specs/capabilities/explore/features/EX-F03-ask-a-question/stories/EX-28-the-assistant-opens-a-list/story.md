@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Ask for Runs, Agents, Inbox › Needs you or Inbox › History with filters, and open it | — |
+| Admin | Ask for Runs, Agents, Inbox › Needs you or Settings › Access › History with filters, and open it | — |
 | Operator | The same, through the agents they may use — the list opens with what they may read, counted under their rights; a Modeller the same | A name they cannot see is said as not found, never as forbidden; a run whose content they may not read lists with *withheld* (CP-F10) |
 
 ## Flow
@@ -43,7 +43,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-28.1 | *Show me Order Checker's failed runs this month* | the person asks | the reply carries a card — the list's name, a chip per filter and the row count, *Runs · 3 filters · 2 runs* |
-| EX-28.2 | The card | the person opens it | Control Plane › Runs opens with the agent, *failed* and the last 30 days applied, each chip marked *set by the assistant* |
+| EX-28.2 | The card | the person opens it | Agents › Runs opens with the agent, *failed* and the last 30 days applied, each chip marked *set by the assistant* |
 | EX-28.3 | The question asked from Agents | it is answered | the list opens by itself, and the card stays in the thread as the way back |
 | EX-28.4 | The words *this week*, *today*, *didn't serve* | they are asked | they become the last 7 days, the last 24 hours and *not served* |
 | EX-28.5 | *Order Chekcer*, an agent name that does not exist | the person asks | the reply says *No agent named "Order Chekcer"* and the card carries the filters that did resolve |

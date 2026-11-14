@@ -33,7 +33,7 @@ flowchart LR
   h -->|no| w["Write a case — a question and its checks"]
   h -->|no| pr["Propose from the instructions"]
   pr -->|the Assistant proposes up to five| pc["Proposed — Accept or Retire, one by one"]
-  pr -->|no AI model offered| px["Says so, linking Control Plane › AI models"]
+  pr -->|no AI model offered| px["Says so, linking Settings › Connections › AI models"]
   r([A run's answer]) -->|Promote to eval · passing or failing| c["A case keeping its run"]
   r -->|content the person may not read| rx["Promote to eval disabled, naming who reads it"]
   w --> s["The set — cases, judge, rubric"]
@@ -50,7 +50,7 @@ flowchart LR
 | AG-56.1 | An agent's or a skill's sheet | Evals opens | the set's cases read, each a question with its checks and *passing* or *failing*; a judged rubric names the model version that judges it |
 | AG-56.2 | No case | Evals opens | it reads *No eval set — nothing checked*, with *Write a case* and *Propose from the instructions* |
 | AG-56.3 | A Modeller or an Admin writing a case | they add checks | each check is hard and counted — cites records · says *cannot answer* when it should · a rule held · expected records present · tokens under N · time under N |
-| AG-56.4 | A set | a Modeller or an Admin sets a judge model version and a rubric | the judge is offered only from the versions Control Plane › AI models offers, each marked *Local* or *External* |
+| AG-56.4 | A set | a Modeller or an Admin sets a judge model version and a rubric | the judge is offered only from the versions Settings › Connections › AI models offers, each marked *Local* or *External* |
 | AG-56.5 | A judge set to the model version under test | the editor saves the set | it is refused, naming both |
 | AG-56.6 | A Modeller or an Admin | they press *Propose from the instructions* | the Assistant proposes up to five cases from the instructions, each waiting as *proposed* until a person accepts it; *How it got here* shows what it read and the model version that wrote them |
 | AG-56.7 | A proposed case | a Modeller or an Admin presses *Accept* or *Retire* | it becomes active or retired; no proposed case is ever replayed |

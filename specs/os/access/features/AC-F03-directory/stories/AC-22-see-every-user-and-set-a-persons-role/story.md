@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › People and access › Users]) --> l["Every user · tabs All · People · Service users · Agents · System"]
+  s([Settings › Access › People]) --> l["Every user · tabs All · People · Service users · Agents · System"]
   l --> f["Filter by name, kind, role or team"]
   f -->|no one matches| fe["Nothing matches · Clear filters"]
   l -->|a person| p["Their role · teams · agents granted, and how · default agent"]

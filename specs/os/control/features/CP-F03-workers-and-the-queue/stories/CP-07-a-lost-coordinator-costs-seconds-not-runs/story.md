@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers › Coordinators]) --> l["Each coordinator: runs it holds · last renewed"]
+  s([Settings › Operations › Workers › Coordinators]) --> l["Each coordinator: runs it holds · last renewed"]
   l -->|stops renewing| lost["Lost after 15 s"]
   lost --> mv(["Its runs move to another · resume from their last saved step"])
   l -->|only one| one["Runs here · a crash pauses work until it restarts"]

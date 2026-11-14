@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**350 recommendations** · 199 open · 112 taken · 21 declined · 18 done
+**352 recommendations** · 201 open · 112 taken · 21 declined · 18 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -393,3 +393,5 @@ flowchart LR
 | R379 | open | 2026-11-14 | product-manager | phase specs-work-and-access/P07 | docs | medium | Rename board states that name retired grants or owners | Screens cells keep old state names after P07: data.upload · Needs the model grant (RC-08), data.collect · Needs the model grant (RC-11), data.checks · Fix needs a grant (RC-12, now: the agent may not write the record), data.checks · Not the creator (SE-18 → Needs the Modeller role), explore.board · Not an owner (EX-07) and explore.share · Not an owner (EX-15) → No Assistant, explore.ask · Locked, ask the owner (EX-11) → Locked, ask an Admin. Designer renames the boards; PM then updates the Screens cells |  |  |
 | R380 | open | 2026-11-14 | product-manager | phase specs-work-and-access/P07 | docs | medium | AG-60 Make a personal agent has no story folder | P01 §5 maps AG-60 to AG-F01 (P03a); specs/capabilities/agents/features/AG-F01-build-an-agent/stories/ has no AG-60, while AC-F07 and AG-F01 Rules describe personal agents. Write AG-60 as a whole story (five parts, empty task.md, idea) |  |  |
 | R381 | open | 2026-11-14 | product-manager | phase specs-work-and-access/P07 | docs | low | AG-F05 and AG-33 still describe per-user OAuth for outside agents | AG-F05 feature.md and AG-33 say an outside agent may use each person's own account (per-user OAuth); CP-F02 has work connections for shared work and personal connections only in runs the person starts. Align AG-F05/AG-33 with CP-F02 connections |  |  |
+| R382 | open | 2026-11-15 | product-manager | session | test | medium | End-to-end check for NFR-PERF-7 live counts | specs/system-design.md NFR-PERF-7 is review-only: add an e2e test that raises an ask and an open alert and times the header Inbox badge, n running and the browser title against the counts stream (CP-F08 GET /counts/stream), asserting <= 2 s p95 and one value across surfaces. |  |  |
+| R383 | open | 2026-11-15 | product-manager | session | docs | low | AG-F07 agents_schedules still carries graph_id | specs/capabilities/agents/features/AG-F07-schedules/feature.md Records: agents_schedules and agents_schedule_firings list graph_id, against system-design 'One deployment, no scope column'. Drop the column from the spec (and migrations.md if code has it). |  |  |

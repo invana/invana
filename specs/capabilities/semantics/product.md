@@ -105,7 +105,7 @@ terms and standards it follows, what must always hold and what may be derived �
 
 | Product or capability | For |
 |---|---|
-| Control Plane › Graph databases | The connections to the graph databases |
+| Settings › Connections › Graph databases | The connections to the graph databases |
 | Records | The loads checked against a model, the records rules and derivations read, and where derived facts are kept |
 | Access | The approval a breaking publish waits for, and the enforcement of act rules |
 | Control Plane | The queue worker that runs derivations |

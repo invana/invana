@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › What left]) -->|nothing called yet| none["No calls yet"]
+  start([Settings › Access › What left]) -->|nothing called yet| none["No calls yet"]
   start --> list["AC-30 · Every call: when · agent · person behind · target · local or external · schema-only or data-bearing · records · tokens"]
   list -->|Data-bearing to external targets · Refused · Left out · a target · an agent · a window| f{"Matches?"}
   f -->|no| nm["Nothing matches · Clear filters"]
@@ -220,7 +220,7 @@ exports and report publishing each pass their exit through it.
 
 | Decision | Detail |
 |---|---|
-| A tab beside Usage | *What left* is a tab of *Settings › People and access*; a call opens beside the list |
+| A tab beside Usage | *What left* is a tab of *Settings › Access*; a call opens beside the list |
 | The preset an auditor asks for first | *Data-bearing to external targets* is the first preset, with its count for the window; *Refused* and *Left out* follow |
 | Withheld, not hidden | A call of a run the reader may not read still lists, so nothing seems missing; only its content is withheld |
 | Run privacy lives here | The Access Plane owns who may read a run's content; every surface that shows content calls the one check |

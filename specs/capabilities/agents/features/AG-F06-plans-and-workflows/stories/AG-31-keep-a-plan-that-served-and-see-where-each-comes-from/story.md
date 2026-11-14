@@ -44,7 +44,7 @@ flowchart TD
   ask -->|approved| v1(["Workflow key@1 · the platform's, made by the proposer"])
   ask -->|declined · expired| d(["Stays a one-off · the note on the run"])
   ev([The same intent drafted and served again and again]) --> sc["A suggested change in Needs you, with its runs — AG-51"] --> c
-  t([Agents › Skills · Functions]) --> src["Grouped by where each comes from — a plugin, a library"]
+  t([Library › Skills · Functions]) --> src["Grouped by where each comes from — a plugin, a library"]
   src -->|a plugin is off| off["Its functions say the plugin is off, and who switched it"]
 ```
 
@@ -66,7 +66,7 @@ flowchart TD
 | AG-31.12 | A key another workflow holds | the proposer names it | it is refused: *{key} is taken — propose a new key, or ask an Admin.*; proposing its next version is for a Modeller or an Admin (AG-48) |
 | AG-31.13 | A proposal already waiting on the same run | *Propose as a workflow* is pressed again | it reads *This plan is already waiting on {approvers}* and sends nothing |
 | AG-31.14 | A proposal that keeps a record ID or property value as a default | it reaches the engine | it is refused: *{argument} holds a value from the data — it cannot be a default.* |
-| AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Control Plane › Plugins, where an Admin switches it (CP-F02); nothing here switches it |
+| AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Library › Plugins, where an Admin switches it (CP-F02); nothing here switches it |
 | AG-31.16 | Skills | anyone opens *Answer templates* | the templates that shape answers read beside workflows and functions (EX-03 authors them) |
 | AG-31.17 | An approved workflow | a person opens *How it got here* on the run it came from | its steps show who proposed it, the arguments its literals became, who approved it and the version it published |
 

@@ -55,6 +55,7 @@ flowchart TD
 | CP-30.10 | Nothing matches | the list draws | it says *Nothing found*, with *Ask the Assistant* |
 | CP-30.11 | A list ⌘K could not read | it matches | that group says it could not be read; the others still match |
 | CP-30.12 | No graph database on yet | ⌘K opens | it lists Home's set-up and Settings; *Ask the Assistant* says it opens when set-up is done |
+| CP-30.14 | Text typed that matches *Help*, *Shortcuts* or *What's new* | the list draws | each is an entry that opens it; Help has no button in the header or the leftNav |
 | CP-30.13 | A person at the command line | they run `invana search "<text>"` | each hit reads its kind, name and id, closest first — the records ⌘K finds; a project is a hit by its name only |
 
 ## Screens

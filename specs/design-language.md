@@ -17,11 +17,11 @@ that work and go away again.
 | # | Principle | In practice |
 |---|---|---|
 | 1 | **The work stays in main** | Main holds only the thing being worked on: a board, a model, a project. It never turns into a settings page |
-| 2 | **Everything else comes to you** | Records, agents, inbox, settings, history, connecting a graph database: an overlay over the work, closed with Esc |
+| 2 | **Everything else comes to you** | Records, agents, the library, settings, the Inbox, what runs and who acts: a sheet, a modal, a peek or a header dropdown over the work, closed with Esc |
 | 3 | **Agents are helpers, not machinery** | The assistant is always one click away on the right. Agents are colleagues: they answer in threads, ask before acting, and show how they got there |
 | 4 | **Say less** | A surface shows the next decision, not every fact. Detail is one click deeper (peek → sheet), never on the first screen |
 | 5 | **Plain words** | Roles, limits and states are sentences. No internal nouns on screen (see §6) |
-| 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explore, Model and Projects are modes of one Studio, named in the wordmark; everything else is summoned |
+| 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explore, Model and Projects are modes of one Studio, named first in the crumb and switched from the switcher; everything else is summoned |
 | 7 | **The agent proposes, the person decides** | Invana is built for decisions ([vision](vision.md)). An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
 | 8 | **Traceable on demand** | Every answer, proposal and act can show how it got there — steps, sources, assumptions, who did what — through *Why?*, *How it got here* and the full run. Never on the first screen; always one click away |
 
@@ -31,13 +31,59 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 
 | Region | Holds | Rule |
 |---|---|---|
-| Header | Wordmark *Invana Explore · Model · Projects* (plain *Invana* on Home) · crumb · ⌘K *Do, open or ask anything* · bell · Assistant · avatar | The wordmark names the mode in main and changes with it; the crumb never repeats it. No launcher |
-| leftNav | **Modes** above the line: Explore · Model · Projects. **Summoners** below: Records · Agents · Inbox. At the bottom: Settings · Help | A mode changes main; a summoner opens an overlay. Icons carry a label underneath. The leftNav never collapses |
-| leftSection | What the current mode works on: boards and conversations · kinds and relationships · projects and my tasks | **Collapsible** (header toggle, ⌘B, or click the active mode). When collapsed, the toggle leads main's tab row |
+| Header | 40 px. `header.left`: ☰ · the **Invana** wordmark · the crumb *mode ▾ › view › item*. `header.right`, in order: ⌘K · *● n running* · *Access* (Admin only) · *Inbox* and its badge · *Assistant ✦* · avatar ([The header](#the-header)) | The crumb leads with the mode; ☰ and the mode name both open the switcher. No bell, no launcher, no graph picker and no graph name — Graph Data is one per deployment |
+| leftNav | **Views** of the current mode at the top ([The rail](#the-rail)). **Summoners** at the bottom, fixed: Records · Agents · Library · Settings | A view swaps leftSection; a summoner opens its sheet. Icons carry a label underneath. The leftNav never collapses. Home has no views |
+| leftSection | What the current view lists — boards, conversations, dashboards, queries · models, kinds, relationships, standards, health · projects, my tasks, reviews, schedules | **Collapsible** (header toggle, ⌘B, or click the active view). When collapsed, the toggle leads main's tab row |
 | mainSection | The work: board tabs (the workbook), the canvas, a project | Never a list of settings |
 | rightSection | The assistant: the thread, then the composer — its one occupant | Closable; reopened from the header. A record opened on a board is a card on the board, never a rightSection occupant, so it never takes the side from the conversation |
 | bottomSection | The console under the canvas: Data · Queries — its one occupant | Opened from the footer's counts. No other board kind fills it |
-| Footer | Connection · counts · the message line · readouts | One line, two zones |
+| Footer | `footer.left`: graph database health (*3 graph databases · all healthy*) · the console's counts · the message line. `footer.right`: *● n running* · theme | One line, two zones. *● n running* opens the Operations dropdown, as the header's does |
+
+### The header
+
+| Item | Shows | Opens | Who |
+|---|---|---|---|
+| ☰ · mode ▾ | The current mode first in the crumb; plain *Invana* on Home | The switcher | Everyone |
+| ⌘K | *Do, open or ask anything* — the shortcut layer for everything not on the rail, Help included ([CP-F07](os/control/features/CP-F07-find-your-way/feature.md)) | ⌘K | Everyone |
+| *● n running* | Runs going now; *Idle* with a grey dot when nothing runs — it keeps its place | The Operations dropdown ([CP-F09](os/control/features/CP-F09-overview/feature.md)) | Everyone; an Operator's reads their own |
+| *Access* | A lock; a count only when an act was blocked today | The Access dropdown ([AC-F06](os/access/features/AC-F06-history/feature.md)) | Admin only — absent for everyone else |
+| *Inbox* | Its badge: the Needs you count; a dot when only Updates are unread; nothing when nothing waits | The Inbox dropdown ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) | Everyone |
+| *Assistant ✦* | — | rightSection | A person who may use the Assistant |
+| Avatar | The person | Profile · Your access (roles, delegations) · Appearance · Help · Shortcuts · What's new · Sign out | Everyone |
+
+### The switcher
+
+A header dropdown of about 1180 px, from ☰ or the mode name ([CP-68](os/control/features/CP-F07-find-your-way/stories/CP-68-switch-mode-and-pick-up-where-i-left-off/story.md)).
+
+| Side | Holds |
+|---|---|
+| Left — Go to | Home · Explore ⌘1 · Model ⌘2 · Projects ⌘3 |
+| Left — New | Conversation · Board · Project. Connecting a graph database is not here: it lives in Settings › Connections › Graph databases and on Home before set-up |
+| Right — Recent | The person's own, kept by the engine: search · kind tabs (All · Conversations · Boards · Projects · Models · Queries · Runs) · a **Pinned** row (any item starred) · three *Continue where you left off* cards (the last conversation with a snippet, the last board with a preview, the last project with its progress) · grouped lists with state dots |
+| Never | Settings, Help, a graph switcher |
+
+### The rail
+
+| Mode | Views (leftNav top) |
+|---|---|
+| Home | — |
+| Explore | Boards · Conversations · Dashboards · Queries |
+| Model | Models · Kinds · Relationships · Standards · Health |
+| Projects | Projects · My tasks · Reviews · Schedules |
+
+| Rule | Detail |
+|---|---|
+| Views swap, summoners overlay | A view changes leftSection and main; a summoner (Records · Agents · Library · Settings) opens its sheet and never changes the mode |
+| A mode's Schedules is a filter | Projects › Schedules is Agents › Schedules filtered to that mode's kind ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
+| Before set-up | Mode switches are disabled until set-up starts; Home is the only place ([CP-22](os/control/features/CP-F05-graph-databases/stories/CP-22-start-a-fresh-deployment-from-a-question/story.md)) |
+
+### Counts
+
+| Rule | Detail |
+|---|---|
+| One source | Every count — Needs you, running, waiting, open alerts, blocked acts — comes from one engine read and one live subscription ([CP-F08 › Engine](os/control/features/CP-F08-the-inbox/feature.md#engine)); the header badge, *n running*, the footer, the dropdowns and the browser title *(n) Invana* all read it |
+| Needs you | Asks waiting on the reader + runs waiting on the reader's answer + open alerts sent to the reader; unread Updates are a dot, never a number |
+| Studio never counts | It formats what the engine sends; a count it has not been sent is absent, not zero |
 
 ### Regions at work
 
@@ -93,7 +139,7 @@ one never changes another.
 |---|---|
 | A band with no record is absent, not zero | A tile or panel whose record nobody wrote does not render — never `0 of 0`, `{}` or an empty total |
 | A count prints whole | A count of things is printed grouped and in full (*8,314*), never rounded; tokens alone print as `k` · `M` · `B` ([CP-49.10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-49-read-how-one-agent-is-doing/story.md)) |
-| A badge is the engine's count | A nav badge (*Inbox*'s *Needs you*) shows the engine's count; zero draws no badge |
+| A badge is the engine's count | The header Inbox badge shows the engine's *Needs you* count; zero draws no badge, and a dot when only Updates are unread ([Counts](#counts)) |
 | Shape carries status | A row's status is a glyph, with no status word on the row; its shape carries the status for a reader who cannot tell the colours apart |
 | A chart is plain | One series each, token colours, a recessive grid |
 
@@ -127,21 +173,59 @@ every one.
 | A missing WebGPU falls back and says so | The page's `RendererCapabilityBanner` is silent on WebGPU, a dismissible notice on the WebGL fallback and a permanent alert when neither can draw; a canvas shows no banner of its own |
 | Every canvas roots on `<GraphCanvas>` | A child calling `useGraphCanvas()` under a plain `<Canvas>` throws at render, and `tsc` does not catch it; canvas-ui's boards provide the root |
 
-## 3. Overlays — three tiers
+## 3. Overlays — four tiers
 
 | Tier | Use it for | Shape | Closes to |
 |---|---|---|---|
 | **Peek** | One fact: why an answer says this, a record, a finding, a run's status | A popover anchored to what was clicked, ≤ 360 px | Nothing moves |
-| **Modal** | One task or one decision: add data, approve, invite, publish, new agent, settings | Centred over a scrim, 640–1040 px, a footer holding the acts | The work behind it |
-| **Sheet** | Heavy authoring or reading: a skill, an agent, a run, a load, an Access Policy, a report | Nearly full screen, its own crumb, tabs if needed | The work behind it |
+| **Dropdown** | A live summary with its acts in place: the switcher, Operations, Access, the Inbox | Anchored to its header button, up to about 1200 px wide; no scrim, the work stays usable | Nothing moves; outside click or Esc closes it |
+| **Modal** | One task or one decision: add data, approve, invite, publish, new agent, a create | Centred over a scrim, 640–1040 px, a footer holding the acts | The work behind it |
+| **Sheet** | Heavy authoring or reading: the summoners' places, a skill, an agent, a run, a load, an Access Policy, a report | Nearly full screen, below the header and right of leftNav — the header and leftNav's summoners stay usable to switch — its own nav | The work behind it |
 
 | Rule | Detail |
 |---|---|
-| One level | Never a modal on a modal. A drill-in **replaces** the overlay's content and its crumb grows; Back steps up |
-| Every overlay has a URL | It survives a reload and can be shared. An old page route becomes a deep link that opens the overlay over the last workspace |
-| Esc always returns | The Esc chip is drawn in every overlay's header |
-| The summoner lights | While an overlay is open, its leftNav icon is outlined |
-| Steps, not pages | A flow with steps (Connect a graph database, New agent) stays in one modal with a step strip |
+| A dropdown is its own tier | A peek holds one fact at ≤ 360 px; a dropdown holds a summary of many and acts in place, so it is a tier, not a wide peek |
+| One level | Never a modal on a modal. A drill-in **replaces** the overlay's content and its crumb grows; Back steps up. A dropdown's act that needs a modal or a sheet closes the dropdown and opens it |
+| Every overlay has a URL | A sheet, a modal and a peek survive a reload and can be shared; an old page route becomes a deep link that opens the overlay over the last workspace. A dropdown has no URL — it is a glance |
+| Esc always returns | The Esc chip is drawn in every sheet's and modal's header |
+| The summoner lights | While a sheet is open, its leftNav icon is outlined; while a dropdown is open, its header button is |
+| Creates choose a type on one page | A create that chooses a type — a graph database, a project, an agent, an AI model, a connector — is one modal of numbered sections: **1 Name** (optional) · **2** the type, as a grouped card grid · **3** its details, appearing once a type is picked — and one filled act |
+| Simple creates happen at once | A board or a conversation is made on the click, with no modal |
+| A step strip only for what happens over time | Add workers is a 720 px modal with a step strip — Where · Group · Join key · Run it · Joined — because a worker joins after the person acts ([CP-10](os/control/features/CP-F03-workers-and-the-queue/stories/CP-10-add-workers-on-my-own-machines-with-one-command/story.md)) |
+
+### The sheet frame
+
+| Part | Holds |
+|---|---|
+| Left | A searchable, grouped nav |
+| Header | The crumb · ✦ · Esc · close. ✦ opens the Assistant as the sheet's right column, scoped to that sheet and section |
+| Body, by type | **Preference rows** — a setting a line · **A table** with live counts and drill-in · **A detail page** — a header, one act, tabs and a metadata column |
+
+### The sheets
+
+| Sheet | Nav | Rule |
+|---|---|---|
+| Records | Kinds, grouped by model · then Loads · Quality · Annotations | A write is checked against the model; no free-edit grid ([RC-F01](capabilities/records/features/RC-F01-records-by-kind/feature.md)) |
+| Agents | Agents · Runs · Schedules | One Schedules list for tasks, loads and reports, with a *Kind* filter; each mode's Schedules view is a filter of it ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
+| Library | Skills · Plugins · Connectors · Packs | Each item shows *Used by n agents* ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
+| Settings | Invana (General · Appearance) · You · Connections (Graph databases · AI models) · Operations (Workers · Limits · Alerts) · Access (People · Policies · History) · Notifications | Preference rows and tables; a place an act needs a role for reads, its act reading *Ask {Admin}* |
+| Inbox | Needs you · Running · Updates · Done | Opened from the Inbox dropdown's *Open the Inbox*; an Admin also filters *All open alerts* ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) |
+
+### The header dropdowns
+
+| Dropdown | Width | Holds | Who |
+|---|---|---|---|
+| Switcher | ~1180 px | [The switcher](#the-switcher) | Everyone |
+| Inbox | 640 px | Needs you · Running · Updates; each ask a card with enough to decide in place and its acts; only what needs *you* ([CP-69](os/control/features/CP-F08-the-inbox/stories/CP-69-decide-what-needs-me-from-the-header/story.md)) | Everyone |
+| Operations | up to ~1200 px | Tiles, running now and queued, agents against their budgets, workers by group, AI models, graph databases, alerts ([CP-70](os/control/features/CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) | Everyone; an Operator's holds their own runs and agents and one line of system health |
+| Access | up to ~1200 px | Tiles, acting now, blocked today, delegations in force, recent changes ([AC-48](os/access/features/AC-F06-history/stories/AC-48-see-who-is-acting-and-what-was-blocked-from-the-header/story.md)) | Admin only |
+
+| Rule | Detail |
+|---|---|
+| Low-risk acts in place | *Acknowledge*, *Send back*, *Allow tokens* answer inside the dropdown |
+| A write confirms | An *Accept* that writes Graph Data or the model opens a confirm modal listing what changes |
+| Hidden is not the guard | An act a person may not take reads *Ask {Admin}*, and the engine refuses it too |
+| Links, not more summoners | Operations links into Agents › Runs and Settings › Operations; Access into the Inbox and Settings › Access › History — none is a fifth summoner |
 
 ## 4. The assistant and agents
 
@@ -158,9 +242,11 @@ every one.
 
 | State | Drawn as |
 |---|---|
+| Before set-up | Home asks *What are you trying to decide?* and offers *Connect a graph database* (Admin) or *Ask {Admin}* (Operator) and *Try it on demo data*; then set-up *n of 4*; then the first answer. Mode switches are disabled until set-up starts |
 | Empty | A one-line reason and the next act (*Ask your first question*), never a blank region |
-| Loading / running | The footer's message line and the Inbox's *Running*. The work stays usable |
-| Needs you | A count on Inbox, the act inside the row |
+| Loading / running | The footer's message line, *● n running* and the Inbox's *Running*. The work stays usable |
+| Idle | *● n running* reads *Idle* with a grey dot and keeps its place |
+| Needs you | The Inbox badge's count, the act inside the card |
 | Cannot answer / refused | The assistant says why and who can help, in a sentence, with the act that asks them |
 | No access | The surface is visible; the act is replaced by *Ask Priya (Admin)*, naming the role or the approver it needs — never a dead end. The act gated is the one that enters an area ([Access Plane](os/access/product.md)) |
 | Draft | A floating bar over the canvas: *Draft · 3 changes not published* · Discard · Review and publish |
@@ -169,7 +255,7 @@ every one.
 
 | Not on screen | Say instead |
 |---|---|
-| Product names as places (Agent Builder, Fleet, IAM, Activity) | Agents · Settings › Workers · Settings › People and access · Inbox |
+| Product names as places (Agent Builder, Fleet, IAM, Activity) | Agents · Operations · Settings › Operations › Workers · Settings › Access · Inbox |
 | Policy statement · effect | A rule of an Access Policy · Allow, Ask or Deny |
 | Roles other than the three (viewer · contributor · builder · owner · iam-admin) | *Operator* · *Modeller* · *Admin* |
 | World | An Access Policy rule on data · a sensitive property |
@@ -192,11 +278,15 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 
 | Was | Now | Tier |
 |---|---|---|
-| Home · Graphs · Onboarding | **Home** — the setup steps until the deployment is ready (a graph database connected, the model shaped from it), then the first answer | page |
-| Explorer | **Explore** mode — boards, conversations, dashboards; tools on right-click | mode |
-| Modeller | **Model** mode — the Semantics capability: the map, a kind with its Meaning, Standards, Health, History; rules as a sheet | mode · sheet |
-| Datasets · Imports | **Records** — Records · Loads · Quality · Annotations; a record and a load as sheets | modal · sheet |
-| Agent Builder · Fleet dashboard | **Agents** — Agents · Runs · Skills · Schedules; an agent, a skill, a run as sheets | modal · sheet |
-| Activity · Notifications | **Inbox** — Needs you · Running · History | modal |
-| Graph settings · IAM · Settings · Fleet workers · Profile | **Settings** — Invana · You; Access Policies as a sheet | modal · sheet |
-| Projects | **Projects** mode — a project is a repository, tasks are issues | mode |
+| Home · Graphs · Onboarding | **Home** — *What are you trying to decide?*, the set-up steps until the deployment is ready (*n of 4*), then the first answer | page |
+| Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; tools on right-click | mode |
+| Modeller | **Model** mode — the Semantics capability: Models · Kinds · Relationships · Standards · Health; rules as a sheet | mode · sheet |
+| Datasets · Imports | **Records** — kinds grouped by model, then Loads · Quality · Annotations; a record and a load as detail pages | sheet |
+| Agent Builder | **Agents** — Agents · Runs · Schedules; an agent and a run as detail pages | sheet |
+| Skills · Plugins · Connectors · Team packs | **Library** — Skills · Plugins · Connectors · Packs, each with *Used by n agents* | sheet |
+| Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's | dropdown |
+| Activity · Notifications | **Inbox** — the header's dropdown (Needs you · Running · Updates), then the sheet (Needs you · Running · Updates · Done) | dropdown · sheet |
+| IAM activity | **Access** — the header's lock, Admin only | dropdown |
+| Graph settings · IAM · Settings · Fleet workers · Profile | **Settings** — Invana · You · Connections · Operations · Access · Notifications | sheet |
+| Help | The avatar menu and ⌘K | menu |
+| Projects | **Projects** mode — Projects · My tasks · Reviews · Schedules; a project is a repository, tasks are issues | mode |

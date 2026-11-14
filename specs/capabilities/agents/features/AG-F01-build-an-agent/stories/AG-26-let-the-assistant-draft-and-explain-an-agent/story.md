@@ -30,7 +30,7 @@ Drafting and changing an agent follow building one ([the role table](../../../..
 ```mermaid
 flowchart LR
   w(["What it should do, in plain words"]) --> a["The Assistant drafts"]
-  a -->|no AI model offered| ax["Says it cannot draft, linking Control Plane › AI models"]
+  a -->|no AI model offered| ax["Says it cannot draft, linking Settings › Connections › AI models"]
   a -->|fails| af["Says why; the form is untouched"]
   a --> p["A proposal — instructions · skills · voice · effort · policies to ask for, each part apart"]
   p -->|Apply a part| d["Part of the draft"]
@@ -52,7 +52,7 @@ flowchart LR
 | AG-26.5 | A proposal that would widen what the agent may touch or its limits | it is shown | the widening is marked as an Admin's act, never applied with the rest |
 | AG-26.6 | A draft | the builder asks the Assistant to run its evals | it asks first, then runs the agent's eval set in the practice graph database and reports the checks; it never publishes |
 | AG-26.7 | Any signed-in person | they ask why a skill is refused, why a run was refused or what a limit does | the Assistant explains, citing the settings, the rule and policy, and the refusal it read |
-| AG-26.8 | No AI model offered in the deployment | the builder asks for a draft | the Assistant says it cannot draft, linking Control Plane › AI models; the form still saves by hand |
+| AG-26.8 | No AI model offered in the deployment | the builder asks for a draft | the Assistant says it cannot draft, linking Settings › Connections › AI models; the form still saves by hand |
 | AG-26.9 | A draft that fails | it ends | the Assistant says why in a sentence; the form is untouched |
 | AG-26.10 | A proposal | the builder opens *How it got here* | its steps and the sources it read are shown, each assumption marked *Challenge this* |
 | AG-26.11 | An Operator | they ask the Assistant to draft or change an agent | it explains instead and says it cannot change the agent, naming the role |

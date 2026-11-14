@@ -36,7 +36,7 @@ flowchart LR
   r -->|session budget reached| ct["Same row, same number · continuing in session n"]
   r -->|it ends| done["Done: how it ended"]
   done -->|open| sh(["The run's sheet · How it got here"])
-  done -->|See every run| all(["Control Plane › Runs"])
+  done -->|See every run| all(["Agents › Runs"])
 ```
 
 ## Acceptance criteria
@@ -54,7 +54,7 @@ flowchart LR
 | CP-57.9 | A run the reader is behind, or any run for an Admin | they press *Stop* | it stops as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says — it ends *stopped*, each helper *stopped with its parent*, and a History row says who stopped it |
 | CP-57.10 | A run the reader is not behind, the reader not an Admin | they reach *Stop* | it is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 | CP-57.11 | A run that ends | Running is open | it moves to Done with how it ended — served · cannot answer · out of tokens · out of time · stopped · failed — its time and its tokens |
-| CP-57.12 | Runs ended today | Done opens | they list newest first; *See every run* opens Control Plane › Runs |
+| CP-57.12 | Runs ended today | Done opens | they list newest first; *See every run* opens Agents › Runs |
 | CP-57.13 | A row | the person opens it | the run opens as its sheet (CP-50), and *How it got here* shows its steps and sources |
 | CP-57.14 | Each run | it is read | it names where it came from — Ask, a task, a schedule, a project, the API — and the person behind it |
 | CP-57.15 | A run whose content the reader may not read | Running and Done are read | it lists with its agent, the person behind it, its status and its tokens; what it was about reads *withheld*; opened, its sheet reads its head and *withheld*, and a link to a step reads *Not found* |

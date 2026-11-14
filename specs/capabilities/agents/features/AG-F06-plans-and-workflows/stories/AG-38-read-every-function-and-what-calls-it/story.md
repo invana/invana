@@ -27,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ```mermaid
 flowchart TD
-  b([Agents › Skills · Functions]) --> g["Grouped by what each touches · a count per group"]
+  b([Library › Skills · Functions]) --> g["Grouped by what each touches · a count per group"]
   s([A run's step]) --> f
   p([A workflow's step]) --> f
   r([A refusal naming a function]) --> f
@@ -50,7 +50,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-38.1 | Agents › Skills | anyone opens *Functions* | every function lists grouped by what it touches, each group naming it and its count; a row reads its dotted name, one-line summary, and how many workflows and skills call it, or *not used yet* |
+| AG-38.1 | Library › Skills | anyone opens *Functions* | every function lists grouped by what it touches, each group naming it and its count; a row reads its dotted name, one-line summary, and how many workflows and skills call it, or *not used yet* |
 | AG-38.2 | Functions | a person searches by name, summary or what it touches | the list narrows; nothing matching reads *No functions match*, with *Clear* |
 | AG-38.3 | A search for *if*, *loop*, *map*, *retry* or *stop* | it runs | it says that is part of a plan, not a function, and where workflows are read |
 | AG-38.4 | A function | a person opens it | its page's head names it, what it touches, its side effect and its plugin and version, with *Contract* · *Used by* · *Calls* |

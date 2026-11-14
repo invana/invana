@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ```mermaid
 flowchart LR
-  a([Control Plane › Runs]) --> t["Tiles · Needs attention · runs a day · changed recently"]
+  a([Agents › Runs]) --> t["Tiles · Needs attention · runs a day · changed recently"]
   t -->|nothing ran| e["Tiles read 0 or —; what a run is"]
   t -->|failing| r(["Open run — the run's sheet"])
   t -->|waiting| i(["Review — Inbox › Needs you"])

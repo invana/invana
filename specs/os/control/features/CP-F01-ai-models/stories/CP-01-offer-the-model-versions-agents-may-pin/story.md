@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › AI models]) --> l["Versions: exact name · endpoint · local or external · pinned by · status · Default"]
+  s([Settings › Connections › AI models]) --> l["Versions: exact name · endpoint · local or external · pinned by · status · Default"]
   l -->|no endpoint| e["Add an endpoint"]
   e --> k["Kind → its own fields · name · key"]
   k --> loc["Local or external · CP-61"] --> sv(["Saved"]) --> p{"Ping"}

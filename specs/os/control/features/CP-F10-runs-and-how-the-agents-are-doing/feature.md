@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([Control Plane › Runs]) --> dash["CP-48 · Runs: runs today · failed · needs you · tokens against the budget"]
+  start([Agents › Runs]) --> dash["CP-48 · Runs: runs today · failed · needs you · tokens against the budget"]
   dash -->|nothing ran yet| empty["What a run is, and that a question, a task or a schedule starts one"]
   dash -->|a run failing| run
   dash -->|an ask waiting| inbox(["Inbox › Needs you"])
@@ -169,7 +169,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 
 | Rule | Detail |
 |---|---|
-| One runs list | Control Plane › Runs lists every run in the deployment; an agent's runs, a person's runs, a team's runs, a graph database's runs and a schedule's runs are that list, filtered |
+| One runs list | Agents › Runs lists every run in the deployment; an agent's runs, a person's runs, a team's runs, a graph database's runs and a schedule's runs are that list, filtered |
 | A run has a number | `#2291` is how people quote a run; numbered for the deployment, never reused; a helper's run and a step carry none |
 | Its status is why it ended | Once ended, a run reads its reason: served · cannot answer · out of tokens · out of time · out of steps · no progress · loop · stopped with its parent · stopped · refused · failed. Running reads *running*; held on a person, *waiting* |
 | From | Where a run started, in the reader's words: Ask · Task · Schedule · Project · API |
@@ -200,7 +200,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 | An ended run holds no asks | Its pending asks close as expired and leave *Needs you* |
 | Stop is the run's one write | *Stop run* is the only act that changes a run; re-running makes a new run |
 | Stopping tells | The person behind a stopped run, when someone else stopped it, is told in the Inbox, naming who stopped it |
-| One journal | There is one record of runs in the deployment. Control Plane › Runs is the full list; the Overview (CP-F09), Inbox › Running and Done and a load's history are readings of it — never a second record |
+| One journal | There is one record of runs in the deployment. Agents › Runs is the full list; the Overview (CP-F09), Inbox › Running and Done and a load's history are readings of it — never a second record |
 | Running is not History | A run is what executed — how it ended, what it spent; a History row is what a person or an agent did — who, on whose behalf. Neither is drawn from the other |
 | Everything that runs is a run | A question, a typed query, a load, a link between models, an enrichment, a planner and a checker are each a run; a step is never a run of its own in a list |
 | Helpers nest | A helper an agent delegated to, or a part a step fanned out, sits under the run that started it, never as a sibling; past the second level it collapses, showing how many it holds |
@@ -381,7 +381,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Runs are the Control Plane's | Every run, whatever started it, is read, filtered and stopped in one place; Agents is where agents and skills are built |
+| Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, the Agents sheet's *Runs*; agents are built in Agents, skills in the Library |
+| Running now is everyone's glance | The header's *● n running* opens Operations ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) with each run's step, tokens, time, worker group and *Stop*; the Inbox's Running holds the reader's own |
 | Runs opens on what needs you | Tiles — runs today against the same day last week · failed today · needs you · p95 over 7 days · tokens this month against the agents' monthly limits · success over 7 days — then *Needs attention*, runs a day over 30 days and what changed recently |
 | Needs attention | Failing workflows first, then agents, then degraded agents; an agent whose latest failure is a listed workflow's run is not listed again; each item has one act that opens where it is answered |
 | A run is a sheet | A run opens as a sheet over the work: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
@@ -400,7 +401,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A change is the engine's | `↑ 38%`, `▲ 1.2 pt` or *flat* — under 2% or 0.1 pt reads flat; run time and tokens up read worse, success up reads better, counts are neutral |
 | A failed run is the way into a better skill | *Improve this skill* opens the skill's draft with the run added as a test and a way back to the run |
 | Spend in tokens | No cost is shown anywhere, even when a provider prices tokens |
-| Running is the Inbox's, the list is Runs' | Inbox › Running answers *what is moving now*; Control Plane › Runs is where every run is found, filtered and opened. A run opens as one sheet wherever it is listed |
+| Running is the Inbox's, the list is Runs' | Inbox › Running answers *what is moving now*; Agents › Runs is where every run is found, filtered and opened. A run opens as one sheet wherever it is listed |
 | Done is today | Done lists the runs that ended today, the reader's day; older runs are in Runs |
 | Mine first | Running lists the runs the reader is behind first, then everyone else's |
 

@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Inbox › History › Changes]) -->|nothing versioned| e["No changes yet"]
+  s([Settings › Access › History › Changes]) -->|nothing versioned| e["No changes yet"]
   s --> c["A change: when · who · product · record vA → vB · why · effect after"]
   c -->|Compare| cmp["Two versions side by side: each changed field · the workflow · the model · the policy's rules"]
   cmp -->|pick other versions| cmp

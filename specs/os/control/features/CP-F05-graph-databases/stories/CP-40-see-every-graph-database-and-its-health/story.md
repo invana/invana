@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Graph databases]) --> l["Each: name · connector and language · mode · switch · health · last connected"]
+  s([Settings › Connections › Graph databases]) --> l["Each: name · connector and language · mode · switch · health · last connected"]
   l -->|filter| fl{"Any match?"}
   fl -->|no| nm(["No graph database matches · Clear"])
   l -->|unreachable| un["Unreachable since … · retrying"]

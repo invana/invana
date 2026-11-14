@@ -24,7 +24,7 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  start([Records › Bring records in]) --> how{How do the records arrive?}
+  start([Records › Loads › Bring records in]) --> how{How do the records arrive?}
   how -->|a file in the browser| up["RC-08 · Upload: a file, the model it goes into, its key, licence"]
   up --> prev["What it becomes — columns, the kinds and properties each maps to, examples"]
   prev -->|missing or repeated keys| upx["Refused — names the first five rows"]
@@ -222,7 +222,7 @@ flowchart TD
 
 | Decision | Detail |
 |---|---|
-| Loads live in Records › Bring records in | *Loads — from the CLI, the API and here*: one row per load, newest first; a row opens the run as a sheet |
+| Loads live in Records › Loads › Bring records in | *Loads — from the CLI, the API and here*: one row per load, newest first; a row opens the run as a sheet |
 | Rejections group by reason | One bad column is one line with its count and sample rows, not thousands |
 | A run's page reads in audit order | Outcome · Steps · What was rejected · Log · What landed |
 | What landed names its version | Counts per kind sit beside *Checked against Model@v3* |

@@ -29,7 +29,7 @@ Reading is every signed-in person's ([the role table](../../../../../../os/acces
 
 ```mermaid
 flowchart TD
-  a([Agents › Skills · Workflows]) --> f["Filter by origin, kind, made by, flagged · search"]
+  a([Library › Skills · Workflows]) --> f["Filter by origin, kind, made by, flagged · search"]
   f -->|nothing matches| fx["No workflows match · Clear"]
   f --> p["A workflow · its head names the version and who made it"]
   p --> o["Overview · Layers · Flow · Runs · 7 · 30 · 90 days"]
@@ -56,7 +56,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-18.1 | Agents › Skills | anyone opens *Workflows* | every workflow lists with its `key@version`, what it is for, its origin (*built-in* · *approved*), what it touches, who made it, how many workflows compose it and when it last ran |
+| AG-18.1 | Library › Skills | anyone opens *Workflows* | every workflow lists with its `key@version`, what it is for, its origin (*built-in* · *approved*), what it touches, who made it, how many workflows compose it and when it last ran |
 | AG-18.2 | Workflows | a person filters by origin, kind, who made it or flagged, or searches | the list narrows; nothing matching reads *No workflows match*, naming the filter, with *Clear* |
 | AG-18.3 | A one-off plan and a skill's own plan | Workflows is read | neither is listed — the first is read from its run, the second under its skill |
 | AG-18.4 | A workflow in the list | a person opens it | its page's head names the version and says what it is — its steps, its intent, what it touches, who made it, what composes it and the agents allowed to run it — over tabs *Overview* · *Layers* · *Flow* · *Runs* and a 7 · 30 · 90 day window every tab follows |

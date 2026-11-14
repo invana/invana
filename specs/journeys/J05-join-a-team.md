@@ -17,7 +17,7 @@ boards: [settings.access, access.signin, explore.ask, explore.board, shell.comma
 flowchart TD
   P([An Admin adds Tom]) --> Q{"Has Tom an account?"}
   Q -->|no| Q2["AC-18 · An Admin makes his account, with one role — Operator"] --> Q
-  Q -->|yes| T["AC-09 · Access Plane › Directory: the Admin puts Tom on a team"]
+  Q -->|yes| T["AC-09 · Settings › Access › People: the Admin puts Tom on a team"]
   T --> A(["Tom may use the agents granted to him and to his team"])
   A --> B["AC-01 · Sign in"]
   B --> D["EX-11 · Explore: the agents he may use, and questions drawn from the published model"]

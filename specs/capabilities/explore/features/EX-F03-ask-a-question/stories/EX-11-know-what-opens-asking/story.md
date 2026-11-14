@@ -43,7 +43,7 @@ flowchart LR
 |---|---|---|---|
 | EX-11.1 | A deployment whose set-up is not done — no graph database on, or no published model | anyone opens Explore | the board is the lock alone — *Asking opens when {step}* — with what is left, and no question box |
 | EX-11.2 | The lock on *a model is published*, and a Modeller or an Admin | they click *Open Model* | Model mode opens on the draft |
-| EX-11.3 | The lock on *a graph database is connected and on*, and an Admin | they click *Connect a graph database* | Control Plane › Graph databases opens on *Connect* ([CP-F05](../../../../../../os/control/features/CP-F05-graph-databases/feature.md)) |
+| EX-11.3 | The lock on *a graph database is connected and on*, and an Admin | they click *Connect a graph database* | Settings › Connections › Graph databases opens on *Connect* ([CP-F05](../../../../../../os/control/features/CP-F05-graph-databases/feature.md)) |
 | EX-11.4 | The lock, and an Operator | they read it | the lock offers *Ask an Admin* where the step's act would be, naming the role the step needs |
 | EX-11.5 | The lock is showing | someone finishes the last step | the next visit opens on the question box, and the ready step says asking is open and offers the first question |
 | EX-11.6 | Set-up not done | a question is sent by any path | it is refused before it runs — *Asking opens when {step}.* |

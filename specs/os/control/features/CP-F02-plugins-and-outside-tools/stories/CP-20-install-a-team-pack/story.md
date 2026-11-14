@@ -31,7 +31,7 @@ the install switch* is the Admin's.
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Plugins › Team packs]) --> l["Every pack · installed or not"]
+  s([Library › Plugins › Team packs]) --> l["Every pack · installed or not"]
   l --> p["A pack: each piece and the product that will offer it"]
   p -->|Admin · Install| c{"Any piece clashes with one already here?"}
   c -->|yes| x(["Names the piece and what it clashes with · nothing installed"])
@@ -61,6 +61,7 @@ flowchart TD
 | CP-20.9 | A pack turned on that carries agents | the catalogue opens | each agent lists as a *Team pack* agent, owned by the platform and made by the pack, granted to nobody until an Admin grants it; until its policies are applied it reaches nothing, and its sheet says so |
 | CP-20.10 | A plugin folder with no `.claude-plugin/plugin.json`, with an Invana field outside `metadata`, or carrying `hooks/` or `commands/` | the engine starts | it does not start, naming the plugin, the file and why |
 | CP-20.11 | A pack whose `.mcp.json` names an outside server | it is turned on | the server is listed for an Admin to add in Plugins (CP-02), never added or started; one started as a local process is named as refused, as Invana reaches servers by address |
+| CP-20.12 | Packs in the Library | the list is read | each pack reads *Used by n agents* — the agents it brought or whose skills it ships, as the engine counts them |
 
 ## Screens
 

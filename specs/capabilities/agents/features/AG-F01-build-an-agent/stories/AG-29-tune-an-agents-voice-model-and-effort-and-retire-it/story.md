@@ -21,7 +21,7 @@ Tuning and retiring an agent is the Modeller's and the Admin's ([the role table]
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Control Plane › AI models | A built-in agent's settings read; *Copy* in place of every edit |
+| Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Settings › Connections › AI models | A built-in agent's settings read; *Copy* in place of every edit |
 | Modeller | Every act an Admin has here, except offering model versions | Offering model versions reads *Ask an Admin* |
 | Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle | Every edit and lifecycle act disabled, naming the role — *Needs the Modeller role — ask an Admin* |
 
@@ -55,9 +55,9 @@ flowchart TD
 | AG-29.5 | Any voice | the agent refuses, cannot answer, fails or pauses at a limit | it says so without humour, whatever the dial reads |
 | AG-29.6 | A long voice | it is typed | Voice shows its length in characters, which every ask carries |
 | AG-29.7 | A run in flight when the voice changes | it ends | it spoke with the voice it opened with; the next run speaks with the new one; a helper it creates speaks with its voice |
-| AG-29.8 | Model version | it opens | it lists only the versions Control Plane › AI models offers, each by the provider's exact name and marked *Local* or *External*; a provider alias cannot be pinned |
+| AG-29.8 | Model version | it opens | it lists only the versions Settings › Connections › AI models offers, each by the provider's exact name and marked *Local* or *External*; a provider alias cannot be pinned |
 | AG-29.9 | A pinned version moved to another | the builder saves | the agent's evals run on the new version first (AG-F10); a failing hard check refuses the move naming it; otherwise the move becomes the next version with its reason |
-| AG-29.10 | A pinned version the deployment does not offer | a run opens | the run is refused, naming the pin; nothing calls another model; Control Plane › AI models warns, naming the agents that pin it |
+| AG-29.10 | A pinned version the deployment does not offer | a run opens | the run is refused, naming the pin; nothing calls another model; Settings › Connections › AI models warns, naming the agents that pin it |
 | AG-29.11 | An agent with no pin | it runs | the deployment's default model decides, and the run records the version it called |
 | AG-29.12 | A pinned agent | Model version opens | *Versions it has run on* lists each recorded version with its first run, runs, served rate and p95 — the engine's numbers; a set pin can be moved, never cleared |
 | AG-29.13 | Effort | it opens | the most steps, replans and questions a run may take, each with the number a run reads; *0 questions* means it never asks, and every reading it picks is a declared assumption shown before the answer |

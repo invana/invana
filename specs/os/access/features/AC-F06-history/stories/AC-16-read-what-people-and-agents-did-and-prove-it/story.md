@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Inbox › History]) -->|nothing yet| e["No acts yet"]
+  s([Settings › Access › History]) -->|nothing yet| e["No acts yet"]
   s --> r["Rows, today: when · who ▸ through which agents · act · touched · allowed or refused · run"]
   r -->|Everything · People · Agents · Refused · window| f{"Matches?"}
   f -->|no| z["0 of N match · Clear all"]

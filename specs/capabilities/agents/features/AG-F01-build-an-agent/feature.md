@@ -109,7 +109,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | Name or change the agent's approvers | Admin only ([AC-26](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; changing them is disabled — *Needs the Admin role* |
 | Set the agent's limits | Admin, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The limits read; *Edit in Usage and limits* reads *Ask an Admin* |
 | Make an agent the deployment's default | Admin ([AG-F02](../AG-F02-the-agents-catalogue/feature.md)) | *Make default* disabled — *Needs the Admin role* |
-| Offer model versions to pin | Admin, in Control Plane › AI models ([CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md)) | A version not offered cannot be picked |
+| Offer model versions to pin | Admin, in Settings › Connections › AI models ([CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md)) | A version not offered cannot be picked |
 | Name the practice graph database | Admin ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | The evals read *No practice graph database — they read in read mode* |
 | Ask the assistant to explain an agent | Every signed-in person | — |
 | Ask the assistant to draft or change an agent | As creating or editing it | The assistant explains and says it cannot change the agent, naming the role |
@@ -160,7 +160,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | Nothing is deleted once it ran | Retiring keeps the agent's row, so every run, trace and helper still resolves; the name stays taken |
 | Pausing kills nothing | Runs in flight finish; open work is named item by item before the act |
 | One default | The deployment has one default agent, which can answer questions; an Admin sets it ([AG-F02](../AG-F02-the-agents-catalogue/feature.md#rules)) |
-| No AI model offered | *New agent* says no model version is offered yet, linking Control Plane › AI models |
+| No AI model offered | *New agent* says no model version is offered yet, linking Settings › Connections › AI models |
 | The engine counts | Tokens this month, served, p95 and every number on the sheet are the engine's; Studio formats them |
 | Leans on | Skills (AG-F04) · evals (AG-F10) · runs and their sessions (CP-F10) · helpers, delegation and hand-off notes (AG-F05) · the catalogue and the default (AG-F02) · Access Policies (AC-F02) · grants (AC-F03) · what an agent may touch (AC-F04) · named approvers (AC-F05) · ownership (AC-F07) · what left the platform (AC-F09) · AI models (CP-F01) · runtime plugins (CP-F02) · workers, the sandbox and workspaces (CP-F03) · limits (CP-F04) · the practice graph database (CP-F05) |
 
@@ -327,6 +327,7 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Decision | Detail |
 |---|---|
+| New agent is a create modal of numbered sections | One page — **1** Name (optional) · **2** the type as a grouped card grid · **3** its details once a type is picked — and one act ([design-language › Overlays](../../../../design-language.md#3-overlays--four-tiers)) |
 | New agent is a modal, the agent a sheet | *New agent* asks for a name and what it should do in plain words, and suggests which Access Policies to ask an Admin for; *Create agent* saves a draft and opens it as a sheet |
 | The sheet's tabs | Setup · Flow · Versions. Setup holds instructions, voice, skills, runs with, model version and effort, access, limits, where it runs and lifecycle |
 | Runs with is three choices | Invana · Claude Code · Codex, on Setup beside the model version; one is chosen, Invana by default. A runtime that is not installed reads disabled with why and the Admins to ask; each reads where its model runs |

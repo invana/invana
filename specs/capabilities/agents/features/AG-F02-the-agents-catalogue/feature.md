@@ -171,6 +171,7 @@ The code changes are [migrations.md](../../../../migrations.md) M37 (Team pack a
 
 | Decision | Detail |
 |---|---|
+| Agents is a sheet | The Agents summoner opens a sheet whose nav is Agents · Runs · Schedules; an agent opens as a detail page in it — its header, one act, tabs and a metadata column |
 | Agents is the catalogue | One list of every agent, each row its name, what it does, kind, live version, who made it, who may use it and *Granted to you* or *Not granted to you*; the row opens the agent's sheet (AG-F01) |
 | Who may use it is shown, changed in the Directory | The row and the sheet read the people and teams it is granted to; an Admin's *Grant* opens the Directory on that agent |
 | A person sees why they may use it | *Granted to you* names *directly* or the team that gives it |

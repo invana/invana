@@ -230,7 +230,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Restore forks | Restoring reads a version and saves it as a new one; there is no restore route. Opening a version as its own board makes a new board and conversation, made by the person who opened it |
 | History cap | Each board keeps its newest `INVANA_BOARD_HISTORY_LIMIT` versions (30; `0` keeps all), pruned as a new one is written; a shared snapshot is never pruned |
 | Page ids | A board opens as the page `kind:id` live and `kind:id@version` frozen |
-| Reads run as the Assistant | `POST /expand` runs `expand-neighbours` (`graph.read.get_neighbors`, trigger `canvas`); `/type-counts` runs `count-types` (`graph.read.types_count`, `canvas`); `/resolve` runs `resolve-elements` (`graph.read.resolve`, `system`). Each runs as the built-in Assistant for the person, checked against its Access Policies before any graph database is read; it spends no token budget, is never counted against an agent's runs at once, and is hidden in Control Plane › Runs unless *Show interactive runs* is on |
+| Reads run as the Assistant | `POST /expand` runs `expand-neighbours` (`graph.read.get_neighbors`, trigger `canvas`); `/type-counts` runs `count-types` (`graph.read.types_count`, `canvas`); `/resolve` runs `resolve-elements` (`graph.read.resolve`, `system`). Each runs as the built-in Assistant for the person, checked against its Access Policies before any graph database is read; it spends no token budget, is never counted against an agent's runs at once, and is hidden in Agents › Runs unless *Show interactive runs* is on |
 | One step per graph database | An expansion or a count runs one step per graph database the node's kind and its identity links reach, each in that database's language and its driver's read mode; neighbours across databases are joined on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine)). A kind the rules deny is refused before its step, and the whole read is refused rather than answered with what is left |
 | The turn is written first | An expansion in a conversation writes its turn — *Expand neighbours of "Acme Ltd"* — before its run opens; one that returned nothing is still a turn |
 | Type counts | Per graph database: `nodes` · `edges` as `[{name, count}]`, biggest first · `counted` (`false` when the database cannot count; every kind still listed, `count: null`) · `total_nodes` · `total_edges`, summed once in the engine, `null` when any kind is uncounted · `run_id` |
@@ -282,7 +282,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A vertical toolbar | It takes the board's left edge, where labels need room |
 | An *excluded* mark for what a rule keeps out | The board is never told what a rule keeps from the Assistant |
 | Sorting, filtering or exporting the console's rows · an editable query box in it | The console's order is the board's; export belongs to Share (EX-F02); queries are typed in the composer |
-| Queries of other conversations in the console | Control Plane › Runs is the journal |
+| Queries of other conversations in the console | Agents › Runs is the journal |
 | Plans and other steps in the console · a REPL or terminal | A run's page owns the run; the console lists queries, and nothing here is a shell |
 | A console tab per kind of board | Data and Queries are true of every board |
 | Editing inline on the drawing | A drawing is not a form; the Element panel edits |

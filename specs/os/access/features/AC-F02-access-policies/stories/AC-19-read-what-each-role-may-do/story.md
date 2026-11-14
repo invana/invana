@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Settings › People and access › Roles]) --> t["Every feature · Operator · Modeller · Admin — Acts · Own · Reads"]
+  s([Settings › Access › Roles]) --> t["Every feature · Operator · Modeller · Admin — Acts · Own · Reads"]
   t -->|Find a feature| f{"Matches?"}
   f -->|no| e["Nothing matches · Clear filters"]
   f -->|yes| row["The feature's row · the reader's role marked"]

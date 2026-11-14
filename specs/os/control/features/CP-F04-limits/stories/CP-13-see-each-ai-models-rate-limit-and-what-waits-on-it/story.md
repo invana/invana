@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers › AI model limits]) --> m["Each model version: requests and tokens a minute · used · steps waiting"]
+  s([Settings › Operations › Workers › AI model limits]) --> m["Each model version: requests and tokens a minute · used · steps waiting"]
   m -->|Edit · an Admin| ed(["Rate limit saved · applies to the next step"])
   m -->|Edit · not an Admin| ro(["Disabled, naming the Admins"])
   m -->|at its limit| w["Steps wait · use no worker · are not counted as short of workers"]

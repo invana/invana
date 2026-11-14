@@ -245,7 +245,7 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | The gate's thresholds | A failed hard check blocks; tokens or time more than 20% over live, or a judged score 0.5 below it, warns with the numbers |
 | An edit cannot ship a regression | A case prefers a check the engine runs on the answer's query over a judged score; an answer that claims what it cites no record for fails its case (*cites records*) |
 | A sensitive ask is promoted by a person who read it | Promoting is a person's act on a run they may read |
-| The eval token budget sits with the limits | It reads on Control Plane › Usage and limits beside the limits per team, user and agent, apart from them |
+| The eval token budget sits with the limits | It reads on Settings › Operations › Limits beside the limits per team, user and agent, apart from them |
 | No practice graph database is not a refusal | The evals read the real graph database in its read mode, so a publish is never blocked on an Admin naming one; the run says which it read |
 
 ## Open questions

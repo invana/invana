@@ -27,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 flowchart LR
   e([An answer from the Assistant]) --> h["How it got here"]
   h -->|Open the run| r["Run #N — by the Assistant, on behalf of who asked"]
-  l([Control Plane › Runs · from Ask]) --> r
+  l([Agents › Runs · from Ask]) --> r
   r --> s["Its steps, drawn as How it got here draws them"]
   r -->|their own, or shared| c(["Open the conversation"])
   r -->|someone else's, read by an Admin| x["The run reads; the conversation stays with its author"]

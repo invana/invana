@@ -23,7 +23,7 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › Usage]) --> list["AC-28 · Every agent: reads · writes · runs · people behind · in a window"]
+  start([Settings › Access › Usage]) --> list["AC-28 · Every agent: reads · writes · runs · people behind · in a window"]
   list -->|nothing has run| none["No usage yet — a run writes the first call"]
   list -->|a filter matches nothing| nm["Nothing matches · Clear filters"]
   list --> one["AC-28 · One agent: each resource used, how often, for whom, the last run"]
@@ -150,7 +150,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| A tab beside Access Policies | *Usage* is a tab of *Settings › People and access*; an agent opens beside the list |
+| A tab beside Access Policies | *Usage* is a tab of *Settings › Access*; an agent opens beside the list |
 | 90 days by default for unused | A shorter window flags access used monthly or quarterly as unused |
 
 ## Open questions

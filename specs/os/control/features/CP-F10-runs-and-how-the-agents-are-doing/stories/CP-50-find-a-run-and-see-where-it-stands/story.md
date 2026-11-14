@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ```mermaid
 flowchart LR
-  l([Control Plane › Runs]) --> f{"All · Live · Waiting · Ended · person behind it · agent · team · graph database · from"}
+  l([Agents › Runs]) --> f{"All · Live · Waiting · Ended · person behind it · agent · team · graph database · from"}
   f -->|no match| z["0 of N runs match · Clear all"]
   f --> r["A run: #N, its agent, the person behind it, status, what started it, tokens against its budget"]
   r -->|content not theirs to read| w["That it ran · status · tokens · content withheld"]

@@ -20,7 +20,7 @@ depends_on: [SE-F02]
 
 ```mermaid
 flowchart TD
-  start([Records › Records]) --> k["RC-01 · Pick a model and a kind"]
+  start([Records › a kind]) --> k["RC-01 · Pick a model and a kind"]
   k --> any{Any records?}
   any -->|none| e0["No records of this kind yet — where records come from"]
   any -->|yes| list["RC-01 · Records in key order · total · filter by property"]
@@ -81,6 +81,8 @@ flowchart TD
 
 | Decision | Detail |
 |---|---|
+| Records is a sheet | The Records summoner opens a sheet whose nav is the kinds, grouped by model, then Loads · Quality · Annotations; a record opens as a detail page in it |
+| Writes are checked, never free-edited | Every write from the sheet is checked against the model before it lands; there is no free-edit grid ([RC-F02](../RC-F02-bring-records-in/feature.md) · [EX-F06](../../../explore/features/EX-F06-annotate-and-edit-the-data/feature.md)) |
 | Key order | Records page in the order of their kind's key, so a page is stable between visits |
 | Open on a board | A record opens on a new board from here, with its neighbours one step out |
 

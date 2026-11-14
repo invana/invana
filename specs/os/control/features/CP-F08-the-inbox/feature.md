@@ -4,18 +4,20 @@ title: The Inbox — what needs me, and notifications
 product: CP
 status: idea
 personas: [admin, builder, analyst, decision-maker]
-stories: [CP-36, CP-37, CP-45, CP-46]
+stories: [CP-36, CP-37, CP-45, CP-46, CP-69]
 journeys: [J03, J04, J06, J08]
-boards: [inbox, settings.notifications, settings.me, access.sign_in_again]
-nfrs: [NFR-SEC-2, NFR-PERF-3]
+boards: [inbox, inbox.dropdown, inbox.dropdown.confirm, settings.notifications, settings.me, access.sign_in_again]
+nfrs: [NFR-SEC-2, NFR-PERF-3, NFR-PERF-7, NFR-UX-2]
 depends_on: [AC-F05, CP-F11, PJ-F01, PJ-F03, PJ-F06]
 ---
 
 # The Inbox — what needs me, and notifications
 
 > Every ask that waits on a person (AC-F05), every open ops alert sent to them (CP-F11) and everything else that
-> should reach them arrives in one Inbox for the deployment, by rules people write, and leaves Invana on the channels an
-> Admin sets up and each person chooses. The decision it helps make: *what needs me first?*
+> should reach them arrives in one Inbox for the deployment — a header dropdown to decide in place, a sheet to read it
+> all — by rules people write, and leaves Invana on the channels an Admin sets up and each person chooses. It also
+> serves the one live counts source every badge and count in Studio reads. The decision it helps make: *what needs me
+> first?*
 
 ## User journey
 
@@ -25,7 +27,7 @@ Journeys this feature is a step of: [J03 · Give an agent work and decide on the
 flowchart TD
   ev([A person or an agent wants to send, change or spend · an event happens]) --> kind{"What is it?"}
   kind -->|an ask| route(["AC-15 · Routed to the agent's named approvers, then the Admins"])
-  route --> cnt["CP-36 · A count on the Inbox icon · a toast while Studio is open"]
+  route --> cnt["CP-36 · The header Inbox badge · a toast while Studio is open"]
   kind -->|an alert| oa(["CP-59 · To whom its kind names, then the Admins"])
   oa --> cnt
   oa --> mine
@@ -34,7 +36,10 @@ flowchart TD
   route --> mine["CP-46 · Each approver's own channels · email · Slack · one line and a link"]
   mine -->|opened from the link| ask
   rule -->|a channel fails| retry["Tried three times, then failed with the error · the Inbox row is never lost"]
-  cnt --> inbox["CP-36 · Inbox › Needs you · Updates"]
+  cnt --> dd["CP-69 · The Inbox dropdown · Needs you · Running · Updates"]
+  dd -->|Acknowledge · Send back · Allow tokens| inplace(["Decided in place"])
+  dd -->|Accept that writes| conf(["A confirm modal · what changes"])
+  dd -->|Open the Inbox| inbox["CP-36 · The Inbox sheet · Needs you · Running · Updates · Done"]
   inbox -->|nothing waits| calm(["Nothing needs you"])
   inbox --> ask(["AC-15 · Decide the ask"])
   inbox --> upd["CP-36 · An update opens what it is about · marked read"]
@@ -54,6 +59,7 @@ flowchart TD
 | CP-37 | [Say which events reach whom, and where](stories/CP-37-say-which-events-reach-whom-and-where/story.md) | idea |
 | CP-45 | [Set up where asks and alerts can go](stories/CP-45-set-up-where-asks-and-alerts-can-go/story.md) | idea |
 | CP-46 | [Choose where my asks and alerts reach me](stories/CP-46-choose-where-my-asks-and-alerts-reach-me/story.md) | idea |
+| CP-69 | [Decide what needs me from the header](stories/CP-69-decide-what-needs-me-from-the-header/story.md) | idea |
 
 ## Access
 
@@ -62,7 +68,11 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 
 | Act | Role | Everyone else sees |
 |---|---|---|
-| Read one's own Inbox — Needs you and Updates | Operator · Modeller · Admin | — |
+| Read one's own Inbox — the dropdown, and the sheet's Needs you · Running · Updates · Done | Operator · Modeller · Admin | — |
+| Read one's own counts — Needs you, runs going, open alerts sent to one | Operator · Modeller · Admin | — |
+| Read the deployment's counts — every run going, every open alert, acts blocked today — and filter the Inbox to *All open alerts* | Admin | The counts are one's own; *All open alerts* is not offered |
+| Decide an ask in place in the dropdown — *Allow tokens* among them | As AC-F05: the people the ask is routed to | *Ask {approver}* — and the engine refuses it |
+| *Acknowledge* an alert sent to one | Operator · Modeller · Admin, on alerts sent to them | — |
 | Decide an ask | As AC-F05 | As AC-F05 |
 | Read rules and channels | Operator · Modeller · Admin | — |
 | Write, change or remove a notification rule that reaches only oneself | Operator · Modeller · Admin, for their own rules | Another person's rule reads; its switch and *Edit* are disabled, naming its creator and the Admins |
@@ -77,8 +87,8 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 |---|---|
 | First use | Needs you: *Nothing needs you*, as good news. Updates with no rule written: *Nothing needs you*, with *New rule* — failures reach a person only through a rule. Rules: *No rules yet*, with *New rule* |
 | Empty after a filter | Needs you or Updates filtered by product, kind or *Unread* with no match: *Nothing matches*, with *Clear filters* |
-| Loading | The Inbox opens at once with rows loading in place; its count is the last one read |
-| Has data | Needs you — asks first, nearest deadline first (AC-F05); Updates newest first, unread marked. Rules one row each; channels with their masked target and *ready* |
+| Loading | The dropdown and the sheet open at once with rows loading in place; the badge is the last count read |
+| Has data | The dropdown: Needs you as cards to decide in place · Running · Updates. The sheet: Needs you — asks first, nearest deadline first (AC-F05); Running; Updates newest first, unread marked; Done. Rules one row each; channels with their masked target and *ready* |
 | Failed | The list could not load, saying why, with *Try again*. A channel that failed a send names the error on its delivery |
 | Agent working or proposing | An agent's ask in Needs you, as AC-F05 shows it |
 | No access | An ask routed to someone else reads, as AC-F05 says. Rules and channels read; a rule for others and every channel write are disabled for everyone but an Admin, naming the Admins |
@@ -88,9 +98,12 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Rule | Detail |
 |---|---|
 | One Inbox for the deployment | Each person has one Inbox; there is no other place an ask, an alert or an update waits |
-| One list of what waits | Needs you holds every ask a person, an agent or a run makes of a person — access · budget · delegation · send · question · more than a policy allows (AC-14) · a person's act set to Ask — a held delivery of a finished run, a breaking model publish, project work — a task in review, to its author and the person behind its run (PJ-12); *Start this task?* (PJ-15), an agent's open proposal (PJ-05) and a new lead (PJ-19), each to the project's members — and each open alert sent to the reader ([CP-F11](../CP-F11-ops-alerting/feature.md)). The Inbox icon and the header carry one count: unread updates + asks waiting on the reader + runs waiting on the reader's answer + open ops alerts sent to the reader |
+| One list of what waits | Needs you holds every ask a person, an agent or a run makes of a person — access · budget · delegation · send · question · more than a policy allows (AC-14) · a person's act set to Ask — a held delivery of a finished run, a breaking model publish, project work — a task in review, to its author and the person behind its run (PJ-12); *Start this task?* (PJ-15), an agent's open proposal (PJ-05) and a new lead (PJ-19), each to the project's members — and each open alert sent to the reader ([CP-F11](../CP-F11-ops-alerting/feature.md)). The header Inbox badge carries one count, *Needs you*: asks waiting on the reader + runs waiting on the reader's answer + open ops alerts sent to the reader; unread Updates are a dot, never a number |
 | An alert leaves Needs you when it closes | It reads closed, naming what closed it, and moves to Updates |
 | A stopped run tells the person behind it | When someone else stops a run, the person behind it gets an update naming who stopped it ([CP-58](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-58-stop-a-run-that-should-not-go-on/story.md)) |
+| The dropdown first | The header Inbox opens a 640 px dropdown — Needs you · Running · Updates — to decide in place; *Open the Inbox* opens the sheet — Needs you · Running · Updates · Done. Only what needs *you*: system state is Operations' ([CP-F09](../CP-F09-overview/feature.md)) |
+| Low-risk acts in place, writes confirm | *Acknowledge*, *Send back* and *Allow tokens* answer on the card; an *Accept* that writes Graph Data or the model opens a confirm modal listing what changes |
+| One counts source | Every count Studio shows — the badge, *n running*, the footer, the dropdowns, the browser title *(n) Invana* — is one engine read and one live stream; Studio never counts ([design-language › Counts](../../../../design-language.md#counts)) |
 | Questions lead Needs you | A question asked back of the person sits first: it holds a run until it is answered. Then every other ask and each open ops alert, oldest first |
 | Only asks toast | A new ask or question for the reader shows a toast with *Review*; updates never toast |
 | Rules read what happened | A rule matches events after they are written, never slowing or failing a write. A rule never matches its own notifications, deliveries or reminders, so it cannot feed itself |
@@ -152,7 +165,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Route, after `/api/v1/control` | Does | Story |
 |---|---|---|
-| `GET /notifications` | The reader's Inbox — `?view=needs_you · updates` · `?product=` · `?kind=` · `?unread=true` — with `count` (unread updates + asks waiting on the reader + runs waiting on their answer + open ops alerts sent to them) | CP-36 |
+| `GET /notifications` | The reader's Inbox — `?view=needs_you · running · updates · done` · `?product=` · `?kind=` · `?unread=true` · `?alerts=all` (an Admin's *All open alerts*) — with `needs_you` and `updates_unread` | CP-36 · CP-69 |
+| `GET /counts` | The reader's counts: `needs_you` · `updates_unread` · `running` · `waiting` · `alerts_open` · `blocked_today` · `as_of` — scoped by role (below) | CP-36 · CP-69 · CP-70 · AC-48 |
+| `GET /counts/stream` | Server-sent events: the same body each time a count changes, at most once a second | CP-36 · CP-69 |
 | `POST /notifications/read` | Mark rows read — `{ids[]}` or `{all: true}` | CP-36 |
 | `GET /notifications/rules` · `POST /notifications/rules` | Notification rules, each with `may_edit` · write one | CP-37 |
 | `GET /notifications/rules/{id}` · `PATCH /notifications/rules/{id}` · `DELETE /notifications/rules/{id}` | Read · change, switch on or off · remove one | CP-37 |
@@ -182,6 +197,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 422 | A channel whose test fails — nothing saved | *{kind}: {what the service answered}.* | CP-45.7 |
 | 409 | Turning on Slack direct messages with no Slack channel, or for an email Slack does not know | *Slack is not set up — ask {admins}.* · *Not found in Slack.* | CP-46.2 · CP-46.3 |
 | 404 | Reading another person's channel choices | *Not found.* | CP-46.10 |
+| 403 | `?alerts=all` by anyone but an Admin | *This needs the Admin role.* | CP-36.21 |
 | 422 | A rules file with a refused rule — nothing in it applied | *{rule} · {field}: {why}.* | CP-37.17 |
 
 ### CLI
@@ -205,7 +221,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The address check | Every channel host is resolved at add and at each delivery; loopback, link-local and the deployment's own addresses are refused, and the connection goes to the address checked |
 | A channel's test | Adding a channel sends one test to the adding Admin — an email to them, a Slack `auth.test`, a Teams message, a webhook ping — and saves only when it passes |
 | Alerts | CP-F11's checker writes an `ops_alert` row in *Needs you* per recipient, then their own deliveries; its close sets `done_at` and moves the row to Updates |
-| The count | Unread notifications + asks waiting on the reader + runs waiting on their answer + open alerts sent to them; a run held on an ask counts once, as the ask |
+| The counts | `needs_you` — asks waiting on the reader + runs waiting on their answer + open alerts sent to them; a run held on an ask counts once, as the ask · `updates_unread` — unread notifications · `running` — runs queued or running ([CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) · `waiting` — runs held on a person or a limit · `alerts_open` ([CP-F11](../CP-F11-ops-alerting/feature.md#engine)) · `blocked_today` — acts a policy refused today ([AC-F06](../../../access/features/AC-F06-history/feature.md#engine) `GET /refusals`) |
+| Counts by role | An Admin reads the deployment's `running`, `waiting`, `alerts_open` and `blocked_today`; an Operator or a Modeller reads `running` and `waiting` for runs they are behind, `alerts_open` for alerts sent to them, and no `blocked_today` — the field is absent, never `0` |
+| The counts stream | One stream per signed-in Studio tab. The stream listens to the event store's live tail ([AC-F06](../../../access/features/AC-F06-history/feature.md#engine)); an event that can move a count recomputes the subscriber's counts, coalesced to at most one send a second, sent only when a value changed. Each owner's count is a read through its manager — this feature stores no counter |
 | Read state | Per row, `read_at` |
 
 ## System impact
@@ -214,7 +232,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | § 6 Data and storage | Six tables in Postgres; channel secrets sealed under the install key | — |
 | § 7 Components | The notification matcher and the delivery sender run on the shared clock | — |
-| § 8 APIs and events | The Inbox, rules and channels routes under `/api/v1/control` and `control.notification_rules.*` · `control.channels.*` events | — |
+| § 8 APIs and events | The Inbox, rules, channels and counts routes under `/api/v1/control` — the counts stream one more server-sent events route — and `control.notification_rules.*` · `control.channels.*` events | NFR-PERF-7 |
 | § 9 Distributed execution | The cursor taken `FOR UPDATE SKIP LOCKED` and unique Inbox rows keep two engine processes from matching an event twice | — |
 | § 11 Failure modes and the outside boundary | Email, Slack, Teams and webhooks: a channel down fails its delivery after three tries; the Inbox row never depends on it | — |
 | § 12 Qualities | Security: webhook bodies signed, channel secrets sealed and write-only, addresses checked, decisions only signed in; Privacy: a delivery carries a line and a link, never content | NFR-SEC-2 |
@@ -230,6 +248,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A person picks their own channels | Asks and alerts for a person follow that person's choices; Teams and webhooks reach a place, so they are a rule's, never a person's |
 | One line and a link | A channel never carries content, so no channel needs to be trusted with what a run read, and every decision is made signed in |
 | Updates are notifications | The Inbox's Updates are the reader's notifications; Needs you never holds an update |
+| The Inbox is a dropdown, then a sheet | The header Inbox opens a dropdown that decides in place; the full Inbox is a sheet opened from it — never a leftNav summoner |
+| The badge counts what needs you | The badge is Needs you only; unread Updates show as a dot, so the number always means *someone waits on you* |
+| One counts source, live | Every count is the engine's, served by one read and one stream, so the badge, *n running*, the footer and the title never disagree |
 
 ## Open questions
 
