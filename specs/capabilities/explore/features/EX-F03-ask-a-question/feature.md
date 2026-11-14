@@ -13,7 +13,7 @@ depends_on: [EX-F01, EX-F04, EX-F05, AG-F01, AG-F02, AG-F06, AG-F09, AC-F02, AC-
 
 # Ask a question
 
-> How a person puts a question to the Graph — every graph database, stitched — in plain words to the Assistant beside
+> How a person puts a question to Graph Data — every graph database, stitched — in plain words to the Assistant beside
 > their work, or as a query they type themselves through the Query console; and gets asked back rather than guessed
 > for. A question in words becomes a **typed query plan** written from the published model, checked against the model
 > and the agent's Access Policies, and run one step per graph database in its own language — so the answer they decide
@@ -43,7 +43,7 @@ flowchart TD
   cq -->|nobody here| park(["The run waits for a person — not failed"])
   u -->|small talk| talk["EX-01 · A line back · up to three questions it could answer"]
   u -->|a list| ol["EX-28 · The list opens with its filters, set by the Assistant"]
-  u -->|the Graph cannot| ca(["Cannot answer — EX-F05"])
+  u -->|Graph Data does not hold it| ca(["Cannot answer — EX-F05"])
   u -->|yes| plan["EX-01 · A typed query plan from the published model"]
   plan -->|the plan cannot express it| gap["EX-01 · I cannot ask this yet · what the plan lacks · a function offered"]
   plan -->|a rule denies a kind · a sensitive property to an external model| rf(["Refused before anything runs — EX-06"])
@@ -69,7 +69,7 @@ sequenceDiagram
   S->>E: the ask, through an agent the person may use
   E->>A: understand it, grounded in the published model — never in records
   alt ambiguous
-    A-->>S: a closed question, its options read from the Graph
+    A-->>S: a closed question, its options read from Graph Data
     S-->>P: one tap per option
     P->>S: an option
     S->>E: the answer, as a value
@@ -139,7 +139,7 @@ runs through may read.
 | One question, one run | A follow-up is its own run in the same conversation; the last 20 turns go with it, so *only the top 5* means something. Nothing reaches an AI model or a graph database outside a run of a plan ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)) |
 | Recall before planning | The plan step reads what the thinking graph recalls for this intent — what served and what to avoid ([AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md)); a conversation itself carries no memory beyond its last 20 turns |
 | A typed query plan, never a raw query | The agent's AI model writes a typed query plan — kinds, properties, filters, hops, aggregates — from the published model, never from records. The engine validates it against the model and the agent's Access Policies, then compiles one step per graph database in its own language. The AI model never writes Cypher or Gremlin |
-| Across graph databases | A question is asked of the Graph, not of one database: a plan whose kinds live in several graph databases runs one step in each and joins the steps' rows on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)). No record is copied between them |
+| Across graph databases | A question is asked of Graph Data, not of one database: a plan whose kinds live in several graph databases runs one step in each and joins the steps' rows on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)). No record is copied between them |
 | A gap is said, never patched | A question the plan grammar cannot express is answered *I cannot ask this yet*, naming what the plan lacks, and offers a function from the catalogue that does it — or, when none does, *Write the query myself* for a person who may use the Query console. The agent never runs a query it wrote outside the grammar |
 | Checked before it runs | A kind, relationship or property the published model lacks, a Deny on `data/<graph database>/<kind>`, a graph database switched off or down, or a sensitive property bound for an external model ends the run as refused before any step reads ([EX-06](../EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-06-a-refusal-or-a-failure-that-says-why/story.md)); an Ask waits on the agent's named approvers |
 | Grounded in the published model | A question is read against the published model, its descriptions and its identity links; a kind the model lacks is never named in a plan |
@@ -223,7 +223,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | 404 | Another person's conversation, its turns or their context, read by anyone but its asker, those it is shared with and Admins | *Not found.* | EX-10.13 |
 | 409 `setup_incomplete` | An ask before set-up is done — CP-F05's gate | *Asking opens when {step}.* | EX-11.6 |
 | 403 | An ask through an agent the person may not use | *{person} may not use {agent} — ask an Admin.* | EX-10.11 · EX-10.23 · EX-08.16 |
-| 422 | An ask through an agent whose policies allow Read on no kind of the published model; never re-routed | *{agent} cannot read the Graph — pick another agent for this conversation.* | EX-10.18 |
+| 422 | An ask through an agent whose policies allow Read on no kind of the published model; never re-routed | *{agent} cannot read your Graph Data — pick another agent for this conversation.* | EX-10.18 |
 | 422 | A typed query in a Model conversation | *A Model conversation authors a model — ask in words.* | API only — Studio's Model composer offers no query kind |
 | 422 | A typed query naming a kind or property the model lacks, or one that does not parse | *{name} is not in the model — it has {kinds}.* · *{the parser's message}, at {line}:{column}.* | EX-08.5 · EX-08.4 |
 | 422 | A typed query in a language its graph database does not speak | *{graph database} speaks {language}.* | API only — Studio offers only its languages (EX-08.1) |
@@ -294,7 +294,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | New is a blank thread | *New* in the header and in the history shows a blank thread with the composer focused on a question; no conversation exists until the first question |
 | Archiving hides, deleting removes | An archived conversation leaves the list and comes back with *Show archived*. Deleting removes the conversation and its turns; its runs stay in Control Plane › Runs and its forks stay whole |
 | A question asked back waits | Nobody answering parks the run as waiting, never failed and never expired; answering resumes the same run |
-| Options are described only when the label is not enough | Each option is one line; a second line only where the person would be unsure which to pick. Options read from the Graph are their own label |
+| Options are described only when the label is not enough | Each option is one line; a second line only where the person would be unsure which to pick. Options read from Graph Data are their own label |
 | A list opens through its own filters | The assistant sets the same filters a person would; the list reads, reloads and clears like any other, and counts with its own query |
 | The plan is the AI model's only query | The AI model writes a typed plan or nothing; compiling is code. A person who wants a query the grammar cannot express types it in the Query console, where it is theirs and ledgered |
 | Lock | Until set-up is done, Explore is the lock alone: *Asking opens when {step}*, what is left, and the act that does it |

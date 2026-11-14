@@ -9,7 +9,7 @@ boards: [explore.ask, explore.board, explore.board.cannot]
 
 # EX-01 · Ask in plain words
 
-**As** an analyst who knows the business but not the query language **I want** to ask the Graph plainly, from one
+**As** an analyst who knows the business but not the query language **I want** to ask my Graph Data plainly, from one
 question box, and have the agent turn my question into a plan it checks against the model before anything runs —
 across every graph database the answer needs **so that** I start by asking, not configuring, and get an answer I can
 check before I act on it.
@@ -35,7 +35,7 @@ flowchart LR
   llm -->|yes| u{Understood?}
   u -->|ambiguous| cq(["Asked back — EX-23"])
   u -->|small talk| t["A line back · up to three questions to try"]
-  u -->|the Graph cannot| ca(["Cannot answer — EX-05"])
+  u -->|Graph Data does not hold it| ca(["Cannot answer — EX-05"])
   u -->|yes| p["A typed query plan · from the model, never from records"]
   p -->|the grammar cannot express it| gap["I cannot ask this yet · what the plan lacks · a function to run, or Write the query myself"]
   p -->|invalid| rp["Repaired once"] -->|still invalid| st(["Stopped · both attempts shown"])

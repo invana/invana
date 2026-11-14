@@ -10,7 +10,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **Graph** | The model and data stitched across every graph database the deployment connects — one per deployment. Always capitalised | Graph |
+| **Graph Data** | Everything the deployment's graph databases hold, read in place and joined on identity links — one per deployment. Never created, opened, selected or listed: it is not an object. Always capitalised | graph data |
 | **graph database** | One configured connection to a Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune or TinkerGraph database, through its connector — read-only or read + write, switched on or off | graph database |
 | **Read-only · Read + write** | A graph database's mode, set by an Admin: agents only read it · agents may also write to it — annotations, derived facts, loads, fixes. Reads always run in the database's read mode | connection mode |
 | **Practice graph database** | A graph database an Admin names for testing agents and skills, never the one people ask | practice graph database |
@@ -26,14 +26,14 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **Model** | The kinds of node and relationship the Graph holds, and their properties — one stitched model across every graph database | Domain model |
+| **Model** | The kinds of node and relationship Graph Data holds, and their properties — one stitched model across every graph database | Domain model |
 | **Kind** | One type of node or relationship in a model | node type · edge type |
 | **Draft** | Unpublished changes; a floating bar says how many | Draft |
 | **Publish** | Make a draft the model everyone asks against | Publish |
 | **Link between models** | A declared meeting of two models — the same entity, or a relationship across them | Stitch · anchor · relationship link |
 | **Constraint** | One property's range with a unit, or one standard's values, on one kind — Reject or Flag for review when a record breaks it | Property constraint (validation rule) |
 | **What the database holds** | The kinds, properties and counts read from the graph database, with when — compared with the model, never the model | Physical mirror · introspection |
-| **Records** | The Graph's nodes and relationships, read in place from the graph databases — never copied — each one of a kind in a published model; *Records* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
+| **Records** | The nodes and relationships Graph Data holds, read in place from the graph databases — never copied — each one of a kind in a published model; *Records* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
 | **Identity link · Match rule** | Two records in different graph databases that are the same entity · the rule a Modeller declares for a pair of kinds that says when they are; links come from rules, never from a guess | identity link · match rule |
 | **Version** | One immutable, hashed state of a model, standard, skill, workflow or agent | Version |
 | **Sensitivity** | A property's level — **public** · **internal** · **confidential** · **personal** — set in its kind's Meaning by a Modeller; *internal* until set. Access Policies may reach one level of a kind; a derived value takes the highest level of what it came from | Sensitivity |
@@ -43,7 +43,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Checks** | How a load's records score against the constraints and standards their model holds them to, with what breaks them | Conformance · validation report |
 | **Meaning** | A tab on a kind: what the kind and each property mean — definitions, synonyms, units, and the outside terms they are the same as | Meaning · IRI · sameAs |
 | **Broader kind** | A kind another kind is a narrower case of — for meaning only; records and questions stay on the kind itself | Taxonomy · subclass |
-| **Derivation** | A rule that adds facts from facts already in the Graph | Derivation rule · inference |
+| **Derivation** | A rule that adds facts from facts already in Graph Data | Derivation rule · inference |
 | **Derived** | A fact a derivation added, written to a read + write graph database — never an observation; it shows its rule and version in *How it got here* | Derived fact |
 | **Predicted** | Evidence from what-if reasoning — what would follow from a change, never an observation | predicted evidence |
 | **Change log** | Every version of a record — who, when, why, the difference, the effect after | Change log |
@@ -57,7 +57,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | Word | Means | Domain term |
 |---|---|---|
 | **Rule** | A statement that must always hold — on the deployment or a project — checked block · warn · report. On an Access Policy, *rule* names one of its lines | Rule · invariant |
-| **Request** | What a person or an agent asked of the model — a rule refused it, the Graph could not answer it, or *Ask for a change* — kept until a Modeller allows, drafts or declines it | Request |
+| **Request** | What a person or an agent asked of the model — a rule refused it, Graph Data did not hold it, or *Ask for a change* — kept until a Modeller allows, drafts or declines it | Request |
 | **Retune** | Narrow or widen what a question reads from a run, then ask again | Retune |
 | **What it may do** | What an agent's Access Policies let it Read, Write and Run | the agent's Access Policies |
 | **Access Policy** | A named list of rules attached to agents — the only thing that gives an agent reach. Each rule is an effect — Allow · Ask · Deny — a verb — Read · Write · Run — and a resource, `type/name`, where `*` stands for a whole segment: `data/<graph database>/<kind>[/<level>]` · `memory/…` · `project/…` · `skill/…` · `workflow/…` · `agent/…` · `plugin/…` · `tool/<plugin>/<tool>` · `fs/…` · `cmd/…` · `net/…`. A rule has no term for a person or a team | Policy · statement |
@@ -129,11 +129,11 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Answer** | What a question produced: words with citations, a drawing, a table, a chart | Emissions |
 | **Why?** | The peek behind a citation: words → query → records → load | Reasoning trace |
 | **How it got here** | An agent result's steps, sources and assumptions, each marked *Challenge this* | Trace · run frames |
-| **Cannot answer** | The Graph does not hold it — said plainly, with who can help; never a failure | Cannot answer |
-| **Third-party** | From beyond the Graph — the internet, an outside service, the model's own knowledge — always with its reference | Third party |
+| **Cannot answer** | Graph Data does not hold it — said plainly, with who can help; never a failure | Cannot answer |
+| **Third-party** | From outside Graph Data — the internet, an outside service, the model's own knowledge — always with its reference | Third party |
 | **Search provider** | A web search service the deployment adds, each a `tool/…` resource a rule can name | Search provider |
 | **Act as · approach** | A method picked for one question — a scientist, a designer — with the assumptions it brings, shown before the run | Stance |
-| **Assumptions** | What an answer rests on that the Graph did not prove: proven · assumed · refused, each with what changes without it | Assumption ledger |
+| **Assumptions** | What an answer rests on that Graph Data did not prove: proven · assumed · refused, each with what changes without it | Assumption ledger |
 | **Fork from here** | A new conversation from one reply, with the turns and the board as they stood there | Fork a session |
 | **Recall** | A run's step that reads the thinking graph for what served and what to avoid, ranked by outcome, and cites what it recalled | Recall step |
 | **Evidence** | What runs show about a skill, plan, rule or criterion — counts over a stated window, each opening its runs | Evidence |
@@ -148,7 +148,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Built-in workflow** | A workflow shipped with Invana or a plugin, owned by the system user | `origin = packaged` |
 | **Run** | One execution of a plan or a workflow, with its time and tokens | TaskRun |
 | **Thinking graph** | What runs leave in **Memory** — every plan, workflow, run, step, evidence, finding and decision, kept and linked; what served is recalled first, what failed is kept as what to avoid | thinking graph |
-| **Memory** | Invana's own graph of the work — activity, runs, sessions, hand-off notes, tasks, findings, decisions and their relations, each with its lineage; the thinking graph is the part runs leave. Never customer data, and never part of the Graph. Project memory sits on its project, agent learnings on their agent, org knowledge on the deployment; no team holds memory ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) | Memory · stored in the system graph |
+| **Memory** | Invana's own graph of the work — activity, runs, sessions, hand-off notes, tasks, findings, decisions and their relations, each with its lineage; the thinking graph is the part runs leave. Never customer data, and never part of Graph Data. Project memory sits on its project, agent learnings on their agent, org knowledge on the deployment; no team holds memory ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) | Memory · stored in the system graph |
 | **Org knowledge** | A learning a person promoted for the whole deployment; an agent only proposes it ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) | org knowledge |
 | **Good · Bad** | A person's mark on a run's thinking, which steers what is recalled next | outcome label |
 | **Voice** | Who an agent is and how it speaks, in plain words, read only by the steps whose words a person reads | Soul · voice dials |
@@ -241,7 +241,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | Task plan · frontier · step envelope | Its steps |
 | TaskRun · Todo | Run · Task |
 | Thought · Emission | Question · Answer |
-| Mission · Atlas · tenant | The deployment · the Graph |
+| Mission · Atlas · tenant | The deployment · Graph Data |
 | Job · job run | Run |
 | Wizard · setup wizard | Setup, in steps |
 | Graph admin | Admin |
@@ -280,18 +280,18 @@ names and the form each takes in every layer are
 
 | Term | Means |
 |---|---|
-| **Deployment** | One install of Invana and everything in it — its graph databases, the Graph, the system graph, users, teams, agents and work. The widest scope: there is no workspace, tenant or Organisation above it and no unit inside it that holds a graph of its own. *Install* means the same in code and docs |
+| **Deployment** | One install of Invana and everything in it — its graph databases, Graph Data, the system graph, users, teams, agents and work. The widest scope: there is no workspace, tenant or Organisation above it and no unit inside it that holds a graph of its own. *Install* means the same in code and docs |
 | **Connector** | The package that speaks to one type of graph database — `invana-neo4j`, `invana-janusgraph` — with its query language and its driver's read mode |
 | **Graph database** | One configured connection, through a connector, to one database — one credential, initialised **read-only** or **read + write** by an Admin, switched on or off. Every read runs in a **read-only session**, which a connector proves with its certification test |
-| **Graph** | The model and data stitched across every graph database the deployment connects, one per deployment, read in place and never copied. The reasoning boundary: what is not in it is third-party. A question runs one step per graph database in its own language, and the engine joins the results on identity links |
-| **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage, the ledger's edges and identity links, never customer data, and is never part of the Graph. It follows Postgres, the source of truth, and is rebuilt from it |
+| **Graph Data** | Everything the graph databases the deployment connects hold, one per deployment, read in place and never copied — never created, opened, selected or listed: the deployment is the only scope. The reasoning boundary: what is not in it is third-party. A question runs one step per graph database in its own language, and the engine joins the results on identity links |
+| **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage, the ledger's edges and identity links, never customer data, and is never part of Graph Data. It follows Postgres, the source of truth, and is rebuilt from it |
 | **System ontology** | The read-only, versioned ontology Invana ships that governs the system graph |
 | **Identity link** | Two records in different graph databases that are the same entity, materialised in the system graph from a **match rule** a Modeller declares for a pair of kinds — agents may propose rules, never links. Never guessed |
 | **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown as *Settings › Invana*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
 | **Operating system** | What runs every deployment: the **Control Plane**, the **Access Plane** and the **Graph Plane** — the packages `control` · `access` · `graph`. A vision and docs word; in code its parts are packages beside the capabilities |
 | **Control Plane** | What runs, where and within which limits — runs, workers and the queue, graph databases, limits, AI models, plugins and the MCP server, ops alerts, the Inbox. Product code `CP` |
 | **Access Plane** | Who may act, through which agent, and what they did — sign-in, keys, Access Policies, the Directory, ownership, asks, the ledger's views, History. Product code `AC` |
-| **Graph Plane** | What Invana reads and what it remembers — **Data**: the Graph, read in place through a connector per graph database and joined on identity links · **Memory**: Invana's own graph of the work, in the system graph. Product code `GP`. A vision and docs word: on screen a person reads *the Graph* and *Memory* ([os/graph](os/graph/product.md)) |
+| **Graph Plane** | What Invana reads and what it remembers — **Data**: Graph Data, read in place through a connector per graph database and joined on identity links · **Memory**: Invana's own graph of the work, in the system graph. Product code `GP`. A vision and docs word: on screen a person reads *Graph Data* and *Memory* ([os/graph](os/graph/product.md)) |
 | **Lineage** | What a copy — an answer, a finding, a report, a snapshot, a transcript, a note, a memory node or an export — was read from: its **sources**, as Access Policy resources with their level, recorded with the copy and kept as edges in Memory. A copy shows to a person only when their default agent may Read every source; else it is withheld. Its level is the highest of its sources' ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) |
 | **Raw query** | A Cypher or Gremlin query a person writes in the Console: a static check against the agent's rules, a read-only session, a result filter, and Gremlin steps only — no scripts or lambdas ([GP-F01](os/graph/features/GP-F01-data/feature.md)) |
 | **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Records** summoner. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
@@ -369,7 +369,7 @@ names and the form each takes in every layer are
 | **Approval** | A pause *before* a Task is dispatched: the agent may not proceed alone. Its answer is a **decision** — approve · reject. Nothing has been spent, and **only a person may answer one**. The same record holds anything about to leave Invana — a schedule's delivery to a channel — until a **named approver** decides; at its deadline it is *expired, not sent*, never approved. |
 | **Verdict** | A pause *after* a pass produced output: the agent may not judge its own work. Its answer is a **verdict** — accept · revise, with a note bound into the next pass. The pass is already paid for, so it is bounded by `max_iterations` **and** a deadline. |
 | **Iteration** | One serial pass of a `loop` node. Distinct from a **lane** (one parallel element of a fan-out) and an **attempt** (one retry of a failure). All three nest, and each is its own row. |
-| **Cannot answer** | The Graph does not hold it. Deliberately not answer-shaped, and distinct from a failure — and distinct from a **refusal**, which names the Access Policy rule that stopped it. |
+| **Cannot answer** | Graph Data does not hold it. Deliberately not answer-shaped, and distinct from a failure — and distinct from a **refusal**, which names the Access Policy rule that stopped it. |
 | **Diagnosis** | What a failure explains about itself, with next steps drawn from evidence — never invented. |
 | **Typed query plan** | What an agent writes for a question — kinds, properties, filters, hops, aggregates — from the model, never from records. The engine checks it against the model and the agent's Access Policies, then compiles it to Cypher or Gremlin per graph database. A question it cannot express is said so, with a function offered — never a silent raw query |
 | **Enrich** | A run that writes derived properties or edges to a read + write graph database. Distinct from a **stitch**, which declares that two published models meet and writes only the relationships of its links. |
@@ -383,7 +383,7 @@ names and the form each takes in every layer are
 | **View panel** | The content of one shell region — `ModelViewPanel`, `InspectorViewPanel`, `AssistantViewPanel` — canvas-ui's suffix. A panel is named for the **occupant**, not for its contents: the Assistant holds sessions, so it is `AssistantViewPanel`, not `SessionsViewPanel`. A panel is *what fills* a region, never a region itself, so "the panel" alone names nothing. |
 | **Section** | One collapsible, resizable part of a stacked view panel — the kit's `PanelStackSection`, with its own header, count, search and drill-in. The Agents view panel has two: **Agents** and **LLMs**. Never a *drawer*: nothing in Studio slides over anything. |
 | **Soul** | Who an agent is and how it speaks — Markdown on the agent, read only by the steps whose words a person reads. Never *persona*, never *character*: a soul changes words, not what runs. |
-| **Third-party** | Anything that is not from the Graph: from an outside service — the **internet**, or an `api`, `app`, `db` or `agent` the deployment connects — or from the **model**'s own knowledge. Always badged `third-party · <source>` and always carrying its reference: the link for the internet, the locator for any other source. |
+| **Third-party** | Anything that is not from Graph Data: from an outside service — the **internet**, or an `api`, `app`, `db` or `agent` the deployment connects — or from the **model**'s own knowledge. Always badged `third-party · <source>` and always carrying its reference: the link for the internet, the locator for any other source. |
 | **Inspector** | The surface that states what is selected and edits it. The canvas selects; the Inspector edits. |
 | **Design kit** | `@invana/design-kit` — the shared component packages every screen is composed from, tokens only. Not a style guide |
 | **Theme** | A named set of the kit's tokens — palette and density — applied across Studio: light and dark ([design-language.md › Theme](design-language.md#theme)). Not dark mode alone |
@@ -475,7 +475,7 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 
 | Not this | Say | Why |
 |---|---|---|
-| Mission · Atlas · Workspace · tenant | the **deployment**, or the **Graph** | one deployment is everything; the Graph is its stitched model and data |
+| Mission · Atlas · Workspace · tenant | the **deployment**, or **Graph Data** | one deployment is everything; Graph Data is what its graph databases hold, joined |
 | A product, module or group name for a part of Invana | the **package** — `control` · `access` · `semantics` · `records` · `agents` · `explore` · `projects` | one package, one name, from spec folder to board ([How a package is named](#how-a-package-is-named)); a verb phrase is a feature's register |
 | Dashboard | **Board** — a *declared* board when the difference matters | every surface is a board: drawn on a canvas or declared from panels (`renders: canvas · declared`). The kit's package is `@invana/boards` and its component `Board`. HyperDX's own dashboards keep their name, since they are that product's word, not ours |
 | Intent | **Instructions** for guidance, **understanding** for the step | the word is ambiguous between the two |
@@ -494,7 +494,7 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 | `TaskRun.plan` | **`plan_snapshot`** | `plan` otherwise names the record, the frozen column, the planning **role** and a callable at once |
 | `kind = plan` · `kind = work` | **`role = plan`** · **a Todo** | `kind` is the *subject* a plan is about. Planning is a role of a run; human work is a Todo, which is a type |
 | Emission (for a stream frame) | **Run frame** | an emission is what a reader sees in an answer; a frame is how it travels |
-| Internet (as a source) | **third party** | it named the network, not the boundary — a private warehouse is as outside the Graph as a public API |
+| Internet (as a source) | **third party** | it named the network, not the boundary — a private warehouse is as outside Graph Data as a public API |
 | Tier (of a model) | **role** | this year's *small* is last year's *frontier*; a plan says how much a decision matters, not how big the model is |
 | Subgraph (for a narrowed view) | an **Access Policy** rule, or a question's filters | *subgraph* already means an [emission](#asking-and-answering), and a second meaning would make both unreadable |
 | Scope (for what a run may see) | the agent's **Access Policies** | `rules.scope` already means `deployment \| project`, and one word for two bounds hides both |

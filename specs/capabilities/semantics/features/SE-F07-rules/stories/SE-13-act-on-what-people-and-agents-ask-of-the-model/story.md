@@ -28,7 +28,7 @@ Answering a request is the Modeller's and the Admin's; any signed-in person file
 ```mermaid
 flowchart LR
   a([Rules and views › Requests · N open]) --> l{Any request?}
-  l -->|no| e["Nothing asked yet — refusals and asks the Graph could not answer land here"]
+  l -->|no| e["Nothing asked yet — refusals, and asks Graph Data did not hold, land here"]
   l -->|yes| o["Open · Done folded"]
   o --> k{What it met}
   k -->|a rule on a property| al["Allow · Decline"]
@@ -44,10 +44,10 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-13.1 | Nothing asked | the person opens Requests | it reads *Nothing asked yet — refusals and asks the Graph could not answer land here* |
+| SE-13.1 | Nothing asked | the person opens Requests | it reads *Nothing asked yet — refusals, and asks Graph Data did not hold, land here* |
 | SE-13.2 | Open requests | Rules and views opens | its head shows the open count, as counted by the engine |
-| SE-13.3 | Requests | the person opens Requests | Open lists first and Done folded; a row is the ask over who · from where · what it met (the rule, or *the Graph could not answer*) · how many times asked · when |
-| SE-13.4 | A run refused by a rule on a property, or ending *cannot answer · outside this graph*, asked by a person or an agent | it settles | a request is filed by the engine; an eval or a test files none |
+| SE-13.3 | Requests | the person opens Requests | Open lists first and Done folded; a row is the ask over who · from where · what it met (the rule, or *Graph Data did not hold it*) · how many times asked · when |
+| SE-13.4 | A run refused by a rule on a property, or ending *cannot answer · not in Graph Data*, asked by a person or an agent | it settles | a request is filed by the engine; an eval or a test files none |
 | SE-13.5 | The same open ask by the same person or agent | it is asked again | it adds to the one request's count and last asked, never a second row |
 | SE-13.6 | A person in Explore | they pick *Ask for a change* | a request is filed with their words |
 | SE-13.7 | A request a rule on a property caused | a Modeller or an Admin picks *Allow* and a view | the view joins the rule's exceptions and the row moves to Done reading *allowed in <view>* |

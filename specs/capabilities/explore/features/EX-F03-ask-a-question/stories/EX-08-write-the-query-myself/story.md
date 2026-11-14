@@ -51,7 +51,7 @@ flowchart LR
   ask -->|declined · expired| dx(["Refused · nothing written"])
   ask -->|approved| r
   w -->|no| r["Runs in read mode · elapsed time · Cancel"]
-  r -->|zero rows| z["The Graph does not hold this — an answer"]
+  r -->|zero rows| z["Graph Data does not hold this — an answer"]
   r -->|failed| f["The reply says why · the console opens on Log"]
   r --> fl["Result filter · what the agent may not read dropped"]
   fl --> ans(["Rows in the console · withheld count · the answer in the thread · a ledger row"])
@@ -69,7 +69,7 @@ flowchart LR
 | EX-08.6 | A query with a write clause, from a Modeller or an Admin, on a read + write graph database | the person runs it | it asks first: the run waits on the Query console's named approvers in the Inbox; approved, it runs; declined or expired, nothing is written and the reply says who decided |
 | EX-08.7 | A read query that mentions *offset*, *settings* or a quoted *merge* | the person runs it | it runs, in a read-only session (GP-04), without asking |
 | EX-08.8 | A valid query | it runs | the query and its outcome are turns in the thread, its rows are in the console's Data, and the call is recorded in *What left the platform* (AC-F09), naming the Query console and the person |
-| EX-08.9 | A query that returns zero rows | it finishes | the reply says the Graph does not hold this, as an answer, not an error |
+| EX-08.9 | A query that returns zero rows | it finishes | the reply says Graph Data does not hold this, as an answer, not an error |
 | EX-08.10 | A slow query | it runs | the elapsed time shows with *Cancel* |
 | EX-08.11 | A very large result | it runs | it is counted first, and capped with the cap stated |
 | EX-08.12 | A query that fails in the graph database | it fails | the reply states the error's first line and *Open the log*; the console opens on Log at the failing step; the board is untouched |
@@ -80,7 +80,7 @@ flowchart LR
 | EX-08.17 | A query with a node or relationship pattern that has no label, and a Query console that may not Read `data/{graph database}/*` | the person runs it | it is refused before it runs, naming the rule — *An unlabelled pattern reaches every kind* (GP-05.3) |
 | EX-08.18 | A Gremlin query with a Groovy script, a lambda or `eval` | the person runs it | it is refused before it runs, naming the construct — a Gremlin query is steps only; nothing is sent (GP-05.9) |
 | EX-08.19 | A read whose result holds kinds or property levels the Query console may not Read | the person runs it | they are dropped, never shown; the console and the reply say how many were withheld and name the kinds and levels (GP-05.7) |
-| EX-08.20 | A read whose result is all withheld | the person runs it | the reply says everything was withheld and how many, never *the Graph does not hold this* (GP-05.8) |
+| EX-08.20 | A read whose result is all withheld | the person runs it | the reply says everything was withheld and how many, never *Graph Data does not hold this* (GP-05.8) |
 
 ## Screens
 

@@ -54,7 +54,7 @@ flowchart LR
 | SE-22.8 | A derivation with write-back off | it runs | nothing is written to the graph database |
 | SE-22.9 | An Admin | they turn on write-back for a derivation | its facts are also written to the graph database, marked derived, and removed when withdrawn |
 | SE-22.10 | Someone who is not an Admin | they open a derivation | write-back reads; turning it on is disabled with *Needs the Admin role — ask an Admin*, and the API refuses it |
-| SE-22.11 | A run that fails or passes the Graph's limit | it stops | the derivation names the reason, with *Run again* |
+| SE-22.11 | A run that fails or passes the deployment's limit | it stops | the derivation names the reason, with *Run again* |
 | SE-22.12 | An Operator | they open Derivations | the list and derived facts read; the acts are disabled with *Needs the Modeller role — ask an Admin*, and the API refuses them |
 | SE-22.13 | A derivation whose premises hold properties of different levels | it derives a fact | each derived property takes the highest level of the properties it was derived from, and shows it; a derivation cannot give a derived property a lower level |
 | SE-22.14 | A premise property whose level is changed in a later published version | the next run ends | the derived property's level follows it |

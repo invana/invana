@@ -58,7 +58,7 @@ from.
 | Quality — what breaks the model and the standards | modal | `data.quality` |
 | A fix across records — preview and run | modal | `data.fix` |
 | Merge two records | modal | `data.merge` |
-| Annotations — every annotation in the Graph | modal | `data.annotations` |
+| Annotations — every annotation in Graph Data | modal | `data.annotations` |
 
 ## Rules
 
@@ -70,13 +70,13 @@ from.
 
 | Decision | Detail |
 |---|---|
-| Records are the instances of the models | Every node and relationship in the Graph's graph database, each a record of a kind in a published model. Scope is the Graph |
+| Records are the instances of the models | Every node and relationship in the deployment's graph databases, each a record of a kind in a published model. Scope is the deployment |
 | Semantics says what should be; Records shows what is | Semantics owns kinds, constraints, standards and rules; Records reads records against them. Semantics' health compares a model with what the database holds, kind by kind; Records' quality is record by record |
 | Records come in three ways | What the connected graph database already holds; a load into one model by upload, CLI or API ([RC-F02](features/RC-F02-bring-records-in/feature.md)); and what people and agents write in Invana — a board's save, a fix, a merge |
 | A load is the citable anchor | Each load has a stable id, its file's content hash and a licence field, and exports with its provenance. Findings, reports and simulations cite a load; undoing a load flags everything that cites it with a *load undone* notice |
 | Every write is a run | A load, a fix, a merge or a board's save is one recorded run, checked against the published model and Semantics' rules before it writes; the engine refuses what the model does not allow, record by record |
 | Derived facts are records | Facts that inference adds (SE-F08, [Semantics](../semantics/product.md)) are stored as records labelled *derived*, each naming its rule and premises; the rules that produce them stay in Semantics |
-| Provenance reads History | Who wrote each value is read from the Graph's one append-only event store, owned by [AC-F06](../../os/access/features/AC-F06-history/feature.md) and filtered to the record — never a second store |
+| Provenance reads History | Who wrote each value is read from the deployment's one append-only event store, owned by [AC-F06](../../os/access/features/AC-F06-history/feature.md) and filtered to the record — never a second store |
 | Annotations are instances of a built-in model | An annotation is a record of the built-in *Annotation* kind, kept by Invana, never in the customer's graph database. Explore creates them while investigating; Records keeps and manages them ([RC-F07](features/RC-F07-annotations/feature.md)) |
 | Merging is chosen, never inferred | A person picks the records that are one; Invana never decides two records are the same |
 | Screen words | *Records* and *Load* are on screen; *instance* is a vision and docs word |
@@ -94,8 +94,8 @@ from.
 
 | Item | Why not |
 |---|---|
-| A dataset catalogue · dataset versions · dataset licences · retraction · a registry | A load is the citable unit; the records are the Graph's, not a second catalogue beside them |
-| Adding a dataset to a graph | Records are loaded into one model of one Graph; there is no install-wide copy to add |
+| A dataset catalogue · dataset versions · dataset licences · retraction · a registry | A load is the citable unit; the records are Graph Data's, not a second catalogue beside them |
+| Adding a dataset to a graph | Records are loaded into one model of the deployment; there is no install-wide copy to add |
 | Datasets collected by an agent | An agent that gathers facts writes them through a load or a run like anyone else |
 | Unstructured data — documents, papers, notices, free-text files | A record is a row that conforms to one model's kind; text without that shape is not a record. Something outside Invana extracts the rows first |
 | Scheduled imports | The customer's pipeline calls the CLI or the API on its own schedule |

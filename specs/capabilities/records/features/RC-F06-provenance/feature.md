@@ -14,7 +14,7 @@ depends_on: [RC-F01, RC-F02, AC-F06]
 # Provenance
 
 > Where each value of a record came from — which load, edit, person or agent wrote it and when — its lineage back to
-> the file and the run, and every change to it since, read from the Graph's one History.
+> the file and the run, and every change to it since, read from the deployment's one History.
 > The decision it helps make: *can I trust where this value came from, and was every change to it right?*
 
 ## User journey
@@ -53,7 +53,7 @@ flowchart TD
 | Provenance is field-level | Each value names the load, edit, person or agent that wrote it, the run, and when |
 | Lineage ends at the file | A value a load wrote traces to the load, its file, its content hash, its licence and its run ([RC-F02](../RC-F02-bring-records-in/feature.md)) |
 | Derived values name their rule | A value inference added is labelled *derived* and names its rule and premises (SE-F08, [Semantics](../../../semantics/product.md)) |
-| One event store | Provenance and history read the Graph's one append-only History ([AC-F06](../../../../os/access/features/AC-F06-history/feature.md)), filtered to the record — never a second log |
+| One event store | Provenance and history read the deployment's one append-only History ([AC-F06](../../../../os/access/features/AC-F06-history/feature.md)), filtered to the record — never a second log |
 | Every write lands there | A load, a board's save, a fix, a merge and a derivation each write their changes to History |
 | The database's own records | A value Invana never wrote reads *Present in the graph database before Invana wrote to it* — never a guess |
 | Provenance is not lineage | Provenance is *where a value came from* — a load, an edit, a person, an agent. Lineage is *what a copy was read from* — an answer, a finding, a report, a snapshot, a note, an export. Provenance feeds lineage: a copy's sources are resources in [Access Policies' grammar](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms), and a record's provenance is what tells which load or run a source was ([GP-F02 › Engine](../../../../os/graph/features/GP-F02-memory/feature.md#engine)) |
@@ -122,7 +122,7 @@ flowchart TD
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 404 | A kind the published model lacks, or an address History never saw | *No `{kind}` `{key}` in this graph.* | API only — Studio opens a record from a listed kind |
+| 404 | A kind the published model lacks, or an address History never saw | *No `{kind}` `{key}` in Graph Data.* | API only — Studio opens a record from a listed kind |
 
 ### CLI
 

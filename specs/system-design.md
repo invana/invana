@@ -31,7 +31,7 @@ status: idea
 
 Invana is a self-hosted engine and web app that sits between the people and agents who decide and the customer's own
 graph databases. One deployment is everything: it connects any number of graph databases, each through its connector,
-and stitches them into one Graph without copying a record. It keeps its own state in Postgres, its Memory in a
+and reads them as one Graph Data without copying a record. It keeps its own state in Postgres, its Memory in a
 bundled system graph and its files in an S3-compatible blob store ([vision](vision.md#where-things-live)).
 
 ```mermaid
@@ -50,7 +50,7 @@ flowchart LR
 
 | In scope | Out of scope |
 |---|---|
-| One deployment is one organisation: its graph databases stitched into one Graph, its users, teams, agents and work | Multi-tenancy, workspaces, an Organisation record, any unit inside a deployment that holds a graph of its own |
+| One deployment is one organisation: its graph databases read as one Graph Data, its users, teams, agents and work | Multi-tenancy, workspaces, an Organisation record, any unit inside a deployment that holds a graph of its own |
 | The ontology, Access Policies, runs, the ledger, History, boards and projects — in Postgres; Memory with its lineage, and identity links — in the system graph | A copy of the customer's records, an extractor, write-back to a system upstream of a graph database |
 | People acting through agents, every agent held to the same Access Policies | A person acting on data without an agent |
 
@@ -131,7 +131,7 @@ the recommendation that adds one. A feature names the NFRs it must meet in its `
 | Constraint | Because |
 |---|---|
 | Self-hosted, single-tenant, air-gappable | The target is the enterprise's own ground; every added stateful service is the customer's ops cost |
-| One deployment, one Graph | The deployment is the widest scope; every graph database it connects is part of its one Graph; no table, route or command is scoped below it ([vision](vision.md#scope)) |
+| One deployment, many graph databases, read as one Graph Data | The deployment is the widest scope and the only one; every graph database it connects is part of its Graph Data, which is never created, opened, selected or listed; no table, route or command is scoped below it ([vision](vision.md#scope)) |
 | The customer's graph databases are theirs | Invana reads them in place through a connector and holds no copy; it writes only to a read + write graph database, and never to a system upstream of one |
 | Supported databases: Neo4j, Memgraph, ArcadeDB (Cypher); JanusGraph, Amazon Neptune, TinkerGraph, ArcadeDB (Gremlin) | The connectors Invana ships ([GP-F01](os/graph/features/GP-F01-data/feature.md#mechanisms)) |
 | Postgres is the source of truth; SQLite in development | Every record, event, the ledger, History and the queue in one transactional store; SQLite keeps a developer's setup to one command |
@@ -143,7 +143,7 @@ the recommendation that adds one. A feature names the NFRs it must meet in its `
 
 ## 5. Capacity estimates
 
-Invana scales with acts, runs, calls and tokens — not with page views. The Graph's size is the customer's databases'.
+Invana scales with acts, runs, calls and tokens — not with page views. The size of Graph Data is the customer's databases'.
 
 | Quantity | Estimate | Reached by | Sizes |
 |---|---|---|---|
@@ -178,7 +178,7 @@ Invana scales with acts, runs, calls and tokens — not with page views. The Gra
 |---|---|---|---|
 | Postgres is the truth, the system graph follows | A write lands in Postgres with an outbox row in the same transaction; a relay applies each row to the system graph in order, retrying with a doubling delay; the system graph can be dropped and rebuilt from History | The system graph lags by seconds; a reader that needs the latest reads Postgres | NFR-REL-6 |
 | The system graph has its own ontology | A read-only, versioned system ontology ships with Invana and governs every node and edge in the system graph; `invana migrate` takes it to head | Invana's own graph changes only with a release | § 13 |
-| One deployment, no scope column | No table carries a Graph or tenant id; a record that belongs to one graph database carries `database_id` and cascades from it | No row is shared between deployments, and none needs to be | Each feature's *Records* |
+| One deployment, no scope column | No table carries a graph or tenant id; a record that belongs to one graph database carries `database_id` and cascades from it | No row is shared between deployments, and none needs to be | Each feature's *Records* |
 | One table, one owner | A table is written only by its feature's managers; another feature reads it through them and links its *Reads* row | A read across features is a call, not a join | Each feature's `## Engine` › *Records* · *Reads* |
 | Every write is an event | A manager emits the event of its write in the write's transaction; History, the change list, notifications and traces are readings of it, never copies | Every write path pays one insert | [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
 | Customer records stay in their graph database | Records are read in place; a dataset is a load batch — a file in the blob store, checked against the model, then loaded into a read + write graph database — never a second store of records | Every look at a record is a query on the customer's database | [RC-F02](capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) |
@@ -305,7 +305,7 @@ flowchart TB
 |---|---|---|
 | One name across layers | A package's name is the same in its spec folder, engine module, tables (`<package>_<records>`), routes, resources, events (`<package>.<records>.<verb>`), spans, Studio package (`@invana-studio/<package>`), Studio routes and boards (`<package>.<surface>`). Packages: `control` · `access` · `graph` · `semantics` · `records` · `agents` · `explore` · `projects`; shared: `core` · `cli` · `server` | [migrations.md](migrations.md) M5 for the code |
 | Records are plural nouns, said once | `access_policies`, `runs`; a record named as its package is said once | Each feature's *Records* |
-| One route shape | `/api/v1/<package>/<records>` — no Graph, user or tenant segment; a route sits under the package that owns its records, never under the screen that calls it; Studio's routes follow without a Graph segment | Each feature's *Routes* |
+| One route shape | `/api/v1/<package>/<records>` — no graph, user or tenant segment; a route sits under the package that owns its records, never under the screen that calls it; Studio's routes follow without a graph segment | Each feature's *Routes* |
 | A read without access | `404` — what the person's agents may not Read is absent, not forbidden; an act they may see but not do is `403`, naming the rule | [AC-F02](os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Errors map once | Not found `404` · conflict `409` · unauthenticated `401` · denied `403` · a shape the model forbids `422` · rate-limited `429`; every error names the field, step, bound or rule, never a bare code | Each feature's *Refusals* |
 | A write answers `{ message, data }` | The engine writes the sentence; Studio shows it and composes none; one gesture reports once | Each feature's *Routes* |
@@ -397,7 +397,7 @@ sequenceDiagram
 | A plan becomes a workflow by approval | The agent's named approvers approve a plan into a workflow for reuse; the platform owns it and keeps who asked as its maker; a workflow is read-only and changes only as a new version. Approval is for reuse, never to run a one-off plan | — | [AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | A closed catalogue of functions | Every step calls one function from a plugin switched on, or an approved library | A new capability is a plugin | [AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) · [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) |
 | Skills are offered, not forced | A skill is bound to agents and offered by its match; its eval cases gate a publish | — | [AG-F04](capabilities/agents/features/AG-F04-skills/feature.md#engine) |
-| Grounding is a contract | An answer states only what the records hold; zero rows is *the Graph does not hold this*; an outside fact is badged with its source; a what-if is evidence labelled *predicted*; a failure is not a cannot-answer | — | [EX-F04](capabilities/explore/features/EX-F04-the-answer/feature.md#engine) · [EX-F05](capabilities/explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine) |
+| Grounding is a contract | An answer states only what the records hold; zero rows is *Graph Data does not hold this*; an outside fact is badged with its source; a what-if is evidence labelled *predicted*; a failure is not a cannot-answer | — | [EX-F04](capabilities/explore/features/EX-F04-the-answer/feature.md#engine) · [EX-F05](capabilities/explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine) |
 | Three pauses | Clarification (*I do not know*), approval (*I may not proceed*), verdict (*I may not judge what I made*); a paused run holds nothing | — | [CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [AC-F05](os/access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | An ask reaches its approvers | An Ask waits for the agent's named approvers — people or a team, else the Admins with a *no approver* alert, never the one it benefits — in the Inbox, email, Slack, Teams or a webhook; a yes covers that step of that run; unanswered it reminds, escalates to the Admins, then expires as refused, never allowed. Every decision is a History row whatever the channel | — | [AC-F05](os/access/features/AC-F05-asks-and-approvals/feature.md#engine) · [CP-F08](os/control/features/CP-F08-the-inbox/feature.md#engine) |
 | Bounded four ways | Tokens held before each call; sub-task depth, count and tokens from the agent's budget; runs at once per team, user and agent; a fan-out ceiling | A wide question waits | [CP-F04](os/control/features/CP-F04-limits/feature.md#engine) · [AG-F05](capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine) |
@@ -614,7 +614,7 @@ record (§ 6).
 |---|---|---|
 | A plan interpreter, not a job scheduler | The runtime walks plans generated as data and refuses what the policies forbid | Invana keeps its own interpreter |
 | One deployment, one organisation | No multi-tenancy, no workspaces, no unit below the deployment; hosted means one deployment per customer | Each customer runs their own |
-| The graph databases are the customer's | Invana reads them in place, stitches them into one Graph, and writes only to a read + write one | Invana depends on each database's availability |
+| The graph databases are the customer's | Invana reads them in place, reads them as one Graph Data, and writes only to a read + write one | Invana depends on each database's availability |
 | Postgres is the truth | Records, events, the ledger, History, the outbox and the queue in one database; the system graph and the blob store hold what it cannot hold well | One database carries every write |
 | Agents do every act | A person acts through the agents they may use; one access model for people, agents, keys and outside callers | A person's direct act is a built-in agent's run |
 | Tokens are the unit of spend | Budgets, limits and figures in tokens | No cost view in currency |

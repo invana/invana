@@ -30,7 +30,7 @@ flowchart TD
   live -->|a step fails| fl["The step turns failed · why, in place"]
   live -->|reloaded| live
   live --> rows{Any rows?}
-  rows -->|none| empty(["The Graph does not hold this — an answer"])
+  rows -->|none| empty(["Graph Data does not hold this — an answer"])
   rows -->|yes| words["EX-25 · One to three cited sentences, first"]
   words -->|a sensitive property for an external model| skip["The records alone · the step names the property"]
   words --> shape["EX-03 · The plan's rows through the projection template that fits"]
@@ -99,7 +99,7 @@ is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-run
 | State | What the person sees |
 |---|---|
 | First use | No answer yet: the question box (EX-F03); the five built-in projection templates are the only ones |
-| Empty after a filter | Zero rows: *The Graph does not hold this*, a sentence in the reading order — never an empty table or a zeroed chart |
+| Empty after a filter | Zero rows: *Graph Data does not hold this*, a sentence in the reading order — never an empty table or a zeroed chart |
 | Loading | A row per step as it starts — running · done · failed · retrying 2/3 · repairing — with time and tokens; a table paints while the next step runs; *Writing the answer…* over it |
 | Has data | Cited words, then the records' shape, then the meta line — *195 records · sales, crm · 9 ms* — and its acts |
 | Failed | The failed step, why, in place; a failed Answer step leaves the records as the answer |
@@ -229,7 +229,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Decision | Detail |
 |---|---|
 | Everything answers in the thread | Answers, the words of a chart, refusals, cannot answer, traces and confirmations arrive as the assistant's messages; the question is a bubble on the right |
-| A reply | The assistant's mark, the cited words, the parts; under them the meta line — record count · the graph databases read · time — then *Load to canvas* (a graph not yet drawn, or a table whose rows are things in the Graph) · *Keep board* · *Share* · *Fork from here* · *Schedule this* · *Add to a project*, folding into *⋯* by width; *How it got here* pinned first. No labelled button row under the answer |
+| A reply | The assistant's mark, the cited words, the parts; under them the meta line — record count · the graph databases read · time — then *Load to canvas* (a graph not yet drawn, or a table whose rows are things in Graph Data) · *Keep board* · *Share* · *Fork from here* · *Schedule this* · *Add to a project*, folding into *⋯* by width; *How it got here* pinned first. No labelled button row under the answer |
 | One offer, from the result | *Load to canvas* is the only offer, at most one per reply, never on a number, a chart or a total; it runs the drawing as its own read in the same conversation |
 | A graph part has no card | In the thread it is the reply's sentence and meta line; on the board it is the drawing. Every other part is a card: its kind, the template drawing it, the citation |
 | Switching the template is the answer's | A switch re-draws the same rows and is kept on the answer, so everyone who may read it sees the shape chosen |
@@ -245,7 +245,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| Does a `pick-from-graph` question asked back refresh its options when it is asked again, or keep the options of its first ask? Recommend: refresh — the options are read from the Graph under the agent's Access Policies, and a frozen list can offer what the Graph does not hold now | Ravi |
+| Does a `pick-from-graph` question asked back refresh its options when it is asked again, or keep the options of its first ask? Recommend: refresh — the options are read from Graph Data under the agent's Access Policies, and a frozen list can offer what Graph Data does not hold now | Ravi |
 | The home's composer showing the skill as its first chip (*Explain*) is drawn and not built. Build it, or drop it — the composer offers no skill picker (EX-F03 › Not building)? Recommend: drop it, unless the chip only names the agent's skill and picks nothing | Ravi |
 | *Loads behind the records* under a trace's steps is drawn and not built: it needs each record's load on the reply. Build it with EX-04, or leave the load to the record's panel (RC-F06)? Recommend: build it with EX-04 — the trace is where a person checks where an answer came from | Ravi |
 

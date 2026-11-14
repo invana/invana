@@ -9,7 +9,7 @@ boards: [model.rules]
 
 # SE-11 · Keep protected data protected
 
-**As** a modeller accountable for what this Graph does with its data **I want** one rule per protected property,
+**As** a modeller accountable for what the deployment does with its Graph Data **I want** one rule per protected property,
 always in force, saying what a run may do with it **so that** protected data stays protected and I can hand the list
 to an auditor.
 
@@ -30,7 +30,7 @@ Writing a rule on a property is the Modeller's and the Admin's ([the role table]
 flowchart LR
   a([Rules and views › Rules]) --> l{Any rule on a property?}
   l -->|no| e["No rules on properties — every property may be read and may leave"]
-  l -->|yes| r["Each rule as a line · scope This graph · what it stopped"]
+  l -->|yes| r["Each rule as a line · scope Everywhere · what it stopped"]
   r --> one["Rule · Refusals · History"]
   a -->|New rule · a property| d["When a run touches · it may · and the result"]
   d --> i["What it would stop — counted before saving"]
@@ -45,14 +45,14 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-11.1 | A Graph with no rule on a property | the person opens Rules | the list reads *No rules on properties — every property may be read and may leave* |
-| SE-11.2 | A Modeller or an Admin | they pick *New rule* and *A property* | the dialog offers *When a run touches* (a pick over the published kinds' properties, either side may be *any*) · *It may* Read · Read in counts only · Never read · *And the result* May leave · Stays in the Graph |
+| SE-11.1 | A deployment with no rule on a property | the person opens Rules | the list reads *No rules on properties — every property may be read and may leave* |
+| SE-11.2 | A Modeller or an Admin | they pick *New rule* and *A property* | the dialog offers *When a run touches* (a pick over the published kinds' properties, either side may be *any*) · *It may* Read · Read in counts only · Never read · *And the result* May leave · Stays in Graph Data |
 | SE-11.3 | The dialog with a target chosen | it changes | the engine counts the views and schedules that read the property today and shows it before saving; *Save rule* waits while it reads *Counting…* |
 | SE-11.4 | *Read* with *May leave* | the rule is saved | it is refused: *this rule narrows nothing* |
 | SE-11.5 | A property another rule already holds | the rule is saved | it is refused naming that rule |
-| SE-11.6 | A saved rule | it lists | its name is made from the rule — `Deal.price never leaves` · `*.email never read` · `Deal.price in counts only` — its scope reads *This graph*, and it shows what it stopped this week |
+| SE-11.6 | A saved rule | it lists | its name is made from the rule — `Deal.price never leaves` · `*.email never read` · `Deal.price in counts only` — its scope reads *Everywhere*, and it shows what it stopped this week |
 | SE-11.7 | `Deal.price` *Read in counts only* | a run sums or counts it | the result returns; a query returning the value itself is refused |
-| SE-11.8 | `Deal.price` *Stays in the Graph* | a run calls an AI model or an outside service | no record value crosses in that run |
+| SE-11.8 | `Deal.price` *Stays in Graph Data* | a run calls an AI model or an outside service | no record value crosses in that run |
 | SE-11.9 | A run that needs `Deal.price` held by *Never read* | it is asked | it ends *cannot answer*, naming the rule, and a request is filed (SE-13) |
 | SE-11.10 | A rule on a property | the person opens it | it shows *Rule* (the kinds carrying the property, the rule as a sentence, the views it is allowed in, refused this week — who · where · when) · *Refusals* (every request it filed) · *History* (its events, before and after) |
 | SE-11.11 | A run in progress | the rule is edited | that run keeps what it was frozen with; the next run gets the new rule |

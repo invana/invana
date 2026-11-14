@@ -14,7 +14,7 @@ depends_on: [EX-F01]
 # Annotations
 
 > The one home for annotations: what people and the assistant say about the records, kept by Invana as records of
-> the built-in *Annotation* kind — what an annotation is, how it is kept, and every one in the Graph in one place,
+> the built-in *Annotation* kind — what an annotation is, how it is kept, and every one in Graph Data in one place,
 > found by record, author or kind, and edited or removed by its author. Making one is done on a board
 > ([RC-13](stories/RC-13-annotate-the-records-on-a-board/story.md)).
 > The decision it helps make: *which annotations still hold, and which should go?*
@@ -38,7 +38,7 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| RC-07 | [Find and manage the Graph's annotations](stories/RC-07-find-and-manage-the-graphs-annotations/story.md) | idea |
+| RC-07 | [Find and manage every annotation in Graph Data](stories/RC-07-find-and-manage-the-graphs-annotations/story.md) | idea |
 | RC-13 | [Annotate the records on a board](stories/RC-13-annotate-the-records-on-a-board/story.md) | idea |
 
 ## Rules
@@ -50,13 +50,13 @@ flowchart TD
 | Made on a board, kept here | Annotating is done on a board (RC-13); what an annotation is, and finding, reading, editing and removing all of them, is here too |
 | On data, never free | It names the records it is about — a node, a relationship, one value, a set (highlight) or two or more nodes (group) |
 | One word | *Annotation*, with an author — a person or the assistant |
-| It belongs to the Graph | Any board that loads a record shows its annotations |
+| It belongs to Graph Data | Any board that loads a record shows its annotations |
 | A value annotation keeps its value | When the record's value differs it says *Was 71% when noted*; it never rewrites itself |
 | A deleted record | Its annotation is listed as *its record was deleted*, with what it said |
-| Reach | A person's annotations reach the Graph. The assistant's stay in their conversation until a person adds them to the Graph or dismisses them; one still in someone else's conversation is absent to everyone else |
-| Evidence | The assistant's annotations carry their query, what came back and the reply; where the Graph cannot answer, a gap annotation — never a number |
+| Reach | A person's annotations reach Graph Data. The assistant's stay in their conversation until a person adds them to Graph Data or dismisses them; one still in someone else's conversation is absent to everyone else |
+| Evidence | The assistant's annotations carry their query, what came back and the reply; where Graph Data does not hold it, a gap annotation — never a number |
 | Five colours | Amber, blue, green, red or grey, from the theme's tokens — amber `--warning`, blue `--primary`, green `--success`, red `--destructive`, grey `--muted-foreground`; a new one is amber, a group blue |
-| Never counted as data | Annotations are not records of the Graph's own models: never counted in Quality, never exported with records |
+| Never counted as data | Annotations are not records of the published models: never counted in Quality, never exported with records |
 
 ## Access
 
@@ -105,7 +105,7 @@ flowchart TD
 | Question | Who answers |
 |---|---|
 | Is the Annotation kind shown in Semantics, read-only? Recommend: no — it is Invana's, shown only here | Ravi |
-| EX-F06 › Access gives changing or deleting an annotation to its author alone; here an Admin may delete any, with a reason. Which holds? Recommend: an Admin may delete any with a reason, written into EX-F06 too, so nothing anyone wrote is beyond the Graph's Admin | Ravi |
+| EX-F06 › Access gives changing or deleting an annotation to its author alone; here an Admin may delete any, with a reason. Which holds? Recommend: an Admin may delete any with a reason, written into EX-F06 too, so nothing anyone wrote is beyond an Admin | Ravi |
 
 ## Not building
 

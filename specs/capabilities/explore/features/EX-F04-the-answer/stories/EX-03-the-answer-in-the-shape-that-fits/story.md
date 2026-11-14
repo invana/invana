@@ -51,7 +51,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-03.1 | A result of one number | it is shown | it reads as a number with its unit, not a one-row table |
-| EX-03.2 | A result of one number per category | it is shown | it reads as a chart, with Graph and Table one click away |
+| EX-03.2 | A result of one number per category | it is shown | it reads as a chart, with the graph and the table one click away |
 | EX-03.3 | A chart result with a single point | it is shown | it reads as a number, not a dot |
 | EX-03.4 | *As a chart* asked over one number | it is shown | the number shows, and the chart is offered disabled with its reason |
 | EX-03.5 | An answer's card | the person picks another template that accepts the rows | it re-draws from the same rows without running any query again, and everyone who may read the answer sees that shape |

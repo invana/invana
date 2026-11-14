@@ -179,6 +179,7 @@ every one.
 | Pool · lane · worker-seconds | Workers · *runs at once* |
 | Stitch | Link between models |
 | Task plan · frontier · step envelope | Its steps |
+| *Graph* as a thing you open, pick, switch or list | *Graph Data* — everything the deployment's graph databases hold, read in place and joined; never an object |
 
 Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *Derivation*, *Derived* — and the words they replace are defined once in [glossary.md](glossary.md). Code, docs and the CLI keep the domain terms in [the glossary's domain terms](glossary.md#domain-terms); this table governs only what a person reads in Studio.
 

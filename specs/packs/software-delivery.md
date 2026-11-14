@@ -128,7 +128,7 @@ an Admin edits the paths to the repository's own before applying them. Anything 
 | Hosts | Read `net/` the package registries the repository uses; no Write to any host but through a tool |
 | The code host | Run `tool/<code host>/*` on Ask for the Coder — opening a pull request is an outbound act, with its text through the outbound check ([AC-F09](../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)); through a work connection an Admin made ([CP-F02](../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)) |
 | Projects and memory | Read and Write `project/*` and Read `memory/project/*` — narrowed at run time to the run's project and the ones related to it ([AC-F04](../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
-| Data | None. A team that wants its agents to read the Graph writes that rule itself |
+| Data | None. A team that wants its agents to read Graph Data writes that rule itself |
 | Rows within a file | Each role adds only its own rows of a story's tasks; the sandbox guards files, so a row is the spec check's to guard, not a rule's |
 | Never | No agent may Write `fs/.claude/**`, `fs/CLAUDE.md` or `fs/AGENTS.md`: the team's rules are a person's to change |
 
@@ -153,4 +153,4 @@ an Admin edits the paths to the repository's own before applying them. Anything 
 | An agent that merges or deploys | A merge and a release are a person's |
 | Policy rules in the agent files | Only an Access Policy grants; the files declare |
 | Paths for one repository | The pack is general; an Admin sets the paths before applying the policies |
-| Graph data for the team's agents | Software work needs files and a code host; a team adds data rules itself |
+| Graph Data for the team's agents | Software work needs files and a code host; a team adds data rules itself |

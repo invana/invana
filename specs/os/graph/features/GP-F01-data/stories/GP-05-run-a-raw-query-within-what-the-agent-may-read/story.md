@@ -50,7 +50,7 @@ flowchart TD
 | GP-05.5 | A raw read | it runs | it runs in a read-only session (GP-04), whatever the graph database's mode |
 | GP-05.6 | A raw query with a write the agent's rules allow, on a read + write graph database | it runs | a write session opens for that step only, after its asks are answered; on a read-only graph database it is refused before the wire (GP-01.9) |
 | GP-05.7 | A result with nodes or relationships of kinds the agent may not Read, or properties of a level it may not Read | the query returns | each such node, relationship and property is dropped, never shown; the reply says how many it withheld and names the kinds and levels |
-| GP-05.8 | A result with nothing the agent may read left | the query returns | the reply says everything was withheld and how many, never *the Graph does not hold this* |
+| GP-05.8 | A result with nothing the agent may read left | the query returns | the reply says everything was withheld and how many, never *Graph Data does not hold this* |
 | GP-05.9 | A Gremlin query | it contains a Groovy script, a lambda or `eval` | it is refused before it runs, naming the construct — *Steps only* — and nothing is sent |
 | GP-05.10 | A Gremlin query of steps only | it runs | it passes layer 4 and layers 1 to 3 apply as to Cypher: every label and key in its steps is checked, and a step that reaches every kind needs Read on `data/{graph database}/*` |
 | GP-05.11 | A raw query | it runs, is refused or is filtered | the call is recorded in *What left the platform* (AC-F09) with the query, the layer that refused it or the count it withheld, naming the Query console and the person who started it |

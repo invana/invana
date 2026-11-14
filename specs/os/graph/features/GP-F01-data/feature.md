@@ -1,6 +1,6 @@
 ---
 id: GP-F01
-title: Data — the customer's Graph, read in place
+title: Data — the customer's Graph Data, read in place
 product: GP
 status: idea
 personas: [analyst, builder, modeller]
@@ -11,7 +11,7 @@ nfrs: [NFR-SEC-1, NFR-SEC-5, NFR-SEC-7, NFR-SEC-9, NFR-PERF-5, NFR-PERF-6]
 depends_on: [CP-F05, AC-F02, AC-F06, AC-F09, SE-F06, EX-F03]
 ---
 
-# Data — the customer's Graph, read in place
+# Data — the customer's Graph Data, read in place
 
 > Every question, board and agent step reads each graph database in its own language through its connector, answers
 > in one shape whatever the vendor, finds similar records with the database's own vector index, and joins the results
@@ -129,7 +129,7 @@ role decides only whether they may start the act that asks for it.
 
 ## Engine
 
-The low-level design: how a connector reads and writes, and how the Graph is joined. Conventions — naming, errors,
+The low-level design: how a connector reads and writes, and how Graph Data is joined. Conventions — naming, errors,
 lists, events — are [system-design.md](../../../../system-design.md) §§ 6–8; this section only fills them in. The
 records of each graph database — its connection, mode, switches and health — are [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md#engine)'s.
 
@@ -209,7 +209,7 @@ records of each graph database — its connection, mode, switches and health —
 | Conformance | One shared suite every package runs against a live database, never mocked; a method left unimplemented fails it, named |
 | The join | One query step per graph database, in its own language; the engine joins the results on the identity links the system graph holds, bounded by NFR-PERF-5 |
 | Identity links | Materialised in the system graph from the match rules a Modeller declares per pair of kinds ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)); never guessed; a rule change re-materialises its links |
-| Committing a link | `stitch-commit@1`, no agent and no view, the Graph's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
+| Committing a link | `stitch-commit@1`, no agent and no view, the deployment's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
 | What each kind writes | *Same thing* writes `SAME_AS` source → target, read undirected; a keyed relationship writes its `edge_type`; a row-sourced relationship writes nothing at commit — committing loads its rows, the files' place read back from the load's run |
 | Nothing written says so | A link that wrote nothing — a side the rules refuse — commits, says why, and never reports success; the others still solve |
 | Every later load joins | A load's link step runs the same `MERGE`, scoped to that load's stamp; writing again never writes twice |

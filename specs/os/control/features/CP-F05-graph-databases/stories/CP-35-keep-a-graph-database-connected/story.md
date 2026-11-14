@@ -10,7 +10,7 @@ boards: [settings.databases.database, access.sign_in_again]
 # CP-35 · Keep a graph database connected
 
 **As** an Admin **I want** one graph database's connection in one place — proven to work before anything depends on
-it, reconnected when it drops, and removable without touching its data **so that** the Graph rests on connections that
+it, reconnected when it drops, and removable without touching its data **so that** Graph Data rests on connections that
 were proven, and nothing is built on one that never was.
 
 Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
@@ -63,7 +63,7 @@ flowchart TD
 | CP-35.12 | A graph database a rule, a match rule or a workflow names | the Admin removes it | it is refused, naming each of them |
 | CP-35.13 | An Operator or a Modeller | they reach any act | it reads *Ask an Admin*, naming the Admins; the password field is absent |
 | CP-35.14 | A credential change or a removal | the Admin sends it | they are asked for their password for this act; a wrong password or a key is refused and nothing changes |
-| CP-35.15 | Nothing names it | the Admin removes it, typing its name and signing in again | it is gone from the list and from the Graph; the database's own data is untouched; History keeps who removed it, with its name |
+| CP-35.15 | Nothing names it | the Admin removes it, typing its name and signing in again | it is gone from the list and from Graph Data; the database's own data is untouched; History keeps who removed it, with its name |
 | CP-35.16 | A connector that cannot detect its server version | the Admin declares the version | it is saved, and the property types the model offers follow it, as a detected version would |
 | CP-35.17 | A server version Invana has not tested | the graph database reads | it is read-only, saying the version is untested, with *Accept this version* |
 | CP-35.18 | A graph database that is not connected | the Admin presses *Read types again* | it is refused, saying it is not connected, with *Reconnect* |

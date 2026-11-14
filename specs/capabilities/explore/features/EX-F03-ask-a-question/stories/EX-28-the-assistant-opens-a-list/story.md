@@ -52,7 +52,7 @@ flowchart LR
 | EX-28.8 | A list the assistant opened | its count is compared with the list | the card's count is the list's own total |
 | EX-28.9 | A request for something that is not a list it can open | the person asks | it is answered as an ordinary question |
 | EX-28.10 | An Operator asking for an agent they cannot see | the person asks | the agent is said as not found, and the count is of what they may read |
-| EX-28.11 | Any list the assistant opens | it opens | nothing in the Graph or the list changes |
+| EX-28.11 | Any list the assistant opens | it opens | nothing in Graph Data or the list changes |
 | EX-28.12 | A card the assistant drew | the person opens *How it got here* | its steps and sources are shown — the words it read and the filter each became |
 
 ## Screens

@@ -10,7 +10,7 @@ boards: [data.checks]
 # SE-17 · Keep a library of standards
 
 **As** a data curator **I want** a library of standards — the packs Invana ships and our own — each in immutable
-versions — that any Graph's kinds and properties can hold **so that** data follows the terms our field agreed.
+versions — that any model's kinds and properties can hold **so that** data follows the terms our field agreed.
 
 Tasks: [task.md](task.md) · Feature: [SE-F05](../../feature.md)
 
@@ -48,7 +48,7 @@ flowchart LR
 | SE-17.3 | A person writing a standard | they add a term | it has a name unique in the version, a type (text · integer · number · boolean · date), whether it is required, and allowed values, each a code with a label |
 | SE-17.4 | Terms identical to the current version | the person publishes | it is refused as *unchanged* and no version is minted |
 | SE-17.5 | A changed standard | a Modeller or an Admin publishes | the next version is minted; every kind and property that holds it stays on the version it holds |
-| SE-17.6 | A standard | the person opens *Used by* | it lists each kind and property that holds it, with its Graph, model, version and mode; ones in a Graph the person cannot read are counted as not readable |
+| SE-17.6 | A standard | the person opens *Used by* | it lists each kind and property that holds it, with its model, version and mode; ones the person cannot read are counted as not readable |
 | SE-17.7 | An Operator | they open a standard | *New version* is absent and a line reads *Needs the Modeller role — ask an Admin* |
 | SE-17.8 | The library cannot be read | Standards opens | it says it could not load, with *Try again* |
 | SE-17.9 | An Admin with a shipped pack's file | they apply it from the command line | it is published as a standard marked *pack*, or as its next version when the terms changed; identical terms read *unchanged* |

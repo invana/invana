@@ -8,7 +8,7 @@ personas: [analyst, decision-maker, modeller]
 
 # Explore
 
-> Ask the Graph — every graph database, stitched — a question in plain words, and read, keep and share an answer
+> Ask your Graph Data — every graph database, stitched — a question in plain words, and read, keep and share an answer
 > you can trace to its records.
 > The decision it helps make: *does this answer hold up well enough to act on and share?*
 
@@ -67,8 +67,8 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 | An answer draws onto the board | It adds to what is there and never replaces it |
 | Boards are named, saved and versioned | Autosave never overwrites history; going back makes a new version |
 | The console spans the board only | The left section and the assistant stay full height; the console describes the drawing |
-| Every answer is grounded | It states only what the records hold and cites the query and records behind each part; zero rows is *Cannot answer*, never a guess; a cannot answer is never answer-shaped, and a failure is never a cannot answer (EX-F05). Facts from beyond the Graph appear only when a rule allows them, marked *Third-party*; a what-if is evidence marked *Predicted* (EX-F05) |
-| One question, every graph database | A question is asked of the Graph, not of one database: the agent writes a typed query plan from the published model, the engine checks it against the model and the agent's Access Policies and runs one step per graph database in its own language, joined on identity links. No record is copied (EX-F03) |
+| Every answer is grounded | It states only what the records hold and cites the query and records behind each part; zero rows is *Cannot answer*, never a guess; a cannot answer is never answer-shaped, and a failure is never a cannot answer (EX-F05). Facts from outside Graph Data appear only when a rule allows them, marked *Third-party*; a what-if is evidence marked *Predicted* (EX-F05) |
+| One question, every graph database | A question is asked of Graph Data, not of one database: the agent writes a typed query plan from the published model, the engine checks it against the model and the agent's Access Policies and runs one step per graph database in its own language, joined on identity links. No record is copied (EX-F03) |
 | A gap is said, never patched | A question a typed plan cannot express is answered *I cannot ask this yet*, naming what the plan lacks and offering a function — never a raw query the person did not write (EX-F03) |
 | Nothing runs outside a run | Nothing in a conversation reaches an AI model or a graph database except through a run of a plan — a published workflow matched to the question, else one drafted for it ([AG-F06](../agents/features/AG-F06-plans-and-workflows/feature.md)) — so every answer can be traced, ledgered and limited |
 | How a run comes together | The agent decides what is possible, the plans decide what is tried, the rules and skills decide what it knows, and the agent's Access Policies are checked before anything runs |
@@ -103,6 +103,6 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 | Free-form drawing on a board | A board draws what exists; what a person says about it is an annotation on the records |
 | Real-time multi-cursor editing | One editor per board with version history is honest at this scale |
 | A raw query written by an AI model | A typed plan is checked before it runs; what it cannot express is said so (EX-F03) |
-| Unmarked outside facts in an answer | The claim is that answers are grounded; anything not from the Graph is marked with its reference (EX-F05) |
+| Unmarked outside facts in an answer | The claim is that answers are grounded; anything not from Graph Data is marked with its reference (EX-F05) |
 | A second place to watch imports run | An import is a run, read the same way as any other |
-| Memory carried within a run from turn to turn | Each run is put together from the rules, the skills, the Graph and what the thinking graph recalls |
+| Memory carried within a run from turn to turn | Each run is put together from the rules, the skills, Graph Data and what the thinking graph recalls |

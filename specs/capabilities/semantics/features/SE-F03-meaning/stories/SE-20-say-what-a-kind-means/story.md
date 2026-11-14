@@ -49,7 +49,7 @@ flowchart LR
 | SE-20.1 | A kind with no meaning | Meaning opens | it reads *No meaning yet*, with *Add a definition* for a Modeller or an Admin |
 | SE-20.2 | A kind with meaning | Meaning opens | it shows the definition, the synonyms, each property's unit and level, and each outside term with its label and address |
 | SE-20.3 | A Modeller or an Admin | they add a definition, a synonym, a unit or an outside term | it is staged on the model's draft and published with it, never changing a record |
-| SE-20.4 | A synonym another published kind in the Graph already has | it is staged | it is refused, naming the other kind and model |
+| SE-20.4 | A synonym another published kind already has | it is staged | it is refused, naming the other kind and model |
 | SE-20.5 | An outside term that is not an address | it is staged | it is refused, naming the field |
 | SE-20.6 | A published synonym | someone asks a question in that word | the answer resolves to the kind, and *How it got here* names the synonym that matched |
 | SE-20.7 | A synonym proposed by Explore's memory | the kind's Meaning opens | it waits with *Accept into the draft* · *Dismiss*, naming where it came from; accepting stages it |

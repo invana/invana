@@ -124,7 +124,7 @@ flowchart TD
 |---|---|---|---|
 | 403 | A fix on a record the person's agent may not write | *`{policy}` does not let this agent write `{kind}`.* | RC-12.9 |
 | 409 | The record changed since the problem was opened | *`{record}` changed since you opened it — reload and fix again.* | RC-12.6 |
-| 409 | A fix on a read-only connection | *This graph's connection is read-only — a fix needs a writable connection.* | RC-12.10 |
+| 409 | A fix on a read-only connection | *This graph database's connection is read-only — a fix needs a writable connection.* | RC-12.10 |
 | 422 | A fix whose value still breaks the rule, or with no reason | *`{value}` still breaks `{rule}`* · *A fix needs a reason.* | RC-12.11 |
 | 404 | A model with no published version | *`{model}` has no published version to check against.* | API only — *Quality* lists published models alone |
 
@@ -171,5 +171,4 @@ flowchart TD
 |---|---|
 | Fixing many records from the queue | A fix across records is previewed and run as one (RC-F04) |
 | Checks the model does not state | Quality reads the model's own constraints and rules, nothing else |
-| A queue across every Graph | Records' scope is the Graph; each Graph's queue is its own |
 | A claim on a standard outside the model | A kind or property holds a standard through its model (SE-F07); there is no second place to attach one |

@@ -44,7 +44,7 @@ flowchart TD
 | CP-41.3 | A practice graph database | a question, a board, a schedule or a workflow step names it | it is refused, saying it is for practice |
 | CP-41.4 | Practice for itself, for a practice one, or for one of another connector | an Admin saves it | it is refused, saying why |
 | CP-41.5 | An Operator or a Modeller | they reach *Make practice* | it reads *Ask an Admin*, naming the Admins |
-| CP-41.6 | A practice graph database | the Graph's model and answers are read | it is never part of them |
+| CP-41.6 | A practice graph database | the model and answers over Graph Data are read | it is never part of them |
 | CP-41.7 | A practice graph database | an Admin unnames it | it is an ordinary graph database again, off until an Admin turns it on |
 
 ## Screens

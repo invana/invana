@@ -10,7 +10,7 @@ boards: [settings.databases.connect, settings.databases.connect.shape, settings.
 # CP-25 · Connect a graph database in one modal of steps
 
 **As** an Admin **I want** to connect a graph database by naming it, proving the connection and seeing the model the
-agent drafts from what is there — one step at a time **so that** it joins the Graph with a name people recognise,
+agent drafts from what is there — one step at a time **so that** it joins Graph Data with a name people recognise,
 read-only and off until I decide otherwise.
 
 Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)

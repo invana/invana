@@ -8,7 +8,7 @@ personas: [analyst, builder, modeller, decision-maker, admin]
 
 # Graph Plane
 
-> What Invana reads and what it remembers: **Data** — the customer's Graph, read in place through a connector per
+> What Invana reads and what it remembers: **Data** — the customer's Graph Data, read in place through a connector per
 > graph database, in each database's own language, joined across graph databases on identity links — and **Memory** —
 > Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their
 > relations, each with its lineage. The decision it helps make: *what does this answer rest on, and what has been
@@ -27,7 +27,7 @@ followed back. Without one home for both, every capability reads the databases i
 
 | Persona | Comes here to |
 |---|---|
-| Analyst · Decision maker | Ask across every graph database as one Graph; follow a decision back to its sources in Memory; see what any copy was read from and know it shows only as far as their own agent may read |
+| Analyst · Decision maker | Ask across every graph database as one Graph Data; follow a decision back to its sources in Memory; see what any copy was read from and know it shows only as far as their own agent may read |
 | Agent builder | See what agents' runs left in Memory, what served and what failed |
 | Modeller | Rely on one shape of answer from every connector while shaping the model across them |
 | Admin | Trust that every read is a read the database enforces, every raw query is checked and every call is recorded; the Admin's controls for graph databases are [CP-F05](../control/features/CP-F05-graph-databases/feature.md) |
@@ -43,7 +43,7 @@ followed back. Without one home for both, every capability reads the databases i
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| GP-F01 | [Data — the customer's Graph, read in place](features/GP-F01-data/feature.md) | GP-01 · GP-02 · GP-04 · GP-05 | idea |
+| GP-F01 | [Data — the customer's Graph Data, read in place](features/GP-F01-data/feature.md) | GP-01 · GP-02 · GP-04 · GP-05 | idea |
 | GP-F02 | [Memory — Invana's own graph of the work](features/GP-F02-memory/feature.md) | GP-03 · GP-06 · GP-07 | idea |
 
 ## Surfaces
@@ -59,7 +59,7 @@ followed back. Without one home for both, every capability reads the databases i
 
 | Decision | Detail |
 |---|---|
-| Two graphs, never mixed | **Data** is the customer's Graph: their records, read in place and never copied. **Memory** is Invana's own graph, held in the system graph: never customer data — record IDs and keyed hashes, never a record's values |
+| Two graphs, never mixed | **Data** is the customer's Graph Data: their records, read in place and never copied. **Memory** is Invana's own graph, held in the system graph: never customer data — record IDs and keyed hashes, never a record's values |
 | The Admin's controls stay in Control | Installing a connector, connecting a graph database, its mode, switches, health and practice graph databases are [CP-F05](../control/features/CP-F05-graph-databases/feature.md)'s; how a connector reads and writes is Data's |
 | Thinking stays in Agents | What an agent learns from Memory — recall, outcome labels, marks, evidence and suggested changes — is [AG-F09 · Learn from memory](../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)'s; Memory is the store it reads |
 | One memory, no team memory | Memory is one for the deployment: project memory sits on its project, agent learnings on their agent, org knowledge on the deployment. No team holds memory of its own |
@@ -81,7 +81,7 @@ followed back. Without one home for both, every capability reads the databases i
 
 | Item | Why not |
 |---|---|
-| A copy of the customer's records | The Graph is read in place; Memory holds IDs and keyed hashes |
+| A copy of the customer's records | Graph Data is read in place; Memory holds IDs and keyed hashes |
 | Team-scoped memory | Memory is the deployment's; what a person reads of it follows run privacy and the agent's Access Policies |
 | A second memory store beside the system graph | One store, one truth, rebuilt from History |
 | A copy that shows without its sources | A copy with no recorded sources is not shown; no role overrides lineage |

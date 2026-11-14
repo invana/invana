@@ -39,7 +39,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-01.1 | A Graph with published models | the person opens Model | the map shows every published model as a frame in its own hue with its kinds inside, laid out and framed before it first shows |
+| SE-01.1 | A deployment with published models | the person opens Model | the map shows every published model as a frame in its own hue with its kinds inside, laid out and framed before it first shows |
 | SE-01.2 | Links between models | the map draws | each link is a dashed line crossing between frames; a model's own relationships are solid and stay inside its frame |
 | SE-01.3 | The map | the person picks *Show* | it draws all models or the one picked |
 | SE-01.4 | The map | the person picks *Detail* | kinds draw as circles, cards or property cards, re-laid out with room for what is drawn |
@@ -48,7 +48,7 @@ flowchart LR
 | SE-01.7 | Staged links, or links bound to an older version | the map shows | each set sits on a bar above the canvas with its acts; no count is drawn on the canvas |
 | SE-01.8 | The map | the person hovers a kind or a link | a kind shows its properties and a link its rule |
 | SE-01.9 | The dark theme | the map draws | frames, hues and titles follow the theme |
-| SE-01.10 | A Graph with no model | the person opens Model | the map says *No model yet* with *New model* |
+| SE-01.10 | A deployment with no model | the person opens Model | the map says *No model yet* with *New model* |
 | SE-01.11 | An Operator | they open the map | it reads in full; *Link models* and *New model* are disabled with *Needs the Modeller role — ask an Admin* |
 | SE-01.12 | Published models and active links | the person opens the whole model's list | Each kind and relationship is listed with the models that contribute it and whether a link joins it as the same thing, counted by the engine |
 

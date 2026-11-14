@@ -9,7 +9,7 @@ boards: [data.records]
 
 # RC-01 · Browse the records of a kind
 
-**As** an analyst **I want** every record of a kind, filtered by its properties and opened whole **so that** I know what the Graph holds before I ask it anything.
+**As** an analyst **I want** every record of a kind, filtered by its properties and opened whole **so that** I know what Graph Data holds before I ask it anything.
 
 Tasks: [task.md](task.md) · Feature: [RC-F01](../../feature.md)
 

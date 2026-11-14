@@ -10,7 +10,7 @@ boards: [settings.databases]
 # CP-40 · See every graph database and its health
 
 **As** an Admin **I want** every graph database the deployment connects in one list — its connector, mode, switch and
-whether it is answering **so that** I see at a glance what the Graph is made of and which part of it is down.
+whether it is answering **so that** I see at a glance what Graph Data is made of and which part of it is down.
 
 Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 

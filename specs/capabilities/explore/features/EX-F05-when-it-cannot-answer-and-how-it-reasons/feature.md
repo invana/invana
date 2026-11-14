@@ -13,10 +13,10 @@ depends_on: [EX-F01, EX-F03, EX-F04, EX-F06, AC-F02, AC-F05, AC-F09, AG-F06, AG-
 
 # When it cannot answer, and how it reasons
 
-> What a question gives back when it is not a plain answer — the Graph does not hold it, a typed plan cannot express
+> What a question gives back when it is not a plain answer — Graph Data does not hold it, a typed plan cannot express
 > it, an Access Policy refuses it, something is switched off, or something broke — and the ways a person steers how it
-> is reasoned: an approach with its assumptions shown, a what-if whose output is *Predicted*, facts from beyond the
-> Graph marked *Third-party*, and a fork to try another direction — so the person knows which kind of nothing they
+> is reasoned: an approach with its assumptions shown, a what-if whose output is *Predicted*, facts from outside
+> Graph Data marked *Third-party*, and a fork to try another direction — so the person knows which kind of nothing they
 > have, and what an answer rests on, before acting on it.
 > The decision it helps make: *which kind of nothing is this, and which method and facts may an answer rest on?*
 
@@ -46,9 +46,9 @@ flowchart TD
   wait -->|allowed| run
   run -->|a graph database or plugin switched off| off["EX-06 · Refused · who switched it off, and when"]
   run -->|a sensitive property for an external model| sen["EX-06 · Refused · the property named"]
-  run -->|the Graph does not hold it| ca["EX-05 · Cannot answer · what is missing · what to ask instead"]
+  run -->|Graph Data does not hold it| ca["EX-05 · Cannot answer · what is missing · what to ask instead"]
   run -->|needs facts from outside| out{"EX-26 · Run on the tool allowed?"}
-  out -->|no| gonly["Answered from the Graph · it says it could not look"]
+  out -->|no| gonly["Answered from Graph Data · it says it could not look"]
   out -->|yes| tp["Third-party claims marked, each with its reference"]
   wi -->|no simulator installed| nosim(["EX-33 · What-if needs a simulator · nothing guessed"])
   run -->|a what-if| sim["EX-33 · Simulating · from pinned records and loads"]
@@ -99,11 +99,11 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| EX-05 | [Be told when the Graph cannot answer](stories/EX-05-be-told-when-the-graph-cannot-answer/story.md) | idea |
+| EX-05 | [Be told when Graph Data does not hold it](stories/EX-05-be-told-when-the-graph-cannot-answer/story.md) | idea |
 | EX-06 | [A refusal or a failure that says why and what next](stories/EX-06-a-refusal-or-a-failure-that-says-why/story.md) | idea |
 | EX-24 | [Ask with an approach, with the assumptions shown](stories/EX-24-ask-with-an-approach-and-see-its-assumptions/story.md) | idea |
 | EX-33 | [Ask what if, and read the prediction as evidence](stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md) | idea |
-| EX-26 | [Facts from beyond the Graph, marked as such](stories/EX-26-facts-from-beyond-the-graph/story.md) | idea |
+| EX-26 | [Facts from outside Graph Data, marked as such](stories/EX-26-facts-from-beyond-the-graph/story.md) | idea |
 | EX-27 | [Fork a conversation from a reply](stories/EX-27-fork-a-conversation-from-a-reply/story.md) | idea |
 
 ## Access
@@ -129,9 +129,9 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 
 | State | What the person sees |
 |---|---|
-| First use | No approach picked and no outside tool allowed: the question is answered from the Graph alone; *Act as* lists the built-in *What-if* and any published approach |
+| First use | No approach picked and no outside tool allowed: the question is answered from Graph Data alone; *Act as* lists the built-in *What-if* and any published approach |
 | Empty after a filter | Zero rows from a valid plan: *Cannot answer*, worded as an answer to the question asked, naming what is missing |
-| Loading | The step reads what it does — *Retrying 2/3*, *Repairing*, *Waiting for approvers*, *Searching the web*, *Simulating* — while the Graph's steps already show; *Fork from here* shows a spinner until the new conversation exists |
+| Loading | The step reads what it does — *Retrying 2/3*, *Repairing*, *Waiting for approvers*, *Searching the web*, *Simulating* — while the steps over Graph Data already show; *Fork from here* shows a spinner until the new conversation exists |
 | Has data | An answer whose assumptions, third-party claims, predicted parts and fork lineage are each one click away |
 | Failed | What broke, on the step it broke on, with its evidence folded under it and one next step |
 | Agent working or proposing | The approach's assumptions above the composer before the run; the assistant's third-party nodes on the board, marked, waiting for *Keep*; a predicted part waiting for *Save as derived records* |
@@ -155,16 +155,16 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 | An approach is a method, not an actor | It brings a method, a declared set of assumptions and an answer shape. The agent still acts, with its own Access Policies, budget and model |
 | An approach never changes what runs | It reaches understanding, planning and the answer's shape; it never reaches checking, compiling or running the plan. The policy check is the same with or without one |
 | One run, one approach | Two at once are refused; an agent carries no default approach ([AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md)) |
-| An approach never softens *Cannot answer* | If its method needs what the Graph does not hold, the answer is *Cannot answer*, never an estimate |
+| An approach never softens *Cannot answer* | If its method needs what Graph Data does not hold, the answer is *Cannot answer*, never an estimate |
 | An approach that only changes the words did nothing | Swapping it on the same question and data must change the plan or the assumptions |
 | A model rule beats an assumption | An assumption a model rule ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) contradicts is dropped, naming the rule |
 | What-if is a reasoning method | Picked as the built-in *What-if* approach, or understood from a *what if …* question. The agent runs a simulator the deployment has installed — a plugin function, Run on its plugin allowed — from records and loads it pins; Invana never computes a figure itself |
 | Predicted is never observed | A simulation's output is a part marked *Predicted*, citing the simulator and its version, the seed, and the records and loads it started from; it never shares a table, a drawing or a claim with what the records hold |
 | Saved predictions are derived | Saving a predicted part writes derived records to a read + write graph database, labelled *derived* with the simulator and its version; its lineage — the run and its pinned loads — lives in the system graph ([RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md)) |
-| Anything not from the Graph is third-party | The internet, any connected tool and the model's own knowledge — marked *Third-party · internet*, *· api*, *· app*, *· db*, *· agent* or *· model*, in words, on the canvas and in the panel |
+| Anything not from Graph Data is third-party | The internet, any connected tool and the model's own knowledge — marked *Third-party · internet*, *· api*, *· app*, *· db*, *· agent* or *· model*, in words, on the canvas and in the panel |
 | No reference, not shown | Every third-party item keeps where it came from — for the internet the link, title, kind and when it was fetched — captured on arrival and never recomputed |
 | Off unless a rule allows it | An outside tool, and the model's own knowledge, reach a run only when an Access Policy on the agent allows Run on `tool/<plugin>/<tool>` — `tool/web/search`, `tool/web/read_url`, `tool/answer/own_knowledge`. Default deny; the strictest rule wins; an Ask waits on the agent's approvers |
-| The agent never plans what it may not run | A tool no rule allows is never planned, and the words say it could only answer from the Graph |
+| The agent never plans what it may not run | A tool no rule allows is never planned, and the words say it could only answer from Graph Data |
 | A third-party node is drawn first, written on *Keep* | It is on the board only; *Keep* writes it as a record of the built-in *Source* kind linked to what it is about, through a board save ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)), still marked third-party after a reload |
 | A fork copies; it does not point | A fork holds its own copies of the turns up to the reply and the board as it stood there; deleting the parent takes nothing from it |
 | Lineage is one link deep | A conversation knows its parent and the reply it branched at; nothing links conversations by inference |
@@ -252,7 +252,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 422 | Two approaches on one ask | *One run, one approach.* | EX-24.9 |
 | 403 | Authoring, changing or publishing an approach without the Modeller role | *Skills needs the Modeller role.* | EX-24.15 |
 | 422 | Changing the built-in *What-if* in place | *What-if is built in — copy it to change it.* | EX-24.16 |
-| step refused | No rule allows Run on the tool, or a Deny reaches it; the run goes on from the Graph | *I'm not allowed to look that up here.* | EX-26.6 |
+| step refused | No rule allows Run on the tool, or a Deny reaches it; the run goes on from Graph Data | *I'm not allowed to look that up here.* | EX-26.6 |
 | step failed | The web tool has no search address set | *Web search is not set up — an Admin sets it in Plugins.* | EX-26.17 |
 | 403 | *Keep* without the Modeller role | *Edit on the board needs the Modeller role.* | EX-26.18 |
 | 409 | *Keep* on a read-only graph database | *{graph database} is read-only — nothing can be written to it.* | EX-26.12 |
@@ -276,7 +276,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Mechanism | How |
 |---|---|
 | Outcome beside status | `answered` · `conversed` · `cannot_answer` · `refused` · `failed` · `cancelled` on the run; *succeeded* and *cannot answer* are two claims |
-| Three endings, three signals | A step returns *cannot answer* (`CannotAnswer`), a failure (`TaskFailure`) or an answer — never one shaped as another. `execute` returning nothing is *the Graph does not hold this*, never a generated guess |
+| Three endings, three signals | A step returns *cannot answer* (`CannotAnswer`), a failure (`TaskFailure`) or an answer — never one shaped as another. `execute` returning nothing is *Graph Data does not hold this*, never a generated guess |
 | Steps that end a run | `understand` — *cannot answer* or the plan gap · `plan` — the plan gap · `check` — refused, naming the policy and rule, the switch or the property, after its one repair against the model · `execute` — a failure with a diagnosis. `verify` records its verdict and never ends one |
 | Retry | Per step kind: attempts, backoff, jitter; each attempt a frame on its step |
 | Repair | The check's error against the model is carried into the plan step's second attempt |
@@ -303,13 +303,13 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | § 6 Data and storage | Two tables in Postgres; `Source` records and derived records written to the customer's read + write graph database; their lineage in the system graph | — |
 | § 10 AI and agents | The `nl-outside` and `simulate` workflows; approaches as offered context, never an input to the policy check; recall from the thinking graph; predicted and third-party evidence kept apart from observed | NFR-SEC-5 · NFR-SEC-8 |
-| § 11 Failure modes and the outside boundary | An outside tool or a simulator reaches a run only when an Access Policy allows Run on it; a failed search or simulation fails its step and the answer is from the Graph | — |
+| § 11 Failure modes and the outside boundary | An outside tool or a simulator reaches a run only when an Access Policy allows Run on it; a failed search or simulation fails its step and the answer is from Graph Data | — |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| A refusal is part of the answer | A search or a simulation a rule refuses is refused before it is sent and recorded; the run goes on from the Graph and the words say it could not look |
+| A refusal is part of the answer | A search or a simulation a rule refuses is refused before it is sent and recorded; the run goes on from Graph Data and the words say it could not look |
 | Approaches are authored with skills | Same shape — named, described, *when to use*, offered to a step, reused by many agents — so they sit in Agents › Skills, not a second authoring place |
 | No default approach | The plain path has no assumptions list; an approach is picked for one question |
 | Assumptions say what changes without them | Each assumption carries what the answer becomes if it does not hold, authored with the approach — so dropping one is predictable, and a re-run proves it |

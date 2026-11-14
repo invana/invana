@@ -42,10 +42,10 @@ flowchart LR
 | RC-06.3 | A change in the list | it is opened | its run opens |
 | RC-06.4 | A record Invana never changed | *History* opens | it reads *No changes made in Invana* |
 | RC-06.5 | A record deleted in a later run | its address is opened | its History ends with *deleted* and what it said |
-| RC-06.6 | A record's History and the Graph's History filtered to it | both are read | they show the same rows |
+| RC-06.6 | A record's History and the deployment's History filtered to it | both are read | they show the same rows |
 | RC-06.7 | A change by a member the Operator cannot see | *History* opens | it reads *a member you cannot see* |
 | RC-06.8 | The record cannot be read | it opens | *Could not load* shows with *Try again* |
-| RC-06.9 | A change to a property whose level the person's default agent may not Read | *History* opens | the change lists with its time, who and run, and *before → after* reads *Withheld — your agent may not read {resource}*; the same row in the Graph's History shows to those whose agent may read it |
+| RC-06.9 | A change to a property whose level the person's default agent may not Read | *History* opens | the change lists with its time, who and run, and *before → after* reads *Withheld — your agent may not read {resource}*; the same row in the deployment's History shows to those whose agent may read it |
 
 ## Screens
 

@@ -53,7 +53,7 @@ flowchart LR
 | RC-12.7 | A fixed record that conforms | the queue reloads | the item has left it |
 | RC-12.8 | Kinds a view hides | the queue opens | they are counted as not readable, never left out silently |
 | RC-12.9 | A problem on a record the person's agent may not write | they open it | it reads; *Fix* is disabled, naming the Access Policy that stops it |
-| RC-12.10 | A Graph whose connection is read-only | a fix is saved | it is refused, naming the connection setting; nothing is written |
+| RC-12.10 | A graph database whose connection is read-only | a fix is saved | it is refused, naming the connection setting; nothing is written |
 | RC-12.11 | A fix whose value still breaks the rule, or with no reason | it is saved | it is refused, naming the rule or asking for the reason; nothing is written |
 
 ## Screens

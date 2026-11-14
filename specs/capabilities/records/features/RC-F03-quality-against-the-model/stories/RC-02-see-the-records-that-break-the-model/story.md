@@ -37,7 +37,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| RC-02.1 | A Graph with a published model | a check runs | it ends with counts by kind and by rule, stored by the engine |
+| RC-02.1 | A deployment with a published model | a check runs | it ends with counts by kind and by rule, stored by the engine |
 | RC-02.2 | A rule with breaking records | it is opened | each record shows with its value and the rule it breaks |
 | RC-02.3 | Every record fits | a check ends | *Every record fits the model* shows with when it was checked |
 | RC-02.4 | A check running | the person presses *Stop* | it stops and keeps what it counted, marked as partial |

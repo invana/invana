@@ -8,8 +8,8 @@ boards: [explore.ask, explore.board, explore.board.chart, explore.board.why, dat
 
 # Ask and trust the answer
 
-> **Tom**, an analyst, asks the Graph a question in plain words and needs an answer he can defend — or to be told
-> plainly that the Graph cannot answer it.
+> **Tom**, an analyst, asks Graph Data a question in plain words and needs an answer he can defend — or to be told
+> plainly that Graph Data does not hold it.
 
 ## The journey
 
@@ -29,8 +29,8 @@ flowchart TD
   I -->|it holds| K{"What next"}
   K -->|share it| L(["EX-15 · A link that opens the answer"])
   K -->|work on it| M(["EX-12 · Add it to a project"])
-  F -->|the Graph lacks a fact, and the agent's Access Policies allow Run on an outside tool| X["EX-26 · Filled from beyond the Graph · marked Third-party with its source"] --> G
-  F -->|the Graph cannot answer| N["EX-05 · Says what is missing and who can add it"]
+  F -->|Graph Data lacks a fact, and the agent's Access Policies allow Run on an outside tool| X["EX-26 · Filled from outside Graph Data · marked Third-party with its source"] --> G
+  F -->|Graph Data does not hold it| N["EX-05 · Says what is missing and who can add it"]
   F -->|a typed plan cannot express it| NP["EX-05 · Says so · offers a function, never a raw query"]
   F -->|refused or failed| O["EX-06 · Says why, names who can help, the act that asks them"]
   N --> P(["Ask a Modeller · or ask again"])
@@ -59,10 +59,10 @@ flowchart TD
 | It needs permission | The agent's Access Policies narrow what it may read; the answer says so, and the act asks a named approver | EX-06 | `explore.board.cannot` |
 | It fails | A failed run says why in a sentence, with the act that tries again | EX-06 | `explore.board.cannot` |
 | The person has no access | Tom asks and reads as an Operator; acts beyond it name the role they need | EX-06 | `explore.board.cannot` |
-| The Graph cannot answer | It says what is missing — never an invented answer | EX-05 | `explore.board.cannot` |
+| Graph Data does not hold it | It says what is missing — never an invented answer | EX-05 | `explore.board.cannot` |
 | A typed plan cannot express the question | The agent says so and offers a function that could; it never runs a raw query unseen | EX-05 | `explore.board.cannot` |
 | A graph database the plan needs is switched off | Refused before it starts, naming the graph database and who switched it off | EX-06 | `explore.board.cannot` |
-| The Graph lacks a fact, and the agent's Access Policies allow Run on an outside tool (`tool/web/*`) | The agent fills it from the web or the model's own knowledge, each claim marked *Third-party ·* its source; a refused source is skipped and named | EX-26 | `explore.board` |
+| Graph Data lacks a fact, and the agent's Access Policies allow Run on an outside tool (`tool/web/*`) | The agent fills it from the web or the model's own knowledge, each claim marked *Third-party ·* its source; a refused source is skipped and named | EX-26 | `explore.board` |
 | An assumption is wrong | *Challenge this* asks again with Tom's approach | EX-24 | `explore.board.why` |
 | He asks *what if* | A simulation answers as evidence marked *Predicted*, never mixed with what the records hold | EX-33 | `explore.board` |
 | A cited record's run is one he may not read | The record's lineage names the run, without opening it; a change by a user he cannot see reads *a user you cannot see* | RC-05 · RC-06 | `data.record` |

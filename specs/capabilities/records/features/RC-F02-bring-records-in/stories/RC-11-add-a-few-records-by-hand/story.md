@@ -40,7 +40,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| RC-11.1 | Records › Bring records in | it opens for a Modeller or an Admin | *Add records by hand* carries an *Experimental* badge and offers the kinds of the Graph's published models |
+| RC-11.1 | Records › Bring records in | it opens for a Modeller or an Admin | *Add records by hand* carries an *Experimental* badge and offers the kinds of the published models |
 | RC-11.2 | A chosen kind | the person adds records | the form has the kind's properties; *Save records* waits until each record has its key |
 | RC-11.3 | Records saved | the load runs | they are one load, its source *by hand*, the person its author, each record checked against the kind's constraints like any load |
 | RC-11.4 | A new record whose key already exists | it is saved | it is refused naming the key; a new record never overwrites one |

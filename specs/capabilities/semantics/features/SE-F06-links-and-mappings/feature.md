@@ -14,7 +14,7 @@ depends_on: [SE-F01, SE-F02]
 # Links and mappings
 
 > Every published model on one map, the links between them declared by a person — never guessed — the mappings from
-> a model to a standard and between standards, and each model carried to another Graph as one file. The decision it helps make: *do these two models describe the same thing, and
+> a model to a standard and between standards, and each model carried to another deployment as one file. The decision it helps make: *do these two models describe the same thing, and
 > on which key?* — answered with the count of records each rule joins before it is made.
 
 ## User journey
@@ -42,7 +42,7 @@ flowchart TD
   run --> act(["Active · questions cross both models · every later load joins new records"])
   act -->|Remove link| rm["A run withdraws what it wrote"] --> map
   map -->|Export| ex1(["One file: the model, or the model and its records · confidential and personal values left out, and named"])
-  ex1 --> imp["SE-16 · Import into another Graph"]
+  ex1 --> imp["SE-16 · Import into another deployment"]
   imp -->|name taken| nt["Named — another name, or a new version · Restore an earlier version"]
   imp -->|kinds this database cannot hold| np["A draft that cannot publish, naming them"]
   imp --> dr(["A draft — publish it here (SE-F02)"])
@@ -56,7 +56,7 @@ sequenceDiagram
   participant R as Run
   M->>S: a key on each side
   S->>E: count what this rule joins
-  E->>R: preview, under the Graph's rules
+  E->>R: preview, under the deployment's rules
   R-->>S: 1,284 of 1,310 join · the 26 that do not
   M->>S: Stage this link · Commit
   S->>E: commit the staged links
@@ -108,7 +108,7 @@ sequenceDiagram
 | A link stages before it counts | Declared links are listed, drawn and counted as *staged* and change no answer until committed; *Commit* activates every staged link at once, *Discard* drops them |
 | An active link stands | Committing writes its relationships; every later load joins the records it brings. Writing again never writes twice |
 | A link's relationships say so | Each is marked as made by its link, with the rule and when; removing the link removes exactly those, and only once they are gone does the link go |
-| Every read and write is a run, under the Graph's rules | Counting, committing and removing a link; a rule that denies either model refuses it, with the reason — never counted around |
+| Every read and write is a run, under the deployment's rules | Counting, committing and removing a link; a rule that denies either model refuses it, with the reason — never counted around |
 | A model travels as one file | A published version exports with its kinds, keys and constraints; links travel only when both ends are in the same file. Its identity is its package and its content, not its name, so a later import is recognised as a new version. Files and git are the registry |
 | An export is a send | A model file with its records leaves the platform, so it passes the outbound check ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) with lineage: confidential and personal values are left out and the file names what was left out; the records are only those the person's default agent may read |
 | Three kinds of mapping | *Model to model* — a link between models, above · *Model to standard* — a kind or property means a standard's term or value, staged in the model's draft and published with it; a question may then be asked in the standard's words · *Standard to standard* — a term or value in one standard is the same as, broader than or narrower than one in another, kept on the newer standard's version |
@@ -146,7 +146,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 |---|---|
 | Models and their published versions | [SE-F01](../SE-F01-start-a-model/feature.md#engine) · [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Each kind's latest record count · the queries that crossed a link | [SE-F10](../SE-F10-health-and-history/feature.md#engine) |
-| The Graph's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
+| The deployment's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
 | Loads that join new records and bring a relationship's rows · record stamps | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Standards a mapping names | [SE-F05](../SE-F05-standards/feature.md#engine) |
 | Committing and withdrawing a link's relationships · identity links and the join across graph databases | [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md#engine) |
@@ -186,7 +186,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | 422 | A *same thing* link or a keyed relationship without a key on each side (`key_required_on_each_side`) | *Name a key on each side.* | API only — the card asks both keys |
 | 422 | A *same thing* link with a relationship name or a source model (`edge_type_on_anchor` · `source_model_on_anchor`) · a relationship without its name or its ends (`edge_type_required` · `endpoints_required`) · with keys and rows together (`keys_and_source_model`) | *{field}: {why}.* | API only — the card offers each field only for its kind |
 | 409 | A pair already linked, staged or active (`link_already_declared`) — carries the existing link's rule | *{source} and {target} are already linked by {rule}.* | SE-03.7 |
-| 409 | A count, commit or removal a rule in the Graph's rules refuses (`preview_refused`) — the link stays as it was | *{rule} denies {model} — nothing was counted.* | SE-03.13 |
+| 409 | A count, commit or removal a rule in the deployment's rules refuses (`preview_refused`) — the link stays as it was | *{rule} denies {model} — nothing was counted.* | SE-03.13 |
 | 409 | A count while the preview is queued (`preview_queued`) | *The count is waiting for a worker — try again.* | SE-03.19 |
 | 409 | A commit with nothing staged, no connection, or a read-only connection — before a run exists | *{why} — nothing was written.* | SE-03.13 |
 
@@ -201,7 +201,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Mechanism | How |
 |---|---|
-| Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the Graph's rules on properties, awaited; a rule naming a kind or key the rules deny comes back refused, never counted around |
+| Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the deployment's rules on properties, awaited; a rule naming a kind or key the rules deny comes back refused, never counted around |
 | Committing and removing write through Data | *Commit* starts `stitch-commit@1` and *Remove link* `stitch-withdraw@1`; what each kind writes, the marks on every relationship, joining later loads, counting `edges` and withdrawing exactly what a link wrote — with the identity links and the join across graph databases — are [GP-F01 › Mechanisms](../../../../os/graph/features/GP-F01-data/feature.md#mechanisms). A staged link's row is deleted with no run |
 | A touch per side | Counting, committing and withdrawing record one touch per model with the relationships written into it; a side a rule refuses skips that link only; a model checked but not written gets no touch |
 | A new version carries its links | Publishing re-binds active links to the new version; links on the replaced version stay as history, not counted twice |

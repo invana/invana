@@ -1,15 +1,15 @@
 ---
 id: RC-07
-title: Find and manage the Graph's annotations
+title: Find and manage every annotation in Graph Data
 feature: RC-F07
 status: idea
 personas: [analyst, curator]
 boards: [data.annotations]
 ---
 
-# RC-07 · Find and manage the Graph's annotations
+# RC-07 · Find and manage every annotation in Graph Data
 
-**As** an analyst **I want** every annotation in the Graph in one place, found by record, author or kind **so that** I see what others found and clear what does not hold any more.
+**As** an analyst **I want** every annotation in Graph Data in one place, found by record, author or kind **so that** I see what others found and clear what does not hold any more.
 
 Tasks: [task.md](task.md) · Feature: [RC-F07](../../feature.md)
 

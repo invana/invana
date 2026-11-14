@@ -13,7 +13,7 @@ depends_on: [AC-F02, AC-F07, CP-F05, CP-F10, SE-F06]
 
 # The board and its canvas
 
-> Where an answer is looked at: a quiet, kept board that draws what the Graph holds — every graph database, stitched —
+> Where an answer is looked at: a quiet, kept board that draws what Graph Data holds — every graph database, stitched —
 > lets the analyst move around it, pick things out and read the rows behind it, so they can judge what the answer says
 > before deciding what to do with it.
 > The decision it helps make: *does this answer say what it seems to, and is it worth acting on?*
@@ -63,7 +63,7 @@ sequenceDiagram
   S-->>P: "412 neighbours" · cap or filter
   P->>S: draw
   E-->>S: the neighbours, recorded as an interactive run
-  S-->>P: added to what is drawn · the footer says Graph ready
+  S-->>P: added to what is drawn · the footer says Graph Data ready
 ```
 
 ## Stories
@@ -143,7 +143,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | Board — name, made by, layout, styling, what is drawn | Read · write (autosave, by whoever has it open) |
 | Board version — one per meaningful change, with what changed | Read · write |
 | Shares — who a board, or one of its snapshots, is shared with ([EX-F02](../EX-F02-share-and-present-an-answer/feature.md)) | Read · write |
-| Graph records and their counts by kind, from each graph database | Read, as the Assistant, within its Access Policies |
+| Records and their counts by kind, from each graph database | Read, as the Assistant, within its Access Policies |
 | Runs — each expansion and each query step | Write (an expansion), read (the console) |
 | The published model's kinds and keys | Read |
 
@@ -294,4 +294,4 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Autosave on a declared board | It holds nothing of its own; a report is kept deliberately, once |
 | A report of a report · *Reports* on a frozen page | A report is already frozen; the list belongs to the live board it is of |
 | Deleting or renaming a report | Versions are append-only; a kept reading somebody linked is not tidy-up |
-| A board copied between graph databases | A board draws the stitched Graph; it is never a copy of records |
+| A board copied between graph databases | A board draws Graph Data, stitched; it is never a copy of records |

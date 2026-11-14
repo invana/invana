@@ -113,7 +113,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 
 | Rule | Detail |
 |---|---|
-| Memory is Invana's own graph | It lives in the system graph, governed by the system ontology, and is never part of the Graph |
+| Memory is Invana's own graph | It lives in the system graph, governed by the system ontology, and is never part of Graph Data |
 | Every piece of work is a node | Every plan, workflow, run, step, evidence, finding and decision is a node, linked: a run ran a plan or a workflow · a plan composed workflows · a step found evidence citing records by ID · a finding came from steps · a decision weighed findings · a decision supersedes another · a workflow was approved from a plan |
 | Lineage is its edges | What each node came from — the steps, findings and record IDs behind it — is an edge, so a decision is followed back to the records it cites |
 | Every copy records its sources | An answer, a finding, a report, a snapshot, a run transcript, a note (a hand-off note, an annotation), a memory node and an export each record the resources it was read from, in [AC-F02's grammar](../../../access/features/AC-F02-access-policies/feature.md#engine) — `data/<graph database>/<kind>/<level>` for each property level it carries, `memory/…`, `project/…` — in the same transaction that makes the copy ([GP-06](stories/GP-06-see-where-any-excerpt-came-from-and-who-may-see-it/story.md)) |

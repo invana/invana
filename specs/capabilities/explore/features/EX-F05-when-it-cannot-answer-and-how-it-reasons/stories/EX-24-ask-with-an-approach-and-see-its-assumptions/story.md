@@ -34,7 +34,7 @@ flowchart TD
   ask --> amb{The question is ambiguous?}
   amb -->|yes| cq(["Asked back — EX-23 · never assumed"])
   amb -->|no| run["Planned with the method · the plan checked and run without it"]
-  run -->|the Graph does not hold what the method needs| ca(["Cannot answer — EX-05 · never an estimate"])
+  run -->|Graph Data does not hold what the method needs| ca(["Cannot answer — EX-05 · never an estimate"])
   run --> ans["The answer in the approach's shape"]
   ans --> led["Assumptions: proven · assumed · refused · what changes without each"]
   led -->|drop one| re["Re-run without it"]
@@ -49,10 +49,10 @@ flowchart TD
 | EX-24.1 | The composer | the person opens *Act as* | it lists the published approaches — the built-in *What-if* among them — opening on none |
 | EX-24.2 | An approach picked | before the question is sent | its assumptions show above the composer, each removable |
 | EX-24.3 | No approach picked | the question is asked | it runs plainly, with no assumptions list |
-| EX-24.4 | An answer run with an approach | it settles | it carries its assumptions as a table — claim · where it entered (the approach, the question, the model, a model rule) · whether the Graph checked it, and by which query · what the answer becomes without it |
+| EX-24.4 | An answer run with an approach | it settles | it carries its assumptions as a table — claim · where it entered (the approach, the question, the model, a model rule) · whether Graph Data checked it, and by which query · what the answer becomes without it |
 | EX-24.5 | An assumption in an answer | the person drops it | the question re-runs without it, and the earlier answer stays |
 | EX-24.6 | An approach picked | the plan is checked, compiled and run | the approach is not passed to those steps, and the policy check is the same as without it |
-| EX-24.7 | An approach whose method needs what the Graph does not hold | the run settles | the reply is *Cannot answer* (EX-05), never an estimate |
+| EX-24.7 | An approach whose method needs what Graph Data does not hold | the run settles | the reply is *Cannot answer* (EX-05), never an estimate |
 | EX-24.8 | An ambiguous question with an approach | it is understood | the person is asked back (EX-23) — a question to the asker, not an ask to approvers; the approach never settles what the question means |
 | EX-24.9 | Two approaches asked for at once | the question is sent | it is refused: *One run, one approach* |
 | EX-24.10 | An assumption a model rule contradicts | the run settles | the assumption is dropped from the list, naming the rule |

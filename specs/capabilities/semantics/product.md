@@ -8,14 +8,14 @@ personas: [modeller, curator, researcher, investigator]
 
 # Semantics
 
-> Everything the Graph's data means, published as one versioned contract — drafted, reviewed, then published: its
+> Everything Graph Data means, published as one versioned contract — drafted, reviewed, then published: its
 > models, their meaning, taxonomies, standards, links and mappings, rules, derived facts and views of the graph.
 > The decision it helps make: *what does the data mean, what must always hold, and what may agents see?*
 
 Pillar: **Ontology** — [Pillars and capabilities](../../vision.md#pillars-and-capabilities)
 
 Everything downstream — what can be asked, what can be loaded, what an agent is grounded in, what is derived — resolves
-against the contract shaped here. One Graph binds to one graph database and holds many models, each named for its
+against the contract shaped here. The deployment holds many models across its graph databases, each named for its
 domain.
 
 ## Problem
@@ -38,7 +38,7 @@ terms and standards it follows, what must always hold and what may be derived �
 | Goal | Measured by |
 |---|---|
 | A model is drafted for the person, from a database, files, a standard or a starter, never from a blank page | Open — set at the spec review |
-| A breaking change never reaches the Graph unreviewed | Open — set at the spec review |
+| A breaking change never reaches Graph Data unreviewed | Open — set at the spec review |
 | Every derived fact names the rule and the facts it came from | Open — set at the spec review |
 
 ## Features
@@ -74,38 +74,38 @@ terms and standards it follows, what must always hold and what may be derived �
 
 | Decision | Detail |
 |---|---|
-| Semantics owns meaning | Models, meaning, taxonomies, standards, links and mappings, constraints, derivations, act rules, views of the graph and derived-fact rules live here; records and loads live in Records; the Graph's connection and members live in Graph |
+| Semantics owns meaning | Models, meaning, taxonomies, standards, links and mappings, constraints, derivations, act rules, views of the graph and derived-fact rules live here; records and loads live in Records; graph databases and their connections live in the Control Plane |
 | One contract, one lifecycle | Every part is changed only as a draft, reviewed when it breaks something, and published as the next version; what used an older version still resolves to it |
-| One Graph, one graph database | Set once; the database kind cannot change after the first save, since everything modelled is against it |
-| Models are per domain and portable | A Graph holds many; they meet only through declared links and mappings |
+| A kind lives in one graph database | Set once; the graph database cannot change after the first save, since everything modelled is against it |
+| Models are per domain and portable | The deployment holds many; they meet only through declared links and mappings |
 | A published version never changes | Changes publish the next version; answers and loads that used an older one still resolve to it |
 | The whole model is derived | Every published model, its meaning and its active links, computed when read and never stored — it is what every question is grounded in. What the database holds is compared against it and never grounds an answer |
 | Declared, never guessed | A link or a mapping is declared by a person, or proposed by an agent and accepted by a person; linking never merges records |
 | Reading the database only drafts | It never writes a published version |
 | A breaking publish needs a review | A change that only adds publishes; one that breaks goes through a preview, an approver's yes, never the requester's, then the run that publishes (SE-F02) |
 | What bounds what | A *constraint* refuses data that breaks it, checked when a record is loaded or changed · a *derivation* adds facts · an *act rule* blocks, warns on or reports what people and agents do, enforced by Access · an *alert* notices a pattern and opens a lead in a project · a *view of the graph* narrows what a run may see, picked per question (SE-F07 · SE-F09) |
-| Rule scope | A rule is scoped to the install, a Graph or a project; the install is the widest scope |
-| Standards are install-wide | A standard is kept once in the install's library and held by a kind or a property of any Graph's model (SE-F05) |
+| Rule scope | A rule is scoped to *Everywhere* — the deployment — or a project |
+| Standards are install-wide | A standard is kept once in the install's library and held by a kind or a property of any model (SE-F05) |
 | Broader kinds are meaning only | A kind may name a broader kind; storage and queries stay flattened — each kind carries its own properties (SE-F04) |
 | Inference is rule-based | Derivations run as a queue worker, rule-based only; each derived fact is stored as a record labelled *derived*, with its rule and premises (SE-F08) |
 | What a run may see, use and send | Declared before it runs, proved after: every run records what it read, what it called and what it was refused, so a person narrows or widens by reading the difference — the edit is to the view or the rule, never to the plan |
 | Narrowing is enforced, never filtered | A hidden kind or property is left out of what the AI model is told and refused by the database's connector; a slice is composed into the query that runs. Nothing is dropped after it comes back |
-| Composed once, at run open | The Graph's rules on properties, the agent's own bound and the run's view are composed when a run opens — a load included, with no view — and frozen on it. A view from another Graph is refused before the run is written |
-| Deny wins at any level | Across the Graph, the agent and the work, a narrower allow never punches through a deny ([SE-F09 › Mechanisms](features/SE-F09-views-of-the-graph/feature.md#mechanisms)) |
+| Composed once, at run open | The deployment's rules on properties, the agent's own bound and the run's view are composed when a run opens — a load included, with no view — and frozen on it. |
+| Deny wins at any level | Across the deployment, the agent and the work, a narrower allow never punches through a deny ([SE-F09 › Mechanisms](features/SE-F09-views-of-the-graph/feature.md#mechanisms)) |
 | Reading is not sending | A query may filter on a property whose value never enters a prompt — used to compute, not to reason. What may leave is said per destination, on the rule that reached it |
 | An outside service is allowed or denied whole | It carries no slice; data worth slicing is brought in as a model |
 | The internet is an outside service | A search and each fetched site are addresses a rule can allow or deny; what an AI model adds from its own knowledge is off unless the rule on that AI model allows it |
 | A plan names a role, the view names the model | A plan says *decide* or *extract*; the view says which AI model plays it, checked against the rules |
 | A refusal is an answer | A refused source is recorded and the run carries on without it; a run refused the AI model it thinks with, or the model version it is grounded on, ends *cannot answer* naming the rule — never an error |
 | A write is governed like a read | Loading into a model is checked against the same rules before it writes; one rule decides both, and a refused target writes nothing |
-| Who edits | Shaping a model is the Modeller's and the Admin's ([the role table](../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); an *Everywhere* rule, a shipped pack and an index suggestion are the Admin's alone |
+| Who edits | Shaping a model is the Modeller's and the Admin's ([the role table](../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); a shipped pack and an index suggestion are the Admin's alone |
 | Outside formats are imported | Invana keeps its own contract and every import maps into it: SKOS, OWL/RDFS with schema.org, SHACL and CSV code lists, each by its own importer (SE-F05 · SE-15). Import only — source addresses kept on every kind and term make export cheap later |
 
 ## Depends on
 
 | Product or capability | For |
 |---|---|
-| Graph › This graph | The connection to the graph database |
+| Control Plane › Graph databases | The connections to the graph databases |
 | Records | The loads checked against a model, the records rules and derivations read, and where derived facts are kept |
 | Access | The approval a breaking publish waits for, and the enforcement of act rules |
 | Control Plane | The queue worker that runs derivations |
@@ -116,7 +116,6 @@ terms and standards it follows, what must always hold and what may be derived �
 |---|---|
 | A model registry | A model exports as one file; files and git are the registry |
 | Merging linked records | A merge is lossy with no undo; a person merges two records in Records |
-| A Graph over several databases | The Graph is the reasoning boundary, and one boundary is one database |
 | Writing records from Semantics | The contract describes; loads write, and derived facts are written by Inference into Records |
 | OSI (Open Semantic Interchange) | It standardises BI metrics, not graph models |
 | Full OWL DL reasoning in core | Only as an outside plugin; rule-based inference is SE-F08 |

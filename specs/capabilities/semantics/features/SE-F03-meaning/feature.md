@@ -68,7 +68,7 @@ flowchart TD
 | Rule | Detail |
 |---|---|
 | Meaning is a tab on a kind | *Meaning* beside Properties · Indexes · Constraints · Mappings; a property's meaning sits on its row |
-| Five parts | **Definition** — one or two sentences · **Synonyms** — the words people ask with, unique across the published models of a Graph · **Unit** — per number property, from a fixed list · **Outside terms** — an address (IRI), a schema.org type or property, or a *same as* address elsewhere · **Level** — per property, one of four |
+| Five parts | **Definition** — one or two sentences · **Synonyms** — the words people ask with, unique across the published models · **Unit** — per number property, from a fixed list · **Outside terms** — an address (IRI), a schema.org type or property, or a *same as* address elsewhere · **Level** — per property, one of four |
 | Four levels | `public` · `internal` · `confidential` · `personal`, set per property of a kind in Meaning. A property no one has set is `internal`. *Sensitive* means confidential or personal |
 | A level is set in a draft | A Modeller or an Admin sets it in the model's draft; it is published with the model, in force from that version, and never changes a record. A level is the model's, never a policy file's |
 | Access Policies read the level | A read of a property is checked as `data/<graph database>/<kind>/<level>` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)); an agent that may not Read that level does not receive the property, and the result counts it withheld |
@@ -121,7 +121,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 
 | Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
-| `GET /sensitivity?kind=&level=` | Every property of the published versions the Graph reads now — graph database · kind · property · level (`internal` where none is set) · who set it and when; the list [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)'s `GET /kept-from-agents` and the outbound check read | SE-20 |
+| `GET /sensitivity?kind=&level=` | Every property of the published versions the deployment reads now — graph database · kind · property · level (`internal` where none is set) · who set it and when; the list [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)'s `GET /kept-from-agents` and the outbound check read | SE-20 |
 
 ### Events
 
@@ -135,7 +135,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | 403 | A change by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-20.8 |
-| 409 | A synonym another published kind in the Graph has | *{synonym} already means {kind} in {model}.* | SE-20.4 |
+| 409 | A synonym another published kind has | *{synonym} already means {kind} in {model}.* | SE-20.4 |
 | 422 | An outside term that is not an address | *{field}: not an address.* | SE-20.5 |
 | 422 | A level that is not one of the four | *{level} is not a level — public, internal, confidential or personal.* | SE-20.11 |
 | 422 | A level on a kind's own row, or on a property the kind does not carry | *{kind} has no property {property}.* | SE-20.11 |
@@ -152,7 +152,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 
 | Mechanism | How |
 |---|---|
-| The level of a property | `sensitivity.of(kind, property)` reads the property's row in the published version the Graph reads now; no row, or an empty level, is `internal`. It is the one function the access check, the outbound check and lineage call |
+| The level of a property | `sensitivity.of(kind, property)` reads the property's row in the published version the deployment reads now; no row, or an empty level, is `internal`. It is the one function the access check, the outbound check and lineage call |
 | The resource a read is checked as | A property read names `data/<graph database>/<kind>/<level>` for [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)'s `decide()`; this feature supplies only `<level>` |
 | Published with the model | A level is staged on the draft and frozen when it publishes; a version in force never changes, so a read meets one level per property |
 | A lowered level | The draft review marks the change as a widening ([SE-F02](../SE-F02-change-and-publish-a-model/feature.md)); the publish writes the History row with who, from and to |
@@ -169,7 +169,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 
 | Decision | Detail |
 |---|---|
-| Synonyms are unique in a Graph | One word leads to one kind; a second is refused naming the first, so grounding never guesses |
+| Synonyms are unique in the deployment | One word leads to one kind; a second is refused naming the first, so grounding never guesses |
 | Units come from a fixed list | A unit is picked, never typed, so two kinds in the same unit compare |
 | Four levels, one default | `internal` is the default so an unmarked property is not public; *sensitive* means confidential or personal, and the two stay inside the deployment |
 | A level is a model fact | It is set per property in a draft and published with the model, never by a policy file, so one level holds for every agent |
@@ -186,7 +186,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 | Item | Why not |
 |---|---|
 | Converting between units | A unit says what a value is in; converting is a derivation's job (SE-F08) |
-| Synonyms per person | One Graph, one vocabulary |
+| Synonyms per person | One deployment, one vocabulary |
 | Fetching an outside term to show its definition | The engine never fetches |
-| Translations of the meaning | One language per Graph until a person asks for more |
+| Translations of the meaning | One language per deployment until a person asks for more |
 | A level per record or per value | A level belongs to a property of a kind; one record's value is as sensitive as its property |

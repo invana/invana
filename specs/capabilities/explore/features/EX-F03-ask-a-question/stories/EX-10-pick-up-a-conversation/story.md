@@ -41,7 +41,7 @@ flowchart LR
   h -->|New| n["A blank thread · composer focused"] -->|first question| saved(["The conversation exists"])
   o --> ag["The agent in the composer"]
   ag -->|one they may use| run(["Every question after it runs through that agent · each turn names it"])
-  ag -->|cannot read the Graph| agr["Refused, naming the agent"]
+  ag -->|cannot read Graph Data| agr["Refused, naming the agent"]
   ag -->|not theirs to use now| ng["Refused · may not use it — ask an Admin"]
   row -->|rename · pin · archive| kept(["The list follows · nothing in the thread changes"])
   row -->|delete| del{Sure?}

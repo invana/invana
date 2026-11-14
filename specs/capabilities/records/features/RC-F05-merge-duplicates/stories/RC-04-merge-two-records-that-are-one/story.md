@@ -9,7 +9,7 @@ boards: [data.merge]
 
 # RC-04 · Merge two records that are one
 
-**As** a data curator **I want** to merge two records I know are the same thing, choosing which values survive **so that** the Graph says it once.
+**As** a data curator **I want** to merge two records I know are the same thing, choosing which values survive **so that** Graph Data says it once.
 
 Tasks: [task.md](task.md) · Feature: [RC-F05](../../feature.md)
 

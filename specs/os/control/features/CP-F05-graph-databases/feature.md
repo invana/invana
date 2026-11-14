@@ -15,7 +15,7 @@ depends_on: [AC-F01, AC-F02, AC-F06, SE-F01, RC-F02, CP-F01, GP-F01]
 
 > The Admin's controls for the graph databases the deployment connects — installing a connector, connecting one with
 > its one credential, read-only or read + write, switched on or off, healthy or not, a practice graph database — and
-> the steps from a fresh deployment to its first answer. How a connector reads, writes and joins them into the Graph is
+> the steps from a fresh deployment to its first answer. How a connector reads, writes and joins them into Graph Data is
 > [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md). The decision it helps make: *which graph databases
 > may agents read and write, and is each one working?*
 
@@ -125,7 +125,7 @@ names the acts.
 
 | Rule | Detail |
 |---|---|
-| A graph database is one connection | One connector, one address, one database, one credential. The Graph is every graph database the deployment has on |
+| A graph database is one connection | One connector, one address, one database, one credential. Graph Data is what every graph database the deployment has on holds |
 | Its name is a resource segment | Lowercase letters, digits and `_`, unique, fixed once saved — it is the `<graph database>` of `data/<graph database>/<kind>` in every rule |
 | A test gates every save | Nothing is saved until the details passed a test — on the first save and on every change to address, user, password, database |
 | The connector is fixed once saved | Address, user, password and database stay editable; a different connector is a different graph database |
@@ -136,9 +136,9 @@ names the acts.
 | Off means refused, named | Work that needs a graph database that is off — for the deployment or for the person behind it — is refused before it starts, naming who switched it off; a schedule skips its firing and raises an ops alert; a workflow that depends on it is flagged and its runs refused until it is on |
 | Health is honest | Connected · unreachable · degraded, with the last time it connected and its latency; rotated credentials read unreachable, never silence. Work that needs no step on an unreachable graph database keeps answering |
 | The server version decides the property types | Detected on connect, or declared by an Admin; a version Invana has not tested keeps the graph database read-only until an Admin accepts it |
-| A practice graph database is never the Graph | It stands in for one graph database in an agent's or a skill's tests; no question, board, schedule or workflow reads it |
+| A practice graph database is never part of Graph Data | It stands in for one graph database in an agent's or a skill's tests; no question, board, schedule or workflow reads it |
 | Removing never touches the data | Removing a graph database removes Invana's records of it; the database's own data is untouched. It is refused while a rule, a match rule or a workflow names it |
-| Set-up is the deployment's | Four required steps — a graph database is connected and on · a model is published · the Graph holds records · an AI model answers. Each is done because its fact exists, whoever made it and from wherever; only a skipped offer is stored |
+| Set-up is the deployment's | Four required steps — a graph database is connected and on · a model is published · Graph Data holds records · an AI model answers. Each is done because its fact exists, whoever made it and from wherever; only a skipped offer is stored |
 | Each step opens a gate | *Connected* — reading the graph databases · *Modelled* — loading data and links between models · *Grounded* — answers that cite a record · *Answering* — asking, the Assistant and every agent run. A surface waits on the one gate it needs and names the step that opens it |
 | Set-up owns no forms | Each step opens the place that makes its fact — Graph databases, Model, Records, AI models — with its command beside it |
 | Agents read the schema, never records, to draft | The draft model comes from the kinds, properties and counts the database reports ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) |

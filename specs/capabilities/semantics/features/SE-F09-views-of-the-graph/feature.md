@@ -31,7 +31,7 @@ flowchart TD
   pick --> val{Checked against the rules on properties at save}
   val -->|widens a rule| vr["Refused, naming the rule"]
   val -->|slices an axis the model never declared| va["Refused, naming the model and the axis"]
-  val -->|holds| saved(["Saved — in the Graph's views"])
+  val -->|holds| saved(["Saved — in the deployment's views"])
   v -->|a view| board["The view's own page: layers, its runs, who asked under it"]
   runs([Two runs of one question]) -->|Compare| cmp["Side by side — what each read, and how"]
 ```
@@ -65,7 +65,7 @@ sequenceDiagram
 | Read every view | Every signed-in person — Operator, Modeller, Admin | — |
 | Pick a view for a question · compare two runs | Every signed-in person — Operator, Modeller, Admin | — |
 | Retune from their own run into a view kept private to that run | Every signed-in person — Operator, Modeller, Admin | — |
-| Name a view (it joins the Graph's views) · create, edit, duplicate or delete a view | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* under the list |
+| Name a view (it joins the deployment's views) · create, edit, duplicate or delete a view | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* under the list |
 
 ## States
 
@@ -84,15 +84,15 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | Rules and views is one sheet | Opened from Model: *Rules* (SE-F07) · *Views* (what agents may see) · *Requests* (SE-13), the open requests counted in its head |
-| Outside this view is not cannot answer | A question that needs what the view keeps out reads *outside this view*, naming what it was grounded in and the rule or view in the way — a setting the person can widen. *Cannot answer* is kept for what the Graph does not hold |
+| Outside this view is not cannot answer | A question that needs what the view keeps out reads *outside this view*, naming what it was grounded in and the rule or view in the way — a setting the person can widen. *Cannot answer* is kept for what Graph Data does not hold |
 | A view narrows, never widens | A view may hide models, kinds and properties, slice a model, pick the AI model that decides, say what may leave, cap how old a cached answer may be and say who may be asked and how often. It never widens a rule on a property; one that would is refused at save, naming the rule |
 | Five layers | A view narrows along graph data · AI models · outside services · cache · people; worker capacity is not a layer |
 | Hidden is structural | A hidden property does not exist for the run — a query naming it is refused, and a whole record comes back without it. Nothing is filtered afterwards |
 | Only declared axes slice | A published model declares which property carries time, which carries place and which are selectable dimensions; it declares none until a person does. A view slices only along declared axes — any other is refused naming the model and the axis. The axes travel with the model's file, and a declared axis naming a property the model lacks is refused at import |
-| Default is the widest | A Graph with no view and no rule sees every published model, every AI model configured and every outside service its agents may use |
-| Naming shares | A view made by retuning a run is private to that run. Naming it adds it to the Graph's views; the name field reads *Name it to add it to Views*. The name is unique in the Graph; only the first naming shares, a rename renames |
+| Default is the widest | A deployment with no view and no rule sees every published model, every AI model configured and every outside service its agents may use |
+| Naming shares | A view made by retuning a run is private to that run. Naming it adds it to the deployment's views; the name field reads *Name it to add it to Views*. The name is unique in the deployment; only the first naming shares, a rename renames |
 | One view per run | A run composes the rules on properties, its agent's own bound and its view once, when it opens, and keeps that; a later edit reaches only the next run |
-| A view is picked, never typed | Every control offers what the Graph declares — published model versions, their axes, configured AI models, caches — with *any version* beside each exact version |
+| A view is picked, never typed | Every control offers what the deployment declares — published model versions, their axes, configured AI models, caches — with *any version* beside each exact version |
 | Transaction time is the view's | A view may be pinned to what was known on a date; it is a field of the view, never a control beside the question |
 | A layer with nothing configured says so | Picking what may leave to outside services, with none configured, reads *No third-party endpoints are configured* where the matches would be — never an empty list |
 | A cast that names a denied AI model | The run does not open: it reads *cannot answer*, naming the rule, with *Use the view's cast* · *Pick another view* |
@@ -121,7 +121,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 
 | Table | Columns | Notes |
 |---|---|---|
-| `model_lenses` | `graph_id` · `kind` (`guardrail` · `world`) · `key` · `name` · `scope` (`graph` · `agent:<id>`; a guardrail's only) · `rules` · `closed_layers` · `cast` · `egress` · `as_of` · `created_in_run_id` · `created_by_id` · `version` · `target` · `access` · `leaves` · `allowed_in` | Unique (`graph_id`, `key`), plain — unnamed lenses (`key` null) coexist. CHECK a guardrail has `scope` and `key`, a world has `scope` null; CHECK a Graph guardrail carries `target` · `access` · `leaves`. Index (`graph_id`, `kind`). `key` is derived from `name` at the first naming and frozen. `version` is bumped on every `rules` or `cast` edit. `as_of` null is now |
+| `model_lenses` | `graph_id` · `kind` (`guardrail` · `world`) · `key` · `name` · `scope` (`graph` · `agent:<id>`; a guardrail's only) · `rules` · `closed_layers` · `cast` · `egress` · `as_of` · `created_in_run_id` · `created_by_id` · `version` · `target` · `access` · `leaves` · `allowed_in` | Unique (`graph_id`, `key`), plain — unnamed lenses (`key` null) coexist. CHECK a guardrail has `scope` and `key`, a world has `scope` null; CHECK a deployment guardrail carries `target` · `access` · `leaves`. Index (`graph_id`, `kind`). `key` is derived from `name` at the first naming and frozen. `version` is bumped on every `rules` or `cast` edit. `as_of` null is now |
 | `model_run_touches` | `run_id` · `graph_id` · `seq` · `step_key` · `address` · `layer` · `sublayer` · `participant` · `direction` (`out` · `in` · `refused` · `skipped`) · `rule_matched` · `why` · `volume` {`rows` · `tokens_in` · `tokens_out` · `bytes` · `cache_hit` · `age_s`} · `applied` {`models` · `select` · `properties_excluded` per kind} · `sent` {`to` · `classes[]` · `cut[]`} · `query` {`generated_sha256` · `executed_sha256`} · `duration_ms` · `at` | Unique (`run_id`, `seq`); index (`graph_id`, `address`) · (`run_id`, `direction`). A projection of the run's ledger, rebuildable from it and losing to it on any disagreement. Tokens in and out, never one sum; digests, never query texts; a refusal is a row |
 
 | `rules[]` element | Carries |
@@ -135,7 +135,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 
 | Layer | Slug | Sublayers — the touch's `sublayer` | A participant's address |
 |---|---|---|---|
-| `graph_data` | Graph data | `model` · `stitch` (a link between models) · `load` | `graph_data/model/<model>@<version>` · `graph_data/stitch/<source>_<target>` · `…@<edge type>` for a relationship link |
+| `graph_data` | Graph Data | `model` · `stitch` (a link between models) · `load` | `graph_data/model/<model>@<version>` · `graph_data/stitch/<source>_<target>` · `…@<edge type>` for a relationship link |
 | `llm` | AI models | One per configured provider row | `llm/<provider row>/<model>` |
 | `third_party` | Outside services | `api` · `app` · `db` · `agent` · `internet` | `third_party/api/<host>/<path>` · `third_party/agent/<name>` for a peer agent |
 | `cache` | Cache | — | `cache/answer` · `cache/schema` · `cache/result` · `cache/prefix` |
@@ -174,8 +174,8 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | `POST /lenses/{id}/duplicate` | A copy, unnamed until named | SE-10 |
 | `GET /lenses/{id}/usage` | `runs` · `last_used_at` · `actor_ids` · `people` · `runs_30d` · `by_agent[{agent_id, name, runs, last_at}]`, most runs first | SE-10 |
 | `POST /lenses/validate` · `POST /lenses/impact` | Check a draft lens as at save · what saving changes, view by view | SE-10 |
-| `GET /view?world=` | A view read on the model: `world` · `models[{name, version, seen: all · sliced · hidden}]` · `types[{model, type, hidden, sliced, excluded[], guarded[{property, guardrail_id, guardrail, access, leaves}]}]` · `hidden_types[]` · `guarded` · `window{time, geo}` · `thinks_with` · `answers_go[{address, may_send[] or null}]` · `used_by[{kind: agent · person, id, name, runs}]`; without `world`, the Graph's rules alone | SE-10 |
-| `GET /participants` | Every address the Graph can name, resolved live, never stored | SE-10 |
+| `GET /view?world=` | A view read on the model: `world` · `models[{name, version, seen: all · sliced · hidden}]` · `types[{model, type, hidden, sliced, excluded[], guarded[{property, guardrail_id, guardrail, access, leaves}]}]` · `hidden_types[]` · `guarded` · `window{time, geo}` · `thinks_with` · `answers_go[{address, may_send[] or null}]` · `used_by[{kind: agent · person, id, name, runs}]`; without `world`, the deployment's rules alone | SE-10 |
+| `GET /participants` | Every address the deployment can name, resolved live, never stored | SE-10 |
 | `GET /runs/{id}/touches` | The ledger `items` · `total` · `counts`; `allowed` · `touched` · `never_touched` · `refused`; `participants[{address, layer, verdict, why, calls, rows, tokens}]` — `verdict` is `refused` over `touched` over `miss` over `never_touched`; `layers[{layer, allowed, touched, refused, touches, calls, rows}]` · `tallies` | SE-10 |
 | `GET /compare?a=&b=` | Two runs: `touched_a` · `touched_b` · `shared` · `only_one` · `read_differently` | SE-10 |
 
@@ -197,12 +197,11 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | 422 | A slice on an axis the model never declared | *{model} declares no {axis} axis.* | SE-10.7 |
 | 422 | A view that matches nothing, or whose cast names an AI model its rules deny | *{view}: {why}.* | SE-10.20 |
 | 422 | A rule setting `properties` or `select` on a layer other than `graph_data`, or an option its layer does not take | *A {layer} participant carries no {field}; it is allowed or denied whole.* | SE-10.22 |
-| 422 | `cast_refused` — a run whose effective cast names an AI model the effective rules deny; the body carries `role` · `address` · `rule` · `denied_in` (the agent's own, a Graph rule, the view) · `world` (*Everything* when none); the opening role at the send, a later role when its step resolves | *Cannot answer: {rule} in {denied_in} denies {address} for {role}.* | SE-10.19 |
+| 422 | `cast_refused` — a run whose effective cast names an AI model the effective rules deny; the body carries `role` · `address` · `rule` · `denied_in` (the agent's own, a deployment rule, the view) · `world` (*Everything* when none); the opening role at the send, a later role when its step resolves | *Cannot answer: {rule} in {denied_in} denies {address} for {role}.* | SE-10.19 |
 | 422 | A run whose cast names an AI model whose provider is gone — at the start, before the run is written | *{provider} is gone — {role} cannot be cast.* | SE-10.21 |
-| 409 | A name already used by a view in the Graph | *A view named {name} is in this graph.* | SE-10.10 |
+| 409 | A name already used by a view | *A view named {name} already exists.* | SE-10.10 |
 | 409 | Deleting a view a schedule or an agent uses | *{view} is used by {schedules and agents}.* | SE-10.13 |
 | 409 | A run opened in a view naming a version that is not published — before the run is written | *{view} names {model} v{n}, which is not published.* | SE-10.14 |
-| 409 | A run opened in a view from another Graph — before the run is written | *That view belongs to another graph.* | API only — Studio offers only this Graph's views |
 
 ### CLI
 
@@ -220,24 +219,24 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | `closed_layers` | A layer named admits only what this lens's rules allow; a layer not named is permitted whole. Each contributing view's closure is kept whole and frozen with its name, so another level's broader allow never satisfies it. Narrowing to a set is a closed layer and the allows that name it — never a broad deny with allows punched through |
 | Matching | `match` is a glob; a deny wins over any allow at any specificity; a participant no rule matches takes the default, the widest. A refused participant reads *outside the lens* whatever its layer — an endpoint, a link and a year alike |
 | A closed layer refuses by name | A step needing a layer a lens closes is refused naming which view closed which layer; its touch's `rule_matched` stays empty, because the closure refused it, not a rule |
-| The grounding version | A lens binds on the Graph's introspected `global` version — the one version whose types cover every type a query can reach; `open_graph` checks it and the connector's `QueryLens` compiles over its types |
+| The grounding version | A lens binds on the deployment's introspected `global` version — the one version whose types cover every type a query can reach; `open_graph` checks it and the connector's `QueryLens` compiles over its types |
 | An authored model is bindable | A rule naming an authored version — `graph_data/model/<model>@*` — resolves to the kinds that version declares, admitted, hidden and sliced along that version's axes, and the touch records which model addresses reached each kind; an unresolved rule is refused, never left to fail open |
 | Two times | `as_of` on the lens is transaction time — which versions and links resolve; `select.time` on a rule is valid time, a predicate on the axis the model declared. They compose |
 | Links in a lens | Denying `graph_data/stitch/*` keeps the models and drops cross-model edges — a question needing a link is *outside the lens*; an allow may name one anchor (its pair of kinds) or one relationship link (`…@<edge type>`). A denied link does not resolve for the run, its relationships are not read, and the run continues. The edges a load writes are records, narrowed by a `graph_data/load/*` rule |
-| AI models | The sublayer is the provider row — two rows of one provider are two participants with their own keys. An agent binds no provider; the cast names the model and the Graph resolves the credential from the row the address names. A Task names a role — `extract` · `decide` · `judge` · `embed` — never a model id or a tier; the cast binds role to address, so retuning is one edit of the cast and a re-run |
+| AI models | The sublayer is the provider row — two rows of one provider are two participants with their own keys. An agent binds no provider; the cast names the model and the engine resolves the credential from the row the address names. A Task names a role — `extract` · `decide` · `judge` · `embed` — never a model id or a tier; the cast binds role to address, so retuning is one edit of the cast and a re-run |
 | An AI model call is recorded | Address, role, tokens in and out, and what it was shown (`applied` · `sent.classes`) on the touch; the prompt as sent and the completion on the step's output, never on the touch |
 | Outside services | Allowed or denied whole, with `egress.may_send` governing what goes with the call; a third party worth slicing is brought in as a model. A denied one is refused before dispatch — nothing spent. A peer agent is `third_party/agent/<name>`: its response is quoted as data, never executed, and its spend is bounded before the call |
 | The caches | *Answer* — before the whole plan; a hit ends the run, recorded as a catalogue entry with its own run row · *Schema* — before a catalogue read · *Result* — before a query runs · *Prefix* — inside the provider's call, only cheaper; the last three are `result.cache` on the step. `max_age_s` per cache; denying `cache/**` walks every layer; a cache error is a miss — it may change a cost, never an outcome |
 | People | Denying `human/**` turns a clarification into *cannot answer — needs input that may not be requested*; allowing `human/role/<role>` or `human/person/<id>` names who may be asked, and `max_rounds` how often — on the lens, not the plan, because a scheduled run and an interactive one share a plan |
 | Delegation | A delegated child's lens is its parent's or narrower, in every layer and slice; a replan never changes the lens — a different lens is a different run |
-| What the run can be told | Something outside the lens settles *outside this view*, carrying what the run was grounded in and the rule or view that kept out what it needs (SE-10.23). Something the Graph lacks settles *cannot answer* ([EX-F05](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md)) |
+| What the run can be told | Something outside the lens settles *outside this view*, carrying what the run was grounded in and the rule or view that kept out what it needs (SE-10.23). Something Graph Data lacks settles *cannot answer* ([EX-F05](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md)) |
 | Grounded needs a record | An answer with no touches behind it is not shown as grounded |
 | What it may see, what it may do | The lens bounds what a run may see, use and send; what it may do is its access rules ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)), where the view is one of the checks every act passes. There is no second bound |
 | Enforcement | In the interpreter before dispatch (participant, egress) and in the connector at execution (projection, predicate) — never in Studio, never by filtering afterwards. The snapshot compiles into the connector's `QueryLens`, a model address resolving to the kinds its version declares |
 | A hidden property | Not in the schema the AI model is told; a query naming it is refused at the connector; a whole record returns without it |
 | The three crossings | A run reaches the model, the graph and a write through `open_model`/`close_model` · `open_graph`/`close_graph` · `open_write`/`close_write` |
 | Validated at save | A draft lens does not widen a guardrail, selects only declared axes, matches something, and its cast is allowed — checked at save, never at run |
-| The default cast | Ships with the distribution, computed over the AI models the Graph offers: `extract` the cheapest that can read · `decide` the most capable · `judge` a local one where one exists, else the cheapest · `embed` the only embedding model, or none. A role no lens casts takes it |
+| The default cast | Ships with the distribution, computed over the AI models the deployment offers: `extract` the cheapest that can read · `decide` the most capable · `judge` a local one where one exists, else the cheapest · `embed` the only embedding model, or none. A role no lens casts takes it |
 | A cast holds its AI model | Removing an AI model a view casts is refused on the runtime's route, naming the views ([CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine)) |
 | Read and send are two permissions | A run may rank by a property whose value never enters a prompt: allow/deny, `properties` and `select` govern what it reads; `egress.may_send` on the rule matching the destination governs what it sends there |
 | What may leave | Per destination, never per run. `may_send` absent from every matching rule leaves the crossing unbounded — a rule nobody wrote narrows nothing; a matching rule that states none takes the lens's `egress` default, `[]`; `[]` cuts everything. Several matching rules intersect; `everything` on one leaves the others to decide. A hosted AI model is an outside party governed this way; a local one has nothing to declare |
@@ -272,7 +271,7 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 | Deleting a used view is refused | Refused naming the schedules or agents that use it |
 | A view naming an unpublished version | Listed with a warning naming the version; picking it is refused before a run opens |
 | A view's key is frozen at its first naming | A rename changes the name alone; a key that moved would break every schedule that pinned it |
-| A default cast ships with the distribution | AI model providers carry no default, so a Graph with providers and no cast could run nothing; the shipped cast runs a role nobody cast |
+| A default cast ships with the distribution | AI model providers carry no default, so a deployment with providers and no cast could run nothing; the shipped cast runs a role nobody cast |
 | Declared and recorded are one loop | A lens with no touches is a rule nobody can check; touches with no lens have nothing to check against. Their difference tunes the view: allowed and never read → narrow · refused again and again → widen, or accept *outside this view* on purpose · a slice clipping what a query wanted → widen it or confirm it · `decide` resolved to a small model on the step that wrote the number → retune the cast and compare · values sent where not expected → tighten what may leave, the runs listed · every AI model call hosted → move a role to a local model. Touched and undeclared cannot happen while enforcement holds |
 | A rule on a property stays editable | It is a row a Modeller or an Admin edits; a bound nobody can reach would be a second record |
 | Nothing is its own table that could be a key | A rule is an element of the view's rules, the cast is four keys, usage is a grouped read of runs; the touches are the one projection kept as rows |
@@ -289,10 +288,9 @@ and a rule on a property is *lens*: a view is `kind = world`, a rule on a proper
 |---|---|
 | Worker capacity as a layer | Workers are capacity, not something a view allows or denies |
 | A view per step | The view is the run's circumstances; narrowing a step is its plan's job |
-| Folders or tags for views | A Graph that needs to file its views has too many; naming is the filter |
+| Folders or tags for views | A deployment that needs to file its views has too many; naming is the filter |
 | Views suggested from run history | *Allowed but never read* is already the suggestion, and a person reads it |
 | Comparing two views without running them | What differs is in the answers and what they read, and those need runs |
-| Sharing a view across Graphs | A Graph is the reasoning boundary |
 | Masking what leaves | A view decides whether data may go, never a transformation of it |
 | Alerting when a layer lights up | Invana is not a monitoring platform; an alert on the records is a rule (SE-F07) |
 | A rule on a whole layer | A rule on a property is one property; a layer bound is a view's or an agent's |

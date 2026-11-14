@@ -15,7 +15,7 @@ depends_on: [SE-F02]
 
 > One install-wide library of standards — shared, versioned sets of terms with their types, allowed values and
 > required fields — written in Invana, imported from an outside format, or applied from a pack a field publishes. A
-> kind or a property in any Graph's model holds one exact version (SE-F07). The decision it helps make: *which terms
+> kind or a property in any model holds one exact version (SE-F07). The decision it helps make: *which terms
 > did our field agree, and which version do we follow?*
 
 ## User journey
@@ -90,7 +90,7 @@ flowchart TD
 | Record | Read or write |
 |---|---|
 | Standard and its versions — terms, hash, origin, why | Read · write |
-| Who holds each version — kinds and properties, per Graph | Read |
+| Who holds each version — kinds and properties, per model | Read |
 | Events — standard create and version, pack applied | Write |
 
 ## Engine
@@ -128,4 +128,4 @@ flowchart TD
 | SKOS collections and SKOS-XL labels | Listed, not imported |
 | Several schemes into several standards at once | One import, one scheme |
 | Export back to an outside format | Import only |
-| A standard private to one Graph | A private range or vocabulary is a constraint on one property |
+| A standard private to one model | A private range or vocabulary is a constraint on one property |

@@ -8,7 +8,7 @@ two lenses (below).
 
 | Key | Persona | Comes to Invana to | Works mostly in | Usual role |
 |---|---|---|---|---|
-| `analyst` | **Analyst** | Ask the Graph questions, read answers, keep boards and share them | Explore | Operator |
+| `analyst` | **Analyst** | Ask Graph Data questions, read answers, keep boards and share them | Explore | Operator |
 | `decision-maker` | **Decision maker** — a policy maker, investor or marketer | Pursue a question: fork it into branches, weigh findings for and against, decide with a trail | Projects | Operator |
 | `modeller` | **Modeller** — a modeller or compliance lead | Give the data meaning across every graph database: models, meaning and sensitive properties, links and identity match rules, rules that must always hold | Model | Modeller |
 | `researcher` | **Researcher** | Test hypotheses against the evidence, reproducibly: every finding cites the loads and records behind it, and a study can be rerun and cited | Projects · Explore | Operator |

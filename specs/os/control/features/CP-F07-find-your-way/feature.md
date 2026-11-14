@@ -65,7 +65,7 @@ flowchart TD
 | ⌘K reads only what may be opened | Every list it reads is scoped by the engine to the person: the agents granted to them; a project's name is a hit for everyone, opening it reads as far as their default agent may Read it |
 | ⌘K ranks names | Exact, then prefix, then contains; meaning-based matches wait for a vector index and then show as *Related* |
 | ⌘K never sends | *Ask the Assistant* puts the text in the composer and focuses it; the person still sends it before any tokens are spent |
-| The Graph's own records are found by asking | A customer or an order is reached through Explore and the Assistant, not ⌘K |
+| The records in Graph Data are found by asking | A customer or an order is reached through Explore and the Assistant, not ⌘K |
 | Leans on | The role table and who holds each role ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md)) · the person's own settings ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md)) |
 
 ## Data touched
@@ -158,5 +158,5 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Item | Why not |
 |---|---|
-| ⌘K over the Graph's own records | That is the graph databases', through Explore and the Assistant |
+| ⌘K over the records in Graph Data | That is the graph databases', through Explore and the Assistant |
 | Search history or saved searches | Not asked for |

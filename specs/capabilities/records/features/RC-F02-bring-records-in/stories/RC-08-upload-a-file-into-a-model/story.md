@@ -20,7 +20,7 @@ Loading records is the Modeller's and the Admin's ([the role table](../../../../
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Upload a file into any published model of the Graph and load it | — |
+| Admin | Upload a file into any published model and load it | — |
 | Operator | Read the loads. A Modeller uploads as an Admin does | *Upload* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow

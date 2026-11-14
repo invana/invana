@@ -165,8 +165,8 @@ flowchart TD
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 404 | The load names no model, or one the Graph lacks | *No model `{name}` in this graph — it has {models}.* | RC-09.1 |
-| 409 | The Graph's connection is read-only | *This graph's connection is read-only — loading needs a writable connection.* | RC-09.2 |
+| 404 | The load names no model, or one the deployment lacks | *No model `{name}` — the published models are {models}.* | RC-09.1 |
+| 409 | The graph database's connection is read-only | *This graph database's connection is read-only — loading needs a writable connection.* | RC-09.2 |
 | 403 | A rule refuses writing into the model | *Cannot answer — `{rule}` refuses writing into `{model}`.* | RC-09.3 |
 | 403 | The caller is an Operator | *Needs the Modeller role — ask an Admin.* | RC-08.9 |
 | 415 | A file that is not rows with a header — a document, a paper, free text | *Only rows that fit a kind can be loaded — extract them first.* | RC-08.10 |
@@ -181,10 +181,10 @@ flowchart TD
 
 | Command | Does |
 |---|---|
-| `invana load <file> --graph <g> --model <m> [--licence <l>]` | One load into one model; exits non-zero past the rejection threshold; progress on `stderr` (a rewriting counter on a terminal, a line a step otherwise), the summary alone on `stdout` |
-| `invana load --bundle <folder> --graph <g> [--check]` | Check, then load a bundle as one run; `--check` runs the offline check alone and writes nothing; one progress line per lane; exits non-zero when any file failed |
-| `invana load --bulk <path> --graph <g>` | The marked fast path: no checks, no provenance; the Graph supplies the connector, URI and credentials, and `--connector` · `--uri` · `--username` · `--password` each override one part |
-| `invana load --bulk <path> --connector <c> --uri <u>` | Without `--graph`: runs direct, records nothing and says so — credentials never ride a run's params |
+| `invana load <file> --database <name> --model <m> [--licence <l>]` | One load into one model; exits non-zero past the rejection threshold; progress on `stderr` (a rewriting counter on a terminal, a line a step otherwise), the summary alone on `stdout` |
+| `invana load --bundle <folder> --database <name> [--check]` | Check, then load a bundle as one run; `--check` runs the offline check alone and writes nothing; one progress line per lane; exits non-zero when any file failed |
+| `invana load --bulk <path> --database <name>` | The marked fast path: no checks, no provenance; the graph database supplies the connector, URI and credentials, and `--connector` · `--uri` · `--username` · `--password` each override one part |
+| `invana load --bulk <path> --connector <c> --uri <u>` | Without `--database`: runs direct, records nothing and says so — credentials never ride a run's params |
 
 ### Mechanisms
 
@@ -196,8 +196,8 @@ flowchart TD
 | Per-record check | Each record is checked against its kind's properties, constraints and standards; a break of a `reject` rule rejects it, a break of a `flag` rule writes it for RC-F03 to list ([SE-F02 › Engine](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) `on_break`); the run never stops for a bad record |
 | Provenance stamps | Every node and relationship written carries `_inv_load_id` · `_inv_model_id` · `_inv_record_id` · `_inv_file` · `_inv_run_id`; a node's peek reads them off the element with no request. An element with none was written by a bulk load or before Invana ([RC-F06](../RC-F06-provenance/feature.md#engine) reads them) |
 | A loaded link row carries both marks | A relationship a link file writes carries the load's stamps and its link's, as [SE-F06 › Engine](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) says |
-| Link rows from a file | A file ships a link's rows in `stitches/<RELATIONSHIP>.json` (`{id, from, to, properties}`); the Graph must hold an active link naming this load's model and that relationship, or the file is reported `no_stitch_for_edge` and nothing of it is written |
-| A load is governed | The run freezes the Graph's view at open; Write engages the version the open pinned and records one touch with what it wrote; Stitch touches every model its relationships joined; Validate and Snapshot touch nothing. A rule that refuses the model ends the load *cannot answer*, naming it, before anything is written ([SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine)) |
+| Link rows from a file | A file ships a link's rows in `stitches/<RELATIONSHIP>.json` (`{id, from, to, properties}`); the deployment must hold an active link naming this load's model and that relationship, or the file is reported `no_stitch_for_edge` and nothing of it is written |
+| A load is governed | The run freezes the deployment's view at open; Write engages the version the open pinned and records one touch with what it wrote; Stitch touches every model its relationships joined; Validate and Snapshot touch nothing. A rule that refuses the model ends the load *cannot answer*, naming it, before anything is written ([SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine)) |
 | A failure is its step's | A failure is attributed to the step in flight; the database's refusal of a write becomes a diagnosis with the next step, never a stack trace |
 | The version holds | A model published mid-run does not switch the run; it keeps and reports the version it opened with |
 | Cancel | Accepted records stay; the run is `cancelled` and the report says where it stopped; a bundle says which files had finished |
@@ -206,11 +206,11 @@ flowchart TD
 | The bundle manifest | `stitches.json` at the folder's root: `name` · `datasets[]` (folders, each declaring its model in `graph-model.json`, by `package_id` then `name`; two may declare one model) · `stitches[]` — `id` (a label for the report) · `kind` (`anchor` · `relationship`) · `source` · `target` (`<folder>:<Kind>.<property>`) · `identity_match` (`exact` · `case_insensitive`) · `edge_type` · `rows` (a rows file when there is no key pair) · `partial` (the sides overlap, not match fully) |
 | The offline check | `data.bundle.check`, before anything is written: `node_ids_unique` · `identity_key_present` · `identity_key_unique` · `node_type_declared` · `edge_type_declared` · `property_declared` · `property_type` · `enum_value` · `endpoint_types`; each rule between files resolves and is counted by distinct key values, failing when it leaves values unresolved unless `partial`; `endpoint_resolves` is reported deferred, never failed |
 | `bundle-import@1` | **check** (the offline check) · **load** — one lane per file, up to 4 at once, each inlining `model-import@1` by `uses` so a lane and a single load never drift; a failed lane does not stop the others · **stitch** — once, over everything that landed; skipped when every lane failed, and the run fails with a diagnosis · **report** — each file's counts rolled into the run · **triage** — a task naming a failed file, assigned to the person who started the bundle or left unassigned. Lanes and events are the runtime's; no table of its own |
-| `bulk-load@1` | A run of kind `bulk`, one step `graph.write.bulk` through the connector's bulk write — counts, log and who ran it, no report and no provenance. With no model version to pin, the Graph's grounding version governs it |
+| `bulk-load@1` | A run of kind `bulk`, one step `graph.write.bulk` through the connector's bulk write — counts, log and who ran it, no report and no provenance. With no model version to pin, the deployment's grounding version governs it |
 | A Python call | `load_records(...)` for an orchestrator that holds the records in memory: the same load, returning its run to wait on, with an `on_progress` callback |
 | A saved result | `POST /loads` with `from_run_id` and a kind: one `source = run` load of that kind, keyed by each row's label, one property per figure; `record_load_inputs` copies the run's pinned loads. Every value it writes reads *derived*, its provenance the run and those loads |
 | Undo | Removes the nodes and relationships the load created; reverts a value it wrote only when no later write changed it, and lists the rest as kept; sets `undone_at` and emits `records.load.undo` with what cites the load — findings, reports, simulations and every `source = run` load whose inputs name it |
-| Counts | `written` · `created` · `updated` · `rejected` are stored when the run settles; the tiles are the runtime's run statistics for this Graph; Studio never derives them |
+| Counts | `written` · `created` · `updated` · `rejected` are stored when the run settles; the tiles are the runtime's run statistics for the deployment; Studio never derives them |
 
 ## System impact
 
@@ -231,8 +231,8 @@ flowchart TD
 | Purged rows say so | A run past retention keeps its counts and says its rows are gone |
 | The browser reads the file | Rows left out for having no key are listed in the load's report |
 | Records by hand are a load | The new records are one load, its source *by hand*, the person its author; a new record never overwrites a key; above 5,000 records the form points to the command |
-| A bulk load is listed when it names its Graph | The Graph supplies the connection and the load is listed; a connection typed on the command line runs direct and is not listed, because credentials never ride a run — the command says so |
-| Loading needs the Modeller role | Writing records into a Graph's model is the Modeller's and the Admin's, in the browser, the CLI and the API alike; which records a load reaches is the agent's Access Policies |
+| A bulk load is listed when it names its graph database | The graph database supplies the connection and the load is listed; a connection typed on the command line runs direct and is not listed, because credentials never ride a run — the command says so |
+| Loading needs the Modeller role | Writing records into a model is the Modeller's and the Admin's, in the browser, the CLI and the API alike; which records a load reaches is the agent's Access Policies |
 | Experimental | Records by hand carry an *Experimental* badge on their act and page head |
 | A saved result is a load | Records saved from a run's result are one load, its source *run*, naming that run and the loads it was pinned to; its records read *derived*, and undoing an input flags it like any other citation |
 

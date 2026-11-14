@@ -78,7 +78,7 @@ flowchart TD
 |---|---|
 | One page, the model a filter | Overview · Database · Usage · Performance · Growth, read for all models or one; changing scope keeps the tab. History opens from *Versions* |
 | One window | 7 · 30 · 90 days, read by every number on the page; Database ignores it and says so |
-| Signals are fixed rules, not a score | *Unused* — records and no query touched it. *Empty* — published, no records. *Cold property* — never filtered, returned or ordered on, where the database can explain a query. *Hot* — touched by a quarter of the window's queries. *Hot and slow* — hot, with p95 at or above the Graph's. *Supernode* — a kind whose most connected record has at least a hundred times the median and at least 1,000. Nothing is called with fewer than 50 queries in the window |
+| Signals are fixed rules, not a score | *Unused* — records and no query touched it. *Empty* — published, no records. *Cold property* — never filtered, returned or ordered on, where the database can explain a query. *Hot* — touched by a quarter of the window's queries. *Hot and slow* — hot, with p95 at or above the deployment's. *Supernode* — a kind whose most connected record has at least a hundred times the median and at least 1,000. Nothing is called with fewer than 50 queries in the window |
 | Every use is split by who called | Agent · plan · Explore · API, read off the run, never guessed from the query |
 | Queries are grouped by shape | A query with its values taken out; a thousand calls of one generated query are one row, with p50 · p95 · rows · callers |
 | Drift is matched by what a row covers | A kind, relationship, index or constraint is *in both*, *model only* or *database only* by what it covers, never by its name |

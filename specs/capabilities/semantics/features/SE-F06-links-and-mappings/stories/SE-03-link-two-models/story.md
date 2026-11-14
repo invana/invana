@@ -9,7 +9,7 @@ boards: [model.board]
 
 # SE-03 · Link two models
 
-**As** a modeller with several models in one Graph **I want** to declare how two of them meet — the same thing, or a
+**As** a modeller with several models in one deployment **I want** to declare how two of them meet — the same thing, or a
 relationship between them — on a key on each side, and see how many records it joins before I make it **so that** a
 question can cross them without anyone guessing which `Stock` is which.
 

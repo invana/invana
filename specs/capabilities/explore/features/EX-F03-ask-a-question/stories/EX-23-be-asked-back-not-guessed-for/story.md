@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 ```mermaid
 flowchart LR
   a([An ambiguous question]) --> o{Options}
-  o -->|read from the Graph| r{Rows?}
+  o -->|read from Graph Data| r{Rows?}
   r -->|none| ca(["Cannot answer — nothing to choose between"])
   r -->|some| q["A closed question · one row per option"]
   o -->|a fixed set| q
@@ -43,8 +43,8 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-23.1 | A question the assistant cannot settle | it is understood | the reply asks one closed question — a choice, several choices or yes/no — and no answer is given yet |
-| EX-23.2 | Options read from the Graph | the question is asked | the options are the rows a checked plan returned, read only where the agent's Access Policies allow; none is invented |
-| EX-23.3 | Options read from the Graph return no rows | the question would be asked | no empty picker is shown; the reply is *cannot answer — nothing to choose between* |
+| EX-23.2 | Options read from Graph Data | the question is asked | the options are the rows a checked plan returned, read only where the agent's Access Policies allow; none is invented |
+| EX-23.3 | Options read from Graph Data return no rows | the question would be asked | no empty picker is shown; the reply is *cannot answer — nothing to choose between* |
 | EX-23.4 | Options whose labels say enough | the question is drawn | each option is one line; a second line shows only on an option written with a description |
 | EX-23.5 | A question asked back | the person taps an option | it folds to *Answered · <choice>* and the same run goes on with it, not a new run |
 | EX-23.6 | A folded answer | the person opens it | the question shows with the options not taken dimmed |
