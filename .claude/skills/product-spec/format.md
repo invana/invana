@@ -43,7 +43,7 @@ specs/
 | Acceptance criterion | `<story>.<n>` | `RC-08.2` |
 | Journey | `J<nn>` | `J02` |
 | Non-functional requirement | `NFR-<PILLAR>-<n>` — `REL` · `SEC` · `PERF` · `COST` · `OPS` · `SUS` · `UX` | `NFR-PERF-2` |
-| Board | `area.feature.surface.variant`, lower snake | `model.kind.load_data.map` |
+| Board | `area.feature`, lower snake, one per place — a cell reads `<board> · <view or overlay> · <state>` (`specs/design-language.md` §7) | `model.kinds · Detail · Edit` |
 
 - An ID is never reused. A deleted story's ID stays retired.
 - Numbers are assigned in order of creation, not in reading order.
