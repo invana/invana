@@ -1,6 +1,6 @@
 ---
 name: design-redesign
-status: ready
+status: running
 branch: chore/specs-graph-data
 scope: design-redesign
 ---
@@ -317,7 +317,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Foundation — reference page, kit, shell components, pages |  | pending |  |  |
+| P01 | Foundation — reference page, kit, shell components, pages |  | in progress | 2026-11-15 |  |
 | P02 | Name the missing boards | P01 | pending |  |  |
 | P03 | Prototype I — Shell, Sign-in & Home, Explore, Model, Projects | P02 | pending |  |  |
 | P04 | Prototype II — Inbox, Records, Agents, Library, Settings | P03 | pending |  |  |
