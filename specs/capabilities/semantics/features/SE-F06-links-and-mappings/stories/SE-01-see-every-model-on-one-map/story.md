@@ -4,7 +4,7 @@ title: See every model on one map
 feature: SE-F06
 status: idea
 personas: [modeller]
-boards: [model.board]
+boards: [model.board, model.models]
 ---
 
 # SE-01 · See every model on one map
@@ -58,5 +58,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The map | Admin | model.board · No model yet | model.board · One model | model.board · Laying out | model.board | model.board · Could not load | — | — |
 | The map | Operator | model.board · No model yet | model.board · One model | model.board · Laying out | model.board · Read only | model.board · Could not load | — | model.board · Read only |
-| The whole model's list | Admin | model.board · No model yet | model.board · One model | model.board · Laying out | model.board · Whole model | model.board · Could not load | — | — |
-| The whole model's list | Operator | model.board · No model yet | model.board · One model | model.board · Laying out | model.board · Whole model | model.board · Could not load | — | model.board · Whole model |
+| The whole model's list | Admin | model.models · No model yet | model.models · One model | model.models · Laying out | model.models · Whole model | model.models · Could not load | — | — |
+| The whole model's list | Operator | model.models · No model yet | model.models · One model | model.models · Laying out | model.models · Whole model | model.models · Could not load | — | model.models · Whole model |

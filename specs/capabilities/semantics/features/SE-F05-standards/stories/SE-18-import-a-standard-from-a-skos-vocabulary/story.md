@@ -4,7 +4,7 @@ title: Import a standard from a SKOS vocabulary
 feature: SE-F05
 status: idea
 personas: [curator]
-boards: [data.checks]
+boards: [model.standards]
 ---
 
 # SE-18 · Import a standard from a SKOS vocabulary
@@ -62,7 +62,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Import from SKOS | Admin | data.checks · Import SKOS | — | data.checks · Reading the vocabulary | data.checks · SKOS preview | data.checks · SKOS refused | — | — |
-| Import from SKOS | Operator | data.checks · Import SKOS | — | data.checks · Reading the vocabulary | data.checks · SKOS preview | data.checks · SKOS refused | — | data.checks · Not the creator |
-| Pick a concept scheme | Admin | — | — | data.checks · Reading the vocabulary | data.checks · Pick a scheme | data.checks · SKOS refused | — | — |
-| Pick a concept scheme | Operator | — | — | data.checks · Reading the vocabulary | data.checks · Pick a scheme | data.checks · SKOS refused | — | — |
+| Import from SKOS | Admin | model.standards · Import SKOS | — | model.standards · Reading the vocabulary | model.standards · SKOS preview | model.standards · SKOS refused | — | — |
+| Import from SKOS | Operator | model.standards · Import SKOS | — | model.standards · Reading the vocabulary | model.standards · SKOS preview | model.standards · SKOS refused | — | model.standards · Not the creator |
+| Pick a concept scheme | Admin | — | — | model.standards · Reading the vocabulary | model.standards · Pick a scheme | model.standards · SKOS refused | — | — |
+| Pick a concept scheme | Operator | — | — | model.standards · Reading the vocabulary | model.standards · Pick a scheme | model.standards · SKOS refused | — | — |

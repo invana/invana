@@ -4,7 +4,7 @@ title: Set limits for the deployment, a team, a user or an agent
 feature: CP-F04
 status: idea
 personas: [admin]
-boards: [settings.usage]
+boards: [settings.limits]
 ---
 
 # CP-11 · Set limits for the deployment, a team, a user or an agent
@@ -78,7 +78,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Limits — the deployment, teams, users and agents | Admin | settings.usage · Default limits | settings.usage · Nothing matches | settings.usage · Loading | settings.usage | settings.usage · Could not save | — | — |
-| Limits — the deployment, teams, users and agents | Operator | settings.usage · Default limits · Read only | settings.usage · Nothing matches | settings.usage · Loading | settings.usage · Read only | settings.usage · Could not load | — | settings.usage · Read only |
-| Edit limits | Admin | settings.usage · Edit limits | — | — | settings.usage · Edit limits | settings.usage · Could not save | — | — |
-| Edit limits | Operator | — | — | — | — | — | — | settings.usage · Read only |
+| Limits — the deployment, teams, users and agents | Admin | settings.limits · Default limits | settings.limits · Nothing matches | settings.limits · Loading | settings.limits | settings.limits · Could not save | — | — |
+| Limits — the deployment, teams, users and agents | Operator | settings.limits · Default limits · Read only | settings.limits · Nothing matches | settings.limits · Loading | settings.limits · Read only | settings.limits · Could not load | — | settings.limits · Read only |
+| Edit limits | Admin | settings.limits · Edit limits | — | — | settings.limits · Edit limits | settings.limits · Could not save | — | — |
+| Edit limits | Operator | — | — | — | — | — | — | settings.limits · Read only |

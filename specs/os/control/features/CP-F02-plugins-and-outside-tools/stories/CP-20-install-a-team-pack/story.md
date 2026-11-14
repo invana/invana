@@ -4,7 +4,7 @@ title: Install a Team pack
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.plugins, settings.access]
+boards: [settings.plugins, settings.access, settings.packs]
 ---
 
 # CP-20 · Install a Team pack
@@ -67,8 +67,8 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Team packs | Admin | settings.plugins · No pack installed | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · Packs | settings.plugins · Pack clashes | — | — |
-| Team packs | Operator | settings.plugins · No pack installed | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · Packs · Read only | settings.plugins · Could not load | — | settings.plugins · Packs · Read only |
+| Team packs | Admin | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs | settings.packs · Pack clashes | — | — |
+| Team packs | Operator | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs · Read only | settings.packs · Could not load | — | settings.packs · Packs · Read only |
 | A pack's policies to apply | Admin | — | — | settings.access · Loading | settings.plugins · Policies to apply | settings.access · Rule refused | — | — |
 | A pack's policies to apply | Operator | — | — | — | settings.plugins · Policies to apply · Read only | — | — | settings.access · Waiting to apply |
 | A pack's outside servers | Admin | — | — | — | settings.plugins · Servers to add | — | — | — |

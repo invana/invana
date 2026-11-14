@@ -6,7 +6,7 @@ status: idea
 personas: [curator, researcher, admin]
 stories: [SE-17, SE-18]
 journeys: []
-boards: [data.checks]
+boards: [model.standards]
 nfrs: []
 depends_on: [SE-F02]
 ---

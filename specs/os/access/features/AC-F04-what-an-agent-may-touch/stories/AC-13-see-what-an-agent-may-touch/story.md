@@ -4,7 +4,7 @@ title: See what an agent may touch
 feature: AC-F04
 status: idea
 personas: [admin, builder]
-boards: [settings.access, access.locked]
+boards: [access.locked, settings.agent_access]
 ---
 
 # AC-13 · See what an agent may touch
@@ -67,7 +67,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| What it may touch | Admin | settings.access · What it may touch · Holds no policy | settings.access · What it may touch · Nothing matches | settings.access · What it may touch · Loading | settings.access · What it may touch | settings.access · What it may touch · Could not load | — | — |
+| What it may touch | Admin | settings.agent_access · What it may touch · Holds no policy | settings.agent_access · What it may touch · Nothing matches | settings.agent_access · What it may touch · Loading | settings.agent_access · What it may touch | settings.agent_access · What it may touch · Could not load | — | — |
 | What it may touch | Operator | access.locked · What it may touch · Holds no policy | access.locked · What it may touch · Nothing matches | access.locked · What it may touch · Loading | access.locked · What it may touch | access.locked · What it may touch · Could not load | — | access.locked · What it may touch |
-| Declared needs | Admin | settings.access · Declared needs · Nothing used yet | — | settings.access · Declared needs · Loading | settings.access · Declared needs | settings.access · Declared needs · Could not load | — | — |
+| Declared needs | Admin | settings.agent_access · Declared needs · Nothing used yet | — | settings.agent_access · Declared needs · Loading | settings.agent_access · Declared needs | settings.agent_access · Declared needs · Could not load | — | — |
 | Declared needs | Operator | access.locked · Declared needs · Nothing used yet | — | access.locked · Declared needs · Loading | access.locked · Declared needs | access.locked · Declared needs · Could not load | — | access.locked · Declared needs |

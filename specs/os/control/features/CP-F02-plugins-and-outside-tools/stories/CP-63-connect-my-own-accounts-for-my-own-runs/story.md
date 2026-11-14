@@ -4,7 +4,7 @@ title: Connect my own accounts for my own runs
 feature: CP-F02
 status: idea
 personas: [analyst, builder, admin]
-boards: [settings.me, settings.plugins, agents.run]
+boards: [settings.plugins, agents.run, settings.me.connections]
 ---
 
 # CP-63 · Connect my own accounts for my own runs
@@ -60,8 +60,8 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Runs that used my connection | Admin | settings.me · Not used yet | — | settings.me · Loading | settings.me · Runs that used it | settings.me · Could not load | — | — |
-| Runs that used my connection | Operator | settings.me · Not used yet | — | settings.me · Loading | settings.me · Runs that used it | settings.me · Could not load | — | — |
+| Runs that used my connection | Admin | settings.me.connections · Not used yet | — | settings.me.connections · Loading | settings.me.connections · Runs that used it | settings.me.connections · Could not load | — | — |
+| Runs that used my connection | Operator | settings.me.connections · Not used yet | — | settings.me.connections · Loading | settings.me.connections · Runs that used it | settings.me.connections · Could not load | — | — |
 | A call refused for a missing connection | Admin | — | — | — | agents.run · No connection | — | agents.run · No connection | — |
 | A call refused for a missing connection | Operator | — | — | — | agents.run · No connection | — | agents.run · No connection | — |
 | A copy from another person's connection | Admin | — | — | — | agents.run · Withheld · Personal connection | — | — | agents.run · Withheld · Personal connection |

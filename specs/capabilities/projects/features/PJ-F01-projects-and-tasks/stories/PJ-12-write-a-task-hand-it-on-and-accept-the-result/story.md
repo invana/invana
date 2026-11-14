@@ -4,7 +4,7 @@ title: Write a task, hand it on and accept the result
 feature: PJ-F01
 status: idea
 personas: [analyst, decision-maker]
-boards: [projects.list, projects.task, projects.task.thinking, inbox]
+boards: [projects.task, projects.task.thinking, inbox, projects.my_tasks, projects.reviews]
 ---
 
 # PJ-12 · Write a task, hand it on and accept the result
@@ -106,13 +106,15 @@ flowchart TD
 | PJ-12.32 | A task's run the reader may not read ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) | they open the task or *How it got here* | the task, its result and its state read; the run reads that it ran, its status and its tokens, and its steps read *Content withheld* |
 | PJ-12.33 | A task's run the agent's Access Policies refuse | the run is checked | the task reads *Failed*, naming the rule that refused — a project or a task grants nothing beyond the agent's policies |
 | PJ-12.34 | A task in review and a person who is not a reviewer of its project | they open it | the result reads; *Accept* and *Send back* are disabled — *Reviewers only*; a call is refused the same way |
+| PJ-12.35 | Tasks written by or handed to the person, in projects or in none | they open Projects › My tasks | those tasks list across every project, grouped by status, each with its project and kind as badges |
+| PJ-12.36 | Results waiting on the person as a reviewer | they open Projects › Reviews | each task in review lists with its project, who posted the result and since when, oldest first; opening one opens the task at its result |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Tasks | Admin | projects.list · No tasks yet | projects.list · No tasks match | projects.list · Loading tasks | projects.list · Tasks | projects.list · Could not load tasks | projects.list · Tasks running | — |
-| Tasks | Operator | projects.list · No tasks yet | projects.list · No tasks match | projects.list · Loading tasks | projects.list · Tasks | projects.list · Could not load tasks | projects.list · Tasks running | — |
+| Tasks | Admin | projects.my_tasks · No tasks yet | projects.my_tasks · No tasks match | projects.my_tasks · Loading tasks | projects.my_tasks · Tasks | projects.my_tasks · Could not load tasks | projects.my_tasks · Tasks running | — |
+| Tasks | Operator | projects.my_tasks · No tasks yet | projects.my_tasks · No tasks match | projects.my_tasks · Loading tasks | projects.my_tasks · Tasks | projects.my_tasks · Could not load tasks | projects.my_tasks · Tasks running | — |
 | New task | Admin | projects.task · New | — | — | projects.task · Assign | projects.task · New refused | — | — |
 | New task | Operator | projects.task · New | — | — | projects.task · Assign | projects.task · New refused | — | projects.task · Assign · Agent not granted |
 | A task | Admin | projects.task · Open | — | projects.task · Loading | projects.task · In review | projects.task · Could not load | projects.task.thinking | — |
@@ -125,3 +127,5 @@ flowchart TD
 | A result in Needs you | Operator | — | — | inbox · Loading | inbox · A result to accept | inbox · Could not load | — | — |
 | A task's History | Admin | projects.task · History · Nothing yet | — | projects.task · Loading | projects.task · History | projects.task · Could not load | projects.task · History | — |
 | A task's History | Operator | projects.task · History · Nothing yet | — | projects.task · Loading | projects.task · History | projects.task · Could not load | projects.task · History | projects.task · History · Content withheld |
+| Reviews on the left | Admin | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |
+| Reviews on the left | Operator | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |

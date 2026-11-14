@@ -4,7 +4,7 @@ title: Keep a library of standards
 feature: SE-F05
 status: idea
 personas: [curator]
-boards: [data.checks]
+boards: [model.standards]
 ---
 
 # SE-17 · Keep a library of standards
@@ -59,9 +59,9 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Standards | Admin | data.checks · No standards yet | data.checks · No standard matches | data.checks · Loading | data.checks | data.checks · Could not load | — | — |
-| Standards | Operator | data.checks · No standards yet | data.checks · No standard matches | data.checks · Loading | data.checks | data.checks · Could not load | — | — |
-| A standard | Admin | — | — | data.checks · Loading | data.checks · Standard | data.checks · Could not load | — | — |
-| A standard | Operator | — | — | data.checks · Loading | data.checks · Standard | data.checks · Could not load | — | data.checks · Standard read only |
-| Write a standard | Admin | data.checks · Write a standard | — | — | data.checks · Write a standard | data.checks · Standard unchanged | — | — |
-| Write a standard | Operator | data.checks · Write a standard | — | — | data.checks · Write a standard | data.checks · Standard unchanged | — | data.checks · Standard read only |
+| Standards | Admin | model.standards · No standards yet | model.standards · No standard matches | model.standards · Loading | model.standards | model.standards · Could not load | — | — |
+| Standards | Operator | model.standards · No standards yet | model.standards · No standard matches | model.standards · Loading | model.standards | model.standards · Could not load | — | — |
+| A standard | Admin | — | — | model.standards · Loading | model.standards · Standard | model.standards · Could not load | — | — |
+| A standard | Operator | — | — | model.standards · Loading | model.standards · Standard | model.standards · Could not load | — | model.standards · Standard read only |
+| Write a standard | Admin | model.standards · Write a standard | — | — | model.standards · Write a standard | model.standards · Standard unchanged | — | — |
+| Write a standard | Operator | model.standards · Write a standard | — | — | model.standards · Write a standard | model.standards · Standard unchanged | — | model.standards · Standard read only |

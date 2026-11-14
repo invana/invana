@@ -4,7 +4,7 @@ title: Install a graph connector and see it offered
 feature: CP-F05
 status: idea
 personas: [admin]
-boards: [settings.databases.connect]
+boards: [settings.databases.connect, settings.connectors]
 ---
 
 # CP-17 · Install a graph connector and see it offered
@@ -49,6 +49,7 @@ flowchart TD
 | CP-17.8 | Two packages that register the same name | the engine starts | neither is offered under that name; `invana version` names both packages |
 | CP-17.9 | An Operator | they open a graph database's details | they read its connector and language; installing one is not offered anywhere in Invana |
 | CP-17.10 | Connectors in the Library | the list is read | each installed connector reads its graph databases and *Used by n agents*, as the engine counts them |
+| CP-17.11 | Installed graph connectors | a person opens Library › Connectors | each lists with the graph database it connects, its version and *Used by n graph databases*; an Operator reads the same list, which has no acts of its own |
 
 ## Screens
 
@@ -56,3 +57,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The connector choice | Admin | settings.databases.connect · No connector installed | — | — | settings.databases.connect | settings.databases.connect · Connector failed | — | — |
 | The connector choice | Operator | — | — | — | — | — | — | — |
+| Connectors in the Library | Admin | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | — |
+| Connectors in the Library | Operator | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | settings.connectors · Read only |

@@ -4,7 +4,7 @@ title: See every change and compare two versions
 feature: AC-F06
 status: idea
 personas: [admin, modeller, builder]
-boards: [inbox.history]
+boards: [settings.history]
 ---
 
 # AC-17 · See every change and compare two versions
@@ -63,7 +63,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| History › Changes | Admin | inbox.history · No changes yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history | inbox.history · Could not load | — | — |
-| History › Changes | Operator | inbox.history · No changes yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history | inbox.history · Could not load | — | inbox.history |
-| A compare | Admin | inbox.history · Nothing to compare | — | inbox.history · Loading | inbox.history · Compare | inbox.history · Not found | — | — |
-| A compare | Operator | inbox.history · Nothing to compare | — | inbox.history · Loading | inbox.history · Compare | inbox.history · Not found | — | inbox.history · Not found |
+| History › Changes | Admin | settings.history · No changes yet | settings.history · Nothing matches | settings.history · Loading | settings.history | settings.history · Could not load | — | — |
+| History › Changes | Operator | settings.history · No changes yet | settings.history · Nothing matches | settings.history · Loading | settings.history | settings.history · Could not load | — | settings.history |
+| A compare | Admin | settings.history · Nothing to compare | — | settings.history · Loading | settings.history · Compare | settings.history · Not found | — | — |
+| A compare | Operator | settings.history · Nothing to compare | — | settings.history · Loading | settings.history · Compare | settings.history · Not found | — | settings.history · Not found |

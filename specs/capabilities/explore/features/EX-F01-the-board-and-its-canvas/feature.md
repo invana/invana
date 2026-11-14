@@ -6,7 +6,7 @@ status: idea
 personas: [analyst]
 stories: [EX-07, EX-09, EX-14, EX-16, EX-18, EX-21]
 journeys: []
-boards: [explore.ask, explore.board, explore.board.left_closed, explore.board.menu, explore.board.console, explore.board.edit, explore.share]
+boards: [explore.ask, explore.board, explore.board.left_closed, explore.board.menu, explore.board.console, explore.board.edit, explore.share, explore.boards]
 nfrs: [NFR-PERF-4]
 depends_on: [AC-F02, AC-F07, CP-F05, CP-F10, SE-F06]
 ---

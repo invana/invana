@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst, curator]
 stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-20, CP-64]
 journeys: [J07, J10]
-boards: [settings.plugins, settings.plugins.server, settings.mcp, settings.me, settings.people, settings.access, agents.agent, access.sign_in_again, access.locked]
+boards: [settings.plugins, settings.plugins.server, settings.mcp, settings.people, settings.access, agents.agent, access.sign_in_again, access.locked, settings.packs, settings.me.connections, agents.run, settings.workers]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-PERF-3]
 depends_on: [AC-F02, AC-F04, AC-F05, AC-F09, AC-F10, AC-F11, CP-F03, AG-F06, RC-F02]
 ---

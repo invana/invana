@@ -4,7 +4,7 @@ title: Read every Access Policy and what it is attached to
 feature: AC-F02
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.access, access.locked]
+boards: [access.locked, settings.policies]
 ---
 
 # AC-03 · Read every Access Policy and what it is attached to
@@ -55,5 +55,5 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Access Policies — the list | Admin | settings.access · Built in only | settings.access · Nothing matches | settings.access · Loading | settings.access | settings.access · Could not load | — | — |
+| Access Policies — the list | Admin | settings.policies · Built in only | settings.policies · Nothing matches | settings.policies · Loading | settings.policies | settings.policies · Could not load | — | — |
 | Access Policies — the list | Operator | access.locked · Built in only | access.locked · Nothing matches | access.locked · Loading | access.locked | access.locked · Could not load | — | access.locked |

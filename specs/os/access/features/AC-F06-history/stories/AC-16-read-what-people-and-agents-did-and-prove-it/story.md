@@ -4,7 +4,7 @@ title: Read what people and agents did, and prove it
 feature: AC-F06
 status: idea
 personas: [admin, builder, analyst]
-boards: [inbox.history, agents.run]
+boards: [agents.run, settings.history]
 ---
 
 # AC-16 · Read what people and agents did, and prove it
@@ -77,15 +77,15 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| History — rows | Admin | inbox.history · No acts yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history · Everything | inbox.history · Chain broken | inbox.history · Agents | — |
-| The head after a prune | Admin | — | — | — | inbox.history · From a checkpoint | inbox.history · Checkpoint broken | — | — |
-| The head after a prune | Operator | — | — | — | inbox.history · From a checkpoint | inbox.history · Checkpoint broken | — | — |
-| History — rows | Operator | inbox.history · No acts yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history · Counted, not shown | inbox.history · Chain broken | inbox.history · Agents | inbox.history · Counted, not shown |
-| A row's detail | Admin | — | — | inbox.history · Loading | inbox.history · Row | inbox.history · Could not load | — | — |
-| A row's detail | Operator | — | — | inbox.history · Loading | inbox.history · Row | inbox.history · Could not load | — | inbox.history · Arguments withheld |
-| By actor · by record · refusals | Admin | inbox.history · No acts yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history · Refused | inbox.history · Could not load | — | — |
-| By actor · by record · refusals | Operator | — | — | — | — | — | — | inbox.history · Counted, not shown |
-| Export | Admin | — | inbox.history · Nothing to export | — | inbox.history · Export | inbox.history · Could not load | — | — |
-| Export | Operator | — | inbox.history · Nothing to export | — | inbox.history · Export | inbox.history · Could not load | — | inbox.history · Export |
+| History — rows | Admin | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Everything | settings.history · Chain broken | settings.history · Agents | — |
+| The head after a prune | Admin | — | — | — | settings.history · From a checkpoint | settings.history · Checkpoint broken | — | — |
+| The head after a prune | Operator | — | — | — | settings.history · From a checkpoint | settings.history · Checkpoint broken | — | — |
+| History — rows | Operator | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Counted, not shown | settings.history · Chain broken | settings.history · Agents | settings.history · Counted, not shown |
+| A row's detail | Admin | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | — |
+| A row's detail | Operator | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | settings.history · Arguments withheld |
+| By actor · by record · refusals | Admin | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Refused | settings.history · Could not load | — | — |
+| By actor · by record · refusals | Operator | — | — | — | — | — | — | settings.history · Counted, not shown |
+| Export | Admin | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | — |
+| Export | Operator | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | settings.history · Export |
 | The step a row opens | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | — |
 | The step a row opens | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | agents.run · Not found |

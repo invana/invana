@@ -4,7 +4,7 @@ title: See every load and what it rejected
 feature: RC-F02
 status: idea
 personas: [curator, modeller]
-boards: [data.upload, agents.run, explore.board.menu]
+boards: [agents.run, explore.board.menu, data.loads]
 ---
 
 # RC-09 · See every load and what it rejected
@@ -74,8 +74,8 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Loads | Admin | data.upload · No loads yet | data.upload · No loads match | data.upload · Loads loading | data.upload | data.upload · Loads could not load | — | — |
-| Loads | Operator | data.upload · No loads yet | data.upload · No loads match | data.upload · Loads loading | data.upload | data.upload · Loads could not load | — | — |
+| Loads | Admin | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
+| Loads | Operator | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
 | A load's run | Admin | — | — | agents.run · Load running | agents.run · Load | agents.run · Load failed | — | — |
 | A load's run | Operator | — | — | agents.run · Load running | agents.run · Load | agents.run · Load failed | — | agents.run · Undo not theirs |
 | What was rejected | Admin | — | — | agents.run · Load running | agents.run · Load rejected | agents.run · Load failed | — | — |

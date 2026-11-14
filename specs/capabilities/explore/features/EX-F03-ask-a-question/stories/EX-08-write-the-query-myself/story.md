@@ -4,7 +4,7 @@ title: Write the query myself
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.board.console]
+boards: [explore.board.console, explore.queries]
 ---
 
 # EX-08 · Write the query myself
@@ -81,6 +81,8 @@ flowchart LR
 | EX-08.18 | A Gremlin query with a Groovy script, a lambda or `eval` | the person runs it | it is refused before it runs, naming the construct — a Gremlin query is steps only; nothing is sent (GP-05.9) |
 | EX-08.19 | A read whose result holds kinds or property levels the Query console may not Read | the person runs it | they are dropped, never shown; the console and the reply say how many were withheld and name the kinds and levels (GP-05.7) |
 | EX-08.20 | A read whose result is all withheld | the person runs it | the reply says everything was withheld and how many, never *Graph Data does not hold this* (GP-05.8) |
+| EX-08.21 | Queries the person typed | they open Explore › Queries | their typed queries list newest first, each naming its graph database, its language and when it ran; opening one opens its conversation at that query |
+| EX-08.22 | A person with typed queries who is not granted the Query console | they open Queries | their queries list; running one again is disabled — *{person} may not use Query console — ask an Admin* |
 
 ## Screens
 
@@ -92,3 +94,5 @@ flowchart LR
 | A query refused before it runs | Operator | — | — | — | explore.board.console · Query refused | explore.board.console · Query refused | — | explore.board.console · Query console not granted |
 | The rows in the console | Admin | — | explore.board.console · Zero rows | explore.board.console · Running | explore.board.console · Withheld count | explore.board.console · Log | — | — |
 | The rows in the console | Operator | — | explore.board.console · Zero rows | explore.board.console · Running | explore.board.console · Withheld count | explore.board.console · Log | — | explore.board.console · Query console not granted |
+| Queries on the left | Admin | explore.queries · No queries yet | explore.queries · No query matches | explore.queries · Loading | explore.queries | explore.queries · Could not load | — | — |
+| Queries on the left | Operator | explore.queries · No queries yet | explore.queries · No query matches | explore.queries · Loading | explore.queries | explore.queries · Could not load | — | explore.queries · Query console not granted |

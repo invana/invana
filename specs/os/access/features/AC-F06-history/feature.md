@@ -6,7 +6,7 @@ status: idea
 personas: [admin, modeller, builder, analyst]
 stories: [AC-16, AC-17, AC-48]
 journeys: [J09]
-boards: [inbox.history, agents.run, shell.access, shell.avatar.access]
+boards: [agents.run, shell.access, shell.avatar.access, settings.history]
 nfrs: [NFR-REL-4, NFR-SEC-2, NFR-PERF-3, NFR-PERF-7]
 depends_on: [AC-F05, AC-F09, AC-F12, CP-F10, AC-F01, AC-F03, AC-F10, AC-F11, CP-F08]
 ---

@@ -4,7 +4,7 @@ title: Open a model and a kind
 feature: SE-F06
 status: idea
 personas: [modeller]
-boards: [model.board, model.board.kind]
+boards: [model.board, model.board.kind, model.kinds, model.relationships]
 ---
 
 # SE-02 · Open a model and a kind
@@ -51,6 +51,8 @@ flowchart LR
 | SE-02.8 | A model's head and a Modeller or an Admin | they rename it or change its description | It saves at once, outside the draft — a name and a description are not part of a version — and History names who changed it |
 | SE-02.9 | A kind's Mappings and a Modeller or an Admin | they pick *Map to a standard* and a property, a standard and a term or value | the mapping — same as · broader · narrower — is staged on the model's draft and publishes with it |
 | SE-02.10 | A kind's Mappings | it opens | each mapping lists its property, the standard's term or value and version, and who declared it; an Operator reads them with *Map to a standard* absent |
+| SE-02.11 | Published models | a person opens Model › Kinds | every kind lists grouped by its model, with the record count the engine sends; picking one opens the kind |
+| SE-02.12 | Published models | a person opens Model › Relationships | every relationship kind lists grouped by its model, naming the two kinds it joins; picking one opens it on its model |
 
 ## Screens
 
@@ -60,3 +62,7 @@ flowchart LR
 | A kind | Operator | model.board.kind · No properties | — | model.board.kind · Loading | model.board.kind · Read only | model.board.kind · Could not load | — | model.board.kind · Read only |
 | A model | Admin | model.board · Model with nothing yet | — | model.board · Loading | model.board · One model | model.board · Could not load | — | — |
 | A model | Operator | model.board · Model with nothing yet | — | model.board · Loading | model.board · One model | model.board · Could not load | — | model.board · Read only |
+| Kinds on the left | Admin | model.kinds · No kinds yet | model.kinds · No kind matches | model.kinds · Loading | model.kinds | model.kinds · Could not load | — | — |
+| Kinds on the left | Operator | model.kinds · No kinds yet | model.kinds · No kind matches | model.kinds · Loading | model.kinds | model.kinds · Could not load | — | model.kinds · Read only |
+| Relationships on the left | Admin | model.relationships · No relationships yet | model.relationships · No relationship matches | model.relationships · Loading | model.relationships | model.relationships · Could not load | — | — |
+| Relationships on the left | Operator | model.relationships · No relationships yet | model.relationships · No relationship matches | model.relationships · Loading | model.relationships | model.relationships · Could not load | — | model.relationships · Read only |
