@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**367 recommendations** · 205 open · 112 taken · 21 declined · 29 done
+**368 recommendations** · 206 open · 112 taken · 21 declined · 29 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -410,3 +410,4 @@ flowchart LR
 | R396 | open | 2026-11-15 | product-manager | phase design-redesign/P02 | docs | medium | design-redesign phase board lists still name boards P02 renamed | project.md P11 lists inbox.history and P15 lists settings.usage as the Limits place; P02 moved History to settings.history (AC-16, AC-17 → Settings · Access, P16) and Limits to settings.limits (CP-11). Update P11/P13–P16 Boards lists to P02's names (see P02 hand-off note); inbox.history is cited by no story now. |  |  |
 | R397 | open | 2026-11-15 | product-manager | phase design-redesign/P02 | docs | medium | Engine sections for EX-34 dashboards and CP-71 General and Appearance | EX-F01 and CP-F07 ## Engine have no records, routes or refusals for dashboards (tiles, order, last run) or for the deployment name, default theme and a person's theme. Write them before either story reaches specified. |  |  |
 | R398 | open | 2026-11-15 | product-manager | phase design-redesign/P02 | docs | low | design-language §7 areas omit graph, access and control prefixes | specs/design-language.md §7 lists areas start · explore · model · data · agents · inbox · settings · projects · shell, but stories cite graph.memory.*, access.* and control.alerts*. Add them, or rename those boards into the listed areas. |  |  |
+| R399 | open | 2026-11-15 | designer | phase design-redesign/P03 | bug | blocker | Runner logged P01 done though its session reported BLOCKED; P03 cannot start | design-redesign P01 report (.agent-reports/designer/design-redesign-P01-boards.md) is RESULT: BLOCKED (R395: no canvas access), yet the Log shows P01 done 'gates green · reviews passed' — the specs gate passes with no canvas work. P03 session 2026-11-15: still no Artifact tool, mcp__claude_ai_Claude_Docs__read refused, no .design/canvas-invana/ mirror, no shell components or pages. Nothing can be drawn or published. Recommend: runner treats a report's RESULT: BLOCKED as blocked (pick) rather than trusting gates alone (rejected: gates only — specs check cannot see the canvas); set P01 and P03 blocked, grant canvas access per R395, re-run from P01 |  |  |

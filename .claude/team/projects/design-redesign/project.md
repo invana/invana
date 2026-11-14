@@ -319,7 +319,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 |---|---|---|---|---|---|
 | P01 | Foundation — reference page, kit, shell components, pages |  | done | 2026-11-15 | gates green · reviews passed |
 | P02 | Name the missing boards | P01 | done | 2026-11-15 | gates green · reviews passed |
-| P03 | Prototype I — Shell, Sign-in & Home, Explore, Model, Projects | P02 | pending |  |  |
+| P03 | Prototype I — Shell, Sign-in & Home, Explore, Model, Projects | P02 | in progress | 2026-11-15 |  |
 | P04 | Prototype II — Inbox, Records, Agents, Library, Settings | P03 | pending |  |  |
 | P05 | Shell — every state and lens | P04 | pending |  |  |
 | P06 | Sign-in & Home — every state and lens | P05 | pending |  |  |
