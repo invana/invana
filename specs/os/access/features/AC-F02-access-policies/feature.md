@@ -36,7 +36,7 @@ flowchart TD
   open -->|Super user| lock["Locked · reads only"]
   open -->|built in · an Access template| copy["Copy, or edit the template in place"] --> open
   list --> np["AC-49 · New policy · 1 Start · a name and an Access template, or Blank"]
-  np --> form["AC-49 · 2 What it allows · a tab per section, each with its status · Graph Data down to kinds, relationships and properties · Models · AI models · Agents · Skills & plugins · Fleet / Workers · Projects · Access · Settings · Outside Invana"]
+  np --> form["AC-49 · 2 What it allows · a tab strip above full-width content, each tab with its status · Graph Data down to kinds, relationships and properties · Models · AI models · Agents · Skills & plugins · Fleet / Workers · Projects · Access · Settings · Outside Invana"]
   form -->|Edit as policy| open
   form --> hold["AC-49 · 3 Who holds it · people, teams and projects in one picker"]
   hold --> rv["AC-49 · 4 Review · every section read back · who holds it · who it changes"]
@@ -149,7 +149,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Rule | Detail |
 |---|---|
 | Access is Access Policies only | There are no roles. What anyone may do is the Access Policies attached to them, read against [the permission catalogue](#the-permission-catalogue). Nothing in the engine names a role |
-| Who holds a policy | **Users** — people and service users · **teams** — each person on the team holds it · **projects** — what the project's runs may reach · **agents** — a ceiling: the most the agent may ever do, never a grant. It is the same object for every holder — one kind of permission, with no kind of its own: any policy may be attached to any holder. A key holds none: it narrows its owner ([AC-F10](../AC-F10-keys/feature.md)) |
+| Who holds a policy | **Users** — people · **teams** — each person on the team holds it · **projects** — what the project's runs may reach · **agents** — a ceiling: the most the agent may ever do, never a grant. It is the same object for every holder — one kind of permission, with no kind of its own: any policy may be attached to any holder. A key holds none: it inherits from its owner — a person or a project — and only narrows ([AC-F10](../AC-F10-keys/feature.md)) |
 | A holder's permissions | A person's — and a project's — are the Allows of every policy attached to them (for a person, and to every team they are on), minus every Deny. Attaching a policy adds to what a holder holds, never replaces it. Default deny: what no rule allows is refused. Deny wins over Allow |
 | A rule | Effect · action · resource. The effect is Allow, Deny or **Ask** on any policy — Ask makes a run's step wait for a named approver ([AC-F05](../AC-F05-asks-and-approvals/feature.md)); in a person's or a team's own permissions, checked before any run, Ask counts as Deny. A new rule starts at Ask |
 | Actions | Read · Create · Edit · Publish · Run · Manage — what each means for each resource is [the permission catalogue](#the-permission-catalogue); an action a resource does not take is refused. On screen *Publish* reads *Publish · Approve* |
@@ -163,7 +163,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Access templates | Access Policies shipped as data to start from ([below](#access-templates)) — one list of suggested starting points: *Read only* · *Explore* · *Shape the model* · *Build agents* · *Run the deployment* · *Read and analyse* · *Fix data quality* · *Full project*. Any may be attached to any holder. Owned by the system user; attached as they are, copied, or edited in place by Edit on Access. A project's type may name its default. Nothing in the engine depends on their names |
 | An agent holds only a ceiling | The policies attached to an agent are the most it may ever do — *may edit Graph Data: no*, *may send outside: no*. Adding it to a project's team grants it nothing. Using an agent is Run on `agent/<name>`, a person's permission |
 | Super user | One built-in policy: every action on every resource. The first account, made from the CLI, holds it. It is locked — never edited, renamed, copied over or deleted — and never taken off its last active holder |
-| Newcomers | A new person or service user holds the policies the deployment names for newcomers — the setting `access.newcomer_policies`, *Read only* out of the box — set by Manage on Access. *Read only* is data: it is never named or special-cased in code. Any further policy is attached only by a holder of Manage on Access — *Super user*, or *Run the deployment* |
+| Newcomers | A new person holds the policies the deployment names for newcomers — the setting `access.newcomer_policies`, *Read only* out of the box — set by Manage on Access. *Read only* is data: it is never named or special-cased in code. Any further policy is attached only by a holder of Manage on Access — *Super user*, or *Run the deployment* |
 | Everyone sees every place and act | Every mode, view and act shows to everyone. The policy decides what responds: an act a person lacks is shown disabled, naming the permission and who can grant it; data a policy denies is withheld — a kind absent from a picker, a property dropped and counted as withheld — never shown. The engine refuses any act or step the policy does not allow, naming the rule: hiding is never the guard |
 | Who can grant | The active people who hold Manage on Access — on screen *Admins* |
 | Every act is checked in one order | [The order of checks](#the-order-of-checks); a refusal names the first check that refused |
@@ -200,7 +200,7 @@ The one source of what may be granted. A permission is an action on a resource �
 | Runs | `run/<agent>` | Read runs the reader is not behind — content only with a logged reason | — | — | — | — | Stop, re-run or re-assign another's run | users · teams |
 | Workers | `worker/<group>` | Read groups, workers, the queue, limits, alerts | Add a group or a worker | Change labels, limits, alert rules | — | Place runs on the group | Drain, pause the queue | users · teams · projects · agents |
 | Settings | `setting/<section>` — `graph-databases` · `ai-models` · `connections` · `team-packs` · `deployment` · `retention` | Read it | Connect one — a graph database, an AI model, a Team pack | Change it — mode, switch, keys, retention, holds | — | — | — | users · teams |
-| Access | `access/<area>` — `policies` · `directory` · `history` · `reviews` | Read every History row (a person always reads their own) | Make a policy, a person, a service user, a team | Change a policy's draft · a team's people · deactivate, reactivate | Approve another's change to access · sign off a review | — | Attach and take off policies · name newcomers' policies · the second-yes setting | users · teams |
+| Access | `access/<area>` — `policies` · `directory` · `history` · `reviews` | Read every History row (a person always reads their own) | Make a policy, a person, a team | Change a policy's draft · a team's people · deactivate, reactivate | Approve another's change to access · sign off a review | — | Attach and take off policies · name newcomers' policies · the second-yes setting | users · teams |
 | On a worker | `fs/<path>` · `cmd/<program>` · `net/<host>` | Read files · fetch from a host | Send to a host | Change files | — | Run a program | — | projects · agents |
 
 | Rule | Detail |
@@ -231,7 +231,8 @@ any may be attached to any holder. The last three are written for a project's ru
 
 ## The policy form
 
-The plain way to say what a policy allows — *What it allows*, one tab per section, each tab with a short status. The
+The plain way to say what a policy allows — *What it allows*, one tab per section: a horizontal tab strip above the
+content, each tab with its short status, the selected tab's content spanning the full width of *What it allows*. The
 same form is *New policy*'s, New project's Access step and a project's Access tab
 ([AC-49](stories/AC-49-make-a-policy-from-an-access-template/story.md)). Every section is part of every policy, whoever
 holds it; a section that takes no effect for a holder says so in Review. Each section writes rules; *Edit as policy* opens the same policy as the matrix. A policy whose rules the form cannot
@@ -422,7 +423,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Review reads everything | One scrollable page: every section's full read-back, who holds it and *Who it changes*, then *Create policy* and a confirm |
 | Kinds, relationships and properties | A policy reaches down to each kind of node and relationship — *None* · *Read* · *Read + write* — and each property — *Hidden* · *Read* · *Read + write* — so a sensitive property, *Crew member · personal*, is hidden without hiding the kind |
 | Policies add up | A project holds policies exactly as a user does: any number, their Allows added, any Deny winning; attaching one adds, never replaces |
-| A newcomer reads, nothing more | Every new person and service user starts on *Read only*; what more they may do is attached by a holder of Manage on Access. *Explore* — read, ask the Assistant, start projects — is a template to attach, never a default |
+| A newcomer reads, nothing more | Every new person starts on *Read only*; what more they may do is attached by a holder of Manage on Access. *Explore* — read, ask the Assistant, start projects — is a template to attach, never a default |
 | Built-in agents are narrowed, never edited | A built-in ceiling stays attached to its built-in agent; it is narrowed by attaching a custom policy with a Deny |
 | Everyone reads | Reading policies, rules, the catalogue and the built-in agents is never gated for a signed-in person: a person must see a rule to know whom to ask |
 | *Can someone do this?* writes nothing | It runs the engine's own checks without running anything |

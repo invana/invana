@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Make, rename, describe and delete a team; put people and service users on it and take them off; grant it an agent or take one away | A team an agent's approvers name has no *Delete* until they change |
+| Admin | Make, rename, describe and delete a team; put people on it and take them off; grant it an agent or take one away | A team an agent's approvers name has no *Delete* until they change |
 | Operator | Read every team, its people, the agents granted to it and the agents whose asks it answers; a Modeller reads the same | *New team*, *Add people*, *Grant an agent* and *Delete* disabled — *Needs the Admin role — ask Priya or Lee* |
 
 ## Flow
@@ -47,8 +47,8 @@ flowchart TD
 | AC-09.1 | A deployment with no teams | *Teams* is read | *No teams yet — grant a whole team its agents at once* reads, with *New team* |
 | AC-09.2 | An Admin | they make a *New team* with a name and what it is for | it is listed with no people and no agents; History records it |
 | AC-09.3 | A team name already used | a *New team* is made with it | it is refused in place, naming it |
-| AC-09.4 | An Admin on a team's page | they add a person or a service user, or take one off | the preview names the agents that person gains or loses (AC-39); on confirm, they may use them, or may not, from their next step; no rule changes for anyone |
-| AC-09.5 | *Add people* | it is offered | it lists people and service users only — never an agent, the system user or another team |
+| AC-09.4 | An Admin on a team's page | they add a person, or take one off | the preview names the agents that person gains or loses (AC-39); on confirm, they may use them, or may not, from their next step; no rule changes for anyone |
+| AC-09.5 | *Add people* | it is offered | it lists people only — never an agent, the system user or another team |
 | AC-09.6 | A team | its page is read | it shows its people, the agents granted to it and the agents whose asks it answers (AC-26) |
 | AC-09.7 | An Admin | they grant an agent to a team, after its preview (AC-39) and signing in again | every person on the team may use it from their next step; taking it away ends that for whoever has no other grant |
 | AC-09.8 | A team | an owner is chosen for anything | a team is never offered as an owner; a policy is never attached to a team and no rule names one (AC-11.9) |

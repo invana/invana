@@ -91,22 +91,21 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **User** | Who acts in the deployment: a person, an agent, a service user, or the system user | Principal |
+| **User** | Who acts in the deployment: a person, an agent, or the system user | Principal |
 | **Permission** | An action — Read · Create · Edit · Publish · Run · Manage — on a resource, from [the permission catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); what an act needs, named when it is disabled — *Needs Edit on Access — ask Priya or Lee* | permission |
 | **Super user** | The locked Access Policy that allows every action on every resource; the first account holds it, and it always has a holder | superuser |
 | **Access templates** | Access Policies shipped as data to start from, edited, copied or attached like any other — one list of suggested starting points: *Read only* · *Explore* · *Shape the model* · *Build agents* · *Run the deployment* · *Read and analyse* · *Fix data quality* · *Full project*. Any may be attached to any holder. *Read only* goes to newcomers out of the box, by a setting | access template |
 | **Admins** | The people who hold Manage on Access — whom a refusal names as able to grant | — |
 | **What can {person} do?** | Every permission a person holds, each with the policy and the team it comes through, and each Deny that removes one | effective permissions |
-| **New policy** | The one way to make an Access Policy, for any holder: *Start* — a name and an Access template, or Blank · *What it allows* — a tab per section: Graph Data down to kinds, relationships and properties, Models, AI models, Agents, Skills & plugins, Fleet / Workers, Projects, Access, Settings, Outside Invana · *Who holds it* — people, teams and projects in one picker · *Review* — the whole policy read back, then *Create policy*; *Edit as policy* opens the matrix. New project's Access step runs the same form | policy wizard |
+| **New policy** | The one way to make an Access Policy, for any holder: *Start* — a name and an Access template, or Blank · *What it allows* — a tab strip, one tab per section with its status, above full-width content: Graph Data down to kinds, relationships and properties, Models, AI models, Agents, Skills & plugins, Fleet / Workers, Projects, Access, Settings, Outside Invana · *Who holds it* — people, teams and projects in one picker · *Review* — the whole policy read back, then *Create policy*; *Edit as policy* opens the matrix. New project's Access step runs the same form | policy wizard |
 | **Team** | A flat group of people that holds Access Policies — each person on it holds them. A team owns nothing and holds no other team | Team |
 | **Agents they may use** | The agents granted to a person, directly or through a team; every act a person makes runs through one of them | agent grant |
 | **Built-in agent** | An agent every deployment ships, one of each, owned by the system user: Assistant · Query console · Modeller · Coordinator · Record editor · Loader. A person's direct acts run as one of them | built-in agent |
 | **Query console** | The built-in agent behind the Console's queries: it reads, asks first before a write, and every query it runs is recorded; granted like any agent | built-in agent `query` |
-| **Owner · Made by** | Who a resource belongs to — the platform for built-in and shared work, its person for a personal agent, people for a service user · who made it, kept beside its owner. Owning grants nothing | Owner · `made_by` |
+| **Owner · Made by** | Who a resource belongs to — the platform for built-in and shared work, its person for a personal agent · who made it, kept beside its owner. Owning grants nothing | Owner · `made_by` |
 | **System user** | The user that owns what Invana ships; it never signs in. What it owns is copied to customise, never edited | system user |
-| **Hand over** | Move a service user one person owns to another | transfer ownership |
 | **Deactivate · Reactivate** | Stop a person who leaves from signing in or acting, keeping their work and its History · let them back in; nothing handed on returns | deactivate user |
-| **Successor** | The active person an Admin names when deactivating someone: they take every place the leaver held on the work, their service users and their chats outside projects, and may adopt their personal agents | successor |
+| **Successor** | The active person an Admin names when deactivating someone: they take every place the leaver held on the work and their chats outside projects, and may adopt their personal agents | successor |
 | **Slot** | A place a person sits on work — an agent's approver, a place on a project's team, a task's assignee, a schedule's setter — each with a fallback, so no work waits on one person | slot |
 | **Adopt** | Make a departed person's retired personal agent one's own, as their successor | adopt agent |
 | **Former member** | How a departed person's work names them when names are pseudonymised — *Former member · 4F7A*, the same code everywhere | pseudonym |
@@ -124,8 +123,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Who it changes** | Before an Access Policy is saved: which agents gain, which lose, which skills and workflows would break | Impact |
 | **What it can do** | What an agent may actually do in a run once every check is applied — the project's policies, or outside a project the person, ∩ its ceiling ∩ the run's other ceilings — with why not for each refusal | Effective access |
 | **Can someone do this?** | A check of whether a person, or an agent's run for them or a project, may do something, and which rule decides; nothing runs | Test access |
-| **Key** | A long-lived credential a person mints for themselves, or for a service user they own; it acts as the key and its owner together, may be narrowed, expires in 30, 90 or 365 days or never, and is shown once | Personal access token |
-| **Service user** | A user for automation, owned by people: it never signs in, owns nothing and acts only through keys; it holds the newcomers' policies unless named | service user |
+| **Key** | A long-lived credential that belongs to a person — a personal key, acting with their policies — or to a project — a project key, acting with the project's policies and outliving anyone on its team, for CI, integrations and clients that are no one person; either way ∩ the agent's ceiling. It holds no policy of its own, may be narrowed, expires in 30, 90 or 365 days or never, and is shown once | Personal access token |
 | **Connected client** | An MCP client — Claude Code, an IDE — a person connected to the deployment's MCP server by signing in and consenting; it acts for that person through their default agent, is external to the outbound check, and they revoke it on their account | OAuth client |
 | **Sign out here · Sign out everywhere** | End this device's session · every session of the account | Revoke refresh token(s) |
 | **Sign in again** | A fresh sign-in the risky acts ask for — changing access, keys or credentials — however recent the session | step-up · fresh sign-in |
@@ -321,9 +319,8 @@ names and the form each takes in every layer are
 | **Ready** | A deployment whose required setup steps are done. It can be asked a question. The word in the UI is **ready** — never "graduated", "complete", "live" or "onboarded". *Graduation* is the onboarding cap's metaphor and nothing else: it names no state, no badge and no API field |
 | **Team** | A flat group of people, no nesting; it owns nothing and holds Access Policies, which each person on it holds |
 | **Permission catalogue** | The engine's one constant of resource types, the actions each takes and who may hold a rule on it ([AC-F02](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); every route declares the action and resource it needs. There are no roles |
-| **Owner** | Who a resource belongs to: the platform — the system user — for built-in, shared and Team pack agents and every piece of work, keeping who made it; a person for their personal agent or a service user ([AC-F07](os/access/features/AC-F07-ownership/feature.md)). Ownership grants no reach. Decisions are not owned: they are immutable and superseded |
+| **Owner** | Who a resource belongs to: the platform — the system user — for built-in, shared and Team pack agents and every piece of work, keeping who made it; a person for their personal agent ([AC-F07](os/access/features/AC-F07-ownership/feature.md)). Ownership grants no reach. Decisions are not owned: they are immutable and superseded |
 | **System user** | The user, with no sign-in, that owns everything Invana ships |
-| **Service user** | A user kind for automation: owned by people, owns nothing, never signs in, acts only through keys |
 | **Super user** | The locked built-in Access Policy — every action on every resource — written from code and held by the first account `invana createsuperuser` makes; it always has a holder |
 
 ### Models and data
@@ -460,7 +457,7 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 | **Outside agent** | An agent outside Invana, reached over A2A (its agent card) or MCP — an agent of kind `external`, outbound in the ledger and Ask by default; it takes a delegated task and returns a verdict and artifacts. Never *partner bot*. |
 | **Ephemeral** | A spawned agent that retires when its work closes. Its row stays so lineage resolves. |
 | **On behalf of** | The person behind a run, distinct from the agent that ran it. |
-| **Personal access token** | A long-lived credential a person mints on their profile, for themselves or a service user they own. It acts as the key and its owner together, may be narrowed further, and expires in 30, 90 or 365 days or never. Managing credentials and access needs a session, never a key. On screen a **Key**; set beside a sign-in's access token below. |
+| **Personal access token** | A long-lived credential minted for a person or for a project. It acts as the key and its owner's policies together, may be narrowed further, and expires in 30, 90 or 365 days or never. Managing credentials and access needs a session, never a key. On screen a **Key**; set beside a sign-in's access token below. |
 | **Approve into a workflow** | The agent's named approvers turn a plan that served into a workflow (`origin = promoted`) — for reuse, never to run it once. A multi-stage load is a workflow too; ingestion has no grammar of its own. |
 | **Agent orchestrator** | What Invana is. It decides which agent takes a task, what it may run, what it is offered, in what order, and who checks the result. |
 | **Job scheduler** | The role behind the runtime protocol: when a run is dispatched, retried and queued at the process level. Invana fills it itself, in process. An external one could implement the protocol; none has. |
@@ -469,7 +466,7 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 
 | Credential | Owned by | Lives | Carries | Reaches | Ended by |
 |---|---|---|---|---|---|
-| **Personal access token** (a *Key*) | A person, or a service user they own | To 30, 90 or 365 days, or never, or until revoked | The key and its owner together, optionally narrowed | What its owner may reach, narrowed by the key | Revoking it, or deactivating its owner |
+| **Personal access token** (a *Key*) | A person, or a project | To 30, 90 or 365 days, or never, or until revoked | The key and its owner together, optionally narrowed | What its owner may reach, narrowed by the key | Revoking it; deactivating its person; archiving or deleting its project |
 | **Access token** | A sign-in | Minutes, renewed underneath by its refresh token, within the session's absolute lifetime | The person's identity | What the person may reach, through the agents they may use | Expiry; *Sign out here · Sign out everywhere* retire its refresh; reusing a retired refresh ends the session |
 | **MCP client token** | A person, through the client they connected | Minutes, renewed until revoked | The person's identity, bound to the deployment's MCP server | What the person may reach, through the agents they may use | Revoking the client |
 
@@ -517,7 +514,7 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 | Merge (for an anchor) | **Link** | anchors link; folding two nodes is lossy |
 | From · To (for a stitch's two sides) | **Source** · **Target** | the payload's own words (`source_version_id`, `target_type`); *from/to* reads as direction, which an anchor does not have |
 | API key · PAT | **Personal access token**, spelled out | a person's identity with a longer life, narrowed |
-| Service account | **Service user** | a user kind owned by people, not an account of its own |
+| Service account · service user | **Project key** | automation that is no one person's acts for a project, never as a user of its own |
 | Wizard · onboarding · checklist · getting started | **Setup**, and **setup step** | nothing is walked modally, nothing is ticked and nothing is dismissed — the steps are derived, so the words for walking one are all false ([CP-F05](os/control/features/CP-F05-graph-databases/feature.md)) |
 | Rail · left rail · activity bar | **`leftNav`** | the kit's prop name is the word; nothing else names a region |
 | Sidebar · left panel · docked panel | **`leftSection`** | ditto |

@@ -328,9 +328,8 @@ flowchart TB
 | Caller | Credential | Acts as | Detail in |
 |---|---|---|---|
 | A person in Studio | Password sign-in; a short-lived access token and a rotated refresh token in the browser's local storage, under a strict Content Security Policy; every session ends at its absolute lifetime | The person, through the agents they may use | [AC-F01](os/access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine) |
-| A script or the CLI | A key — 30, 90 or 365 days, or never | The key and its owner together, narrowed further if the key says so; never manages credentials or access | Access Plane › *Keys* |
+| A script or the CLI | A key — 30, 90 or 365 days, or never | A personal key — its person; a project key — its project, for automation no one person runs. Either way ∩ the agent's ceiling, narrowed further if the key says so; never manages credentials or access | Access Plane › *Keys* |
 | An MCP client — Claude Code, an IDE | An OAuth 2.1 token from Invana's authorization server: authorization code with PKCE, registered client, consent, bound to the deployment's MCP server (RFC 8707); discovery by protected-resource metadata (RFC 9728) and authorization-server metadata (RFC 8414); a key still works | The person who consented, through the agents they may use | Access Plane › *Connect an MCP client* |
-| A service user | Keys only; it never signs in | Operator by default, owned by people | Access Plane › *Directory* |
 | A worker | A join key, then a worker credential | Its group; no database credential | [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md#engine) |
 | An install Admin at `/admin` | A session for an Admin; no default secret | The Admin | § 13 |
 

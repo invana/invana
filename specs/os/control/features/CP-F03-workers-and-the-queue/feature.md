@@ -196,7 +196,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | The session budget | [CP-F04](../CP-F04-limits/feature.md#engine) |
 | `fs/` · `cmd/` · `net/` rules and `decide()` | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | The tasks a workspace belongs to, and their state | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
-| Join keys — a service account's keys scoped to one group | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
+| The person who mints a join key, active or not | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
 | Libraries a group must carry | [AG-F08](../../../../capabilities/agents/features/AG-F08-portable-agents-and-skills/feature.md#engine) |
 | Pauses — approvals, clarifications, verdicts — and who answers | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | History rows of every join, mint, drain, revoke and group change | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |

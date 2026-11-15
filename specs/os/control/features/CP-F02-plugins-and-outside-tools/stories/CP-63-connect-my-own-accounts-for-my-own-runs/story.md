@@ -31,7 +31,7 @@ flowchart TD
   r([A step calls an outside server]) --> w{"The agent has a work connection there?"}
   w -->|yes| wk(["Called with the work connection (CP-62)"])
   w -->|no| who{"Did a person start this run, or the run it helps?"}
-  who -->|no — a schedule, a pick-up, a service user| rf(["Refused before the call · a Modeller or an Admin attaches a work connection"])
+  who -->|no — a schedule, a pick-up, a project key| rf(["Refused before the call · a Modeller or an Admin attaches a work connection"])
   who -->|yes| pc{"That person has a personal connection there?"}
   pc -->|no or expired| cn(["Refused · Connect your account (CP-43)"])
   pc -->|yes| call(["Called as that person · recorded"])
@@ -49,7 +49,7 @@ flowchart TD
 | CP-63.1 | A run a person started, whose agent has no work connection on a server, and that person's personal connection there | a step calls the server | the call is made with their personal connection, and *What left the platform* names it |
 | CP-63.2 | A helper run the person's run delegated to | it calls that server and its agent has no work connection there | it uses the same person's personal connection |
 | CP-63.3 | An agent with a work connection on the server | a person who also has a personal connection there starts a run | the work connection is used, never the personal one |
-| CP-63.4 | A schedule, a picked-up task or a service user's run | a step needs the server and its agent has no work connection there | it is refused before the call; no person's personal connection is used |
+| CP-63.4 | A schedule, a picked-up task or a project key's run | a step needs the server and its agent has no work connection there | it is refused before the call; no person's personal connection is used |
 | CP-63.5 | What a personal connection returned — in an answer, a finding, a report or a memory node | another person, an Admin included, opens it | it reads *Withheld — from {person}'s own connection*, with when and who made it (GP-F02) |
 | CP-63.6 | A person on *Personal connections* | they open one | it lists the runs that used it, newest first, each opening the run |
 | CP-63.7 | A person who turned a plugin or a graph database off for themselves | a run they started, or its helper, needs it | it is refused before it starts, saying they switched it off, with *Turn it on* |

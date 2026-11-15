@@ -9,7 +9,7 @@ boards: [settings.people]
 
 # AC-22 · See every user and set a person's role
 
-**As** an Admin **I want** every user of the deployment in one list — people, agents, service users and the system
+**As** an Admin **I want** every user of the deployment in one list — people, agents and the system
 user — with each person's role and the agents they may use **so that** I can read who acts here and change a person's
 role or their agents on purpose.
 
@@ -19,14 +19,14 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every user; set a person's or a service user's role; grant an agent to a person or take it away, after its preview; set a person's default agent (AC-38). Each change asks them to sign in again | An Admin's role is fixed while only two Admins are active |
+| Admin | Read every user; set a person's role; grant an agent to a person or take it away, after its preview; set a person's default agent (AC-38). Each change asks them to sign in again | An Admin's role is fixed while only two Admins are active |
 | Operator | Read every user, their role, their teams, the agents granted to them and their default agent; a Modeller reads the same | *Change role* and *Grant an agent* disabled — *Needs the Admin role — ask Priya or Lee* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Access › Who]) --> l["Every user · tabs All · People · Service users · Agents · System"]
+  s([Access › Who]) --> l["Every user · tabs All · People · Agents · System"]
   l --> f["Filter by name, kind, role or team"]
   f -->|no one matches| fe["Nothing matches · Clear filters"]
   l -->|a person| p["Their role · teams · agents granted, and how · default agent"]
@@ -44,7 +44,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-22.1 | A signed-in person | they open *Users* | every user reads one row each — name · username · kind (*Person* · *Agent* · *Service user* · *System*) · role · teams · agents granted · default agent · *Deactivated* where it applies — with tabs *All · People · Service users · Agents · System* and the engine's counts |
+| AC-22.1 | A signed-in person | they open *Users* | every user reads one row each — name · username · kind (*Person* · *Agent* · *System*) · role · teams · agents granted · default agent · *Deactivated* where it applies — with tabs *All · People · Agents · System* and the engine's counts |
 | AC-22.2 | A fresh deployment | *Users* is read | the first Admin, the system user and each built-in agent read; the system user reads *Owns what Invana ships · never signs in* and has no role |
 | AC-22.3 | An agent's or the system user's row | it is read | it shows no role and offers no *Change role*; an agent's row opens its page, with the Access Policies attached to it (AC-11) |
 | AC-22.4 | An Admin | they change a person's role and sign in again | the person holds that role from their next step, including a run already going, and Studio clears what it held for them; the role changes which acts they may start, never what an agent reaches; *History* records who changed whom, from what, to what, and when (AC-F06) |

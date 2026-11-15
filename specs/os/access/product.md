@@ -65,7 +65,7 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Connect an MCP client — consent | page | `access.consent` |
 | Access Policies | modal | `settings.policies` |
 | Permissions — the permission catalogue | modal | `settings.roles` |
-| Directory — users, service users, teams, the policies attached to each, every key and connected client | modal | `settings.people` |
+| Directory — users, teams, the policies attached to each, every key and connected client | modal | `settings.people` |
 | Owners of what a person owns | modal | `settings.me · Owners` |
 | You — profile, default agent, sessions, keys, connected clients | modal | `settings.me` |
 | An ask in Needs you | modal | `inbox` |

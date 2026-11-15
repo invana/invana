@@ -108,7 +108,7 @@ three planes.
 
 | An OS has | Invana has | Plane |
 |---|---|---|
-| **Users** | Users — human, agent, service and the system user — and the teams people are on; each person and team holds Access Policies | Access |
+| **Users** | Users — human, agent and the system user — and the teams people are on; each person, team and project holds Access Policies; a key belongs to a person or a project | Access |
 | **A type system** | The ontology — every record has a kind, every kind its rules; owned by the Ontology pillar, enforced here | — |
 | **Permissions** | Access Policies — Allow · Ask · Deny × an action × a resource, from the permission catalogue — on people, teams, projects and, as a ceiling, agents; default deny, Deny wins | Access |
 | **Mounts** | Graph databases, each connected read-only or read + write and switched on or off, read as Graph Data | Control |

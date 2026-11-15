@@ -23,7 +23,7 @@ flowchart TD
   A -->|yes| AR["AC-22 · Refused · there are always two Admins"]
   A -->|no| S["AC-23 · Lee names Sam successor · tasks to Sam or back to Open"]
   S --> PW{"Lee signs in again"}
-  PW --> OFF(["Dana deactivated · sessions end · keys revoked"])
+  PW --> OFF(["Dana deactivated · sessions end · personal keys revoked · project keys keep working"])
   OFF --> W1(["Agents unchanged · their Access Policies are the agents' own"])
   OFF --> W2(["Schedules and pick-up run for Sam, or a project's other Lead · Dana recorded as first setter"])
   OFF --> W3(["Projects unchanged · Lead places fall to the other people on the team, then Sam"])

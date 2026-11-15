@@ -46,7 +46,7 @@ flowchart TD
 | AC-47.4 | A subject export | History and *What left the platform* are read | one History row and one call in *What left the platform* name who made it, for whom and its size |
 | AC-47.5 | A person deactivated | an Admin exports their data | their profile and what they did export; personal-connection data erased at their departure is absent, and the file says so |
 | AC-47.6 | An Admin deactivating a person (AC-23) | the modal opens | it offers *Export their data first*, before the erasure it lists |
-| AC-47.7 | An agent, a service user or the system user | an export is asked for them | it is refused — *{user} is not a person* |
+| AC-47.7 | An agent or the system user | an export is asked for them | it is refused — *{user} is not a person* |
 | AC-47.8 | An Operator or a Modeller | they open a person's row, or call the route | *Export their data* is not offered; the API refuses it |
 | AC-47.9 | An export asked with a key | it is sent | it is refused — it needs a person's session |
 | AC-47.10 | The export fails while streaming | it is made | no exports row is written; the modal says why, with *Try again* |

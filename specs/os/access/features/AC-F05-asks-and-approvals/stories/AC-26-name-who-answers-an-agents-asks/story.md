@@ -30,7 +30,7 @@ flowchart TD
   n -->|some| l["The people and teams named"]
   adm --> ch["Change approvers · pick people or teams"]
   l --> ch
-  ch -->|an agent · a service user · a deactivated user| ref["Refused in place · only active people answer asks"]
+  ch -->|an agent · a deactivated user| ref["Refused in place · only active people answer asks"]
   ch -->|one person alone| warn["Warns · one absence sends its asks to the Admins"]
   warn -->|Name anyway| ok
   warn -->|Add another| ch
@@ -48,7 +48,7 @@ flowchart TD
 |---|---|---|---|
 | AC-26.1 | An agent | its *Approvers* are read | the people and teams named read, or with none *No approver — the Admins answer its asks* |
 | AC-26.2 | An Admin | they name people, teams, or both, signing in again | from the next ask they are its approvers; asks already raised keep the approvers they were routed to; History records who named whom |
-| AC-26.3 | *Change approvers* | an agent, a service user, the system user or a deactivated user is chosen | it is not offered, and the API refuses it — *Only active people answer asks* |
+| AC-26.3 | *Change approvers* | an agent, the system user or a deactivated user is chosen | it is not offered, and the API refuses it — *Only active people answer asks* |
 | AC-26.4 | An ask the agent raises | it is routed | it goes to every named approver — each person on a named team — except the person it benefits, and reads *named approver* as its reason |
 | AC-26.5 | An agent with no approvers named | it raises an ask | it goes to the Admins, except the person it benefits, reading *no approver — Admins*, and a *no approver* alert opens ([CP-F11](../../../../../control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) |
 | AC-26.6 | An agent whose maker or co-owner is not named | it raises an ask | they are not routed to for being its maker or owner |

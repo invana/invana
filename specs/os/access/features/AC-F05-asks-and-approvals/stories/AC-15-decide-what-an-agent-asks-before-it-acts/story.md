@@ -68,7 +68,7 @@ flowchart LR
 | AC-15.24 | Any ask | it is raised, then allowed | it stores the exact act — function, arguments, targets and their versions — with a hash; the yes runs only that act; a write whose targets changed since the ask is refused, naming what changed |
 | AC-15.25 | An ask delivered to an approver's email, Slack, Teams or webhook | they follow its link | the ask opens in Studio, where they decide it signed in; the channel never decides |
 | AC-15.26 | An ask from a person | it is decided by someone who put the asker on a team or gave them the agent in the last 30 days | it goes, and a *recently added decider* alert opens ([CP-59.20](../../../../../control/features/CP-F11-ops-alerting/stories/CP-59-be-told-when-an-agent-or-the-deployment-needs-someone-to-act/story.md)) |
-| AC-15.27 | An ask routed to the reader | they decide it with a key, as a service user, or as an agent | it is refused; only a person's signed-in session decides an ask |
+| AC-15.27 | An ask routed to the reader | they decide it with a key, or as an agent | it is refused; only a person's signed-in session decides an ask |
 | AC-15.28 | A person at the command line | they run `invana approvals list`, then `approve` or `decline` with a note | the asks routed to them read nearest deadline first, and a decision is held to every rule a decision in Studio is — routed to them, not late, not decided twice |
 | AC-15.29 | An ask | it fails to load | it says what could not load, with *Try again* |
 | AC-15.30 | Needs you filtered by kind or agent | nothing matches | *Nothing matches*, with *Clear filters* |

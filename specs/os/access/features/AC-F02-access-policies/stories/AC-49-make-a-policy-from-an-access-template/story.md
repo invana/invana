@@ -33,7 +33,7 @@ flowchart TD
   s([Access › Access Policies]) -->|no Edit on Access| off(["New policy disabled · names the permission and who can grant it"])
   s --> st["1 Start · a name · an Access template from one list of eight, or Blank"]
   st -->|a name taken| nt["Refused in place · names it"] --> st
-  st --> f["2 What it allows · one tab per section, each with its status"]
+  st --> f["2 What it allows · a tab strip above full-width content · each tab with its status"]
   f --> gd["Graph Data · per graph database None · Read · Read + write"]
   gd --> kd["A kind of node or relationship · override"]
   kd --> pr["A property · Hidden · Read · Read + write"]
@@ -61,7 +61,7 @@ flowchart TD
 |---|---|---|---|
 | AC-49.1 | A person with Edit on Access in Access Policies | they press *New policy* | one modal opens with a step strip — *1 Start · 2 What it allows · 3 Who holds it · 4 Review* — on Start: a name, and one list of *Read only* · *Explore* · *Shape the model* · *Build agents* · *Run the deployment* · *Read and analyse* · *Fix data quality* · *Full project* and *Blank*, each with one line of what it allows; there is no choice of who the policy is for |
 | AC-49.2 | Start | the name is already used | it is refused in place — *{name} is taken.* — and *Next* stays off |
-| AC-49.3 | A template picked | *What it allows* opens | it shows one tab per section — **Graph Data** · **Models** · **AI models** · **Agents** · **Skills & plugins** · **Fleet / Workers** · **Projects** · **Access** · **Settings** · **Outside Invana** — every one present whatever the template, filled from it, each tab with its short status — *Read on 2 of 3 graph databases* · *Not set* ([AC-F02 › The policy form](../../feature.md#the-policy-form)) |
+| AC-49.3 | A template picked | *What it allows* opens | a horizontal tab strip sits above the content, one tab per section — **Graph Data** · **Models** · **AI models** · **Agents** · **Skills & plugins** · **Fleet / Workers** · **Projects** · **Access** · **Settings** · **Outside Invana** — every one present whatever the template, filled from it, each tab with its short status — *Read on 2 of 3 graph databases* · *Not set* — and the selected tab's content spans the full width of *What it allows*, with no column beside it ([AC-F02 › The policy form](../../feature.md#the-policy-form)) |
 | AC-49.4 | The Graph Data tab | it is read | each graph database reads *None* · *Read* · *Read + write*; opening one lists its kinds of node and of relationship, each inheriting the level with an override *None* · *Read* · *Read + write*; opening a kind lists its properties, each *Hidden* · *Read* · *Read + write* with its level |
 | AC-49.5 | A graph database at *Read + write*, a kind set *None*, one property *Hidden* and another *Read* | the policy is created and a holder reads and edits that graph database | the kind is absent from every picker and refused by name; the hidden property is dropped from every record of its kind and counted as withheld; the *Read* property shows and its edit is refused, naming the rule; the other kinds and properties read and change |
 | AC-49.6 | A relationship kind that reads, one of whose end kinds is *None* | a holder reads it | the relationship is withheld and counted, never drawn to a missing end |

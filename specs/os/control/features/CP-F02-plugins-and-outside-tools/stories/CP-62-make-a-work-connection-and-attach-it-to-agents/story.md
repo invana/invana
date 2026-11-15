@@ -10,7 +10,7 @@ boards: [agents.plugins, agents.agents, access.signin]
 # CP-62 · Make a work connection and attach it to agents
 
 **As** an Admin **I want** to make a service identity on an outside server once, and an agent builder to attach it to
-the agents that need it **so that** shared work — schedules, picked-up tasks, service users — reaches the server as
+the agents that need it **so that** shared work — schedules, picked-up tasks, project keys — reaches the server as
 the organisation, the same for everyone who uses the agent, and keeps working when a person leaves.
 
 Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
@@ -41,7 +41,7 @@ flowchart TD
   a([An agent › Connections]) -->|Modeller or Admin| at["Attach a work connection for a server"]
   at -->|the agent already has one there| one(["Refused · take it off first"])
   at --> used(["Every call of that agent to the server uses it"])
-  r([A schedule · a pick-up · a service user's run]) --> need{"The agent has a work connection on the server?"}
+  r([A schedule · a pick-up · a project key's run]) --> need{"The agent has a work connection on the server?"}
   need -->|no| rf(["Refused before the call · names the agent and the server"])
   need -->|yes| used
   ok -->|the server stops renewing it| ex(["Expired · a connection health alert to the Admins"])
@@ -58,7 +58,7 @@ flowchart TD
 | CP-62.4 | A change waiting for a second Admin | the Admin who made it approves it | it is refused — *Another Admin approves this change* |
 | CP-62.5 | A Modeller or an Admin on an agent | they attach a work connection | from the agent's next call, every call to that server uses it — in a person's own run too — and the agent's page lists it |
 | CP-62.6 | An agent that already has a work connection on a server | a second one on that server is attached | it is refused, naming the one it has |
-| CP-62.7 | A schedule, a picked-up task or a service user's run whose agent has no work connection on a server | a step calls the server | it is refused before the call, naming the agent and the server and saying a Modeller or an Admin attaches one |
+| CP-62.7 | A schedule, a picked-up task or a project key's run whose agent has no work connection on a server | a step calls the server | it is refused before the call, naming the agent and the server and saying a Modeller or an Admin attaches one |
 | CP-62.8 | A work connection the server stops renewing | a renewal is refused | it reads *Expired*; the Admins get a connection health alert; calls that need it are refused until an Admin renews it |
 | CP-62.9 | An Operator or a Modeller | they make, renew or remove a work connection by any path | it is refused — *This needs an Admin* — and the acts read disabled, naming the Admins |
 | CP-62.10 | An Operator | they attach or take off a work connection | it is refused — *This needs the Modeller role* |

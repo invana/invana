@@ -55,7 +55,6 @@ flowchart TD
 ## Screens
 
 In Studio an account is made from Access › Who › *New person*; the command line and the API make it too.
-A service user is made in the Directory ([AC-33](../../../AC-F03-directory/stories/AC-33-make-a-service-user-for-automation/story.md)).
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|

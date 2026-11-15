@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F11](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | — |
-| Operator | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | A person without an account reads *Ask your admin for an account* on sign-in; a service user connects with a key, never this way |
+| Operator | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | A person without an account reads *Ask your admin for an account* on sign-in; a client that is no one person connects with a project key, never this way |
 
 ## Flow
 

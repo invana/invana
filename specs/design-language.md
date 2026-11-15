@@ -241,7 +241,7 @@ sections never closes it.
 | Section | Nav | Rule |
 |---|---|---|
 | Agents | — (one glance) | Three bands: **Waits on you** — each agent's ask of the reader, answered in place · **Running** — each agent at work, what it is doing now and its next ask, with *Pause* and *Stop* in place · **Workers** — keeping up or not, runs at once free, scale advice. *Assign* gives an agent a task from here. Every deeper act — build, test, read a run, add or drain workers, change a limit — is *Open in Agents* ([CP-72](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)) |
-| Access | Now · Who · What they may do · Record · Keeping | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, service users, keys, connected clients · *What they may do* — Roles · Access Policies · Agents · *Record* — History · Usage · What left · *Keeping* — retention, holds, forgetting ([Access Plane](os/access/product.md)) |
+| Access | Now · Who · What they may do · Record · Keeping | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, keys, connected clients · *What they may do* — Roles · Access Policies · Agents · *Record* — History · Usage · What left · *Keeping* — retention, holds, forgetting ([Access Plane](os/access/product.md)) |
 | Settings | General · Appearance · You · Connections · Notifications | *Connections* — Graph databases · AI models · MCP server · Connectors · Team packs. Preference rows and tables |
 | About | — | The version, what's new and Help |
 

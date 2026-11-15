@@ -111,7 +111,7 @@ sequenceDiagram
 | A single person warns | Naming one person as an agent's only approver is allowed, with a warning that one absence sends its asks to the Admins; a team or two people clear it |
 | A change to access waits for a second Admin | When a second Admin's yes is set ([AC-F02](../AC-F02-access-policies/feature.md#rules)), a saved change to an Access Policy, an attachment or a work connection is an ask routed to every other Admin; the Admin who made it is never in the route |
 | Only the people it is routed to decide | A role does not widen it — an Admin not routed to is refused like anyone else, until it is escalated to them. Any one of them decides; no quorum, no order. On a yes the engine checks the decider and every check again before the act goes |
-| Decided in a session | A decision is a person's signed-in act in Studio, the CLI or the API; a key, a service user or an agent never decides. A channel carries the ask and a link to it, never the decision |
+| Decided in a session | A decision is a person's signed-in act in Studio, the CLI or the API; a key or an agent never decides. A channel carries the ask and a link to it, never the decision |
 | Remind, escalate, expire | Each ask has a deadline. At half-time one reminder reaches those who have not decided; at three quarters it is escalated — the Admins join who it waits on, never the person it benefits; at the deadline it expires refused, never allowed |
 | Never decided by itself | Nothing set to Ask is ever decided by itself; expiry is a refusal, and tells the approvers and the person behind the run |
 | An ask ends with its run | When its run ends, every pending ask of it closes expired; what it held is not done. A held delivery and a breaking publish keep their own deadline |
@@ -195,10 +195,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | A second decision — `already_decided`, with `decided_by` and `decided_at` | *Already {allowed or declined} by {person} at {time}.* | AC-15.9 |
 | 409 | A decision after the deadline | *The deadline has passed; it expired, refused.* | AC-32.6 |
 | 403 | A person the ask is not routed to — an Admin before escalation included | *This waits on {approvers}.* | AC-15.17 · AC-15.18 · AC-14.11 |
-| 403 | A decision with a key, as a service user, or by an agent | *Only a person's signed-in session decides an ask.* | AC-15.27 · AC-15.19 · AC-14.10 |
+| 403 | A decision with a key, or by an agent | *Only a person's signed-in session decides an ask.* | AC-15.27 · AC-15.19 · AC-14.10 |
 | 409 | On a yes, the decider may not decide it now, or a check the act needs now refuses — nothing runs | *{check} does not allow this now.* | AC-15.23 |
 | 409 | On a yes, a target of the act changed since the ask | *{target} changed since this was asked — {what}.* | AC-15.24 · AC-14.15 |
-| 422 | Naming an agent, a service user, the system user or a deactivated user as an approver | *Only active people answer asks.* | AC-26.3 |
+| 422 | Naming an agent, the system user or a deactivated user as an approver | *Only active people answer asks.* | AC-26.3 |
 | 403 | Changing an agent's approvers by someone who is not an Admin, or with a key | *This needs the Admin role.* | AC-26.10 · AC-26.11 |
 | 403 | The Admin who made a change to access decides its ask | *Another Admin approves this change.* | AC-04.18 |
 | 422 | Declining for more than 90 days | *At most 90 days.* | AC-14.12 |

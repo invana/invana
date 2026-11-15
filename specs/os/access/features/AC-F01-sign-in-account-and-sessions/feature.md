@@ -80,7 +80,7 @@ sequenceDiagram
 
 | Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Sign in | Every person with an active account — Operator, Modeller, Admin. A service user, an agent and the system user never sign in | *Ask your admin for an account* — there is no sign-up form |
+| Sign in | Every person with an active account — Operator, Modeller, Admin. An agent and the system user never sign in | *Ask your admin for an account* — there is no sign-up form |
 | Read and change one's own name, email, time zone and username | The person themselves, in a session | — |
 | Change one's own password | The person themselves, in a session, with the current password | — |
 | Sign out here · sign out everywhere | The person themselves, in a session | — |

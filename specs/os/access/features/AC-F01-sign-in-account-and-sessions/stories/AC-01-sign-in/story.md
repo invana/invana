@@ -46,7 +46,7 @@ flowchart TD
 | AC-01.6 | A session that ends | the person acts | they are sent to sign in and, once signed in, returned to the page they were on |
 | AC-01.7 | Signing in | it is waiting on the engine | the button says it is signing in and cannot be pressed twice |
 | AC-01.8 | A person without an account | they read the card | it says *Ask your admin for an account*; there is no sign-up form |
-| AC-01.9 | A service user, an agent or the system user | a sign-in is tried with its username or email | it is refused as *Could not sign in* — only people sign in |
+| AC-01.9 | An agent or the system user | a sign-in is tried with its username or email | it is refused as *Could not sign in* — only people sign in |
 
 ## Screens
 
