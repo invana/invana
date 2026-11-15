@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, decision-maker, admin]
 stories: [AG-42]
 journeys: [J04]
-boards: [agents.schedules, inbox]
+boards: [agents.schedules, projects.schedules, inbox]
 nfrs: [NFR-PERF-3]
 depends_on: [AG-F01, CP-F10]
 ---

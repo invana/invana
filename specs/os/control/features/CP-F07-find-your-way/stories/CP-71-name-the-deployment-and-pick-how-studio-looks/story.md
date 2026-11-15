@@ -4,7 +4,7 @@ title: Name the deployment and pick how Studio looks
 feature: CP-F07
 status: idea
 personas: [admin, analyst]
-boards: [settings.general]
+boards: [settings.general, settings.appearance, settings.about]
 ---
 
 # CP-71 · Name the deployment and pick how Studio looks
@@ -56,5 +56,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | General | Admin | settings.general · Default name | — | settings.general · Loading | settings.general | settings.general · Could not save | — | — |
 | General | Operator | settings.general · Default name | — | settings.general · Loading | settings.general · Read only | settings.general · Could not load | — | settings.general · Read only |
-| Appearance | Admin | settings.general · Appearance · As the deployment | — | settings.general · Appearance · Loading | settings.general · Appearance | settings.general · Appearance · Could not save | — | — |
-| Appearance | Operator | settings.general · Appearance · As the deployment | — | settings.general · Appearance · Loading | settings.general · Appearance | settings.general · Appearance · Could not save | — | settings.general · Appearance · Default read only |
+| Appearance | Admin | settings.appearance · As the deployment | — | settings.appearance · Loading | settings.appearance | settings.appearance · Could not save | — | — |
+| Appearance | Operator | settings.appearance · As the deployment | — | settings.appearance · Loading | settings.appearance | settings.appearance · Could not save | — | settings.appearance · Default read only |
+| About | Admin | — | — | settings.about · Loading | settings.about | settings.about · Could not load | — | — |
+| About | Operator | — | — | settings.about · Loading | settings.about | settings.about · Could not load | — | — |

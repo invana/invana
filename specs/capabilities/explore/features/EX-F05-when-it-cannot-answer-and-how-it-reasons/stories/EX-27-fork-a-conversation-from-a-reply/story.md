@@ -4,7 +4,7 @@ title: Fork a conversation from a reply
 feature: EX-F05
 status: idea
 personas: [analyst, decision-maker]
-boards: [explore.board]
+boards: [explore.board, explore.conversations]
 ---
 
 # EX-27 · Fork a conversation from a reply
@@ -65,5 +65,5 @@ flowchart TD
 | Fork from here, on a reply | Operator | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |
 | The fork | Admin | — | — | explore.board · Working | explore.board · Forked | explore.board · Parent deleted | explore.board · Working | — |
 | The fork | Operator | — | — | explore.board · Working | explore.board · Forked | explore.board · Parent deleted | explore.board · Working | — |
-| The conversation list | Admin | — | explore.board · Ask · Conversations filtered | explore.board · Ask · Loading | explore.board · Ask · Forks | — | — | — |
-| The conversation list | Operator | — | explore.board · Ask · Conversations filtered | explore.board · Ask · Loading | explore.board · Ask · Forks | — | — | — |
+| The conversation list | Admin | — | explore.conversations · Conversations filtered | explore.conversations · Loading | explore.conversations · Forks | — | — | — |
+| The conversation list | Operator | — | explore.conversations · Conversations filtered | explore.conversations · Loading | explore.conversations · Forks | — | — | — |

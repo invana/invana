@@ -4,7 +4,7 @@ title: Write the query myself
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.board]
+boards: [explore.board, explore.queries]
 ---
 
 # EX-08 · Write the query myself
@@ -94,5 +94,5 @@ flowchart LR
 | A query refused before it runs | Operator | — | — | — | explore.board · Console · Query refused | explore.board · Console · Query refused | — | explore.board · Console · Query console not granted |
 | The rows in the console | Admin | — | explore.board · Console · Zero rows | explore.board · Console · Running | explore.board · Console · Withheld count | explore.board · Console · Log | — | — |
 | The rows in the console | Operator | — | explore.board · Console · Zero rows | explore.board · Console · Running | explore.board · Console · Withheld count | explore.board · Console · Log | — | explore.board · Console · Query console not granted |
-| Queries on the left | Admin | explore.board · Queries · No queries yet | explore.board · Queries · No query matches | explore.board · Queries · Loading | explore.board · Queries | explore.board · Queries · Could not load | — | — |
-| Queries on the left | Operator | explore.board · Queries · No queries yet | explore.board · Queries · No query matches | explore.board · Queries · Loading | explore.board · Queries | explore.board · Queries · Could not load | — | explore.board · Queries · Query console not granted |
+| Queries on the left | Admin | explore.queries · No queries yet | explore.queries · No query matches | explore.queries · Loading | explore.queries | explore.queries · Could not load | — | — |
+| Queries on the left | Operator | explore.queries · No queries yet | explore.queries · No query matches | explore.queries · Loading | explore.queries | explore.queries · Could not load | — | explore.queries · Query console not granted |

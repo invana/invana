@@ -4,7 +4,7 @@ title: Write a task, hand it on and accept the result
 feature: PJ-F01
 status: idea
 personas: [analyst, decision-maker]
-boards: [projects.tasks, inbox]
+boards: [projects.tasks, projects.reviews, inbox]
 ---
 
 # PJ-12 · Write a task, hand it on and accept the result
@@ -128,5 +128,5 @@ flowchart TD
 | A result in Needs you | Operator | — | — | inbox · Loading | inbox · A result to accept | inbox · Could not load | — | — |
 | A task's History | Admin | projects.tasks · Detail · History · Nothing yet | — | projects.tasks · Detail · Loading | projects.tasks · Detail · History | projects.tasks · Detail · Could not load | projects.tasks · Detail · History | — |
 | A task's History | Operator | projects.tasks · Detail · History · Nothing yet | — | projects.tasks · Detail · Loading | projects.tasks · Detail · History | projects.tasks · Detail · Could not load | projects.tasks · Detail · History | projects.tasks · Detail · History · Content withheld |
-| Reviews on the left | Admin | projects.tasks · Reviews · Nothing to review | projects.tasks · Reviews · No review matches | projects.tasks · Reviews · Loading | projects.tasks · Reviews | projects.tasks · Reviews · Could not load | — | — |
-| Reviews on the left | Operator | projects.tasks · Reviews · Nothing to review | projects.tasks · Reviews · No review matches | projects.tasks · Reviews · Loading | projects.tasks · Reviews | projects.tasks · Reviews · Could not load | — | — |
+| Reviews on the left | Admin | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |
+| Reviews on the left | Operator | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |

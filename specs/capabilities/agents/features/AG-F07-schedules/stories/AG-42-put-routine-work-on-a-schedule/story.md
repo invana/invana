@@ -4,7 +4,7 @@ title: Put routine work on a schedule
 feature: AG-F07
 status: idea
 personas: [analyst, decision-maker, admin]
-boards: [agents.schedules, inbox]
+boards: [agents.schedules, projects.schedules, inbox]
 ---
 
 # AG-42 · Put routine work on a schedule
@@ -85,3 +85,5 @@ flowchart LR
 | A schedule | Operator | agents.schedules · A schedule · No firings yet | — | agents.schedules · A schedule · Loading | agents.schedules · A schedule · Read only | agents.schedules · A schedule · Last run failed | agents.schedules · A schedule · Running | agents.schedules · A schedule · Read only |
 | A delivered result and an outward ask | Admin | — | — | — | inbox · A schedule's result | inbox · A schedule's failed run | inbox · Send this schedule's result? | — |
 | A delivered result and an outward ask | Operator | — | — | — | inbox · A schedule's result | inbox · A schedule's failed run | inbox · Send this schedule's result? · Waiting on the approver | — |
+| Projects › Schedules | Admin | projects.schedules · Nothing is scheduled | — | projects.schedules · Loading | projects.schedules | projects.schedules · Could not load | projects.schedules · Running | — |
+| Projects › Schedules | Operator | projects.schedules · Nothing is scheduled · Read only | — | projects.schedules · Loading | projects.schedules · Read only | projects.schedules · Could not load | projects.schedules · Running | projects.schedules · Read only |

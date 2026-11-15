@@ -51,7 +51,7 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 | *Access* | A lock; a count only when an act was blocked today | The Access dropdown ([AC-F06](os/access/features/AC-F06-history/feature.md)) | Everyone; what a person may not read is withheld, each row's acts disabled with who can grant them |
 | *Inbox* | Its badge: the Needs you count; a dot when only Updates are unread; nothing when nothing waits | The Inbox dropdown ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) | Everyone |
 | *Assistant ✦* | — | rightSection | A person who may use the Assistant |
-| Avatar | The person | Profile · Your access (roles, delegations) · Appearance · Help · Shortcuts · What's new · Sign out | Everyone |
+| Avatar | The person | Profile · Your access (Access Policies, delegations) · Appearance · Help · Shortcuts · What's new · Sign out | Everyone |
 
 ### The switcher
 
@@ -239,13 +239,13 @@ sections never closes it.
 | Section | Nav | Rule |
 |---|---|---|
 | Agents | — (one glance) | Three bands: **Waits on you** — each agent's ask of the reader, answered in place · **Running** — each agent at work, what it is doing now and its next ask, with *Pause* and *Stop* in place · **Workers** — keeping up or not, runs at once free, scale advice. *Assign* gives an agent a task from here. Every deeper act — build, test, read a run, — is *Open in Agents*; adding or draining workers and changing a limit is *Open in Settings*, at Settings › Workers ([CP-72](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)) |
-| Access | Now · Who · What they may do · Record · Keeping | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, keys, connected clients · *What they may do* — Roles · Access Policies · Agents · *Record* — History · Usage · What left · *Keeping* — retention, holds, forgetting ([Access Plane](os/access/product.md)) |
+| Access | Now · Who · What they may do · Record · Keeping | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, keys, connected clients · *What they may do* — Access Policies · Agents · *Record* — History · Usage · What left · *Keeping* — retention, holds, forgetting ([Access Plane](os/access/product.md)) |
 | Settings | General · Appearance · You · Connections · Plugins · Fleet · Workers · Notifications | *Connections* — Graph databases · AI models · MCP server · Connectors · Team packs. Preference rows and tables · *Plugins* — Core · Tool · Outside servers · Runtimes, each reading on or off and *Used by n agents*; an outside server lists its work connections; a plugin opens as its detail page ([CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) · *Fleet* — Map · Workloads: the map of agents, skills, functions and worker groups, and runs and tokens by user, agent and team ([CP-F09](os/control/features/CP-F09-overview/feature.md)) · *Workers* — Groups · All workers · Queue · Limits · Alerts: runs at once free, scale advice on Groups and Queue; a worker group or a worker opens as its detail page ([CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md) · [CP-F04](os/control/features/CP-F04-limits/feature.md) · [CP-F11](os/control/features/CP-F11-ops-alerting/feature.md)) |
 | About | — | The version, what's new and Help |
 
 | Rule | Detail |
 |---|---|
-| Read before act | A section an act needs a role for reads in full; the act reads *Ask {Admin}* |
+| Read before act | A section an act needs a permission for reads in full; the act reads *Ask {Admin}* |
 | A glance, not the workspace | The Agents section shows only enough to stay in Explore, Model or Projects while agents work: what waits on the reader, what runs, whether the workers keep up. A person without Read on Runs sees their own runs and asks in it; *Open in Agents* is there for everyone |
 | The Inbox is its own | The full Inbox — Needs you · Running · Updates · Done — opens in the large modal's frame from the Inbox dropdown's *Open the Inbox*; an Admin also filters *All open alerts* ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) |
 
@@ -288,7 +288,7 @@ sections never closes it.
 | Idle | *● n running* reads *Idle* with a grey dot and keeps its place |
 | Needs you | The Inbox badge's count, the act inside the card |
 | Cannot answer / refused | The assistant says why and who can help, in a sentence, with the act that asks them |
-| No access | The surface is visible; the act is replaced by *Ask Priya (Admin)*, naming the role or the approver it needs — never a dead end. The act gated is the one that enters an area ([Access Plane](os/access/product.md)) |
+| No access | The surface is visible; the act is replaced by *Ask Priya (Admin)*, naming the permission or the approver it needs — never a dead end. The act gated is the one that enters an area ([Access Plane](os/access/product.md)) |
 | Draft | A floating bar over the canvas: *Draft · 3 changes not published* · Discard · Review and publish |
 
 ## 6. Words
