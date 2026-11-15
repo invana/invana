@@ -1,6 +1,6 @@
 ---
 name: design-redesign
-status: ready
+status: running
 branch: chore/specs-graph-data
 scope: design-redesign
 ---
@@ -386,7 +386,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Foundation — reference page, kit, shell components, pages |  | pending | 2026-11-15 | reset — canvas access was missing (R403) |
+| P01 | Foundation — reference page, kit, shell components, pages |  | in progress | 2026-11-15 | reset — canvas access was missing (R403) |
 | P02 | Name the missing boards | P01 | done | 2026-11-15 | gates green · reviews passed |
 | P03 | Prototype I — Shell, Sign-in & Home, Explore | P02 | pending | 2026-11-15 | reset — canvas access was missing (R403) |
 | P03b | Prototype I — Model, Projects | P03 | pending |  |  |
