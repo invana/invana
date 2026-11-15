@@ -401,7 +401,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P11 | Inbox and Records — every state and lens | P10 | done | 2026-11-15 | gates green · reviews passed |
 | P12 | Agents — every state and lens | P11 | done | 2026-11-15 | gates green · reviews passed |
 | P13 | Library — every state and lens | P12 | done | 2026-11-15 | gates green · reviews passed |
-| P14 | Settings — You, Invana and Connections | P13 | in progress | 2026-11-15 |  |
+| P14 | Settings — You, Invana and Connections | P13 | done | 2026-11-15 | gates green · reviews passed |
 | P15 | Settings — Operations | P14 | pending |  |  |
 | P16 | Settings — Access | P15 | pending |  |  |
 | P17 | Audit — every board drawn, every link resolves | P16 | pending |  |  |
