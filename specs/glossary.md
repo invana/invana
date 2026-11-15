@@ -21,7 +21,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Library** | The section of the large modal for what agents are built from and reach out with — Skills · Plugins · Team packs — each with *Used by n agents* | skills · plugins · Team packs |
 | **Operations** | What the deployment is doing now — runs, the queue, workers, tokens this month — the quick-overview dropdown behind the header's *● n running*; its links open the large modal at Workers and Agents › Runs, where every deeper act happens | fleet · overview |
 | **Access** | The section of the large modal for who may do what — Now · Who · What they may do · Record · Keeping; the header lock is an Admin's glance at it: what each person and agent is touching in the last hour, and what a policy blocked | access summary |
-| **Switcher** | The dropdown behind ☰ and the mode name: Go to · New · Recent · Pinned | — |
+| **Switcher** | The dropdown behind the *☰ Invana {Mode} ▾* control: Go to · New · Recent · Pinned | — |
 | **Recent · Pinned** | The items a person opened, newest first, kept for them by the engine · the ones they starred | recents · pins |
 | **General · Appearance · You · Connections · Notifications** | The groups of Settings: the deployment's general settings · how Studio looks · the person's own account · graph databases, AI models, the MCP server and connectors · what reaches whom | deployment settings · profile |
 | **Board** | A named, saved working surface — drawn on a canvas, or a dashboard of panels | Board (`renders: canvas · declared`) |

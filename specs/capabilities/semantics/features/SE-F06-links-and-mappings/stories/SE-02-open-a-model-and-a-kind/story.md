@@ -42,7 +42,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | SE-02.1 | The map | the person clicks a kind, or picks it in the left section | a peek opens beside it: the kind, its model and record count, its description, and each property with its type and *Must be*; the left section marks it and the footer reads *<kind> selected · Esc to close* |
-| SE-02.2 | A kind's peek | the person picks *Open <kind>* | the kind opens as a page of its model, breadcrumb `Model › <model> › <kind>`, with its records and key and tabs Properties · Indexes · Constraints · Mappings, each with its count |
+| SE-02.2 | A kind's peek | the person picks *Open <kind>* | the kind opens as a page of its model, header `Invana Model / Models › <model> › <kind>`, with its records and key and tabs Properties · Indexes · Constraints · Mappings, each with its count |
 | SE-02.3 | A model in the left section | the person picks it | the model opens with its kinds of node, its relationships and the links touching it from either side, each with its count; an empty list says what would go there |
 | SE-02.4 | A kind's peek with constraints that records break | it shows | it names how many records break each, and whether new ones are rejected |
 | SE-02.5 | A kind | the person presses Esc or picks the breadcrumb | they are back on the map as they left it |
@@ -51,8 +51,8 @@ flowchart LR
 | SE-02.8 | A model's head and a Modeller or an Admin | they rename it or change its description | It saves at once, outside the draft — a name and a description are not part of a version — and History names who changed it |
 | SE-02.9 | A kind's Mappings and a Modeller or an Admin | they pick *Map to a standard* and a property, a standard and a term or value | the mapping — same as · broader · narrower — is staged on the model's draft and publishes with it |
 | SE-02.10 | A kind's Mappings | it opens | each mapping lists its property, the standard's term or value and version, and who declared it; an Operator reads them with *Map to a standard* absent |
-| SE-02.11 | Published models | a person opens Model › Kinds | every kind lists grouped by its model, with the record count the engine sends; picking one opens the kind |
-| SE-02.12 | Published models | a person opens Model › Relationships | every relationship kind lists grouped by its model, naming the two kinds it joins; picking one opens it on its model |
+| SE-02.11 | Published models | a person opens Model › Models | the left section is a tree: every model, and under it its Kinds, each with the record count the engine sends; picking a kind opens the kind |
+| SE-02.12 | Published models | a person expands a model in the Models tree | its Relationships list under its Kinds, each naming the two kinds it joins; picking one opens it on its model |
 
 ## Screens
 
@@ -66,7 +66,7 @@ flowchart LR
 | A kind · Change in a draft | Operator | — | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Edit disabled |
 | A relationship | Admin | — | — | model.relationships · Detail · Loading | model.relationships · Detail | model.relationships · Detail · Could not load | — | — |
 | A relationship | Operator | — | — | model.relationships · Detail · Loading | model.relationships · Detail | model.relationships · Detail · Could not load | — | model.relationships · Detail · Read only |
-| Kinds on the left | Admin | model.kinds · No kinds yet | model.kinds · No kind matches | model.kinds · Loading | model.kinds | model.kinds · Could not load | — | — |
-| Kinds on the left | Operator | model.kinds · No kinds yet | model.kinds · No kind matches | model.kinds · Loading | model.kinds | model.kinds · Could not load | — | model.kinds · Read only |
-| Relationships on the left | Admin | model.relationships · No relationships yet | model.relationships · No relationship matches | model.relationships · Loading | model.relationships | model.relationships · Could not load | — | — |
-| Relationships on the left | Operator | model.relationships · No relationships yet | model.relationships · No relationship matches | model.relationships · Loading | model.relationships | model.relationships · Could not load | — | model.relationships · Read only |
+| Kinds in the Models tree | Admin | model.models · Tree · No kinds yet | model.models · Tree · No kind matches | model.models · Tree · Loading | model.models · Tree | model.models · Tree · Could not load | — | — |
+| Kinds in the Models tree | Operator | model.models · Tree · No kinds yet | model.models · Tree · No kind matches | model.models · Tree · Loading | model.models · Tree | model.models · Tree · Could not load | — | model.models · Tree · Read only |
+| Relationships in the Models tree | Admin | model.models · Tree · No relationships yet | model.models · Tree · No relationship matches | model.models · Tree · Relationships loading | model.models · Tree · Relationships | model.models · Tree · Relationships could not load | — | — |
+| Relationships in the Models tree | Operator | model.models · Tree · No relationships yet | model.models · Tree · No relationship matches | model.models · Tree · Relationships loading | model.models · Tree · Relationships | model.models · Tree · Relationships could not load | — | model.models · Tree · Read only |

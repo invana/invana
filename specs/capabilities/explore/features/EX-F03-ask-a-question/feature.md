@@ -290,7 +290,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | The right side has no memory | Opening the assistant replaces what was on the right; closing it closes the region |
 | Every composer control is one inline select | Ask kind (with the graph database for a query) and agent share one trigger and one menu; the token budget per run is in the conversation's settings, not a menu |
 | No model picker | The agent names which AI model answers; the composer never offers one |
-| A conversation has its own address | Opening, starting or leaving a conversation rewrites the Explore address in place, without redrawing the board; a reload or a shared link reopens the conversation with its answer. Crumbs: *Explore › Conversations › <title>* |
+| A conversation has its own address | Opening, starting or leaving a conversation rewrites the Explore address in place, without redrawing the board; a reload or a shared link reopens the conversation with its answer. Header: *Invana Explore / Conversations › <title>* |
 | New is a blank thread | *New* in the header and in the history shows a blank thread with the composer focused on a question; no conversation exists until the first question |
 | Archiving hides, deleting removes | An archived conversation leaves the list and comes back with *Show archived*. Deleting removes the conversation and its turns; its runs stay in Agents › Runs and its forks stay whole |
 | A question asked back waits | Nobody answering parks the run as waiting, never failed and never expired; answering resumes the same run |

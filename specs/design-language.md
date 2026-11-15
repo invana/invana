@@ -21,7 +21,7 @@ that work and go away again.
 | 3 | **Agents are helpers, not machinery** | The assistant is always one click away on the right. Agents are colleagues: they answer in threads, ask before acting, and show how they got there |
 | 4 | **Say less** | A surface shows the next decision, not every fact. Detail is one click deeper (peek → modal), never on the first screen |
 | 5 | **Plain words** | Roles, limits and states are sentences. No internal nouns on screen (see §6) |
-| 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explore, Model and Projects are modes of one Studio, named first in the crumb and switched from the switcher; everything else is summoned |
+| 6 | **Three modes, not nine products** | The person never picks a product from a launcher. Explore, Model and Projects are modes of one Studio, named in the wordmark — *Invana Explore*, *Invana Model*, *Invana Projects* — so the person always sees which mode they are in, and switched from the switcher; everything else is summoned |
 | 7 | **The agent proposes, the person decides** | Invana is built for decisions ([vision](vision.md)). An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
 | 8 | **Traceable on demand** | Every answer, proposal and act can show how it got there — steps, sources, assumptions, who did what — through *Why?*, *How it got here* and the full run. Never on the first screen; always one click away |
 
@@ -31,9 +31,9 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 
 | Region | Holds | Rule |
 |---|---|---|
-| Header | 40 px. `header.left`: ☰ · the **Invana** wordmark · the crumb *mode ▾ › view › item*. `header.right`, in order: ⌘K · *● n running* · *Access* (Admin only) · *Inbox* and its badge · *Assistant ✦* · avatar ([The header](#the-header)) | The crumb leads with the mode; ☰ and the mode name both open the switcher. No bell, no launcher, no graph picker and no graph name — Graph Data is one per deployment |
-| leftNav | A flat labelled nav, 220 px: a search titled for the mode (*Search Model*), then the current mode's **views**, each icon · label · count ([The rail](#the-rail)). **Summoners** at the foot, fixed: Agents · Workers · Library · Access · Settings, then the avatar and the collapse toggle | A view opens its own leftSection; a summoner opens [the large modal](#the-large-modal) at its own section. Views are flat — group labels allowed, never a sub-tree. Expanded by default; `⌘\` or the toggle at its foot collapses it to icons only — collapsed, a dot stands in for a count that needs you and hover shows the label. No mode switch: the header's switcher is the only one. Home has no views |
-| leftSection | What the view in front lists, as a tree ([The rail](#the-rail)) — picking a row opens it in main | **Collapsible** (header toggle, ⌘B, or click the active view). It stays open when the leftNav collapses. When collapsed, the toggle leads main's tab row |
+| Header | 40 px. `header.left`: one control, *☰ Invana {Mode} ▾* — the wordmark names the mode (*Invana Model*; plain *Invana* on Home) — then the crumb *view › item* (*Invana Model / Models › Airways model › Airport*). `header.right`, in order: ⌘K · *● n running* · *Access* (Admin only) · *Inbox* and its badge · *Assistant ✦* · avatar ([The header](#the-header)) | The mode sits in the wordmark, never in the crumb; the whole *☰ Invana {Mode} ▾* control opens the switcher. No bell, no launcher, no graph picker and no graph name — Graph Data is one per deployment |
+| leftNav | A flat labelled nav, 220 px: a search titled for the mode (*Search Model*), then the current mode's **views**, each icon · label · count ([Views and their leftSection](#views-and-their-leftsection)). **Summoners** at the foot, fixed: Agents · Workers · Library · Access · Settings, then the avatar and the collapse toggle | A view opens its own leftSection; a summoner opens [the large modal](#the-large-modal) at its own section. Views are flat — group labels allowed, never a sub-tree. Expanded by default; `⌘\` or the toggle at its foot collapses it to icons only — collapsed, a dot stands in for a count that needs you and hover shows the label. No mode switch: the header's switcher is the only one. Home has no views |
+| leftSection | What the view in front lists, as a tree ([Views and their leftSection](#views-and-their-leftsection)) — picking a row opens it in main | **Collapsible** (header toggle, ⌘B, or click the active view). It stays open when the leftNav collapses. When collapsed, the toggle leads main's tab row |
 | mainSection | The work: board tabs (the workbook), the canvas, a project | Never a list of settings |
 | rightSection | The assistant: the thread, then the composer — its one occupant | Closable; reopened from the header. A record opened on a board is a card on the board, never a rightSection occupant, so it never takes the side from the conversation |
 | bottomSection | The console under the canvas: Data · Queries — its one occupant | Opened from the footer's counts. No other board kind fills it |
@@ -43,8 +43,9 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 
 | Item | Shows | Opens | Who |
 |---|---|---|---|
-| ☰ · mode ▾ | The current mode first in the crumb; plain *Invana* on Home | The switcher | Everyone |
-| ⌘K | *Do, open or ask anything* — the shortcut layer for everything not on the rail, Help included ([CP-F07](os/control/features/CP-F07-find-your-way/feature.md)) | ⌘K | Everyone |
+| ☰ Invana {Mode} ▾ | One control: the wordmark with the current mode — *Invana Explore* · *Invana Model* · *Invana Projects*; plain *Invana* on Home | The switcher | Everyone |
+| The crumb | *view › item* after the wordmark, never the mode: *Models › Airways model › Airport* · *Browse by kind › Airways › Airport* · *Boards › Hub routes* · *Projects › Winter delays review › Tasks*; each level links one level up | That level | Everyone |
+| ⌘K | *Do, open or ask anything* — the shortcut layer for everything not in the leftNav, Help included ([CP-F07](os/control/features/CP-F07-find-your-way/feature.md)) | ⌘K | Everyone |
 | *● n running* | Runs going now; *Idle* with a grey dot when nothing runs — it keeps its place | The Operations dropdown ([CP-F09](os/control/features/CP-F09-overview/feature.md)) | Everyone; an Operator's reads their own |
 | *Access* | A lock; a count only when an act was blocked today | The Access dropdown ([AC-F06](os/access/features/AC-F06-history/feature.md)) | Admin only — absent for everyone else |
 | *Inbox* | Its badge: the Needs you count; a dot when only Updates are unread; nothing when nothing waits | The Inbox dropdown ([CP-F08](os/control/features/CP-F08-the-inbox/feature.md)) | Everyone |
@@ -53,7 +54,7 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 
 ### The switcher
 
-A header dropdown of about 1180 px, from ☰ or the mode name ([CP-68](os/control/features/CP-F07-find-your-way/stories/CP-68-switch-mode-and-pick-up-where-i-left-off/story.md)).
+A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([CP-68](os/control/features/CP-F07-find-your-way/stories/CP-68-switch-mode-and-pick-up-where-i-left-off/story.md)).
 
 | Side | Holds |
 |---|---|
@@ -62,19 +63,19 @@ A header dropdown of about 1180 px, from ☰ or the mode name ([CP-68](os/contro
 | Right — Recent | The person's own, kept by the engine: search · kind tabs (All · Conversations · Boards · Projects · Models · Queries · Runs) · a **Pinned** row (any item starred) · three *Continue where you left off* cards (the last conversation with a snippet, the last board with a preview, the last project with its progress) · grouped lists with state dots |
 | Never | Settings, Help, a graph switcher |
 
-### The rail
+### Views and their leftSection
 
 | Mode | Views (the leftNav's items) |
 |---|---|
 | Home | — |
 | Explore | Boards · Conversations · Dashboards · Queries |
-| Model | Models · Kinds · Relationships · Standards · Health · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
+| Model | Models · Standards · Health · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
 | Projects | Projects · My tasks · Reviews · Schedules |
 
 | View | Its leftSection |
 |---|---|
 | Boards | Mine · Shared with me · Archived |
-| Models | Every model, a tree of its Kinds and Relationships |
+| Models | Every model, a tree of its Kinds and Relationships — Kinds and Relationships are not views of their own |
 | Browse by kind | The kinds, grouped by model |
 | Projects | Active · Draft · Done |
 | Any other view | The list it names, grouped where it has groups |
@@ -83,7 +84,7 @@ A header dropdown of about 1180 px, from ☰ or the mode name ([CP-68](os/contro
 |---|---|
 | One view, one leftSection | Each view opens its own leftSection, a tree of what it lists; picking a row opens it in main. The nav itself never holds a tree |
 | Views swap, summoners overlay | A view changes leftSection and main; a summoner (Agents · Workers · Library · Access · Settings) opens the large modal at its section and never changes the mode |
-| The switcher is the one mode switch | The leftNav holds no mode switch; ☰ and the mode in the crumb open [the switcher](#the-switcher) |
+| The switcher is the one mode switch | The leftNav holds no mode switch; the *☰ Invana {Mode} ▾* control opens [the switcher](#the-switcher) |
 | Collapsed, it still says what needs you | Icons only: the lit view stays lit, a view whose count needs you carries a dot, hover shows its label; leftSection is unchanged |
 | Graph Data is a group of Model | Browse by kind lists the kinds grouped by model across every graph database; Loads · Quality · Annotations follow. A record and a load open in main with a breadcrumb ([Records](capabilities/records/product.md)) |
 | A mode's Schedules is a filter | Projects › Schedules is Agents › Schedules filtered to that mode's kind ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
@@ -315,7 +316,7 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 |---|---|---|
 | Home · Graphs · Onboarding | **Home** — *What are you trying to decide?*, the set-up steps until the deployment is ready (*n of 4*), then the first answer | page |
 | Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
-| Modeller | **Model** mode — the Semantics capability: Models · Kinds · Relationships · Standards · Health; rules and views in the large modal | mode · modal |
+| Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships) · Standards · Health; rules and views in the large modal | mode · modal |
 | Datasets · Imports | **Graph Data** — a group of Model: Browse by kind (kinds grouped by model across every graph database) · Loads · Quality · Annotations; a record and a load open in main | mode |
 | Agent Builder | **Agents** — All agents · Runs · Schedules; an agent and a run as detail pages | modal |
 | Skills · Plugins · Team packs | **Library** — Skills · Plugins · Team packs, each with *Used by n agents* | modal |

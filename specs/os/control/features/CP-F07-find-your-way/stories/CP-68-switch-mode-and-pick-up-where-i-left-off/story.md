@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 
 ```mermaid
 flowchart TD
-  o([☰ or the mode name in the crumb]) --> sw["The switcher · Go to · New · Recent"]
+  o([☰ Invana Mode ▾ in the header]) --> sw["The switcher · Go to · New · Recent"]
   k([⌘1 · ⌘2 · ⌘3]) --> mode
   sw -->|before set-up| bs["Modes and New disabled · Opens when set-up starts"]
   sw -->|Go to| mode(["Home · Explore · Model · Projects"])
@@ -51,7 +51,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-68.1 | Any screen | the person clicks ☰ or the mode name in the crumb | the switcher opens anchored to it, about 1180 px wide, no scrim; outside click or Esc closes it |
+| CP-68.1 | Any screen | the person clicks the *☰ Invana {Mode} ▾* control — *Invana Explore*, *Invana Model*, *Invana Projects*, plain *Invana* on Home | the switcher opens anchored to it, about 1180 px wide, no scrim; outside click or Esc closes it |
 | CP-68.2 | The switcher | *Go to* is read | Home · Explore ⌘1 · Model ⌘2 · Projects ⌘3; picking one switches the mode and closes the switcher; ⌘1–⌘3 switch from any screen |
 | CP-68.3 | The switcher | *New* is read | Conversation · Board · Project — nothing else; a conversation or a board is made at once and opens; a project opens its create modal |
 | CP-68.4 | The switcher | it is read | it holds no Settings, no Help, no *Connect a graph database* and no graph switcher |

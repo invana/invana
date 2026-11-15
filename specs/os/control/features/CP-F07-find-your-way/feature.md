@@ -15,7 +15,7 @@ depends_on: [AC-F02, AC-F01]
 
 > The switcher to change mode, start something and pick up where one left off — each person's recent and pinned items
 > kept by the engine; ⌘K to do, open or ask anything; and one search for the command line — all showing only what the
-> person may open. The frame every surface sits in — the header, the rail, the footer, overlays — is
+> person may open. The frame every surface sits in — the header, the leftNav, the footer, overlays — is
 > [design-language.md](../../../../design-language.md#2-the-layout).
 > The decision it helps make: *where is the thing I need, and can I act on it?*
 
@@ -177,7 +177,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| The switcher moves between modes | ☰ and the mode name open one dropdown: Go to, New and the person's Recent — never Settings, Help or a graph switcher |
+| The switcher moves between modes | The *☰ Invana {Mode} ▾* control — the wordmark names the mode — opens one dropdown: Go to, New and the person's Recent — never Settings, Help or a graph switcher |
 | New holds the three things people start most | Conversation, board and project; connecting a graph database is Settings' and Home's before set-up |
 | Recent is the engine's | Kept per person in the engine so it follows them across devices; never browser storage |
 | ⌘K is the one door | *Do, open or ask anything* — acts, records and sections in one palette, with no products to switch between |
