@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**424 recommendations** · 259 open · 112 taken · 21 declined · 32 done
+**425 recommendations** · 260 open · 112 taken · 21 declined · 32 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -467,3 +467,4 @@ flowchart LR
 | R453 | open | 2026-11-15 | designer | phase design-redesign/P13 | docs | medium | CP-64 story.md ends with stray tool-call text | specs/os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-64-install-an-agent-runtime/story.md:72-77 — leftover '</content></invoke><invoke name="TaskUpdate">…' after the Screens table; delete those lines (check.py does not catch it) |  |  |
 | R454 | open | 2026-11-15 | designer | phase design-redesign/P13 | idea | low | Name the Copy act's modal on agents.skills Detail | AG-F04: a built-in skill's Copy has no Screens cell for its name modal; P13 drew Copy opening agents.skills · Detail · Name taken. Recommend a cell agents.skills · Detail · Copy (name the copy, then Name taken) in the story that owns Copy |  |  |
 | R455 | open | 2026-11-15 | designer | phase design-redesign/P13 | component | low | Library boards: an on/off Switch in a table row | settings.plugins (My switch · Plugin off · Off for the deployment) draws a plugin's switch as a status word plus an act button, because the canvas main has no row Switch block. Kit Switch exists; the canvas generator p13_common.py needs a cell kind for it (a later phase owning the Library contract), and Studio should use the kit Switch in the row |  |  |
+| R456 | open | 2026-11-15 | designer | phase design-redesign/P14 | docs | low | Name the create sections and edits P14 drew that no Screens cell names | P14 drew states the stories' Screens tables do not name, so every numbered section of each create is reachable (D10): settings.me · New key · Narrow to / · Your password (AC-10); settings.notifications · New rule · Who hears / · Just me · Who hears (CP-37); settings.notifications · New channel · Its details (CP-45). Also undrawn-by-name: settings.general Rename has no edit cell (CP-71, drawn inline on General); settings.me Owners · Add an owner / Remove / Hand over have no state of their own (AC-24, drawn as acts on Owners); settings.ai uses an Endpoint view for Pinging · Ping failed · Locality · Stays external · Locked (CP-01, CP-61, AC-42) — confirm Endpoint as a View. Recommend: product-manager adds these cells to the stories' ## Screens so P17's audit traces them. |  |  |
