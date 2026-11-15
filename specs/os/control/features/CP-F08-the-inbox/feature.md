@@ -79,7 +79,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Write a notification rule that reaches other people, a team, a role or a channel | Admin | Those recipients disabled — *Needs the Admin role — ask {admins}* |
 | Add, test or remove a channel | Admin, in a session, with the password again | *Add channel*, *Test* and *Remove* disabled — *Needs the Admin role — ask {admins}* |
 | Choose where one's own asks and alerts reach one | Every signed-in person, for themselves | Another person's choices are absent |
-| Answer project work in Needs you — accept or send back a task in review, start a task an agent asks to pick up, accept or reject an agent's proposal, read a new lead | Operator · Modeller · Admin, on a project they can see ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) · [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) · [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) | Work on a project their default agent may not Read lists its line, its content *Withheld*; *Accept* and *Send back* are its reviewers', a proposal's *Accept* its members' |
+| Answer project work in Needs you — accept or send back a task in review, start a task an agent asks to pick up, accept or reject an agent's proposal, read a new lead | Operator · Modeller · Admin, on a project they can see ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) · [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) · [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) | Work on a project their default agent may not Read lists its line, its content *Withheld*; *Accept* and *Send back* are its people on the team', a proposal's *Accept* its members' |
 
 ## States
 
@@ -156,7 +156,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Project work in Needs you — tasks and their results | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Project work in Needs you — agents' proposals | [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md#engine) |
 | Project work in Needs you — new leads | [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md#engine) |
-| A project's members and reviewers | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
+| A project's members and people on the team | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Users, teams and their roles — who a rule's recipients are | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
 | An agent's named approvers — a rule's *the agent's named approvers* | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | Open alerts sent to the reader, and their closing | [CP-F11](../CP-F11-ops-alerting/feature.md#engine) |

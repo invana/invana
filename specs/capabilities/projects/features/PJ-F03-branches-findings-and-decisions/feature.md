@@ -115,9 +115,9 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read a project's branches, findings, decisions, proposals, lineage and the Decisions page | Anyone whose default agent may Read `project/<key>` | The project's head; the rest reads *Withheld — your agent may not read `project/{key}`* |
-| Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person whose default agent may Read the project — Operator · Modeller · Admin | On an archived project, each act is disabled, saying it is archived |
-| Accept or reject a proposal | The project's members, people only ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)) | The proposal reads; *Accept* and *Reject* disabled — *Members only* |
+| Read a project's branches, findings, decisions, proposals, lineage and the Decisions page | Anyone who may read `project/<key>` | The project's head; the rest reads *Withheld — join the team or ask {who can grant}* |
+| Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person who may read the project — Operator · Modeller · Admin | On an archived project, each act is disabled, saying it is archived |
+| Accept or reject a proposal | The people on the project's team ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)) | The proposal reads; *Accept* and *Reject* disabled — *Join the team to change it* |
 | Add findings, propose a fork or a decision | An agent, in a run on the project | A proposal reads as waiting, with its rationale and *How it got here* |
 | Record a verdict or a decision | A person, never an agent | An agent can only propose |
 | Read the records a finding cites, and an impact reach | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A kind the reader's agents may not read is not shown and never reached |
@@ -134,7 +134,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | Has data | The overview, tree, branch, finding, impact, decisions and lineage as their stories describe |
 | Failed | The page could not load, saying why, with *Try again*; an act the engine refuses names the reason and changes nothing; an impact reach that cannot read a graph database names it |
 | Agent working or proposing | A proposal waits on its branch, an agent's finding reads *Unreviewed*; each opens *How it got here*; an impact reach says which hop it is on |
-| No access | A project the reader's default agent may not Read shows its head only, the rest *Withheld*. A run the reader may not read shows that it ran, its status and its tokens — *Content withheld*. A record the reader's agents may not read is not shown |
+| No access | A project the reader may not read shows its head only, the rest *Withheld*. A run the reader may not read shows that it ran, its status and its tokens — *Content withheld*. A record the reader's agents may not read is not shown |
 
 ## Rules
 
@@ -155,7 +155,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | Superseded, never edited | A decision is never edited or deleted. Revisiting one is a new decision that names the one it supersedes, links back to it and cites a finding added after it; the older one reads *Superseded*, linking to the decision that supersedes it |
 | Immutable | A decision belongs to its project, is the organisation's and names who decided; nobody hands it over or changes it |
 | Merge is a decision | It carries chosen findings into another branch of the same project; findings are shared, never copied; both branches keep their history; the source is always marked merged |
-| Agents propose | A fork or a decision, with a rationale; a person accepts or rejects; accepting a decision runs the full rule check as the accepting person. An open proposal is listed in the Inbox › Needs you of the project's members ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)). The project assistant's proposals — tasks, groups, checks, relations, recommendations and asks — are the same record ([PJ-F01 › Rules](../PJ-F01-projects-and-tasks/feature.md#rules)) |
+| Agents propose | A fork or a decision, with a rationale; a person accepts or rejects; accepting a decision runs the full rule check as the accepting person. An open proposal is listed in the Inbox › Needs you of the project's people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)). The project assistant's proposals — tasks, groups, checks, relations, recommendations and asks — are the same record ([PJ-F01 › Rules](../PJ-F01-projects-and-tasks/feature.md#rules)) |
 | Impact starts from the evidence | Impact starts from the records the branch's findings cite, every stance, and walks 1, 2 or 3 hops (2 by default), each record's hops inside its own graph database — never across graph databases, and only those the reader's agent may read; each hop is what the one before reached, less what was already reached |
 | Impact is bounded, and says so | At most 12 records expanded per hop, each to 50 neighbours, the most reached first; a cut reach reads *A sample — more lies beyond* (NFR-PERF-5) |
 | Impact reads as the person | An impact reach is one run of the built-in Assistant with the reader behind it, under its Access Policies; a kind the reader's agent may not read is never reached; every read is in the ledger |
@@ -177,7 +177,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | A type also carries | Detail |
 |---|---|
 | Default rules | The rules in force on a new project of the type (SE-F07); its members may add more |
-| Suggested agents and skills | Offered first when adding members to the project or assigning a task; never added without a person's yes |
+| Suggested agents and skills | Offered first when adding to the project's team or assigning a task; never added without a person's yes |
 | A report template | What a report of the type opens with (PJ-F05) |
 
 ## Data touched
@@ -270,7 +270,7 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | 403 | A project the caller's default agent may not Read | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-03.9 · PJ-11.8 · PJ-13.6 |
-| 403 | Accepting or rejecting a proposal by someone not a member | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-05.17 |
+| 403 | Accepting or rejecting a proposal by someone not on the team | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-05.17 |
 | 403 | An agent records a verdict or a decision | *An agent proposes — a person decides.* | PJ-05.13 · PJ-07.15 |
 | 422 | A fork with a child not titled | *Each child needs a title.* | PJ-04.7 |
 | 422 | A record, load, run or step cite that does not resolve | *`{cite}` does not resolve — nothing was added.* | PJ-06.3 |
@@ -340,7 +340,7 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | A finding's page | The statement is its title; *Added by* and *reviewed by* name the person or agent, as *By* does on Decisions; a run cite reads `run 8195c5e8` and a step cite `run 8195c5e8 · step 4`, each opening the run |
 | A decision cites findings, not steps | A decision weighs findings; the steps, runs and records it rests on are reached through them in the thinking graph — one path, so lineage and recall agree |
 | Lineage is built from records | A decision, the findings it weighed, their steps, runs, evidence and loads, each load's author chain — never inferred; every node opens its source; *Show* narrows the loads and their authors to one source; a list of every node's hops under the drawing serves readers who cannot use it |
-| Who decided | Decisions names the decider for every reader whose default agent may Read the project; *Export for audit* is a CSV of the rows shown |
+| Who decided | Decisions names the decider for every reader who may read the project; *Export for audit* is a CSV of the rows shown |
 | Current is counted by the engine | *2 current · 5 recorded*; it reads *5* alone when they match |
 | Add from Explore | A settled answer reaches *Add a finding* through *Add to a project* (EX-12); a what-if answer arrives the same way, its evidence *predicted* |
 | Impact is a tab of the project | The branch and the hops are picked on it and kept on reload; it is read each time, never saved as a record |

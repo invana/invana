@@ -24,7 +24,7 @@ depends_on: [AG-F02, AG-F04, AC-F02, CP-F02, CP-F06]
 
 ```mermaid
 flowchart TD
-  start([Library › Skills]) --> imp["AG-39 · Import: a zip or a folder of files · a Claude plugin"]
+  start([Agents › Skills]) --> imp["AG-39 · Import: a zip or a folder of files · a Claude plugin"]
   start --> tf["AG-63 · Import from an agent tool's folder: .claude · .codex · AGENTS.md"]
   tf -->|no agent tool's folder in it| tfn(["No agents or skills found · names what it looks for"])
   tf --> kind

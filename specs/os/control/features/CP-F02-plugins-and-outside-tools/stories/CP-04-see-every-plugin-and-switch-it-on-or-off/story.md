@@ -28,7 +28,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  s([Library › Plugins]) --> l["Every plugin: core · tool · outside server · pack · on or off"]
+  s([Agents › Plugins]) --> l["Every plugin: core · tool · outside server · pack · on or off"]
   l -->|filter| f["Nothing matches · Clear filters"]
   l --> p["A plugin: its functions and versions · skills · workflows"]
   p -->|core| always(["Always on · no switch"])
@@ -68,7 +68,7 @@ flowchart TD
 | CP-04.16 | A tool step and no worker free | it waits past its allowance | it fails, saying no worker took it |
 | CP-04.17 | A web page whose robots.txt disallows it | a web tool would read it | nothing is read, and the step says so with the address |
 | CP-04.18 | Anyone on the command line | they run `invana plugins list`, `show`, `on` or `off` | each does what its Studio act does, under the same checks |
-| CP-04.19 | Plugins in the Library | the list is read | each plugin reads *Used by n agents* — the agents that may use any of its functions, as the engine counts them |
+| CP-04.19 | Plugins in Agents | the list is read | each plugin reads *Used by n agents* — the agents that may use any of its functions, as the engine counts them |
 
 ## Screens
 

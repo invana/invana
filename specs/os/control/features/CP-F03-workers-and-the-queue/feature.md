@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-05, CP-06, CP-07, CP-08, CP-09, CP-10, CP-65]
 journeys: [J07, J10]
-boards: [settings.workers, agents.runs]
+boards: [agents.workers, agents.runs]
 nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14]
 depends_on: [CP-F02, CP-F04, CP-F10, AC-F02]
 ---
@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Workers › Groups]) --> lim(["CP-F04 · Workers › Limits · limits per team, user and agent"])
+  s([Agents › Workers › Groups]) --> lim(["CP-F04 · Agents › Workers › Limits · limits per team, user and agent"])
   s --> wk["CP-09 · Workers: each group, its workers, what each runs"]
   wk -->|no workers| nw["Steps run inside the engine · Add workers"]
   wk --> cap["CP-08 · Slots total · busy · free · where steps wait · add workers, or drain idle ones"]
@@ -130,7 +130,7 @@ this is what it means here.
 | A run waiting is not a run running | It holds no slot, uses no worker and costs nothing |
 | Questions go first | Work is taken in this order: a question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents). People whose work waits share the workers equally, by the person behind each run; an idle person's share is lent |
 | Waiting always says why | A waiting run names its position and what it waits behind — *a person is waiting* · *helper — counts as a run* · *schedule* — or the limit, the AI model's rate limit or the worker group |
-| Agents never start machines | Workers are added and scaled by a person; Invana says where steps wait and advises, per group, how many workers to add or which idle ones to drain — it never starts or stops a machine on that advice |
+| Agents never start or stop machines | Workers are added, scaled and drained by a person; Invana says where steps wait and advises, per group, how many workers to add or which idle ones to drain — it never starts or stops a machine on that advice |
 | Slots say how much work fits | A slot is one agent step a worker takes at once; Workers reads the slots of every worker together — total, busy, free — overall and per group |
 | Work goes by labels | A step goes to a worker group whose labels cover what its function needs; a step no live group covers waits, naming the missing label, then fails |
 | A worker dials out | Over HTTPS with its own credential; no inbound port, no database credential; it runs steps under the agent's access, never its own |
@@ -286,7 +286,6 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | The order work is taken | A question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents); within a class first in, first served; a delegated child takes its parent's class. People whose work waits share the workers equally, by the person behind each run; an idle person's share is lent. Position is stored and readable |
 | Suggested | Steps ready ÷ steps a worker took over the last ten minutes, written to `control_worker_stats` every 30 s; clamped to the group's `min_workers` · `max_workers` and to the worker time an hour of each binding limit ([CP-F04](../CP-F04-limits/feature.md)). A step waiting on an AI model's rate limit is not counted |
 | Advice | `add` when `suggested` > workers, by the difference · `drain` when workers idle over the last ten minutes and `suggested` < workers, by the lesser of the idle count and workers − max(`suggested`, `min_workers`) · else `keep`. Stored with the stats every 30 s; advice never acts |
-| Idle drain | A worker idle 5 minutes in a group above its `min_workers` is drained, then stopped; a person starts every machine |
 | No group carries the label | Past the step's limit plus the queue-wait allowance, the step fails `transient · worker_unavailable`, naming the label and the command that adds a worker; the envelope stays queued |
 | A worker dials out | It long-polls `POST /lease` over HTTPS with its own credential: no inbound port, no database credential. It resolves only the secrets its step's function declares |
 | One coordinator | The engine process whose `control_coordinators` row is `holding` hands out steps, renewing every 5 s; a lease unrenewed for 15 s lapses, another process takes it, woken by `LISTEN/NOTIFY`, and the lost one's runs resume from their last settled step |
@@ -315,7 +314,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 
 | Decision | Detail |
 |---|---|
-| Workers is a section of the large modal | The Workers summoner opens the large modal at Workers — Groups · All workers · Queue · Limits · Alerts; join keys sit with Groups; a worker group or a worker opens in place and the path grows (*Workers / Groups / gpu-k8s*). Workers by group — busy, idle, draining — and the queue's waiting and oldest also show in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) |
+| Workers is a view of the Agents mode | *Agents › Workers* — Groups · All workers · Queue · Limits · Alerts; join keys sit with Groups; a worker group or a worker opens in place and the path grows (*Workers / Groups / gpu-k8s*). Whether the workers keep up shows in the Agents glance ([CP-72](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)); workers by group — busy, idle, draining — and the queue's waiting and oldest also show in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) |
 | Add workers is a 720 px modal with a step strip | Where · Group · Join key · Run it · Joined — the one create with a step strip, because a worker joins after the Admin runs the command |
 | Worker groups are the deployment's | An Admin names the groups a team, user or agent may use in its limits ([CP-F04](../CP-F04-limits/feature.md)); a heavy agent gets its own, others share |
 | Suggested is the engine's | Steps ready ÷ steps a worker took over the last ten minutes, every 30 s |
@@ -323,7 +322,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | Outside runtimes run on workers | Claude Code and Codex run an agent's sessions on a worker group that carries their runtime plugin, inside the sandbox, in the task's workspace — never in the engine serving Studio |
 | The sandbox is the last word on a worker | Whatever a runtime's own settings allow, the sandbox enforces the agent's `fs/` · `cmd/` · `net/` rules at the operating system; its allow list is generated each session, never kept by hand |
 | No retry for a task | A failed task alerts and waits on a fix task; re-running blind repeats what failed. A step's bounded `repeat` inside a run stays |
-| Scale-out keeps its pools, not an autoscaler | Pools carry the labels `cpu` · `llm` · `egress` · `gpu` · `code`, with one queue per label and step class (a question · a project task · batch). The engine's desired-workers figure — steps ready ÷ steps a worker runs at once — is clamped to the pool's min and max and to the worker time an hour of each binding limit; a worker idle 5 minutes is drained, then stopped. A person adds every machine; the engine shape is [Engine](#engine) |
+| Scale-out keeps its pools, not an autoscaler | Pools carry the labels `cpu` · `llm` · `egress` · `gpu` · `code`, with one queue per label and step class (a question · a project task · batch). The engine's desired-workers figure — steps ready ÷ steps a worker runs at once — is clamped to the pool's min and max and to the worker time an hour of each binding limit; it is advice only — a person adds every machine and drains every worker with *Drain*; the engine shape is [Engine](#engine) |
 
 ## Open questions
 

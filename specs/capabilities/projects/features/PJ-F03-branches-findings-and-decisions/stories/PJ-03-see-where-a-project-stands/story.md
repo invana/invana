@@ -21,8 +21,8 @@ on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read the overview of any project they can see; open its branches, findings and decisions | A project their default agent may not Read: its head only, the rest *Withheld — your agent may not read `project/{key}`* — Admins are not exempt |
-| Operator | The same, and every act on the page; a Modeller the same | A project their default agent may not Read: its head only, the rest *Withheld — your agent may not read `project/{key}`*. On an archived project every act is disabled, saying it is archived |
+| Admin | Read the overview of any project they can see; open its branches, findings and decisions | A project they may not read: its head only, the rest *Withheld — join the team or ask {who can grant}* — Admins are not exempt |
+| Operator | The same, and every act on the page; a Modeller the same | A project they may not read: its head only, the rest *Withheld — join the team or ask {who can grant}*. On an archived project every act is disabled, saying it is archived |
 
 ## Flow
 
@@ -53,7 +53,7 @@ flowchart LR
 | PJ-03.6 | A branch with proposals waiting | the overview opens | the branch shows *N proposals waiting*, opening that branch's proposals |
 | PJ-03.7 | A project, a branch or a finding open | the shell's header shows the path | it reads *Projects › the project › H2 · title › the finding's statement*, each level linking one level up; the project is named by its name, never its key |
 | PJ-03.8 | A branch, finding or decision open on the page | the person reloads or shares the address | it opens on the same branch, finding or decision; moving to another project clears them |
-| PJ-03.9 | A project and a person whose default agent may not Read `project/{key}` | they open its address | it reads its head — name, key, type, status and counts — and the rest *Withheld — your agent may not read `project/{key}`*, for an Admin as for anyone; nothing reads *Not found* |
+| PJ-03.9 | A project and a person who may not read `project/{key}` | they open its address | it reads its head — name, key, type, status and counts — and the rest *Withheld — join the team or ask {who can grant}*, for an Admin as for anyone; nothing reads *Not found* |
 | PJ-03.10 | The engine cannot return the project | the page loads | it says *Could not load* with the reason and *Try again*; nothing partial is drawn as complete |
 | PJ-03.11 | An archived project | the overview opens | it reads in full; every act is disabled, saying the project is archived |
 | PJ-03.12 | An Operator or a Modeller who can see the project | they open its overview | it reads in full and every act on it is theirs, as for an Admin |

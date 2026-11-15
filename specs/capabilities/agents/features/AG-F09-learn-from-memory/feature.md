@@ -273,7 +273,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A recall failure never fails a run | The plan is made without it, saying why |
 | Who marks | Whoever may read the run's content; a note is required; the author or an Admin withdraws |
 | The engine counts and ranks | Evidence counts, recall ranks and outcome labels are stored by the engine when their facts settle; Studio shows them and never works one out |
-| Evidence opens from Library › Skills | It is read about a skill, workflow, plan or rule, so it opens from the Skills list and from the item itself, with the same numbers on both |
+| Evidence opens from Agents › Skills | It is read about a skill, workflow, plan or rule, so it opens from the Skills list and from the item itself, with the same numbers on both |
 | Suggested changes wait in Inbox › Needs you | They wait on a person and never block a run; ranked by the size of their evidence, not their age |
 | A plan's approval stays with its approvers | A suggested change may propose it; the agent's named approvers decide it as an ask |
 | A stale base is refused | A suggested change made against an older version than the current one is refused on accept, with both shown — never merged blind |

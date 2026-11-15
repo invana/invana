@@ -28,7 +28,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  p([A plugin in Library › Plugins]) --> f["Each function: Needs — verb · resource"]
+  p([A plugin in Agents › Plugins]) --> f["Each function: Needs — verb · resource"]
   f --> who["Which agents may use it — the agents granted to a person"]
   who --> chk{"Every need within the agent's policies · the graph database's mode allows it · the plugin is on · a connection to use?"}
   chk -->|yes| ok(["Usable · the rule that allows each need"])

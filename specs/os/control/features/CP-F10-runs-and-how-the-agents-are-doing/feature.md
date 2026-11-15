@@ -4,9 +4,9 @@ title: Runs and how the agents are doing
 product: CP
 status: idea
 personas: [admin, builder, analyst]
-stories: [CP-48, CP-49, CP-53, CP-50, CP-66, CP-58, CP-51, CP-52, CP-54, CP-55, CP-56, CP-57]
+stories: [CP-48, CP-49, CP-53, CP-50, CP-66, CP-58, CP-51, CP-52, CP-54, CP-55, CP-56, CP-57, CP-72]
 journeys: [J04, J08]
-boards: [agents.runs, inbox, agents.agents, agents.skills]
+boards: [agents.runs, inbox, agents.agents, agents.skills, shell.agents, agents.fleet]
 nfrs: [NFR-PERF-3, NFR-COST-2, NFR-OPS-3, NFR-UX-2]
 depends_on: [AG-F01, AG-F05, AC-F09, CP-F02, CP-F03, CP-F04, GP-F02]
 ---
@@ -63,6 +63,8 @@ flowchart TD
   r57 -->|Stop| stop
   r57 -->|open a run| run
   r57 -->|See every run| list
+  gl([Agents summoner]) --> r72["CP-72 · The Agents glance: waits on you · running · workers"]
+  r72 -->|Open in Agents| run
 ```
 
 ```mermaid
@@ -133,6 +135,7 @@ sequenceDiagram
 | CP-55 | [Compare two runs of one question](stories/CP-55-compare-two-runs-of-one-question/story.md) | idea |
 | CP-56 | [Turn a failed run into a better skill](stories/CP-56-turn-a-failed-run-into-a-better-skill/story.md) | idea |
 | CP-57 | [See what is running and what just ran](stories/CP-57-see-what-is-running-and-what-just-ran/story.md) | idea |
+| CP-72 | [Glance at the agents without leaving my work](stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md) | idea |
 
 ## Access
 
@@ -381,11 +384,11 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, Agents › Runs in the large modal; agents are built in Agents, skills in the Library |
+| Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, Agents › Runs in the Agents mode, beside the agents and skills it ran |
 | Running now is everyone's glance | The header's *● n running* opens Operations ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) with each run's step, tokens, time, worker group and *Stop*; the Inbox's Running holds the reader's own |
 | Runs opens on what needs you | Tiles — runs today against the same day last week · failed today · needs you · p95 over 7 days · tokens this month against the agents' monthly limits · success over 7 days — then *Needs attention*, runs a day over 30 days and what changed recently |
 | Needs attention | Failing workflows first, then agents, then degraded agents; an agent whose latest failure is a listed workflow's run is not listed again; each item has one act that opens where it is answered |
-| A run is a page | A run opens as a page in Agents › Runs, in the large modal over the work: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
+| A run is a page | A run opens as a page in Agents › Runs: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
 | Sessions are a part of the page | *Sessions* lists each session in order, a hand-off note between two; a run of one session reads that one session, with no note |
 | A step opens inside its run | Its input, output, what it touched and its log; a step that fanned out opens on its first part with *All parts* beside it |
 | A step's detail reads by layer | Bands in order — Touches · Slice · What it sent · Attempts · Model · Cache; a layer the run touched nothing in draws its band dark, never hidden |

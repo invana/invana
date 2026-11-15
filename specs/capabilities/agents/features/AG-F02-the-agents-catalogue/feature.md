@@ -75,7 +75,7 @@ each person uses the agents granted to them; granting is the Directory's ([AC-F0
 | Agent → skills → functions | An agent holds skills, a skill calls functions and workflows, functions are code. A person uses an agent, never a skill on its own |
 | Built once for the deployment | Every agent is one definition with one live version; there is no copy per team, person or graph database |
 | Granted, never invited | A person may use the agents granted to them and to every team they are on; a grant is an Admin's, read at each step ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#rules)) |
-| A grant gives use, never access | What an agent may touch is its Access Policies alone ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)); granting an agent to someone widens nothing it may touch, and the same agent does the same thing for everyone it is granted to |
+| A grant gives use, never access | An agent's Access Policies are its ceiling ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)); granting it to someone, or adding it to a project's team, widens nothing — a run of it reaches what the person behind it may, within that ceiling. One agent serves every project it is on |
 | An agent has no role | It acts for the person behind the run through its own Access Policies; it holds no Operator, Modeller or Admin role |
 | The built-in agents | One of each, owned by the platform: Assistant · Query console · Modeller · Coordinator · Record editor · Loader ([Engine › Mechanisms](#mechanisms)). Each starts granted to every person whose role holds the feature it acts for. Copied to customise, never edited |
 | Team pack agents | A Team pack an Admin turned on brings its agents into the catalogue, owned by the platform, made by the pack, at the pack's version ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)); each is granted to nobody until an Admin grants it, and reaches only what the Access Policies an Admin applied allow. Copied to customise; a newer pack version is their next version. [The Software delivery pack](../../../../packs/software-delivery.md) brings five |
@@ -171,7 +171,7 @@ The code changes are [migrations.md](../../../../migrations.md) M37 (Team pack a
 
 | Decision | Detail |
 |---|---|
-| Agents is a section of the large modal | The Agents summoner opens the large modal at Agents, its nav All agents · Runs · Schedules; an agent opens as a detail page in it — its header, one act, tabs and a metadata column |
+| Agents is a mode | The catalogue is *Agents › Agents* in the Agents mode (⌘4), for everyone, beside Skills · Plugins · Workflows · Runs · Schedules · Fleet · Workers; an agent opens as a detail page in it — its header, one act, tabs and a metadata column. The Agents summoner is only the glance ([CP-72](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)) |
 | Agents is the catalogue | One list of every agent, each row its name, what it does, kind, live version, who made it, who may use it and *Granted to you* or *Not granted to you*; the row opens the agent's page (AG-F01) |
 | Who may use it is shown, changed in the Directory | The row and the agent's page read the people and teams it is granted to; an Admin's *Grant* opens the Directory on that agent |
 | A person sees why they may use it | *Granted to you* names *directly* or the team that gives it |

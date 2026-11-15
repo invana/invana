@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-59, CP-60, CP-67]
 journeys: [J08, J09]
-boards: [control.alerts, inbox]
+boards: [agents.alerts, inbox]
 nfrs: [NFR-OPS-3, NFR-REL-3, NFR-SEC-8]
 depends_on: [CP-F10, CP-F08, CP-F02, CP-F03, CP-F04, CP-F05, PJ-F01, AC-F01, AC-F02, AC-F03, AC-F05, AC-F06, AC-F09, AC-F11]
 ---
@@ -57,7 +57,7 @@ flowchart TD
   view -->|the condition cleared| cl
   view -->|Close · an Admin| note["Close with a note"] --> cl
   view -->|Close · not an Admin| nc["Close disabled, naming the Admins"]
-  set([Workers › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
+  set([Agents › Workers › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
   t -->|not an Admin| ro["Reads · Edit disabled, naming the Admins"]
   set --> ha["CP-60 · History alerts — what in History tells whom"]
   ha -->|not an Admin| hro["Reads · New History alert disabled, naming the Admins"]
@@ -142,7 +142,7 @@ Built in, shipped with Invana, never removed. A kind's threshold is the Admin's 
 |---|---|
 | The one home | Every alert in Invana is one of these kinds. A pattern in the records opens a lead instead ([PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) |
 | The Admins always | Every kind reaches the people it names, then the Admins; with no one named left, the Admins alone. A deactivated person is skipped. A personal connection's alert is the one exception: it reaches its person only |
-| A task's people | A task's assignee that is an agent is reached through the person behind its run; a task with no project reaches its author in place of the reviewers |
+| A task's people | A task's assignee that is an agent is reached through the person behind its run; a task with no project reaches its author in place of the people on the team |
 | A failed task is never re-run | *Task failed* waits on a fix task — a task a person makes to follow the failed one on its failure ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md)); nothing re-runs the failed task, and the alert closes when the fix task is done |
 | A task's run is alerted once | A run that carries out a task stops moving on the task: one *Stopped moving* alert, on the task, never one on each |
 | One open alert per thing | A kind on one task, agent, run, connection, team, user, graph database, schedule, ask, Access Policy or History alert has at most one open alert — a security alert one per reason; a repeat counts on it and moves it to the top, never a second alert |
@@ -152,7 +152,7 @@ Built in, shipped with Invana, never removed. A kind's threshold is the Admin's 
 | A line and a link | An alert names its kind, the task, the agent, run number, connection, team, user, graph database, ask, Access Policy or History alert, and counts; never a run's content, a record, a query or a secret |
 | Evaluated after the fact | Kinds and History alerts are checked on the shared clock from what was written; an alert never slows or fails a run, a call, a decision or a write |
 | Every open and close is History | Who it reached, what closed it and who |
-| Leans on | Tasks, their states, assignees and reviewers (PJ-F01) · runs, their questions and stopping (CP-F10) · connections (CP-F02) · sandbox refusals (CP-F03) · lockouts and token reuse (AC-F01 · AC-F11) · Access Policy versions (AC-F02) · limits (CP-F04) · graph databases (CP-F05) · plugins (CP-F02) · schedules (AG-F07) · the ledger (AC-F09) · asks and named approvers (AC-F05) · teams and agent grants (AC-F03) · History (AC-F06) · the Inbox and channels (CP-F08) |
+| Leans on | Tasks, their states, assignees and people on the team (PJ-F01) · runs, their questions and stopping (CP-F10) · connections (CP-F02) · sandbox refusals (CP-F03) · lockouts and token reuse (AC-F01 · AC-F11) · Access Policy versions (AC-F02) · limits (CP-F04) · graph databases (CP-F05) · plugins (CP-F02) · schedules (AG-F07) · the ledger (AC-F09) · asks and named approvers (AC-F05) · teams and agent grants (AC-F03) · History (AC-F06) · the Inbox and channels (CP-F08) |
 
 ## Data touched
 
@@ -275,7 +275,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Named approvers, then the Admins | An alert about an agent reaches the people who answer its asks, and the Admins always — never a person because they made the agent |
 | Alerts wait in Needs you | An open alert needs someone to act, so it waits beside asks until it closes |
 | Acknowledging is not closing | *Acknowledge* tells everyone it reached who is on it; only the act its kind names, the condition clearing or an Admin's note closes it |
-| Where alerts show | In each recipient's Needs you (the Inbox dropdown and the full Inbox); open and recently closed in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)); an Admin's *All open alerts* filter in the Inbox; thresholds and History alerts in Workers › Alerts |
+| Where alerts show | In each recipient's Needs you (the Inbox dropdown and the full Inbox); open and recently closed in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)); an Admin's *All open alerts* filter in the Inbox; thresholds and History alerts in Agents › Workers › Alerts |
 | Closed by acting | Stopping, a done fix task, an answer, a renewed connection, changing a limit or switching off is what closes an alert; *Close* with a note is for an alert no act settles |
 | A failure waits on a fix | A failed task is never re-run; its alert stays open until a fix task made from it is done, so a failure is looked at before work goes on |
 | A personal account stays its person's | A personal connection's failure reaches its person only; it is their account to renew |

@@ -47,7 +47,7 @@ flowchart TD
 | CP-22.6 | An Operator | Home draws | it offers *Ask {Admin}*, naming an Admin, where an Admin sees *Connect a graph database*; picking it sends the ask to the Admins' Inbox (AC-F05) |
 | CP-22.7 | First use | the person reads it | nothing it offers is experimental, and it promises nothing the deployment does not have |
 | CP-22.8 | Home | it cannot read the graph databases | it says what it could not read, with *Try again* |
-| CP-22.9 | A deployment before set-up starts — no graph database connected and nobody has picked *Try it on demo data* | anyone reads the switcher or presses ⌘1–⌘3 | Explore, Model and Projects are disabled, reading *Opens when set-up starts*; Home is the only place |
+| CP-22.9 | A deployment before set-up starts — no graph database connected and nobody has picked *Try it on demo data* | anyone reads the switcher or presses ⌘1–⌘4 | Explore, Model, Projects and Agents are disabled, reading *Opens when set-up starts*; Home is the only place |
 | CP-22.10 | Set-up started | Home draws | it shows set-up as *n of 4* (CP-24); once the four are done, the first answer |
 | CP-22.11 | Home before set-up | the leftNav is read | it holds no views — only the summoners |
 

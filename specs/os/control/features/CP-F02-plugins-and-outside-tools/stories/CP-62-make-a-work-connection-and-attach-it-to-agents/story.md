@@ -28,7 +28,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  s([Library › Plugins › an outside server]) --> l["Work connections · label · state · agents attached"]
+  s([Agents › Plugins › an outside server]) --> l["Work connections · label · state · agents attached"]
   l -->|Admin · Make a work connection| m{"How the server signs in"}
   m -->|A token| tk["The token · password again"]
   m -->|OAuth| oa["Sign in as the service account at the server"]

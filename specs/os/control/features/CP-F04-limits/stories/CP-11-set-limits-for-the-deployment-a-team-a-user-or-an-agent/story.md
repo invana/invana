@@ -4,7 +4,7 @@ title: Set limits for the deployment, a team, a user or an agent
 feature: CP-F04
 status: idea
 personas: [admin]
-boards: [settings.limits]
+boards: [agents.limits]
 ---
 
 # CP-11 · Set limits for the deployment, a team, a user or an agent
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Workers › Limits]) --> t["Limits: the deployment · each team · user · agent — each limit's ceiling · used now · meter"]
+  s([Agents › Workers › Limits]) --> t["Limits: the deployment · each team · user · agent — each limit's ceiling · used now · meter"]
   t -->|not an Admin| ro(["Reads · Edit disabled, naming the Admins"])
   t -->|Edit · an Admin| e["Tokens a month · a run · a session (deployment and agents) · runs at once · helpers · depth · worker time · worker groups · queue or refuse · may ask for more"]
   e --> v{"Valid?"}
@@ -73,13 +73,13 @@ flowchart TD
 | CP-11.19 | A project's task, a pick-up or a schedule's firing | it is admitted | only the agent's and the deployment's limits bind it, whoever set it going; no person's or team's limit holds or refuses it |
 | CP-11.20 | An Admin | they set *Tokens a session* on a team or a user, or clear the deployment's | it is refused — *Tokens a session is set for the deployment and for agents.* · *The deployment always has tokens a session.* — and nothing is saved |
 | CP-11.21 | A session that reaches its tokens a session — the agent's, else the deployment's | it is reached | the session ends and the run continues in a fresh session from a hand-off note, same run and number; nothing is asked, and its tokens a run and a month still bind the whole run |
-| CP-11.22 | Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| CP-11.22 | Agents › Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs the Admin role — ask {admins}* |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Limits — the deployment, teams, users and agents | Admin | settings.limits · Default limits | settings.limits · Nothing matches | settings.limits · Loading | settings.limits | settings.limits · Could not save | — | — |
-| Limits — the deployment, teams, users and agents | Operator | settings.limits · Default limits · Read only | settings.limits · Nothing matches | settings.limits · Loading | settings.limits · Read only | settings.limits · Could not load | — | settings.limits · Read only |
-| Edit limits | Admin | settings.limits · Edit limits | — | — | settings.limits · Edit limits | settings.limits · Could not save | — | — |
-| Edit limits | Operator | — | — | — | — | — | — | settings.limits · Read only |
+| Limits — the deployment, teams, users and agents | Admin | agents.limits · Default limits | agents.limits · Nothing matches | agents.limits · Loading | agents.limits | agents.limits · Could not save | — | — |
+| Limits — the deployment, teams, users and agents | Operator | agents.limits · Default limits · Read only | agents.limits · Nothing matches | agents.limits · Loading | agents.limits · Read only | agents.limits · Could not load | — | agents.limits · Read only |
+| Edit limits | Admin | agents.limits · Edit limits | — | — | agents.limits · Edit limits | agents.limits · Could not save | — | — |
+| Edit limits | Operator | — | — | — | — | — | — | agents.limits · Read only |

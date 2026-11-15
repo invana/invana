@@ -32,14 +32,14 @@ flowchart TD
   kind -->|built in| bi["System · Copy to change it"]
   bi --> copy["AC-25 · Copy — a personal agent of the person who copied it · or the organisation's skill, workflow or policy, made by them"]
   kind -->|shared| sh["The platform · made by · nobody's alone"]
-  kind -->|a personal agent| pa{"Is the reader its person?"}
+  kind -->|a personal agent| pa{"Is the reader its owner, or holds Manage on Agents?"}
   pa -->|yes| share["AC-24 · Share it — it becomes the platform's, made by them"]
   pa -->|no| ro["Reads · acts disabled"]
-  kind -->|a service user| su{"An owner or an Admin?"}
+  kind -->|a service user| su{"An owner, or Manage on Access?"}
   su -->|yes| ho["AC-24 · Add an owner · hand over"]
   su -->|no| ro
   ho -->|the last owner leaves| last["Refused · hand it over first"]
-  share --> ok(["The platform's · granted by an Admin · History"])
+  share --> ok(["The platform's · used by whoever may Run it · History"])
   ho --> ok
   me([Settings › You › What I own and made]) --> mine["AC-24 · My personal agents · service users I own · what I made · the slots I sit in"]
   run([An agent's run makes something]) --> org(["The organisation's · made by the person behind the run, through the agent"])
@@ -47,8 +47,8 @@ flowchart TD
   leave([AC-23 · A person is deactivated]) --> succ["The successor takes every slot · their chats outside projects · their service users"]
   leave --> pr["Their personal agents retire"]
   pr --> adopt{"AC-43 · The successor adopts?"}
-  adopt -->|Modeller · Admin| mine(["The successor's personal agent · made by kept"])
-  adopt -->|Operator| stay(["Stays retired · Adopt disabled, naming the role"])
+  adopt -->|Create on Agents| mine(["The successor's personal agent · made by kept"])
+  adopt -->|without it| stay(["Stays retired · Adopt disabled, naming the permission"])
 ```
 
 ## Stories
@@ -61,16 +61,18 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
-|---|---|---|
-| Read the owner and maker of any resource · what one owns, made, and the slots one sits in | Every signed-in person | — |
-| Share a personal agent | Its person, a Modeller or an Admin, in a session | — only its person sees *Share* |
-| Add an owner to a service user · hand it over | One of its owners, in a session; an Admin for any service user | Disabled — *Needs the Admin role — ask Priya or Lee* |
-| Retire an agent | Modeller · Admin, on a shared agent; its person, on their personal agent ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)) | Disabled, naming the role it needs |
-| Name the successor who takes every slot of a deactivated person | Admin, while deactivating ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)) | — |
-| Read the chats a departed person started outside projects | Their successor, as their own | Not listed to anyone else |
-| Adopt a departed person's retired personal agent | Their successor, when Modeller · Admin | Disabled for an Operator successor, naming the Modeller role; not offered to anyone else |
-| Copy a built-in | Whoever may make one of its kind by the role table — a policy: Admin; an agent, a skill or a workflow: Modeller · Admin | Disabled, naming the role it needs |
+Permissions are [the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)'s; an act a person lacks shows disabled, naming the permission and who can grant it.
+
+| Act | Who may |
+|---|---|
+| Read the owner and maker of any resource · what one owns, made, and the slots one sits in | Every signed-in person |
+| Share a personal agent | Its owner, or a person with Manage on Agents, in a session |
+| Add an owner to a service user · hand it over | One of its owners, in a session; a person with Manage on Access for any service user |
+| Retire an agent | Its owner, on their personal agent; Manage on Agents, on any other ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)) |
+| Name the successor who takes every slot of a deactivated person | Edit on Access, while deactivating ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)) |
+| Read the chats a departed person started outside projects | Their successor, as their own — not listed to anyone else |
+| Adopt a departed person's retired personal agent | Their successor, when they hold Create on Agents — not offered to anyone else |
+| Copy a built-in | Create on its kind — a policy: Access; an agent: Agents; a skill or a workflow: Skills |
 
 ## States
 
@@ -82,39 +84,39 @@ flowchart TD
 | Has data | The owner — *Platform*, *System* or a person — with who made it and when; for a service user, each owner with how they came to own it |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused change says why in place |
 | Agent working or proposing | — an agent never changes owners; what it makes is the organisation's, made by the person behind its run |
-| No access | The owner and maker read; each act is disabled, naming the role it needs |
+| No access | The owner and maker read; each act is disabled, naming the permission it needs and who can grant it |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
 | The organisation owns the work | Built-in and shared agents, skills, workflows, Access Policies, boards, projects and schedules are owned by the platform — the system user — and each keeps who made it. No person owns them alone, so none goes when a person goes |
-| Personal agents are their person's | A personal agent belongs to the person who made it, is granted to them alone and runs only in the runs they start ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)); sharing it makes it the platform's, made by them |
+| Personal agents are their person's | A personal agent belongs to the person who made it, is used by them alone and runs only in the runs they start ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)); sharing it makes it the platform's, made by them |
 | Service users are owned by people | At least one active person owns each service user and mints its keys ([AC-F10](../AC-F10-keys/feature.md)); owners are people, never an agent, a service user or a team |
 | Made by is kept | Every resource records who made it — the person, or the person behind the run through the agent — and it reads beside its owner. Making something grants nothing over it |
-| Owning never widens | An owner acts on what they own within their role and the agents granted to them; owning or making a resource grants nothing else, and no *Who can* names an owner as a grant ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) |
+| Owning never widens | An owner acts on what they own within their permissions; owning or making a resource grants nothing else, but sharing, retiring and handing over what they own ([AC-F02 › Rules](../AC-F02-access-policies/feature.md#rules)) |
 | Agents retire, never delete | An agent the work does not need is retired: it is offered to no one and runs nothing new; its runs, learnings, History and the work it made stay. A retired agent may be restored ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)) |
 | Built-ins are the system user's | What Invana ships is owned by the system user: no one changes its owner and no one edits it. *Copy* makes a custom one ([AC-25](stories/AC-25-copy-a-built-in-to-change-it/story.md)) |
 | Every seat is a slot | A place a person sits on work is a slot with a fallback — the work never waits on that person ([Slots and fallbacks](#slots-and-fallbacks)) |
 | A leaver has a successor | Deactivating a person names one active person as successor ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)), who takes every slot a fallback gives them, the service users the leaver owned and the chats they started outside projects |
 | Chats are the organisation's | A chat outside a project sits in its person's space and is the organisation's; when its person leaves it goes to their successor, who reads each answer as far as their own default agent may read its sources ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#rules)). A chat inside a project stays with its project |
 | A departed person's personal agent retires | It is offered to no one and runs nothing new; the successor may adopt it as their own personal agent ([AC-43](stories/AC-43-adopt-a-departed-persons-agent-and-chats/story.md)) |
-| Leans on | The Directory — people, the system user, deactivating (AC-F03) · Access Policies and the role table (AC-F02) · History (AC-F06) · the features that own each resource ([Reads](#reads)) |
+| Leans on | The Directory — people, the system user, deactivating (AC-F03) · Access Policies and the permission catalogue (AC-F02) · History (AC-F06) · the features that own each resource ([Reads](#reads)) |
 
 ### Slots and fallbacks
 
 | Slot | Held by | When its holder cannot act |
 |---|---|---|
 | An agent's approver | People or teams ([AC-F05](../AC-F05-asks-and-approvals/feature.md)) | The other approvers → the Admins, with a *no approver* alert |
-| A project's reviewer | People ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md)) | The other reviewers → the successor, with an alert |
+| A project's team place | People ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md)) | The successor joins the team; a project left with no active person on its team alerts the Admins |
 | A task's assignee | A person or an agent ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md)) | The successor, or the task goes back to *Open* |
-| A schedule's or a pick-up's setter | The person who set it, recorded ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md)) | It keeps running as the agent; the setter stays recorded |
+| A schedule's or a pick-up's setter | The person who set it, recorded ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md)) | Their successor becomes the setter and the person behind its next run. The first setter stays recorded |
 | A key's owner | The person who minted it ([AC-F10](../AC-F10-keys/feature.md)) | The key is revoked; automation uses a service user |
 | A service user's owner | People | The successor |
 | A work connection | A service identity, no person ([CP-F02](../../../control/features/CP-F02-plugins-and-outside-tools/feature.md)) | Nothing — no person holds it |
 | A chat outside a project | Its person ([EX-F03](../../../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)) | The successor |
 | A personal agent | Its person ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)) | Retired; the successor may adopt it |
-| The Admin role | The active Admins ([AC-F03](../AC-F03-directory/feature.md)) | A deactivation or demotion that leaves fewer than two is refused |
+| A holder of Super user | The active people who hold it ([AC-F03](../AC-F03-directory/feature.md)) | A deactivation or take-off that leaves none is refused |
 
 ### Where memory goes when a person leaves
 
@@ -161,7 +163,7 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 | Workflows and their copy | [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | Schedules and their setter | [AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#engine) |
 | Approvers — a slot | [AC-F05](../AC-F05-asks-and-approvals/feature.md#engine) |
-| Projects, reviewers and assignees — slots | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
+| Projects, their teams and assignees — slots | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Chats — `explore_sessions` and who started each | [EX-F03](../../../../capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) |
 | Deactivating and the successor | [AC-F03](../AC-F03-directory/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../AC-F06-history/feature.md#engine) |
@@ -172,9 +174,9 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 |---|---|---|
 | `GET /owners/{resource_type}/{id}` | Its owner — `platform`, `system` or its people (`username` · `name` · `via` · `added_by?` · `added_at`) — and `made_by` · `made_via_agent?` | AC-24 |
 | `POST /owners/service_user/{id}` · `DELETE /owners/service_user/{id}/{username}` · `POST /owners/service_user/{id}/hand-over` | Add an owner `{user}` · remove one · hand over `{to}` in one act | AC-24 |
-| `POST /owners/agent/{id}/share` | A personal agent becomes the platform's, `made_by` kept; its grant to its person stays and an Admin grants it to others | AC-24 |
+| `POST /owners/agent/{id}/share` | A personal agent becomes the platform's, `made_by` kept; who may use it is then a permission, Run on `agent/<name>` | AC-24 |
 | `GET /owners/mine` | The caller's personal agents, the service users they own, what they made (`?resource_type=`) and the slots they sit in | AC-24 |
-| `GET /owners/succession` · `POST /owners/agent/{id}/adopt` | What the caller took over as a successor — chats, service users, tasks, reviewer places — and the retired personal agents they may adopt · adopt one | AC-43 |
+| `GET /owners/succession` · `POST /owners/agent/{id}/adopt` | What the caller took over as a successor — chats, service users, tasks, project team places — and the retired personal agents they may adopt · adopt one | AC-43 |
 | `POST /copies` | `{resource_type, name}` — a custom copy of a built-in through its owner feature; an agent copy is a personal agent of the caller, any other copy the platform's, `made_by` the caller | AC-25 |
 
 ### Events
@@ -214,7 +216,7 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 | Mechanism | How |
 |---|---|
 | Made at birth | Every feature that makes a resource writes `made_by_id` — the person behind the act or the run — and `made_via_agent_id` when an agent made it, in the same transaction. A personal agent and a service user also get their `access_owners` rows; a built-in is the system user's |
-| The person behind a run | A run carries the person it acts for; a delegated run carries its caller's ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md#rules)); a scheduled run or a pick-up carries its setter as `made_by` for what it makes |
+| The person behind a run | A run carries the person it acts for; a delegated run carries its caller's ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md#rules)); a scheduled run or a pick-up carries its setter as the person behind it and as `made_by` for what it makes |
 | Share | Removes the personal agent's `access_owners` row and sets the agent `shared`, in one transaction; `made_by` stays |
 | Hand-over | For a service user: adds the receiver `via = handed_over` and removes the giver, in one transaction; on deactivation ([AC-F03](../AC-F03-directory/feature.md#mechanisms)) it runs for every service user the leaver owns alone |
 | Copy | `POST /copies` asks the resource's owner feature to copy the built-in at its current version, with `copied_from` and the version; the copy is custom, attached to nothing and granted to no one but, for an agent, its person |

@@ -54,7 +54,7 @@ flowchart TD
   appr -->|decline · expires| dc(["Stays a one-off plan · the note kept"])
   appr -->|the approver is the asker| self["Not theirs to answer — routed on"]
   verify -->|did not serve| avoid(["Kept as avoid for recall (AG-F09)"])
-  lib([Library › Skills · Workflows]) --> page["AG-18 · A workflow: Overview · Layers · Flow · Runs · Versions · Arguments"]
+  lib([Agents › Skills · Workflows]) --> page["AG-18 · A workflow: Overview · Layers · Flow · Runs · Versions · Arguments"]
   page -->|Retire a version| ret["AG-48 · Not chosen or started again · pins keep running it, marked"]
   page -->|Copy a built-in| cp(["AG-48 · A custom workflow — the platform's, made by the copier"])
   page -->|a step| fn["AG-38 · A function: its contract, what it needs, what calls it"]
@@ -355,7 +355,7 @@ the version.
 
 | Decision | Detail |
 |---|---|
-| Workflows live under Library › Skills | *Workflows* and *Functions* are sections of Skills, beside *Answer templates*; a workflow opens as its own page (`agents.skills · Workflow`), a function as its own page |
+| Workflows live under Agents › Skills | *Workflows* and *Functions* are sections of Skills in the Agents mode, beside *Answer templates*; a workflow opens as its own page (`agents.skills · Workflow`), a function as its own page |
 | A workflow's page answers *how has it behaved* | Overview · Layers · Flow · Runs, over 7 · 30 · 90 days; what it is sits in its head — version, steps, intent, what it touches, who made it, what composes it, the agents allowed to run it |
 | *Composed by* means pinned | The workflows whose steps compose it, each with the version it pins; an agent allowed to run it is a permission, read in the head |
 | What changed is step by step | Each version against the one before: steps added, removed, moved or changed, pins moved, declared arguments; v1 reads *the first version* |

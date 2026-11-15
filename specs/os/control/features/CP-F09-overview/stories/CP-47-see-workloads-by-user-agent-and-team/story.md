@@ -4,7 +4,7 @@ title: See workloads by user, agent and team
 feature: CP-F09
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.workloads]
+boards: [agents.fleet]
 ---
 
 # CP-47 · See workloads by user, agent and team
@@ -59,5 +59,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Workloads | Admin | settings.workloads · Nothing ran yet | settings.workloads · No one ran | settings.workloads · Loading | settings.workloads | settings.workloads · Could not load | settings.workloads · Live | — |
-| Workloads | Operator | settings.workloads · Nothing ran yet | settings.workloads · No one ran | settings.workloads · Loading | settings.workloads | settings.workloads · Could not load | settings.workloads · Live | — |
+| Workloads | Admin | agents.fleet · Workloads · Nothing ran yet | agents.fleet · Workloads · No one ran | agents.fleet · Workloads · Loading | agents.fleet · Workloads | agents.fleet · Workloads · Could not load | agents.fleet · Workloads · Live | — |
+| Workloads | Operator | agents.fleet · Workloads · Nothing ran yet | agents.fleet · Workloads · No one ran | agents.fleet · Workloads · Loading | agents.fleet · Workloads | agents.fleet · Workloads · Could not load | agents.fleet · Workloads · Live | — |

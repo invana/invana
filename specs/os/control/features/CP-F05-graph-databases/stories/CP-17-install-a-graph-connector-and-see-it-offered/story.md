@@ -48,7 +48,7 @@ flowchart TD
 | CP-17.7 | A graph database whose connector's package was removed | it is read or a run reaches it | it says the connector is not installed, naming the package; nothing runs against it |
 | CP-17.8 | Two packages that register the same name | the engine starts | neither is offered under that name; `invana version` names both packages |
 | CP-17.9 | An Operator | they open a graph database's details | they read its connector and language; installing one is not offered anywhere in Invana |
-| CP-17.10 | Connectors in the Library | the list is read | each installed connector reads its graph databases and *Used by n agents*, as the engine counts them |
+| CP-17.10 | Connectors in Settings › Connections | the list is read | each installed connector reads its graph databases and *Used by n agents*, as the engine counts them |
 | CP-17.11 | Installed graph connectors | a person opens Settings › Connections › Connectors | each lists with the graph database it connects, its version and *Used by n graph databases*; an Operator reads the same list, which has no acts of its own |
 
 ## Screens
@@ -57,5 +57,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The connector choice | Admin | settings.databases · Connect · No connector installed | — | — | settings.databases · Connect | settings.databases · Connect · Connector failed | — | — |
 | The connector choice | Operator | — | — | — | — | — | — | — |
-| Connectors in the Library | Admin | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | — |
-| Connectors in the Library | Operator | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | settings.connectors · Read only |
+| Connectors in Settings › Connections | Admin | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | — |
+| Connectors in Settings › Connections | Operator | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | settings.connectors · Read only |

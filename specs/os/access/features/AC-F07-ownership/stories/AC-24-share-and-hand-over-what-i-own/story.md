@@ -54,7 +54,7 @@ flowchart TD
 | AC-24.4 | *Add an owner* | an agent, a service user, a team or a deactivated user is chosen | it is not offered in Studio, and the API refuses it — *Only an active person owns {resource}* |
 | AC-24.5 | The last owner of a service user | they remove themselves | it is refused — *{resource} needs an owner — hand it over first* |
 | AC-24.6 | An owner of a service user | they hand it over to a person | that person owns it and the giver does not, in one act; both read it in History |
-| AC-24.7 | A signed-in person | they open *Settings › You › What I own and made* | their personal agents, the service users they own, what they made by kind and the slots they sit in — approver, reviewer, assignee, setter — read; with nothing, *Nothing yet — what you make belongs to the organisation and shows here as made by you* |
+| AC-24.7 | A signed-in person | they open *Settings › You › What I own and made* | their personal agents, the service users they own, what they made by kind and the slots they sit in — approver, project team place, assignee, setter — read; with nothing, *Nothing yet — what you make belongs to the organisation and shows here as made by you* |
 | AC-24.8 | A person who made an agent but whose role does not hold *Build an agent* | they open it | it reads; making it lets them change nothing — making widens nothing (the role table) |
 | AC-24.9 | A person who neither owns a service user nor is an Admin | they open its *Owner* | owners read; *Add an owner*, *Remove* and *Hand over* are disabled, naming the Admin role and the Admins |
 | AC-24.10 | An owner change or a share sent with a key | it is sent | it is refused — it needs a person's session |

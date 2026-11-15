@@ -29,7 +29,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 ```mermaid
 flowchart LR
-  a([Library › Skills · Tools they call]) --> l["A Modeller or an Admin · Add a library — its package and docs"]
+  a([Agents › Skills · Tools they call]) --> l["A Modeller or an Admin · Add a library — its package and docs"]
   a -->|an Operator| na(["Add a library disabled · names the Modeller role"])
   l --> r["Invana reads them"]
   r -->|the package cannot be found or read| rx["Says why, naming the package"]
@@ -45,7 +45,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-40.1 | Library › Skills | a Modeller or an Admin presses *Add a library* | it asks for the package and its docs |
+| AG-40.1 | Agents › Skills | a Modeller or an Admin presses *Add a library* | it asks for the package and its docs |
 | AG-40.2 | A package and docs | Invana reads them | it proposes typed functions, each with its name, inputs and outputs as JSON Schema, and what it reaches, with *Edit* per row and, for an Admin, *Approve* |
 | AG-40.3 | A proposed function | the Admin approves it | it is listed under *Tools they call* by where it comes from, read-only from then, and skills may call it |
 | AG-40.4 | A proposed function the Admin leaves out | a skill's plan names it | the plan is refused before it runs, naming the function |

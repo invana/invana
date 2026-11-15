@@ -10,7 +10,7 @@ boards: [settings.agent_access, agents.runs]
 # AC-12 · See why an agent can or cannot
 
 **As** an Admin **I want** every agent's access, with why each act is allowed or refused **so that** I see why an agent
-can or cannot — the same for everyone who uses it — and a refusal never surprises anyone in a run.
+can or cannot — its ceiling, and what it reaches for a given person — and a refusal never surprises anyone in a run.
 
 Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
@@ -48,7 +48,7 @@ flowchart TD
 | AC-12.2 | The tab | it is read | it says *An agent holds every Read, Write and Run through the Access Policies attached to it. Workers hold none — they only run steps* |
 | AC-12.3 | An agent | it is opened | tabs *What it can do · Its policies · Refusals*, and *Open in Agents* |
 | AC-12.4 | *What it can do* | it is read, optionally *Called by* an agent, *In* a project or *Under* a key | each row reads verb · resource · effect · the rule and its policy · any ceiling that narrows it · why, for that chain and those ceilings |
-| AC-12.5 | Two readers on different teams, or with different roles | they read the same agent's *What it can do* | they read the same rows: no rule depends on the person behind a run |
+| AC-12.5 | An agent's *What it can do* | it opens, and then a reader names a person behind the run | it opens on the agent's ceiling — the same rows for every reader; with a person named, each row narrows to what that person's default agent also allows, a row the person lacks reading *Not for {person} — {rule} on their default agent* |
 | AC-12.6 | A refused row | *Why* is read | it names the first check that refuses — *{database} is switched off by {person}* · *{rule} on {policy}* · *{caller} may not* · *{ceiling} keeps it from this* · *{database} is read-only* · *No rule — denied* |
 | AC-12.7 | An agent with no policy attached | *What it can do* is read | every row reads *Denied · holds no policy*, and for an Admin *Attach a policy* leads |
 | AC-12.8 | A resource a rule allows that no declared need uses | it is listed | it reads *Nothing it uses needs it* |

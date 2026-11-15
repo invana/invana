@@ -25,8 +25,8 @@ flowchart TD
   S --> PW{"Lee signs in again"}
   PW --> OFF(["Dana deactivated · sessions end · keys revoked"])
   OFF --> W1(["Agents unchanged · their Access Policies are the agents' own"])
-  OFF --> W2(["Schedules and pick-up run as their agent · Dana recorded as setter"])
-  OFF --> W3(["Projects unchanged · reviewer places fall to the other reviewers, then Sam"])
+  OFF --> W2(["Schedules and pick-up run for Sam, or a project's other Lead · Dana recorded as first setter"])
+  OFF --> W3(["Projects unchanged · Lead places fall to the other people on the team, then Sam"])
   OFF --> W4(["Asks Dana answered go to the other approvers, then the Admins"])
   OFF --> PD["AC-45 · Dana's personal connections removed · what they returned erased"]
   PD -->|memory on legal hold| WH["AC-44 · Erasure waits for the hold to lift"]

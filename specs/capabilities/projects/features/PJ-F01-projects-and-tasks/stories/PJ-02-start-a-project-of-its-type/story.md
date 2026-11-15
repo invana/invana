@@ -9,63 +9,92 @@ boards: [projects.projects]
 
 # PJ-02 · Start a project of its type
 
-**As** anyone with work to run **I want** to start a project by picking what kind of work it is — its type, the fields
-that type asks for, its name and the people, teams and agents on it **so that** the work has a shape, the right task
-kinds and the right words from day one.
+**As** anyone with work to run **I want** to start a project in a few clear steps — what it is, the decision it helps
+make and what success looks like, what the project may reach, and the people and agents on it with its Lead agent —
+**so that** the work has a shape, a goal every agent plans from, the right task kinds and words, access that holds
+steady whoever joins, and a team from day one.
 
 Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
-the project is the organisation's, and its creator is its first member and reviewer ([PJ-F01 › Access](../../feature.md#access)).
+Starting a project needs Create on Projects; setting or widening project access needs Manage on Projects
+(`projects:access`) — [PJ-F01 › Access](../../feature.md#access).
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Start a project of any type the deployment offers; add people, teams and the agents granted to them as members | An agent not granted to them is disabled in the picker — *Not granted to you* |
-| Operator | The same; a Modeller the same | An agent not granted to them is disabled in the picker — *Not granted to you* |
+| Admin | Start a project of any type the deployment offers; set its access from a template and adjust any of it; put people, teams and agents on its team and tag one Lead agent | — |
+| Operator | Start a project when they hold Create on Projects; adjust access only within what they may grant — the rest is asked for | Without Create on Projects, *New project* is disabled, naming the permission and who can grant it; a widening they may not grant reads *Will ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Projects]) --> n["New project (modal)"]
-  n --> t["Type: Research · Investigation · Policy · General · a Team pack's"]
-  t --> f["The type's fields · name · key · members · graph databases · started from (PJ-23)"]
-  f --> v{"Valid?"}
-  v -->|a required field empty · unknown type · unknown user, team or agent · key taken, not URL-safe or reserved| ref["Names the field and why · nothing saved"] --> f
-  v -->|an agent not granted to them| na["Disabled in the picker"]
-  v -->|yes| g["Created · the creator its first member and reviewer · the type's kinds, rules, checks and report template applied"]
-  g --> pg(["Project page — every person sees its head"])
-  pg --> ppl["People: the assistant and more reviewers (PJ-22)"]
+  s([Projects · the switcher's New]) -->|no Create on Projects| off(["New project disabled · names the permission and who can grant it"])
+  s --> a["1 About · name · description · type and its fields · key · started from (PJ-23)"]
+  a -->|Next| g["2 Goals · the assistant drafts the decision it helps make and what success looks like"]
+  g -->|drafting| gl["Drafting from the description · the fields stay editable"]
+  g -->|draft failed| gf["Could not draft · write them yourself"]
+  g -->|the person edits| g
+  g -->|Next| d["3 Access · a template — Read and analyse · Fix data quality · Full project · the type's default first"]
+  d --> form["The form · graph databases · models · agents · workers · outside · Adding people needs approval"]
+  form -->|Edit as policy| mx["The full matrix"] --> form
+  form -->|beyond what they may grant| askn["Marked Will ask {who can grant}"]
+  form -->|Next| t["4 Team · people and agents side by side · one agent tagged Lead agent · the creator on it"]
+  askn -->|Next| t
+  t -->|an agent access does not allow| na["Disabled in the picker · may not work here"]
+  t -->|Next| r["5 Review · every answer with Edit"]
+  r -->|Edit| a
+  r -->|Create| v{"Valid?"}
+  v -->|a required field empty · unknown type · unknown user, team, agent or graph database · key taken, not URL-safe or reserved · no person on the team| ref["Opens the step that holds it · names the field and why · nothing saved"] --> r
+  v -->|yes| c["Created · the creator on its team · the type's kinds, rules, checks and report template applied"]
+  c -->|a widening asked for| pend(["Starts with what they may grant · the rest waits in the Inbox of those who may · History"])
+  c --> pg(["Project page — every person sees its head"])
+  s -->|Esc · Close with answers| x{"Discard these answers?"}
+  x -->|Keep editing| a
+  x -->|Discard| out(["Closed · nothing saved"])
 ```
 
 ## Acceptance criteria
 
 | # | Given | When | Then |
 |---|---|---|---|
-| PJ-02.1 | A signed-in person | they press *New project* | one modal opens with the type (the four built-in types, and any type an installed Team pack adds), the fields that type declares, the name, the key, the members and what it started from; nothing in it narrows who reads the project |
-| PJ-02.2 | A type with a question, the question typed and no name | the project is created | the name is the question's first 60 characters; for a type without a question, the name is asked for |
-| PJ-02.3 | A required field of the type left empty, a type the deployment does not offer, or a user, team or agent that does not exist | they press *Create* | it is refused before saving, the modal naming the field and why |
-| PJ-02.4 | A project created | the engine saves it | the creator is its first member and its first reviewer, and is not offered in the picker; the project opens on its page |
-| PJ-02.5 | The members picker | it opens | it lists users and teams by name, and the agents granted to the person; an agent not granted to them is disabled — *Not granted to you* |
-| PJ-02.12 | A project with members | a person not a member opens it | they read it as far as their default agent may Read `project/{key}`; being a member only fills the assignee picker, lets an agent pick up its tasks and lets a person change its settings |
-| PJ-02.14 | A type picked | the project is created | the type's default rules are in force on it, its task kinds are on (PJ-20), its default checks are offered on new tasks (PJ-25), its suggested agents and skills are offered first in the picker, and its report template is the report's starting point |
-| PJ-02.16 | A name typed | the key field is read | it holds a key generated from the name — lower case, URL-safe — unique in the deployment, and may be edited here |
-| PJ-02.17 | A key already used, one that is not URL-safe, or a reserved word (`tasks`, `decisions`, `types`) | they press *Create* | it is refused, the key field naming which and why; nothing is saved |
+| PJ-02.1 | A person with Create on Projects | they press *New project* | one modal opens with a step strip — *1 About · 2 Goals · 3 Access · 4 Team · 5 Review* — on About, with *Next* and no *Create* until Review |
+| PJ-02.2 | A type with a question, the question typed and no name | they leave About | the name is the question's first 60 characters; for a type without a question, the name is asked for |
+| PJ-02.3 | A required field of the type left empty, a type the deployment does not offer, or a user, team or agent that does not exist | they press *Create* | it is refused before saving; the modal opens the step that holds the field and names it and why |
+| PJ-02.4 | A project created | the engine saves it | the creator is on its team, listed in Team; the project opens on its page |
+| PJ-02.5 | The Team step | it opens | people, teams and the agents project access lets work here sit side by side; one agent may be tagged *Lead agent*; an agent access does not allow is disabled — *May not work here*; tagging a second Lead agent is refused, naming the first |
+| PJ-02.12 | A project with a team | a person not on it, without Read on Projects, opens it | they read its head only — *Withheld — join the team or ask {who can grant}* |
+| PJ-02.14 | A type picked | the project is created | the type's default rules are in force on it, its task kinds are on (PJ-20), its default checks are offered on new tasks (PJ-25), its suggested agents and skills are offered first in the Team step, its access template is chosen first, and its report template is the report's starting point |
+| PJ-02.16 | A name typed | the key field is read | it holds a key generated from the name — lower case, URL-safe — unique in the deployment, and may be edited on About |
+| PJ-02.17 | A key already used, one that is not URL-safe, or a reserved word (`tasks`, `decisions`, `types`) | they press *Next* on About, or *Create* | it is refused, the key field naming which and why; nothing is saved |
 | PJ-02.18 | A project created | its Details are read | the key reads as a fact, never a field; no act edits it (PJ-01.7) |
 | PJ-02.19 | A project of a type | it is open | its heading, tabs, dialogs and report use the type's words — a Research project reads *Study* and *Task*, an Investigation *Case* and *Action* — while Projects, My tasks, Inbox › Needs you, Decisions, search and History use *Project* and *Task* with the type as a badge |
 | PJ-02.20 | A project created | every person opens Projects | it is listed for each of them, its head readable; History records who made it |
-| PJ-02.21 | *New project* | it opens | *Graph databases* lists every graph database the deployment attaches, every one ticked; the person may untick some, and the project's runs then read Graph Data only in those ticked, and only where their agent's Access Policies allow |
+| PJ-02.21 | The Access step | it opens | it starts from a project access template — *Read and analyse* · *Fix data quality* · *Full project*, the type's default first — shown as a form: **Graph databases**, each Read or Read + write · **Models**, all or chosen · **Agents** that may work here · **Workers** — the worker group, runs at once, a monthly token budget · **Outside** — email, Slack, the web, outside agents, plugins and tools · *Adding people needs approval*; the person adjusts it, and *Edit as policy* opens the same policy as the full matrix |
 | PJ-02.22 | A graph database the deployment does not attach, sent by the API | they press *Create* | it is refused before saving — *There is no graph database {name}.*; nothing is saved |
+| PJ-02.23 | About filled, with a description | the person moves to Goals | the assistant drafts *The decision it helps make* and *What success looks like* from the name, type and description, each marked *Drafted — edit it*; the person edits either before *Next*; *How it got here* on the draft shows its steps and sources |
+| PJ-02.24 | Goals while the assistant drafts | the step is read | both fields show the draft arriving; the person may type over it and *Next* stays on |
+| PJ-02.25 | The draft cannot be made — no description, or the assistant failed | Goals opens | both fields are empty, reading *Write the decision this project helps make*; nothing blocks *Next* |
+| PJ-02.26 | Review | it opens | every answer of every step reads as a line, each step with *Edit* that opens it with its answers kept; *Create* is the one filled act |
+| PJ-02.27 | Answers on any step | the person presses Esc or Close | a confirm asks *Discard these answers?* — *Keep editing* · *Discard*; nothing is saved until *Create* |
+| PJ-02.28 | A team with no active person — the creator taken off and nobody else added | they press *Create* | it is refused, Team opening and naming why — *A project keeps at least one person on its team.* |
+| PJ-02.29 | A creator without Manage on Projects who sets access beyond the template's or widens it | they press *Create* | the project is created with the part they may grant — or read-only — each part beyond it marked *Asked {who can grant}*; an ask lands in the Inbox of those with Manage on Projects; History records the ask and its answer |
+| PJ-02.30 | A project created | any run inside it starts — asked by anyone on its team, scheduled, picked up or by its Lead agent | it reaches project access ∩ the agent's ceiling; the person who asked is recorded on the run; *How it got here* names project access for each step |
 
 ## Screens
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New project | Admin | projects.projects · New | — | projects.projects · New · Loading people | projects.projects · New · Filled | projects.projects · New · Refused | — | — |
-| New project | Operator | projects.projects · New | — | projects.projects · New · Loading people | projects.projects · New · Filled | projects.projects · New · Refused | — | projects.projects · New · Agent not granted |
-| The type's fields | Admin | projects.projects · New · Type picked | — | projects.projects · New · Loading types | projects.projects · New · Fields | projects.projects · New · Field refused | — | — |
-| The type's fields | Operator | projects.projects · New · Type picked | — | projects.projects · New · Loading types | projects.projects · New · Fields | projects.projects · New · Field refused | — | — |
+| New project · About | Admin | projects.projects · New · About | — | projects.projects · New · Loading types | projects.projects · New · About filled | projects.projects · New · Field refused | — | — |
+| New project · About | Operator | projects.projects · New · About | — | projects.projects · New · Loading types | projects.projects · New · About filled | projects.projects · New · Field refused | — | — |
+| New project · Goals | Admin | projects.projects · New · Goals · No description | — | projects.projects · New · Goals · Drafting | projects.projects · New · Goals | projects.projects · New · Goals · Could not draft | projects.projects · New · Goals · Drafting | — |
+| New project · Goals | Operator | projects.projects · New · Goals · No description | — | projects.projects · New · Goals · Drafting | projects.projects · New · Goals | projects.projects · New · Goals · Could not draft | projects.projects · New · Goals · Drafting | — |
+| New project · Access | Admin | projects.projects · New · Access · Template | — | projects.projects · New · Access · Loading | projects.projects · New · Access · Adjusted | projects.projects · New · Access · Could not load | — | — |
+| New project · Access | Operator | projects.projects · New · Access · Template | — | projects.projects · New · Access · Loading | projects.projects · New · Access · Adjusted | projects.projects · New · Access · Could not load | — | projects.projects · New · Access · Will ask |
+| New project · Team | Admin | projects.projects · New · Team · Only you | — | projects.projects · New · Team · Loading people and agents | projects.projects · New · Team | projects.projects · New · Team · No person | — | — |
+| New project · Team | Operator | projects.projects · New · Team · Only you | — | projects.projects · New · Team · Loading people and agents | projects.projects · New · Team | projects.projects · New · Team · No person | — | projects.projects · New · Team · Agent may not work here |
+| New project · Review | Admin | — | — | — | projects.projects · New · Review | projects.projects · New · Refused | — | — |
+| New project · Review | Operator | — | — | — | projects.projects · New · Review | projects.projects · New · Refused | — | — |
 | A new project's page | Admin | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | — |
 | A new project's page | Operator | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | projects.projects · Detail · Withheld |

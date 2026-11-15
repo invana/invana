@@ -4,7 +4,7 @@ title: Be told when an agent or the deployment needs someone to act
 feature: CP-F11
 status: idea
 personas: [admin, builder]
-boards: [control.alerts, inbox]
+boards: [agents.alerts, inbox]
 ---
 
 # CP-59 · Be told when an agent or the deployment needs someone to act
@@ -65,7 +65,7 @@ flowchart TD
 | CP-59.12 | An alert about a limit or a graph database | the limit is changed, or the database is switched off or answers again | the alert closes naming the act and who, or *cleared* |
 | CP-59.13 | An Admin | they close an alert with a note | it closes naming them and the note |
 | CP-59.14 | An alert opening or closing | it is written | History holds a row naming who it reached, and what closed it and who |
-| CP-59.15 | Workers › Alerts | it is opened | open alerts first, most recently fired first — kind, what it is about, count, since when, who it reached; closed below with what closed them |
+| CP-59.15 | Agents › Workers › Alerts | it is opened | open alerts first, most recently fired first — kind, what it is about, count, since when, who it reached; closed below with what closed them |
 | CP-59.16 | No alert ever opened | the list is opened | *No ops alerts — the platform tells the people each kind names and the Admins when something needs them*, with each kind and its threshold |
 | CP-59.17 | A filter by kind or open/closed with no match | it is applied | *No {kind} alerts {open · closed}* and *Clear* |
 | CP-59.18 | The list fails to load | it is opened | what could not be read, in the engine's words, and *Retry* |
@@ -79,9 +79,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Ops alerts | Admin | control.alerts · No alerts | control.alerts · No match | control.alerts · Loading | control.alerts | control.alerts · Could not load | control.alerts · Counting | — |
-| Ops alerts | Operator | control.alerts · No alerts | control.alerts · No match | control.alerts · Loading | control.alerts | control.alerts · Could not load | control.alerts · Counting | — |
-| An alert | Admin | — | — | control.alerts · Detail · Loading | control.alerts · Detail | control.alerts · Detail · Already closed | control.alerts · Detail · Run still going | — |
-| An alert | Operator | — | — | control.alerts · Detail · Loading | control.alerts · Detail | control.alerts · Detail · Could not load | control.alerts · Detail · Run still going | control.alerts · Detail · Close disabled |
+| Ops alerts | Admin | agents.alerts · No alerts | agents.alerts · No match | agents.alerts · Loading | agents.alerts | agents.alerts · Could not load | agents.alerts · Counting | — |
+| Ops alerts | Operator | agents.alerts · No alerts | agents.alerts · No match | agents.alerts · Loading | agents.alerts | agents.alerts · Could not load | agents.alerts · Counting | — |
+| An alert | Admin | — | — | agents.alerts · Detail · Loading | agents.alerts · Detail | agents.alerts · Detail · Already closed | agents.alerts · Detail · Run still going | — |
+| An alert | Operator | — | — | agents.alerts · Detail · Loading | agents.alerts · Detail | agents.alerts · Detail · Could not load | agents.alerts · Detail · Run still going | agents.alerts · Detail · Close disabled |
 | Inbox — an ops alert | Admin | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |
 | Inbox — an ops alert | Operator | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |

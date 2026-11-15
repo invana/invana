@@ -21,7 +21,7 @@ on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read the lineage of any decision they can see; open every node's source, every run among them | A project their default agent may not Read: its head only, the lineage *Withheld — your agent may not read `project/{key}`* |
+| Admin | Read the lineage of any decision they can see; open every node's source, every run among them | A project they may not read: its head only, the lineage *Withheld — join the team or ask {who can grant}* |
 | Operator | The same; a Modeller the same | A run they are not behind, whose agent they do not own, reads *Content withheld* in the lineage. There is no act on a lineage to refuse |
 
 ## Flow
@@ -51,7 +51,7 @@ flowchart LR
 | PJ-11.5 | A lineage with loads from several sources | the person picks one under *Show* | loads, and their authors, narrow to that source; findings and runs stay |
 | PJ-11.6 | A cited load that was undone in Graph Data | the lineage opens | that node is marked *a load undone*, with who undid it and why, and the path through it stays |
 | PJ-11.7 | A decision that cited no findings | its lineage opens | it says it cites nothing, and shows the decision alone |
-| PJ-11.8 | A decision in a project the reader's default agent may not Read | they ask for its lineage | it reads *Withheld — your agent may not read `project/{key}`*; nothing reads *Not found* |
+| PJ-11.8 | A decision in a project the reader may not read | they ask for its lineage | it reads *Withheld — join the team or ask {who can grant}*; nothing reads *Not found* |
 | PJ-11.9 | The engine cannot return the records | the lineage loads | it says *Could not load* with the reason and *Try again* |
 | PJ-11.10 | A run in the lineage the reader may not read — they are not behind it, do not own its agent and are not an Admin | the lineage is drawn | its node reads that it ran, its status and its tokens — *Content withheld* — and the path through it stays |
 | PJ-11.11 | A decision that supersedes another | its lineage opens | it links back to the decision it supersedes, which opens its own lineage |

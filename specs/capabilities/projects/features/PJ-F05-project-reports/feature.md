@@ -56,7 +56,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read the draft and every version · export a version | Anyone who can see the project, as far as their default agent reads the report's sources | A project their default agent may not Read: the report lists, its content withheld; a part whose source their agent may not Read: *Withheld — your agent may not read {resource}* |
+| Read the draft and every version · export a version | Anyone who can see the project, as far as their default agent reads the report's sources | A project they may not read: the report lists, its content withheld; a part whose source their agent may not Read: *Withheld — your agent may not read {resource}* |
 | Draft from the records · edit the draft · publish a version | Anyone who can see the project — Operator · Modeller · Admin; a publish and an export pass [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) | On an archived project, every version reads; *Draft from the records*, *Edit* and *Publish* are off |
 
 ## States
@@ -69,7 +69,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 | Has data | The draft or a version, read rendered, its cites numbered and listed once under *Cites*; *Versions* counts the draft and every version |
 | Failed | The report could not load, saying why, with *Try again*; publishing an empty draft is refused |
 | Agent working or proposing | — |
-| No access | A report of a project the person's default agent may not Read lists, its content withheld; a part of a report whose sources the person's default agent may not read lists, its content reading *Withheld — your agent may not read {resource}*; on an archived project the draft and every version read and *Draft from the records*, *Edit* and *Publish* are off |
+| No access | A report of a project the person may not read lists, its content withheld; a part of a report whose sources the person's default agent may not read lists, its content reading *Withheld — your agent may not read {resource}*; on an archived project the draft and every version read and *Draft from the records*, *Edit* and *Publish* are off |
 
 ## Rules
 
@@ -77,7 +77,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 |---|---|
 | Drafted from the records | The draft is written by the project type's report template (PJ-F03) from the project's question, branches, evidence by stance, verdicts and current decisions, in the project type's words — nothing invented, no AI model. A finding resting on a what-if reads *predicted*; a superseded decision is named beside the one that supersedes it |
 | A person edits | The draft is Markdown, edited by a person before it is published |
-| A report is a copy | The draft and each version record the resources they were read from ([lineage](../../../../os/graph/features/GP-F02-memory/feature.md#engine)); a person sees one as far as their default agent may Read every source — otherwise it lists and its content reads *Withheld — your agent may not read {resource}*. A report's level is the highest of its sources' |
+| A report is a copy | The draft and each version record the resources they were read from ([lineage](../../../../os/graph/features/GP-F02-memory/feature.md#engine)); a person sees one as far as they may read every source — otherwise it lists and its content reads *Withheld — your agent may not read {resource}*. A report's level is the highest of its sources' |
 | Publishing is an outbound act | *Publish* and *Export* pass [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage: confidential and personal values are left out of the frozen body or the file, and a notice in the version names each property and level left out |
 | One report per project | A single draft and its numbered versions |
 | Published is frozen | A version freezes its body and the loads its findings cite at that moment, by id and content hash; nothing changes it. A later change is a new version |

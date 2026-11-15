@@ -4,7 +4,7 @@ title: See where work is and why it waits
 feature: CP-F03
 status: idea
 personas: [admin]
-boards: [settings.workers]
+boards: [agents.workers]
 ---
 
 # CP-05 · See where work is and why it waits
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Workers › Queue]) --> f["Started → let in → running → waiting · counts for each"]
+  s([Agents › Workers › Queue]) --> f["Started → let in → running → waiting · counts for each"]
   f --> w["Waiting: on a person · on an ask · on a limit · on an AI model · on workers"]
   w --> one["A waiting run: why · for how long · what is ahead"]
   one --> run(["Opens the run (CP-F10)"])
@@ -48,5 +48,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Where work is | Admin | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Where work is | settings.workers · Could not load | — | — |
-| Where work is | Operator | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Where work is | settings.workers · Could not load | — | — |
+| Where work is | Admin | agents.workers · Nothing running | — | agents.workers · Loading | agents.workers · Where work is | agents.workers · Could not load | — | — |
+| Where work is | Operator | agents.workers · Nothing running | — | agents.workers · Loading | agents.workers · Where work is | agents.workers · Could not load | — | — |

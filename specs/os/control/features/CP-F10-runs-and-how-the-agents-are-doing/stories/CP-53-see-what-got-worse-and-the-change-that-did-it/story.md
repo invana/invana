@@ -4,7 +4,7 @@ title: See what got worse and the change that did it
 feature: CP-F10
 status: idea
 personas: [builder, admin]
-boards: [agents.agents, agents.runs]
+boards: [agents.fleet, agents.runs]
 ---
 
 # CP-53 · See what got worse and the change that did it
@@ -58,7 +58,7 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| How they are doing — tiles, trend, rows | Admin | agents.agents · Nothing ran | — | agents.agents · Loading | agents.agents · How they are doing | agents.agents · Could not load | agents.agents · Degraded | — |
-| How they are doing — tiles, trend, rows | Operator | agents.agents · Nothing ran | — | agents.agents · Loading | agents.agents · How they are doing | agents.agents · Could not load | agents.agents · Degraded | agents.agents · How they are doing |
+| How they are doing — tiles, trend, rows | Admin | agents.fleet · Nothing ran | — | agents.fleet · Loading | agents.fleet · How they are doing | agents.fleet · Could not load | agents.fleet · Degraded | — |
+| How they are doing — tiles, trend, rows | Operator | agents.fleet · Nothing ran | — | agents.fleet · Loading | agents.fleet · How they are doing | agents.fleet · Could not load | agents.fleet · Degraded | agents.fleet · How they are doing |
 | Runs a figure opens | Admin | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | — | — |
 | Runs a figure opens | Operator | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | — | agents.runs · Content withheld |

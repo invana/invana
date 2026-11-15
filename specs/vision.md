@@ -43,7 +43,7 @@ tagline does not need it.
 |---|---|
 | **Ontology-governed** | The deployment's ontology is the one contract people and agents share: every question, load, plan and change is checked against it ([The ontology](#the-ontology)) |
 | **A decision intelligence platform** | Every pillar, capability, feature and story serves a person making a decision: the data is given meaning, agents work it into insight, and the evidence is shown so the person decides with a trail anyone can follow ([Pillars and capabilities](#pillars-and-capabilities)) |
-| **For humans and AI agents** | People act through agents: a person is granted the agents they may use, and every read, write and run is an agent's — held to the same ontology and Access Policies, run by the same operating system, in the same History ([The operating system](#the-operating-system)) |
+| **For humans and AI agents** | People and agents are held to one ontology and one access model — Access Policies on people, teams and projects, a ceiling on every agent — run by the same operating system, in the same History ([The operating system](#the-operating-system)) |
 | **An agent orchestrator over a curated graph** | Invana decides which agent takes a piece of work, what it may run, what it is offered, in what order, and who checks the result |
 | **One deployment** | One deployment is everything: the many graph databases it attaches, read as Graph Data — each person, team, project and agent reaching only those its access allows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)) — its people, teams, agents and work. There are no workspaces, no tenants and no unit inside a deployment that holds a graph of its own ([Scope](#scope)) |
 | **Read in place, never copied** | Graph Data is everything the deployment's graph databases hold, read in place. A question runs one step per graph database it reads, in its own query language; results from different graph databases are shown side by side and never joined — links between models stay inside one graph database ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)). No customer data is copied into Invana ([Where things live](#where-things-live)) |
@@ -103,14 +103,14 @@ three planes.
 | Plane | Answers | Holds | Spec |
 |---|---|---|---|
 | **Control Plane** | What runs, where, and within which limits? | The overview of workloads by user, agent and team · every run, and stopping one · ops alerting · the Inbox and its channels · graph databases — connecting one, its mode, switching it on or off, its health · finding the way — ⌘K and search · workers and the queue · limits per team, user and agent · AI models, local or external · plugins, the deployment's MCP server and outside tools · skill scripts | `os/control/` — `CP` |
-| **Access Plane** | Who may act, through which agent, and what did they do? | Sign-in, sessions, keys and connected MCP clients · Access Policies — Allow · Ask · Deny on Read · Write · Run — and the one role table · the Directory — users, teams, the agents each may use · ownership · asks and approvals · access usage · what left the platform · History | [os/access/product.md](os/access/product.md) — `AC` |
+| **Access Plane** | Who may act, through which agent, and what did they do? | Sign-in, sessions, keys and connected MCP clients · Access Policies from one permission catalogue, on people, teams, projects and agents · the Directory — users and teams · ownership · asks and approvals · access usage · what left the platform · History | [os/access/product.md](os/access/product.md) — `AC` |
 | **Graph Plane** | What does Invana read, and what does it remember? | **Data** — the customer's Graph Data, read in place through a connector per graph database, in its own language · **Memory** — Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their relations, each with its lineage | [os/graph/product.md](os/graph/product.md) — `GP` |
 
 | An OS has | Invana has | Plane |
 |---|---|---|
-| **Users** | Users — human, agent, service and the system user — and the teams people are on; a person holds the agents they may use and one role | Access |
+| **Users** | Users — human, agent, service and the system user — and the teams people are on; each person and team holds Access Policies | Access |
 | **A type system** | The ontology — every record has a kind, every kind its rules; owned by the Ontology pillar, enforced here | — |
-| **Permissions** | Access Policies on agents, whose every rule is Allow · Ask · Deny on Read · Write · Run of a named resource; default deny, the strictest wins | Access |
+| **Permissions** | Access Policies — Allow · Ask · Deny × an action × a resource, from the permission catalogue — on people, teams, projects and, as a ceiling, agents; default deny, Deny wins | Access |
 | **Mounts** | Graph databases, each connected read-only or read + write and switched on or off, read as Graph Data | Control |
 | **Drivers** | Connectors — one package per graph database type | Graph |
 | **Processes** | Runs — every execution of a plan or a workflow, by an agent for a person, in one journal, executed on workers | Control |
@@ -139,11 +139,11 @@ three planes.
 | **Plain words in, work out** | A question in plain English becomes a typed query plan, a workflow reused or a plan drafted, and an answer — or choices to pick from |
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
-| **Acts only as far as the person allows** | Every act runs through an agent, and each Read, Write and Run is Allow, Ask or Deny by the Access Policies on that agent; what no rule reaches is denied, and the strictest rule wins. An Ask waits for the agent's named approvers, showing exactly what will happen, and is never decided by the one it benefits ([Access Plane](os/access/product.md#decisions)) |
+| **Acts only as far as a policy allows** | Inside a project a run reaches project access ∩ its agent's ceiling; outside one, the person behind it ∩ the ceiling ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)); what no rule allows is denied, and Deny wins. An Ask waits for the agent's named approvers, showing exactly what will happen, and is never decided by the one it benefits ([Access Plane](os/access/product.md#decisions)) |
 | **Nothing leaves unseen** | Every call to a model, tool or graph database is in the ledger; a sensitive property never goes to an external model |
 | **Learns from outcomes** | Every plan, run, finding and decision is kept in Memory; what served is recalled first, and what failed is kept as what to avoid |
 | **General-purpose** | Nothing in the platform is domain-specific. A team's ontology, its agents and skills and its project types ship together as a Team pack |
-| **Split by role** | An Operator asks and decides; a Modeller shapes the model; an Admin runs the deployment — each sees the acts their role holds ([personas](personas.md)) |
+| **Everyone sees, the policy decides** | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy denies is withheld, and the engine refuses ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
 [glossary.md](glossary.md).
@@ -192,7 +192,7 @@ The deployment defines, limits and uses; a project narrows.
 | One deployment, one organisation | No multi-tenancy, no workspaces and no Organisation record; the deployment is the widest scope |
 | Hosted means single-tenant | A hosted Invana is one deployment per customer, never shared tenancy |
 | One deployment, many graph databases, read as Graph Data | Every graph database the deployment connects is part of its Graph Data; the system graph never is. Graph Data is never created, opened, selected or listed; each person, team, project and agent reaches only the graph databases its access allows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)) |
-| A person uses agents | A person is granted the agents they may use; an agent's Access Policies say what it may Read, Write and Run, the same for everyone who may use it |
+| A project owns its access | A person's Access Policies bound their own work; a project's access bounds every run inside it, whoever asked; an agent's policies are only its ceiling |
 
 ## What it is used for
 

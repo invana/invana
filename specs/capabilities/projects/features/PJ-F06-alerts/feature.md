@@ -31,7 +31,7 @@ flowchart TD
   open -->|no| proj{"The rule's project can take it?"}
   proj -->|archived or gone| nf["PJ-19 · Nothing opens · the rule's author is told in the Inbox"]
   proj -->|yes| lead["PJ-19 · A lead opens — a task or a branch — citing the records and the rule"]
-  lead --> nyou["Inbox › Needs you of the project's members"]
+  lead --> nyou["Inbox › Needs you of the project's people"]
   nyou --> tri{"A person who can see the project triages"}
   tri -->|take it| work(["Worked as any task or branch (PJ-F01 · PJ-F03)"])
   tri -->|dismiss, with a reason| dis(["Dismissed · the reason kept · the rule's counts move"])
@@ -69,7 +69,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
 | Write an alert rule and the project it opens leads in | Modeller · Admin ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) | As SE-F07 |
-| Read a project's leads and the rule behind each | Anyone whose default agent may Read the project | A project their default agent may not Read: its leads count, their content *Withheld — your agent may not read `project/{key}`* |
+| Read a project's leads and the rule behind each | Anyone who may read the project | A project they may not read: its leads count, their content *Withheld — join the team or ask {who can grant}* |
 | Read the records a lead matched | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A record of a kind the reader's agents may not read reads *Withheld* |
 | Take or dismiss a lead | Anyone who can see the project — Operator · Modeller · Admin | On an archived project, *Take* and *Dismiss* are disabled, saying it is archived |
 | Open a lead | The engine, on a rule's match — never an agent's own act | — |
@@ -84,7 +84,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 | Has data | Leads newest first: the rule, the records matched, how many matches, opened when, open · taken · dismissed |
 | Failed | The list could not load, saying why, with *Try again*; a dismissal with no reason is refused |
 | Agent working or proposing | An agent assigned a taken lead works it as any task (PJ-F01) |
-| No access | A project the reader's default agent may not Read shows its leads' count only; a matched record the reader's agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
+| No access | A project the reader may not read shows its leads' count only; a matched record the reader's agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
 
 ## Rules
 
@@ -95,7 +95,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 | A lead is a task or a branch | The lead is an ordinary task (PJ-F01) or branch (PJ-F03) with the rule, the load or change and the matched records as its cites |
 | One open lead per pattern | A match on the same records while a lead from the same rule is open adds to it and counts, never a second lead |
 | Evaluated after the write | Alert rules run on a queue worker after a load or change settles; they never block or slow the write |
-| A lead waits in the Inbox | A new lead is listed in the Inbox › Needs you of the project's members ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)); a rule whose project is archived or gone tells its author instead |
+| A lead waits in the Inbox | A new lead is listed in the Inbox › Needs you of the project's people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)); a rule whose project is archived or gone tells its author instead |
 | Take | A task lead is assigned as the taker picks — a person, or an agent they may use — and worked as any task; a branch lead is worked as any branch |
 | Dismiss | Needs a reason. A task lead is cancelled with the reason as its note; a branch lead is dropped by a *drop* decision in the dismisser's name, the reason its rationale, checked by the rules like any decision (PJ-F03) |
 | Records read as the reader | A lead stores record IDs; opening one reads it through the agents the reader may use |
@@ -129,7 +129,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | Alert rules, their versions, and the match their evaluation hands over | [SE-F07](../../../semantics/features/SE-F07-rules/feature.md#engine) |
-| Projects, their members and reviewers, reading a project through the default agent · tasks | [PJ-F01](../PJ-F01-projects-and-tasks/feature.md#engine) |
+| Projects, their members and people on the team, reading a project through the default agent · tasks | [PJ-F01](../PJ-F01-projects-and-tasks/feature.md#engine) |
 | Branches and the *drop* decision a dismissal records | [PJ-F03](../PJ-F03-branches-findings-and-decisions/feature.md#engine) |
 | Loads | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | The Inbox items a lead raises | [CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine) |
@@ -176,7 +176,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Receiving a match | SE-F07's worker calls `projects.leads.open(rule_id, rule_version, source, records[])`. The engine computes `match_key`; an open lead with the same `rule_id` and `match_key` gets `matches + 1` and `projects.leads.matched`; otherwise a lead row and its task or branch are written in one transaction, citing the rule, the source and the records, `projects.leads.opened` |
 | A project that cannot take it | An archived or deleted project writes no lead; `projects.leads.not_opened` raises an Inbox item to the rule's author naming the project |
-| Needs you | A new lead raises one Needs you item to the project's members ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)); taking or dismissing it closes the item for everyone |
+| Needs you | A new lead raises one Needs you item to the project's people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)); taking or dismissing it closes the item for everyone |
 | Take | A task lead writes its assignee through PJ-F01's assign — an agent opens its run with the taker behind it; `state = taken` |
 | Dismiss | A task lead is cancelled through PJ-F01 with `reason` as its note; a branch lead records a *drop* decision through PJ-F03 as the dismisser, `reason` its rationale; a rule that blocks it leaves the lead open. `state = dismissed` only once that write succeeds |
 | Rule counts | Leads per rule, taken and dismissed are counted from `projects_leads` and served to SE-F07's rule page |

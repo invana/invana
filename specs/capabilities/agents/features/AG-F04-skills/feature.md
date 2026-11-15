@@ -26,7 +26,7 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([Library › Skills]) --> may{"Modeller or Admin?"}
+  start([Agents › Skills]) --> may{"Modeller or Admin?"}
   may -->|no| ro["Every skill reads; acts disabled, naming the Modeller role — ask an Admin"]
   may -->|yes| new["AG-37 · New skill — a draft opens on its instructions; the platform's, made by its maker"]
   new -->|name already in the catalogue| nx["Refused, linking the skill that has it"]
@@ -349,9 +349,9 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Decision | Detail |
 |---|---|
-| Skills live in the Library | Library › Skills in the large modal, beside Plugins · Team packs; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
+| Skills live in Agents › Skills | A view of the Agents mode, beside Agents · Plugins · Workflows; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
 | How it runs is in the head | *Guided* or *Planned* beside the state; a Modeller or an Admin switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
-| A skill is a page in the Library | Opened from Library › Skills; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
+| A skill is a page in Agents › Skills | Opened from the Skills list; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
 | The head says its state and its owner | The name, then *draft · empty*, *draft vN*, or *vN · published* with *draft vN+1* beside it, and its owner — *Platform*, or *System* on a built-in — with who made it; acts are *Run a test* and *Publish* on a draft, *Edit instructions* on a published skill with no draft, *Copy* on a built-in |
 | A skill is a document | Instructions is one editor (Edit · Preview) with two cards beside it — *What it needs* and *Plan preview* — over a console (Tests · Evals · Problems · Log) that folds to its tab strip |
 | New skill opens on its instructions | An *untitled* draft with the four headings — Goal · Arguments · Steps · When things go wrong — since a draft has nothing else to show |

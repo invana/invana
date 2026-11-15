@@ -14,12 +14,13 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **graph database** | One configured connection to a Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune or TinkerGraph database, through its connector — read-only or read + write, switched on or off | graph database |
 | **Read-only · Read + write** | A graph database's mode, set by an Admin: agents only read it · agents may also write to it — annotations, derived facts, loads, fixes. Reads always run in the database's read mode | connection mode |
 | **Practice graph database** | A graph database an Admin names for testing agents and skills, never the one people ask | practice graph database |
-| **Explore · Model · Projects** | The three modes of Studio, named in the wordmark | — |
-| **Agents · Workers · Library · Access · Settings** | The summoners at the foot of the leftNav — each opens the one large modal over the work at its own section | — |
+| **Explore · Model · Projects · Agents** | The four modes of Studio, named in the wordmark, shown to everyone; what each act does follows the person's Access Policies | — |
+| **Agents · Access · Settings** | The summoners at the foot of the leftNav — each opens the one large modal over the work at its own section; the Agents summoner is a glance, the Agents mode the workspace | — |
 | **Large modal** | The modal, inset from the window edges, that holds every summoner's place — its own nav, the path, at most one action and Close (Esc); moving between sections never closes it | — |
-| **Workers** | The section of the large modal for the machines agents run on — Groups · All workers · Queue · Limits · Alerts | worker pool |
-| **Library** | The section of the large modal for what agents are built from and reach out with — Skills · Plugins · Team packs — each with *Used by n agents* | skills · plugins · Team packs |
-| **Operations** | What the deployment is doing now — runs, the queue, workers, tokens this month — the quick-overview dropdown behind the header's *● n running*; its links open the large modal at Workers and Agents › Runs, where every deeper act happens | fleet · overview |
+| **Workers** | The view of the Agents mode for the machines agents run on — Groups · All workers · Queue · Limits · Alerts; whether they keep up shows in the Agents glance and *● n running* | worker pool |
+| **Fleet** | The view of the Agents mode that maps agents, skills, functions and worker groups and reads how each agent performs — never the name of a product | fleet |
+| **Agents glance** | What the Agents summoner opens in the large modal: what waits on the reader, what runs, whether the workers keep up; every deeper act is *Open in Agents* | — |
+| **Operations** | What the deployment is doing now — runs, the queue, workers, tokens this month — the quick-overview dropdown behind the header's *● n running*; its links open Agents › Runs and Agents › Workers, where every deeper act happens | fleet · overview |
 | **Access** | The section of the large modal for who may do what — Now · Who · What they may do · Record · Keeping; the header lock is an Admin's glance at it: what each person and agent is touching in the last hour, and what a policy blocked | access summary |
 | **Switcher** | The dropdown behind the *☰ Invana {Mode} ▾* control: Go to · New · Recent · Pinned | — |
 | **Recent · Pinned** | The items a person opened, newest first, kept for them by the engine · the ones they starred | recents · pins |
@@ -65,10 +66,10 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Rule** | A statement that must always hold — on the deployment or a project — checked block · warn · report. On an Access Policy, *rule* names one of its lines | Rule · invariant |
 | **Request** | What a person or an agent asked of the model — a rule refused it, Graph Data did not hold it, or *Ask for a change* — kept until a Modeller allows, drafts or declines it | Request |
 | **Retune** | Narrow or widen what a question reads from a run, then ask again | Retune |
-| **What it may do** | What an agent's Access Policies let it Read, Write and Run | the agent's Access Policies |
-| **Access Policy** | A named list of rules attached to agents — the only thing that gives an agent reach. Each rule is an effect — Allow · Ask · Deny — a verb — Read · Write · Run — and a resource, `type/name`, where `*` stands for a whole segment: `data/<graph database>/<kind>[/<level>]` · `memory/…` · `project/…` · `skill/…` · `workflow/…` · `agent/…` · `plugin/…` · `tool/<plugin>/<tool>` · `fs/…` · `cmd/…` · `net/…`. A rule has no term for a person or a team | Policy · statement |
-| **Read · Write · Run** | The three verbs a rule names: read data · write data · run a skill, workflow, agent, plugin or tool | verb |
-| **Allow · Ask · Deny** | The effect of every rule — it acts · it waits for a named approver · it is refused, naming the rule and who set it. What no rule reaches is denied; where rules disagree, the strictest wins. Set only by a person | effect |
+| **What it may do** | The most an agent may ever do — its ceiling, the Access Policies attached to it; never a grant | the agent's ceiling |
+| **Access Policy** | A named list of **rules** attached to users, teams, projects and agents. A rule is an effect (`allow · ask · deny`), an action (`read · create · edit · publish · run · manage`) and a resource `type/name` where `*` matches one whole segment. Default deny; Deny wins; `ask` only on a project's or an agent's. A person holds the Allows on them and their teams minus the Denies; a project's is its project access; an agent's is its ceiling. A run inside a project reaches project access ∩ the agent's ceiling; outside one, the person ∩ the agent's ceiling |
+| **Read · Create · Edit · Publish · Run · Manage** | The six actions a rule names; *Publish* reads *Publish · Approve*; what each means for each resource is the permission catalogue | action |
+| **Allow · Ask · Deny** | The effect of every rule — it acts · it waits for a named approver, on a project's or an agent's policy only · it is refused, naming the rule and who set it. What no rule allows is denied; Deny wins. Set only by a person | effect |
 | **Asks first** | An act a rule sets to Ask waits in the Inbox, showing exactly what it will do, for one of the agent's named approvers; a yes covers that step of that run; unanswered, it reminds, then goes to the Admins, then expires refused — never allowed by default | Approval |
 | **Token budget** | The tokens an agent, schedule or eval set may spend in a period — never currency | Budget |
 | **Limits** | What a team, a user or an agent may spend and have running at once | limits |
@@ -91,11 +92,14 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | Word | Means | Domain term |
 |---|---|---|
 | **User** | Who acts in the deployment: a person, an agent, a service user, or the system user | Principal |
-| **Role** | What a person may do in Studio, one each: **Operator** · **Modeller** · **Admin** — one fixed table of roles and features, never edited | role |
-| **Operator** | A person who asks, looks and decides, through the agents they may use | role `operator` |
-| **Modeller** | A person who also shapes the model — models, meaning, links between models, rules, loads | role `modeller` |
-| **Admin** | A person who also runs the deployment — graph databases, plugins, AI models, users, teams, Access Policies | role `admin` |
-| **Team** | A flat group of people that agents are granted to. A team owns nothing, holds no rule and holds no other team | Team |
+| **Permission** | An action — Read · Create · Edit · Publish · Run · Manage — on a resource, from [the permission catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); what an act needs, named when it is disabled — *Needs Edit on Access — ask Priya or Lee* | permission |
+| **Super user** | The locked Access Policy that allows every action on every resource; the first account holds it, and it always has a holder | superuser |
+| **Starter policies** | *Explore* · *Shape the model* · *Build agents* · *Run the deployment* — Access Policies shipped as data, attached, copied or edited like any other; *Explore* goes to newcomers out of the box | starter policy |
+| **Admins** | The people who hold Manage on Access — whom a refusal names as able to grant | — |
+| **What can {person} do?** | Every permission a person holds, each with the policy and the team it comes through, and each Deny that removes one | effective permissions |
+| **Project access** | What a project's runs may reach — an Access Policy attached to the project, set from a template through a form of graph databases, models, agents, workers and what may leave; *Edit as policy* opens the matrix. Every run inside the project reaches project access ∩ the agent's ceiling, whoever asked ([PJ-F01 › Rules](capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) | project access policy |
+| **Read and analyse · Fix data quality · Full project** | The project access templates the Access step starts from, shipped as data and edited like a starter policy | project access template |
+| **Team** | A flat group of people that holds Access Policies — each person on it holds them. A team owns nothing and holds no other team | Team |
 | **Agents they may use** | The agents granted to a person, directly or through a team; every act a person makes runs through one of them | agent grant |
 | **Built-in agent** | An agent every deployment ships, one of each, owned by the system user: Assistant · Query console · Modeller · Coordinator · Record editor · Loader. A person's direct acts run as one of them | built-in agent |
 | **Query console** | The built-in agent behind the Console's queries: it reads, asks first before a write, and every query it runs is recorded; granted like any agent | built-in agent `query` |
@@ -104,7 +108,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Hand over** | Move a service user one person owns to another | transfer ownership |
 | **Deactivate · Reactivate** | Stop a person who leaves from signing in or acting, keeping their work and its History · let them back in; nothing handed on returns | deactivate user |
 | **Successor** | The active person an Admin names when deactivating someone: they take every place the leaver held on the work, their service users and their chats outside projects, and may adopt their personal agents | successor |
-| **Slot** | A place a person sits on work — an agent's approver, a project's reviewer, a task's assignee, a schedule's setter — each with a fallback, so no work waits on one person | slot |
+| **Slot** | A place a person sits on work — an agent's approver, a place on a project's team, a task's assignee, a schedule's setter — each with a fallback, so no work waits on one person | slot |
 | **Adopt** | Make a departed person's retired personal agent one's own, as their successor | adopt agent |
 | **Former member** | How a departed person's work names them when names are pseudonymised — *Former member · 4F7A*, the same code everywhere | pseudonym |
 | **Leaving and keeping** | Where an Admin sets how long each store is kept, holds memory or History, decides a departed person's name, forgets a subject and exports what is held about a person | retention and erasure |
@@ -115,14 +119,14 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Erased** | What a copy reads when its content is gone — *Erased — personal data of a person who left* · *Erased — a forgotten subject* — its kind, when and who made it kept | erased |
 | **Checkpoint** | What each prune of History leaves: the number and hash of the last row removed, signed, so the rows kept still prove they follow on | History checkpoint |
 | **Named approvers** | The people or teams who answer an agent's asks; naming a single person warns; with none named or none active, the Admins, with a *no approver* alert. Never the person the ask benefits | approvers |
-| **Person behind the run** | The person a run acts for — who asked, or who set the schedule | On behalf of |
-| **Built in · Custom** | An Access Policy shipped with Invana, owned by the system user and copied to change · one written in the deployment | built-in · custom policy |
-| **Attached to** | The agents an Access Policy holds for | attachments |
+| **Person behind the run** | The person a run is recorded for — who asked, a key's owner, or who set the schedule or pick-up. Outside a project their permissions bound the run; inside one, project access does | On behalf of |
+| **Built in · Starter · Custom** | An Access Policy shipped and locked — Super user, a built-in agent's ceiling · one shipped as data to start from · one written in the deployment | built-in · starter · custom policy |
+| **Attached to** | The users, teams, projects and agents an Access Policy holds for | attachments |
 | **Who it changes** | Before an Access Policy is saved: which agents gain, which lose, which skills and workflows would break | Impact |
-| **What it can do** | What an agent may actually do once every check is applied, with why not for each refusal | Effective access |
-| **Can someone do this?** | A check of whether a person, through an agent, may Read, Write or Run something, and which rule decides; nothing runs | Test access |
+| **What it can do** | What an agent may actually do in a run once every check is applied — project access, or outside a project the person, ∩ its ceiling ∩ the run's other ceilings — with why not for each refusal | Effective access |
+| **Can someone do this?** | A check of whether a person, or an agent's run for them or a project, may do something, and which rule decides; nothing runs | Test access |
 | **Key** | A long-lived credential a person mints for themselves, or for a service user they own; it acts as the key and its owner together, may be narrowed, expires in 30, 90 or 365 days or never, and is shown once | Personal access token |
-| **Service user** | A user for automation, owned by people: it never signs in, owns nothing and acts only through keys; Operator by default | service user |
+| **Service user** | A user for automation, owned by people: it never signs in, owns nothing and acts only through keys; it holds the newcomers' policies unless named | service user |
 | **Connected client** | An MCP client — Claude Code, an IDE — a person connected to the deployment's MCP server by signing in and consenting; it acts for that person through their default agent, is external to the outbound check, and they revoke it on their account | OAuth client |
 | **Sign out here · Sign out everywhere** | End this device's session · every session of the account | Revoke refresh token(s) |
 | **Sign in again** | A fresh sign-in the risky acts ask for — changing access, keys or credentials — however recent the session | step-up · fresh sign-in |
@@ -168,9 +172,9 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Plugin** | A versioned package of functions, skills and workflows an Admin switches on, as a folder in the Claude plugin layout; a core plugin is always on | Plugin |
 | **Claude plugin** | A folder in Claude Code's plugin layout — `.claude-plugin/plugin.json`, `skills/`, `agents/`, `.mcp.json`; every Invana plugin and Team pack is one, its own fields under `metadata`, and one made for Claude Code imports ([CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)) | plugin bundle |
 | **Agent tool's folder** | Where an agent tool keeps a project's agents and skills — `.claude/`, `.codex/`, `AGENTS.md`; a Modeller imports from it ([AG-63](capabilities/agents/features/AG-F08-portable-agents-and-skills/stories/AG-63-bring-in-agents-and-skills-from-an-agent-tools-folder/story.md)) | — |
-| **Imported** | An agent or skill brought in from files, a Claude plugin or an agent tool's folder: a draft, the platform's, made by who imported it, granted to nobody until an Admin grants it | `imported` |
+| **Imported** | An agent or skill brought in from files, a Claude plugin or an agent tool's folder: a draft, the platform's, made by who imported it, used by nobody until a policy allows Run on it | `imported` |
 | **Built in · Team pack · Custom** (agents) | An agent Invana ships · one a Team pack brought, naming the pack · one people built or imported. Each reads who made it | `kind` |
-| **Your default** | The agent a person's asks go to when they name none, and every Studio screen reads through; an Admin sets it in the Directory | default agent |
+| **Your default** | The agent a person's asks go to when they name none, and what a connected MCP client asks; it grants nothing. Set in the Directory | default agent |
 | **MCP server** | An outside server whose tools agents may call as functions, frozen as an Admin saw them | MCP plugin |
 | **The deployment's MCP server · Served** | The deployment's one endpoint for Claude Code and other callers, who act as the person who connected them or as a key · an agent or function an Admin lets callers reach | MCP server · `mcp_served` |
 | **Withdrawn** | A model version something still pins that the deployment has stopped offering | `no longer offered` status |
@@ -196,25 +200,25 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Task** | One piece of work a person or an agent takes, as an issue thread | Todo |
 | **Task kind** | What kind of task it is — its fields and default checks; a project's type declares its kinds, and every project has *Task* and *Recommendation* ([PJ-20](capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) | task kind |
 | **Recommendation** | A task kind: a change someone recommends to a project; it arrives as a proposal for the project assistant | recommendation |
-| **Member** | A person, team or agent on a project: fills the assignee picker, lets an agent pick up its tasks, lets a person change its settings and answer its proposals. Grants no reach | project member |
-| **Project assistant** | The one agent a project names to ideate with its members and turn ideas, recommendations and asks into proposals ([PJ-21](capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-21-ideate-with-the-project-assistant/story.md)) | project assistant |
-| **Reviewer** | A person who accepts or sends back a project's results; a slot, at least one per project | project reviewer |
+| **Team** (of a project) | The people, teams and agents on a project. Every person on it may do everything inside the project — there are no project roles; one agent may be tagged *Lead agent*. Joining grants nothing outside the project ([PJ-22](capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) | project team |
+| **Lead agent** | The one agent on a project's team that coordinates its agents — ideates, plans, splits and assigns tasks — and sends every decision a person must give to the project's people as a proposal; the project assistant | `lead_agent` |
+| **Project assistant** | The project's Lead agent: it ideates with the team and turns ideas, recommendations and asks into proposals a person on the team accepts ([PJ-21](capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-21-ideate-with-the-project-assistant/story.md)) | project assistant |
 | **Group** | A named set of a project's tasks done in order; it may wait on a group of this project or another | task group |
 | **Check · Checking · Checks failed** | A workflow that judges a task's result in a run of its own · its checks running · one failed, so *Accept* is off ([PJ-25](capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) | task check |
 | **Started from · Waits on · Related** | How one project relates to another: made from its task or finding · a group of it waits on the other's · sharing context. A run reaches the projects related to its own | project relation |
-| **Ask another project** | A request from a task to another project; it lands as a proposal for that project's assistant, and a member accepts it | cross-project ask |
+| **Ask another project** | A request from a task to another project; it lands as a proposal for that project's assistant, and a person on its team accepts it | cross-project ask |
 | **Map** | A project drawn from Memory — groups, tasks, runs, findings, decisions, related projects — with what is moving now | project map |
 | **Project type** | What kind of work a project is, and so its fields, task kinds and words inside the project: `research` (Study · Task) · `investigation` (Case · Action) · `policy` · `general` (Project · Task). It relabels Project, Task, Branch, Finding and Decision inside a project only and carries defaults — rules, suggested agents and skills, default checks, a report template. Types come built in or from a Team pack; never authored in Studio. |
 | **Branch** | A line of inquiry in a project; forked, merged, parked or dropped | [Branch](#projects-and-schedules) |
 | **Finding** | Evidence on a branch that supports, contradicts or gives context | [Finding](#projects-and-schedules) · stance |
 | **Verdict · decision** | Whether a branch held up, and what to do: pursue · park · drop · merge | Project decision |
-| **Proposal** | An agent's suggested fork, decision, task, group, check or relation — or a recommendation or an ask from another project — which a member accepts or rejects | [Project proposal](#projects-and-schedules) |
+| **Proposal** | An agent's suggested fork, decision, task, group, check or relation — or a recommendation or an ask from another project — which a person on the team accepts or rejects | [Project proposal](#projects-and-schedules) |
 | **Report** | A project written up from its records and published as frozen versions | Project report |
 | **What-if** | A way of reasoning about what would follow from a change; its evidence is labelled *predicted* | what-if method |
 | **Impact** | What a branch's option reaches over the graph, hop by hop | Impact |
-| **Accept · Send back** | A reviewer closes a task on its result · reopens it, with a note on the task | Accept · reject |
+| **Accept · Send back** | A person on the team closes a task on its result · reopens it, with a note on the task | Accept · reject |
 | **A pass to judge · Good enough · Go again** | A loop's pass waiting on a person · settle it · run another, the note its input | Verdict (runtime) |
-| **Pick-up · Allow · Ask · Deny** | How member agents take a project's tasks — the mode for starting one: on their own, where a member set and confirmed it · asking a member first · only when assigned. A picked-up run runs as the agent | Pick-up mode |
+| **Pick-up · Allow · Ask · Deny** | How the team's agents take a project's tasks — the mode for starting one: on their own, where a person on the team set and confirmed it · asking the project's people first · only when assigned. A picked-up run records who set *Allow* or pressed *Start it*, and reaches project access ∩ the agent's ceiling | Pick-up mode |
 | **Claimed** | A task an agent has taken by pick-up, for a while; a lapsed claim returns it | Claim |
 | **Order** | A project's tab of its groups and tasks in waves, by what each waits on | Plan canvas |
 | **Open · Assigned · In progress · Needs input · Blocked · Checking · Checks failed · In review · Done · Failed · Cancelled** | A task's state, read off its latest run and its checks; only the last three are written, by a person | Todo status (derived) |
@@ -233,9 +237,9 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Not on screen | Say instead |
 |---|---|
-| Agent Builder · Fleet · IAM · Activity · Graph settings | Agents · Operations · Workers · Access · Inbox · Settings › Connections — product names are never places |
+| Agent Builder · IAM · Activity · Graph settings | Agents · Operations · Workers · Access · Inbox · Settings › Connections — product names are never places; *Fleet* is said only as the Agents view |
 | Policy statement · policy effect | A **rule** of an Access Policy · Allow, Ask or Deny |
-| viewer · contributor · iam-admin | *Operator* · the person's role — *Operator*, *Modeller* or *Admin* · *Admin* |
+| viewer · contributor · iam-admin | The Access Policy — *Explore*, *Shape the model*, *Run the deployment* — or the permission an act needs |
 | World | An Access Policy rule on `data/…` · a sensitive property |
 | Guardrail · invariant | A rule (*must always hold*) |
 | Envelope | *What it may do* |
@@ -292,7 +296,7 @@ names and the form each takes in every layer are
 | **Graph Data** | Everything the graph databases attached to the deployment hold, read in place and never copied — never created, opened, selected or listed: the deployment is the only scope. Each person, team, project and agent reaches only the graph databases its access allows. The reasoning boundary: what is not in it is third-party. A question runs one step per graph database it reads, in its own language; results from different graph databases are shown side by side, never joined |
 | **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage and the ledger's edges, never customer data, and is never part of Graph Data. It follows Postgres, the source of truth, and is rebuilt from it |
 | **System ontology** | The read-only, versioned ontology Invana ships that governs the system graph |
-| **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown in *Settings › Connections*, *Workers* and the *Library*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
+| **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown in *Settings › Connections* and the Agents mode — Workers · Plugins. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
 | **Operating system** | What runs every deployment: the **Control Plane**, the **Access Plane** and the **Graph Plane** — the packages `control` · `access` · `graph`. A vision and docs word; in code its parts are packages beside the capabilities |
 | **Control Plane** | What runs, where and within which limits — runs, workers and the queue, graph databases, limits, AI models, plugins and the MCP server, ops alerts, the Inbox. Product code `CP` |
 | **Access Plane** | Who may act, through which agent, and what they did — sign-in, keys, Access Policies, the Directory, ownership, asks, the ledger's views, History. Product code `AC` |
@@ -302,7 +306,7 @@ names and the form each takes in every layer are
 | **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Graph Data** group of Model. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
 | **Worker pool** | The deployment's workers, in groups that share labels — the Control Plane's, [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md). On screen *Workers*. How each agent is doing is Agents' (`agents`), never the pool's |
 | **Rule** | One statement that is always true, scoped `deployment` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. A **policy rule** is a line of an Access Policy, never this |
-| **Library** *(runtime)* | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. A code and docs word; on screen *Library* is the large modal's section of Skills · Plugins · Team packs. Never the journal — that is **Runs**. |
+| **Library** *(runtime)* | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. A code and docs word only; on screen there is no *Library* — Skills and Plugins are views of the Agents mode, Team packs sit in Settings › Connections. Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. On disk it is an **Agent Skills folder** — `SKILL.md` plus `references/`, `scripts/`, `assets/` — stored whole per version, and it is the source. It runs **planned** — drawn into a plan before anything runs, the plan a cache compiled from its text, never edited or exported — or **guided**, with no plan, the model following its instructions with the functions its agent may use. |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model, a standard. A draft is not a version. |
 | **Change log** | Every version of every versioned record — who, when, why, the diff, the effect after. It is the Events list narrowed to the events that mint a version, never a second record. A **change** is one such event. Never "audit log" for this narrower list, never "revision history". |
@@ -316,13 +320,13 @@ names and the form each takes in every layer are
 | **Setup step** | One of them. `done · next · todo · blocked · skipped · broken`. |
 | **Gate** | A group of setup steps, named for what it unlocks: **Connected** · **Grounded** · **Answering**. |
 | **Ready** | A deployment whose required setup steps are done. It can be asked a question. The word in the UI is **ready** — never "graduated", "complete", "live" or "onboarded". *Graduation* is the onboarding cap's metaphor and nothing else: it names no state, no badge and no API field |
-| **Team** | A flat group of people, no nesting; it owns nothing and holds no rule. Agents may be granted to one, and each person on it may then use them |
-| **Role** | What a person may do: `operator` · `modeller` · `admin`, one each, set by one fixed role × feature table the engine enforces and no one edits. In UI copy *role* alone is fine; in code it is qualified, because a run's `role` is another thing |
-| **Access Policy** | A named list of **rules** attached to agents. A rule is an effect (`allow · ask · deny`), a verb (`read · write · run`) and a resource `type/name` — `data/<graph-database>/<kind>[/<level>]` · `memory/` · `project/` · `skill/` · `workflow/` · `agent/` · `plugin/` · `tool/<plugin>/<tool>` · `fs/` · `cmd/` · `net/` — where `*` matches one whole segment. No person or team term. Default deny; the strictest wins |
+| **Team** | A flat group of people, no nesting; it owns nothing and holds Access Policies, which each person on it holds |
+| **Permission catalogue** | The engine's one constant of resource types, the actions each takes and who may hold a rule on it ([AC-F02](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); every route declares the action and resource it needs. There are no roles |
+| **Access Policy** | A named list of **rules** attached to agents. A rule is an effect (`allow · ask · deny`), a verb (`read · write · run`) and a resource `type/name` — `data/<graph-database>/<kind>[/<level>]` · `memory/` · `project/` · `skill/` · `workflow/` · `agent/` · `plugin/` · `tool/<plugin>/<tool>` · `fs/` · `cmd/` · `net/` — where `*` matches one whole segment. No person or team term. Default deny; the strictest wins. An agent's policies are its **ceiling**; a run reaches the person behind it (their default agent's policies) ∩ the project's graph databases ∩ the agent's ceiling ∩ the run's other ceilings |
 | **Owner** | Who a resource belongs to: the platform — the system user — for built-in, shared and Team pack agents and every piece of work, keeping who made it; a person for their personal agent or a service user ([AC-F07](os/access/features/AC-F07-ownership/feature.md)). Ownership grants no reach. Decisions are not owned: they are immutable and superseded |
 | **System user** | The user, with no sign-in, that owns everything Invana ships |
 | **Service user** | A user kind for automation: owned by people, owns nothing, never signs in, acts only through keys |
-| **Admin** | The role that runs the deployment — graph databases, plugins, models, users, teams, Access Policies, deployment rules, standards, Team packs. The operations console `/admin` is theirs alone |
+| **Super user** | The locked built-in Access Policy — every action on every resource — written from code and held by the first account `invana createsuperuser` makes; it always has a holder |
 
 ### Models and data
 
@@ -423,13 +427,13 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 
 | Term | Means |
 |---|---|
-| **Project** | Any kind of work in the deployment — a folder of **Todos** in groups, with members, reviewers, a project assistant and relations to other projects. Its own record: it never runs, holds no permissions, has no criteria and no plan. Flat — there are no sub-projects. |
+| **Project** | Any kind of work in the deployment — a folder of **Todos** in groups, with a team of people and agents, one agent its Lead agent, its **project access** and relations to other projects. It never runs and has no criteria and no plan. Flat — there are no sub-projects. |
 | **Todo** | One unit of work a person wrote, with a definition of done — prose, criteria, an optional assignee and due date. It has no status of its own: its state derives from its runs, and only acceptance is stored. A Todo may have no Project (the *No project* bucket) and no plan at all (a person simply does it). On screen, *Task* |
 | **Project type** | What a project is deciding, and so its words: `research · investment · policy · market · investigation · general`. Changing it only relabels. |
 | **Branch** | One line of inquiry inside a project. The type names it — hypothesis, thesis, option, position, lead. Forked, merged, parked, dropped; never a sub-project. |
 | **Finding** | One piece of evidence on a branch, with a **stance** — `supports · contradicts · context` — and what it cites. The type may call it a signal, insight or evidence. |
 | **Project decision** | A person's verdict (`supported · refuted · inconclusive`) and decision (`pursue · park · drop · merge`) on a branch, in the type's words, checked by the rules. Append-only: revisiting **supersedes**. In code `ProjectDecision`; in a project's UI just *decision* and *verdict*. Not an approval's answer and not a runtime verdict ([Asking and answering](#asking-and-answering)). |
-| **Project proposal** | An agent's suggested fork or decision on a branch, or a task, group, check or relation for the project; a recommendation and an ask from another project are proposals too. A member accepts or rejects it. Not an org-knowledge proposal. |
+| **Project proposal** | An agent's suggested fork or decision on a branch, or a task, group, check or relation for the project; a recommendation and an ask from another project are proposals too. A person on the team accepts or rejects it. Not an org-knowledge proposal. |
 | **Project report** | A project written up from its records and published as frozen versions. Not a *Report* board ([Working surfaces](#working-surfaces)). |
 | **Impact** | What a branch's option reaches over the graph, hop by hop from the records its findings cite; reach only, no what-if values. Not *blast radius* in UI copy. |
 | **Simulator** | A plugin of kind `simulator` that does a domain's science, shipped in a Team pack; Invana runs it, never computes a figure itself. Its result is evidence labelled *predicted* from what-if reasoning ([Explore](capabilities/explore/product.md)). |
@@ -449,12 +453,12 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 | Term | Means |
 |---|---|
 | **Principal** | Who acted: `user · agent · system · external · anonymous`. |
-| **Agent** | A principal that can be assigned work, carrying provider, model, skills, Access Policies and budget. Built and versioned in the **agents catalogue** and granted to people and teams; it holds every Read, Write and Run a person makes through it. |
+| **Agent** | A principal that can be assigned work, carrying provider, model, skills, Access Policies and budget. Built and versioned in the **agents catalogue**, reusable across projects; a person uses it where they hold Run on it. Its Access Policies are a ceiling, never a grant. |
 | **Agents catalogue** | The deployment's agents and skills, built and versioned there — the Agents capability (`agents`); nothing runs from it. Agents are granted to people and teams from it. [AG-F02](capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md) |
 | **Built-in agent · core skill** | Shipped with the engine, versioned with its release, one instance each, owned by the system user: the **Assistant**, the **Query console**, Modeller, Coordinator, Record editor and Loader; the dialect skills (Cypher query, Gremlin query) chosen by each graph database's languages; natural-language query. Copied to customise, never edited. |
 | **Budget** | The cost ceiling a run may spend — the smallest of the agent's, the plan's and the Todo's. **At the ceiling the run pauses and asks**, as an `approval`; in-flight work finishes and nothing is discarded. Never a hard stop — that is a separate `hard_ceiling`. |
 | **Role** | What a TaskRun is *for*: `execute` · `plan` · `evaluate`. Planning and evaluating are roles of a run, never kinds of a plan. |
-| **Delegation** | An agent handing work to an agent — a Run on `agent/<name>`. The callee acts within its own Access Policies ∩ every caller's in the chain, narrowing at every hop, within the caller's depth, fan-out and budget; an agent delegates only to agents the person, or the run's chain, is granted. |
+| **Delegation** | An agent handing work to an agent — a Run on `agent/<name>`. The callee acts within project access, or outside a project the person behind the run, ∩ its own ceiling ∩ every caller's in the chain, narrowing at every hop, within the caller's depth, fan-out and budget. |
 | **Outside agent** | An agent outside Invana, reached over A2A (its agent card) or MCP — an agent of kind `external`, outbound in the ledger and Ask by default; it takes a delegated task and returns a verdict and artifacts. Never *partner bot*. |
 | **Ephemeral** | A spawned agent that retires when its work closes. Its row stays so lineage resolves. |
 | **On behalf of** | The person behind a run, distinct from the agent that ran it. |

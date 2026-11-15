@@ -28,7 +28,7 @@ Reading Evidence is every role's; changing the item is the Modeller's and the Ad
 
 ```mermaid
 flowchart TD
-  a([Library › Skills]) --> e["Evidence · ranked by the size of the gap · a kind · a window"]
+  a([Agents › Skills]) --> e["Evidence · ranked by the size of the gap · a kind · a window"]
   s([A skill, workflow, plan or rule]) --> e2["Its own evidence · the same numbers"]
   e --> c["weekly-digest v3 · offered 40 · applied 2 · last 30 days"]
   e2 --> c
@@ -47,7 +47,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-49.1 | Runs that offered skills | the person opens Evidence from Library › Skills | each skill shows how often it was offered and reported applied, per version and per agent, ranked by the size of the gap |
+| AG-49.1 | Runs that offered skills | the person opens Evidence from Agents › Skills | each skill shows how often it was offered and reported applied, per version and per agent, ranked by the size of the gap |
 | AG-49.2 | Workflows and plans with a check step | the person filters Evidence to workflows or plans | each version shows how often its check said it served |
 | AG-49.4 | Rules | the person filters to rules | each shows how often it is cited, and those never cited |
 | AG-49.5 | Refusals and failures | the person filters to them | each Access Policy rule that refuses plans, and each step that fails with which diagnosis, shows how often |

@@ -35,7 +35,7 @@ flowchart LR
   card -->|pick another| sw{It accepts the records?}
   sw -->|yes| re(["Re-drawn from the same rows · nothing re-runs"])
   sw -->|no| dis["Disabled, with why"]
-  tl([Library › Skills · Projection templates]) -->|Modeller · Admin| au["Author: Name · Kind · Surface · Accepts · Shape · Intent → Save as a draft · Publish"]
+  tl([Agents › Skills · Projection templates]) -->|Modeller · Admin| au["Author: Name · Kind · Surface · Accepts · Shape · Intent → Save as a draft · Publish"]
   tl -->|Operator| ro["Read · authoring disabled, naming Modeller"]
   tl -->|usage| us(["Every answer it drew that the reader may read · each opens its conversation"])
   au -->|a field it needs is missing| ref["Refused, naming the field"]
@@ -58,7 +58,7 @@ flowchart LR
 | EX-03.6 | An answer's card | the person opens the template picker | every published template is listed, those that cannot take the rows disabled with why |
 | EX-03.7 | No template fits | the answer is shown | it uses the default for its kind and the card says so; it names no template it did not use |
 | EX-03.8 | Thousands of rows | the table is shown | it is counted, paged and the cap stated |
-| EX-03.9 | A deployment with no custom templates | the person opens Library › Skills › Projection templates | the five built-in ones are listed — records table · single value · category bars · graph · nothing held — each *built-in* |
+| EX-03.9 | A deployment with no custom templates | the person opens Agents › Skills › Projection templates | the five built-in ones are listed — records table · single value · category bars · graph · nothing held — each *built-in* |
 | EX-03.10 | A Modeller or an Admin | they author a template and *Publish* | it is saved and published, and picked next time the rows match |
 | EX-03.11 | A template whose definition names a field the shape lacks | it is saved | it is refused, naming the field |
 | EX-03.12 | An Operator | they open the projection templates | they read them; *+* and every authoring act are disabled — *Needs the Modeller role — ask an Admin*; the engine refuses an authoring call — *Skills needs the Modeller role.* |

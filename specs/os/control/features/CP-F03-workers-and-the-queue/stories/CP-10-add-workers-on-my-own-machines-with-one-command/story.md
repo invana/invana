@@ -4,7 +4,7 @@ title: Add workers on my own machines with one command
 feature: CP-F03
 status: idea
 personas: [admin]
-boards: [settings.workers]
+boards: [agents.workers]
 ---
 
 # CP-10 · Add workers on my own machines with one command
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Workers › Groups › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
+  s([Agents › Workers › Groups › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
   wh --> g{"Group"}
   g -->|existing| ge["Its labels · slots · plugins · runtimes · secret names · outbound domains"]
   g -->|new| gn["Name · labels · slots a worker · plugins · runtimes · secret names · outbound domains"]
@@ -65,11 +65,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Add workers · 1 Where | Admin | settings.workers · Add workers | — | — | settings.workers · Add workers · Where picked | — | — | — |
-| Add workers · 1 Where | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 2 Group | Admin | settings.workers · Add workers · New group | — | — | settings.workers · Add workers · Existing group | settings.workers · Add workers · Runtime not installed | — | — |
-| Add workers · 2 Group | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 3 Join key · 4 Run it | Admin | — | — | — | settings.workers · Add workers · Run it | settings.workers · Add workers · Key expired | — | — |
-| Add workers · 3 Join key · 4 Run it | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 5 Joined | Admin | — | — | settings.workers · Add workers · Waiting to join | settings.workers · Add workers · Joined | settings.workers · Add workers · Join failed | — | — |
-| Add workers · 5 Joined | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 1 Where | Admin | agents.workers · Add workers | — | — | agents.workers · Add workers · Where picked | — | — | — |
+| Add workers · 1 Where | Operator | — | — | — | — | — | — | agents.workers · Read only |
+| Add workers · 2 Group | Admin | agents.workers · Add workers · New group | — | — | agents.workers · Add workers · Existing group | agents.workers · Add workers · Runtime not installed | — | — |
+| Add workers · 2 Group | Operator | — | — | — | — | — | — | agents.workers · Read only |
+| Add workers · 3 Join key · 4 Run it | Admin | — | — | — | agents.workers · Add workers · Run it | agents.workers · Add workers · Key expired | — | — |
+| Add workers · 3 Join key · 4 Run it | Operator | — | — | — | — | — | — | agents.workers · Read only |
+| Add workers · 5 Joined | Admin | — | — | agents.workers · Add workers · Waiting to join | agents.workers · Add workers · Joined | agents.workers · Add workers · Join failed | — | — |
+| Add workers · 5 Joined | Operator | — | — | — | — | — | — | agents.workers · Read only |

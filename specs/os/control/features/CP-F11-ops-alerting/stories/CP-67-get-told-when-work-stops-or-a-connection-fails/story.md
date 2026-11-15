@@ -4,7 +4,7 @@ title: Get told when work stops or a connection fails
 feature: CP-F11
 status: idea
 personas: [admin, builder]
-boards: [control.alerts, inbox]
+boards: [agents.alerts, inbox]
 ---
 
 # CP-67 · Get told when work stops or a connection fails
@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every task, connection and security alert; read every alert; act on what it is about; close one with a note | — |
-| Operator | Operator · Modeller: receive the alerts of tasks they are assignee or reviewer of or are asked, of their own personal connections, of work connections whose agents they approve for, and of sandbox refusals of agents they approve for — never another person's personal connection ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
+| Operator | Operator · Modeller: receive the alerts of tasks they are assignee or team place of or are asked, of their own personal connections, of work connections whose agents they approve for, and of sandbox refusals of agents they approve for — never another person's personal connection ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
 
 ## Flow
 
@@ -66,9 +66,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Ops alerts | Admin | control.alerts · No alerts | control.alerts · No match | control.alerts · Loading | control.alerts | control.alerts · Could not load | control.alerts · Counting | — |
-| Ops alerts | Operator | control.alerts · No alerts | control.alerts · No match | control.alerts · Loading | control.alerts | control.alerts · Could not load | control.alerts · Counting | — |
-| An alert | Admin | — | — | control.alerts · Detail · Loading | control.alerts · Detail | control.alerts · Detail · Already closed | control.alerts · Detail · Run still going | — |
-| An alert | Operator | — | — | control.alerts · Detail · Loading | control.alerts · Detail | control.alerts · Detail · Could not load | control.alerts · Detail · Run still going | control.alerts · Detail · Close disabled |
+| Ops alerts | Admin | agents.alerts · No alerts | agents.alerts · No match | agents.alerts · Loading | agents.alerts | agents.alerts · Could not load | agents.alerts · Counting | — |
+| Ops alerts | Operator | agents.alerts · No alerts | agents.alerts · No match | agents.alerts · Loading | agents.alerts | agents.alerts · Could not load | agents.alerts · Counting | — |
+| An alert | Admin | — | — | agents.alerts · Detail · Loading | agents.alerts · Detail | agents.alerts · Detail · Already closed | agents.alerts · Detail · Run still going | — |
+| An alert | Operator | — | — | agents.alerts · Detail · Loading | agents.alerts · Detail | agents.alerts · Detail · Could not load | agents.alerts · Detail · Run still going | agents.alerts · Detail · Close disabled |
 | Inbox — an ops alert | Admin | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |
 | Inbox — an ops alert | Operator | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |

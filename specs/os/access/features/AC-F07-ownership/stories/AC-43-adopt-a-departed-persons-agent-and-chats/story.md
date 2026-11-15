@@ -45,7 +45,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-43.1 | A person deactivated with me as successor | I open my Inbox | it lists what I took over — chats, service users, tasks, reviewer places — and the personal agents I may adopt, each with the engine's count |
+| AC-43.1 | A person deactivated with me as successor | I open my Inbox | it lists what I took over — chats, service users, tasks, project team places — and the personal agents I may adopt, each with the engine's count |
 | AC-43.2 | Their chats outside projects | I open my conversations | they read under *From {person}*, mine now; I may reopen, rename, archive or continue each like my own |
 | AC-43.3 | A chat I took over | I read an answer in it | it shows in full when my default agent may read every source it drew on; otherwise it reads *Withheld — your agent may not read {resource}* (GP-F02) |
 | AC-43.4 | A chat whose answers drew on the departed person's personal connections | I read them | each such answer reads *Erased — personal data of a person who left* (AC-45) |

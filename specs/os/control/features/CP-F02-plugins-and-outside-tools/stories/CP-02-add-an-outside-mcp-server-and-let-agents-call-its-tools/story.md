@@ -28,7 +28,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  s([Library › Plugins › Outside servers]) --> a["Add a server: address · name · how Invana signs in (CP-42)"]
+  s([Agents › Plugins › Outside servers]) --> a["Add a server: address · name · how Invana signs in (CP-42)"]
   a --> n{"Name free and well-formed · address allowed?"}
   n -->|no| nf["Says which · nothing stored"]
   n -->|yes| l{"Lists its tools?"}

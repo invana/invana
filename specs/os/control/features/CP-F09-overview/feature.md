@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst]
 stories: [CP-47, CP-70]
 journeys: [J08]
-boards: [settings.workloads, shell.operations]
+boards: [agents.fleet, shell.operations]
 nfrs: [NFR-PERF-3, NFR-COST-2, NFR-PERF-7, NFR-UX-2]
 depends_on: [CP-F10, CP-F04, CP-F11, AC-F09, CP-F03, CP-F01, CP-F05, CP-F08]
 ---
@@ -28,7 +28,7 @@ flowchart TD
   h([The header ● n running · the footer's]) --> od["CP-70 · The Operations dropdown · Running · Queue · Workers · Tokens this month · Running now with Stop"]
   od -->|Operator| odo["CP-70 · My runs only"]
   od -->|Agents › Runs| runs(["Agents › Runs (CP-F10)"])
-  od -->|Workers · Admin| set(["The large modal at Workers"])
+  od -->|Workers| set(["Agents › Workers in the Agents mode"])
   runs -->|Workloads| s
   s([Agents › Runs › Workloads]) --> o["CP-47 · Tiles: running · waiting · failed today · tokens today and this month against the deployment's limit"]
   o -->|nothing ran yet| e["What a run is, and that a question, a task or a schedule starts one"]
@@ -84,7 +84,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Windows | Today (the reader's day) · 7 · 30 days; *this month* is the limits' month |
 | Each row against its limit | Tokens this month against the row's limit from [CP-F04](../CP-F04-limits/feature.md); a row with no limit reads *No limit*, never an empty meter |
 | Every figure opens its runs | A count opens Runs filtered to that user, agent or team, that state and that window |
-| Operations is a quick overview | A dropdown of about 720 px: four tiles — Running · Queue · Workers · Tokens this month — then *Running now*. The header's *● n running* and the footer's open it; it reads *Idle* with a grey dot when nothing runs and keeps its place. It links into the large modal at Agents › Runs and Workers, where every deeper act happens and where agents against their budgets, workers by group, AI models, graph databases and alerts are read — add workers, change a limit, tune an alert, drain; in place it offers only *Stop* on a run (CP-58). It is never a summoner |
+| Operations is a quick overview | A dropdown of about 720 px: four tiles — Running · Queue · Workers · Tokens this month — then *Running now*. The header's *● n running* and the footer's open it; it reads *Idle* with a grey dot when nothing runs and keeps its place. It links into the Agents mode at Agents › Runs and Agents › Workers, where every deeper act happens and where agents against their budgets, workers by group, AI models, graph databases and alerts are read — add workers, change a limit, tune an alert, drain; in place it offers only *Stop* on a run (CP-58). It is never a summoner |
 | Only system state | Operations holds what the deployment is doing; what waits on a person is the Inbox's ([CP-F08](../CP-F08-the-inbox/feature.md)) |
 | Near a budget is the engine's | The engine marks the *Tokens this month* tile `near_limit` at 80% or more of the deployment's budget; Studio colours it amber and computes nothing |
 | Counts, never content | A row counts every run, including those the reader may not read; their content stays withheld ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
@@ -174,7 +174,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Operations is the header's glance | The deployment's state is one dropdown from every screen, never a page or a summoner; Agents › Runs and Workers are the depth behind it |
+| Operations is the header's glance | The deployment's state is one dropdown from every screen, never a page or a summoner; Agents › Runs and Agents › Workers, in the Agents mode, are the depth behind it |
 | Workloads is a reading of Agents › Runs | *Agents › Runs › Workloads* reads runs and tokens by user, agent and team; reached from Agents › Runs, which the Operations dropdown links to |
 | An Operator sees their own | Their own runs going; the deployment's queue, workers and tokens are an Admin's |
 | A run counts under each of its teams | Teams are flat and a person may be on several; splitting a run across them would invent a share nobody set |
@@ -191,6 +191,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Custom dashboards or charts | One page answering *whose work, and how much* beats a builder |
 | A cost figure | Tokens only |
-| Operations as a summoner | It links into Agents › Runs and Workers |
+| Operations as a summoner | It links into Agents › Runs and Agents › Workers |
 | Grouping by graph database | A run may cross several; Runs filters by graph database instead (CP-F10) |
 | Acting on many runs at once | Stopping is one run at a time, from the run (CP-58) |

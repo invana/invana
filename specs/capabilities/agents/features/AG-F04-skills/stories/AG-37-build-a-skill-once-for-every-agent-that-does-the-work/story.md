@@ -28,7 +28,7 @@ Making and editing a skill is the Modeller's and the Admin's; a skill is the pla
 
 ```mermaid
 flowchart LR
-  s([Library › Skills]) -->|New skill| nw["New skill — 1 a name · what it is · when to use · 2 planned or guided"]
+  s([Agents › Skills]) -->|New skill| nw["New skill — 1 a name · what it is · when to use · 2 planned or guided"]
   nw -->|name already in the catalogue| nx
   nw -->|Create draft| d["The draft, open on its instructions — the platform's, made by its maker"]
   s -->|a skill| sh["The skill's page — who made it in the head"]
@@ -57,7 +57,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-37.1 | Library › Skills | it opens | each skill reads its name, *vN* or *draft*, its whole *when to use* sentence, its plan's step count, and *Built in* or who made it |
+| AG-37.1 | Agents › Skills | it opens | each skill reads its name, *vN* or *draft*, its whole *when to use* sentence, its plan's step count, and *Built in* or who made it |
 | AG-37.2 | A Modeller or an Admin | they press *New skill* | the *New skill* modal opens on one page — 1 a name, what it is and when to use it · 2 *Planned* or *Guided*, *Planned* picked — and *Create draft* opens the draft on Instructions holding the four headings — Goal · Arguments · Steps · When things go wrong — with *Nothing needed yet* and *Nothing to draw yet*; the skill is the platform's, made by them |
 | AG-37.3 | A draft | a Modeller or an Admin names it | the name is lowercase and hyphenated, up to 64 characters; a name another skill of the deployment has is refused, linking that skill |
 | AG-37.4 | A draft with no *when to use* | a Modeller or an Admin publishes | publishing is refused, naming *when to use* |
@@ -78,7 +78,7 @@ flowchart LR
 | AG-37.19 | A skill with a published version | anyone deletes it | it is refused — runs name its versions — with *Remove it from its agents* opening its Agents tab; nothing is deleted |
 | AG-37.20 | An Operator | they open a skill | everything reads; every act is disabled — *Needs the Modeller role — ask an Admin*; the API and the command line refuse the same way |
 | AG-37.21 | A guided draft | a Modeller or an Admin publishes | its needs are the `needs` list under `metadata:`, read on *What it needs*; a function or workflow the instructions name that the list lacks refuses the publish, naming it |
-| AG-37.22 | Skills in the Library | the list is read | each skill reads *Used by n agents* — the agents it is added to, as the engine counts them |
+| AG-37.22 | Skills in Agents | the list is read | each skill reads *Used by n agents* — the agents it is added to, as the engine counts them |
 
 ## Screens
 

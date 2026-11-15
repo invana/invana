@@ -35,17 +35,17 @@ software-delivery/
 ```mermaid
 flowchart TD
   idea([A member brings an idea, a bug or a recommendation]) --> pm["Product manager · the project assistant — proposes a Story or a Bug, its criteria, its checks"]
-  pm --> sr{"A reviewer — the spec"}
+  pm --> sr{"A person on the team — the spec"}
   sr -->|sends back, with a note| pm
   sr -->|accepts| ds["Designer — draws the boards the story names"]
-  ds --> br{"A reviewer — the boards"}
+  ds --> br{"A person on the team — the boards"}
   br -->|sends back| ds
   br -->|accepts| cd["Coder — on Claude Code or Codex, in the sandbox, from a hand-off note when a session ends"]
   cd --> ck["Checks, each in a run of its own: the spec check · the tests · QA's code review · QA's design review · security's audit"]
   ck -->|a check failed| cd
   ck -->|every check passed| pr{"Open a pull request — Ask"}
   pr -->|a named approver says no| cd
-  pr -->|Send it| rv{"A reviewer"}
+  pr -->|Send it| rv{"A person on the team"}
   rv -->|merges at the code host and accepts| done(["Done — the person's merge, never the agent's"])
   rv -->|sends back| cd
   cd -->|outside its edit rights| rec(["A Recommendation task — a proposal for the product manager"])
@@ -60,7 +60,7 @@ new piece of work.
 
 | Agent | Does | Runs with | Skills | On a project |
 |---|---|---|---|---|
-| `product-manager` · **Product manager** | Turns ideas, bugs and recommendations into stories — who can, flow, criteria, screens — and the system design; proposes tasks and their order; takes up recommendations | Invana | `product-spec` · `system-design` · `recommend` | The project assistant ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-name-the-project-assistant-and-its-reviewers/story.md)): every proposal is a member's to accept |
+| `product-manager` · **Product manager** | Turns ideas, bugs and recommendations into stories — who can, flow, criteria, screens — and the system design; proposes tasks and their order; takes up recommendations | Invana | `product-spec` · `system-design` · `recommend` | The project assistant ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)): every proposal is a member's to accept |
 | `designer` · **Designer** | Draws exactly the boards a story names, every state and lens, from the team's design kit | Invana | `design-story` · `recommend` | Picks up the tasks of the *Design* group |
 | `coder` · **Coder** | Builds the story — code, every test and a changeset — in the task's workspace, and opens a pull request | Claude Code or Codex ([AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md)), set by a Modeller | `build-feature` · `build-ui` · `recommend` | Picks up the tasks of the *Build* group and *Bug* tasks |
 | `qa` · **QA** | Runs the tests and reviews the code against the criteria; compares what was built against its boards; writes PASS or FAIL | Invana | `code-review` · `design-qa` · `recommend` | Its reviews are checks on a task ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
@@ -68,7 +68,7 @@ new piece of work.
 
 | Rule | Detail |
 |---|---|
-| The agents propose, people decide | No agent accepts a task, merges a pull request or applies a policy; a reviewer accepts, a person merges, an Admin applies |
+| The agents propose, people decide | No agent accepts a task, merges a pull request or applies a policy; a person on the team accepts, a person merges, an Admin applies |
 | The same agent for everyone | Each agent reaches only what its own Access Policy allows, whoever it works for ([AC-F02](../os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | A green of its own is not evidence | A task closes on its checks, each a run of its own — never on an agent saying it is done ([PJ-F01](../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) |
 | A long build continues | At its session budget the Coder continues in a fresh session from a hand-off note ([AG-62](../capabilities/agents/features/AG-F05-delegation-and-outside-agents/stories/AG-62-continue-in-a-fresh-session-from-a-hand-off-note/story.md)) |
@@ -95,13 +95,13 @@ new piece of work.
 
 | Part | Holds |
 |---|---|
-| Fields | `repository` — the code host's address · `default_branch` · `product_owner` — the reviewer who accepts specs and boards |
+| Fields | `repository` — the code host's address · `default_branch` · `product_owner` — the person on the team who accepts specs and boards |
 | Task kinds | **Story** — a person's need with its criteria · **Bug** — a fault against criteria that exist · **Task** — one piece of work · **Recommendation** — every project has it ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
 | Groups | *Spec* → *Design* → *Build* → *Verify*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md)) |
-| Default checks | Story: the spec check, then a reviewer · a Bug, and a Task of the *Build* group: the tests, QA's code review, and QA's design review when a screen changed · a story touching access, data, agents or an outside system: security's audit |
-| Reviewers | At least one person; the product owner by default ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-name-the-project-assistant-and-its-reviewers/story.md)) |
+| Default checks | Story: the spec check, then a person on the team · a Bug, and a Task of the *Build* group: the tests, QA's code review, and QA's design review when a screen changed · a story touching access, data, agents or an outside system: security's audit |
+| Reviewers | At least one person; the product owner by default ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
 | Suggested agents and skills | The five agents above, the product manager as the project assistant |
-| Pick-up | Ask by default for every agent; a member may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
+| Pick-up | Ask by default for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
 | Report template | *Release notes*: the stories done, their criteria and checks, the bugs fixed, what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
 
 ## The Access Policy files

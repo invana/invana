@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-11, CP-34, CP-12, CP-13, CP-14]
 journeys: [J07, J08]
-boards: [settings.limits, settings.workers, agents.runs]
+boards: [agents.limits, agents.workers, agents.runs]
 nfrs: [NFR-REL-2, NFR-SEC-4, NFR-PERF-1, NFR-COST-1, NFR-COST-2]
 depends_on: [CP-F03, CP-F10, AC-F03, AC-F05]
 ---
@@ -26,7 +26,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Workers › Limits]) --> lim["CP-11 · Limits for the deployment, each team, user and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
+  s([Agents › Workers › Limits]) --> lim["CP-11 · Limits for the deployment, each team, user and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
   lim -->|not an Admin| ro(["Reads · Edit disabled, naming the Admins"])
   s --> use["CP-34 · What each team, user and agent spends against its limits"]
   use -->|at a limit| al(["An ops alert (CP-59)"])
@@ -215,7 +215,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| A capacity is named for what it limits | On screen the three capacities read *AI model calls* (`llm`) · *graph database calls* (`graphdb`) · *heavy steps* (`heavy`), each with its slots, in use and waiting, in Workers › Limits; *pool* is never shown |
+| A capacity is named for what it limits | On screen the three capacities read *AI model calls* (`llm`) · *graph database calls* (`graphdb`) · *heavy steps* (`heavy`), each with its slots, in use and waiting, in Agents › Workers › Limits; *pool* is never shown |
 | Limits sit with Usage | *Usage and limits* is one page: each limit beside what is spent against it |
 | Four scopes, the tightest binds | Deployment, team, user and agent; a run is inside every one that applies, and the one that stops it is named |
 | Team and user limits bound personal runs | A project's work and a schedule do the same thing whoever set them going, so they run within the agent's and the deployment's limits; a person's and a team's limits bound what that person starts |

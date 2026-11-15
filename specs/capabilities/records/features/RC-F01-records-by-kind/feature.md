@@ -49,7 +49,7 @@ flowchart TD
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and history | Operator — every member, as far as their default agent may Read `data/<graph database>/<kind>` | A kind it may not Read is absent; a direct link to it reads *Withheld — {agent} may not read {kind} in {graph database}* |
+| Read records, their provenance and history | Every signed-in person, as far as their Access Policies allow Read `data/<graph database>/<kind>` | A kind it may not Read is absent; a direct link to it reads *Withheld — {agent} may not read {kind} in {graph database}* |
 | Open a record on a board | Operator — every member | — |
 
 ## States

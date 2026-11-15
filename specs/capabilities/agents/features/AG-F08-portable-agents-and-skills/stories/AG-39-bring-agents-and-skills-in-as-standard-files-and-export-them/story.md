@@ -30,7 +30,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 ```mermaid
 flowchart LR
-  a([Library › Skills · Import]) --> d["Drop a zip, a folder or a Claude plugin"]
+  a([Agents › Skills · Import]) --> d["Drop a zip, a folder or a Claude plugin"]
   d --> k{"What kind of file?"}
   k -->|agent .md · skill folder| m["What came in — file · kind · what it becomes · state"]
   k -->|AGENTS.md · Codex TOML · Claude plugin| cv["Converted to an agent .md and skill folders — import only"]
@@ -45,14 +45,14 @@ flowchart LR
   m --> cf["Confirm split descriptions and model versions"]
   cf -->|Import n| s(["Saved as drafts, the platform's — tested and published like any agent"])
   a -->|an Operator| no(["Import disabled · names the Modeller role"])
-  e([An agent's or skill's page · Library › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields under metadata"])
+  e([An agent's or skill's page · Agents › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields under metadata"])
 ```
 
 ## Acceptance criteria
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-39.1 | Library › Skills | a Modeller presses *Import* | a drop target takes a zip or a folder holding agent files, skill folders, an `AGENTS.md`, Codex TOML agent files or a Claude plugin; nothing is saved until *Import* |
+| AG-39.1 | Agents › Skills | a Modeller presses *Import* | a drop target takes a zip or a folder holding agent files, skill folders, an `AGENTS.md`, Codex TOML agent files or a Claude plugin; nothing is saved until *Import* |
 | AG-39.2 | Dropped files | they are read | *What came in* lists every file — its kind, what it becomes and its state: *ready*, *needs approval*, *left out* or *refused* |
 | AG-39.3 | An agent file — Markdown with YAML front matter | it is read | its front matter `name` · `description` · `model` · `tools` · `skills` and its body become the agent and its instructions; Invana's own fields — voice, voice dials, effort, its tests — are read from `metadata:` when present |
 | AG-39.4 | A skill folder | it is read | `SKILL.md` and its folder become a draft version; Invana's own fields — when to use, how it runs, model version — are read from `metadata:`; without them the `description` is split into what it does and when to use it, shown for the importer to confirm |
@@ -64,7 +64,7 @@ flowchart LR
 | AG-39.10 | Nothing refused | the Modeller presses *Import n* | every agent and skill is saved as a draft, owned by the platform and made by the Modeller, granted to nobody; a skill with no tests imports and waits for them before it publishes |
 | AG-39.11 | An agent, a skill or the whole catalogue | a Modeller presses *Export* | agent `.md` files and `SKILL.md` folders are written, Invana's fields under `metadata:`; the plan is not exported, and no `AGENTS.md`, TOML or Claude plugin is ever written |
 | AG-39.12 | Files being read | the dry run is in progress | it reads *Reading the files…* and each row fills in as it is mapped |
-| AG-39.13 | An Operator | they open Library › Skills or an agent's or skill's page | *Import* and *Export* are disabled — *Needs the Modeller role — ask an Admin*; the engine refuses the same from the API |
+| AG-39.13 | An Operator | they open Agents › Skills or an agent's or skill's page | *Import* and *Export* are disabled — *Needs the Modeller role — ask an Admin*; the engine refuses the same from the API |
 | AG-39.14 | An `AGENTS.md` | it is read | it becomes one draft agent whose instructions are its body, named after the folder it sat in, for the importer to confirm |
 | AG-39.15 | A Codex TOML agent file | it is read | it is converted to the agent `.md` shape, each field it maps shown beside its source, and a field with no place named as left out |
 | AG-39.16 | A Claude plugin — a folder with `.claude-plugin/plugin.json` | it is read | its agents and skills come in as AG-39.3 and AG-39.4; each MCP server its `.mcp.json` names is listed for an Admin to add in Settings (CP-02), never added by the import; a server started as a local process is refused, naming that Invana reaches servers by address |

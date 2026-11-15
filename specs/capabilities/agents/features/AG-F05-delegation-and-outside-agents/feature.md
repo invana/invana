@@ -17,7 +17,7 @@ depends_on: [AG-F01, AC-F02, AC-F04, AC-F05, AC-F09, CP-F02, CP-F03, CP-F04, CP-
 > agent outside Invana. At its session budget a run **continues** in a fresh session from a **hand-off note** — what is
 > done, what is next, what it read — the same run, the same number. A **fork** starts a new run from a note. A
 > **delegation** hands part of the work to a helper it makes or another agent of the deployment, as a Run on
-> `agent/<name>`: the callee runs with its own Access Policies ∩ every caller's, narrowing at every hop, only to agents
+> `agent/<name>`: the callee runs with the person behind the run ∩ its own Access Policies ∩ every caller's, narrowing at every hop, only to agents
 > granted to the person behind the run, within the caller's depth and helpers. **Federation** hands a task to an agent
 > outside Invana over A2A or MCP. Every hand-off is drawn on the run with who made whom, on whose behalf and what came
 > back. The decisions it helps make: *may this agent hand this work on, to whom, and is what came back fit to use?*
@@ -49,7 +49,7 @@ flowchart TD
   may -->|Ask| ask
   ask -->|declined or expired| dec["The step ends declined; the agent carries on without it"]
   ask -->|approved| helper
-  need -->|Allow| helper["AG-24 · It runs — its policies ∩ every caller's, tokens set aside"]
+  need -->|Allow| helper["AG-24 · It runs — the person's reach ∩ its policies ∩ every caller's, tokens set aside"]
   may -->|Allow| helper
   helper --> ret["Its answer returns, cited by the agent · unspent tokens go back"]
   ret --> tree(["AG-24 · Who did what: who made whom, on which run, on whose behalf"])
@@ -177,7 +177,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Federation is outside agents only | Handing a task to an agent outside Invana, over A2A or MCP (AG-33 · AG-34); an agent of the deployment is delegated to, never federated with |
 | Handing on is a Run on `agent/<name>` | Delegating to an agent of the deployment or an outside agent is a step that runs `agent/<name>`; the caller's Access Policies Allow, Ask or Deny it like any resource; no rule, no hand-off ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | Making a helper needs Run `agent/*` | The function that makes a helper declares the need Run `agent/*` ([declared needs](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)); the Coordinator's built-in policy allows it, the Assistant's asks first |
-| Narrowed at every hop | The callee runs with its own Access Policies ∩ every caller's on the chain, agent to agent only; a step any of them denies is refused, naming the agent in the chain whose rule denied it ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
+| Narrowed at every hop | The callee runs with the person behind the run ∩ its own Access Policies — its ceiling — ∩ every caller's on the chain; a step any of them denies is refused, naming the agent in the chain whose rule denied it ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
 | A helper holds its parent's policies | A helper is attached to its parent's Access Policies and may only narrow them; it holds no grant of its own and is in its run's delegation chain |
 | Delegation follows grants | An agent hands work only to an agent granted to the person behind the run, or one already in the run's delegation chain; a run with no person behind it — a schedule or a pick-up — hands work only where its agent's rules allow. An outside agent is granted to nobody and is reached only through a rule on Run `agent/<name>`, Ask by default ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#rules)) |
 | Within the caller's limits | Depth below the first agent and helpers in all are the caller's limits ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#rules)); past either the hand-off is refused before it starts, naming the limit and the count. A helper's run takes a slot like any run; at runs at once it waits *queued* |

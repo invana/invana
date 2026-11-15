@@ -54,8 +54,8 @@ flowchart TD
 | PJ-19.5 | A lead | a person who can see the project takes it | it becomes ordinary work, assigned as they pick — a person, or an agent they may use (PJ-F01); an agent they may not use is refused — *You may not use {agent} — ask an Admin* |
 | PJ-19.6 | A lead | a person dismisses it without a reason | it is refused, asking for the reason; nothing changes |
 | PJ-19.7 | A lead | it is opened | *How it got here* shows the rule, its condition, the load or change and the records that matched |
-| PJ-19.8 | A project the person's default agent may not Read | they look at its leads | they read how many there are, and each lead's content reads *Withheld — your agent may not read `project/{key}`*; nothing reads *Not found* |
-| PJ-19.9 | A new lead | the project's members open the Inbox | it is listed in their *Needs you*; taking or dismissing it clears it for all of them |
+| PJ-19.8 | A project the person may not read | they look at its leads | they read how many there are, and each lead's content reads *Withheld — join the team or ask {who can grant}*; nothing reads *Not found* |
+| PJ-19.9 | A new lead | the project's people open the Inbox | it is listed in their *Needs you*; taking or dismissing it clears it for all of them |
 | PJ-19.10 | A matched record of a kind the reader's agents may not read | they open the lead | that record reads *Withheld*; the rule and every other record read |
 | PJ-19.11 | An archived project | someone opens a lead | it reads; *Take* and *Dismiss* are disabled, saying the project is archived |
 | PJ-19.12 | A branch lead | a person dismisses it with a reason | a *drop* decision is recorded in their name with the reason as its rationale, checked by the rules (PJ-07); a rule that blocks it leaves the lead open, naming the rule |

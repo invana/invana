@@ -4,7 +4,7 @@ title: See every worker and what it is running
 feature: CP-F03
 status: idea
 personas: [admin]
-boards: [settings.workers]
+boards: [agents.workers]
 ---
 
 # CP-09 · See every worker and what it is running
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Workers › Groups]) --> g["Each group: runs on · labels · workers · busy · waiting · state"]
+  s([Agents › Workers › Groups]) --> g["Each group: runs on · labels · workers · busy · waiting · state"]
   g -->|no workers anywhere| nw["Steps run inside the engine · Add workers"]
   g --> grp["A group: every worker · state · running now · heartbeat"]
   grp -->|filter by state| f["No worker matches"]
@@ -61,9 +61,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Workers | Admin | settings.workers · No workers | — | settings.workers · Loading | settings.workers | settings.workers · Could not load | — | — |
-| Workers | Operator | settings.workers · No workers | — | settings.workers · Loading | settings.workers · Read only | settings.workers · Could not load | — | settings.workers · Read only |
-| A group | Admin | — | settings.workers · No worker matches | settings.workers · Loading | settings.workers · Group | settings.workers · Worker lost | — | — |
-| A group | Operator | — | settings.workers · No worker matches | settings.workers · Loading | settings.workers · Group · Read only | settings.workers · Worker lost | — | settings.workers · Read only |
-| A worker | Admin | — | — | settings.workers · Loading | settings.workers · Worker | settings.workers · Worker lost | — | — |
-| A worker | Operator | — | — | settings.workers · Loading | settings.workers · Worker · Read only | settings.workers · Worker lost | — | settings.workers · Read only |
+| Workers | Admin | agents.workers · No workers | — | agents.workers · Loading | agents.workers | agents.workers · Could not load | — | — |
+| Workers | Operator | agents.workers · No workers | — | agents.workers · Loading | agents.workers · Read only | agents.workers · Could not load | — | agents.workers · Read only |
+| A group | Admin | — | agents.workers · No worker matches | agents.workers · Loading | agents.workers · Group | agents.workers · Worker lost | — | — |
+| A group | Operator | — | agents.workers · No worker matches | agents.workers · Loading | agents.workers · Group · Read only | agents.workers · Worker lost | — | agents.workers · Read only |
+| A worker | Admin | — | — | agents.workers · Loading | agents.workers · Worker | agents.workers · Worker lost | — | — |
+| A worker | Operator | — | — | agents.workers · Loading | agents.workers · Worker · Read only | agents.workers · Worker lost | — | agents.workers · Read only |
