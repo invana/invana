@@ -65,22 +65,22 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | Surface | Tier | Board |
 |---|---|---|
 | Home — first use and set-up | page | `start.home` · `start.home · Set-up` |
-| Workloads — by user, agent and team, in Agents › Runs | modal | `agents.fleet` |
+| Fleet — the map and workloads by user, agent and team, in Settings › Fleet | modal | `settings.fleet` |
 | Runs — how the agents are doing, every run | modal | `agents.agents` · `agents.runs` |
 | A run | modal | `agents.runs · Detail` · `agents.runs · Detail · Answer` |
-| Ops alerts — the list, an alert, thresholds | modal | `agents.alerts` · `agents.alerts · Detail` · `agents.alerts · Settings` |
+| Ops alerts — the list, an alert, thresholds | modal | `settings.alerts` · `settings.alerts · Detail` · `settings.alerts · Settings` |
 | Graph databases — the list, one graph database | modal | `settings.databases` · `settings.databases · Detail` |
 | Connect a graph database | modal | `settings.databases · Connect` · `settings.databases · Connect · Files` · `settings.databases · Connect · Shape` · `settings.databases · Connect · Ready` |
 | ⌘K | modal | `shell.command` |
 | Inbox — Needs you · Updates · Running · Done | modal | `inbox` |
 | Settings › Notifications — rules and channels | modal | `settings.notifications` |
 | Settings › You — outside accounts · where asks reach me | modal | `settings.me` |
-| Plugins — every plugin, a plugin, Team packs | modal | `agents.plugins` |
-| An outside MCP server — its tools, how Invana signs in | modal | `agents.plugins · Servers` |
+| Plugins — every plugin, a plugin, Team packs | modal | `settings.plugins` |
+| An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins · Servers` |
 | The deployment's MCP server — what it serves, recent calls | modal | `settings.mcp` |
 | AI models | modal | `settings.ai` |
-| Workers | modal | `agents.workers` |
-| Usage and limits | modal | `agents.limits · Usage` |
+| Workers | modal | `settings.workers` |
+| Usage and limits | modal | `settings.limits · Usage` |
 
 ## Decisions
 

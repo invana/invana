@@ -66,7 +66,7 @@ flowchart TD
 | AG-31.12 | A key another workflow holds | the proposer names it | it is refused: *{key} is taken — propose a new key, or ask an Admin.*; proposing its next version is for a Modeller or an Admin (AG-48) |
 | AG-31.13 | A proposal already waiting on the same run | *Propose as a workflow* is pressed again | it reads *This plan is already waiting on {approvers}* and sends nothing |
 | AG-31.14 | A proposal that keeps a record ID or property value as a default | it reaches the engine | it is refused: *{argument} holds a value from the data — it cannot be a default.* |
-| AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Agents › Plugins, where an Admin switches it (CP-F02); nothing here switches it |
+| AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Settings › Plugins, where an Admin switches it (CP-F02); nothing here switches it |
 | AG-31.16 | Skills | anyone opens *Answer templates* | the templates that shape answers read beside workflows and functions (EX-03 authors them) |
 | AG-31.17 | An approved workflow | a person opens *How it got here* on the run it came from | its steps show who proposed it, the arguments its literals became, who approved it and the version it published |
 

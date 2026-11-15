@@ -4,7 +4,7 @@ title: Run an outside runtime safely on a worker
 feature: CP-F03
 status: idea
 personas: [admin, builder]
-boards: [agents.runs, agents.workers]
+boards: [agents.runs, settings.workers]
 ---
 
 # CP-65 · Run an outside runtime safely on a worker
@@ -74,8 +74,8 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A run's sessions and sandbox refusals | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sandbox refused | agents.runs · Detail · Session running | — |
 | A run's sessions and sandbox refusals | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sandbox refused | agents.runs · Detail · Session running | agents.runs · Detail · Withheld |
-| A worker running a session | Admin | — | — | agents.workers · Loading | agents.workers · Worker | agents.workers · No worker carries the runtime | agents.workers · Worker | — |
-| A worker running a session | Operator | — | — | agents.workers · Loading | agents.workers · Worker · Read only | agents.workers · No worker carries the runtime | agents.workers · Worker · Read only | agents.workers · Read only |
+| A worker running a session | Admin | — | — | settings.workers · Loading | settings.workers · Worker | settings.workers · No worker carries the runtime | settings.workers · Worker | — |
+| A worker running a session | Operator | — | — | settings.workers · Loading | settings.workers · Worker · Read only | settings.workers · No worker carries the runtime | settings.workers · Worker · Read only | settings.workers · Read only |
 </content>
 </invoke>
 <invoke name="Bash">

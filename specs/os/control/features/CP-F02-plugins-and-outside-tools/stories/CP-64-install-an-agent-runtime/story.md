@@ -4,7 +4,7 @@ title: Install an agent runtime
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [agents.plugins, agents.workers]
+boards: [settings.plugins, settings.workers]
 ---
 
 # CP-64 · Install an agent runtime
@@ -28,7 +28,7 @@ The role × feature table is [AC-F02 › The role table](../../../../../access/f
 
 ```mermaid
 flowchart TD
-  s([Agents › Plugins › Runtimes]) --> l["Invana · always · then each installed runtime: versions · model local or external · needs · groups · agents"]
+  s([Settings › Plugins › Runtimes]) --> l["Invana · always · then each installed runtime: versions · model local or external · needs · groups · agents"]
   l -->|none installed| fu["Only Invana's runtime · Install a runtime"]
   fu --> i["Install: Claude Code or Codex"]
   l --> i
@@ -63,12 +63,12 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Runtimes | Admin | agents.plugins · Only Invana's runtime | — | agents.plugins · Loading | agents.plugins · Runtimes | agents.plugins · Install refused | — | — |
-| Runtimes | Operator | agents.plugins · Only Invana's runtime | — | agents.plugins · Loading | agents.plugins · Runtimes · Read only | agents.plugins · Could not load | — | agents.plugins · Runtimes · Read only |
-| Install a runtime | Admin | agents.plugins · Runtimes · Install | — | — | agents.plugins · Runtimes · Install · Installed, off | agents.plugins · Runtimes · Install · Install refused | — | — |
-| Install a runtime | Operator | — | — | — | — | — | — | agents.plugins · Runtimes · Read only |
-| A worker group's runtimes | Admin | — | — | agents.workers · Loading | agents.workers · Group | agents.workers · No worker carries the runtime | — | — |
-| A worker group's runtimes | Operator | — | — | agents.workers · Loading | agents.workers · Group · Read only | agents.workers · No worker carries the runtime | — | agents.workers · Read only |
+| Runtimes | Admin | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes | settings.plugins · Install refused | — | — |
+| Runtimes | Operator | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes · Read only | settings.plugins · Could not load | — | settings.plugins · Runtimes · Read only |
+| Install a runtime | Admin | settings.plugins · Runtimes · Install | — | — | settings.plugins · Runtimes · Install · Installed, off | settings.plugins · Runtimes · Install · Install refused | — | — |
+| Install a runtime | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |
+| A worker group's runtimes | Admin | — | — | settings.workers · Loading | settings.workers · Group | settings.workers · No worker carries the runtime | — | — |
+| A worker group's runtimes | Operator | — | — | settings.workers · Loading | settings.workers · Group · Read only | settings.workers · No worker carries the runtime | — | settings.workers · Read only |
 </content>
 </invoke>
 <invoke name="TaskUpdate">

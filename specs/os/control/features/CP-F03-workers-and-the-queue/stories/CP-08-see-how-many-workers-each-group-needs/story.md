@@ -4,7 +4,7 @@ title: See how many workers each group needs
 feature: CP-F03
 status: idea
 personas: [admin]
-boards: [agents.workers]
+boards: [settings.workers]
 ---
 
 # CP-08 · See how many workers each group needs
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Agents › Workers › Groups › Where steps wait]) --> sl["Slots: total · busy · free — overall and per group"]
+  s([Settings › Workers › Groups › Where steps wait]) --> sl["Slots: total · busy · free — overall and per group"]
   sl --> g["Each group: steps waiting · oldest · workers · suggested"]
   g -->|more workers than the load needs| idle["n idle — drain n"]
   idle -->|Drain · Admin| dr(["CP-09 · those workers finish what they hold, then stop"])
@@ -48,7 +48,7 @@ flowchart TD
 | CP-08.5 | A step whose labels no live group covers | it waits | it is named, with the missing label, and fails when its wait runs out |
 | CP-08.6 | Any group | Invana suggests workers | nothing starts a machine; a person adds them |
 | CP-08.7 | An Operator | they open Where steps wait | everything reads; *Add workers* and *Drain* are disabled — *Needs the Admin role — ask {admins}* |
-| CP-08.8 | Workers in any group | Agents › Workers › Groups opens | its head reads the slots every worker together has now — *48 slots · 31 busy · 17 free* — and each group reads its own; a slot is one agent step a worker can take at once, and every number is the engine's, stored every 30 s |
+| CP-08.8 | Workers in any group | Settings › Workers › Groups opens | its head reads the slots every worker together has now — *48 slots · 31 busy · 17 free* — and each group reads its own; a slot is one agent step a worker can take at once, and every number is the engine's, stored every 30 s |
 | CP-08.9 | A group whose suggested count is above its workers | it is read | its advice reads *Add {n} workers*, the number the engine suggested |
 | CP-08.10 | A group with workers idle over the last ten minutes and a suggested count below its workers, above its minimum | it is read | its advice reads *{n} idle — drain {n}*, never below the group's minimum; an Admin's *Drain* drains that many idle workers (CP-09) |
 | CP-08.11 | A group whose workers match the load | it is read | its advice reads *Keeping up*; no act is offered |
@@ -57,7 +57,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Where steps wait | Admin | agents.workers · No workers | — | agents.workers · Loading | agents.workers · Where steps wait | agents.workers · Short of workers | — | — |
-| Where steps wait | Operator | agents.workers · No workers | — | agents.workers · Loading | agents.workers · Where steps wait | agents.workers · Short of workers | — | agents.workers · Read only |
-| Slots and advice | Admin | agents.workers · No workers | — | agents.workers · Loading | agents.workers · Slots and advice | agents.workers · Short of workers | — | — |
-| Slots and advice | Operator | agents.workers · No workers | — | agents.workers · Loading | agents.workers · Slots and advice | agents.workers · Short of workers | — | agents.workers · Read only |
+| Where steps wait | Admin | settings.workers · No workers | — | settings.workers · Loading | settings.workers · Where steps wait | settings.workers · Short of workers | — | — |
+| Where steps wait | Operator | settings.workers · No workers | — | settings.workers · Loading | settings.workers · Where steps wait | settings.workers · Short of workers | — | settings.workers · Read only |
+| Slots and advice | Admin | settings.workers · No workers | — | settings.workers · Loading | settings.workers · Slots and advice | settings.workers · Short of workers | — | — |
+| Slots and advice | Operator | settings.workers · No workers | — | settings.workers · Loading | settings.workers · Slots and advice | settings.workers · Short of workers | — | settings.workers · Read only |

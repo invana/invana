@@ -4,7 +4,7 @@ title: See every plugin and switch it on or off
 feature: CP-F02
 status: idea
 personas: [admin, analyst]
-boards: [agents.plugins]
+boards: [settings.plugins]
 ---
 
 # CP-04 · See every plugin and switch it on or off
@@ -28,7 +28,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  s([Agents › Plugins]) --> l["Every plugin: core · tool · outside server · pack · on or off"]
+  s([Settings › Plugins]) --> l["Every plugin: core · tool · outside server · pack · on or off"]
   l -->|filter| f["Nothing matches · Clear filters"]
   l --> p["A plugin: its functions and versions · skills · workflows"]
   p -->|core| always(["Always on · no switch"])
@@ -74,7 +74,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Plugins | Admin | agents.plugins · New and off | agents.plugins · Nothing matches | agents.plugins · Loading | agents.plugins | agents.plugins · Could not load | — | — |
-| Plugins | Operator | agents.plugins · New and off · Read only | agents.plugins · Nothing matches | agents.plugins · Loading | agents.plugins · My switch | agents.plugins · Could not load | — | agents.plugins · Read only |
-| A plugin | Admin | agents.plugins · Plugin off | — | agents.plugins · Loading | agents.plugins · Plugin | agents.plugins · Not installed | — | — |
-| A plugin | Operator | agents.plugins · Plugin off · Read only | — | agents.plugins · Loading | agents.plugins · Plugin · My switch | agents.plugins · Off for the deployment | — | agents.plugins · Read only |
+| Plugins | Admin | settings.plugins · New and off | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins | settings.plugins · Could not load | — | — |
+| Plugins | Operator | settings.plugins · New and off · Read only | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Could not load | — | settings.plugins · Read only |
+| A plugin | Admin | settings.plugins · Plugin off | — | settings.plugins · Loading | settings.plugins · Plugin | settings.plugins · Not installed | — | — |
+| A plugin | Operator | settings.plugins · Plugin off · Read only | — | settings.plugins · Loading | settings.plugins · Plugin · My switch | settings.plugins · Off for the deployment | — | settings.plugins · Read only |

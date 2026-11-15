@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst, curator]
 stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-20, CP-64]
 journeys: [J07, J10]
-boards: [agents.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, agents.workers]
+boards: [settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-PERF-3]
 depends_on: [AC-F02, AC-F04, AC-F05, AC-F09, AC-F10, AC-F11, CP-F03, AG-F06, RC-F02]
 ---
@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Agents › Plugins]) --> pl["CP-04 · Every plugin: core · tool · outside server · pack · on or off · who switched it"]
+  s([Settings › Plugins]) --> pl["CP-04 · Every plugin: core · tool · outside server · pack · on or off · who switched it"]
   pl -->|core| always(["Always on · no switch"])
   pl -->|Admin turns a plugin on| on(["On for the deployment · from the next step"])
   pl -->|not an Admin| ro["The deployment's switch reads · Ask an Admin"]
@@ -396,8 +396,8 @@ The code changes are [migrations.md](../../../../migrations.md) M15 (work and pe
 
 | Decision | Detail |
 |---|---|
-| Where its places sit | Agents › Plugins (`agents.plugins`) and Settings › Connections › Team packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`); a person's personal connections under Settings › You (`settings.me · Connections`) |
-| Plugins live in Agents › Plugins | A view of the Agents mode: every plugin and outside server, each server with its work connections; each row reads *Used by n agents*. *Team packs* and *MCP server* are entries of Settings › Connections; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
+| Where its places sit | Settings › Plugins (`settings.plugins`) and Settings › Connections › Team packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`); a person's personal connections under Settings › You (`settings.me · Connections`) |
+| Plugins live in Settings › Plugins | A section of Settings in the large modal — Core · Tool · Outside servers · Runtimes: every plugin and outside server, each server with its work connections; each row reads *Used by n agents*. *Team packs* and *MCP server* are entries of Settings › Connections; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
 | An outside server is a plugin | One kind of list, one pair of switches, one resource name `tool/<server>/<tool>` for every tool, shipped or added |
 | Per server, one way to sign in | An Admin chooses none, a token or OAuth for each outside server, and whether people may connect their own over OAuth; a shipped tool's settings are the deployment's secrets |
 | The work connection wins | When an agent has a work connection on a server, every call uses it — even in a person's own run — so an agent does the same thing for everyone who may use it; a personal connection serves only where the agent has none |

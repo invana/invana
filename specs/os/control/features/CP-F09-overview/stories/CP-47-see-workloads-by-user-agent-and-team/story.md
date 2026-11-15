@@ -4,7 +4,7 @@ title: See workloads by user, agent and team
 feature: CP-F09
 status: idea
 personas: [admin, builder, analyst]
-boards: [agents.fleet]
+boards: [settings.fleet]
 ---
 
 # CP-47 · See workloads by user, agent and team
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Agents › Runs › Workloads · or the Operations dropdown's Workloads]) --> l{"Loaded?"}
+  s([Settings › Fleet › Workloads]) --> l{"Loaded?"}
   l -->|no| f["What could not be read · Retry"]
   l -->|nothing ran| e["Nothing ran yet · what starts a run"]
   l -->|yes| t["Tiles: running · waiting · failed · tokens · this month against the deployment's limit · ops alerts open"]
@@ -59,5 +59,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Workloads | Admin | agents.fleet · Workloads · Nothing ran yet | agents.fleet · Workloads · No one ran | agents.fleet · Workloads · Loading | agents.fleet · Workloads | agents.fleet · Workloads · Could not load | agents.fleet · Workloads · Live | — |
-| Workloads | Operator | agents.fleet · Workloads · Nothing ran yet | agents.fleet · Workloads · No one ran | agents.fleet · Workloads · Loading | agents.fleet · Workloads | agents.fleet · Workloads · Could not load | agents.fleet · Workloads · Live | — |
+| Workloads | Admin | settings.fleet · Workloads · Nothing ran yet | settings.fleet · Workloads · No one ran | settings.fleet · Workloads · Loading | settings.fleet · Workloads | settings.fleet · Workloads · Could not load | settings.fleet · Workloads · Live | — |
+| Workloads | Operator | settings.fleet · Workloads · Nothing ran yet | settings.fleet · Workloads · No one ran | settings.fleet · Workloads · Loading | settings.fleet · Workloads | settings.fleet · Workloads · Could not load | settings.fleet · Workloads · Live | — |

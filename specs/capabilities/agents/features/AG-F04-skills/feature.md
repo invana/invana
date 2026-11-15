@@ -349,7 +349,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Decision | Detail |
 |---|---|
-| Skills live in Agents › Skills | A view of the Agents mode, beside Agents · Plugins · Workflows; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
+| Skills live in Agents › Skills | A view of the Agents mode, beside Agents · Runs · Schedules, its Workflows within it; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
 | How it runs is in the head | *Guided* or *Planned* beside the state; a Modeller or an Admin switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
 | A skill is a page in Agents › Skills | Opened from the Skills list; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
 | The head says its state and its owner | The name, then *draft · empty*, *draft vN*, or *vN · published* with *draft vN+1* beside it, and its owner — *Platform*, or *System* on a built-in — with who made it; acts are *Run a test* and *Publish* on a draft, *Edit instructions* on a published skill with no draft, *Copy* on a built-in |

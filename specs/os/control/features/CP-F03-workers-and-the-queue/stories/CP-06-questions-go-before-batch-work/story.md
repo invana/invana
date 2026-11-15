@@ -4,7 +4,7 @@ title: Questions go before batch work
 feature: CP-F03
 status: idea
 personas: [admin]
-boards: [agents.workers]
+boards: [settings.workers]
 ---
 
 # CP-06 · Questions go before batch work
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Agents › Workers › Queue]) --> o["Order: questions · project tasks · batch"]
+  s([Settings › Workers › Queue]) --> o["Order: questions · project tasks · batch"]
   o --> g["Each person's share of the workers"]
   g -->|a person with nothing waiting| lend(["Their share is lent to those whose work waits"])
   g -->|everyone's work waiting| eq(["Shared equally"])
@@ -46,5 +46,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The order and each person's share | Admin | agents.workers · Nothing running | — | agents.workers · Loading | agents.workers · Order | agents.workers · Could not load | — | — |
-| The order and each person's share | Operator | agents.workers · Nothing running | — | agents.workers · Loading | agents.workers · Order | agents.workers · Could not load | — | — |
+| The order and each person's share | Admin | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Order | settings.workers · Could not load | — | — |
+| The order and each person's share | Operator | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Order | settings.workers · Could not load | — | — |

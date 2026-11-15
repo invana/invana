@@ -4,7 +4,7 @@ title: Tune when ops alerts fire
 feature: CP-F11
 status: idea
 personas: [admin]
-boards: [agents.alerts]
+boards: [settings.alerts]
 ---
 
 # CP-60 · Tune when ops alerts fire
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Agents › Workers › Alerts › Thresholds]) --> l["Each kind: its threshold · its window · whom it reaches"]
+  s([Settings › Workers › Alerts › Thresholds]) --> l["Each kind: its threshold · its window · whom it reaches"]
   l -->|not an Admin| ro["Reads · Edit disabled, naming the Admins"]
   l -->|Edit · Admin| e["Threshold · window"]
   e -->|outside its range| r["Names the field and its range"]
@@ -62,11 +62,11 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Thresholds | Admin | agents.alerts · Settings · Defaults | — | agents.alerts · Settings · Loading | agents.alerts · Settings | agents.alerts · Settings · Out of range | — | — |
-| Thresholds | Operator | agents.alerts · Settings · Defaults | — | agents.alerts · Settings · Loading | agents.alerts · Settings | agents.alerts · Settings · Could not load | — | agents.alerts · Settings · Edit disabled |
-| History alerts | Admin | agents.alerts · Settings · No History alerts | — | agents.alerts · Settings · Loading | agents.alerts · Settings · History alerts | agents.alerts · Settings · Could not load | — | — |
-| History alerts | Operator | agents.alerts · Settings · No History alerts | — | agents.alerts · Settings · Loading | agents.alerts · Settings · History alerts · Read only | agents.alerts · Settings · Could not load | — | agents.alerts · Settings · History alerts · Read only |
-| New History alert | Admin | agents.alerts · Settings · New | — | — | agents.alerts · Settings · New · Filled | agents.alerts · Settings · New · Refused | — | — |
-| New History alert | Operator | — | — | — | — | — | — | agents.alerts · Settings · History alerts · Read only |
-| A History alert — edit | Admin | — | — | — | agents.alerts · Settings · History alert | agents.alerts · Settings · History alert refused | — | — |
-| A History alert — edit | Operator | — | — | — | — | — | — | agents.alerts · Settings · History alerts · Read only |
+| Thresholds | Admin | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Out of range | — | — |
+| Thresholds | Operator | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Could not load | — | settings.alerts · Settings · Edit disabled |
+| History alerts | Admin | settings.alerts · Settings · No History alerts | — | settings.alerts · Settings · Loading | settings.alerts · Settings · History alerts | settings.alerts · Settings · Could not load | — | — |
+| History alerts | Operator | settings.alerts · Settings · No History alerts | — | settings.alerts · Settings · Loading | settings.alerts · Settings · History alerts · Read only | settings.alerts · Settings · Could not load | — | settings.alerts · Settings · History alerts · Read only |
+| New History alert | Admin | settings.alerts · Settings · New | — | — | settings.alerts · Settings · New · Filled | settings.alerts · Settings · New · Refused | — | — |
+| New History alert | Operator | — | — | — | — | — | — | settings.alerts · Settings · History alerts · Read only |
+| A History alert — edit | Admin | — | — | — | settings.alerts · Settings · History alert | settings.alerts · Settings · History alert refused | — | — |
+| A History alert — edit | Operator | — | — | — | — | — | — | settings.alerts · Settings · History alerts · Read only |

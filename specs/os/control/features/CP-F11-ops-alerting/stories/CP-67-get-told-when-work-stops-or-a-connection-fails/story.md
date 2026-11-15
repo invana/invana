@@ -4,7 +4,7 @@ title: Get told when work stops or a connection fails
 feature: CP-F11
 status: idea
 personas: [admin, builder]
-boards: [agents.alerts, inbox]
+boards: [settings.alerts, inbox]
 ---
 
 # CP-67 · Get told when work stops or a connection fails
@@ -66,9 +66,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Ops alerts | Admin | agents.alerts · No alerts | agents.alerts · No match | agents.alerts · Loading | agents.alerts | agents.alerts · Could not load | agents.alerts · Counting | — |
-| Ops alerts | Operator | agents.alerts · No alerts | agents.alerts · No match | agents.alerts · Loading | agents.alerts | agents.alerts · Could not load | agents.alerts · Counting | — |
-| An alert | Admin | — | — | agents.alerts · Detail · Loading | agents.alerts · Detail | agents.alerts · Detail · Already closed | agents.alerts · Detail · Run still going | — |
-| An alert | Operator | — | — | agents.alerts · Detail · Loading | agents.alerts · Detail | agents.alerts · Detail · Could not load | agents.alerts · Detail · Run still going | agents.alerts · Detail · Close disabled |
+| Ops alerts | Admin | settings.alerts · No alerts | settings.alerts · No match | settings.alerts · Loading | settings.alerts | settings.alerts · Could not load | settings.alerts · Counting | — |
+| Ops alerts | Operator | settings.alerts · No alerts | settings.alerts · No match | settings.alerts · Loading | settings.alerts | settings.alerts · Could not load | settings.alerts · Counting | — |
+| An alert | Admin | — | — | settings.alerts · Detail · Loading | settings.alerts · Detail | settings.alerts · Detail · Already closed | settings.alerts · Detail · Run still going | — |
+| An alert | Operator | — | — | settings.alerts · Detail · Loading | settings.alerts · Detail | settings.alerts · Detail · Could not load | settings.alerts · Detail · Run still going | settings.alerts · Detail · Close disabled |
 | Inbox — an ops alert | Admin | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |
 | Inbox — an ops alert | Operator | — | — | inbox · Loading | inbox · Ops alert | inbox · Could not load | — | — |

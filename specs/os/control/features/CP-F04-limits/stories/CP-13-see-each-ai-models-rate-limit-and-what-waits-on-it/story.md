@@ -4,7 +4,7 @@ title: See each AI model's rate limit and what waits on it
 feature: CP-F04
 status: idea
 personas: [admin]
-boards: [agents.workers]
+boards: [settings.workers]
 ---
 
 # CP-13 · See each AI model's rate limit and what waits on it
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Agents › Workers › Limits › AI model limits]) --> m["Each model version: requests and tokens a minute · used · steps waiting"]
+  s([Settings › Workers › Limits › AI model limits]) --> m["Each model version: requests and tokens a minute · used · steps waiting"]
   m -->|Edit · an Admin| ed(["Rate limit saved · applies to the next step"])
   m -->|Edit · not an Admin| ro(["Disabled, naming the Admins"])
   m -->|at its limit| w["Steps wait · use no worker · are not counted as short of workers"]
@@ -49,7 +49,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| AI model limits | Admin | agents.workers · No AI model | — | agents.workers · Loading | agents.workers · AI model limits | agents.workers · Could not load | — | — |
-| AI model limits | Operator | agents.workers · No AI model | — | agents.workers · Loading | agents.workers · AI model limits | agents.workers · Could not load | — | agents.workers · AI model limits · Read only |
-| Edit a rate limit | Admin | — | — | — | agents.workers · Edit rate limit | agents.workers · Could not save | — | — |
-| Edit a rate limit | Operator | — | — | — | — | — | — | agents.workers · AI model limits · Read only |
+| AI model limits | Admin | settings.workers · No AI model | — | settings.workers · Loading | settings.workers · AI model limits | settings.workers · Could not load | — | — |
+| AI model limits | Operator | settings.workers · No AI model | — | settings.workers · Loading | settings.workers · AI model limits | settings.workers · Could not load | — | settings.workers · AI model limits · Read only |
+| Edit a rate limit | Admin | — | — | — | settings.workers · Edit rate limit | settings.workers · Could not save | — | — |
+| Edit a rate limit | Operator | — | — | — | — | — | — | settings.workers · AI model limits · Read only |

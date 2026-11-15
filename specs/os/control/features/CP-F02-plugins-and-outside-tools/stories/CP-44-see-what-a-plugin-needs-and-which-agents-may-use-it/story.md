@@ -4,7 +4,7 @@ title: See what a plugin needs and which agents may use it
 feature: CP-F02
 status: idea
 personas: [admin, builder]
-boards: [agents.plugins]
+boards: [settings.plugins]
 ---
 
 # CP-44 · See what a plugin needs and which agents may use it
@@ -28,7 +28,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  p([A plugin in Agents › Plugins]) --> f["Each function: Needs — verb · resource"]
+  p([A plugin in Settings › Plugins]) --> f["Each function: Needs — verb · resource"]
   f --> who["Which agents may use it — the agents granted to a person"]
   who --> chk{"Every need within the agent's policies · the graph database's mode allows it · the plugin is on · a connection to use?"}
   chk -->|yes| ok(["Usable · the rule that allows each need"])
@@ -56,7 +56,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A function's needs | Admin | — | — | agents.plugins · Loading | agents.plugins · Needs | agents.plugins · Could not load | — | — |
-| A function's needs | Operator | — | — | agents.plugins · Loading | agents.plugins · Needs | agents.plugins · Could not load | — | — |
-| Which agents may use it | Admin | agents.plugins · No agent may use it | agents.plugins · Nothing matches | agents.plugins · Loading | agents.plugins · Agents and needs | agents.plugins · Need missing | — | — |
-| Which agents may use it | Operator | agents.plugins · No agent may use it | agents.plugins · Nothing matches | agents.plugins · Loading | agents.plugins · Agents and needs | agents.plugins · Need missing | — | — |
+| A function's needs | Admin | — | — | settings.plugins · Loading | settings.plugins · Needs | settings.plugins · Could not load | — | — |
+| A function's needs | Operator | — | — | settings.plugins · Loading | settings.plugins · Needs | settings.plugins · Could not load | — | — |
+| Which agents may use it | Admin | settings.plugins · No agent may use it | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · Agents and needs | settings.plugins · Need missing | — | — |
+| Which agents may use it | Operator | settings.plugins · No agent may use it | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · Agents and needs | settings.plugins · Need missing | — | — |

@@ -4,7 +4,7 @@ title: See why a run started, waits or was refused
 feature: CP-F04
 status: idea
 personas: [admin]
-boards: [agents.workers]
+boards: [settings.workers]
 ---
 
 # CP-12 · See why a run started, waits or was refused
@@ -39,7 +39,7 @@ flowchart TD
   tok -->|yes| cap{"A free slot in its capacity?"}
   cap -->|no| pw["Waiting · names the capacity"]
   cap -->|yes| in(["Admitted"])
-  s([Agents › Workers › Queue › Starts]) --> list["Each start: admitted · waiting · refused · the limit and whose"]
+  s([Settings › Workers › Queue › Starts]) --> list["Each start: admitted · waiting · refused · the limit and whose"]
 ```
 
 ## Acceptance criteria
@@ -59,5 +59,5 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Starts | Admin | agents.workers · Nothing running | — | agents.workers · Loading | agents.workers · Starts | agents.workers · Could not load | — | — |
-| Starts | Operator | agents.workers · Nothing running | — | agents.workers · Loading | agents.workers · Starts | agents.workers · Could not load | — | — |
+| Starts | Admin | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Starts | settings.workers · Could not load | — | — |
+| Starts | Operator | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Starts | settings.workers · Could not load | — | — |

@@ -4,7 +4,7 @@ title: Install a Team pack
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.packs, settings.policies, agents.plugins]
+boards: [settings.packs, settings.policies, settings.plugins]
 ---
 
 # CP-20 · Install a Team pack
@@ -71,7 +71,7 @@ flowchart TD
 | Team packs | Operator | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs · Read only | settings.packs · Could not load | — | settings.packs · Packs · Read only |
 | Install a pack | Admin | settings.packs · Install | — | — | settings.packs · Install · What it brings | settings.packs · Install · Pack clashes | — | — |
 | Install a pack | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
-| A pack's policies to apply | Admin | — | — | settings.policies · Loading | agents.plugins · Policies to apply | settings.policies · Rule refused | — | — |
-| A pack's policies to apply | Operator | — | — | — | agents.plugins · Policies to apply · Read only | — | — | settings.policies · Waiting to apply |
-| A pack's outside servers | Admin | — | — | — | agents.plugins · Servers to add | — | — | — |
-| A pack's outside servers | Operator | — | — | — | agents.plugins · Servers to add · Read only | — | — | agents.plugins · Packs · Read only |
+| A pack's policies to apply | Admin | — | — | settings.policies · Loading | settings.plugins · Policies to apply | settings.policies · Rule refused | — | — |
+| A pack's policies to apply | Operator | — | — | — | settings.plugins · Policies to apply · Read only | — | — | settings.policies · Waiting to apply |
+| A pack's outside servers | Admin | — | — | — | settings.plugins · Servers to add | — | — | — |
+| A pack's outside servers | Operator | — | — | — | settings.plugins · Servers to add · Read only | — | — | settings.plugins · Packs · Read only |

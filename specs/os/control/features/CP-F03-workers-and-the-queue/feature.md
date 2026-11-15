@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-05, CP-06, CP-07, CP-08, CP-09, CP-10, CP-65]
 journeys: [J07, J10]
-boards: [agents.workers, agents.runs]
+boards: [settings.workers, agents.runs]
 nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14]
 depends_on: [CP-F02, CP-F04, CP-F10, AC-F02]
 ---
@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Agents › Workers › Groups]) --> lim(["CP-F04 · Agents › Workers › Limits · limits per team, user and agent"])
+  s([Settings › Workers › Groups]) --> lim(["CP-F04 · Settings › Workers › Limits · limits per team, user and agent"])
   s --> wk["CP-09 · Workers: each group, its workers, what each runs"]
   wk -->|no workers| nw["Steps run inside the engine · Add workers"]
   wk --> cap["CP-08 · Slots total · busy · free · where steps wait · add workers, or drain idle ones"]
@@ -314,7 +314,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 
 | Decision | Detail |
 |---|---|
-| Workers is a view of the Agents mode | *Agents › Workers* — Groups · All workers · Queue · Limits · Alerts; join keys sit with Groups; a worker group or a worker opens in place and the path grows (*Workers / Groups / gpu-k8s*). Whether the workers keep up shows in the Agents glance ([CP-72](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)); workers by group — busy, idle, draining — and the queue's waiting and oldest also show in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) |
+| Workers is a section of Settings | *Settings › Workers*, in the large modal — Groups · All workers · Queue · Limits · Alerts; join keys sit with Groups; a worker group or a worker opens in place and the path grows (*Workers / Groups / gpu-k8s*). Whether the workers keep up shows in the Agents glance ([CP-72](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)); workers by group — busy, idle, draining — and the queue's waiting and oldest also show in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) |
 | Add workers is a 720 px modal with a step strip | Where · Group · Join key · Run it · Joined — the one create with a step strip, because a worker joins after the Admin runs the command |
 | Worker groups are the deployment's | An Admin names the groups a team, user or agent may use in its limits ([CP-F04](../CP-F04-limits/feature.md)); a heavy agent gets its own, others share |
 | Suggested is the engine's | Steps ready ÷ steps a worker took over the last ten minutes, every 30 s |

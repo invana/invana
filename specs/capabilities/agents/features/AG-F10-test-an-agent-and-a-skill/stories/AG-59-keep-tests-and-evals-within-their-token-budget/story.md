@@ -4,7 +4,7 @@ title: Keep tests and evals within their token budget
 feature: AG-F10
 status: idea
 personas: [admin, builder]
-boards: [agents.limits, agents.skills, agents.agents]
+boards: [settings.limits, agents.skills, agents.agents]
 ---
 
 # AG-59 · Keep tests and evals within their token budget
@@ -42,7 +42,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-59.1 | Agents › Workers › Limits | anyone opens it | the deployment's monthly eval token budget reads beside what tests, evals and drift spent this month, apart from what agents spent; *No eval budget* when none is set; Evals on every page reads the same spent-of-budget line |
+| AG-59.1 | Settings › Workers › Limits | anyone opens it | the deployment's monthly eval token budget reads beside what tests, evals and drift spent this month, apart from what agents spent; *No eval budget* when none is set; Evals on every page reads the same spent-of-budget line |
 | AG-59.2 | The budget spent | a scheduled eval run or drift would start | it settles *paused: budget* and Evals says so; a publish-time run still runs, its result carrying the warning |
 | AG-59.3 | An Admin | they set or change the budget | it saves and a History row names the old and new value; anyone else reads it, editing disabled — *Needs the Admin role* |
 | AG-59.4 | A new month | it starts | what is spent reads from zero and paused scheduled runs take their next firing |
@@ -52,8 +52,8 @@ flowchart LR
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The eval token budget | Admin | agents.limits · Usage · No eval budget | — | agents.limits · Usage · Loading | agents.limits · Usage · Eval token budget | agents.limits · Usage · Could not load | — | — |
-| The eval token budget | Operator | agents.limits · Usage · No eval budget | — | agents.limits · Usage · Loading | agents.limits · Usage · Read only | agents.limits · Usage · Could not load | — | agents.limits · Usage · Read only |
+| The eval token budget | Admin | settings.limits · Usage · No eval budget | — | settings.limits · Usage · Loading | settings.limits · Usage · Eval token budget | settings.limits · Usage · Could not load | — | — |
+| The eval token budget | Operator | settings.limits · Usage · No eval budget | — | settings.limits · Usage · Loading | settings.limits · Usage · Read only | settings.limits · Usage · Could not load | — | settings.limits · Usage · Read only |
 | A skill's run paused on budget | Admin | — | — | — | agents.skills · Detail · Budget paused | agents.skills · Detail · Budget paused | — | — |
 | A skill's run paused on budget | Operator | — | — | — | agents.skills · Detail · Budget paused | agents.skills · Detail · Budget paused | — | agents.skills · Detail · Budget paused |
 | An agent's run paused on budget | Admin | — | — | — | agents.agents · Detail · Budget paused | agents.agents · Detail · Budget paused | — | — |

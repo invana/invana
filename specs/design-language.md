@@ -72,7 +72,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | Explore | Boards · Conversations · Dashboards · Queries |
 | Model | Models · Standards · Health · **Rules and meaning**: Rules · Views · Taxonomies · Inference · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
 | Projects | Projects · My tasks · Reviews · Schedules |
-| Agents | Agents · Skills · Plugins · Runs · Schedules · Fleet · Workers |
+| Agents | Agents · Skills · Runs · Schedules |
 
 | View | Its leftSection |
 |---|---|
@@ -86,11 +86,8 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | Projects | Active · Draft · Done |
 | Agents (view) | Every agent, grouped Built in · Team pack · Custom · Outside — outside agents a group, never a view ([AG-F02](capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md)); an agent opens as its page in main |
 | Skills | Skills · Workflows (Built in · Approved, by what each touches) · Functions (*Tools they call*) · Approaches · Projection templates; a skill, a workflow and a function each open as their page in main ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md)) |
-| Plugins | Core · Tool · Outside servers · Runtimes, each reading on or off and *Used by n agents*; an outside server lists its work connections; a plugin opens as its page in main ([CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
-| Runs | Needs attention · Running · Failed · All runs; a run opens as its page in main ([CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Runs | Needs attention · Running · Failed · All runs, and the tab *How they are doing* — each agent, skill, plan and model version against its own baseline; a run opens as its page in main ([CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Schedules (Agents) | On · Paused ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
-| Fleet | Map · How they are doing · Workloads — the map of agents, skills, functions and worker groups, and how each agent performs ([CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) · [CP-F09](os/control/features/CP-F09-overview/feature.md)) |
-| Workers | Groups · All workers · Queue · Limits · Alerts — runs at once free, scale advice on Groups and Queue; a worker group or a worker opens in main ([CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md) · [CP-F04](os/control/features/CP-F04-limits/feature.md) · [CP-F11](os/control/features/CP-F11-ops-alerting/feature.md)) |
 | Any other view | The list it names, grouped where it has groups |
 
 | Rule | Detail |
@@ -98,7 +95,8 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | One view, one leftSection | Each view opens its own leftSection, a tree of what it lists; picking a row opens it in main. The nav itself never holds a tree |
 | Views swap, summoners overlay | A view changes leftSection and main; a summoner (Agents · Access · Settings) opens the large modal at its section and never changes the mode |
 | Agents is a mode for everyone | The Agents mode — in the switcher, ⌘4 and every *Open in Agents* — shows to everyone; building, publishing and running respond to the person's Access Policies, each act they lack disabled with who can grant it. The Agents summoner is the glance ([Its sections](#its-sections)) |
-| The Agents summoner is a glance; the Agents mode is the workspace | Building, testing, reading runs and running workers happen in the Agents mode; the summoner shows only enough to stay on the work in front, and every deeper act is *Open in Agents*, which closes the modal and switches mode |
+| Infrastructure is Settings | Plugins, Fleet (Map · Workloads) and Workers are sections of Settings in the large modal, not views of the Agents mode; they show to everyone and the policy decides (rule 9). The Agents mode is for building and running agents — Agents · Skills · Runs · Schedules. An agent's tool picker stays on the agent's page; installing a plugin and switching it on or off is Settings › Plugins |
+| The Agents summoner is a glance; the Agents mode is the workspace | Building, testing and reading runs happen in the Agents mode, running workers in Settings › Workers; the summoner shows only enough to stay on the work in front, and every deeper act is *Open in Agents*, which closes the modal and switches mode — a worker act is *Open in Settings*, at Settings › Workers |
 | The switcher is the one mode switch | The leftNav holds no mode switch; the *☰ Invana {Mode} ▾* control opens [the switcher](#the-switcher) |
 | Collapsed, it still says what needs you | Icons only: the lit view stays lit, a view whose count needs you carries a dot, hover shows its label; leftSection is unchanged |
 | Rules and meaning is a group of Model | Rules · Views · Taxonomies · Inference are views of Model like any other — each its own leftSection, a rule, a view, a taxonomy or a derivation opening in main; none opens in the large modal |
@@ -240,9 +238,9 @@ sections never closes it.
 
 | Section | Nav | Rule |
 |---|---|---|
-| Agents | — (one glance) | Three bands: **Waits on you** — each agent's ask of the reader, answered in place · **Running** — each agent at work, what it is doing now and its next ask, with *Pause* and *Stop* in place · **Workers** — keeping up or not, runs at once free, scale advice. *Assign* gives an agent a task from here. Every deeper act — build, test, read a run, add or drain workers, change a limit — is *Open in Agents* ([CP-72](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)) |
+| Agents | — (one glance) | Three bands: **Waits on you** — each agent's ask of the reader, answered in place · **Running** — each agent at work, what it is doing now and its next ask, with *Pause* and *Stop* in place · **Workers** — keeping up or not, runs at once free, scale advice. *Assign* gives an agent a task from here. Every deeper act — build, test, read a run, — is *Open in Agents*; adding or draining workers and changing a limit is *Open in Settings*, at Settings › Workers ([CP-72](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)) |
 | Access | Now · Who · What they may do · Record · Keeping | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, keys, connected clients · *What they may do* — Roles · Access Policies · Agents · *Record* — History · Usage · What left · *Keeping* — retention, holds, forgetting ([Access Plane](os/access/product.md)) |
-| Settings | General · Appearance · You · Connections · Notifications | *Connections* — Graph databases · AI models · MCP server · Connectors · Team packs. Preference rows and tables |
+| Settings | General · Appearance · You · Connections · Plugins · Fleet · Workers · Notifications | *Connections* — Graph databases · AI models · MCP server · Connectors · Team packs. Preference rows and tables · *Plugins* — Core · Tool · Outside servers · Runtimes, each reading on or off and *Used by n agents*; an outside server lists its work connections; a plugin opens as its detail page ([CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) · *Fleet* — Map · Workloads: the map of agents, skills, functions and worker groups, and runs and tokens by user, agent and team ([CP-F09](os/control/features/CP-F09-overview/feature.md)) · *Workers* — Groups · All workers · Queue · Limits · Alerts: runs at once free, scale advice on Groups and Queue; a worker group or a worker opens as its detail page ([CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md) · [CP-F04](os/control/features/CP-F04-limits/feature.md) · [CP-F11](os/control/features/CP-F11-ops-alerting/feature.md)) |
 | About | — | The version, what's new and Help |
 
 | Rule | Detail |
@@ -257,17 +255,17 @@ sections never closes it.
 |---|---|---|---|
 | Switcher | ~1180 px | [The switcher](#the-switcher) | Everyone |
 | Inbox | 640 px | Needs you · Running · Updates; each ask a card with enough to decide in place and its acts; only what needs *you* ([CP-69](os/control/features/CP-F08-the-inbox/stories/CP-69-decide-what-needs-me-from-the-header/story.md)) | Everyone |
-| Operations | ~720 px | Four tiles — Running (and queued) · Queue (waiting, oldest) · Workers (busy of total, lost) · Tokens this month against the budget — then *Running now*, each run with its step progress and *Stop*; links to Agents › Runs and Agents › Workers in the Agents mode ([CP-70](os/control/features/CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) | Everyone; an Operator's holds their own runs |
+| Operations | ~720 px | Four tiles — Running (and queued) · Queue (waiting, oldest) · Workers (busy of total, lost) · Tokens this month against the budget — then *Running now*, each run with its step progress and *Stop*; links to Agents › Runs in the Agents mode and Settings › Workers in the large modal ([CP-70](os/control/features/CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) | Everyone; an Operator's holds their own runs |
 | Access | ~1100 px | Four tiles — People signed in · Agents acting now · Requests waiting · Blocked today — then the timeline *What each one is touching · last hour* — a row per person or agent, a bar per layer touched, a blocked act struck through — drawn with the kit's Gantt in its *Layer access* reading; links to Access › Now and Access › Record ([AC-48](os/access/features/AC-F06-history/stories/AC-48-see-who-is-acting-and-what-was-blocked-from-the-header/story.md)) | Admin only |
 
 | Rule | Detail |
 |---|---|
-| A dropdown is a quick overview | It reads at a glance and links on; every deeper act happens where it links — add workers, change a limit, tune an alert, drain in the Agents mode; edit a policy in the large modal at Access |
+| A dropdown is a quick overview | It reads at a glance and links on; every deeper act happens where it links — add workers, change a limit, tune an alert, drain in Settings › Workers; edit a policy in the large modal at Access |
 | Low-risk acts in place | *Acknowledge*, *Send back*, *Allow tokens* answer inside the Inbox dropdown; *Stop* a run is Operations' one act in place; Access has none |
 | A write confirms | An *Accept* that writes Graph Data or the model opens a confirm modal listing what changes |
 | Hidden is not the guard | An act a person may not take reads *Ask {Admin}*, and the engine refuses it too |
-| Links, not more summoners | Operations links into the Agents mode at Runs and Workers, for everyone — what a person may not read there is withheld; Access links into Access › Now and Access › Record — neither dropdown is a summoner |
-| The depth is elsewhere | Agents against their budgets, workers by group and alerts are read in the Agents mode; AI models and graph databases in Settings › Connections; who acts now, delegations in force and recent changes in Access › Now and Record — none in a dropdown |
+| Links, not more summoners | Operations links to Agents › Runs and Settings › Workers, for everyone — what a person may not read there is withheld; Access links into Access › Now and Access › Record — neither dropdown is a summoner |
+| The depth is elsewhere | Agents against their budgets, workers by group and alerts are read in Settings › Workers; AI models and graph databases in Settings › Connections; who acts now, delegations in force and recent changes in Access › Now and Record — none in a dropdown |
 
 ## 4. The assistant and agents
 
@@ -297,7 +295,7 @@ sections never closes it.
 
 | Not on screen | Say instead |
 |---|---|
-| Product names as places (Agent Builder, IAM, Activity) · *Fleet* as a product | Agents · Operations · Workers · Access · Inbox — *Fleet* is only the name of a view of the Agents mode |
+| Product names as places (Agent Builder, IAM, Activity) · *Fleet* as a product | Agents · Operations · Workers · Access · Inbox — *Fleet* is only the name of a section of Settings |
 | Policy statement · effect | A rule of an Access Policy · Allow, Ask or Deny |
 | Roles of any kind (viewer · contributor · builder · modeller · owner · iam-admin) | The Access Policy — *Explore*, *Shape the model*, *Run the deployment* — or the permission an act needs |
 | World | An Access Policy rule on data · a sensitive property |
@@ -333,12 +331,12 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 | Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
 | Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships, and the links between models) · Standards · Health · Rules and meaning (Rules · Views · Taxonomies · Inference) · Graph Data | mode |
 | Datasets · Imports | **Graph Data** — a group of Model: Browse by kind (kinds grouped by model, from the graph databases the person may read) · Loads · Quality · Annotations; a record and a load open in main | mode |
-| Agent Builder · Fleet · Skills · Plugins | **Agents** mode — Agents · Skills (with its Workflows) · Plugins · Runs · Schedules · Fleet · Workers; an agent, a skill, a plugin, a workflow, a run and a worker group open in main. Its glance is the Agents summoner | mode · modal |
+| Agent Builder · Fleet · Skills · Plugins | **Agents** mode — Agents · Skills (with its Workflows) · Runs (with *How they are doing*) · Schedules; an agent, a skill, a workflow and a run open in main. Its glance is the Agents summoner. Plugins, the Fleet map and Workloads, and Workers are Settings | mode · modal |
 | Team packs | **Settings › Connections › Team packs**, each with *Used by n agents* | modal |
-| Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's; the depth is Agents › Fleet | dropdown |
+| Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's; the depth is Agents › Runs and Settings › Workers | dropdown |
 | Activity · Notifications | **Inbox** — the header's dropdown (Needs you · Running · Updates), then the large modal (Needs you · Running · Updates · Done) | dropdown · modal |
-| Fleet workers · limits · ops alerts | **Agents › Workers** — Groups · All workers · Queue · Limits · Alerts; whether workers keep up shows in the Agents glance and *● n running* | mode |
+| Fleet workers · limits · ops alerts | **Settings › Workers** — Groups · All workers · Queue · Limits · Alerts; whether workers keep up shows in the Agents glance and *● n running* | modal |
 | IAM · IAM activity | **Access** — Now · Who · What they may do · Record · Keeping; the header's lock is its glance, for everyone | modal · dropdown |
-| Graph settings · Settings · Connectors · Profile | **Settings** — General · Appearance · You · Connections · Notifications | modal |
+| Graph settings · Settings · Connectors · Profile | **Settings** — General · Appearance · You · Connections · Plugins · Fleet · Workers · Notifications | modal |
 | Help | The avatar menu and ⌘K | menu |
 | Projects | **Projects** mode — Projects · My tasks · Reviews · Schedules; a project is a repository, tasks are issues | mode |

@@ -33,7 +33,7 @@ flowchart TD
   t --> run["Running now · agent · who is behind it · step progress · Stop where the reader may"]
   run -->|Stop| st(["CP-58 · Stop the run"])
   run -->|Agents › Runs| ar(["The Agents mode at Agents › Runs (CP-50)"])
-  t -->|Workers| so(["The Agents mode at Agents › Workers"])
+  t -->|Workers| so(["The large modal at Settings › Workers"])
   run -->|another's run, no Manage on Runs| ns["Stop disabled · Needs Manage on Runs"]
   d -->|nothing ran yet| e["Nothing has run yet · what starts a run"]
   d -->|outside click · Esc| x(["Closed · nothing moves"])
@@ -50,9 +50,9 @@ flowchart TD
 | CP-70.5 | Runs going | *Running now* is read | each run with its agent, the person behind it, its step progress — step *n of m* — and *Stop* where the reader may stop it — the runs they are behind, or every run with Manage on Runs |
 | CP-70.6 | A run in *Running now* | the reader presses *Stop* | it stops as CP-58 says; the run leaves the list and the tiles move |
 | CP-70.7 | No monthly budget set | the *Tokens this month* tile is read | it reads the month's tokens and *No limit* |
-| CP-70.8 | The dropdown | the reader follows *Agents › Runs* or *Workers* | the Agents mode opens at Agents › Runs (CP-50) or at Agents › Workers; Operations is never a summoner of its own |
-| CP-70.9 | The dropdown | an Admin looks for agents against their budgets, workers by group, AI models, graph databases or alerts | none is in the dropdown; each is read where it lives — Agents › Agents, Agents › Workers and Agents › Workers › Alerts in the Agents mode, Settings › Connections in the large modal — and the dropdown stays a quick overview |
-| CP-70.10 | The dropdown | an Admin wants to add workers, change a limit, tune an alert or drain a worker | none is offered in place; *Workers* opens Agents › Workers in the Agents mode, where the act is taken — *Stop* on a run is the dropdown's one act |
+| CP-70.8 | The dropdown | the reader follows *Agents › Runs* or *Workers* | the Agents mode opens at Agents › Runs (CP-50), or the large modal at Settings › Workers; Operations is never a summoner of its own |
+| CP-70.9 | The dropdown | an Admin looks for agents against their budgets, workers by group, AI models, graph databases or alerts | none is in the dropdown; each is read where it lives — Agents › Agents, Settings › Workers and Settings › Workers › Alerts in the large modal, Settings › Connections in the large modal — and the dropdown stays a quick overview |
+| CP-70.10 | The dropdown | an Admin wants to add workers, change a limit, tune an alert or drain a worker | none is offered in place; *Workers* opens Settings › Workers in the large modal, where the act is taken — *Stop* on a run is the dropdown's one act |
 | CP-70.11 | A person without Manage on Runs | the dropdown opens | it reads the same tiles, runs and links as anyone's; *Stop* is offered on the runs they are behind and disabled on another's — *Needs Manage on Runs*; nothing is hidden by policy |
 | CP-70.12 | Any figure | it is read | it is a count or tokens — never currency |
 | CP-70.13 | Runs start and end while it is open | it is read | the figures move in place, at most once a second |

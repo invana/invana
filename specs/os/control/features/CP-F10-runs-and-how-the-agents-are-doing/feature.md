@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst]
 stories: [CP-48, CP-49, CP-53, CP-50, CP-66, CP-58, CP-51, CP-52, CP-54, CP-55, CP-56, CP-57, CP-72]
 journeys: [J04, J08]
-boards: [agents.runs, inbox, agents.agents, agents.skills, shell.agents, agents.fleet]
+boards: [agents.runs, inbox, agents.agents, agents.skills, shell.agents]
 nfrs: [NFR-PERF-3, NFR-COST-2, NFR-OPS-3, NFR-UX-2]
 depends_on: [AG-F01, AG-F05, AC-F09, CP-F02, CP-F03, CP-F04, GP-F02]
 ---
@@ -34,7 +34,8 @@ flowchart TD
   dash -->|an ask waiting| inbox(["Inbox › Needs you"])
   dash -->|an agent got slower| perf
   start --> agent["CP-49 · An agent: its runs, served, p95, tokens today and this month"]
-  agent --> perf["CP-53 · How they are doing: agents · skills · plans · model versions over 7, 30 or 90 days"]
+  start --> perf["CP-53 · Runs › How they are doing: agents · skills · plans · model versions over 7, 30 or 90 days"]
+  agent -->|its own line| perf
   perf -->|too few runs| few["Says there were too few runs, never a flat line"]
   perf -->|degraded| change["The change before the first slow run, opened to compare"]
   perf -->|a figure| list
@@ -385,6 +386,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Decision | Detail |
 |---|---|
 | Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, Agents › Runs in the Agents mode, beside the agents and skills it ran |
+| How they are doing is a tab of Runs | *How they are doing* — each agent, skill, plan and model version against its own baseline — is a tab of Agents › Runs, beside the runs it counts; an agent's page shows that agent's own line. The Fleet map and Workloads are Settings › Fleet ([CP-F09](../CP-F09-overview/feature.md)) |
 | Running now is everyone's glance | The header's *● n running* opens Operations ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) with each run's step, tokens, time, worker group and *Stop*; the Inbox's Running holds the reader's own |
 | Runs opens on what needs you | Tiles — runs today against the same day last week · failed today · needs you · p95 over 7 days · tokens this month against the agents' monthly limits · success over 7 days — then *Needs attention*, runs a day over 30 days and what changed recently |
 | Needs attention | Failing workflows first, then agents, then degraded agents; an agent whose latest failure is a listed workflow's run is not listed again; each item has one act that opens where it is answered |

@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-59, CP-60, CP-67]
 journeys: [J08, J09]
-boards: [agents.alerts, inbox]
+boards: [settings.alerts, inbox]
 nfrs: [NFR-OPS-3, NFR-REL-3, NFR-SEC-8]
 depends_on: [CP-F10, CP-F08, CP-F02, CP-F03, CP-F04, CP-F05, PJ-F01, AC-F01, AC-F02, AC-F03, AC-F05, AC-F06, AC-F09, AC-F11]
 ---
@@ -57,7 +57,7 @@ flowchart TD
   view -->|the condition cleared| cl
   view -->|Close · an Admin| note["Close with a note"] --> cl
   view -->|Close · not an Admin| nc["Close disabled, naming the Admins"]
-  set([Agents › Workers › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
+  set([Settings › Workers › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
   t -->|not an Admin| ro["Reads · Edit disabled, naming the Admins"]
   set --> ha["CP-60 · History alerts — what in History tells whom"]
   ha -->|not an Admin| hro["Reads · New History alert disabled, naming the Admins"]
@@ -275,7 +275,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Named approvers, then the Admins | An alert about an agent reaches the people who answer its asks, and the Admins always — never a person because they made the agent |
 | Alerts wait in Needs you | An open alert needs someone to act, so it waits beside asks until it closes |
 | Acknowledging is not closing | *Acknowledge* tells everyone it reached who is on it; only the act its kind names, the condition clearing or an Admin's note closes it |
-| Where alerts show | In each recipient's Needs you (the Inbox dropdown and the full Inbox); open and recently closed in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)); an Admin's *All open alerts* filter in the Inbox; thresholds and History alerts in Agents › Workers › Alerts |
+| Where alerts show | In each recipient's Needs you (the Inbox dropdown and the full Inbox); open and recently closed in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)); an Admin's *All open alerts* filter in the Inbox; thresholds and History alerts in Settings › Workers › Alerts |
 | Closed by acting | Stopping, a done fix task, an answer, a renewed connection, changing a limit or switching off is what closes an alert; *Close* with a note is for an alert no act settles |
 | A failure waits on a fix | A failed task is never re-run; its alert stays open until a fix task made from it is done, so a failure is looked at before work goes on |
 | A personal account stays its person's | A personal connection's failure reaches its person only; it is their account to renew |

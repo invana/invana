@@ -4,7 +4,7 @@ title: Read what each team, user and agent spends against its limits
 feature: CP-F04
 status: idea
 personas: [admin, builder, analyst]
-boards: [agents.limits]
+boards: [settings.limits]
 ---
 
 # CP-34 · Read what each team, user and agent spends against its limits
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Agents › Workers › Limits]) --> m["The deployment: tokens this month · today · runs right now — against each limit"]
+  s([Settings › Workers › Limits]) --> m["The deployment: tokens this month · today · runs right now — against each limit"]
   m --> by["By team · user · agent: tokens and runs this month, runs at once — against its limits"]
   by -->|a figure| runs(["Runs, filtered to what it counts (CP-50)"])
   by -->|near a limit| nl["Says so · only an Admin raises it"]
@@ -57,7 +57,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Usage | Admin | agents.limits · Usage · Nothing run yet | agents.limits · Usage · Nothing matches | agents.limits · Usage · Loading | agents.limits · Usage | agents.limits · Usage · Could not load | — | — |
-| Usage | Operator | agents.limits · Usage · Nothing run yet | agents.limits · Usage · Nothing matches | agents.limits · Usage · Loading | agents.limits · Usage · Read only | agents.limits · Usage · Could not load | — | agents.limits · Usage · Read only |
-| Near or at a limit | Admin | — | — | — | agents.limits · Usage · Near a limit | — | — | — |
-| Near or at a limit | Operator | — | — | — | agents.limits · Usage · Near a limit | — | — | — |
+| Usage | Admin | settings.limits · Usage · Nothing run yet | settings.limits · Usage · Nothing matches | settings.limits · Usage · Loading | settings.limits · Usage | settings.limits · Usage · Could not load | — | — |
+| Usage | Operator | settings.limits · Usage · Nothing run yet | settings.limits · Usage · Nothing matches | settings.limits · Usage · Loading | settings.limits · Usage · Read only | settings.limits · Usage · Could not load | — | settings.limits · Usage · Read only |
+| Near or at a limit | Admin | — | — | — | settings.limits · Usage · Near a limit | — | — | — |
+| Near or at a limit | Operator | — | — | — | settings.limits · Usage · Near a limit | — | — | — |
