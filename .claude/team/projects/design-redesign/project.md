@@ -1,6 +1,6 @@
 ---
 name: design-redesign
-status: running
+status: done
 branch: chore/specs-graph-data
 scope: design-redesign
 ---
