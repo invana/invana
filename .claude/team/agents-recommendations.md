@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**389 recommendations** · 224 open · 112 taken · 21 declined · 32 done
+**391 recommendations** · 226 open · 112 taken · 21 declined · 32 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -432,3 +432,5 @@ flowchart LR
 | R418 | open | 2026-11-15 | designer | phase design-redesign/P03b | component | low | Kit has no chart, model frame or kind chip component; TreeView carries a card look | model.health Growth draws stacked bars from --color-data-N + LegendItem; model.models composes model frames and kind chips in the page; kit TreeView ships rounded-lg + shadow-sm + 240px width, against design-language §2 Corners (square structure). Recommend a plain BarChart, a ModelFrame/KindChip composition in ui-extended, and a flat TreeView variant |  |  |
 | R419 | open | 2026-11-15 | designer | phase design-redesign/P03b | docs | low | SE-11 and SE-12 disagree on New rule for an Operator: absent or disabled | SE-11 Who can says New rule is absent for an Operator; SE-12 says disabled with the reason. P03b drew disabled (SE-12). Also SE-19.4 alerts rows name outcome words while design-language §2 says status is a glyph with no word; P03b drew both. Align the stories |  |  |
 | R420 | open | 2026-11-15 | designer | phase design-redesign/P04 | docs | low | EX-03 names Library › Skills › Projection templates; the glossary's word is Template (answer template) | specs/capabilities/explore/features/EX-F04-the-answer/stories/EX-03-the-answer-in-the-shape-that-fits/story.md Flow and EX-03.9 say 'Projection templates'; glossary.md Template and line 533 make 'projection template' a code word. agents.skills draws the section as 'Answer templates' — rename EX-03's place to match, or settle the on-screen word. |  |  |
+| R421 | open | 2026-11-15 | designer | phase design-redesign/P04b | docs | low | Name the Operator reading of control.alerts and settings.me tabs Connections · Owners in Screens | CP-59 / CP-67 Screens name control.alerts rows for Admin only; P04b drew the Operator lens as alerts on runs they are behind with Close disabled (Ask Priya Shah), rejecting an empty list (design-language §7: Locked is the Operator lens). Add the Operator row to both stories so P15 draws it from the spec, not a guess. |  |  |
+| R422 | open | 2026-11-15 | designer | phase design-redesign/P04b | idea | low | No board links back to the Index — add a link in a shell component | No .dc.html in .design/canvas-invana/project links Main.dc.html; the way back to the Index is the canvas's page list. Recommend ShellHeader's ☰ Invana (or the switcher) link Main.dc.html in the prototype, applied by whoever owns Components (none after P01) — P17 audit to judge. |  |  |
