@@ -3,6 +3,7 @@ name: design-v2027-redraw
 status: running
 branch: design-redesign/P17-audit-every-board-drawn-every-link-resol
 scope: design-v2027-redraw
+artifact_publish: off
 ---
 
 # Design — redraw Invana v2027.11.0 in full, on the approved navigation
@@ -24,6 +25,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | What | Where | Use it for |
 |---|---|---|
 | The canvas | `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX` — mirror `.design/canvas-invana/project/` (seeded from live version `1794727248-917f`, identical on 2026-11-16) | The deliverable |
+| The review artifact | Not created yet — Ravi creates and pins it, and gives its URL here. Never `PgtkC6KygGZz2u8fYq1LWX` | The one artifact a session may publish the mirror to, under the rule *Artifacts: read freely, publish only on Ravi's word* |
 | The approved proposal | `https://claude.ai/artifact/Fjfg52oUYZQDryQanykk9m` v21 — generators `.design/canvas-nav-proposals/b_nav.py` (page B: nav, left content, large modal, dropdowns) · `c_iam.py` (page C: Access Policies, New policy, project access and team, New project wizard) · `d_modes.py` (page D: Agents mode, glance, tuning in the frame, Settings › Workers); every v21 board (pages A–D) synced into `.design/canvas-nav-proposals/project/` on 2026-11-16 — read boards there, never the live artifact | The shell, the nav and every board it already drew — port the markup, never re-invent it |
 | The previous version | *Invana Products* `https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg` (352 boards, 13 pages) — generators `.design/canvas-products/p_*.py`, boards in `.design/canvas-products/project/`, each board's page in that folder's `canvas.json`. Read only — never edited or published | Main-area content: Modeller → Model · Datasets → Graph Data · Agent Builder → Agents · Activity → Runs and Record · IAM → Access · Fleet → Settings › Fleet and Workers |
 
@@ -39,7 +41,8 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | Read the list, open only the closest boards | Read the Products page's board titles in `.design/canvas-products/project/canvas.json`, then open only the 3–5 boards nearest the board being drawn — never a whole page |
 | Say what came from Products | Each phase writes hand-off notes: one line per Products idea taken (board → where it landed) and one per idea rejected because the spec differs |
 | Stories at `idea` are drawn | Statuses are not moved; no `task.md` rows — boards trace to stories by name |
-| The mirror is the canvas | Sessions edit `.design/canvas-invana/project/` only; no session reads or publishes the live artifact. Publishing is the last step, done by Ravi's interactive session after P09 |
+| The mirror is the deliverable | Sessions edit `.design/canvas-invana/project/` only. The live canvas `PgtkC6KygGZz2u8fYq1LWX` is never published by a session — Ravi publishes it after P09 |
+| Artifacts: read freely, publish only on Ravi's word | Any session may read an artifact (Artifact `read`). It may publish the mirror — to the *review artifact* in References and no other — only when this file's header says `artifact_publish: approved` or `artifact_publish: auto approve`, set by Ravi. `off`, missing, or no review URL in References: never publish or update any artifact. Read the header each session; never change it |
 | Who writes `canvas.json` | Only the phase's lead; change only `pages`, `boards`, `order` and `notes`, keep every other key |
 | Board ids stay | Keep the ids the specs cite (`settings.people` stays though it is drawn under Access › Who); the board's title says where it lives |
 | Never stop | A gap the spec does not settle: draw what `design-language.md` supports, write a hand-off note, raise a recommendation (`recommend`), go on. A component the kit lacks: compose the nearest kit components, raise a `component` recommendation, go on |
@@ -195,7 +198,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Foundation — pages, shell components, Index |  | pending |  |  |
+| P01 | Foundation — pages, shell components, Index |  | in progress | 2026-11-16 |  |
 | P02 | Shell, Sign-in & Home, Explore | P01 | pending |  |  |
 | P03 | Model and Graph Data | P02 | pending |  |  |
 | P04 | Projects | P03 | pending |  |  |
