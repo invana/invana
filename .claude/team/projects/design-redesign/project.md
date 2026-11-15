@@ -398,7 +398,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P08 | Explore II — dashboards and memory | P07 | done | 2026-11-15 | gates green · reviews passed |
 | P09 | Model — every state and lens | P08 | done | 2026-11-15 | gates green · reviews passed |
 | P10 | Projects — every state and lens | P09 | done | 2026-11-15 | gates green · reviews passed |
-| P11 | Inbox and Records — every state and lens | P10 | in progress | 2026-11-15 |  |
+| P11 | Inbox and Records — every state and lens | P10 | done | 2026-11-15 | gates green · reviews passed |
 | P12 | Agents — every state and lens | P11 | pending |  |  |
 | P13 | Library — every state and lens | P12 | pending |  |  |
 | P14 | Settings — You, Invana and Connections | P13 | pending |  |  |
