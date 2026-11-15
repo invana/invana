@@ -62,7 +62,7 @@ what it means here.
 | Act | Role | Everyone else sees |
 |---|---|---|
 | Read every limit and what each team, user and agent spends against it | Operator · Modeller · Admin | — |
-| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit | Admin | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit; the slots of *AI model calls*, *graph database calls* and *heavy steps* | Admin | *Edit* disabled — *Needs the Admin role — ask {admins}* |
 | Ask for a higher limit from a held run | The person behind the run | *Ask for more* absent; why it is held reads |
 | Allow that ask | Admin, in Needs you (AC-15) | As AC-F05 |
 
@@ -148,6 +148,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /contention` | `running` (run ids) · `queued` (`run_id` · `position` · `triggered_by` · `queued_at` · `reason` · `binding` {scope, subject, limit}) · `running_count` · `queued_count` · `pools` — every capacity pool with `size` and `in_use`, idle ones included | CP-12 · CP-14 |
 | `GET /starts` | Each start — admitted, waiting or refused — with the limit and whose that decided it, newest first | CP-12 |
 | `POST /limits/asks` | *Ask for more* from a held run `{run_id, limit, span (run · days · always), days?}` → an ask in the Admins' Needs you | CP-14 |
+| `PUT /contention/pools/{name}` | Set a capacity's slots `{slots}` — `llm` · `graphdb` · `heavy` | CP-11 |
 | `GET /llm-limits` · `PUT /llm-limits/{llm_id}` | Each offered model version's rate limit, how much is used and the steps waiting on it · set one | CP-13 |
 
 ### Events
@@ -214,6 +215,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
+| A capacity is named for what it limits | On screen the three capacities read *AI model calls* (`llm`) · *graph database calls* (`graphdb`) · *heavy steps* (`heavy`), each with its slots, in use and waiting, in Workers › Limits; *pool* is never shown |
 | Limits sit with Usage | *Usage and limits* is one page: each limit beside what is spent against it |
 | Four scopes, the tightest binds | Deployment, team, user and agent; a run is inside every one that applies, and the one that stops it is named |
 | Team and user limits bound personal runs | A project's work and a schedule do the same thing whoever set them going, so they run within the agent's and the deployment's limits; a person's and a team's limits bound what that person starts |

@@ -142,7 +142,7 @@ assignees are slots ([AC-F07](../../../../os/access/features/AC-F07-ownership/fe
 | See a project's head — name, key, type, status, counts | Every signed-in person | — |
 | Read a project, its tasks, its Order, its assistant's thread and its relations | A person whose default agent may Read `project/<key>` | The head only; the rest reads *Withheld — your agent may not read `project/{key}`* |
 | Start a project | Operator · Modeller · Admin; the creator is its first member and first reviewer | — |
-| Edit a project's name, purpose and fields; archive or unarchive it; add or take off members; name its assistant and reviewers; turn task kinds on or off; relate it; set its pick-up | Its members · Admins | Every setting reads; each act is disabled — *Members and Admins only* |
+| Edit a project's name, purpose, fields and graph databases; archive or unarchive it; add or take off members; name its assistant and reviewers; turn task kinds on or off; relate it; set its pick-up | Its members · Admins | Every setting reads; each act is disabled — *Members and Admins only* |
 | Write a task, assign it to a person, start it, post a result, cancel it, add checks, draw or remove a dependency, make a group | A person who may read the project; a task with no project, anyone | An archived project's tasks read; each act is disabled, saying it is archived |
 | Assign a task to an agent, name an agent as assistant or member, set *Allow* for an agent | A person the agent is granted to ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)) | The agent is disabled in the picker — *Not granted to you* |
 | Accept or reject a proposal of the project assistant · answer an agent's ask to start a task | Its members, people only — an answer to *Start it* names an agent granted to them | The proposal or ask reads, naming who it waits on |
@@ -185,6 +185,7 @@ assignees are slots ([AC-F07](../../../../os/access/features/AC-F07-ownership/fe
 | Only a person accepts | Accepting or sending back is a reviewer's act. An agent posts a result and never accepts, and a judging run's verdict is not an acceptance |
 | A result waits in the Inbox | A task *In review* or *Checks failed* is listed in Inbox › Needs you ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)) of the project's reviewers and of the person behind its run; for a task with no project, of its author |
 | One assignee field | A person and an agent are both assignees; assigning to an agent opens exactly one run, the assigner behind it, through that agent — so only an agent granted to the assigner can be assigned |
+| Graph databases | A project names the graph databases its runs may read — every graph database the deployment attaches, unless its members tick fewer. It only narrows: a run of the project reads `data/…` only in those graph databases, and there only where its agent's Access Policies allow ([AC-F04 › Rules](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)). It never lets a run reach a graph database its agent may not Read, and it never changes what a person reads outside the project's runs |
 | A run is checked like any run | A task's run is checked by the agent's Access Policies within the run scope, like every run ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)); a project grants nothing. The task's text is data to the agent, never an instruction that widens what it may do |
 | A project reads through the default agent | A person sees every project's head; its content — tasks, results, the thread, relations, Order — reads when their default agent may Read `project/<key>`, else *Withheld*. A copy inside it — a result, a proposal, an ask — reads as far as [GP-F02's lineage](../../../../os/graph/features/GP-F02-memory/feature.md#rules) allows |
 | Owned by the organisation | A project is the organisation's, keeping who made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)); its members and Admins change its settings. Tasks are the project's |
@@ -230,7 +231,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `projects` | `key` · `name` · `description` (the purpose) · `type` · `fields` (JSON, checked against the type's fields) · `status` (`active` · `archived`) · `assistant_agent_id?` · `assistant_set_by_id?` · `created_by_id` · `created_at` | Unique `key`. `type` is a key listed by `GET /api/v1/projects/types`; a question is a field of the types that ask one. Owned by the system user ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)) |
+| `projects` | `key` · `name` · `description` (the purpose) · `type` · `fields` (JSON, checked against the type's fields) · `graph_databases?` (JSON, graph database names) · `status` (`active` · `archived`) · `assistant_agent_id?` · `assistant_set_by_id?` · `created_by_id` · `created_at` | Unique `key`. `graph_databases` null is every graph database the deployment attaches; a list narrows the run scope to those ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine)). `type` is a key listed by `GET /api/v1/projects/types`; a question is a field of the types that ask one. Owned by the system user ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)) |
 | `projects_members` | `project_id` · `principal_kind` (`user` · `team` · `agent`) · `principal_id` · `added_by_id` · `added_at` | Unique (`project_id`, `principal_kind`, `principal_id`). The creator is written as the first member |
 | `projects_reviewers` | `project_id` · `user_id` · `added_by_id` · `added_at` | At least one row per project; the creator is the first |
 | `projects_task_kinds` | `project_id` · `kind` · `enabled` | A kind its type declares; *task* and *recommendation* always enabled. No row is enabled |
@@ -256,6 +257,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Users, teams, the agents granted to each, default agents | [AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#engine) |
 | `decide()` and the default agent's read | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | The run scope — a run's project, related projects and task | [AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
+| The graph databases the deployment attaches | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
 | Slots and the successor | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
 | Proposals — `projects_proposals` | [PJ-F03](../PJ-F03-branches-findings-and-decisions/feature.md#engine) |
 | Handing work to another agent — the same act as raising a task | [AG-F05](../../../agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine) |
@@ -272,7 +274,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Route, after `/api/v1/projects` | Does | Story |
 |---|---|---|
 | `GET /` · `POST /` | Every project's head, and the content the reader's default agent may Read · create one, the caller its first member and reviewer | PJ-01 · PJ-02 |
-| `GET /{key}` · `PATCH /{key}` | Read a project · edit its name, purpose and fields, or archive and unarchive it (`status` `active` ⇄ `archived`) | PJ-01 · PJ-02 |
+| `GET /{key}` · `PATCH /{key}` | Read a project · edit its name, purpose, fields and graph databases, or archive and unarchive it (`status` `active` ⇄ `archived`) | PJ-01 · PJ-02 |
 | `GET /{key}/members` · `POST /{key}/members` · `DELETE /{key}/members/{principal}` | Who is on it · add a user, team or agent · take one off | PJ-22 |
 | `GET /{key}/reviewers` · `POST /{key}/reviewers` · `DELETE /{key}/reviewers/{user}` | Reviewers · add one · take one off | PJ-22 |
 | `PUT /{key}/assistant` | Name the project assistant | PJ-22 |
@@ -303,7 +305,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 
 | Event | When |
 |---|---|
-| `projects.create` · `projects.update` | A project is created · its name, purpose or fields change |
+| `projects.create` · `projects.update` | A project is created · its name, purpose, fields or graph databases change — from and to |
 | `projects.archive` · `projects.unarchive` | Two acts, two History rows |
 | `projects.members.add` · `projects.members.remove` | Put on · taken off |
 | `projects.reviewers.add` · `projects.reviewers.remove` · `projects.assistant.set` | A reviewer added · taken off · the assistant named |
@@ -323,7 +325,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | 403 | Reading a project, its tasks, its Order or its thread when the caller's default agent may not Read `project/<key>` | *Withheld — your agent may not read `project/{key}`.* | PJ-01.3 · PJ-12.21 |
-| 403 | A project's settings — edit, archive, members, assistant, reviewers, kinds, relations, pick-up — by someone neither a member nor an Admin | *Members and Admins only.* | PJ-01.13 · PJ-22.9 · PJ-15.16 · PJ-20.7 · PJ-23.8 |
+| 403 | A project's settings — edit, graph databases, archive, members, assistant, reviewers, kinds, relations, pick-up — by someone neither a member nor an Admin | *Members and Admins only.* | PJ-01.13 · PJ-22.9 · PJ-15.16 · PJ-20.7 · PJ-23.8 |
 | 403 | Assigning a task to an agent, naming it as assistant or member, setting *Allow* for it, or answering *Start it* with it, by a person it is not granted to | *{agent} is not granted to you.* | PJ-12.22 · PJ-22.4 · PJ-15.20 |
 | 403 | Accepting or rejecting a proposal by someone not a member | *Members only.* | PJ-21.9 |
 | 403 | Accepting or sending back a result by someone not a reviewer, or by an agent | *Reviewers only.* · *Only a person accepts or sends back a result.* | PJ-12.14 · PJ-12.34 |
@@ -334,6 +336,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | 422 | A task of a kind the project does not use, or a field its kind does not declare | *{kind}: {why}.* | PJ-20.4 |
 | 422 | A check naming a workflow that does not exist | *There is no workflow {key}.* | PJ-25.9 |
 | 422 | An edit that leaves the name empty | *A project needs a name.* | PJ-01.8 |
+| 422 | A create or an edit naming a graph database the deployment does not attach | *There is no graph database {name}.* | PJ-02.22 |
 | 409 | A key already used | *The key `{key}` is taken.* | PJ-02.17 |
 | 422 | A key that is not URL-safe, or is `tasks`, `decisions` or `types` | *`{key}` cannot be a key — {why}.* | PJ-02.17 |
 | 422 | An edit that names the key | *A project's key is fixed once saved.* | PJ-02.18 |
@@ -410,7 +413,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | The detail has no footer | Each act sits where its subject is: a task is written in Tasks, a dependency or a group is drawn on the Order tab, archive is in Details |
 | Members, assistant and reviewers are one tab | *People* holds the members, the project assistant and the reviewers |
 | The project assistant is in the assistant region | Its thread opens in the right region of the project, where the assistant always sits ([design language](../../../../design-language.md)) |
-| New project is one modal of numbered sections | From the switcher's *New* or Projects, one page and one act ([design-language › Overlays](../../../../design-language.md#3-overlays--four-tiers)): **1** Name (optional) · **2** the type as a grouped card grid (Research · Investigation · Policy · General, and any a Team pack adds) · **3** once a type is picked, the type's fields, key, members and what it started from. The type's default rules, suggested agents and skills, task kinds, default checks and report template are applied; the assistant and more reviewers are named on People after it exists |
+| New project is one modal of numbered sections | From the switcher's *New* or Projects, one page and one act ([design-language › Overlays](../../../../design-language.md#3-overlays--four-tiers)): **1** Name (optional) · **2** the type as a grouped card grid (Research · Investigation · Policy · General, and any a Team pack adds) · **3** once a type is picked, the type's fields, key, members, graph databases and what it started from. The type's default rules, suggested agents and skills, task kinds, default checks and report template are applied; the assistant and more reviewers are named on People after it exists |
 | Settings are the members' and the Admins' | A project is the organisation's; its members change its settings, and an Admin may, so no project waits on one person |
 | Head for everyone, content through the default agent | Every person sees that a project exists, its type and its counts; what it holds reads as far as their default agent may Read `project/<key>` — never hidden, never a list of its own |
 | Reviewers accept | A result is accepted by a reviewer, so who may close work is named on the project and falls back like any slot |
@@ -437,7 +440,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | Item | Why not |
 |---|---|
 | Sub-projects | Branches, groups and relations carry it |
-| A project's own access list | Projects hold no permissions; the default agent decides what a person reads |
+| A project's own access list | Projects hold no permissions; the default agent decides what a person reads, and a project's graph databases only narrow its runs |
 | Connectors on a project | Agents bring their work connections ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
 | Objectives and per-task criteria | A task's body says what done means; checks prove what can be proved; a reviewer accepts |
 | Task dependencies across levels or projects | Order is derived among siblings; groups carry waits across projects |

@@ -199,7 +199,7 @@ The default skills — built in, owned by the system user, each added to its bui
 | `answer-a-question` | Answers a question from the records, citing every record it relies on | Assistant |
 | `profile-a-database` | Reads a graph database's kinds, properties and counts and says what it holds | Modeller |
 | `draft-a-model` | Drafts a model from a profiled graph database, for a Modeller to change and publish | Modeller |
-| `propose-identity-rules` | Proposes match rules that link the same thing across graph databases, for a Modeller to accept | Modeller |
+| `propose-links` | Proposes links between models in one graph database — the same thing, on a key on each side — for a Modeller to accept | Modeller |
 | `check-quality` | Checks records against the model and its rules and lists what fails, with the records | Assistant |
 | `weigh-the-evidence` | Weighs the findings for and against a question and says which way the evidence leans, citing each | Assistant |
 | `weekly-digest` | Sums up the week — what ran, what changed, what waits on a person | Coordinator |

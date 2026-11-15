@@ -73,6 +73,7 @@ flowchart TD
 | CP-11.19 | A project's task, a pick-up or a schedule's firing | it is admitted | only the agent's and the deployment's limits bind it, whoever set it going; no person's or team's limit holds or refuses it |
 | CP-11.20 | An Admin | they set *Tokens a session* on a team or a user, or clear the deployment's | it is refused — *Tokens a session is set for the deployment and for agents.* · *The deployment always has tokens a session.* — and nothing is saved |
 | CP-11.21 | A session that reaches its tokens a session — the agent's, else the deployment's | it is reached | the session ends and the run continues in a fresh session from a hand-off note, same run and number; nothing is asked, and its tokens a run and a month still bind the whole run |
+| CP-11.22 | Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs the Admin role — ask {admins}* |
 
 ## Screens
 

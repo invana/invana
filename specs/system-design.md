@@ -31,7 +31,7 @@ status: idea
 
 Invana is a self-hosted engine and web app that sits between the people and agents who decide and the customer's own
 graph databases. One deployment is everything: it connects any number of graph databases, each through its connector,
-and reads them as one Graph Data without copying a record. It keeps its own state in Postgres, its Memory in a
+and reads them as Graph Data without copying a record — each person, team, project and agent reaching only the graph databases its access allows. It keeps its own state in Postgres, its Memory in a
 bundled system graph and its files in an S3-compatible blob store ([vision](vision.md#where-things-live)).
 
 ```mermaid
@@ -50,8 +50,8 @@ flowchart LR
 
 | In scope | Out of scope |
 |---|---|
-| One deployment is one organisation: its graph databases read as one Graph Data, its users, teams, agents and work | Multi-tenancy, workspaces, an Organisation record, any unit inside a deployment that holds a graph of its own |
-| The ontology, Access Policies, runs, the ledger, History, boards and projects — in Postgres; Memory with its lineage, and identity links — in the system graph | A copy of the customer's records, an extractor, write-back to a system upstream of a graph database |
+| One deployment is one organisation: its graph databases read as Graph Data, its users, teams, agents and work | Multi-tenancy, workspaces, an Organisation record, any unit inside a deployment that holds a graph of its own |
+| The ontology, Access Policies, runs, the ledger, History, boards and projects — in Postgres; Memory with its lineage — in the system graph | A copy of the customer's records, an extractor, write-back to a system upstream of a graph database |
 | People acting through agents, every agent held to the same Access Policies | A person acting on data without an agent |
 
 | Quality goal (top 5) | Why it matters to the person deciding |
@@ -111,7 +111,7 @@ the recommendation that adds one. A feature names the NFRs it must meet in its `
 | NFR-PERF-3 | Lists answer fast | A list route answers ≤ 500 ms p95 server time over 10,000 rows with filters applied; at most 200 rows a page | `http.server.request.duration` by route on the demo deployment | `review` | CP-F07 · CP-F08 · AC-F02 · AC-F05 · AC-F06 · CP-F01 · CP-F02 · SE-F07 · RC-F02 · CP-F10 · AG-F04 · AG-F06 · AG-F07 · PJ-F01 |
 | NFR-PERF-4 | The board stays usable | Layouts up to 3,000 nodes; switching presets glides in ≤ 400 ms under 2,000 nodes; a solve past 400 ms shows a cancellable toast | `ui.canvas.layout.duration` | `review` | SE-F06 · EX-F01 |
 | NFR-PERF-5 | Reads on a person's behalf are bounded | A publish preview reads ≤ 1,000 records a kind; an answer speaks from ≤ 50 rows; an impact reach expands ≤ 12 records a hop, 50 neighbours each — and each says it is a sample | The criteria of SE-F02, EX-F04, PJ-F03 | test | SE-F02 · EX-F04 · PJ-F03 |
-| NFR-PERF-6 | Stitching costs little over its slowest step | Validating and compiling a typed query plan takes ≤ 50 ms p95; joining step results on identity links adds ≤ 200 ms p95 for up to 1,000 rows a step | Spans on a two-database question over the demo deployment | `review` | EX-F03 · GP-F01 · SE-F06 |
+| NFR-PERF-6 | Planning costs little over its slowest step | Validating and compiling a typed query plan takes ≤ 50 ms p95; the steps of a question over several graph databases run at once, so it takes no longer than its slowest step plus planning | Spans on a two-database question over the demo deployment | `review` | EX-F03 · GP-F01 |
 | NFR-PERF-7 | Counts are live and agree | A change to any count — Needs you, running, waiting, open alerts, blocked today — reaches every open Studio tab within 2 s p95; one stream per tab, at most one send a second; the header badge, *n running*, the footer, the dropdowns and the browser title show the same value | An end-to-end test that raises an ask and an alert and times each surface against the counts stream | `review` | CP-F08 · CP-F09 · AC-F06 |
 | NFR-COST-1 | Spend stays inside its budget | Tokens are held before every AI model call; a run never passes its budget by more than the one held call; every limit is in tokens | CP-F04 admission and hold tests | `review` | CP-F01 · CP-F04 · AG-F01 · AG-F05 |
 | NFR-COST-2 | Spend is tokens, never currency | 0 currency amounts in any record, route, event or screen | A schema and string check | `review` | CP-F04 · CP-F10 |
@@ -132,7 +132,7 @@ the recommendation that adds one. A feature names the NFRs it must meet in its `
 | Constraint | Because |
 |---|---|
 | Self-hosted, single-tenant, air-gappable | The target is the enterprise's own ground; every added stateful service is the customer's ops cost |
-| One deployment, many graph databases, read as one Graph Data | The deployment is the widest scope and the only one; every graph database it connects is part of its Graph Data, which is never created, opened, selected or listed; no table, route or command is scoped below it ([vision](vision.md#scope)) |
+| One deployment, many graph databases, read as Graph Data | The deployment is the widest scope and the only one; every graph database it connects is part of its Graph Data, which is never created, opened, selected or listed; no table, route or command is scoped below it ([vision](vision.md#scope)). Who reaches which graph database is access: an agent's rules on `data/<graph database>/…`, narrowed by a project's graph databases ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | The customer's graph databases are theirs | Invana reads them in place through a connector and holds no copy; it writes only to a read + write graph database, and never to a system upstream of one |
 | Supported databases: Neo4j, Memgraph, ArcadeDB (Cypher); JanusGraph, Amazon Neptune, TinkerGraph, ArcadeDB (Gremlin) | The connectors Invana ships ([GP-F01](os/graph/features/GP-F01-data/feature.md#mechanisms)) |
 | Postgres is the source of truth; SQLite in development | Every record, event, the ledger, History and the queue in one transactional store; SQLite keeps a developer's setup to one command |
@@ -149,14 +149,14 @@ Invana scales with acts, runs, calls and tokens — not with page views. The siz
 | Quantity | Estimate | Reached by | Sizes |
 |---|---|---|---|
 | Graph database size | Unbounded by Invana; reads are bounded per act | Invana never loads a whole graph: a board draws ≤ 3,000 nodes, a preview reads ≤ 1,000 records a kind, an answer ≤ 50 rows | NFR-PERF-4 · NFR-PERF-5 |
-| Graph databases per deployment | Up to 20 | A stitched question runs one step per graph database it needs; identity links are declared per pair of kinds | NFR-PERF-6 · NFR-REL-3 |
+| Graph databases per deployment | Up to 20 | A question runs one step per graph database it reads, never joined; links between models stay inside one graph database | NFR-PERF-6 · NFR-REL-3 |
 | Runs going at once | Hundreds per deployment; limits per team, user and agent set by an Admin | [CP-F04](os/control/features/CP-F04-limits/feature.md#engine) | NFR-PERF-1 · NFR-PERF-2 |
 | Width of one run | 700 agents, 5,000 graph-query lanes | The fan-out acceptance workload | NFR-PERF-2 |
 | Parked runs | 10,000 waiting on a person | A run held for days on an approval holds nothing | NFR-PERF-2 · NFR-COST-3 |
 | Run length | Seconds to weeks | A run may wait on a person; every `*_ms` column is 64-bit ([CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) | NFR-REL-2 |
 | Events and History rows | About 10⁵ a day for an active deployment; kept until an Admin sets a period | One event per write, one History row per act, for people and agents alike | NFR-REL-4 |
 | Ledger rows | About 10⁶ a day for an active deployment; kept until an Admin sets a period | One row per call to an AI model, a tool or a graph database; a read keeps at most 1,000 record IDs, a send keeps every ID | NFR-SEC-7 |
-| System graph | About 10⁷ nodes a year for an active deployment | One node per plan, workflow, run, step, evidence, finding and decision; one edge per ledger row's record touched; identity links per match rule | NFR-REL-6 |
+| System graph | About 10⁷ nodes a year for an active deployment | One node per plan, workflow, run, step, evidence, finding and decision; one edge per ledger row's record touched | NFR-REL-6 |
 | Tokens | Per team, user and agent a period, set by an Admin | Every call held first | NFR-COST-1 |
 | Blob store | Grows with loads, reports and run artifacts; artifacts expire before their run | Stored by digest, each object under its own data key | NFR-COST-3 · NFR-SEC-10 |
 
@@ -168,7 +168,7 @@ Invana scales with acts, runs, calls and tokens — not with page views. The siz
 | Event store — `events` in Postgres | Every write, append-only, with its user, the person behind it, its agent, parent event and trace | Same transaction as the write; a live tail by notify | [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
 | The ledger — rows in Postgres, edges in the system graph | One row per call to an AI model, a tool or a graph database (§ 10) | Written before the call's result is used; the edges follow through the outbox | Access Plane › *What left the platform* |
 | Queue — procrastinate's schema in Postgres | Step envelopes waiting for a worker | At-least-once delivery under one idempotency key; the outcome is a row | [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md#engine) |
-| The system graph — bundled ArcadeDB | Memory — plans, workflows, runs, steps, evidence, findings, decisions and their outcome labels, with lineage; the ledger's edges; identity links materialised from match rules | Follows Postgres through the outbox, retried, rebuildable from History; governed by the system ontology; never customer data | The feature that owns the Postgres record it mirrors |
+| The system graph — bundled ArcadeDB | Memory — plans, workflows, runs, steps, evidence, findings, decisions and their outcome labels, with lineage; the ledger's edges | Follows Postgres through the outbox, retried, rebuildable from History; governed by the system ontology; never customer data | The feature that owns the Postgres record it mirrors |
 | The customer's graph databases | The records — nodes and relationships; the schema statements Invana pushes; annotations and derived facts on a read + write one | The database's own; Invana inherits it | Writes: [RC-F02](capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) loads · [SE-F02](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) schema · [RC-F07](capabilities/records/features/RC-F07-annotations/feature.md#engine) annotations · [EX-F06](capabilities/explore/features/EX-F06-annotate-and-edit-the-data/feature.md#engine) edits · [SE-F08](capabilities/semantics/features/SE-F08-inference/feature.md#engine) derived facts · RC-F04 fixes · RC-F05 merges |
 | The blob store — one interface over the S3 API | Files: uploads, load batches, reports, run artifacts and hand-off note bodies, by `sha256` digest | Written once, each object under its own data key; the record holds the digest — a hand-off note's row in Postgres, its body here | [RC-F02](capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) load batches · [CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) artifacts · [AG-F05](capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine) hand-off notes |
 | A task's workspace — a folder on a worker | The files an agent works on for one task, across its sessions | The worker's own disk; never copied to the engine; removed when the task closes | [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md#engine) |
@@ -184,7 +184,7 @@ Invana scales with acts, runs, calls and tokens — not with page views. The siz
 | Every write is an event | A manager emits the event of its write in the write's transaction; History, the change list, notifications and traces are readings of it, never copies | Every write path pays one insert | [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
 | Customer records stay in their graph database | Records are read in place; a dataset is a load batch — a file in the blob store, checked against the model, then loaded into a read + write graph database — never a second store of records | Every look at a record is a query on the customer's database | [RC-F02](capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) |
 | What Invana writes into a customer's graph database | Annotations, derived facts, loads, fixes and merges, only to a read + write graph database and only with Write permission; a derived fact is labelled *derived* with its rule and version; lineage lives in the system graph | A read-only graph database holds no annotation | [RC-F07](capabilities/records/features/RC-F07-annotations/feature.md#engine) · [SE-F08](capabilities/semantics/features/SE-F08-inference/feature.md#engine) |
-| Identity links live in the system graph | Materialised from the match rules a Modeller declares per pair of kinds; never written into a customer's graph database, never guessed | A rule change re-materialises its links | [GP-F01](os/graph/features/GP-F01-data/feature.md#mechanisms) · match rules [SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
+| Links stay in one graph database | A link between models joins two models of the same graph database and writes its relationships there, each marked with its link; nothing joins records across graph databases — that is later | A question that relates records in two graph databases is answered *Not yet* | [SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) · [GP-F01](os/graph/features/GP-F01-data/feature.md#mechanisms) |
 | Versions are immutable | Models, rules, skills, agents, workflows and Access Policies publish new versions; a run is frozen onto the versions it used | Storage grows with every publish | [SE-F02](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) · [AG-F01](capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [AG-F04](capabilities/agents/features/AG-F04-skills/feature.md#engine) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | Hard deletes, downward cascade | No soft delete, no trash, no undo; retention removes whole windows; a purged blob or secret is crypto-shredded; retire, retract and undoing a load keep history resolvable | A mistaken delete is gone | Each feature's *Refusals* |
 | Kept until an Admin sets a period | Memory, History, the ledger, the query log and recall each keep everything by default; an Admin sets a period per store, and each store's owner prunes whole windows; a legal hold on memory or History stops pruning and erasure | Stores grow until a period is set | [AC-F12](os/access/features/AC-F12-leaving-and-keeping/feature.md#engine) · NFR-REL-4 |
@@ -264,7 +264,7 @@ flowchart TB
 | Engine | The API, the authorization server, the Control Plane, the Access Plane, the outbox relay, the clock | Nothing at rest | `invana start` or Compose | One or more processes; one coordinator by lease |
 | Studio | The web app, served by the engine or on its own | Nothing at rest | Compose on `8300` | Bundled in the engine image or `invana/studio` |
 | Postgres | The source of truth | Every record, event, ledger row, outbox row, the queue | Compose; SQLite for engine tests | The customer's Postgres |
-| ArcadeDB | The system graph | Memory with its lineage, ledger edges, identity links | Compose | Bundled image, pinned by digest |
+| ArcadeDB | The system graph | Memory with its lineage, ledger edges | Compose | Bundled image, pinned by digest |
 | RustFS | The blob store | Files, sealed | Compose, pinned by digest | Amazon S3 or the customer's S3-compatible store |
 | Vault | Transit for the install key | The install key | Not used — a key file, with Studio's warning | The customer's Vault |
 | Workers | Step envelopes; sessions of agents on their runtimes, inside the sandbox | A workspace per open task | Inline, or Compose | Docker, plain Python or Kubernetes, dialling out; a group carries the runtime plugins an Admin installed on it |
@@ -280,10 +280,10 @@ flowchart TB
 | Access Plane | The policy check on every Read · Write · Run; sign-in, sessions and keys; the Directory; asks and approvals; the ledger; History | Users, teams, Access Policies, keys, approvals, ledger rows, History | [AC-F01](os/access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine) · [AC-F02](os/access/features/AC-F02-access-policies/feature.md#engine) · [AC-F04](os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) · [AC-F05](os/access/features/AC-F05-asks-and-approvals/feature.md#engine) · [AC-F06](os/access/features/AC-F06-history/feature.md#engine) |
 | Control Plane | Walks a plan: the frontier, fan-out, signals, pauses, cancel and resume; admits runs against limits and switches; graph databases, AI models, plugins and workers; one coordinator by lease | Runs, steps, the queue's envelopes, limits, graph database connections, switches | [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md#engine) · [CP-F04](os/control/features/CP-F04-limits/feature.md#engine) · [CP-F05](os/control/features/CP-F05-graph-databases/feature.md#engine) · [CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | The clock | One shared tick for schedules, deadlines, ask reminders and expiry, chain verification and sweeps | Schedules and firings | [AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md#engine) |
-| Typed query plans | Validate a plan against the published model and the agent's policies, compile one step per graph database, join the results on identity links | Nothing stored | [EX-F03](capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) |
+| Typed query plans | Validate a plan against the published model and the agent's policies, compile one step per graph database, keep each graph database's rows apart | Nothing stored | [EX-F03](capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) |
 | Workers | Run step envelopes from their group's queues, and an agent's sessions on the runtime it runs with — Invana's, Claude Code or Codex — inside a sandbox that enforces the agent's `fs/` · `cmd/` · `net/` rules, in a workspace per task; no inbound port, no database credential | Workspaces; post outcomes, session ends and sandbox refusals back | [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md#engine) |
 | AI model client | The only caller of an AI model; one structured call to the endpoint a run resolved, through the outbound check, ledgered | Nothing; endpoints are CP-F01's | [AG-F01](capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) · [CP-F01](os/control/features/CP-F01-ai-models/feature.md#engine) |
-| Graph Plane — Data | Connectors: one package per database family, found by entry point; one credential per graph database; every read in a read-only session, proved by a certification test; raw queries through four layers; every call ledgered; the join across graph databases on identity links | Capabilities, cached with each connection; identity links in the system graph | [GP-F01](os/graph/features/GP-F01-data/feature.md#engine) |
+| Graph Plane — Data | Connectors: one package per database family, found by entry point; one credential per graph database; every read in a read-only session, proved by a certification test; raw queries through four layers; every call ledgered; each graph database's rows kept apart | Capabilities, cached with each connection | [GP-F01](os/graph/features/GP-F01-data/feature.md#engine) |
 | Graph Plane — Memory | Serves Invana's own graph of the work — the nodes and edges the outbox relay writes — and the lineage of every copy, withholding what a reader's default agent may not read | Nothing in Postgres; nodes and edges in the system graph | [GP-F02](os/graph/features/GP-F02-memory/feature.md#engine) |
 | Plugins and MCP | Core, tool, Team pack and runtime plugins, each a Claude plugin — `.claude-plugin/plugin.json` with Invana's fields under `metadata`, `skills/`, `agents/`, `.mcp.json` — with their declared needs; a Team pack's agents the platform's and its policy files drafts until an Admin applies them; every tool plugin an MCP server on the workers; the deployment's one MCP server; outside credentials | The registry, switches, MCP servers | [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) · [CP-F06](os/control/features/CP-F06-skill-scripts/feature.md#engine) |
 | Blob interface | Every file in and out of the blob store, sealed and unsealed | Nothing; objects are their feature's | § 6 *Files and encryption* |
@@ -379,7 +379,7 @@ sequenceDiagram
   G-->>C: Rows
   C->>L: Row per call: query, kinds, counts, result hash, record IDs to a cap
   C-->>Q: Rows per step
-  Q-->>A: Joined on identity links
+  Q-->>A: Rows, each graph database's apart
   A->>X: Check: data-bearing call to the model allowed
   X->>L: Row: kinds, fields and every record ID sent
   A-->>P: The answer, each part citing its records
@@ -388,7 +388,7 @@ sequenceDiagram
 | Decision | Choice | Trade-off | Detail in |
 |---|---|---|---|
 | A typed query plan, never a raw query | The AI model writes a typed plan — kinds, properties, filters, hops, aggregates — from the published model, never from records; the engine validates it against the model and the agent's Access Policies, then compiles it to Cypher or Gremlin per graph database. A question the plan cannot express is said so, and the agent offers a function — never a silent raw query | Some questions need a function first | [EX-F03](capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) |
-| Stitched, never copied | One query step per graph database, in its own language; the engine joins the results on the identity links the system graph holds | A join across databases runs in the engine, bounded by NFR-PERF-5 | [GP-F01](os/graph/features/GP-F01-data/feature.md#mechanisms) · NFR-PERF-6 |
+| Read in place, never copied | One query step per graph database the agent may read, in its own language; each graph database's rows are kept apart and shown side by side, never joined | A question relating records in two graph databases is answered *Not yet* until joins across graph databases come | [GP-F01](os/graph/features/GP-F01-data/feature.md#mechanisms) · NFR-PERF-6 |
 | The policy check | Every act is an agent's: users hold the agents they may use and one role, agents hold every Read · Write · Run. A rule is an effect, a verb and a resource `type/name` with whole-segment `*`; a rule has no term for a person or a team. Default deny; the strictest rule wins; a person's own acts run as built-in agents | Every act pays one check | [AC-F02](os/access/features/AC-F02-access-policies/feature.md#engine) · [AC-F04](os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
 | Declared needs | A skill, plugin or function declares what it needs; it is usable when the needs are within the agent's policies and the graph database's mode allows it, otherwise refused naming what is missing | A need not declared is not granted | [CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine) · [AG-F04](capabilities/agents/features/AG-F04-skills/feature.md#engine) |
 | One door to an AI model | The AI model client makes one structured call to the endpoint the run resolved and records it in the ledger; the policy check decides before it | Every model feature goes through one interface | [AG-F01](capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) the client · [CP-F01](os/control/features/CP-F01-ai-models/feature.md#engine) endpoints and the cache |
@@ -523,7 +523,7 @@ date it was read; moving a pin is a spec change; a file at another version is re
 | Access below the product | A person with the host, Postgres, the system graph or the blob store reads what the product would not show them; the install key, sealed excerpts and the ledger's keyed hashes narrow it; it is the operator's to control, and documented for the customer | Invana cannot police its own operators | § 13 |
 | Leaving and keeping | A leaver names a successor who takes every slot; their personal-connection data is erased; their name kept or pseudonymised by one setting; a subject is forgotten through lineage; everything held about a person exports as JSON; the customer's graph databases are never written to for it | Erasure cannot be undone | [AC-F12](os/access/features/AC-F12-leaving-and-keeping/feature.md#engine) · [AC-F07](os/access/features/AC-F07-ownership/feature.md#engine) |
 | The browser forgets on a change | A revoke, a role change, a grant change or a default agent change clears what Studio holds and reads again | One more read after each change | [AC-F03](os/access/features/AC-F03-directory/feature.md#engine) |
-| The system graph holds no customer data | Thinking, ledger edges, identity links and lineage carry record IDs and keyed hashes, never values | Recall cites records, then reads them | § 6 |
+| The system graph holds no customer data | Thinking, ledger edges and lineage carry record IDs and keyed hashes, never values | Recall cites records, then reads them | § 6 |
 | Who acted, never what they sent | Telemetry and logs carry user, origin and ids — never record contents, prompts, answers or credentials | Debugging content needs the record, not the log | Observability below |
 
 ### Observability
@@ -596,7 +596,7 @@ record (§ 6).
 | NFR-PERF-3 | § 8 list contract | at risk — no budget measured | CP-F07 · CP-F08 · AC-F02 · AC-F05 · AC-F06 · CP-F01 · CP-F02 · SE-F07 · RC-F02 · CP-F10 · AG-F04 · AG-F06 · AG-F07 · PJ-F01 |
 | NFR-PERF-4 | `@invana/canvas` layouts | at risk | SE-F06 · EX-F01 |
 | NFR-PERF-5 | Bounded reads in SE-F02, EX-F04, PJ-F03 | meets — criteria | SE-F02 · EX-F04 · PJ-F03 |
-| NFR-PERF-6 | § 10 stitched, never copied | gap — no stitching ([migrations.md](migrations.md) M7) | EX-F03 · GP-F01 · SE-F06 |
+| NFR-PERF-6 | § 10 read in place, never copied | gap — many graph databases per deployment not built ([migrations.md](migrations.md) M7) | EX-F03 · GP-F01 |
 | NFR-PERF-7 | § 8 one counts source over the event store's live tail | gap — not built (R382) | CP-F08 · CP-F09 · AC-F06 |
 | NFR-COST-1 | § 10 bounded four ways | at risk | CP-F01 · CP-F04 · AG-F01 · AG-F05 |
 | NFR-COST-2 | § 4 spend in tokens | at risk | CP-F04 · CP-F10 |
@@ -618,7 +618,7 @@ record (§ 6).
 |---|---|---|
 | A plan interpreter, not a job scheduler | The runtime walks plans generated as data and refuses what the policies forbid | Invana keeps its own interpreter |
 | One deployment, one organisation | No multi-tenancy, no workspaces, no unit below the deployment; hosted means one deployment per customer | Each customer runs their own |
-| The graph databases are the customer's | Invana reads them in place, reads them as one Graph Data, and writes only to a read + write one | Invana depends on each database's availability |
+| The graph databases are the customer's | Invana reads them in place, each step in one graph database, and writes only to a read + write one | Invana depends on each database's availability |
 | Postgres is the truth | Records, events, the ledger, History, the outbox and the queue in one database; the system graph and the blob store hold what it cannot hold well | One database carries every write |
 | Agents do every act | A person acts through the agents they may use; one access model for people, agents, keys and outside callers | A person's direct act is a built-in agent's run |
 | Tokens are the unit of spend | Budgets, limits and figures in tokens | No cost view in currency |
@@ -632,7 +632,8 @@ record (§ 6).
 | Three bundled services | Each is the customer's to run and back up | Admin | The system graph is rebuildable from History; the blob store is any S3-compatible store the customer already runs |
 | AI model providers are outside | An outage or a rate limit stops agents | Admin | Pinned versions, a local model per call, rate limits as backpressure |
 | A typed plan cannot express a question | An agent cannot answer it | product-manager | The agent says so and offers a function, never a raw query (NFR-SEC-5) |
-| Identity links match wrongly | A stitched answer joins two different entities | Modeller | Links only from declared match rules, never guessed; each link cites its rule |
+| A link between models matches wrongly | A question crosses a link that joins two different entities | Modeller | Links only from declared keys, never guessed; counted before staged; each relationship cites its link |
+| No join across graph databases | A question relating records in two graph databases cannot be answered yet | product-manager | Said *Not yet*, naming both graph databases; joining across graph databases is later ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
 
 | Not building | Why not |
 |---|---|

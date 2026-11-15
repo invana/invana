@@ -21,7 +21,7 @@ depends_on: [SE-F07, RC-F06, CP-F03]
 
 ```mermaid
 flowchart TD
-  start([Model › Rules and views › Rules · New rule · A derivation]) --> may{Modeller or Admin?}
+  start([Model › Inference · New rule · A derivation]) --> may{Modeller or Admin?}
   may -->|no| na["Reads · Needs the Modeller role — ask an Admin"]
   may -->|yes| d["SE-22 · When … then … · scope · write back to the database or not"]
   d -->|a form outside the supported rules| bad["Refused, naming what is not supported"]

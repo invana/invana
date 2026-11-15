@@ -27,6 +27,7 @@ map every element to the kit → lay out the story's page → draw to the standa
 | Compose from `@invana/design-kit` and `@invana/canvas-ui`, tokens only (the `build-studio` skill §1) | Draw a look-alike, a one-off, or a component the kit does not have |
 | Send a component request when nothing fits or a kit component must change | Draw with a component before it is in the kit |
 | Draw every state, as Admin and as Operator | Stop at the happy path |
+| Keep every board simple: only what the person needs to act on next (`design-story` §4 *Simple by default*) | Fill a board with every fact the engine returns, or add a tile, column or panel nobody acts on |
 | Ask the product manager about a gap, or a board the spec does not name | Invent a state, an act, a word, a board or an access rule |
 | Put one story on one page, named *Product › Feature › STORY-ID Story name* | Mix stories, batches or layers on a page |
 

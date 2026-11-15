@@ -13,7 +13,7 @@ depends_on: [AC-F02, AC-F07, CP-F05, CP-F10, SE-F06]
 
 # The board and its canvas
 
-> Where an answer is looked at: a quiet, kept board that draws what Graph Data holds — every graph database, stitched —
+> Where an answer is looked at: a quiet, kept board that draws what Graph Data holds — every graph database the Assistant may read —
 > lets the analyst move around it, pick things out and read the rows behind it, so they can judge what the answer says
 > before deciding what to do with it.
 > The decision it helps make: *does this answer say what it seems to, and is it worth acting on?*
@@ -28,7 +28,7 @@ flowchart TD
   b -->|empty: nothing drawn| e0["What it is for · Ask your first question"]
   b --> d{What now?}
   d -->|look| look["Pan · zoom · hover"]
-  d -->|widen| ex["EX-09 · Expand a node — counted first, across graph databases by identity links"]
+  d -->|widen| ex["EX-09 · Expand a node — counted first, in its own graph database"]
   ex -->|too many| cap["The count, and a cap or a kind to filter by"] --> ex
   ex -->|a rule denies the kind| rf["Refused · names the rule, its policy and who set it"]
   ex -->|a graph database off or down| off["Refused · names the database and why"]
@@ -60,7 +60,7 @@ sequenceDiagram
   S->>E: an expansion, as the Assistant
   E->>X: Read data/<graph database>/<kind> for each kind it reaches
   X-->>E: Allow · Deny, the strictest rule winning
-  E->>G: one counted step per graph database, joined on identity links
+  E->>G: one counted step, in the graph database that holds the node
   E-->>S: the count first
   S-->>P: "412 neighbours" · cap or filter
   P->>S: draw
@@ -123,7 +123,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | Size by connections | On by default: a node's radius grows with the square root of its connections, from 8 to 28 px. It is worked out on every draw and never saved; while it is on it wins over a kind's size in Styling; switching it re-runs the layout |
 | Counted before drawn | An expansion or a large answer states its count before it draws, and a cap the person can raise |
 | Missing is shown | An element gone from its graph database stays drawn, marked missing, with when it was last seen |
-| Stitched, never copied | An expansion runs one step per graph database the node reaches and joins them on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)); a neighbour in another graph database draws like any other, its database named in the Element panel |
+| Read in place, never copied | An expansion runs one step in the graph database that holds the node, and its neighbours are that graph database's; nothing is joined across graph databases — that is later ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)). A board may hold records of several graph databases, each naming its graph database in the Element panel |
 | A rule refuses, never hides silently | The board is never told what an Access Policy keeps from the Assistant. An expansion into a kind a rule denies is refused naming the rule, never answered with zero neighbours |
 | Sensitive is still read | A sensitive property ([SE-F03](../../../semantics/features/SE-F03-meaning/feature.md)) draws on the board and in the panel; the board sends nothing to an AI model |
 | Off is named | A read that needs a graph database switched off is refused naming who switched it off; one that is down is refused naming it ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)) |
@@ -138,7 +138,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | One place per piece of chrome | Top-left the row; top-right the rail and its one floating panel; bottom-left the dock; bottom-centre the presenter, only while presenting. The rail and the dock show only in the work modes |
 | The footer | Left: the graph databases drawn from · `195 nodes · 312 relationships` (opens Data) · `4 queries` (opens Queries, with a dot when one failed) · the message line. Right: `3 selected` · the view chip `87% · 1,240, −380` (a click copies it) · the renderer and frame rate. The message is plain text, never a link. The footer counts what the board draws; the Legend and the kind counts count the graph databases — `26 nodes` in the footer and `24,477 nodes` in the Legend are both true |
 | Inspect is the default | The Element panel states what an element is; it edits only in Edit mode, and only against the model |
-| Leans on | Ontology — the published model gives kinds, keys and colours; identity links stitch graph databases (SE-F06) · Access Policies (AC-F02) · who made it (AC-F07) · graph databases, their switches and health (CP-F05) · runs (CP-F10) · EX-F03 — answers that draw onto the board · EX-F06 — saving edits · RC-F07 — annotations · Agents › Schedules — *Schedule this* |
+| Leans on | Ontology — the published model gives kinds, keys and colours; links between models (SE-F06) · Access Policies (AC-F02) · who made it (AC-F07) · graph databases, their switches and health (CP-F05) · runs (CP-F10) · EX-F03 — answers that draw onto the board · EX-F06 — saving edits · RC-F07 — annotations · Agents › Schedules — *Schedule this* |
 
 ## Data touched
 
@@ -174,7 +174,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Who made a board — the platform owns it | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
 | Users and teams a board is shared with — who they are, who is on a team | [AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#engine) |
 | Graph databases, their switches, mode and health | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
-| Identity links between kinds of two graph databases | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
+| Links between models | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | The published model's kinds and keys | [SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Schedules — *Schedule this* | [AG-F07](../../../agents/features/AG-F07-schedules/feature.md#engine) |
 | A conversation and its turns — the board's `session_id` | [EX-F03](../EX-F03-ask-a-question/feature.md#engine) |
@@ -188,7 +188,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /boards/{board}/versions` · `POST /boards/{board}/versions` · `GET /boards/{board}/versions/{version}` | A board's versions · save one · read one | EX-07 · EX-09 |
 | `GET /boards/{kind}/{subject}/versions` · `POST /boards/{kind}/{subject}/versions` · `GET /boards/{kind}/{subject}/versions/{version}` | A declared board's reports · keep one, creating or finding the board's row · read one | EX-15 |
 | `GET /boards/{board}/shares` · `PUT /boards/{board}/shares` · `DELETE /boards/{board}/shares/{share}` | Who the board and its snapshots are shared with · share with users and teams `{version_id?, principals[{kind, id}]}` · stop sharing | EX-15 |
-| `POST /expand` | A node's neighbours — the variant (all · by relationship kind · by neighbour kind) is a field, with direction, page size and property filters; counted first; across graph databases by identity links | EX-09 |
+| `POST /expand` | A node's neighbours — the variant (all · by relationship kind · by neighbour kind) is a field, with direction, page size and property filters; counted first; in the node's graph database | EX-09 |
 | `POST /resolve` | Which elements of a reopened board are still in their graph databases | EX-09 |
 | `GET /type-counts` | Every node and relationship kind with its count, per graph database, as the Assistant | EX-09 |
 
@@ -235,7 +235,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | History cap | Each board keeps its newest `INVANA_BOARD_HISTORY_LIMIT` versions (30; `0` keeps all), pruned as a new one is written; a shared snapshot is never pruned |
 | Page ids | A board opens as the page `kind:id` live and `kind:id@version` frozen |
 | Reads run as the Assistant | `POST /expand` runs `expand-neighbours` (`graph.read.get_neighbors`, trigger `canvas`); `/type-counts` runs `count-types` (`graph.read.types_count`, `canvas`); `/resolve` runs `resolve-elements` (`graph.read.resolve`, `system`). Each runs as the built-in Assistant for the person, checked against its Access Policies before any graph database is read; it spends no token budget, is never counted against an agent's runs at once, and is hidden in Agents › Runs unless *Show interactive runs* is on |
-| One step per graph database | An expansion or a count runs one step per graph database the node's kind and its identity links reach, each in that database's language and its driver's read mode; neighbours across databases are joined on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine)). A kind the rules deny is refused before its step, and the whole read is refused rather than answered with what is left |
+| One step per graph database | An expansion or a count runs one step in the graph database that holds the node, in that database's language and its driver's read mode; over nodes of several graph databases, one step in each, kept apart and never joined. A kind the rules deny is refused before its step, and the whole read is refused rather than answered with what is left |
 | The turn is written first | An expansion in a conversation writes its turn — *Expand neighbours of "Acme Ltd"* — before its run opens; one that returned nothing is still a turn |
 | Type counts | Per graph database: `nodes` · `edges` as `[{name, count}]`, biggest first · `counted` (`false` when the database cannot count; every kind still listed, `count: null`) · `total_nodes` · `total_edges`, summed once in the engine, `null` when any kind is uncounted · `run_id` |
 | Missing is marked | Reopening calls `/resolve`; an element gone from its graph database is returned as missing with when it was last seen, never dropped |
@@ -248,7 +248,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | § 6 Data and storage | Three tables in Invana's own store; no new store | — |
 | § 8 APIs and events | The routes and events above, under `explore` | — |
-| § 10 AI and agents | Board reads run built-in workflows as the Assistant, checked against its Access Policies, with no token budget; one step per graph database, joined on identity links | NFR-PERF-6 |
+| § 10 AI and agents | Board reads run built-in workflows as the Assistant, checked against its Access Policies, with no token budget; one step per graph database, never joined | NFR-PERF-6 |
 
 ## Decisions
 
@@ -299,4 +299,4 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Autosave on a declared board | It holds nothing of its own; a report is kept deliberately, once |
 | A report of a report · *Reports* on a frozen page | A report is already frozen; the list belongs to the live board it is of |
 | Deleting or renaming a report | Versions are append-only; a kept reading somebody linked is not tidy-up |
-| A board copied between graph databases | A board draws Graph Data, stitched; it is never a copy of records |
+| A board copied between graph databases | A board draws Graph Data in place; it is never a copy of records |

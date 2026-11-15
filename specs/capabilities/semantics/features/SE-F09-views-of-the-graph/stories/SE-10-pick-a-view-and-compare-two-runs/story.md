@@ -29,7 +29,7 @@ Reading, picking and comparing are every signed-in person's; naming and authorin
 
 ```mermaid
 flowchart TD
-  a([Model › Rules and views › Views]) --> l["Each view: what it hides · who uses it · its runs"]
+  a([Model › Views]) --> l["Each view: what it hides · who uses it · its runs"]
   l -->|none yet| e["Everything — inside the rules on properties"]
   l -->|a view| pg["Its page: the model read through it · layers · runs"]
   l -->|New view · Edit| r{Modeller or Admin?}
@@ -50,7 +50,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-10.1 | The deployment's views | a person opens Model › Rules and views › Views | each view lists with what it hides, who uses it and its runs in 30 days, as the engine counts them |
+| SE-10.1 | The deployment's views | a person opens Model › Views | each view lists with what it hides, who uses it and its runs in 30 days, as the engine counts them |
 | SE-10.2 | No view yet | Views opens | it reads *Everything — inside the rules on properties*, with *New view* for a Modeller or an Admin |
 | SE-10.3 | A view | a person opens it in Views | the model reads through it — hidden kinds dimmed, protected properties shielded — beside *Sees · Answers go · Used by* |
 | SE-10.4 | Views in the deployment | a person picks one in the composer and asks | the run opens under that view and keeps it; a later edit of the view reaches only the next run |

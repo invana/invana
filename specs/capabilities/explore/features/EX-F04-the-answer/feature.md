@@ -116,7 +116,8 @@ is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-run
 | The plan picks the shape | The shape is read from the typed query plan and its rows — whole records and hops are a graph, returned properties are rows, one aggregate is a number, one aggregate per group is a category and a number, nothing is nothing — then a projection template is ranked by the visual asked for (*as a chart*) and the kind of question. The AI model classifies the question and writes the words; it never picks a template, and templates are never in the prompt |
 | Projection templates are one home | Every way rows become a part — the answer in the thread, a part on a task, a scheduled answer, a question asked back — is a projection template here; nothing else draws an answer |
 | Asking for a visual ranks, never forces | *As a chart* over one number still shows the number; the chart is offered disabled with its reason |
-| A drawing adds | A graph answer adds to what is on the board, never replaces it; it is counted as drawn — each node and relationship once, a record linked across graph databases once |
+| A drawing adds | A graph answer adds to what is on the board, never replaces it; it is counted as drawn — each node and relationship once |
+| Each graph database apart | An answer that read several graph databases shows each one's result in its own part, headed by its graph database, side by side; nothing is joined, related or added up across them ([EX-F03](../EX-F03-ask-a-question/feature.md#rules)) |
 | A reload reads the record | Opening a conversation, switching a tab or reloading shows what is stored and asks no graph database; reading again is the person's *Re-run* |
 | A re-run is a new run | It leaves the earlier answer in place; a re-run that fails shows beside the answer it re-checked |
 | The time is the run's | The meta line's time is the run's work, stored by the engine when it settles; each compiled query's own time is its step's |

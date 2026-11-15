@@ -15,8 +15,8 @@ depends_on: []
 
 > A model is never started from a blank page: Invana drafts it from what a graph database already holds, from a
 > description the assistant turns into kinds, from a file, a starter or an ontology a field already published. The
-> person decides what to keep, and nothing is published until they publish it. Every published model joins the one
-> stitched model of the deployment.
+> person decides what to keep, and nothing is published until they publish it. Every published model joins the whole
+> model of the deployment.
 > The decision it helps make: *which drafted kinds and links belong in the model, and is it ready to publish?*
 
 ## User journey
@@ -102,8 +102,8 @@ table names the acts.
 | A start is always a draft | Every way in lands on the new model's draft canvas; nothing publishes until a person does (SE-F02) |
 | What a graph database holds is not the model | It is named as such, per graph database, shown with the time it was read, and compared against the model; it never grounds an answer |
 | A model lives in one graph database | Every model is bound to the graph database its records are in — picked when it is made, fixed once saved; a model drafted from a graph database is bound to it |
-| One stitched model | The deployment's published models, their links and identity match rules are one model — what every question is grounded in, across every graph database (SE-F06) |
-| A model is named for its domain | `Customers`, `Orders`, `Suppliers` — unique in the deployment and portable to another deployment as a file; models meet only through declared links and identity match rules (SE-F06) |
+| One whole model | The deployment's published models and their links are one whole model — what every question is grounded in; each model stays in its graph database, and links join models in the same one (SE-F06) |
+| A model is named for its domain | `Customers`, `Orders`, `Suppliers` — unique in the deployment and portable to another deployment as a file; models meet only through declared links, inside one graph database (SE-F06) |
 | The graph database decides what a property can be | A property type the model's graph database cannot hold is refused when it is authored, naming the type and the server version; an import with one lands as a draft that cannot publish, naming it |
 | Starters are ordinary models | Memory and Provenance ship as model files, renamed on arrival; nothing in Invana depends on their kind names |
 | An ontology maps into Invana's model | RDFS, an OWL subset and schema.org, from JSON-LD, Turtle or RDF/XML. Subclasses are flattened; what Invana cannot hold is skipped and listed; equivalences come back as links to confirm, never made |

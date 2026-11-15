@@ -9,7 +9,7 @@ personas: [analyst, builder, modeller, decision-maker, admin]
 # Graph Plane
 
 > What Invana reads and what it remembers: **Data** — the customer's Graph Data, read in place through a connector per
-> graph database, in each database's own language, joined across graph databases on identity links — and **Memory** —
+> graph database, in each database's own language, each graph database's results kept apart — and **Memory** —
 > Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their
 > relations, each with its lineage. The decision it helps make: *what does this answer rest on, and what has been
 > learned and decided before?*
@@ -27,7 +27,7 @@ followed back. Without one home for both, every capability reads the databases i
 
 | Persona | Comes here to |
 |---|---|
-| Analyst · Decision maker | Ask across every graph database as one Graph Data; follow a decision back to its sources in Memory; see what any copy was read from and know it shows only as far as their own agent may read |
+| Analyst · Decision maker | Ask Graph Data across every graph database their agent may read, each one's results side by side; follow a decision back to its sources in Memory; see what any copy was read from and know it shows only as far as their own agent may read |
 | Agent builder | See what agents' runs left in Memory, what served and what failed |
 | Modeller | Rely on one shape of answer from every connector while shaping the model across them |
 | Admin | Trust that every read is a read the database enforces, every raw query is checked and every call is recorded; the Admin's controls for graph databases are [CP-F05](../control/features/CP-F05-graph-databases/feature.md) |
@@ -74,7 +74,7 @@ followed back. Without one home for both, every capability reads the databases i
 |---|---|
 | Control Plane | The graph databases, their mode, switches and health ([CP-F05](../control/features/CP-F05-graph-databases/feature.md)); runs ([CP-F10](../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Access Plane | The Access Policies every read and write passes ([AC-F02](../access/features/AC-F02-access-policies/feature.md)); the ledger ([AC-F09](../access/features/AC-F09-what-left-the-platform/feature.md)); History ([AC-F06](../access/features/AC-F06-history/feature.md)) |
-| Semantics | The published model a plan is checked against; the match rules identity links come from ([SE-F06](../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| Semantics | The published model a plan is checked against; links between models, inside one graph database ([SE-F06](../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
 | Agents · Projects | The runs, findings and decisions Memory holds ([AG-F06](../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md) · [PJ-F03](../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) |
 
 ## Not building

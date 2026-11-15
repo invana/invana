@@ -62,6 +62,7 @@ flowchart TD
 | AC-13.15 | *What it may touch* | it fails to load | it says what could not load, with *Try again* |
 | AC-13.16 | A step its rules allow | the key it runs under, its run scope or a credential's scope does not | it is refused before it runs, naming the ceiling — *{ceiling} keeps {agent} from {verb} {resource}*; no ceiling ever lets a step its rules refuse |
 | AC-13.17 | A run inside a project whose agent may read `memory/project/*` | it reads another project's memory that is not related to its own | it is refused, naming the run scope; its own project, the projects related to it and its task read as the rules allow |
+| AC-13.18 | A run inside a project that names only `sales`, whose agent may Read `data/*/*` | a step reads `data/crm/Ticket` | it is refused before it runs — *Run scope keeps {agent} from Read data/crm/Ticket*; its steps in `sales` read as the rules allow, and *What it may touch* lists the project's graph databases among the run's ceilings |
 
 ## Screens
 

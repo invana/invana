@@ -46,7 +46,7 @@ flowchart LR
 | SE-04.5 | Kinds or property types the model cannot hold | the graph database is read | they are listed as *Not supported*, each with its reason, and left out of the draft |
 | SE-04.6 | A graph database with hundreds of kinds | it is read | the counts show first and kinds page in; *Start a model from it* does not wait for every kind to draw |
 | SE-04.7 | A published model | its graph database is read again | what it holds is replaced with the new read and its time; every published version is unchanged |
-| SE-04.8 | A draft started from a graph database | nobody publishes it | it stays a draft; nothing reaches the stitched model everyone asks against |
+| SE-04.8 | A draft started from a graph database | nobody publishes it | it stays a draft; nothing reaches the whole model everyone asks against |
 | SE-04.9 | An Access Policy rule that denies agents a kind | the graph database is read | the read still lists that kind: the Modeller agent reads the schema whole, and no record |
 | SE-04.10 | A read has finished | the person opens *How it got here* on what the graph database holds | it shows the run that read it, the person behind it, when, the calls it made marked schema-only, and what was left out and why |
 | SE-04.11 | An Operator | they open Model's health | *Read the database* is disabled with *Needs the Modeller role — ask an Admin*; what each graph database holds still reads |

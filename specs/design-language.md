@@ -31,7 +31,7 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 
 | Region | Holds | Rule |
 |---|---|---|
-| Header | 40 px. `header.left`: one control, *☰ Invana {Mode} ▾* — the wordmark names the mode (*Invana Model*; plain *Invana* on Home) — then the crumb *view › item* (*Invana Model / Models › Airways model › Airport*). `header.right`, in order: ⌘K · *● n running* · *Access* (Admin only) · *Inbox* and its badge · *Assistant ✦* · avatar ([The header](#the-header)) | The mode sits in the wordmark, never in the crumb; the whole *☰ Invana {Mode} ▾* control opens the switcher. No bell, no launcher, no graph picker and no graph name — Graph Data is one per deployment |
+| Header | 40 px. `header.left`: one control, *☰ Invana {Mode} ▾* — the wordmark names the mode (*Invana Model*; plain *Invana* on Home) — then the crumb *view › item* (*Invana Model / Models › Airways model › Airport*). `header.right`, in order: ⌘K · *● n running* · *Access* (Admin only) · *Inbox* and its badge · *Assistant ✦* · avatar ([The header](#the-header)) | The mode sits in the wordmark, never in the crumb; the whole *☰ Invana {Mode} ▾* control opens the switcher. No bell, no launcher, no graph picker and no graph name — Graph Data is never picked: each person reads the graph databases their access allows |
 | leftNav | A flat labelled nav, 220 px: a search titled for the mode (*Search Model*), then the current mode's **views**, each icon · label · count ([Views and their leftSection](#views-and-their-leftsection)). **Summoners** at the foot, fixed: Agents · Workers · Library · Access · Settings, then the avatar and the collapse toggle | A view opens its own leftSection; a summoner opens [the large modal](#the-large-modal) at its own section. Views are flat — group labels allowed, never a sub-tree. Expanded by default; `⌘\` or the toggle at its foot collapses it to icons only — collapsed, a dot stands in for a count that needs you and hover shows the label. No mode switch: the header's switcher is the only one. Home has no views |
 | leftSection | What the view in front lists, as a tree ([Views and their leftSection](#views-and-their-leftsection)) — picking a row opens it in main | **Collapsible** (header toggle, ⌘B, or click the active view). It stays open when the leftNav collapses. When collapsed, the toggle leads main's tab row |
 | mainSection | The work: board tabs (the workbook), the canvas, a project | Never a list of settings |
@@ -69,13 +69,17 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 |---|---|
 | Home | — |
 | Explore | Boards · Conversations · Dashboards · Queries |
-| Model | Models · Standards · Health · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
+| Model | Models · Standards · Health · **Rules and meaning**: Rules · Views · Taxonomies · Inference · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
 | Projects | Projects · My tasks · Reviews · Schedules |
 
 | View | Its leftSection |
 |---|---|
 | Boards | Mine · Shared with me · Archived |
-| Models | Every model, a tree of its Kinds and Relationships — Kinds and Relationships are not views of their own |
+| Models | Every model, a tree of its Kinds and Relationships, then *Links between models* with their count — Kinds and Relationships are not views of their own; links between models are declared here and on the model map ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| Rules | Everywhere · each project · on properties · Requests, its open count beside it ([SE-F07](capabilities/semantics/features/SE-F07-rules/feature.md)) |
+| Views | The views, grouped by who uses them ([SE-F09](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md)) |
+| Taxonomies | Per model: its broader kinds and value hierarchies ([SE-F04](capabilities/semantics/features/SE-F04-taxonomies/feature.md)) |
+| Inference | The derivations, grouped by rule ([SE-F08](capabilities/semantics/features/SE-F08-inference/feature.md)) |
 | Browse by kind | The kinds, grouped by model |
 | Projects | Active · Draft · Done |
 | Any other view | The list it names, grouped where it has groups |
@@ -86,7 +90,8 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | Views swap, summoners overlay | A view changes leftSection and main; a summoner (Agents · Workers · Library · Access · Settings) opens the large modal at its section and never changes the mode |
 | The switcher is the one mode switch | The leftNav holds no mode switch; the *☰ Invana {Mode} ▾* control opens [the switcher](#the-switcher) |
 | Collapsed, it still says what needs you | Icons only: the lit view stays lit, a view whose count needs you carries a dot, hover shows its label; leftSection is unchanged |
-| Graph Data is a group of Model | Browse by kind lists the kinds grouped by model across every graph database; Loads · Quality · Annotations follow. A record and a load open in main with a breadcrumb ([Records](capabilities/records/product.md)) |
+| Rules and meaning is a group of Model | Rules · Views · Taxonomies · Inference are views of Model like any other — each its own leftSection, a rule, a view, a taxonomy or a derivation opening in main; none opens in the large modal |
+| Graph Data is a group of Model | Browse by kind lists the kinds grouped by model, from the graph databases the person's default agent may read; Loads · Quality · Annotations follow. A record and a load open in main with a breadcrumb ([Records](capabilities/records/product.md)) |
 | A mode's Schedules is a filter | Projects › Schedules is Agents › Schedules filtered to that mode's kind ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
 | Before set-up | Mode switches are disabled until set-up starts; Home is the only place ([CP-22](os/control/features/CP-F05-graph-databases/stories/CP-22-start-a-fresh-deployment-from-a-question/story.md)) |
 
@@ -193,7 +198,7 @@ every one.
 | **Peek** | One fact: why an answer says this, a record, a finding, a run's status | A popover anchored to what was clicked, ≤ 360 px | Nothing moves |
 | **Dropdown** | A live summary with its acts in place: the switcher, Operations, Access, the Inbox | Anchored to its header button, up to about 1200 px wide; no scrim, the work stays usable | Nothing moves; outside click or Esc closes it |
 | **Modal** | One task or one decision: add data, approve, invite, publish, new agent, a create | Centred over a scrim, 640–1040 px, a footer holding the acts | The work behind it |
-| **Large modal** | Heavy authoring or reading: the summoners' places and what opens in them — an agent, a run, a skill, an Access Policy — and Model's rules and views, the full Inbox, a report | Inset 64 px from every window edge over a backdrop that dims the whole app, leftNav and header included; its own nav ([The large modal](#the-large-modal)) | The work behind it |
+| **Large modal** | Heavy authoring or reading: the summoners' places and what opens in them — an agent, a run, a skill, an Access Policy — and the full Inbox, a report | Inset 64 px from every window edge over a backdrop that dims the whole app, leftNav and header included; its own nav ([The large modal](#the-large-modal)) | The work behind it |
 
 | Rule | Detail |
 |---|---|
@@ -218,7 +223,7 @@ sections never closes it.
 | Left | A 260 px nav: search (*Search Agents, Workers, Access, Settings…*) · the sections as groups ([below](#its-sections)) · *About Invana* at the foot |
 | Top bar | The path, `/`-separated (*Workers / Groups / gpu-k8s*) · at most one action for what is in front (*Restore defaults*, *Add workers*) · ✦ · Close (Esc). ✦ opens the Assistant as the modal's right column, scoped to the section in front |
 | Body, by type | **Preference rows** — a setting a line · **A table** with live counts and drill-in · **A detail page** — a header, one act, tabs and a metadata column |
-| Elsewhere | Model's rules and views, the full Inbox and a project's report open in the same frame with a nav of their own; they are not sections of the summoners' modal |
+| Elsewhere | The full Inbox and a project's report open in the same frame with a nav of their own; they are not sections of the summoners' modal |
 
 ### Its sections
 
@@ -292,7 +297,7 @@ sections never closes it.
 | Pool · lane · worker-seconds | Workers · *runs at once* |
 | Stitch | Link between models |
 | Task plan · frontier · step envelope | Its steps |
-| *Graph* as a thing you open, pick, switch or list | *Graph Data* — everything the deployment's graph databases hold, read in place and joined; never an object |
+| *Graph* as a thing you open, pick, switch or list | *Graph Data* — everything the deployment's graph databases hold, read in place, each reached as far as access allows; never an object |
 
 Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *Derivation*, *Derived* — and the words they replace are defined once in [glossary.md](glossary.md). Code, docs and the CLI keep the domain terms in [the glossary's domain terms](glossary.md#domain-terms); this table governs only what a person reads in Studio.
 
@@ -316,8 +321,8 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 |---|---|---|
 | Home · Graphs · Onboarding | **Home** — *What are you trying to decide?*, the set-up steps until the deployment is ready (*n of 4*), then the first answer | page |
 | Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
-| Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships) · Standards · Health; rules and views in the large modal | mode · modal |
-| Datasets · Imports | **Graph Data** — a group of Model: Browse by kind (kinds grouped by model across every graph database) · Loads · Quality · Annotations; a record and a load open in main | mode |
+| Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships, and the links between models) · Standards · Health · Rules and meaning (Rules · Views · Taxonomies · Inference) · Graph Data | mode |
+| Datasets · Imports | **Graph Data** — a group of Model: Browse by kind (kinds grouped by model, from the graph databases the person may read) · Loads · Quality · Annotations; a record and a load open in main | mode |
 | Agent Builder | **Agents** — All agents · Runs · Schedules; an agent and a run as detail pages | modal |
 | Skills · Plugins · Team packs | **Library** — Skills · Plugins · Team packs, each with *Used by n agents* | modal |
 | Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's | dropdown |

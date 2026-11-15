@@ -28,7 +28,7 @@ Writing a rule on a property is the Modeller's and the Admin's ([the role table]
 
 ```mermaid
 flowchart LR
-  a([Rules and views › Rules]) --> l{Any rule on a property?}
+  a([Model › Rules · on properties]) --> l{Any rule on a property?}
   l -->|no| e["No rules on properties — every property may be read and may leave"]
   l -->|yes| r["Each rule as a line · scope Everywhere · what it stopped"]
   r --> one["Rule · Refusals · History"]

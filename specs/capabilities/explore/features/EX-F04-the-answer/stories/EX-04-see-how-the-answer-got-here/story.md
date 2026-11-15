@@ -33,7 +33,6 @@ flowchart LR
   st -->|understanding| u["What was sent · what it settled"]
   st -->|the plan| pl["The typed plan · the check per kind and graph database"]
   st -->|a compiled query| q["Exactly as run, on its graph database · copy · run it yourself"]
-  st -->|the join| j["Rows joined on identity links · how many crossed"]
   st -->|reading| rows["Rows read → a record → its load"]
   st -->|a delegated run| child["Collapsed · the child agent named"]
   run -->|purged| pg["Steps and counts stay · payloads say purged"]
@@ -58,7 +57,7 @@ flowchart LR
 | EX-04.11 | A run older than its payloads' window | the person opens it | the steps and their counts show, and each payload says it was purged |
 | EX-04.12 | A task an agent ran | the person opens it in Projects | the same trace is reached from the task |
 | EX-04.13 | A person who may read the answer | they open the trace | they see its prompts, plan and queries; nothing in it can be edited. A person who may not read it gets *Content withheld* in Studio and *Not found* from the API |
-| EX-04.14 | An answer joined across two graph databases | the person opens the join step | it shows each step's graph database and row count, the identity links that joined them and how many rows crossed |
+| EX-04.14 | An answer that read two graph databases | the person opens its run | it shows one query step per graph database, each naming its graph database and its row count, and no join step |
 | EX-04.15 | A step that called an AI model | the person opens it | it says whether the call was schema-only or data-bearing, whether the model is local or external, and what it recorded in *What left the platform* ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
 
 ## Screens

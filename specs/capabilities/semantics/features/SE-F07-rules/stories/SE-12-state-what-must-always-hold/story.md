@@ -28,7 +28,7 @@ Writing a rule, *Everywhere* or on a project, is the Modeller's and the Admin's 
 
 ```mermaid
 flowchart LR
-  a([Rules and views › Rules]) --> l{Any rule?}
+  a([Model › Rules]) --> l{Any rule?}
   l -->|no| e["What a rule is · New rule"]
   l -->|yes| r["Each rule · scope · checked on · when broken · broken in 30 days"]
   r -->|filter| fl["Scope · Checked on"]

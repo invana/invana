@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**453 recommendations** · 287 open · 112 taken · 21 declined · 33 done
+**454 recommendations** · 288 open · 112 taken · 21 declined · 33 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -496,3 +496,4 @@ flowchart LR
 | R482 | done | 2026-11-15 | designer | session | docs | medium | Specs: one labelled nav, Workers sheet, Graph Data inside Model | Nav-proposals canvas B round 2 replaces the icon rail + left tree with one labelled nav (Explore · Model · Projects switch; bottom Agents · Workers · Library · Access · Settings), moves Workers (+ Limits, Alerts) out of Settings › Operations into its own sheet, and makes Graph Data a Model group; once Ravi approves, update specs/design-language.md places and specs/glossary.md (Operations, Settings groups). | P2 | session |
 | R483 | open | 2026-11-15 | product-manager | session | docs | medium | Skills still name the retired sheet tier and old places | .claude/skills/product-spec/SKILL.md (Source table: 'peek · modal · sheet') and .claude/skills/design-story (places list: Inbox · Records · Agents · Library · Settings) predate the large modal; update to peek · dropdown · modal (large modal) and add Workers · Access as places, per specs/design-language.md §3. |  |  |
 | R484 | open | 2026-11-15 | product-manager | session | debt | low | Board IDs still name Settings for Workers and Access places | Workers left Settings (settings.workers, settings.limits, settings.workloads, control.alerts) and Access is its own section (settings.people, settings.policies, settings.roles, settings.keeping, settings.history, settings.agent_access); consider renaming to workers.* and access.* in specs Screens and the canvas in one change before any story is drawn. |  |  |
+| R485 | open | 2026-11-16 | product-manager | session | debt | high | The engine still models a Graph as an object | Limits, contention and capacity pools (apps/graphs/models.py DEFAULT_POOLS), alert rules (activity/models.py AlertRule.graph_id), the eval token budget and agents live under /api/v1/u/{user}/{graph}/…, while specs say Graph Data is never created or selected, workers and limits are deployment-wide, and graph databases are reached by access (AC-F02 › Rules, AC-F04 run scope, migrations M7). Recommend one model — deployment scope plus graph databases reached by access — settled first as a system-design decision, then built by the coder under M7/M5. |  |  |

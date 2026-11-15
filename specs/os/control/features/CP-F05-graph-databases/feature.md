@@ -137,12 +137,12 @@ names the acts.
 | Health is honest | Connected · unreachable · degraded, with the last time it connected and its latency; rotated credentials read unreachable, never silence. Work that needs no step on an unreachable graph database keeps answering |
 | The server version decides the property types | Detected on connect, or declared by an Admin; a version Invana has not tested keeps the graph database read-only until an Admin accepts it |
 | A practice graph database is never part of Graph Data | It stands in for one graph database in an agent's or a skill's tests; no question, board, schedule or workflow reads it |
-| Removing never touches the data | Removing a graph database removes Invana's records of it; the database's own data is untouched. It is refused while a rule, a match rule or a workflow names it |
+| Removing never touches the data | Removing a graph database removes Invana's records of it; the database's own data is untouched. It is refused while a rule, a project or a workflow names it |
 | Set-up is the deployment's | Four required steps — a graph database is connected and on · a model is published · Graph Data holds records · an AI model answers. Each is done because its fact exists, whoever made it and from wherever; only a skipped offer is stored |
 | Each step opens a gate | *Connected* — reading the graph databases · *Modelled* — loading data and links between models · *Grounded* — answers that cite a record · *Answering* — asking, the Assistant and every agent run. A surface waits on the one gate it needs and names the step that opens it |
 | Set-up owns no forms | Each step opens the place that makes its fact — Graph databases, Model, Graph Data, AI models — with its command beside it |
 | Agents read the schema, never records, to draft | The draft model comes from the kinds, properties and counts the database reports ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) |
-| How a connector reads and writes | One package per database, two languages, one shape of answer, declared unsupported acts, the database's own vector index and the join across graph databases are [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md)'s |
+| How a connector reads and writes | One package per database, two languages, one shape of answer, declared unsupported acts and the database's own vector index are [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md)'s |
 | Leans on | How a connector reads and writes ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) · signing in again ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md)) · Access Policies on `data/…` ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md)) · History ([AC-F06](../../../access/features/AC-F06-history/feature.md)) · drafting a model ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) · loads ([RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md)) · AI models ([CP-F01](../CP-F01-ai-models/feature.md)) |
 
 ## Data touched
@@ -175,7 +175,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Who may act and the role table | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | Signing in again for an act | [AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine) |
-| Rules, match rules and workflows that name a graph database | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) · [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
+| Rules, projects and workflows that name a graph database | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) · [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | The drafted model, and whether a model is published | [SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md#engine) · [SE-F02](../../../../capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Loads — the first that succeeded | [RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) |
 | The default AI model and its last check | [CP-F01](../CP-F01-ai-models/feature.md#engine) |
@@ -228,7 +228,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | A write to a read-only graph database, or one on an untested server version, by any path — before the wire | *{name} is read-only — {why}.* | CP-38.5 · CP-35.17 |
 | 409 | Work that needs a graph database that is off — `switched_off`, with who and when | *{name} is off — switched off by {person} {when}.* | CP-39.4 · CP-39.5 |
 | 409 | Turning on, for oneself, a graph database the deployment has off | *{name} is off for the deployment — ask {admin}.* | CP-39.6 |
-| 409 | Removing a graph database a rule, a match rule or a workflow names | *{name} is named by {what} — change {it} first.* | CP-35.12 |
+| 409 | Removing a graph database a rule, a project or a workflow names | *{name} is named by {what} — change {it} first.* | CP-35.12 |
 | 422 | Removing with a `confirm` that is not its name | *Type {name} to remove it.* | CP-35.11 |
 | 422 | A practice graph database standing in for itself, for a practice one, or for one with another connector | *{name} cannot stand in for {other} — {why}.* | CP-41.4 |
 | 409 | A question, board, schedule or workflow step on a practice graph database | *{name} is for practice — it is never asked.* | CP-41.3 |

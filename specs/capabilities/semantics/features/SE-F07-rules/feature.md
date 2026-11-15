@@ -23,7 +23,7 @@ depends_on: [SE-F02, SE-F05, SE-F09]
 
 ```mermaid
 flowchart TD
-  start([Model › Rules and views › Rules]) --> l{Rules in force?}
+  start([Model › Rules]) --> l{Rules in force?}
   l -->|loading| sk["Skeleton rows"]
   l -->|none| e["One line on what a rule is · New rule"]
   l -->|failed| f["The rules could not be read"]

@@ -31,7 +31,7 @@ the project is the organisation's, and its creator is its first member and revie
 flowchart TD
   s([Projects]) --> n["New project (modal)"]
   n --> t["Type: Research · Investigation · Policy · General · a Team pack's"]
-  t --> f["The type's fields · name · key · members · started from (PJ-23)"]
+  t --> f["The type's fields · name · key · members · graph databases · started from (PJ-23)"]
   f --> v{"Valid?"}
   v -->|a required field empty · unknown type · unknown user, team or agent · key taken, not URL-safe or reserved| ref["Names the field and why · nothing saved"] --> f
   v -->|an agent not granted to them| na["Disabled in the picker"]
@@ -56,6 +56,8 @@ flowchart TD
 | PJ-02.18 | A project created | its Details are read | the key reads as a fact, never a field; no act edits it (PJ-01.7) |
 | PJ-02.19 | A project of a type | it is open | its heading, tabs, dialogs and report use the type's words — a Research project reads *Study* and *Task*, an Investigation *Case* and *Action* — while Projects, My tasks, Inbox › Needs you, Decisions, search and History use *Project* and *Task* with the type as a badge |
 | PJ-02.20 | A project created | every person opens Projects | it is listed for each of them, its head readable; History records who made it |
+| PJ-02.21 | *New project* | it opens | *Graph databases* lists every graph database the deployment attaches, every one ticked; the person may untick some, and the project's runs then read Graph Data only in those ticked, and only where their agent's Access Policies allow |
+| PJ-02.22 | A graph database the deployment does not attach, sent by the API | they press *Create* | it is refused before saving — *There is no graph database {name}.*; nothing is saved |
 
 ## Screens
 

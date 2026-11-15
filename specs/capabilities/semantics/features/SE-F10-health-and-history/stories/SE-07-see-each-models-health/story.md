@@ -66,6 +66,7 @@ flowchart LR
 | SE-07.22 | An archived model and a Modeller or an Admin | they restore it | It is back on the map with its versions; History records who restored it |
 | SE-07.23 | A Modeller | they open a suggested index | *Add index to draft* is absent and the row reads *Needs the Admin role — ask an Admin* |
 | SE-07.24 | Questions that failed in the window — *cannot answer*, refused, or erroring | Performance opens for a model | each kind shows its failed questions with their reason, counted by the engine, each linking to its run |
+| SE-07.25 | A slow query shape whose plan the database can explain | its row opens | its advice names a faster way to reach the same records, each in one line with the step it would change — *add an index on Order.placed_at*, *start from the kind, not every node*, *bound this hop to 3*, *filter by relationship kind before expanding the supernode Airport*, *these two patterns multiply — join them on a key* — and only an index offers an act (*Add index to draft*); the rest is read by whoever writes the plan, the function or the query |
 
 ## Screens
 

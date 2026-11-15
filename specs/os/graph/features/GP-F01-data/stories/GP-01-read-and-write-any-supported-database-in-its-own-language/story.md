@@ -38,7 +38,7 @@ flowchart TD
   w -->|no, or read + write| x["Runs · a read-only session for every read · recorded"]
   x -->|the vendor cannot do it| r2(["Refused before the wire · names the vendor and the act"])
   x -->|the database fails| r3(["The database's own message"])
-  x --> o(["Vertices · edges · records, one shape · joined on identity links"])
+  x --> o(["Vertices · edges · records, one shape · each graph database's apart"])
 ```
 
 ## Acceptance criteria

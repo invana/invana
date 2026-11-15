@@ -9,7 +9,7 @@ boards: [model.models]
 
 # SE-03 · Link two models
 
-**As** a modeller with several models in one deployment **I want** to declare how two of them meet — the same thing, or a
+**As** a modeller with several models in one graph database **I want** to declare how two of them meet — the same thing, or a
 relationship between them — on a key on each side, and see how many records it joins before I make it **so that** a
 question can cross them without anyone guessing which `Stock` is which.
 
@@ -35,6 +35,7 @@ flowchart LR
   n -->|n of m join| s["Stage this link"]
   z --> s
   c -->|already linked| ex["The existing link's rule · Open it"]
+  a -->|the two models in different graph databases| xdb(["Refused · names both graph databases"])
   s --> st["Staged · changes no answer"]
   st -->|Discard| x(["Gone · nothing written"])
   st -->|Commit| r["A run writes its relationships"]
@@ -47,7 +48,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-03.1 | Two published models | the person drags a kind onto a kind in the other model, or picks *Link models* | one card opens with both sides filled as *Source* and *Target*, the choice *Same thing* or *Relationship*, and a key on each side |
+| SE-03.1 | Two published models bound to the same graph database | the person drags a kind onto a kind in the other model, or picks *Link models* | one card opens with both sides filled as *Source* and *Target*, the choice *Same thing* or *Relationship*, and a key on each side |
 | SE-03.2 | A relationship link | the person fills the card | they name the relationship and choose where its ends come from — *These keys* or *Its own rows* from a load — never both |
 | SE-03.3 | Both keys named | the card completes | it counts what the rule joins at once — *1,284 of 1,310 join* — with the sentence naming both keys and *Show the 26* listing the keys that matched nothing |
 | SE-03.4 | A rule that joins nothing against records that exist | it is counted | *Stage this link* is disabled and the card offers *Try another key* |
@@ -66,6 +67,7 @@ flowchart LR
 | SE-03.17 | A model republished | its links show | they carry onto the new version; links on the version it replaced stay as history and are not counted twice |
 | SE-03.18 | An Operator | they drag between models or reach *Link models* | it is refused with *Needs the Modeller role — ask an Admin*; every link still reads |
 | SE-03.19 | Both keys named while no worker is free to count | the card counts | It reads that the count is waiting for a worker, with *Try again*; nothing is staged |
+| SE-03.20 | Two published models bound to different graph databases | the person drags a kind of one onto a kind of the other, or picks the other as *Target* | nothing is staged: the drag draws nothing and the footer says why, and in the card the model is disabled — *In {database} — a link joins two models in one graph database*; the API refuses it, naming both graph databases |
 
 ## Screens
 

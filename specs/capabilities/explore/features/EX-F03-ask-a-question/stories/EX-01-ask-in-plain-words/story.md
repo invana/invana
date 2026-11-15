@@ -11,7 +11,7 @@ boards: [explore.board]
 
 **As** an analyst who knows the business but not the query language **I want** to ask my Graph Data plainly, from one
 question box, and have the agent turn my question into a plan it checks against the model before anything runs —
-across every graph database the answer needs **so that** I start by asking, not configuring, and get an answer I can
+across every graph database my agent may read **so that** I start by asking, not configuring, and get an answer I can
 check before I act on it.
 
 Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
@@ -40,7 +40,8 @@ flowchart LR
   p -->|the grammar cannot express it| gap["I cannot ask this yet · what the plan lacks · a function to run, or Write the query myself"]
   p -->|invalid| rp["Repaired once"] -->|still invalid| st(["Stopped · both attempts shown"])
   p -->|refused by a rule · a database off| rf(["Refused — EX-06"])
-  p -->|checked| r["One step per graph database · joined on identity links · steps live"]
+  p -->|relates kinds in two graph databases| xdb(["Not yet — names both kinds and graph databases · nothing runs"])
+  p -->|checked| r["One step per graph database · each graph database's rows apart · steps live"]
   r -->|cancelled| c["Steps done stay · nothing partial shown as an answer"]
   r --> ans(["The answer, with its plan, queries and records — EX-F04"])
 ```
@@ -59,7 +60,7 @@ flowchart LR
 | EX-01.8 | An agent whose policies allow Read on no kind | the person makes small talk | the reply comes alone, with no questions to try |
 | EX-01.9 | A question to try under a reply | the person taps it | it is asked as a new question; only the latest reply's can be tapped |
 | EX-01.10 | No AI model answering | the person asks in plain words | the reply names it and where an Admin sets one; Cypher and Gremlin still run for a person who may use the Query console |
-| EX-01.11 | A question across two kinds with no identity link declared between their graph databases | it is asked | the reply names the two kinds and their graph databases, and that no identity link joins them (SE-F06) |
+| EX-01.11 | A question that relates two kinds in different graph databases — a hop, a filter or a count across them | it is asked | nothing runs; the reply reads *Not yet — {kind} is in {graph database} and {kind} in {graph database}; Invana does not join across graph databases yet* |
 | EX-01.12 | A run on its way | the person cancels it | the steps done stay in the thread and nothing partial is shown as an answer |
 | EX-01.13 | A plan that does not validate against the model | it is repaired once and fails again | the run stops before any graph database is read — *The plan names {name}, which the model does not have.* — showing both attempts and their errors |
 | EX-01.14 | An answered question | the person opens *How it got here* | it shows the steps, what the AI model was given — the model's kinds and the question, never a record — the typed plan and each compiled query |
@@ -67,8 +68,9 @@ flowchart LR
 | EX-01.16 | A question the plan grammar cannot express — a shortest path, a hop deeper than 4, a graph algorithm | it is asked | the reply reads *I cannot ask this yet — a plan cannot {what it lacks}*; no query runs and none is written for the person |
 | EX-01.17 | A plan gap, and a function in the catalogue that does it | the reply shows | it offers *Run {function}*; running it opens a run of that function through the same agent and its checks. With none, it offers *Write the query myself* (EX-08) to a person who may use the Query console |
 | EX-01.18 | A plan needing a graph database that is switched off, or not answering | it is checked | it is refused before anything runs, naming the graph database — *{name} is off — switched off by {person} {when}* or *{name} is not answering* |
-| EX-01.19 | A question whose kinds live in two graph databases joined by an identity link | it runs | one step runs in each graph database in its own language, the rows are joined on the identity links, and the answer cites the records of both |
+| EX-01.19 | A question that reads kinds in two graph databases without relating them — *how many customers, and how many tickets?* | it runs | one step runs in each graph database in its own language, and the answer shows each graph database's result in its own part, side by side, naming the graph database and citing its records — never joined |
 | EX-01.20 | The person may use no agent | they open Explore | the question box is disabled — *{person} may not use Assistant — ask an Admin*; their kept boards still open |
+| EX-01.21 | An agent whose Access Policies allow Read on one of two graph databases | the person asks about a kind in the other | the AI model is offered only the kinds it may read, so the reply is *cannot answer* naming the agent (EX-05); a plan naming that kind anyway is refused before it runs, naming the rule (EX-06) |
 
 ## Screens
 

@@ -14,8 +14,8 @@ depends_on: [CP-F05, AC-F02, AC-F06, AC-F09, SE-F06, EX-F03]
 # Data — the customer's Graph Data, read in place
 
 > Every question, board and agent step reads each graph database in its own language through its connector, answers
-> in one shape whatever the vendor, finds similar records with the database's own vector index, and joins the results
-> across graph databases on identity links. The decision it helps make: *can I rely on this answer whichever
+> in one shape whatever the vendor, finds similar records with the database's own vector index, and keeps each graph
+> database's results apart — never joined. The decision it helps make: *can I rely on this answer whichever
 > databases hold its records?*
 
 ## User journey
@@ -33,7 +33,7 @@ flowchart TD
   ro -->|a write in a read session| rf(["The database refuses it"])
   rw -->|the vendor cannot do it| r2(["Refused · names the vendor and the act"])
   rw -->|the database fails| r3(["The database's own message"])
-  rw --> j["Joined across graph databases on identity links"]
+  rw --> j["Each graph database's rows kept apart · never joined"]
   j --> o(["Vertices · edges · records, one shape · cited"])
   rq([A raw query]) --> l["GP-05 · Static check · read-only session · result filter · Gremlin steps only"]
   l -->|a kind the agent may not Read · a script · a lambda| lr(["Refused before it runs · names the rule or the construct"])
@@ -58,7 +58,7 @@ sequenceDiagram
   C->>G: Cypher or Gremlin, in a read-only session for a read
   G-->>C: driver records
   C-->>E: vertices, edges and records of one shape
-  E->>E: drop what the agent may not read, counted · join on identity links
+  E->>E: drop what the agent may not read, counted · each graph database's rows kept apart
   E-->>A: the result, cited
 ```
 
@@ -113,7 +113,7 @@ role decides only whether they may start the act that asks for it.
 | One shape | Every vendor answers in vertices, edges and records; nobody downstream sees a driver's types |
 | Unsupported is declared | An act a vendor cannot do is refused before the wire, naming the vendor and the act — never a driver error |
 | Vector search is the database's | Its own index; no store beside the graph |
-| Joined on identity links | A question runs one step per graph database it needs; the engine joins the results on identity links, materialised from the match rules a Modeller declares ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| Each graph database apart | A question runs one step per graph database it needs, each only where the agent may Read ([AC-F02 › Rules](../../../access/features/AC-F02-access-policies/feature.md#rules)); each step's rows stay its graph database's and are never joined with another's. Links between models, and the relationships they write, stay inside one graph database ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)); a join across graph databases is later |
 | Proven against a live database | Every package passes one conformance suite against a running database, never mocked |
 | Every call is ledgered | Every call writes its ledger row before its result is used ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md)) |
 
@@ -123,7 +123,6 @@ role decides only whether they may start the act that asks for it.
 |---|---|
 | The customer's records — nodes, relationships, schema, vector indexes | Read · write on a read + write graph database |
 | Graph databases — connector, mode, switches, health ([CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) | Read |
-| Identity links — in the system graph | Write (commit and withdraw) · read (the join) |
 | Relationships a link between models writes, each marked with its link | Write on commit and on each load · delete on removal |
 | The ledger ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md)) | Write, one row per call |
 
@@ -137,7 +136,7 @@ records of each graph database — its connection, mode, switches and health —
 
 | Table | Columns | Notes |
 |---|---|---|
-| — | No Postgres table of its own | Identity links are nodes and edges in the system graph; the link rule they come from is `model_links` ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine)) |
+| — | No Postgres table of its own | A link's rule is `model_links` ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine)); what it writes is relationships in its graph database, each marked with the link |
 
 ### Reads
 
@@ -147,7 +146,7 @@ records of each graph database — its connection, mode, switches and health —
 | Who may act and the order of checks | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | The typed plan a step is compiled from | [EX-F03](../../../../capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) |
 | The query step that calls a connector · packaged plans | [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
-| Link rules (`model_links`) — the match rules identity links come from | [SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
+| Links between models (`model_links`) | [SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | Loads and their record stamps | [RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) |
 | The ledger row every call writes | [AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine) |
 | History — every event a commit or withdrawal writes | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |
@@ -207,8 +206,7 @@ records of each graph database — its connection, mode, switches and health —
 | Capabilities | Property types and features — constraints, index kinds, algorithms, vector search — keyed by connector and server version, resolved from the server on connect and on demand, or declared by an Admin ([CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)), and cached with the connection. Enforced at authoring, publish and import: a model version validated against a database that has since changed is refused naming the difference; a model whose types the target cannot hold arrives as an unpublishable draft listing them |
 | Vector search | A queryset in each language connector, overridden per vendor; the database's own index. Results are records with scores, cited; an index with nothing embedded returns none, worded *nothing embedded*. Memgraph declares none |
 | Conformance | One shared suite every package runs against a live database, never mocked; a method left unimplemented fails it, named |
-| The join | One query step per graph database, in its own language; the engine joins the results on the identity links the system graph holds, bounded by NFR-PERF-5 |
-| Identity links | Materialised in the system graph from the match rules a Modeller declares per pair of kinds ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)); never guessed; a rule change re-materialises its links |
+| Steps apart | One query step per graph database, in its own language, run at once; each step's rows are returned under its graph database and never joined, bounded by NFR-PERF-5 |
 | Committing a link | `stitch-commit@1`, no agent and no view, the deployment's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
 | What each kind writes | *Same thing* writes `SAME_AS` source → target, read undirected; a keyed relationship writes its `edge_type`; a row-sourced relationship writes nothing at commit — committing loads its rows, the files' place read back from the load's run |
 | Nothing written says so | A link that wrote nothing — a side the rules refuse — commits, says why, and never reports success; the others still solve |
@@ -222,7 +220,7 @@ records of each graph database — its connection, mode, switches and health —
 | HLD section | Change | NFRs |
 |---|---|---|
 | § 7 Architecture and components | Connector packages found by entry point; base · language · integration layers | — |
-| § 10 AI and agents | One step per graph database in its own language, joined on identity links | NFR-PERF-5 · NFR-PERF-6 |
+| § 10 AI and agents | One step per graph database in its own language, each graph database's rows kept apart | NFR-PERF-5 · NFR-PERF-6 |
 | § 7 Architecture and components | `read_session()` in the connector contract; the certification test every connector passes; the raw-query static check and result filter | NFR-SEC-9 |
 | § 12 Qualities | Every read in a read-only session the database enforces; every raw query checked in four layers; every call ledgered | NFR-SEC-1 · NFR-SEC-5 · NFR-SEC-7 · NFR-SEC-9 |
 
@@ -230,8 +228,8 @@ records of each graph database — its connection, mode, switches and health —
 
 | Decision | Detail |
 |---|---|
-| How a connector reads is Data's | The connector contract, read session, raw-query layers, query languages, the one shape, vector search and the join live here; connecting a graph database and its mode, switches and health are [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)'s |
-| Identity links are Data's; match rules are the model's | Link records, commit, withdraw and the join live here; the match rules a Modeller declares, *Link two models* and its count are [SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)'s |
+| How a connector reads is Data's | The connector contract, read session, raw-query layers, query languages, the one shape, vector search and keeping each graph database's rows apart live here; connecting a graph database and its mode, switches and health are [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)'s |
+| Writing a link is Data's; the link is the model's | Committing and withdrawing a link's relationships live here; the link a Modeller declares, *Link two models* and its count are [SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)'s |
 ## Open questions
 
 | Question | Who answers |
@@ -244,8 +242,8 @@ records of each graph database — its connection, mode, switches and health —
 |---|---|
 | A second credential per graph database | One credential each; what an agent may touch is its Access Policies, not a second login |
 | A raw query that skips the checks · Groovy scripts, lambdas or `eval` from a person or an AI model | A raw query passes the same four layers a typed plan's reads do; Gremlin is steps only |
-| Translating between openCypher and Gremlin | Each step runs in its own graph database's language; the engine joins the results |
+| Translating between openCypher and Gremlin | Each step runs in its own graph database's language |
 | SQL or SPARQL databases | Not families Invana targets |
 | A vector store beside the graph · embeddings made by the engine | Two stores are two truths; embeddings arrive with the data |
 | A Python fallback for an algorithm a database lacks | The honest answer is that it cannot |
-| Guessed identity links | Links come from match rules a person declares |
+| A join across graph databases · guessed links | Later — each graph database's rows are kept apart; a link between models is declared by a person, inside one graph database ([SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |

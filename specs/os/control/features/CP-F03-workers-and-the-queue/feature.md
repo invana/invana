@@ -28,7 +28,7 @@ flowchart TD
   s([Workers › Groups]) --> lim(["CP-F04 · Workers › Limits · limits per team, user and agent"])
   s --> wk["CP-09 · Workers: each group, its workers, what each runs"]
   wk -->|no workers| nw["Steps run inside the engine · Add workers"]
-  wk --> cap["CP-08 · Where steps wait · how many workers would clear it"]
+  wk --> cap["CP-08 · Slots total · busy · free · where steps wait · add workers, or drain idle ones"]
   cap -->|a group is short| add["CP-10 · Add workers: where · group · join key · run it · joined"]
   add -->|a check fails| fx["Says which check and what to look at"]
   add -->|first heartbeat| j(["Joined · takes work"])
@@ -130,7 +130,8 @@ this is what it means here.
 | A run waiting is not a run running | It holds no slot, uses no worker and costs nothing |
 | Questions go first | Work is taken in this order: a question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents). People whose work waits share the workers equally, by the person behind each run; an idle person's share is lent |
 | Waiting always says why | A waiting run names its position and what it waits behind — *a person is waiting* · *helper — counts as a run* · *schedule* — or the limit, the AI model's rate limit or the worker group |
-| Agents never start machines | Workers are added and scaled by a person; Invana says where steps wait and how many workers would clear them |
+| Agents never start machines | Workers are added and scaled by a person; Invana says where steps wait and advises, per group, how many workers to add or which idle ones to drain — it never starts or stops a machine on that advice |
+| Slots say how much work fits | A slot is one agent step a worker takes at once; Workers reads the slots of every worker together — total, busy, free — overall and per group |
 | Work goes by labels | A step goes to a worker group whose labels cover what its function needs; a step no live group covers waits, naming the missing label, then fails |
 | A worker dials out | Over HTTPS with its own credential; no inbound port, no database credential; it runs steps under the agent's access, never its own |
 | A worker carries runtimes | A worker group carries the runtimes an Admin installed on it — Invana's always, Claude Code and Codex when their runtime plugins are installed ([CP-64](../CP-F02-plugins-and-outside-tools/stories/CP-64-install-an-agent-runtime/story.md)). A session goes to a group that carries its agent's runtime and the `code` label; with none, it waits, naming the runtime, then fails |
@@ -210,7 +211,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | `GET /pools/{name}/events` | Its changes, newest first | CP-09 |
 | `POST /pools/{name}/drain` · `POST /{id}/drain` | Drain a group · a worker | CP-09 |
 | `GET /{id}` | One worker — what it runs now, steps this hour, failures, recent log | CP-09 |
-| `GET /capacity` | Per group: steps waiting, the oldest, workers, suggested, as last stored | CP-08 |
+| `GET /capacity` | Per group and overall: `slots` · `slots_busy` · `slots_free` · steps waiting · the oldest · workers · `idle` · `suggested` · `advice` (`add` · `drain` · `keep`) with `advice_count`, as last stored | CP-08 |
 | `GET /work` | Runs by stage — started · admitted · running · waiting — each count as stored, each waiting run with its reason and how long; the order work is taken in and each person's share | CP-05 · CP-06 |
 | `GET /coordinators` | Each coordinator, its state, the runs it holds, when it last renewed | CP-07 |
 | `GET /join-keys` · `POST /pools/{name}/join-keys` · `POST /join-keys/{id}/revoke` | List keys (prefix, expiry, joined of cap, revoked) · mint one `{expires_at, cap}` → its secret once and the commands · revoke | CP-10 |
@@ -284,6 +285,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | Queues | A step's queue is `tools.<labels>` — its function's `resources`, sorted and joined by `+` (`tools.cpu`, `tools.cpu+gpu`) — one per label set and step class; a worker leases from every queue its labels cover. The step's frames land in the run's stream by run id |
 | The order work is taken | A question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents); within a class first in, first served; a delegated child takes its parent's class. People whose work waits share the workers equally, by the person behind each run; an idle person's share is lent. Position is stored and readable |
 | Suggested | Steps ready ÷ steps a worker took over the last ten minutes, written to `control_worker_stats` every 30 s; clamped to the group's `min_workers` · `max_workers` and to the worker time an hour of each binding limit ([CP-F04](../CP-F04-limits/feature.md)). A step waiting on an AI model's rate limit is not counted |
+| Advice | `add` when `suggested` > workers, by the difference · `drain` when workers idle over the last ten minutes and `suggested` < workers, by the lesser of the idle count and workers − max(`suggested`, `min_workers`) · else `keep`. Stored with the stats every 30 s; advice never acts |
 | Idle drain | A worker idle 5 minutes in a group above its `min_workers` is drained, then stopped; a person starts every machine |
 | No group carries the label | Past the step's limit plus the queue-wait allowance, the step fails `transient · worker_unavailable`, naming the label and the command that adds a worker; the envelope stays queued |
 | A worker dials out | It long-polls `POST /lease` over HTTPS with its own credential: no inbound port, no database credential. It resolves only the secrets its step's function declares |

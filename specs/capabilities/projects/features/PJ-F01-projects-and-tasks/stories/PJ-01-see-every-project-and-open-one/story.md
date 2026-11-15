@@ -57,13 +57,14 @@ flowchart LR
 | PJ-01.4 | A project's page | it opens | the heading shows the name, who made it, the created time and the purpose clamped to three lines with *Show more*; the breadcrumb is the only way back |
 | PJ-01.5 | A project with no purpose written | its page opens | the heading drops the paragraph; Details reads *No purpose written yet* and offers *Edit* to its members and the Admins |
 | PJ-01.6 | A project whose maker was removed | its page opens | *made by* reads *unknown*, never a bare id |
-| PJ-01.7 | A member of the project, or an Admin | they press *Edit* on Details | name, purpose and the type's fields become fields in place; key, maker and times stay facts; *Save* writes them and *Cancel* leaves them |
+| PJ-01.7 | A member of the project, or an Admin | they press *Edit* on Details | name, purpose, the type's fields and its graph databases become fields in place; key, maker and times stay facts; *Save* writes them and *Cancel* leaves them |
 | PJ-01.8 | An edit with an empty name or an empty required field | *Save* is pressed | it is refused, naming the field; nothing is saved |
 | PJ-01.9 | An active project | a member or an Admin presses *Archive* | the project reads archived, its tasks go read only, a run already going finishes, and History records *archived* |
 | PJ-01.10 | An archived project | it opens | Details shows every field read only and offers its members and the Admins *Unarchive*; pressing it makes the project active and History records *unarchived*, a separate row from *archived* |
 | PJ-01.11 | The list or a project's counts | they load | every count is the engine's; none is added up in the browser |
 | PJ-01.12 | The list failing to load | the request fails | it says why, with *Try again*; rows already on screen stay |
 | PJ-01.13 | An Operator or a Modeller who is not a member | they open its Details | *Edit*, *Archive* and *Unarchive* are disabled — *Members and Admins only* |
+| PJ-01.14 | A project's Details | it is read | *Graph databases* reads *Every graph database*, or the ones it names; a member or an Admin who saves fewer or more has every later step of the project's runs checked against the new list, and History records from and to |
 
 ## Screens
 

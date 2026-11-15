@@ -146,6 +146,7 @@ sequenceDiagram
 | Default deny · the strictest wins | What no rule reaches is denied. Across every rule that reaches a step — on every policy attached to the agent, and along its caller chain ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md)) — Deny over Ask over Allow |
 | Declare, never grant | A skill, a workflow, a plugin, a Team pack or a runtime declares what it needs; a declaration grants nothing. *Who it changes* names each declared need a change leaves unmet |
 | Policies attach to agents | Never to a person, a team or a key. A person reaches data only through an agent granted to them ([AC-F03](../AC-F03-directory/feature.md)) |
+| Many graph databases, each reached by rule | A deployment attaches many graph databases. An agent reaches one only where a rule on `data/<graph database>/…` allows it. A person or a team reaches the graph databases of the agents granted to them ([AC-F03](../AC-F03-directory/feature.md)) — every Studio screen through the person's default agent; a project narrows its runs to the graph databases it names ([AC-F04 › Rules](../AC-F04-what-an-agent-may-touch/feature.md#rules)). What a person's agent may not Read is absent from what they read — a kind in a picker, a kind offered to an AI model — and the engine refuses any step on it, naming the rule: hiding is never the guard |
 | The default agent | Each person has one default agent, granted to them; every Studio screen reads through it, and a connected MCP client acts through it ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md)). A new person's default is the built-in Assistant. An Admin sets it ([AC-38](../AC-F03-directory/stories/AC-38-choose-a-persons-default-agent/story.md)) |
 | A default agent is changed like any agent | A Modeller or an Admin may edit an agent that is someone's default, as any agent ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)); its writes and outbound acts stay on Ask, the change shows who gains it before it is saved, and History records it |
 | Built-in policies | Each built-in agent ships with one built-in policy, owned by the system user and attached to it. A built-in policy is never edited, renamed, deleted or taken off its agent; *Copy* makes a custom policy. A built-in agent is narrowed by attaching a custom policy with a Deny |
@@ -184,7 +185,7 @@ every surface reads, each act disabled, naming the role it needs · *Own* — ac
 | Access Plane | Asks and approvals — answer an ask the person is named for | Acts | Acts | Acts |
 | Access Plane | What an agent may touch · access usage · what left the platform | Reads | Reads | Reads |
 | Access Plane | History | Own | Own | Reads |
-| Ontology | Start a model · change and publish · meaning and property levels · taxonomies · standards · links and identity match rules · rules · inference · health and history | Reads | Acts | Acts |
+| Ontology | Start a model · change and publish · meaning and property levels · taxonomies · standards · links between models · rules · inference · health and history | Reads | Acts | Acts |
 | Intelligence | Records by kind · quality · provenance · annotations | Acts | Acts | Acts |
 | Intelligence | Bring records in · bulk fixes · merge duplicates | Reads | Acts | Acts |
 | Agents | The agents catalogue — use the agents granted to the person | Acts | Acts | Acts |
@@ -324,7 +325,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Built-in policies and agents | Written from code at start: one built-in agent of each kind, each with its built-in policy attached, owned by the system user. A start rewrites a built-in policy to the code's rules; a person's change is a copy |
 | `assistant` — the Assistant: asking, answering, boards; every new person's default agent | Allow Read `data/*/*` · `memory/project/*` · `memory/org` · `project/*` · Allow Run `skill/*` · `workflow/*` · `plugin/*` · Ask Write `project/*` · Ask Run `agent/*` · `tool/*/*` |
 | `query-console` — the Query console: the Console's queries | Allow Read `data/*/*` · Ask Write `data/*/*` · Allow Run `plugin/graph.read` · Ask Run `plugin/graph.write` |
-| `modeller` — the Modeller agent: changes to the model, links and match rules | Allow Read `data/*/*` · Allow Run `plugin/model` · `plugin/graph.stitch` · `skill/*` |
+| `modeller` — the Modeller agent: changes to the model and links between models | Allow Read `data/*/*` · Allow Run `plugin/model` · `plugin/graph.stitch` · `skill/*` |
 | `coordinator` — the Coordinator: plans, workflows and handing work on | Allow Read `project/*` · `memory/project/*` · Ask Write `project/*` · Allow Run `plugin/plan` · `plugin/work` · `workflow/*` · `skill/*` · `agent/*` |
 | `record-editor` — the Record editor: a person's own edits on the board, fixes and merges | Allow Read `data/*/*` · Allow Write `data/*/*` · Allow Run `plugin/graph.write` |
 | `loader` — the Loader: a person's own loads | Allow Read `data/*/*` · Allow Write `data/*/*` · Allow Run `plugin/data` |

@@ -166,7 +166,7 @@ plugin it comes from. The default kit's plugins are [CP-F02](../../../../os/cont
 | Namespace | Functions | What it touches | Plugin |
 |---|---|---|---|
 | `graph.read` | `query` · `get_neighbors` · `types_count` · `resolve` · `validate` | Reads graph databases (`validate` touches nothing) | Core |
-| `graph.stitch` | `preview` · `declare` · `commit` · `withdraw` · `run` | `preview` reads; the rest write match rules and identity links | Core |
+| `graph.stitch` | `preview` · `declare` · `commit` · `withdraw` · `run` | `preview` reads; the rest write links between models and the relationships they make | Core |
 | `graph.write` | `records` · `bulk` · `edits` | Writes a read + write graph database | Core |
 | `data` | `bundle.check` · `records.validate` · `snapshot` | Brings data in | Core |
 | `model` | `propose` · `understand_ask` · `validate_proposal` · `migrate` | Changes the model | Core |
@@ -188,7 +188,7 @@ plugin it comes from. The default kit's plugins are [CP-F02](../../../../os/cont
 | `ql-direct` | A typed query, and every re-run, with no translation | Reads graph databases |
 | `count-types` · `expand-neighbours` · `resolve-elements` | One act of a board, each one step | Reads graph databases |
 | `board-open` | Open one of Studio's lists with the filters an ask names | Nothing outside |
-| `stitch-preview` · `stitch-apply` · `stitch-commit` · `stitch-withdraw` | Identity match rules, previewed and applied | Reads graph databases · writes identity links |
+| `stitch-preview` · `stitch-apply` · `stitch-commit` · `stitch-withdraw` | Links between models, counted and applied | Reads a graph database · writes a link's relationships in it |
 | `data-edit` | A board's saved edits, checked against the model | Writes a read + write graph database |
 | `model-import` · `bulk-load` | Load a dataset into a model · write a folder through the connector | Brings data in · writes a read + write graph database |
 | `modeller-propose` · `model-migration` | Stage a described change on the model draft · preview or publish a breaking change | Changes the model |

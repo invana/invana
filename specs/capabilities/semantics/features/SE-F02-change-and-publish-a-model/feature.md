@@ -112,10 +112,10 @@ table names the acts.
 | Statements need read + write | Publishing pushes constraints and indexes to the model's graph database only when it is read + write; on a read-only one the version publishes and each statement reads *not pushed — read-only*, so drift (SE-F10) is measured against the version |
 | Counts are of what was read | The preview reads at most 1,000 records a kind and says so — *first 1,000 of 52,310* — never extrapolating |
 | Data is never rewritten | Publishing changes what the model says; records that do not fit the new version are listed, never changed or deleted |
-| Who reads it | The loads into a touched kind, the rules and derivations on it, the links between models and identity match rules on it, and the workflows that name it. Runs do not pin a model version, so a run is not a reader |
+| Who reads it | The loads into a touched kind, the rules and derivations on it, the links between models on it, and the workflows that name it. Runs do not pin a model version, so a run is not a reader |
 | A constraint is one property on one kind | A range with a unit, or one standard's values; Reject or Flag for review. Checked by one check wherever a record lands — every load and every edit on a board |
 | One constraint a property, versioned with the model | Saving a range or a standard replaces the one the property had; a pattern or a length rule stays beside it. A kind carries its own properties — a broader kind is meaning only (SE-F04) — so a constraint is always on the kind that has the property. A constraint is staged, compared and published with the draft like a property |
-| Leans on | SE-F01 — the draft · SE-F06 — links and match rules that read a model · SE-F05 — the standards a constraint names · RC-F02 — the loads into it · AC-F05 — the approval |
+| Leans on | SE-F01 — the draft · SE-F06 — links between models that read a model · SE-F05 — the standards a constraint names · RC-F02 — the loads into it · AC-F05 — the approval |
 
 ## Data touched
 
@@ -153,7 +153,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | The model, its name and status | [SE-F01](../SE-F01-start-a-model/feature.md#engine) |
 | Standards and their versions | [SE-F05](../SE-F05-standards/feature.md#engine) |
-| Links between models and identity match rules on a touched kind | [SE-F06](../SE-F06-links-and-mappings/feature.md#engine) |
+| Links between models on a touched kind | [SE-F06](../SE-F06-links-and-mappings/feature.md#engine) |
 | Rules and derivations on a touched kind | [SE-F07](../SE-F07-rules/feature.md#engine) · [SE-F08](../SE-F08-inference/feature.md#engine) |
 | The Modeller agent's Access Policies a preview and a change run under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Loads into a touched kind · the load that checks a constraint | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
@@ -180,7 +180,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
 | `GET /models/property-constraints/standards` | The standards with a term that has values: `standard` · `title` · `version` · `term` · `values` (a count) | SE-08 |
-| `GET /schema/active-version` | Each model's published version the stitched model reads now | SE-05 |
+| `GET /schema/active-version` | Each model's published version the whole model reads now | SE-05 |
 
 ### Events
 

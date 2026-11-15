@@ -20,7 +20,8 @@ depends_on: [SE-F02]
 
 ```mermaid
 flowchart TD
-  start([Model › Graph Data › Browse by kind]) --> k["RC-01 · Pick a model and a kind"]
+  start([Model › Graph Data › Browse by kind]) --> k["RC-01 · Pick a model and a kind — from the graph databases the default agent may Read"]
+  start -->|a link to a kind it may not Read| wh(["RC-01 · Withheld · names the rule"])
   k --> any{Any records?}
   any -->|none| e0["No records of this kind yet — where records come from"]
   any -->|yes| list["RC-01 · Records in key order · total · filter by property"]
@@ -40,6 +41,7 @@ flowchart TD
 | Rule | Detail |
 |---|---|
 | Records are read through the model | Only kinds of a published model are listed; what the database holds outside any model is Semantics' health, not Records |
+| Read through the default agent | Every read is the person's default agent's, checked on `data/<graph database>/<kind>` ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)). A kind in a graph database it may not Read is absent from the picker; a direct read of one is refused by the engine, naming the rule. Each kind reads from the one graph database its model is bound to; nothing is joined across graph databases |
 | A view of the graph applies | A kind or property a view hides is absent here as it is everywhere |
 | The engine counts | The total is the engine's, never counted by Studio |
 
@@ -47,7 +49,7 @@ flowchart TD
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and history | Operator — every member | — |
+| Read records, their provenance and history | Operator — every member, as far as their default agent may Read `data/<graph database>/<kind>` | A kind it may not Read is absent; a direct link to it reads *Withheld — {agent} may not read {kind} in {graph database}* |
 | Open a record on a board | Operator — every member | — |
 
 ## States
@@ -60,7 +62,7 @@ flowchart TD
 | Has data | Rows with the kind's key and its first properties; the total the engine counted |
 | Failed | *Could not load the records* and *Try again* |
 | Agent working or proposing | — |
-| No access | A kind a view of the graph hides is absent from the picker |
+| No access | A kind a view of the graph hides, or one in a graph database the person's default agent may not Read, is absent from the picker; a direct link to it reads *Withheld* |
 
 ## Data touched
 
@@ -81,7 +83,7 @@ flowchart TD
 
 | Decision | Detail |
 |---|---|
-| Graph Data is a group of Model | Model's *Graph Data* group: Browse by kind lists the kinds grouped by model across every graph database, then Loads · Quality · Annotations; a record opens in main with a breadcrumb |
+| Graph Data is a group of Model | Model's *Graph Data* group: Browse by kind lists the kinds grouped by model, from the graph databases the person's default agent may read, then Loads · Quality · Annotations; a record opens in main with a breadcrumb |
 | Writes are checked, never free-edited | Every write from Graph Data is checked against the model before it lands; there is no free-edit grid ([RC-F02](../RC-F02-bring-records-in/feature.md) · [EX-F06](../../../explore/features/EX-F06-annotate-and-edit-the-data/feature.md)) |
 | Key order | Records page in the order of their kind's key, so a page is stable between visits |
 | Open on a board | A record opens on a new board from here, with its neighbours one step out |

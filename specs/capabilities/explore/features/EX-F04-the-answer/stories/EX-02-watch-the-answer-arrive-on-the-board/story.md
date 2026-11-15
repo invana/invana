@@ -51,7 +51,7 @@ flowchart LR
 | EX-02.5 | The connection drops and cannot reattach | it fails | the thread says so and offers *Reload* |
 | EX-02.6 | The first answer of a new conversation is a graph | it settles | it is drawn onto the conversation's new board and offers no *Load to canvas* |
 | EX-02.7 | A graph answer not yet drawn, or a table whose rows are things in the graph | the person clicks *Load to canvas* | what it holds is added to the board, never replacing what is there, and the reply's offer is answered |
-| EX-02.8 | A drawn answer with a hub on every path, and a record linked across two graph databases | it is counted | each node and relationship counts once, the linked record once; the reply's counts, its record count and the board agree |
+| EX-02.8 | A drawn answer with a hub on every path | it is counted | each node and relationship counts once; the reply's counts, its record count and the board agree |
 | EX-02.9 | An answer | the person clicks *Re-run* | a new run reads again and the earlier answer stays; a re-run that fails shows beside it |
 | EX-02.10 | A conversation with answers | the person reopens or reloads it | every answer shows as stored and no graph database is asked anything |
 | EX-02.11 | A settled answer | the person reads its meta line | it shows the record count, the graph databases it read and the run's time, with *How it got here* first and the acts after it folding into *⋯* by width |

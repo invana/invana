@@ -13,7 +13,7 @@ depends_on: [EX-F01, EX-F04, EX-F05, AG-F01, AG-F02, AG-F06, AG-F09, AC-F02, AC-
 
 # Ask a question
 
-> How a person puts a question to Graph Data — every graph database, stitched — in plain words to the Assistant beside
+> How a person puts a question to Graph Data — every graph database their agent may read — in plain words to the Assistant beside
 > their work, or as a query they type themselves through the Query console; and gets asked back rather than guessed
 > for. A question in words becomes a **typed query plan** written from the published model, checked against the model
 > and the agent's Access Policies, and run one step per graph database in its own language — so the answer they decide
@@ -47,7 +47,8 @@ flowchart TD
   u -->|yes| plan["EX-01 · A typed query plan from the published model"]
   plan -->|the plan cannot express it| gap["EX-01 · I cannot ask this yet · what the plan lacks · a function offered"]
   plan -->|a rule denies a kind · a sensitive property to an external model| rf(["Refused before anything runs — EX-06"])
-  plan -->|checked| run["One step per graph database · joined on identity links · steps live in the thread"]
+  plan -->|relates kinds in two graph databases| xdb["EX-01 · Not yet — names both kinds and their graph databases · nothing runs"]
+  plan -->|checked| run["One step per graph database · each graph database's rows kept apart · steps live in the thread"]
   run -->|failed| fl["Says why · the console opens on Log"]
   run --> ans(["The answer — EX-F04"])
   home -->|first question sent| dock["EX-13 · The conversation docks right · the board keeps the drawing"]
@@ -79,7 +80,7 @@ sequenceDiagram
   E->>X: every kind and property against the model and the agent's Access Policies
   X-->>E: Allow · Ask · Deny, the strictest winning
   E->>D: one compiled step per graph database — Cypher or Gremlin, in a read-only session
-  D-->>E: rows per step, joined on identity links
+  D-->>E: rows per step, each graph database's kept apart
   E-->>S: steps as they settle, then the answer
   S-->>P: the reply in the thread · drawings on the board
 ```
@@ -139,10 +140,11 @@ runs through may read.
 | One question, one run | A follow-up is its own run in the same conversation; the last 20 turns go with it, so *only the top 5* means something. Nothing reaches an AI model or a graph database outside a run of a plan ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)) |
 | Recall before planning | The plan step reads what the thinking graph recalls for this intent — what served and what to avoid ([AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md)); a conversation itself carries no memory beyond its last 20 turns |
 | A typed query plan, never a raw query | The agent's AI model writes a typed query plan — kinds, properties, filters, hops, aggregates — from the published model, never from records. The engine validates it against the model and the agent's Access Policies, then compiles one step per graph database in its own language. The AI model never writes Cypher or Gremlin |
-| Across graph databases | A question is asked of Graph Data, not of one database: a plan whose kinds live in several graph databases runs one step in each and joins the steps' rows on identity links ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)). No record is copied between them |
+| Only what the agent may read | A question reads only the graph databases the asking agent may Read ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)) — inside a project, narrowed to the project's ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)). The grounding block lists only their kinds, so the AI model is never offered another; a plan that names one anyway is refused before it runs, naming the rule (EX-06). Hiding is not the guard: the engine's check is |
+| Across graph databases | A question is asked of Graph Data, not of one database: a plan may read kinds in several graph databases, one step in each. Each graph database's rows stay apart — the answer shows them side by side, each naming its graph database, never joined. A plan never relates kinds in different graph databases — a hop, a filter or an aggregate across them; such a question is answered *Not yet*, naming both kinds and their graph databases, and nothing runs. Joining across graph databases is later ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)). No record is copied between them |
 | A gap is said, never patched | A question the plan grammar cannot express is answered *I cannot ask this yet*, naming what the plan lacks, and offers a function from the catalogue that does it — or, when none does, *Write the query myself* for a person who may use the Query console. The agent never runs a query it wrote outside the grammar |
 | Checked before it runs | A kind, relationship or property the published model lacks, a Deny on `data/<graph database>/<kind>`, a graph database switched off or down, or a sensitive property bound for an external model ends the run as refused before any step reads ([EX-06](../EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-06-a-refusal-or-a-failure-that-says-why/story.md)); an Ask waits on the agent's named approvers |
-| Grounded in the published model | A question is read against the published model, its descriptions and its identity links; a kind the model lacks is never named in a plan |
+| Grounded in the published model | A question is read against the published model, its descriptions and its links between models; a kind the model lacks is never named in a plan |
 | Asked back, never assumed | An ambiguous question becomes a closed question with grounded options; only a person answers it |
 | Reads read | Every step of a question runs in a read-only session the graph database enforces ([GP-04](../../../../os/graph/features/GP-F01-data/stories/GP-04-trust-that-a-read-never-writes/story.md)). Only a typed query through the Query console may write, and it asks first |
 | A typed query passes four layers | A static check, a read-only session, a result filter, and — for Gremlin — steps only, no script, lambda or `eval`; what the agent may not read is refused before it runs or dropped and counted as withheld ([GP-05](../../../../os/graph/features/GP-F01-data/stories/GP-05-run-a-raw-query-within-what-the-agent-may-read/story.md)) |
@@ -151,7 +153,7 @@ runs through may read.
 | Closing never cancels | A run goes on while the assistant is closed and is read in the thread on reopening |
 | The user menu's two switches are per browser | *Assistant* (on by default) and *Tools always shown* (off by default — on starts the board's manual tools on, rather than off until *Tools* is pressed) are kept in the browser, not on the account; where the browser keeps nothing, each reads its default. The theme sits in the same menu |
 | Off is the person's | The user menu's *Assistant* switches it off in every mode, per browser: no header button, no docked thread, no pill, no *Ask the Assistant* in ⌘K, no *Ask about* on a record |
-| Leans on | The published model and its descriptions (SE-F02) · identity links (SE-F06) · sensitive properties (SE-F03) · AI models, local or external (CP-F01) · graph databases and their modes (CP-F05) · agents, the catalogue and the built-in agents (AG-F01 · AG-F02) · plans and the function catalogue (AG-F06) · the thinking graph (AG-F09) · Access Policies (AC-F02) · runs and run privacy (CP-F10) · the ledger (AC-F09) · EX-F01 — the board and the console · EX-F04 — the answer · EX-F05 — cannot answer and refusals |
+| Leans on | The published model and its descriptions (SE-F02) · links between models (SE-F06) · sensitive properties (SE-F03) · AI models, local or external (CP-F01) · graph databases and their modes (CP-F05) · agents, the catalogue and the built-in agents (AG-F01 · AG-F02) · plans and the function catalogue (AG-F06) · the thinking graph (AG-F09) · Access Policies (AC-F02) · runs and run privacy (CP-F10) · the ledger (AC-F09) · EX-F01 — the board and the console · EX-F04 — the answer · EX-F05 — cannot answer and refusals |
 
 ## Data touched
 
@@ -160,7 +162,7 @@ runs through may read.
 | Conversation — title, agent, token budget per run, pinned, archived | Read · write |
 | Turn — the question, its attachment in words, its ask kind, its typed query plan or typed query, the run it started | Write · read |
 | Run — its steps, the plan's compiled step per graph database, a question asked back and the answer to it | Write · read ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
-| The published model, its descriptions, identity link rules and sensitive properties | Read |
+| The published model, its descriptions, links between models and sensitive properties | Read |
 | Records — the option rows of a question asked back, the counts behind a list | Read, under the agent's Access Policies |
 | Lists — Runs · Agents · Inbox › Needs you · Access › Record › History — and their filters | Read |
 | Ledger rows — every call to an AI model and a graph database | Write, by the engine ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
@@ -189,7 +191,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | The built-in workflows `nl-single` · `ql-direct` · `board-open`, the function catalogue and the plan check | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | Recall — what served and what to avoid for an intent | [AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md#engine) |
 | Published model versions — kinds, relationship kinds, properties, descriptions, which graph database holds each kind | [SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
-| Identity link rules and the links materialised in the system graph | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
+| Links between models | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | Sensitive properties | [SE-F03](../../../semantics/features/SE-F03-meaning/feature.md#engine) |
 | AI models and their local or external mark | [CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md#engine) |
 | Graph databases — language, mode, switches, health · set-up | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
@@ -231,6 +233,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | refused | A plan reading a kind the agent's policies deny — before compile | *{agent} may not Read data/{graph database}/{kind} — {rule} on {policy}, set by {person}.* | EX-06.1 · EX-08.15 |
 | refused | A typed query with an unlabelled pattern, when the agent may not Read `data/<graph database>/*` ([GP-F01 › Engine](../../../../os/graph/features/GP-F01-data/feature.md#engine)) | *An unlabelled pattern reaches every kind — {agent} may not Read data/{graph database}/* — {rule} on {policy}, set by {person}.* | EX-08.17 |
 | 422 | A typed Gremlin query with a script, a lambda or `eval` | *{construct} is not allowed — a Gremlin query is steps only.* | EX-08.18 |
+| refused `plan_across_graph_databases` | A plan relating kinds in different graph databases — a hop, a filter or an aggregate across them; outcome `cannot_answer`, never run | *Not yet — {kind} is in {graph database} and {kind} in {graph database}; Invana does not join across graph databases yet.* | EX-01.11 |
 | refused `plan_gap` | A question the plan grammar cannot express; outcome `cannot_answer`, never a raw query | *I cannot ask this yet — a plan cannot {what it lacks}.* | EX-01.16 |
 | refused | A plan needing a graph database switched off, or one that does not answer | *{name} is off — switched off by {person} {when}.* · *{name} is not answering.* | EX-01.18 |
 | 403 | A typed write by a person whose role does not hold *Edit on the board* | *Edit on the board needs the Modeller role.* | EX-08.13 |
@@ -252,11 +255,11 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | Tokens per run | Stored as `min(asked, the agent's max_tokens_run)`; the run freezes the same `min`; the conversation's read carries the agent's cap so Studio can say it was clamped |
 | The question's steps | The built-in workflow `nl-single`: `understand` → `plan` → `check` → `compile` → `execute` (one lane per graph database) → `join` → `project` → `verify`, each streaming its state and its parts as they arrive. How a step ends a run is [EX-F05 › Engine](../EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine); `project` and `verify` are [EX-F04 › Engine](../EX-F04-the-answer/feature.md#engine) |
 | The typed query plan | `{targets[{alias, kind}], hops[{from, relationship, to, direction (out · in · both), min (1), max (≤ 4)}], filters[{alias, property, op (= · != · < · <= · > · >= · in · contains · starts_with · exists · not_exists), value? \| argument?}], returns[{alias, property?}], aggregates[{fn (count · sum · avg · min · max · collect), alias, property?, as}], group_by[], order_by[{field, dir}], limit (≤ 10,000, default 100), distinct, arguments[{name, type, value}]}`. Every name is a kind, relationship kind or property of the published model; every literal from the question is an argument, never spliced into a query |
-| Validate | The engine checks every alias, kind, relationship kind and property against the published model version; resolves which graph database holds each kind; then calls `decide()` with Read on `data/<graph database>/<kind>` for each pair, the strictest winning — a Deny refuses before compile, an Ask parks the run on the agent's named approvers. Validating and compiling take ≤ 50 ms p95 (NFR-PERF-6) |
+| Validate | The engine checks every alias, kind, relationship kind and property against the published model version; resolves which graph database holds each kind; refuses a hop, filter or aggregate between kinds in different graph databases (`plan_across_graph_databases`); then calls `decide()` with Read on `data/<graph database>/<kind>` for each pair, within the run's ceilings, the strictest winning — a Deny refuses before compile, an Ask parks the run on the agent's named approvers. Validating and compiling take ≤ 50 ms p95 (NFR-PERF-6) |
 | Compile | Per graph database, the connector's compiler turns its share of the plan into one query in its language — Cypher or Gremlin — with the arguments as parameters; never through an AI model. The compiled step is kept on the turn's `compiled` and on its step |
-| Join on identity links | A plan spanning graph databases runs the step that narrows most first; the record IDs it returns are mapped through the identity links in the system graph to the next database's records, which bound the next step. At most 1,000 rows a step cross a join; more says it is a sample. The join adds ≤ 200 ms p95 (NFR-PERF-6) |
+| Side by side | A plan reading several graph databases runs one step in each, at once; each step's rows stay its graph database's and the answer is assembled per graph database, each part naming it — never joined. At most 1,000 rows a step; more says it is a sample |
 | The plan gap | `understand` or `plan` returns `plan_gap {lacks, offered[]}` when the question needs what the grammar has no form for — a shortest path, a hop deeper than 4, a graph algorithm, full-text scoring, a subquery, a write. `offered` lists the catalogue's functions the agent may run that do it (AG-F06), each runnable from the reply; with none, the reply offers *Write the query myself* to a person who may use the Query console. The run settles `cannot_answer` with `cannot.kind = plan_gap` |
-| The grounding block | Every AI-model step gets one: the published model's kinds, unioned across graph databases, and the identity links. Node kind: `(:Customer) — description` · relationship kind: `[:PLACED] (Customer)->(Order) — description` · property: `placed_at:datetime (description)` inside its kind · identity link: `crm.Customer.email ≡ sales.Customer.email`. A kind or property every rule reaching the agent denies is not listed; a kind the model lacks never is |
+| The grounding block | Every AI-model step gets one: the published model's kinds in the graph databases the agent may Read within the run's ceilings, each with its graph database, and the links between models. Node kind: `(:Customer) — description` · relationship kind: `[:PLACED] (Customer)->(Order) — description` · property: `placed_at:datetime (description)` inside its kind · link between models: `sales.Order.instrument_isin → sales.Stock.isin`. A kind or property every rule reaching the agent denies is not listed; a kind the model lacks never is |
 | What reaches the AI model | Writing the plan is a schema-only call: the question, the grounding block and the last 20 turns' questions and plans — never a record. Writing the answer's words is data-bearing ([EX-F04](../EX-F04-the-answer/feature.md#engine)). Every call is a ledger row ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
 | The history sent | The last 20 turns: each ask, and the plan that answered it. Rows are never sent; a `load` turn is skipped |
 | Every exchange is recorded | An answer, a cannot answer and a question asked back each keep their prompt and completion on the step |
@@ -276,7 +279,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 |---|---|---|
 | § 6 Data and storage | Two tables in Postgres; no new store | — |
 | § 8 APIs and events | The routes and events above, under `explore` | — |
-| § 10 AI and agents | The typed query plan — written from the model, validated against the model and the agent's Access Policies, compiled per graph database, joined on identity links; the plan gap; one grounding block per AI-model step; a parked run that waits on a person; the `board.open` function | NFR-SEC-5 · NFR-PERF-6 |
+| § 10 AI and agents | The typed query plan — written from the model, validated against the model and the agent's Access Policies, compiled per graph database, each graph database's rows kept apart; the plan gap; one grounding block per AI-model step; a parked run that waits on a person; the `board.open` function | NFR-SEC-5 · NFR-PERF-6 |
 | § 12 Qualities | Privacy: writing a plan is schema-only; records reach an AI model only in the answer step, never a sensitive property to an external one | NFR-SEC-8 |
 
 ## Decisions
@@ -316,7 +319,8 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | A saved-query library | A conversation keeps its queries; a schedule makes one recurring |
 | Query formatting or linting beyond checking it | The editor is for asking, not for authoring code |
 | Translating a typed query between languages | A typed query runs on one graph database, in its language; a question across databases is asked in words |
-| Copying records between graph databases to answer a question | Stitched, never copied: the engine joins on identity links |
+| Copying records between graph databases to answer a question | Read in place, never copied |
+| Joining across graph databases | Later ([SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md)); each graph database's rows are shown side by side |
 | Free-text answers to a question asked back by default | A closed answer stores a value; prose stores a guess |
 | An agent answering a question asked back | That is assuming, with extra steps |
 | Expiring an unanswered question | The run shows it is waiting; a silent timeout hides work |

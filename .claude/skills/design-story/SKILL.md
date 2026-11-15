@@ -90,7 +90,7 @@ The kit rules — compose, tokens, density, the type ladder, where a component g
 |---|---|
 | **Kit only** | `@invana/ui`, `forms`, `tables`, `themes`, `styling`, `@invana/canvas-ui`. Tokens only: no hex, no `hsl(`, no inline style literals, no hard-coded control heights. Never a look-alike or a one-off |
 | **The agent proposes, the person decides** | The agent's proposal and the choice — a recommendation and **one** primary act — never a blank form where an agent could draft |
-| **Simple by default** | The first screen shows the decision and its result. Steps, queries, logs and plans are not on it |
+| **Simple by default — never overdo it** | A board shows only what the person needs to act on next: the decision and its result, the one call to action, or the one fact that tells them what to start. Everything else — steps, queries, logs, plans, secondary metrics, every column the API returns — is one click deeper (peek → modal), never on the first screen. Fewer tiles, fewer columns, fewer panels: when in doubt, leave it out. Check every board against this before publishing |
 | **Traceable on demand** | Every agent answer, proposal and act has *Why?* / *How it got here* one click away (peek), and the full run one more (sheet) |
 | **Asks before it acts** | An act that writes, sends, spends or changes access shows exactly what will happen before the person agrees |
 | **Every state, both lenses** | All seven states as the UI shows them — first use says why it is empty and offers the one act that starts it; failed says what failed and the next act. The Operator lens shows each act as its *Who can* row says |

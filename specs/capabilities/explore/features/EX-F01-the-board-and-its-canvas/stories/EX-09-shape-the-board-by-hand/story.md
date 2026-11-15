@@ -30,7 +30,7 @@ flowchart LR
   a([A drawn board]) -->|right-click a node · Expand neighbours| ck{"The Assistant's Access Policies · each graph database on"}
   ck -->|a rule denies the kind| r["Refused — names the rule, its policy and who set it"]
   ck -->|a graph database off| off["Refused — names it and who switched it off"]
-  ck -->|allowed| c{The count, across graph databases}
+  ck -->|allowed| c{The count, in the node's graph database}
   c -->|within the cap| d["Neighbours added · nothing replaced"]
   c -->|over the cap| k["The count · raise the cap or pick a kind"] --> d
   c -->|queued · failed| q["Queued behind runs · or the run's message"]
@@ -55,7 +55,7 @@ flowchart LR
 | EX-09.9 | A node gone from its graph database since it was drawn | the board reopens | the node stays drawn, marked missing, with when it was last seen |
 | EX-09.10 | A dense result zoomed out | over 500 relationships are drawn below 50% zoom | about 1 in 10 is drawn and the footer says *About 1 in 10 relationships drawn · zoom in for all* until every edge is drawn again |
 | EX-09.11 | A drawn node | the person picks *Expand…* | a card offers direction, relationship kind, neighbour kind, how many, and a property to match; the count shows before anything draws |
-| EX-09.12 | A Customer in `sales` with identity links to Customers in `crm` | the person expands it | its neighbours in both graph databases are counted and drawn, each in the Element panel naming its graph database |
+| EX-09.12 | A Customer in `sales`, and a Customer with the same email in `crm` | the person expands the one in `sales` | only its neighbours in `sales` are counted and drawn, the Element panel naming `sales`; the Customer in `crm` is not reached — nothing is joined across graph databases |
 | EX-09.13 | A graph database that cannot count by kind | the Legend opens | every drawn kind is listed without a number, and no total is made up from a partial sum |
 | EX-09.14 | The Legend open | the person picks *Count again* | the kinds are counted again as the Assistant, as a run, and nothing drawn changes |
 | EX-09.15 | Styling open | the person sets a relationship kind's width, or labels a node kind by a key, its id or its kind | the board repaints at once and keeps it |

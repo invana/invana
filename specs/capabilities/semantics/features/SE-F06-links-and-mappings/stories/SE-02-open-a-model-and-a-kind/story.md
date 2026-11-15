@@ -53,6 +53,7 @@ flowchart LR
 | SE-02.10 | A kind's Mappings | it opens | each mapping lists its property, the standard's term or value and version, and who declared it; an Operator reads them with *Map to a standard* absent |
 | SE-02.11 | Published models | a person opens Model › Models | the left section is a tree: every model, and under it its Kinds, each with the record count the engine sends; picking a kind opens the kind |
 | SE-02.12 | Published models | a person expands a model in the Models tree | its Relationships list under its Kinds, each naming the two kinds it joins; picking one opens it on its model |
+| SE-02.13 | A kind's Properties tab | it opens | each property reads its type, *Must be*, whether it is the key, and where it comes from — *Authored*, *Read from {graph database}*, *A starter*, *From {ontology}* with its source IRI, or *A model file* — with the version that added it and who published it |
 
 ## Screens
 

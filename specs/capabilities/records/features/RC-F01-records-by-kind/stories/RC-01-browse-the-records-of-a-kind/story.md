@@ -20,7 +20,7 @@ Every role browses records ([the role table](../../../../../../os/access/feature
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse, filter and open the records of any kind | — |
-| Operator | Browse, filter and open the records of any kind a view of the graph lets them see | Kinds a view hides are absent |
+| Operator | Browse, filter and open the records of any kind a view of the graph lets them see, in the graph databases their default agent may Read | Kinds a view hides, and kinds in a graph database their default agent may not Read, are absent; a direct link reads *Withheld* |
 
 ## Flow
 
@@ -32,6 +32,7 @@ flowchart LR
   fl -->|yes| l
   l -->|open| r([The record's page])
   l -->|could not load| f[Could not load · Try again]
+  a -->|a kind its default agent may not Read| w([Withheld · names the rule])
 ```
 
 ## Acceptance criteria
@@ -44,6 +45,8 @@ flowchart LR
 | RC-01.4 | A kind with no records | it is picked | the page says there are none yet and where records come from |
 | RC-01.5 | A kind a view of the graph hides | an Operator opens the picker | the kind is absent |
 | RC-01.6 | The records cannot be read | the page opens | *Could not load the records* shows with *Try again* |
+| RC-01.7 | Kinds in two graph databases, and a default agent whose Access Policies allow Read on only one | the person opens the picker | only the kinds of that graph database are listed, grouped by model; the other's kinds are absent |
+| RC-01.8 | A kind in a graph database the person's default agent may not Read | they open a direct link to it | the engine refuses the read and the page reads *Withheld — {agent} may not read {kind} in {graph database}*, naming the rule; no record is shown |
 
 ## Screens
 
@@ -51,3 +54,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Browse by kind | Admin | data.records · No records yet | data.records · Nothing matches | data.records · Loading | data.records | data.records · Could not load | — | — |
 | Browse by kind | Operator | data.records · No records yet | data.records · Nothing matches | data.records · Loading | data.records | data.records · Could not load | — | data.records · Kind hidden |
+| A kind the default agent may not read | Admin | — | — | — | — | — | — | data.records · Withheld |
+| A kind the default agent may not read | Operator | — | — | — | — | — | — | data.records · Withheld |

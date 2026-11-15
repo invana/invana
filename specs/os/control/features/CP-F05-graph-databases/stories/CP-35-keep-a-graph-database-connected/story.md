@@ -40,7 +40,7 @@ flowchart TD
   c -->|version untested| ut["Read-only, saying why"] --> acc{"Accept this version"}
   acc -->|accepted| rw(["Writes open if read + write · History records who"])
   c --> del["Remove · type its name · sign in again"]
-  del -->|a rule, match rule or workflow names it| blk(["Refused · names them"])
+  del -->|a rule, project or workflow names it| blk(["Refused · names them"])
   del -->|nothing names it| gone(["Gone · its data untouched · History keeps it"])
   c -->|an Operator| ask(["Reads · acts read Ask an Admin"])
 ```
@@ -60,7 +60,7 @@ flowchart TD
 | CP-35.9 | A test | it runs | History records who tested it and when |
 | CP-35.10 | An unreachable graph database | the Admin presses *Reconnect* | it tries again and the status refreshes, saying when it last connected |
 | CP-35.11 | Remove | the Admin types a name that is not this one | it is refused, saying *Type {name} to remove it* |
-| CP-35.12 | A graph database a rule, a match rule or a workflow names | the Admin removes it | it is refused, naming each of them |
+| CP-35.12 | A graph database a rule, a project or a workflow names | the Admin removes it | it is refused, naming each of them |
 | CP-35.13 | An Operator or a Modeller | they reach any act | it reads *Ask an Admin*, naming the Admins; the password field is absent |
 | CP-35.14 | A credential change or a removal | the Admin sends it | they are asked for their password for this act; a wrong password or a key is refused and nothing changes |
 | CP-35.15 | Nothing names it | the Admin removes it, typing its name and signing in again | it is gone from the list and from Graph Data; the database's own data is untouched; History keeps who removed it, with its name |

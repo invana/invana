@@ -10,7 +10,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **Graph Data** | Everything the deployment's graph databases hold, read in place and joined on identity links — one per deployment. Never created, opened, selected or listed: it is not an object. Always capitalised. On screen also the Model group *Graph Data* — Browse by kind · Loads · Quality · Annotations | graph data |
+| **Graph Data** | Everything the graph databases attached to the deployment hold, read in place. A deployment attaches many graph databases; each person, team, project and agent reaches only those its access allows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)). Results from different graph databases are never joined. Never created, opened, selected or listed: it is not an object. Always capitalised. On screen also the Model group *Graph Data* — Browse by kind · Loads · Quality · Annotations | graph data |
 | **graph database** | One configured connection to a Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune or TinkerGraph database, through its connector — read-only or read + write, switched on or off | graph database |
 | **Read-only · Read + write** | A graph database's mode, set by an Admin: agents only read it · agents may also write to it — annotations, derived facts, loads, fixes. Reads always run in the database's read mode | connection mode |
 | **Practice graph database** | A graph database an Admin names for testing agents and skills, never the one people ask | practice graph database |
@@ -33,15 +33,14 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **Model** | The kinds of node and relationship Graph Data holds, and their properties — one stitched model across every graph database | Domain model |
+| **Model** | The kinds of node and relationship Graph Data holds, and their properties — each model bound to one graph database | Domain model |
 | **Kind** | One type of node or relationship in a model | node type · edge type |
 | **Draft** | Unpublished changes; a floating bar says how many | Draft |
 | **Publish** | Make a draft the model everyone asks against | Publish |
-| **Link between models** | A declared meeting of two models — the same entity, or a relationship across them | Stitch · anchor · relationship link |
+| **Link between models** | A declared meeting of two models in the same graph database — the same entity, or a relationship across them, on a key on each side. Never across graph databases ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) | Stitch · anchor · relationship link · identity link · match rule |
 | **Constraint** | One property's range with a unit, or one standard's values, on one kind — Reject or Flag for review when a record breaks it | Property constraint (validation rule) |
 | **What the database holds** | The kinds, properties and counts read from the graph database, with when — compared with the model, never the model | Physical mirror · introspection |
 | **Records** | The nodes and relationships Graph Data holds, read in place from the graph databases — never copied — each one of a kind in a published model; *Model › Graph Data › Browse by kind* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
-| **Identity link · Match rule** | Two records in different graph databases that are the same entity · the rule a Modeller declares for a pair of kinds that says when they are; links come from rules, never from a guess | identity link · match rule |
 | **Version** | One immutable, hashed state of a model, standard, skill, workflow or agent | Version |
 | **Sensitivity** | A property's level — **public** · **internal** · **confidential** · **personal** — set in its kind's Meaning by a Modeller; *internal* until set. Access Policies may reach one level of a kind; a derived value takes the highest level of what it came from | Sensitivity |
 | **Sensitive property** | A property whose level is confidential or personal; it never leaves for an external target — a call carrying it is refused, a document or a result leaves without it, naming it | sensitive tag |
@@ -94,7 +93,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **User** | Who acts in the deployment: a person, an agent, a service user, or the system user | Principal |
 | **Role** | What a person may do in Studio, one each: **Operator** · **Modeller** · **Admin** — one fixed table of roles and features, never edited | role |
 | **Operator** | A person who asks, looks and decides, through the agents they may use | role `operator` |
-| **Modeller** | A person who also shapes the model — models, meaning, links and match rules, rules, loads | role `modeller` |
+| **Modeller** | A person who also shapes the model — models, meaning, links between models, rules, loads | role `modeller` |
 | **Admin** | A person who also runs the deployment — graph databases, plugins, AI models, users, teams, Access Policies | role `admin` |
 | **Team** | A flat group of people that agents are granted to. A team owns nothing, holds no rule and holds no other team | Team |
 | **Agents they may use** | The agents granted to a person, directly or through a team; every act a person makes runs through one of them | agent grant |
@@ -290,15 +289,14 @@ names and the form each takes in every layer are
 | **Deployment** | One install of Invana and everything in it — its graph databases, Graph Data, the system graph, users, teams, agents and work. The widest scope: there is no workspace, tenant or Organisation above it and no unit inside it that holds a graph of its own. *Install* means the same in code and docs |
 | **Connector** | The package that speaks to one type of graph database — `invana-neo4j`, `invana-janusgraph` — with its query language and its driver's read mode |
 | **Graph database** | One configured connection, through a connector, to one database — one credential, initialised **read-only** or **read + write** by an Admin, switched on or off. Every read runs in a **read-only session**, which a connector proves with its certification test |
-| **Graph Data** | Everything the graph databases the deployment connects hold, one per deployment, read in place and never copied — never created, opened, selected or listed: the deployment is the only scope. The reasoning boundary: what is not in it is third-party. A question runs one step per graph database in its own language, and the engine joins the results on identity links |
-| **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage, the ledger's edges and identity links, never customer data, and is never part of Graph Data. It follows Postgres, the source of truth, and is rebuilt from it |
+| **Graph Data** | Everything the graph databases attached to the deployment hold, read in place and never copied — never created, opened, selected or listed: the deployment is the only scope. Each person, team, project and agent reaches only the graph databases its access allows. The reasoning boundary: what is not in it is third-party. A question runs one step per graph database it reads, in its own language; results from different graph databases are shown side by side, never joined |
+| **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage and the ledger's edges, never customer data, and is never part of Graph Data. It follows Postgres, the source of truth, and is rebuilt from it |
 | **System ontology** | The read-only, versioned ontology Invana ships that governs the system graph |
-| **Identity link** | Two records in different graph databases that are the same entity, materialised in the system graph from a **match rule** a Modeller declares for a pair of kinds — agents may propose rules, never links. Never guessed |
 | **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown in *Settings › Connections*, *Workers* and the *Library*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
 | **Operating system** | What runs every deployment: the **Control Plane**, the **Access Plane** and the **Graph Plane** — the packages `control` · `access` · `graph`. A vision and docs word; in code its parts are packages beside the capabilities |
 | **Control Plane** | What runs, where and within which limits — runs, workers and the queue, graph databases, limits, AI models, plugins and the MCP server, ops alerts, the Inbox. Product code `CP` |
 | **Access Plane** | Who may act, through which agent, and what they did — sign-in, keys, Access Policies, the Directory, ownership, asks, the ledger's views, History. Product code `AC` |
-| **Graph Plane** | What Invana reads and what it remembers — **Data**: Graph Data, read in place through a connector per graph database and joined on identity links · **Memory**: Invana's own graph of the work, in the system graph. Product code `GP`. A vision and docs word: on screen a person reads *Graph Data* and *Memory* ([os/graph](os/graph/product.md)) |
+| **Graph Plane** | What Invana reads and what it remembers — **Data**: Graph Data, read in place through a connector per graph database · **Memory**: Invana's own graph of the work, in the system graph. Product code `GP`. A vision and docs word: on screen a person reads *Graph Data* and *Memory* ([os/graph](os/graph/product.md)) |
 | **Lineage** | What a copy — an answer, a finding, a report, a snapshot, a transcript, a note, a memory node or an export — was read from: its **sources**, as Access Policy resources with their level, recorded with the copy and kept as edges in Memory. A copy shows to a person only when their default agent may Read every source; else it is withheld. Its level is the highest of its sources' ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) |
 | **Raw query** | A Cypher or Gremlin query a person writes in the Console: a static check against the agent's rules, a read-only session, a result filter, and Gremlin steps only — no scripts or lambdas ([GP-F01](os/graph/features/GP-F01-data/feature.md)) |
 | **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Graph Data** group of Model. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
@@ -335,10 +333,10 @@ names and the form each takes in every layer are
 | **Migration run** | The run a publish review is: `model-migration@1`. Previewing, it counts what a breaking change touches and which records would fail; applied, it publishes the version and lists the records that fail. **It never rewrites a record.** |
 | **Anchor** | A declared link saying two types are the same entity (`Publisher.code ≡ Sponsor.publisher_code`), resolved by a key on each side. It links; it never merges. |
 | **Relationship link** | A declared cross-model edge type (`Article -[MENTIONS]-> Drug`). Its endpoints come from a key on each side *or* from a load — never both. Never inferred. |
-| **Global model** | The read-time union of every published model plus its links and identity match rules — the one stitched model. Derived, never stored, never edited. |
+| **Global model** | The read-time union of every published model plus its links between models — the whole model. Derived, never stored, never edited. |
 | **Cast** | The binding of a plan's **role** (`extract` · `decide` · `judge` · `embed`) to a model address. A resolution, not a bound — the rules are what narrow. |
 | **Ledger entry** | One recorded call to an AI model, a tool or a graph database: run · step · agent · person behind · direction · target · class (`schema-only · data-bearing`) · kinds, fields and record IDs sent · response schema · tokens · keyed hashes. Reads keep the query, kinds, counts and a result hash, and IDs up to a cap; anything sent to a model or tool keeps every ID. Not a log line |
-| **Stitch** | A link between models: declaring that two published models meet, and the Studio surface that holds them — a section in the Model view panel. An anchor and a relationship link are the two kinds. **Committing a link writes its relationships, marked with the link; removing it withdraws what it wrote.** Not an identity link, which joins records across graph databases at read time ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| **Stitch** | A link between models: declaring that two published models in the same graph database meet, and the Studio surface that holds them — a section in the Model view panel. An anchor and a relationship link are the two kinds. **Committing a link writes its relationships, marked with the link; removing it withdraws what it wrote.** Never across graph databases ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
 | **Physical** | The introspected mirror of what the database actually holds. |
 | **Query shape** | A query with its literal values replaced by parameters — a thousand calls of one generated query are one shape. What the model page's Performance tab groups by. Not a saved query. |
 | **Records** | Externally produced data in the graph databases, conforming to exactly one model, read in place. They are the model's — there is no record between the model and its data. |
@@ -482,7 +480,7 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 
 | Not this | Say | Why |
 |---|---|---|
-| Mission · Atlas · Workspace · tenant | the **deployment**, or **Graph Data** | one deployment is everything; Graph Data is what its graph databases hold, joined |
+| Mission · Atlas · Workspace · tenant | the **deployment**, or **Graph Data** | one deployment is everything; Graph Data is what its graph databases hold |
 | A product, module or group name for a part of Invana | the **package** — `control` · `access` · `semantics` · `records` · `agents` · `explore` · `projects` | one package, one name, from spec folder to board ([How a package is named](#how-a-package-is-named)); a verb phrase is a feature's register |
 | Dashboard | **Board** — a *declared* board when the difference matters | every surface is a board: drawn on a canvas or declared from panels (`renders: canvas · declared`). The kit's package is `@invana/boards` and its component `Board`. HyperDX's own dashboards keep their name, since they are that product's word, not ours |
 | Intent | **Instructions** for guidance, **understanding** for the step | the word is ambiguous between the two |

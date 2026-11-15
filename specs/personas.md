@@ -10,7 +10,7 @@ two lenses (below).
 |---|---|---|---|---|
 | `analyst` | **Analyst** | Ask Graph Data questions, read answers, keep boards and share them | Explore | Operator |
 | `decision-maker` | **Decision maker** — a policy maker, investor or marketer | Pursue a question: fork it into branches, weigh findings for and against, decide with a trail | Projects | Operator |
-| `modeller` | **Modeller** — a modeller or compliance lead | Give the data meaning across every graph database: models, meaning and sensitive properties, links and identity match rules, rules that must always hold | Model | Modeller |
+| `modeller` | **Modeller** — a modeller or compliance lead | Give the data meaning in every graph database: models, meaning and sensitive properties, links between models, rules that must always hold | Model | Modeller |
 | `researcher` | **Researcher** | Test hypotheses against the evidence, reproducibly: every finding cites the loads and records behind it, and a study can be rerun and cited | Projects · Explore | Operator |
 | `investigator` | **Investigator** — an auditor or case worker | Work a case from its leads to a decision, every piece of evidence kept with its chain of custody — who brought it in, from which load, and who touched it | Projects · Explore | Operator |
 | `curator` | **Data curator** | Bring records in, check them against the model and its standards, fix and trace them | Records | Modeller |
