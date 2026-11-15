@@ -127,7 +127,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 
 | State | What the person sees |
 |---|---|
-| First use | *Super user*, locked, held by the first account; the starter policies, attached to nobody; each built-in agent's ceiling, marked *Built in*; *New policy* and *Draft with the assistant* lead |
+| First use | *Super user*, locked, held by the first account; the starter policies, attached to nobody but *Read only*, named for newcomers; each built-in agent's ceiling, marked *Built in*; *New policy* and *Draft with the assistant* lead |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
 | Loading | The section opens at once; lists show loading rows; counts read `—` until the engine gives them |
 | Has data | Access Policies one row each, the selected one beside them: its permission matrix, its rules as sentences, who it is attached to, its owner and maker, and its versions; a policy file from an import reads *Waiting to be applied* |
@@ -147,13 +147,13 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Resources | `<type>/<segment>…` — the types and their segments are [the permission catalogue](#the-permission-catalogue). `*` stands for one whole segment — `data/*/Customer` is every graph database's Customer, `tool/web/*` every web tool; `*` inside a segment is refused. A rule on `data/<graph database>/<kind>` reaches every level of that kind; a fourth segment — `public` · `internal` · `confidential` · `personal`, the levels of [SE-F03](../../../../capabilities/semantics/features/SE-F03-meaning/feature.md) — reaches only that level. In `fs/` only, a last segment `**` stands for every path below ([AC-37](stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)) |
 | A person's own act | An act a person makes in Studio, the API or the CLI is checked against the person's permissions. When a built-in agent carries it — the Query console, the Loader, the Record editor — that agent's ceiling narrows it too |
 | A project owns its access | Every run inside a project — asked by anyone on its team, scheduled, picked up or started by its Lead agent — reaches **project access ∩ the agent's ceiling** ∩ every caller's ceiling ∩ the run's other ceilings. The person who asked is recorded on the run; their own policies are not read inside a project, and joining or leaving never changes what the project may do ([PJ-F01 › Rules](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) |
-| Outside a project | A run reaches the person behind it ∩ the agent's ceiling ∩ every caller's ∩ the run's other ceilings ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md#rules)). The person behind it is who asked, a key's owner, the person who consented a connected client, or a schedule's setter. A run whose person cannot act — deactivated, with no successor yet — waits, naming them, until the slot falls back ([AC-F07](../AC-F07-ownership/feature.md#slots-and-fallbacks)) |
+| Outside a project | A run reaches the person behind it ∩ the agent's ceiling ∩ every caller's ∩ the run's other ceilings ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md#rules)). The person behind it is who asked, a key's owner, the person who consented a connected client, or a schedule's or a pick-up's setter — so a schedule or a pick-up outside any project reaches its setter's policies ∩ the agent's ceiling. A run whose person cannot act — deactivated, with no successor yet — waits, naming them, until the slot falls back ([AC-F07](../AC-F07-ownership/feature.md#slots-and-fallbacks)) |
 | Project access | One Access Policy attached to each project, started from a project access template and set through a plain form — graph databases, models, agents, workers, what may leave — or, by *Edit as policy*, the full matrix ([PJ-F01 › Rules](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)). Setting or widening it needs Manage on Projects (`projects:access`); a person without it asks, and the part they may not grant waits for someone who may. It grants a person nothing outside the project |
 | Project access templates | *Read and analyse* · *Fix data quality* · *Full project* ship as data, owned by the system user, edited and copied like a starter policy; a project's type may name its default |
 | An agent holds only a ceiling | The policies attached to an agent are the most it may ever do — *may edit Graph Data: no*, *may send outside: no*. Adding it to a project's team grants it nothing. Using an agent is Run on `agent/<name>`, a person's permission |
 | Super user | One built-in policy: every action on every resource. The first account, made from the CLI, holds it. It is locked — never edited, renamed, copied over or deleted — and never taken off its last active holder |
-| Starter policies | *Explore* · *Shape the model* · *Build agents* · *Run the deployment* ([below](#starter-policies)) ship as data, owned by the system user: attach them, copy them or edit them like any custom policy. Nothing in the engine depends on their names |
-| Newcomers | A new person or service user holds the policies the deployment names for newcomers — *Explore* out of the box — set by Manage on Access |
+| Starter policies | *Read only* · *Explore* · *Shape the model* · *Build agents* · *Run the deployment* ([below](#starter-policies)) ship as data, owned by the system user: attach them, copy them or edit them like any custom policy. Nothing in the engine depends on their names |
+| Newcomers | A new person or service user holds the policies the deployment names for newcomers — *Read only* out of the box — set by Manage on Access. Any further policy is attached only by a holder of Manage on Access — *Super user*, or *Run the deployment* |
 | Everyone sees every place and act | Every mode, view and act shows to everyone. The policy decides what responds: an act a person lacks is shown disabled, naming the permission and who can grant it; data a policy denies is withheld — a kind absent from a picker, a property dropped and counted as withheld — never shown. The engine refuses any act or step the policy does not allow, naming the rule: hiding is never the guard |
 | Who can grant | The active people who hold Manage on Access — on screen *Admins* |
 | Every act is checked in one order | [The order of checks](#the-order-of-checks); a refusal names the first check that refused |
@@ -200,13 +200,14 @@ The one source of what may be granted. A permission is an action on a resource �
 
 ## Starter policies
 
-Shipped as data, owned by the system user, attached to nobody but *Explore* to newcomers. Each is edited, copied
+Shipped as data, owned by the system user, attached to nobody but *Read only* to newcomers. Each is edited, copied
 and attached like any custom policy.
 
 | Policy | Allows |
 |---|---|
 | **Super user** — locked | Every action on every resource |
-| **Explore** | Read `data/*/*` · `model/*` · `agent/*` · `skill/*` · `plugin/*` · `worker/*` · `setting/*` · Create `project/*` · Run `agent/assistant` · `agent/query-console` · `skill/*` · `plugin/*` |
+| **Read only** — every newcomer's | Read `data/*/*` · `model/*` · `project/*` · `agent/*` · `skill/*` · `workflow/*` · `plugin/*` · `worker/*` · `setting/*` — Read on every resource that takes it, except `run/*` and `access/*`, whose Read opens another's run content and every History row. No Create, Edit, Publish, Run or Manage |
+| **Explore** — optional | Read `data/*/*` · `model/*` · `agent/*` · `skill/*` · `plugin/*` · `worker/*` · `setting/*` · Create `project/*` · Run `agent/assistant` · `agent/query-console` · `skill/*` · `plugin/*` |
 | **Shape the model** | Read `data/*/*` · Create · Edit · Publish · Run `model/*` · Create · Edit `data/*/*` · Run `agent/modeller` · `agent/loader` · `agent/record-editor` |
 | **Build agents** | Read `run/*` · Create · Edit · Publish · Run `agent/*` · `skill/*` · Create · Edit `plugin/*` |
 | **Run the deployment** | Every action on `worker/*` · `setting/*` · `run/*` · `access/*` · Manage `plugin/*` |
@@ -337,7 +338,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The order of checks | `check(person?, project?, chain, action, resource, run?)` runs [the order](#the-order-of-checks) and returns the first refusal, or allow or ask; the ledger row and the outbound check follow ([AC-F09](../AC-F09-what-left-the-platform/feature.md#engine)). Every route, step and tool call goes through it |
 | Who can grant | A refusal names up to two active people who hold Manage on Access, by `GET /users?can=access:manage` ([AC-F03](../AC-F03-directory/feature.md#engine)) |
 | Super user and the built-in ceilings | Written from code at start, owned by the system user. A start rewrites each to the code's rules; a person's change is a copy |
-| Starter policies | Written at the first start only, `origin = starter`; never rewritten after. The deployment setting `access.newcomer_policies` names *Explore* until changed |
+| Starter policies | Written at the first start only, `origin = starter`; never rewritten after. The deployment setting `access.newcomer_policies` names *Read only* until changed |
 | `assistant` — the Assistant: asking, answering, boards; every new person's default agent | Allow Read `data/*/*` · `model/*` · `memory/project/*` · `memory/org` · `project/*` · Allow Run `skill/*` · `workflow/*` · `plugin/*` · Ask Edit `project/*` · Ask Run `agent/*` · `tool/*/*` |
 | `query-console` — the Query console: the Console's queries | Allow Read `data/*/*` · Ask Create · Edit `data/*/*` · Allow Run `plugin/graph.read` · Ask Run `plugin/graph.write` |
 | `modeller` — the Modeller agent: changes to the model and links between models | Allow Read `data/*/*` · Read · Edit `model/*` · Allow Run `plugin/model` · `plugin/graph.stitch` · `skill/*` |
@@ -368,6 +369,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Access Policies live in Access › What they may do | The Access summoner opens the large modal at Access; *Access Policies* sits beside *Permissions* and *Agents* in *What they may do*, the Directory in *Who*; a policy drills in and the crumb grows |
 | A policy is built as a matrix | The editor is the permission matrix — resources down, actions across, each cell Allow · Deny · — and, for a project or an agent, Ask; a row narrows to a graph database, a kind, a model, an agent; *Rules* shows the same policy as sentences — *Allow reading Customer in every graph database* — with the exact form one click deeper |
 | Policies, never roles | Access is one shape for every holder; the starter policies carry what roles carried, as data anyone with Edit on Access may change |
+| A newcomer reads, nothing more | Every new person and service user starts on *Read only*; what more they may do is attached by a holder of Manage on Access. *Explore* — read, ask the Assistant, start projects — is a starter to attach, never a default |
 | Built-in agents are narrowed, never edited | A built-in ceiling stays attached to its built-in agent; it is narrowed by attaching a custom policy with a Deny |
 | Everyone reads | Reading policies, rules, the catalogue and the built-in agents is never gated for a signed-in person: a person must see a rule to know whom to ask |
 | *Can someone do this?* writes nothing | It runs the engine's own checks without running anything |

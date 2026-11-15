@@ -4,7 +4,7 @@ title: Connect my own accounts for my own runs
 feature: CP-F02
 status: idea
 personas: [analyst, builder, admin]
-boards: [settings.me, agents.runs, settings.plugins]
+boards: [settings.me, agents.runs, agents.plugins]
 ---
 
 # CP-63 · Connect my own accounts for my own runs
@@ -66,5 +66,5 @@ flowchart TD
 | A call refused for a missing connection | Operator | — | — | — | agents.runs · Detail · No connection | — | agents.runs · Detail · No connection | — |
 | A copy from another person's connection | Admin | — | — | — | agents.runs · Detail · Withheld · Personal connection | — | — | agents.runs · Detail · Withheld · Personal connection |
 | A copy from another person's connection | Operator | — | — | — | agents.runs · Detail · Withheld · Personal connection | — | — | agents.runs · Detail · Withheld · Personal connection |
-| My own switch | Admin | settings.plugins · My switch | — | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Off for the deployment | — | — |
-| My own switch | Operator | settings.plugins · My switch | — | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Off for the deployment | — | — |
+| My own switch | Admin | agents.plugins · My switch | — | agents.plugins · Loading | agents.plugins · My switch | agents.plugins · Off for the deployment | — | — |
+| My own switch | Operator | agents.plugins · My switch | — | agents.plugins · Loading | agents.plugins · My switch | agents.plugins · Off for the deployment | — | — |

@@ -4,7 +4,7 @@ title: See what a plugin needs and which agents may use it
 feature: CP-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.plugins]
+boards: [agents.plugins]
 ---
 
 # CP-44 · See what a plugin needs and which agents may use it
@@ -56,7 +56,7 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A function's needs | Admin | — | — | settings.plugins · Loading | settings.plugins · Needs | settings.plugins · Could not load | — | — |
-| A function's needs | Operator | — | — | settings.plugins · Loading | settings.plugins · Needs | settings.plugins · Could not load | — | — |
-| Which agents may use it | Admin | settings.plugins · No agent may use it | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · Agents and needs | settings.plugins · Need missing | — | — |
-| Which agents may use it | Operator | settings.plugins · No agent may use it | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · Agents and needs | settings.plugins · Need missing | — | — |
+| A function's needs | Admin | — | — | agents.plugins · Loading | agents.plugins · Needs | agents.plugins · Could not load | — | — |
+| A function's needs | Operator | — | — | agents.plugins · Loading | agents.plugins · Needs | agents.plugins · Could not load | — | — |
+| Which agents may use it | Admin | agents.plugins · No agent may use it | agents.plugins · Nothing matches | agents.plugins · Loading | agents.plugins · Agents and needs | agents.plugins · Need missing | — | — |
+| Which agents may use it | Operator | agents.plugins · No agent may use it | agents.plugins · Nothing matches | agents.plugins · Loading | agents.plugins · Agents and needs | agents.plugins · Need missing | — | — |

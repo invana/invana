@@ -6,7 +6,7 @@ teams, drawn as two lenses (below).
 
 ## The people
 
-| Key | Persona | Comes to Invana to | Works mostly in | Usual starter policy |
+| Key | Persona | Comes to Invana to | Works mostly in | Usual starter policy, attached by an Admin over *Read only* |
 |---|---|---|---|---|
 | `analyst` | **Analyst** | Ask Graph Data questions, read answers, keep boards and share them | Explore | Explore |
 | `decision-maker` | **Decision maker** — a policy maker, investor or marketer | Pursue a question: fork it into branches, weigh findings for and against, decide with a trail | Projects | Explore |
@@ -43,7 +43,7 @@ catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-c
 | Lens | Who | Sees |
 |---|---|---|
 | **Admin** — full access | A person whose policies allow every act the story names — *Super user*, or the starter policy that fits | Every act |
-| **Operator** — read only | A person whose policies allow reading and nothing more | Every place and act; each act disabled, naming the permission and who can grant it, or *Ask &lt;approver&gt;*; data a policy denies withheld, never shown |
+| **Operator** — read only | A person whose policies allow reading and nothing more — *Read only*, every newcomer's policy | Every place and act; each act disabled, naming the permission and who can grant it, or *Ask &lt;approver&gt;*; data a policy denies withheld, never shown |
 
 A person between the two — one permission but not another — is a criterion in the story, never a third lens on the
 canvas.

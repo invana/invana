@@ -4,7 +4,7 @@ title: Add an outside MCP server and let agents call its tools
 feature: CP-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.plugins]
+boards: [agents.plugins]
 ---
 
 # CP-02 · Add an outside MCP server and let agents call its tools
@@ -70,9 +70,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Outside servers | Admin | settings.plugins · Servers · No servers | settings.plugins · Nothing matches | settings.plugins · Servers · Loading | settings.plugins · Servers | settings.plugins · Servers · Could not load | — | — |
-| Outside servers | Operator | settings.plugins · Servers · No servers · Read only | settings.plugins · Nothing matches | settings.plugins · Servers · Loading | settings.plugins · Servers · Read only | settings.plugins · Servers · Could not load | — | settings.plugins · Servers · Read only |
-| Add a server | Admin | settings.plugins · Servers · Add | — | settings.plugins · Servers · Add · Listing its tools | settings.plugins · Servers · Add · Tools listed | settings.plugins · Servers · Add · Server unreachable | — | — |
-| Add a server | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |
-| A server's tools | Admin | — | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Tools | settings.plugins · Servers · Address refused | — | — |
-| A server's tools | Operator | — | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Tools · Read only | settings.plugins · Servers · Address refused | — | settings.plugins · Servers · Read only |
+| Outside servers | Admin | agents.plugins · Servers · No servers | agents.plugins · Nothing matches | agents.plugins · Servers · Loading | agents.plugins · Servers | agents.plugins · Servers · Could not load | — | — |
+| Outside servers | Operator | agents.plugins · Servers · No servers · Read only | agents.plugins · Nothing matches | agents.plugins · Servers · Loading | agents.plugins · Servers · Read only | agents.plugins · Servers · Could not load | — | agents.plugins · Servers · Read only |
+| Add a server | Admin | agents.plugins · Servers · Add | — | agents.plugins · Servers · Add · Listing its tools | agents.plugins · Servers · Add · Tools listed | agents.plugins · Servers · Add · Server unreachable | — | — |
+| Add a server | Operator | — | — | — | — | — | — | agents.plugins · Servers · Read only |
+| A server's tools | Admin | — | — | agents.plugins · Servers · Loading | agents.plugins · Servers · Tools | agents.plugins · Servers · Address refused | — | — |
+| A server's tools | Operator | — | — | agents.plugins · Servers · Loading | agents.plugins · Servers · Tools · Read only | agents.plugins · Servers · Address refused | — | agents.plugins · Servers · Read only |

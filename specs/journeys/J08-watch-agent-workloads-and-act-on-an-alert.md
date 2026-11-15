@@ -3,7 +3,7 @@ id: J08
 title: Watch agent workloads and act on an alert
 personas: [admin, builder]
 stories: [CP-47, CP-60, CP-37, CP-59, CP-67, CP-36, CP-57, CP-50, CP-66, CP-58, CP-12, CP-05, CP-34, CP-11, CP-40, CP-39, CP-62, CP-49, CP-53]
-boards: [agents.fleet, agents.alerts, inbox, agents.runs, agents.workers, agents.limits, settings.databases, settings.plugins, projects.tasks]
+boards: [agents.fleet, agents.alerts, inbox, agents.runs, agents.workers, agents.limits, settings.databases, agents.plugins, projects.tasks]
 ---
 
 # Watch agent workloads and act on an alert
@@ -69,7 +69,7 @@ flowchart TD
 | 3 | An ops alert fires — a task failed, blocked, needing input or stopped moving, a connection failed, a security event, or a platform kind — and reaches the people its kind names and the Admins | Control Plane · Ops alerting · Inbox | CP-59 · CP-67 · CP-36 | `agents.alerts` · `inbox` |
 | 4 | See what is running and what just ran | Control Plane · Runs | CP-57 | `agents.runs` |
 | 5 | Find the run behind the alert and read it session by session | Control Plane · Runs | CP-50 · CP-66 | `agents.runs · Detail` |
-| 6 | Stop the run · make a fix task for a failed one · renew a failed work connection | Control Plane · Runs · Projects · Plugins | CP-58 · CP-62 | `agents.runs · Detail` · `projects.tasks · Detail` · `settings.plugins` |
+| 6 | Stop the run · make a fix task for a failed one · renew a failed work connection | Control Plane · Runs · Projects · Plugins | CP-58 · CP-62 | `agents.runs · Detail` · `projects.tasks · Detail` · `agents.plugins` |
 | 7 | See why a run waits or was refused, and where work queues | Control Plane · Limits · Workers and the queue | CP-12 · CP-05 | `agents.workers` |
 | 8 | Read spend against limits; raise or lower one | Control Plane · Limits | CP-34 · CP-11 | `agents.limits · Usage` |
 | 9 | Read a graph database's health; switch it off | Control Plane · Graph databases | CP-40 · CP-39 | `settings.databases` |
@@ -79,7 +79,7 @@ flowchart TD
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | Stopping a run is for the person behind it and the Admins; changing a limit, renewing a work connection or switching a graph database off is an Admin's | CP-58 · CP-11 · CP-62 | `agents.runs · Detail` · `agents.limits · Usage` · `settings.plugins` |
+| It needs permission | Stopping a run is for the person behind it and the Admins; changing a limit, renewing a work connection or switching a graph database off is an Admin's | CP-58 · CP-11 · CP-62 | `agents.runs · Detail` · `agents.limits · Usage` · `agents.plugins` |
 | It fails | A run that cannot be stopped in time says what it finished; an unreachable graph database is named, and its runs are refused before they start | CP-58 · CP-59 | `agents.runs · Detail` |
 | A task fails | Nothing re-runs it; the task failed alert stays open until a fix task made from it is done | CP-67 | `agents.alerts` · `projects.tasks · Detail` |
 | The person has no access | An Operator sees the runs they are behind; any other run shows only that it ran, its status and its tokens, and its hand-off notes are *Withheld* | CP-57 · CP-50 · CP-66 | `agents.runs` · `agents.runs · Detail` |

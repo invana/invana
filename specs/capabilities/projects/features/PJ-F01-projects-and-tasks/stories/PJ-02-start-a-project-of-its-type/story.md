@@ -79,7 +79,7 @@ flowchart TD
 | PJ-02.26 | Review | it opens | every answer of every step reads as a line, each step with *Edit* that opens it with its answers kept; *Create* is the one filled act |
 | PJ-02.27 | Answers on any step | the person presses Esc or Close | a confirm asks *Discard these answers?* — *Keep editing* · *Discard*; nothing is saved until *Create* |
 | PJ-02.28 | A team with no active person — the creator taken off and nobody else added | they press *Create* | it is refused, Team opening and naming why — *A project keeps at least one person on its team.* |
-| PJ-02.29 | A creator without Manage on Projects who sets access beyond the template's or widens it | they press *Create* | the project is created with the part they may grant — or read-only — each part beyond it marked *Asked {who can grant}*; an ask lands in the Inbox of those with Manage on Projects; History records the ask and its answer |
+| PJ-02.29 | A creator without Manage on Projects who sets access beyond the template's or widens it | they press *Create* | the project is created read-only on what they chose — Read on the graph databases, models and agents they picked — each part beyond it marked *Asked {who can grant}*; an ask lands in the Inbox of those with Manage on Projects; History records the ask and its answer |
 | PJ-02.30 | A project created | any run inside it starts — asked by anyone on its team, scheduled, picked up or by its Lead agent | it reaches project access ∩ the agent's ceiling; the person who asked is recorded on the run; *How it got here* names project access for each step |
 
 ## Screens

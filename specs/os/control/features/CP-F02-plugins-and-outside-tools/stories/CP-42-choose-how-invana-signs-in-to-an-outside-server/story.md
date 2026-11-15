@@ -4,7 +4,7 @@ title: Choose how Invana signs in to an outside server
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.plugins, access.signin]
+boards: [agents.plugins, access.signin]
 ---
 
 # CP-42 · Choose how Invana signs in to an outside server
@@ -63,9 +63,9 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| How a server signs in | Admin | settings.plugins · Servers · Sign-in not set | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Sign-in | settings.plugins · Servers · Sign-in refused | — | — |
-| How a server signs in | Operator | settings.plugins · Servers · Sign-in · Read only | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Sign-in · Read only | settings.plugins · Servers · Could not load | — | settings.plugins · Servers · Sign-in · Read only |
-| A shipped tool's settings | Admin | settings.plugins · Secret not set | — | settings.plugins · Loading | settings.plugins · Secret set | settings.plugins · Could not load | — | — |
-| A shipped tool's settings | Operator | settings.plugins · Secret not set · Read only | — | settings.plugins · Loading | settings.plugins · Secret set · Read only | settings.plugins · Could not load | — | settings.plugins · Secret set · Read only |
+| How a server signs in | Admin | agents.plugins · Servers · Sign-in not set | — | agents.plugins · Servers · Loading | agents.plugins · Servers · Sign-in | agents.plugins · Servers · Sign-in refused | — | — |
+| How a server signs in | Operator | agents.plugins · Servers · Sign-in · Read only | — | agents.plugins · Servers · Loading | agents.plugins · Servers · Sign-in · Read only | agents.plugins · Servers · Could not load | — | agents.plugins · Servers · Sign-in · Read only |
+| A shipped tool's settings | Admin | agents.plugins · Secret not set | — | agents.plugins · Loading | agents.plugins · Secret set | agents.plugins · Could not load | — | — |
+| A shipped tool's settings | Operator | agents.plugins · Secret not set · Read only | — | agents.plugins · Loading | agents.plugins · Secret set · Read only | agents.plugins · Could not load | — | agents.plugins · Secret set · Read only |
 | Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Password again | Operator | — | — | — | — | — | — | — |

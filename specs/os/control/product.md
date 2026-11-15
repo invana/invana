@@ -75,8 +75,8 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | Inbox — Needs you · Updates · Running · Done | modal | `inbox` |
 | Settings › Notifications — rules and channels | modal | `settings.notifications` |
 | Settings › You — outside accounts · where asks reach me | modal | `settings.me` |
-| Plugins — every plugin, a plugin, Team packs | modal | `settings.plugins` |
-| An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins · Servers` |
+| Plugins — every plugin, a plugin, Team packs | modal | `agents.plugins` |
+| An outside MCP server — its tools, how Invana signs in | modal | `agents.plugins · Servers` |
 | The deployment's MCP server — what it serves, recent calls | modal | `settings.mcp` |
 | AI models | modal | `settings.ai` |
 | Workers | modal | `agents.workers` |

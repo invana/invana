@@ -3,7 +3,7 @@ id: J10
 title: Fix a reported bug with an agent
 personas: [builder, admin]
 stories: [PJ-21, PJ-20, PJ-25, PJ-15, AG-61, CP-64, CP-65, AG-62, CP-66, CP-02, CP-62, AC-42, PJ-12, CP-67]
-boards: [projects.projects, projects.tasks, agents.agents, settings.plugins, agents.workers, agents.runs, inbox, agents.alerts]
+boards: [projects.projects, projects.tasks, agents.agents, agents.plugins, agents.workers, agents.runs, inbox, agents.alerts]
 ---
 
 # Fix a reported bug with an agent
@@ -80,7 +80,7 @@ sequenceDiagram
 |---|---|---|---|---|
 | 1 | Hand the bug report to the project assistant; accept the task and its checks | Projects · the project assistant | [PJ-21](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-21-ideate-with-the-project-assistant/story.md) · [PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md) · [PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md) | `projects.projects · Assistant` |
 | 2 | Let the Coder pick it up | Projects · a project › Pick-up | [PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md) | `projects.tasks · Detail` |
-| 3 | The Coder runs with Claude Code, installed on a worker group | Agents · an agent › Setup · Agents › Plugins | [AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md) · [CP-64](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-64-install-an-agent-runtime/story.md) | `agents.agents · Detail` · `settings.plugins` |
+| 3 | The Coder runs with Claude Code, installed on a worker group | Agents · an agent › Setup · Agents › Plugins | [AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md) · [CP-64](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-64-install-an-agent-runtime/story.md) | `agents.agents · Detail` · `agents.plugins` |
 | 4 | It works on a worker, in the task's workspace, inside the sandbox | Control Plane · Workers · a run | [CP-65](../os/control/features/CP-F03-workers-and-the-queue/stories/CP-65-run-an-outside-runtime-safely-on-a-worker/story.md) | `agents.workers` · `agents.runs · Detail` |
 | 5 | It continues in a fresh session from a hand-off note | Control Plane · a run | [AG-62](../capabilities/agents/features/AG-F05-delegation-and-outside-agents/stories/AG-62-continue-in-a-fresh-session-from-a-hand-off-note/story.md) | `agents.runs · Detail` |
 | 6 | It opens a pull request through the team's work connection; its text passes the outbound check | Control Plane · Plugins · Inbox | [CP-02](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-02-add-an-outside-mcp-server-and-let-agents-call-its-tools/story.md) · [CP-62](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md) · [AC-42](../os/access/features/AC-F09-what-left-the-platform/stories/AC-42-stop-sensitive-data-at-every-exit/story.md) | `inbox` · `agents.runs · Detail` |

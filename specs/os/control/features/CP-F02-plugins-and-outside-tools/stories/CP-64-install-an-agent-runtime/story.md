@@ -4,7 +4,7 @@ title: Install an agent runtime
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.plugins, agents.workers]
+boards: [agents.plugins, agents.workers]
 ---
 
 # CP-64 · Install an agent runtime
@@ -63,10 +63,10 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Runtimes | Admin | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes | settings.plugins · Install refused | — | — |
-| Runtimes | Operator | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes · Read only | settings.plugins · Could not load | — | settings.plugins · Runtimes · Read only |
-| Install a runtime | Admin | settings.plugins · Runtimes · Install | — | — | settings.plugins · Runtimes · Install · Installed, off | settings.plugins · Runtimes · Install · Install refused | — | — |
-| Install a runtime | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |
+| Runtimes | Admin | agents.plugins · Only Invana's runtime | — | agents.plugins · Loading | agents.plugins · Runtimes | agents.plugins · Install refused | — | — |
+| Runtimes | Operator | agents.plugins · Only Invana's runtime | — | agents.plugins · Loading | agents.plugins · Runtimes · Read only | agents.plugins · Could not load | — | agents.plugins · Runtimes · Read only |
+| Install a runtime | Admin | agents.plugins · Runtimes · Install | — | — | agents.plugins · Runtimes · Install · Installed, off | agents.plugins · Runtimes · Install · Install refused | — | — |
+| Install a runtime | Operator | — | — | — | — | — | — | agents.plugins · Runtimes · Read only |
 | A worker group's runtimes | Admin | — | — | agents.workers · Loading | agents.workers · Group | agents.workers · No worker carries the runtime | — | — |
 | A worker group's runtimes | Operator | — | — | agents.workers · Loading | agents.workers · Group · Read only | agents.workers · No worker carries the runtime | — | agents.workers · Read only |
 </content>

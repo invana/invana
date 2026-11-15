@@ -72,7 +72,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | Explore | Boards · Conversations · Dashboards · Queries |
 | Model | Models · Standards · Health · **Rules and meaning**: Rules · Views · Taxonomies · Inference · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
 | Projects | Projects · My tasks · Reviews · Schedules |
-| Agents | Agents · Skills · Plugins · Workflows · Runs · Schedules · Fleet · Workers |
+| Agents | Agents · Skills · Plugins · Runs · Schedules · Fleet · Workers |
 
 | View | Its leftSection |
 |---|---|
@@ -85,9 +85,8 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | Browse by kind | The kinds, grouped by model |
 | Projects | Active · Draft · Done |
 | Agents (view) | Every agent, grouped Built in · Team pack · Custom · Outside — outside agents a group, never a view ([AG-F02](capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md)); an agent opens as its page in main |
-| Skills | Skills · Functions (*Tools they call*) · Approaches · Projection templates; a skill opens as its page in main ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md)) |
+| Skills | Skills · Workflows (Built in · Approved, by what each touches) · Functions (*Tools they call*) · Approaches · Projection templates; a skill, a workflow and a function each open as their page in main ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md)) |
 | Plugins | Core · Tool · Outside servers · Runtimes, each reading on or off and *Used by n agents*; an outside server lists its work connections; a plugin opens as its page in main ([CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
-| Workflows | Built in · Approved, by what each touches; a workflow opens as its page in main ([AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md)) |
 | Runs | Needs attention · Running · Failed · All runs; a run opens as its page in main ([CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Schedules (Agents) | On · Paused ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
 | Fleet | Map · How they are doing · Workloads — the map of agents, skills, functions and worker groups, and how each agent performs ([CP-F10](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) · [CP-F09](os/control/features/CP-F09-overview/feature.md)) |
@@ -334,7 +333,7 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 | Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
 | Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships, and the links between models) · Standards · Health · Rules and meaning (Rules · Views · Taxonomies · Inference) · Graph Data | mode |
 | Datasets · Imports | **Graph Data** — a group of Model: Browse by kind (kinds grouped by model, from the graph databases the person may read) · Loads · Quality · Annotations; a record and a load open in main | mode |
-| Agent Builder · Fleet · Skills · Plugins | **Agents** mode — Agents · Skills · Plugins · Workflows · Runs · Schedules · Fleet · Workers; an agent, a skill, a plugin, a workflow, a run and a worker group open in main. Its glance is the Agents summoner | mode · modal |
+| Agent Builder · Fleet · Skills · Plugins | **Agents** mode — Agents · Skills (with its Workflows) · Plugins · Runs · Schedules · Fleet · Workers; an agent, a skill, a plugin, a workflow, a run and a worker group open in main. Its glance is the Agents summoner | mode · modal |
 | Team packs | **Settings › Connections › Team packs**, each with *Used by n agents* | modal |
 | Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's; the depth is Agents › Fleet | dropdown |
 | Activity · Notifications | **Inbox** — the header's dropdown (Needs you · Running · Updates), then the large modal (Needs you · Running · Updates · Done) | dropdown · modal |
