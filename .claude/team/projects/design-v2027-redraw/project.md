@@ -1,11 +1,11 @@
 ---
-name: design-v2027-nav
+name: design-v2027-redraw
 status: running
 branch: design-redesign/P17-audit-every-board-drawn-every-link-resol
-scope: design-v2027-nav
+scope: design-v2027-redraw
 ---
 
-# Design — redraw Invana v2027.11.0 on the approved navigation
+# Design — redraw Invana v2027.11.0 in full, on the approved navigation
 
 Redraw the *Invana v2027.11.0 design* canvas so every leftNav view of the four modes and every section of the large
 modal has its board, on the new shell (flat labelled nav, mode in the wordmark, Agents · Access · Settings summoners,
@@ -17,7 +17,7 @@ one large modal), matching `specs/design-language.md` and the approved proposal 
 | Specs | `specs/design-language.md` §1–§8 · `specs/glossary.md` · every story whose `## Screens` cites a board below — traced by board name |
 | Not in this project | Studio or engine code · story statuses · design-kit or canvas repo code (a missing component is a recommendation) · the proposal canvas and the Invana Products canvas (reference only, never edited) |
 
-Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the project-lead does, with `--start`).
+Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the project-lead does, with `--start`).
 
 ## References
 
@@ -25,7 +25,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 |---|---|---|
 | The canvas | `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX` — mirror `.design/canvas-invana/project/` (seeded from live version `1794727248-917f`, identical on 2026-11-16) | The deliverable |
 | The approved proposal | `https://claude.ai/artifact/Fjfg52oUYZQDryQanykk9m` v21 — generators `.design/canvas-nav-proposals/b_nav.py` (page B: nav, left content, large modal, dropdowns) · `c_iam.py` (page C: Access Policies, New policy, project access and team, New project wizard) · `d_modes.py` (page D: Agents mode, glance, tuning in the frame, Settings › Workers); every v21 board (pages A–D) synced into `.design/canvas-nav-proposals/project/` on 2026-11-16 — read boards there, never the live artifact | The shell, the nav and every board it already drew — port the markup, never re-invent it |
-| The previous version | *Invana Products* `https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg` (352 boards) — generators `.design/canvas-products/p_*.py`, boards in `.design/canvas-products/project/` | Main-area content: Modeller → Model · Datasets → Graph Data · Agent Builder → Agents · Activity → Runs and Record · IAM → Access · Fleet → Settings › Fleet and Workers |
+| The previous version | *Invana Products* `https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg` (352 boards, 13 pages) — generators `.design/canvas-products/p_*.py`, boards in `.design/canvas-products/project/`, each board's page in that folder's `canvas.json`. Read only — never edited or published | Main-area content: Modeller → Model · Datasets → Graph Data · Agent Builder → Agents · Activity → Runs and Record · IAM → Access · Fleet → Settings › Fleet and Workers |
 
 ## Rules for every session
 
@@ -33,7 +33,11 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 |---|---|
 | Draw by `design-story` | The skill is the procedure — §2 kit mapping, §3 layout, §4 standards incl. *Simple by default — never overdo it*, §4b mechanics, §5 checks 1 and 3 |
 | One board per place | A board is one leftNav view, one large-modal section, a header dropdown or a page outside the shell. Its creates, edits, confirms, peeks, empty and error states are switches on it (View · State · Lens), never boards of their own; the Operator's reading is its Operator lens |
-| Port, don't redraw | Where the proposal canvas or the current canvas already draws a place, port its markup onto the new components and change only what the specs changed. Main-area content comes from the current board or the Products canvas, cut to §4 *Simple by default* |
+| Spec decides, references inform | `specs/` — `design-language.md`, `glossary.md`, each story's `## Screens` and criteria — settles every conflict. Then the proposal canvas (shell, nav, large modal, Access, Agents mode). Then *Invana Products*, a reference for main-area content and component choices only — never a decision. A conflict found is a hand-off note naming what the spec chose |
+| Port, don't redraw | Port markup only from the proposal canvas and the current v2027.11.0 canvas — both already follow the spec — onto the new components, changing only what the specs changed. *Invana Products* is never ported |
+| Look at Invana Products first | Before drawing a page, review the phase's pinned *Invana Products* pages for ideas — content worth showing, a layout, a state, an empty or error line, a component choice. Take an idea by redrawing it on the new shell, in the spec's words, cut to §4 *Simple by default*; never copy its markup or its retired patterns (Graphs as objects, roles, sheets, product pages) |
+| Read the list, open only the closest boards | Read the Products page's board titles in `.design/canvas-products/project/canvas.json`, then open only the 3–5 boards nearest the board being drawn — never a whole page |
+| Say what came from Products | Each phase writes hand-off notes: one line per Products idea taken (board → where it landed) and one per idea rejected because the spec differs |
 | Stories at `idea` are drawn | Statuses are not moved; no `task.md` rows — boards trace to stories by name |
 | The mirror is the canvas | Sessions edit `.design/canvas-invana/project/` only; no session reads or publishes the live artifact. Publishing is the last step, done by Ravi's interactive session after P09 |
 | Who writes `canvas.json` | Only the phase's lead; change only `pages`, `boards`, `order` and `notes`, keep every other key |
@@ -72,7 +76,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's hand-off notes · `design-story` · `b_nav.py` (switcher, dropdowns, Explore) · the stories citing each board |
+| Read | P01's hand-off notes · `design-story` · `b_nav.py` (switcher, dropdowns, Explore) · Products pages *Invana Explorer*, *In every product*, *Invana Home* · the stories citing each board |
 | Stories | — |
 | Done when | Each board below is drawn on the components with every state its stories' `## Screens` cells name, both lenses, linked: switcher to every mode and ⌘4, Operations to Agents › Runs and Settings › Workers, Access dropdown to Access › Now and Record, Inbox dropdown to the full Inbox, Explore's four views from the nav. `explore.board` shows answers from different graph databases side by side; the avatar menu shows the person's policies, no role |
 | Lands | The mirror: 14 board files and `canvas.json` |
@@ -87,7 +91,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P02's hand-off notes · `design-story` · `b_nav.py` (Model, Browse by kind, B16 expanded Model) · Products' Modeller and Datasets boards · the stories citing each board |
+| Read | P02's hand-off notes · `design-story` · `b_nav.py` (Model, Browse by kind, B16 expanded Model) · Products pages *Invana Modeller* and *Invana Datasets* · the stories citing each board |
 | Stories | — |
 | Done when | Model's seven views and Graph Data's four are drawn in the Model mode, each from its own leftSection, every state its stories name, both lenses. `model.models` holds the models tree with Kinds, Relationships and *Links between models* (within one graph database) and the model map; a kind and a relationship open in main as its states — `model.kinds` and `model.relationships` are removed and every link to them repointed. `model.health` shows query advice; `data.records` lists one graph database at a time with a Withheld state |
 | Lands | The mirror: 11 board files, two removed, `canvas.json` |
@@ -102,7 +106,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P03's hand-off notes · `design-story` · `c_iam.py` and its synced boards `c.project.wizard` · `c.project.access` · `c.project.team` · `c.project.ask` · `b.projects` · `b.expanded.projects` · the stories citing each board |
+| Read | P03's hand-off notes · `design-story` · `c_iam.py` and its synced boards `c.project.wizard` · `c.project.access` · `c.project.team` · `c.project.ask` · `b.projects` · `b.expanded.projects` · Products page *Invana Projects (experimental)* · the stories citing each board |
 | Stories | — |
 | Done when | Projects' four views and its three project tabs are drawn with every state their stories name, both lenses. `projects.projects` carries the New project wizard (About · Goals · Access · Team · Review) and a Team tab with one Lead agent and no human roles; `projects.schedules` is the one Schedules list filtered to projects |
 | Lands | The mirror: 7 board files and `canvas.json` |
@@ -117,7 +121,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P04's hand-off notes · `design-story` · `d_modes.py` and its synced boards `d.mode.agent` · `d.mode.skills` · `d.glance` · `d.tune.agent` · `d.tune.skill` · `d.map` · Products' Agent Builder and Activity boards · the stories citing each board |
+| Read | P04's hand-off notes · `design-story` · `d_modes.py` and its synced boards `d.mode.agent` · `d.mode.skills` · `d.glance` · `d.tune.agent` · `d.tune.skill` · `d.map` · Products pages *Agent Builder* and *Activity* · the stories citing each board |
 | Stories | — |
 | Done when | The Agents mode's four views, the Agents glance and the full Inbox are drawn with every state their stories name, both lenses. The Agents mode lists Agents · Skills · Runs · Schedules only; `agents.runs` has the *How they are doing* tab; `shell.agents` is the glance (Waits on you · Running · Workers, its worker link to Settings › Workers) with tuning an agent or a skill in the frame as its states; `inbox` opens in the large modal's frame |
 | Lands | The mirror: 6 board files and `canvas.json` |
@@ -132,7 +136,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P05's hand-off notes · `design-story` · `specs/os/access/**` (AC-F02 permission catalogue, templates, one policy type, AC-49) · `c_iam.py` (page C) · Products' IAM boards · the stories citing each board |
+| Read | P05's hand-off notes · `design-story` · `specs/os/access/**` (AC-F02 permission catalogue, templates, one policy type, AC-49) · `c_iam.py` (page C) · Products pages *Invana IAM* and *Graph settings* · the stories citing each board |
 | Stories | — |
 | Done when | Every Access section is drawn in the large modal with every state its stories name, both lenses: Now · Who (users, teams, keys, connected clients — no service users) · What they may do (Access Policies with the permission catalogue, a policy's page, New policy: Start · What it allows · Who holds it · Review; each agent's ceiling) · Record (History · Usage · What left) · Keeping. No roles anywhere; `settings.roles` is removed and every link to it repointed |
 | Lands | The mirror: 8 board files, one removed, `canvas.json` |
@@ -147,7 +151,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P06's hand-off notes · `design-story` · `b_nav.py` (B9 settings rows) · Products' Settings boards · the stories citing each board |
+| Read | P06's hand-off notes · `design-story` · `b_nav.py` (B9 settings rows) · Products pages *Settings* and *Graph onboarding* · the stories citing each board |
 | Stories | — |
 | Done when | Each board below is drawn in the large modal under Settings with every state its stories name, both lenses; Connections' five sections (Graph databases — many, reached by access · AI models · MCP server · Connectors · Team packs) and their creates as states |
 | Lands | The mirror: 10 board files and `canvas.json` |
@@ -162,7 +166,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-nav` (the projec
 | | |
 |---|---|
 | Agent | designer |
-| Read | P07's hand-off notes · `design-story` · `d_modes.py` (D6 Settings › Workers) · Products' Fleet and Settings boards · CP-F02 · CP-F03 · CP-F04 · CP-F09 · CP-F11 |
+| Read | P07's hand-off notes · `design-story` · `d_modes.py` (D6 Settings › Workers) · Products pages *Fleet* and *Settings* · CP-F02 · CP-F03 · CP-F04 · CP-F09 · CP-F11 |
 | Stories | — |
 | Done when | Each board below is drawn in the large modal under Settings with every state its stories name, both lenses. `settings.fleet` is Map · Workloads and replaces `settings.workloads` (removed, links repointed); `settings.workers` has slots, scale advice and *Add workers* as the one step strip; `settings.alerts` replaces `control.alerts` (removed, links repointed) |
 | Lands | The mirror: 5 board files, two removed, `canvas.json` |
