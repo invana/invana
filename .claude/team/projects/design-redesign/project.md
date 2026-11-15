@@ -395,7 +395,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P05 | Shell — every state and lens | P04b | done | 2026-11-15 | gates green · reviews passed |
 | P06 | Sign-in & Home — every state and lens | P05 | done | 2026-11-15 | gates green · reviews passed |
 | P07 | Explore I — the board | P06 | done | 2026-11-15 | gates green · reviews passed |
-| P08 | Explore II — dashboards and memory | P07 | in progress | 2026-11-15 |  |
+| P08 | Explore II — dashboards and memory | P07 | done | 2026-11-15 | gates green · reviews passed |
 | P09 | Model — every state and lens | P08 | pending |  |  |
 | P10 | Projects — every state and lens | P09 | pending |  |  |
 | P11 | Inbox and Records — every state and lens | P10 | pending |  |  |
