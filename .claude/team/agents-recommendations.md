@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**388 recommendations** · 223 open · 112 taken · 21 declined · 32 done
+**389 recommendations** · 224 open · 112 taken · 21 declined · 32 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -431,3 +431,4 @@ flowchart LR
 | R417 | open | 2026-11-15 | designer | phase design-redesign/P03b | component | medium | AssistantPanel has no proposals slot with Accept and Reject | PJ-21.4 needs the project assistant to show proposals with Accept/Reject; AssistantPanel (Components page, frozen after P01) has no such slot. P03b drew Accept/Reject on the project Overview's Proposals waiting instead. Add a proposals slot (kit ChatSession composition) to AssistantPanel |  |  |
 | R418 | open | 2026-11-15 | designer | phase design-redesign/P03b | component | low | Kit has no chart, model frame or kind chip component; TreeView carries a card look | model.health Growth draws stacked bars from --color-data-N + LegendItem; model.models composes model frames and kind chips in the page; kit TreeView ships rounded-lg + shadow-sm + 240px width, against design-language §2 Corners (square structure). Recommend a plain BarChart, a ModelFrame/KindChip composition in ui-extended, and a flat TreeView variant |  |  |
 | R419 | open | 2026-11-15 | designer | phase design-redesign/P03b | docs | low | SE-11 and SE-12 disagree on New rule for an Operator: absent or disabled | SE-11 Who can says New rule is absent for an Operator; SE-12 says disabled with the reason. P03b drew disabled (SE-12). Also SE-19.4 alerts rows name outcome words while design-language §2 says status is a glyph with no word; P03b drew both. Align the stories |  |  |
+| R420 | open | 2026-11-15 | designer | phase design-redesign/P04 | docs | low | EX-03 names Library › Skills › Projection templates; the glossary's word is Template (answer template) | specs/capabilities/explore/features/EX-F04-the-answer/stories/EX-03-the-answer-in-the-shape-that-fits/story.md Flow and EX-03.9 say 'Projection templates'; glossary.md Template and line 533 make 'projection template' a code word. agents.skills draws the section as 'Answer templates' — rename EX-03's place to match, or settle the on-screen word. |  |  |
