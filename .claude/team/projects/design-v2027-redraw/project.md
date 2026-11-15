@@ -198,7 +198,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Foundation — pages, shell components, Index |  | in progress | 2026-11-16 |  |
+| P01 | Foundation — pages, shell components, Index |  | done | 2026-11-16 | gates green · reviews passed |
 | P02 | Shell, Sign-in & Home, Explore | P01 | pending |  |  |
 | P03 | Model and Graph Data | P02 | pending |  |  |
 | P04 | Projects | P03 | pending |  |  |
