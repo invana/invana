@@ -393,7 +393,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P04 | Prototype II — Inbox, Records, Agents, Library | P03b | done | 2026-11-15 | gates green · reviews passed |
 | P04b | Prototype II — Settings | P04 | done | 2026-11-15 | gates green · reviews passed |
 | P05 | Shell — every state and lens | P04b | done | 2026-11-15 | gates green · reviews passed |
-| P06 | Sign-in & Home — every state and lens | P05 | in progress | 2026-11-15 | reset — canvas access was missing (R403) |
+| P06 | Sign-in & Home — every state and lens | P05 | done | 2026-11-15 | gates green · reviews passed |
 | P07 | Explore I — the board | P06 | pending |  |  |
 | P08 | Explore II — dashboards and memory | P07 | pending |  |  |
 | P09 | Model — every state and lens | P08 | pending |  |  |
