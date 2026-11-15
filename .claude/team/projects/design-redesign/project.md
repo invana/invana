@@ -404,7 +404,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P14 | Settings — You, Invana and Connections | P13 | done | 2026-11-15 | gates green · reviews passed |
 | P15 | Settings — Operations | P14 | done | 2026-11-15 | gates green · reviews passed |
 | P16 | Settings — Access | P15 | done | 2026-11-15 | gates green · reviews passed |
-| P17 | Audit — every board drawn, every link resolves | P16 | in progress | 2026-11-15 |  |
+| P17 | Audit — every board drawn, every link resolves | P16 | done | 2026-11-15 | gates green · reviews passed |
 
 ## Hand-off notes
 
