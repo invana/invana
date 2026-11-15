@@ -74,7 +74,7 @@ sequenceDiagram
 ## Access
 
 Every act here is an agent's, checked against its Access Policies on `data/<graph database>/<kind>` — for a property,
-`data/<graph database>/<kind>/<level>`, the level being the property's sensitivity
+`data/<graph database>/<kind>/<property>` and `data/<graph database>/<kind>/@<level>`, the level being its sensitivity
 ([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); the person's
 role decides only whether they may start the act that asks for it.
 

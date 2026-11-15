@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 ## Who can
 
 *Projects and tasks* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
-within the projects the person may read; inside a project, with the agents its access allows, each run reaching project access ∩ the agent's ceiling; a task with no project, with the agents granted to them; a result is accepted by the
+within the projects the person may read; inside a project, with the agents its access allows, each run reaching the project's policies ∩ the agent's ceiling; a task with no project, with the agents granted to them; a result is accepted by the
 project's people on the team; a run's content follows [AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md).
 
 | Lens | Can | Otherwise sees |
@@ -39,7 +39,7 @@ flowchart TD
   who -->|nobody| open["Open · the picker explains the team"]
   who -->|a person| ap["Assigned · they start it"]
   who -->|an agent the project does not allow · with no project, not granted to the assigner| nu["Disabled: not allowed in this project · not granted to you"]
-  who -->|an agent the project allows · with no project, granted to the assigner| ag["Assigned · one run opens · in a project: project access ∩ ceiling, the assigner recorded"]
+  who -->|an agent the project allows · with no project, granted to the assigner| ag["Assigned · one run opens · in a project: the project's policies ∩ ceiling, the assigner recorded"]
   ag --> ip["In progress · the steps stream to those who may read the run"]
   ip --> out{"What happened?"}
   out -->|asked a question| ni["Needs input · the question is on the task"]
@@ -79,7 +79,7 @@ flowchart TD
 | PJ-12.5 | A person who may read the project, or any person for a task with no project | they save a new task of a kind the project uses, with a title and a body saying what done means | it is created with or without a project, in state *Open*, its kind's fields and default checks with it |
 | PJ-12.6 | A task with no assignee | its page opens | it reads *Open*, and the assignee picker explains that the project's team fills the picker and being on it grants nothing |
 | PJ-12.7 | A task | it is assigned to a person | it reads *Assigned* and names them; nothing runs |
-| PJ-12.8 | A task | it is assigned to an agent the project's access allows — or, for a task with no project, one granted to the assigner | exactly one run opens through that agent, the assigner recorded on it, and the task reads *In progress*; inside a project the run reaches project access ∩ the agent's ceiling, with no project the assigner's reach ∩ the ceiling |
+| PJ-12.8 | A task | it is assigned to an agent the project's access allows — or, for a task with no project, one granted to the assigner | exactly one run opens through that agent, the assigner recorded on it, and the task reads *In progress*; inside a project the run reaches the project's policies ∩ the agent's ceiling, with no project the assigner's reach ∩ the ceiling |
 | PJ-12.9 | A task whose run is going | a person who may read the run opens its page | the steps stream in `projects.tasks · Detail · How it got here`, and *How it got here* shows the steps and sources so far |
 | PJ-12.10 | A run asks a question | it is read | the task reads *Needs input* with the question on its thread; answering resumes the run |
 | PJ-12.11 | A task waiting on an unmet dependency, a paused agent, an exhausted token budget or an open sub-task | its page opens | it reads *Blocked*, naming exactly what it waits on, with *Reassign* offered when the agent is paused |
@@ -104,7 +104,7 @@ flowchart TD
 | PJ-12.26 | A task | its *History* opens | every act on the task and each run's attempts read as one tree — who did it, on whose behalf and caused by what — with a delegated run under the step that opened it; the *on behalf of* line comes from the run, never from the task's text, and a skill reads *offered* or *reported*, never *used* |
 | PJ-12.31 | A task in review or with checks failed | Inbox › Needs you is read | the task is listed for the project's people — its author, for a task with no project — and for the person behind its run, with what it is, its project and its age; it opens on the task ([CP-36](../../../../../../os/control/features/CP-F08-the-inbox/stories/CP-36-see-what-needs-me-in-one-inbox/story.md)) |
 | PJ-12.32 | A task's run the reader may not read ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) | they open the task or *How it got here* | the task, its result and its state read; the run reads that it ran, its status and its tokens, and its steps read *Content withheld* |
-| PJ-12.33 | A step of a task's run outside its reach — project access ∩ the agent's ceiling inside a project; the person behind it ∩ the ceiling with no project | the run is checked | the task reads *Failed*, naming the rule that refused — a place on the team grants a person nothing outside the project |
+| PJ-12.33 | A step of a task's run outside its reach — the project's policies ∩ the agent's ceiling inside a project; the person behind it ∩ the ceiling with no project | the run is checked | the task reads *Failed*, naming the rule that refused — a place on the team grants a person nothing outside the project |
 | PJ-12.34 | A task in review and a person who is not a person on its project | they open it | the result reads; *Accept* and *Send back* are disabled — *Join the team to change it*; a call is refused the same way |
 | PJ-12.35 | Tasks written by or handed to the person, in projects or in none | they open Projects › My tasks | those tasks list across every project, grouped by status, each with its project and kind as badges |
 | PJ-12.36 | Results waiting on the person as a person on the team | they open Projects › Reviews | each task in review lists with its project, who posted the result and since when, oldest first; opening one opens the task at its result |

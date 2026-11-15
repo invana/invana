@@ -70,7 +70,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | Of one type | Its type — Research · Investigation · Policy · General, or one a Team pack adds — declares the fields *New project* asks for, the task kinds it offers, and relabels Project, Task, Branch, Finding and Decision inside the project only; it carries default rules, suggested agents and skills, default checks and a report template. The engine, the API and every shared place say the generic words; changing the type later only relabels |
 | Flat projects | A project has no sub-projects; branches live inside it and are never sub-projects. Tasks nest: sub-tasks to any depth for people, bounded by the run's limits for agents (PJ-F01) |
 | A project is a repository | Tasks are issues: people ask, agents answer, and @ an agent gives it work |
-| A project owns its access | A project is its context, instructions, files, tasks, team, Lead agent and relations, and its **project access** — one Access Policy, set from a template through a plain form. Every run inside it reaches project access ∩ the agent's ceiling, whoever asked; joining or leaving never changes it. It grants a person nothing outside the project ([PJ-F01 › Rules](features/PJ-F01-projects-and-tasks/feature.md#rules) · [AC-F02 › Rules](../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
+| A project owns its access | A project is its context, instructions, files, tasks, team, Lead agent and relations, and its **Access Policies** — attached like a person's, the first made from a template through a plain form. Every run inside it reaches the project's policies ∩ the agent's ceiling, whoever asked; joining or leaving never changes it. It grants a person nothing outside the project ([PJ-F01 › Rules](features/PJ-F01-projects-and-tasks/feature.md#rules) · [AC-F02 › Rules](../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | Every project is open | Every person sees every project's head; what they read of it is what they may read ([AC-F02](../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | Owned by the organisation | A project is the organisation's, keeping who made it ([AC-F07](../../os/access/features/AC-F07-ownership/feature.md)); team places and assignees are slots with fallbacks |
 | No roles inside a project | Every person on the team may do everything inside it. One agent may be tagged **Lead agent** — the project assistant: it coordinates the project's agents and turns ideas, recommendations and asks from other projects into proposals a person on the team accepts (PJ-21 · PJ-22) |
@@ -80,7 +80,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | What waits on a person is the Inbox | A result to accept, a proposal, a question an agent asks and a verdict to give reach the person in Needs you ([CP-F08](../../os/control/features/CP-F08-the-inbox/feature.md)); Projects keeps no list of its own |
 | A todo graph is not a plan | A project's tasks, groups and their dependencies are work people accept; a plan is what one run executes ([AG-F06](../agents/features/AG-F06-plans-and-workflows/feature.md)) |
 | A task needs no plan | A person given a task with a body saying what done means and no steps is the smallest case; it uses no field it does not need |
-| A task is worked through an agent | The agent brings its AI model, skills, Access Policies and limits; assigning a task to an agent — one project access lets work here — opens one run, the assigner recorded; a picked-up task records who set *Allow* |
+| A task is worked through an agent | The agent brings its AI model, skills, Access Policies and limits; assigning a task to an agent — one the project's policies let work here — opens one run, the assigner recorded; a picked-up task records who set *Allow* |
 | A task's state is its latest run's | Open · assigned · in progress · needs input · blocked · checking · checks failed · in review read off the run and its checks; only *done*, *failed* and *cancelled* are written — by a person accepting, rejecting or cancelling |
 | Agents may raise tasks | From inside a run, for a helper or for a person; handing work to another agent and raising a task are the same act |
 | A plan's steps are never tasks | A run's steps — a query, a model call, a step a person does — are its plan's; a task is work someone accepts. No screen calls either a *job* |
@@ -100,14 +100,14 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | Ontology | The rules that check a decision, and the alert rules that open leads (SE-F07) |
 | Graph Plane | Memory — the project map, project memory and org knowledge ([GP-F02](../../os/graph/features/GP-F02-memory/feature.md)) |
 | Control Plane | The Inbox, where project work waits on a person (CP-F08); ops alerts, which are never a project's (CP-F11) |
-| Access Plane | Project access and the permission catalogue (AC-F02); people and teams (AC-F03); slots and fallbacks (AC-F07); the run scope (AC-F04) |
+| Access Plane | The project's Access Policies and the permission catalogue (AC-F02); people and teams (AC-F03); slots and fallbacks (AC-F07); the run scope (AC-F04) |
 
 ## Not building
 
 | Item | Why not |
 |---|---|
 | Sub-projects | Branches carry the forks; groups and relations carry the rest |
-| Roles inside a project | Every person on the team may do everything inside it; project access bounds its runs |
+| Roles inside a project | Every person on the team may do everything inside it; the project's policies bound its runs |
 | Connectors on a project | Agents bring their work connections ([CP-F02](../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
 | Parameter sweeps · game theory | After 1.0 |
 | Per-place on the team | The role table governs every act ([AC-F02](../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) and a project grants nothing |

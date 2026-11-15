@@ -34,7 +34,7 @@ flowchart TD
   AS -->|no| PU
   REL --> PU
   DEC --> PU
-  PU["PJ-15 · Pick-up: Allow for the Writer · confirms the budget cap"]
+  PU["PJ-15 · Pick-up: Allow for the Writer · within the project's tokens a month"]
   PU --> CL["The Writer claims a section · runs as the agent · Ana recorded as setter"]
   CL --> RUN{"The run"}
   RUN -->|its policies refuse a read| RF["PJ-12 · Failed, naming the rule"]

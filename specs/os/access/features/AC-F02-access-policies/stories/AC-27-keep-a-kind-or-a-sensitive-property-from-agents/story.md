@@ -57,7 +57,7 @@ flowchart TD
 | AC-27.8 | A Modeller | they want a kind or a level kept back | *Ask an Admin* raises an ask in the Admins' Needs you (AC-F05) naming the kind, the level and the graph database; an Admin writes the rule (AC-04) |
 | AC-27.9 | Deny rules and levels | a policy file is applied from the command line | a Deny on `data/…`, with or without a level, is saved like any rule (AC-04.15); levels are the model's, never a policy file's |
 | AC-27.10 | An Operator | they open *Kept from agents* | everything reads; *New rule* and *Set level* are disabled, naming the role each needs |
-| AC-27.11 | An agent with `Allow Read data/*/*` and `Deny Read data/*/*/personal` | it reads a kind that has personal properties | every property but the personal ones is in the result, which says how many properties it withheld and names the rule; the read is not refused |
+| AC-27.11 | An agent with `Allow Read data/*` and `Deny Read data/*/*/@personal` | it reads a kind that has personal properties | every property but the personal ones is in the result, which says how many properties it withheld and names the rule; the read is not refused |
 | AC-27.12 | A Deny rule on one level of a kind | an agent reads that kind | only the properties at that level are withheld; properties at other levels are read |
 
 ## Screens

@@ -35,7 +35,7 @@ flowchart TD
   any -->|no| none["No assistant yet · Name one (PJ-22)"]
   any -->|yes| th["The thread · opens on What is this project for?"]
   th --> say["A person on the team says what the work is and what done means"]
-  say --> run["The assistant runs inside the project · project access ∩ its ceiling · the speaker recorded · its steps stream"]
+  say --> run["The assistant runs inside the project · the project's policies ∩ its ceiling · the speaker recorded · its steps stream"]
   run -->|its policies refuse a read| rf["Says what it could not read, naming the rule"]
   run --> prop["Proposals: tasks with kinds and checks · groups · relations"]
   rec([A recommendation raised — by a person, a run or another feature]) --> tri["The assistant triages it"]
@@ -54,7 +54,7 @@ sequenceDiagram
   participant E as Engine
   participant PA as Project assistant
   M->>E: says something in the project's thread
-  E->>PA: opens a run inside the project (project access ∩ its ceiling), the speaker recorded, with the project's purpose, fields, open tasks and proposals
+  E->>PA: opens a run inside the project (the project's policies ∩ its ceiling), the speaker recorded, with the project's purpose, fields, open tasks and proposals
   PA-->>E: replies · proposes tasks, groups, checks, relations
   E-->>M: the reply, and proposals in Needs you
   M->>E: Accept · Reject
@@ -67,7 +67,7 @@ sequenceDiagram
 |---|---|---|---|
 | PJ-21.1 | A project with no assistant named | its assistant region opens | it reads *No assistant yet*, with *Name one* for its people (PJ-22) |
 | PJ-21.2 | A project with an assistant, no thread yet | its assistant region opens | the thread opens on *What is this project for?* with the project's purpose above it |
-| PJ-21.3 | A person on the team says something in the thread | it is sent | a run of the assistant opens inside the project — it reaches project access ∩ the assistant's ceiling, the speaker recorded on it, their own policies not read — with the project's purpose, fields, open tasks and open proposals as its context; its steps stream to those who may read the run |
+| PJ-21.3 | A person on the team says something in the thread | it is sent | a run of the assistant opens inside the project — it reaches the project's policies ∩ the assistant's ceiling, the speaker recorded on it, their own policies not read — with the project's purpose, fields, open tasks and open proposals as its context; its steps stream to those who may read the run |
 | PJ-21.4 | The assistant's run | it replies | its reply is in the thread, and any task, group, check or relation it proposes is a proposal listed under the reply and in the project's people' Needs you — nothing is made yet |
 | PJ-21.5 | A proposal | a person on the team accepts it | what it proposes is made — a task of its kind with its fields and checks, a group, a check, a relation — reads *created by proposal*, and the proposal reads accepted, by whom |
 | PJ-21.6 | A proposal | a person on the team rejects it with a note | it reads rejected, by whom and why, and stays in the thread |

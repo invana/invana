@@ -36,7 +36,7 @@ flowchart TD
   t -->|Clear a team, user or agent| cl(["Back to No limit"])
   run([A run starts]) --> pr{"A personal run?"}
   pr -->|yes| b{"Inside the tightest of agent · person · their teams · deployment?"}
-  pr -->|a project's task · a schedule · a pick-up| b2{"Inside the tightest of agent · deployment?"}
+  pr -->|a project's task · a schedule · a pick-up| b2{"Inside the tightest of agent · the project, when inside one · deployment?"}
   b2 -->|yes| go
   b2 -->|no| q
   go -->|a session reaches tokens a session| ct(["A hand-off note · the run continues in a fresh session"])
@@ -70,10 +70,12 @@ flowchart TD
 | CP-11.16 | A limit with no ceiling set | it is read | it reads *No limit* |
 | CP-11.17 | A limit that *May ask for more* | an agent's run reaches its tokens mid-run | the run pauses and asks the Admins in Needs you (CP-14 · AC-15) |
 | CP-11.18 | A team, user or agent with limits of its own | an Admin clears it | it returns to *No limit*, and only the deployment's and any other limit that applies bound its runs |
-| CP-11.19 | A project's task, a pick-up or a schedule's firing | it is admitted | only the agent's and the deployment's limits bind it, whoever set it going; no person's or team's limit holds or refuses it |
+| CP-11.19 | A project's task, a pick-up or a schedule's firing on a project | it is admitted | the tightest of the project's, the agent's and the deployment's limits binds it, whoever set it going; no person's or team's limit holds or refuses it; a schedule's firing outside any project is bound by the agent's and the deployment's alone |
 | CP-11.20 | An Admin | they set *Tokens a session* on a team or a user, or clear the deployment's | it is refused — *Tokens a session is set for the deployment and for agents.* · *The deployment always has tokens a session.* — and nothing is saved |
 | CP-11.21 | A session that reaches its tokens a session — the agent's, else the deployment's | it is reached | the session ends and the run continues in a fresh session from a hand-off note, same run and number; nothing is asked, and its tokens a run and a month still bind the whole run |
 | CP-11.22 | Agents › Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| CP-11.23 | A project | its limits are set — in its Access, the *Fleet / Workers* tab | only *Runs at once* and *Tokens a month* are offered; any other is refused — *A project takes runs at once and tokens a month.* — and Usage and limits lists the project beside teams, users and agents |
+| CP-11.24 | A project at its *Tokens a month*, with pick-up set to *Allow* | a team agent looks for work | it claims nothing and the project's runs are held — *{project} has used its {n} tokens this month*; there is no other pick-up cap; a person without Manage on Projects for it who sets the limit is refused, naming the permission |
 
 ## Screens
 

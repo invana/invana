@@ -47,7 +47,7 @@ flowchart TD
   newt --> who{"Assign to?"}
   who -->|nobody| open["Open"]
   who -->|a person| person["Assigned · they work it"]
-  who -->|an agent project access allows| ag["PJ-12 · A run opens, the assigner behind it"]
+  who -->|an agent the project's policies allow| ag["PJ-12 · A run opens, the assigner behind it"]
   who -->|an agent it does not allow| nag["Disabled in the picker: may not work here"]
   page --> pick["PJ-15 · Pick-up: Allow · Ask · Deny · narrowed per agent"]
   pick -->|Ask| askbox["PJ-15 · Inbox › Needs you of the project's people: Start this task?"]
@@ -99,7 +99,7 @@ sequenceDiagram
       E->>E: lease the task to the agent for 30 minutes
     end
   end
-  E->>A: opens a run, recording who said Start it or set Allow — project access ∩ A's ceiling
+  E->>A: opens a run, recording who said Start it or set Allow — the project's policies ∩ A's ceiling
   A-->>E: posts a result with its steps and sources
   E->>E: runs each check's workflow in a run of its own
   alt every check passed
@@ -131,8 +131,8 @@ sequenceDiagram
 
 Permissions are [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)'s. Inside a
 project there are no roles: **every person on its team may do everything inside it**. Being on the team grants nothing
-outside the project. **A project owns its access**: its runs reach only **project access** ∩ the agent's ceiling, whoever
-asked ([Rules](#rules)). An act a person lacks shows, disabled, naming the permission or *Join the team* and who can
+outside the project. **A project owns its access**: its runs reach only **the project's Access Policies** ∩ the agent's ceiling, whoever
+asked ([Rules](#rules)) — an Access Policy like a person's or a team's, attached to the project. An act a person lacks shows, disabled, naming the permission or *Join the team* and who can
 grant it.
 
 | Act | Who may |
@@ -141,10 +141,10 @@ grant it.
 | Read a project, its tasks, its Order, its assistant's thread and its relations | A person on its team · Read on Projects |
 | Start a project | Create on Projects; the creator is on its team |
 | Everything inside a project — edit its name, purpose, goals and fields; archive or unarchive it; add people and agents to its team, or take them off, and tag its Lead agent; turn task kinds on or off; relate it; set its pick-up; write, assign, cancel and order tasks; accept proposals and plans; accept or send back results | Every person on its team · Manage on Projects; an agent only proposes |
-| Set or widen project access | Manage on Projects (`projects:access`). Anyone else on the team asks: what they may not grant waits in the Inbox of those who may |
-| Narrow project access | Every person on its team |
-| Add a person, when project access says *Adding people needs approval* | A person on the team asks; Manage on Projects approves |
-| Assign a task to an agent, put an agent on the team, set *Allow* for an agent | A person on its team, for an agent project access lets work here |
+| Widen a project's policies · attach another policy to the project | Manage on Projects. Anyone else on the team asks: what they may not grant waits in the Inbox of those who may |
+| Narrow the project's policies | Every person on its team |
+| Add a person, when the project is set to *Adding people needs approval* | A person on the team asks; Manage on Projects approves |
+| Assign a task to an agent, put an agent on the team, set *Allow* for an agent | A person on its team, for an agent the project's policies let work here |
 | Raise a Recommendation · ask another project for help | A person who may read the project · a run in the asking project |
 | Read a task's run — its steps, sources and *How it got here* | As [AC-31](../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says |
 
@@ -171,11 +171,11 @@ grant it.
 | A Recommendation is a task kind | A recommendation — from a person, an agent's run or another feature — lands as a proposal for the project assistant; a person on the team who accepts it makes a task of kind *Recommendation*, worked like any task (PJ-21) |
 | The team | People, teams and agents on the project. Every person on it — directly or through a team — may do everything inside the project; there are no project roles for people. Being on the team fills the assignee picker and lets an agent pick up the project's tasks; it grants nothing over data, memory or tools. At least one active person; a project left with none alerts the Admins (PJ-22) |
 | The Lead agent | At most one agent on the team is tagged **Lead agent** — the project assistant. It coordinates the project's agents: ideates in the project's thread, plans the work, splits a task into sub-tasks within its own run and assigns open tasks to the team's other agents. Every decision a person must give — a new task, group, check or relation, a plan, a goal, a change to the team or the policy, accepting or sending back a result — reaches the project's people as a proposal. It never accepts its own proposal (PJ-21 · PJ-22) |
-| A project owns its access | Every run inside the project — asked by anyone on its team, scheduled, picked up or started by the Lead agent — reaches **project access ∩ the agent's ceiling** ∩ the run scope. The person who asked is recorded on the run; their own policies are not read inside the project, and joining or leaving never changes what the project may do ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)). The task's text is data to the agent, never an instruction that widens what it may do |
-| Project access | One Access Policy attached to the project, set through a plain form: **Graph databases** — each Read or Read + write · **Models** — all or chosen · **Agents** that may work here, and the Lead agent · **Workers** — the worker group, runs at once, a monthly token budget · **Outside** — what may leave (email, Slack, the web, outside agents) and the plugins and tools · *Adding people needs approval*, for a sensitive project. *Edit as policy* opens the same policy as the full matrix. It grants a person nothing outside the project |
-| A template to start from | New project's Access step starts from a project access template — *Read and analyse* · *Fix data quality* · *Full project*, or the type's default — and the creator only adjusts it ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
-| Widening asks | Setting or widening project access needs Manage on Projects (`projects:access`). A person without it may still create the project: it starts read-only on what they chose — Read on the graph databases, models and agents they picked — and the rest waits as an ask in the Inbox of those with Manage on Projects; History records the ask and its answer. Narrowing is open to the team |
-| Joining is the gate | Joining a project is how a person reaches what it may do; adding a person is open to the team, unless project access says *Adding people needs approval*. Every join and leave is in History |
+| A project owns its access | Every run inside the project — asked by anyone on its team, scheduled, picked up or started by the Lead agent — reaches **the project's policies ∩ the agent's ceiling** ∩ the run scope. The person who asked is recorded on the run; their own policies are not read inside the project, and joining or leaving never changes what the project may do ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)). The task's text is data to the agent, never an instruction that widens what it may do |
+| The project's policies | Access Policies attached to the project exactly as to a user — one or more, their Allows added, any Deny winning; attaching one adds, never replaces. Each is set through [AC-F02's policy form](../../../../os/access/features/AC-F02-access-policies/feature.md#the-policy-form): Graph Data down to kinds, relationships and properties · Models · AI models · Agents that may work here · Skills and plugins · Fleet · Outside Invana — beside the project's setting *Adding people needs approval*, for a sensitive project. *Edit as policy* opens the same policy as the matrix. They grant a person nothing outside the project |
+| A template to start from | New project's Access step runs *New policy*'s form inline, from the one list of Access templates — the type's default first — and attaches the policy it makes to the new project; the creator only adjusts it ([AC-F02 › Access templates](../../../../os/access/features/AC-F02-access-policies/feature.md#access-templates)). A policy made in Access › *New policy* may be held by the project beside it |
+| Widening asks | Setting or widening the project's policies needs Manage on Projects. A person without it may still create the project: it starts read-only on what they chose — Read on the graph databases, models and agents they picked — and the rest waits as an ask in the Inbox of those with Manage on Projects; History records the ask and its answer. Narrowing is open to the team |
+| Joining is the gate | Joining a project is how a person reaches what it may do; adding a person is open to the team, unless the project is set to *Adding people needs approval*. Every join and leave is in History |
 | Relations | *Started from* — a project made from another project, task or finding · *Waits on* — a group of this project waits on a group of the other · *Related* — two projects that share context. A run's scope reaches the projects related to its own by any of the three ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) (PJ-23) |
 | Asks across projects | A person or a run in one project asks another for help; the ask lands as a proposal for the other project's assistant, carrying its sources' lineage ([GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#rules)). Accepted, it is a task in the other project and the two projects become *Related*; the asking task lists it under *Asked of other projects* with its state, and its result is posted to the asking task's thread (PJ-24) |
 | Checks gate a task | A check names a workflow ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)). When a result is posted, the engine runs each check in a run of its own through the project assistant, never in the run that did the work; the task reads *Checking*, then *In review* when every check passed, or *Checks failed*, naming each. *Accept* is off until every check passed; a failed check is never re-run on its own — a person on the team sends the task back. What an agent says about its own work is never a check's result (PJ-25) |
@@ -186,14 +186,14 @@ grant it.
 | A task has no progress of its own | Its state is read off its latest run and its checks: *Open* and *Assigned* when no run yet · *In progress* while a run is open · *Needs input* on an unanswered question · *Blocked* on an unmet dependency, a waiting group, a paused agent, an exhausted token budget or an open sub-task · *Checking* while its checks run · *Checks failed* · *In review* · *Done*, *Failed*, *Cancelled* once closed |
 | Only a person accepts | Accepting or sending back is the act of a person on the team. An agent posts a result and never accepts, and a judging run's verdict is not an acceptance |
 | A result waits in the Inbox | A task *In review* or *Checks failed* is listed in Inbox › Needs you ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)) of the project's people and of the person behind its run; for a task with no project, of its author |
-| One assignee field | A person and an agent are both assignees; assigning to an agent opens exactly one run, the assigner behind it, through that agent — so only an agent project access lets work here can be assigned |
+| One assignee field | A person and an agent are both assignees; assigning to an agent opens exactly one run, the assigner behind it, through that agent — so only an agent the project's policies let work here can be assigned |
 | Who reads a project | A person sees every project's head; its content — tasks, results, the thread, relations, Order — reads to the people on its team and to Read on Projects, else *Withheld*. A copy inside it — a result, a proposal, an ask — reads as far as [GP-F02's lineage](../../../../os/graph/features/GP-F02-memory/feature.md#rules) allows |
 | Owned by the organisation | A project is the organisation's, keeping who made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)); its people, and Manage on Projects, change its settings. Tasks are the project's |
 | Archiving freezes | An archived project's tasks are read only; a run already going finishes. Archiving and unarchiving are separate rows in History |
 | Order is derived | Waves, what a task waits on and the critical path are the engine's derivation from dependencies and groups. A dependency carries a condition: on success · on failure · any outcome. A loop is refused, naming it |
 | Failure edges are contingency | A dependency on failure is drawn dashed and never counts toward the critical path; a task whose condition cannot now be met says why, or reads *Never triggered* |
-| Pick-up mode | Per project, for an agent on the team starting a task on its own: *Allow* · *Ask* (the default) · *Deny*, set by a person on the team. An agent's own mode can be narrower, never wider; Deny over Ask over Allow. *Allow* is set by a person who confirms it after seeing which agents will start which tasks and the token budget cap — a total across every run pick-up opens, enforced by the engine — and for agents project access lets work here. A claim is a 30-minute lease, one claim per task; a lapsed claim returns the task to open |
-| A picked-up run records its setter | The person who set *Allow*, or who pressed *Start it*, is recorded on the claim, the run and History; the run reaches project access ∩ the agent's ceiling — on a task outside any project, the setter's policies ∩ the agent's ceiling. When they leave, the setter's place falls to their successor ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#slots-and-fallbacks)) |
+| Pick-up mode | Per project, for an agent on the team starting a task on its own: *Allow* · *Ask* (the default) · *Deny*, set by a person on the team. An agent's own mode can be narrower, never wider; Deny over Ask over Allow. *Allow* is set by a person who confirms it after seeing which agents will start which tasks and the project's *Tokens a month* they run within — the project's limit ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)), set in its Access; there is no pick-up cap of its own — and for agents the project's policies let work here. A claim is a 30-minute lease, one claim per task; a lapsed claim returns the task to open |
+| A picked-up run records its setter | The person who set *Allow*, or who pressed *Start it*, is recorded on the claim, the run and History; the run reaches the project's policies ∩ the agent's ceiling — on a task outside any project, the setter's policies ∩ the agent's ceiling. When they leave, the setter's place falls to their successor ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#slots-and-fallbacks)) |
 | The backend owns every number | Counts of tasks by state, a project's counts, a group's progress and the critical path come from the engine; Studio formats and never adds up |
 | Agent outcomes carry a trace | A task's result, a check's result, a claim, a proposal and a blocked reason open *How it got here* |
 | Projects own tasks | There is no Tasks place of its own: the Tasks list is under Projects; a task with no project is listed with all of them |
@@ -208,14 +208,14 @@ grant it.
 |---|---|
 | Projects — key, name, purpose, type, fields, status, assistant | Write · read |
 | The team — users, teams and agents, and its Lead agent | Write · read |
-| Project access — an Access Policy attached to the project, and the templates (AC-F02) | Write · read |
+| The project's policies — Access Policies and their attachments, and the Access templates ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)) | Write · read |
 | Task kinds a project uses | Write · read |
 | Relations between projects | Write · read |
 | Groups and their dependencies | Write · read |
 | Tasks — project, parent, group, kind, fields, title, body, assignee, due date, outcome | Write · read |
 | Task dependencies — condition: on success · on failure · any outcome | Write · read |
 | Checks of a task and each check's run | Write · read |
-| Pick-up settings — a project's mode, each agent's narrower mode, who set it, the budget cap | Write · read |
+| Pick-up settings — a project's mode, each agent's narrower mode, who set it | Write · read |
 | Claims — task, agent, who agreed, expires | Write · read |
 | Proposals of the project assistant ([PJ-F03](../PJ-F03-branches-findings-and-decisions/feature.md#engine)) | Write · read |
 | The run each assigned or picked-up task opens, and each check's run (CP-F10) | Write · read |
@@ -232,7 +232,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `projects` | `key` · `name` · `description` (the purpose) · `goal` (the decision it helps make) · `success` (what success looks like) · `type` · `fields` (JSON, checked against the type's fields) · `status` (`active` · `archived`) · `created_by_id` · `created_at` | Unique `key`. Its policy is an `access_policy_attachments` row, `holder_kind = project` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)), written in the same transaction. `type` is a key listed by `GET /api/v1/projects/types`; a question is a field of the types that ask one. Owned by the system user ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)) |
+| `projects` | `key` · `name` · `description` (the purpose) · `goal` (the decision it helps make) · `success` (what success looks like) · `type` · `fields` (JSON, checked against the type's fields) · `status` (`active` · `archived`) · `people_need_approval` (bool — *Adding people needs approval*) · `created_by_id` · `created_at` | Unique `key`. Its policies are `access_policy_attachments` rows, `holder_kind = project` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)), written in the same transaction. `type` is a key listed by `GET /api/v1/projects/types`; a question is a field of the types that ask one. Owned by the system user ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)) |
 | `projects_team` | `project_id` · `principal_kind` (`user` · `team` · `agent`) · `principal_id` · `lead_agent` (bool, an agent row only) · `added_by_id` · `added_at` | Unique (`project_id`, `principal_kind`, `principal_id`). The creator is written first. At least one row that is a user or a team with an active person; at most one `lead_agent` row — the project assistant |
 | `projects_task_kinds` | `project_id` · `kind` · `enabled` | A kind its type declares; *task* and *recommendation* always enabled. No row is enabled |
 | `projects_relations` | `project_id` · `other_project_id` · `kind` (`started_from` · `waits_on` · `related`) · `from_kind?` (`task` · `finding`) · `from_id?` · `created_by_id` · `created_at` | Unique (`project_id`, `other_project_id`, `kind`). `waits_on` is written and removed with the cross-project group dependencies that carry it |
@@ -243,7 +243,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `projects_task_checks` | `task_id` · `name` · `workflow_key` · `from_kind` (`kind` · `type` · `person`) · `added_by_id?` | A kind's and a type's default checks are copied on create |
 | `projects_check_results` | `task_id` · `check_id` · `result_number` (the posting it checked) · `run_id` · `outcome` (`passed` · `failed`) · `settled_at` | One row per check per posted result; written by the check's run only |
 | `projects_task_asks` | `task_id` (the asking task) · `other_project_id` · `proposal_id` · `answered_task_id?` | An ask across projects and the task that answered it |
-| `projects_pickup` | `project_id` · `agent_id?` (null for the project's own mode) · `mode` (`allow` · `ask` · `deny`) · `budget_tokens?` (on the project's `allow`) · `set_by_id` · `set_at` | Unique (`project_id`, `agent_id`). No row is *Ask* |
+| `projects_pickup` | `project_id` · `agent_id?` (null for the project's own mode) · `mode` (`allow` · `ask` · `deny`) · `set_by_id` · `set_at` | Unique (`project_id`, `agent_id`). No row is *Ask* |
 | `projects_task_claims` | `task_id` (unique) · `agent_id` · `agreed_by_id` (who set *Allow* or pressed *Start it*) · `claimed_at` · `expires_at` | `expires_at` is `claimed_at` plus 30 minutes |
 
 ### Reads
@@ -255,7 +255,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Agents and whether one is paused or retired | [AG-F01](../../../agents/features/AG-F01-build-an-agent/feature.md#engine) |
 | Workflows a check names | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | Users, teams and who is on each | [AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#engine) |
-| Access Policies, the project's policy, `decide()` and the person check | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
+| Access Policies, the project's policies, `decide()` and the person check | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | The run scope — a run's project, related projects and task | [AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
 | The graph databases the deployment attaches | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
 | Slots and the successor | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
@@ -276,8 +276,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /` · `POST /` | Every project's head, and the content of those the reader is on or may Read · create one — name, description, goals, type and fields, its policy and team in one call — the caller on its team | PJ-01 · PJ-02 |
 | `POST /drafts/goals` | From a name and a description, the assistant's draft of the goals — `{goal, success}`; writes nothing | PJ-02 |
 | `GET /{key}` · `PATCH /{key}` | Read a project · edit its name, purpose, goals and fields, or archive and unarchive it (`status` `active` ⇄ `archived`) | PJ-01 · PJ-02 |
-| `GET /{key}/access` · `PUT /{key}/access` | Project access, as the form and as the policy · save its next version through [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#routes)'s save; a widening by a person without `projects:access` saves what they may grant and raises an ask for the rest | PJ-02 · PJ-22 |
-| `GET /access-templates` | The project access templates and each type's default | PJ-02 |
+| `GET /{key}/access` · `PUT /{key}/access` | The project's policies, as [the form](../../../../os/access/features/AC-F02-access-policies/feature.md#the-policy-form) and as rules · save a policy's next version, attach another or take one off, through [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#routes)'s save and attach; a widening by a person without Manage on Projects saves what they may grant and raises an ask for the rest | PJ-02 · PJ-22 |
 | `GET /{key}/team` · `PUT /{key}/team/{principal}` · `DELETE /{key}/team/{principal}` | Who is on it and which agent is its Lead agent · add a user, team or agent, or tag an agent Lead agent (`{lead_agent}`) · take one off | PJ-22 |
 | `GET /{key}/kinds` · `PUT /{key}/kinds/{kind}` | The type's task kinds and which the project uses · turn one on or off | PJ-20 |
 | `GET /{key}/relations` · `POST /{key}/relations` · `DELETE /{key}/relations/{id}` | Related projects, both ways · relate · unrelate (`waits_on` only through groups) | PJ-23 |
@@ -285,8 +284,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /{key}/recommendations` | Raise a recommendation for the project — a proposal of kind `recommendation` | PJ-21 |
 | `POST /{key}/asks` | Ask this project for help, from a task of another project — a proposal of kind `ask` | PJ-24 |
 | `GET /{key}/groups` · `POST /{key}/groups` · `POST /groups/{id}/dependencies` · `DELETE /groups/{id}/dependencies/{depends_on_id}` | Groups · make one · a group waits on another, in any project · remove the wait | PJ-18 |
-| `GET /{key}/pickup` · `PUT /{key}/pickup` | The project's mode and each team agent's · set one; `allow` carries `budget_tokens` and `confirmed` | PJ-15 |
-| `GET /{key}/pickup/preview` | Which team agents would start which open tasks now, and the cap they would run within | PJ-15 |
+| `GET /{key}/pickup` · `PUT /{key}/pickup` | The project's mode and each team agent's · set one; `allow` carries `confirmed` | PJ-15 |
+| `GET /{key}/pickup/preview` | Which team agents would start which open tasks now, and the project's *Tokens a month* — used and left — they would run within ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#engine)) | PJ-15 |
 | `GET /{key}/order` | The derived order, groups included | PJ-18 |
 | `GET /{key}/summary` | The project's counts | PJ-01 · PJ-03 |
 | `GET /types` | Every project type — built in, and each a Team pack installs — with its fields, task kinds (each with fields and default checks), labels, default rules, suggested agents and skills, and report template | PJ-02 · PJ-20 |
@@ -309,12 +308,12 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | `projects.create` · `projects.update` | A project is created · its name, purpose, fields or graph databases change — from and to |
 | `projects.archive` · `projects.unarchive` | Two acts, two History rows |
 | `projects.team.add` · `projects.team.lead_agent` · `projects.team.remove` | Put on the team, and who added them · the Lead agent changed, from and to · taken off |
-| `projects.access.save` · `projects.access.asked` | Project access saved, from and to · a widening asked for, and its answer |
+| `projects.access.save` · `projects.access.asked` | A project's policy saved, attached or taken off, from and to · a widening asked for, and its answer |
 | `projects.kinds.set` | A task kind turned on or off |
 | `projects.relations.add` · `projects.relations.remove` | A relation made · removed |
 | `projects.groups.create` · `projects.groups.dependencies.add` · `projects.groups.dependencies.remove` | A group made · a group's wait drawn · removed |
 | `projects.recommendations.raised` · `projects.asks.raised` | A recommendation · an ask from another project, each a proposal |
-| `projects.pickup.set` | A project's or an agent's mode changes — from and to, who set it, the cap on *Allow* |
+| `projects.pickup.set` | A project's or an agent's mode changes — from and to, who set it |
 | `projects.tasks.created` · `assigned` · `started` · `result_posted` · `accepted` · `rejected` · `blocked` · `cancelled` | Each act on a task; `rejected` is a send-back, its note on the event |
 | `projects.tasks.checks.started` · `projects.tasks.checks.settled` | A result's checks start · each settles, with its outcome and run |
 | `projects.tasks.dependencies.add` · `projects.tasks.dependencies.remove` | A dependency drawn · removed |
@@ -328,10 +327,10 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | 403 | Reading a project, its tasks, its Order or its thread by a person not on its team and without Read on Projects | *Withheld — join the team or ask {who can grant}.* | PJ-01.3 · PJ-12.21 |
 | 403 | A project's settings — edit, goals, policy, archive, team and Lead agent, kinds, relations, pick-up — or writing a task, a group, a check or a dependency, by a person not on its team and without Manage on Projects | *Join {project}'s team to change it.* | PJ-01.13 · PJ-22.9 · PJ-15.16 · PJ-20.7 · PJ-23.8 · PJ-12.37 |
 | 403 | The same, or accepting a proposal or a result, by an agent — the project assistant included | *Only a person decides — {agent} may propose it.* | PJ-21.14 · PJ-22.13 |
-| 403 | Assigning a task to an agent, putting it on the team, setting *Allow* for it, or answering *Start it* with it, for an agent project access does not let work here | *{agent} may not work in {project} — widen its access.* | PJ-12.22 · PJ-22.4 · PJ-15.20 |
+| 403 | Assigning a task to an agent, putting it on the team, setting *Allow* for it, or answering *Start it* with it, for an agent the project's policies do not let work here | *{agent} may not work in {project} — widen its access.* | PJ-12.22 · PJ-22.4 · PJ-15.20 |
 | 403 | Accepting or rejecting a proposal by a person not on the team | *Join {project}'s team to change it.* | PJ-21.9 |
 | 403 | Accepting or sending back a result by a person not on the team, or by an agent | *Join {project}'s team to change it.* · *Only a person accepts or sends back a result.* | PJ-12.14 · PJ-12.34 |
-| 202 | A widening of project access by a person without Manage on Projects — the rest waits as an ask | *Asked {who can grant} for the rest — the project starts read-only on what you chose.* | PJ-02.29 |
+| 202 | A widening of the project's policies by a person without Manage on Projects — the rest waits as an ask | *Asked {who can grant} for the rest — the project starts read-only on what you chose.* | PJ-02.29 |
 | 409 | Tagging a second agent Lead agent | *{project} already has {agent} as its Lead agent.* | PJ-22.14 |
 | 409 | Accepting a task whose checks have not all passed | *{n} checks have not passed — {check}.* | PJ-25.6 |
 | 409 | Taking off the last active person on the team | *A project keeps at least one person on its team.* | PJ-22.6 |
@@ -356,7 +355,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | 409 | A claim on a task another agent holds | *{agent} holds this task until {time}.* | PJ-15.8 |
 | 403 | A claim the strictest pick-up mode denies, or by an agent not on the team | *Pick-up on {project} does not let {agent} start work.* | PJ-15.3 |
 | 409 | A claim by an agent that is paused or retired | *{agent} is {state} — it takes no work.* | PJ-15.12 |
-| 403 | A step of a task's run that project access, or the agent's ceiling, refuses | The policy check's sentence, naming the rule ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#refusals)) | PJ-12.33 · PJ-15.19 |
+| 403 | A step of a task's run that the project's policies, or the agent's ceiling, refuse | The policy check's sentence, naming the rule ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#refusals)) | PJ-12.33 · PJ-15.19 |
 
 ### CLI
 
@@ -378,9 +377,9 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | `done` · `failed` · `cancelled` | `closed_at` set, with the `outcome`; a task whose latest run failed reads *failed* until a person acts |
 | One writer of `closed_at` | Accept and cancel write `closed_at` and `outcome`; a send-back writes neither and the task reads *assigned*, its note on `projects.tasks.rejected`. Every other state is read off the task's latest run and its checks. An evaluator run (`role = evaluate`) writes a verdict on its step, never `closed_at` |
 | Reading a project | `GET /` returns every project's head — key, name, type, status, counts. Each content read passes when the caller is on its team, or the person check allows Read on `project/<key>` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)); else it returns the head with `withheld` naming the resource. A copy inside the project — a result, a proposal, an ask — is shown through `lineage.may_see` ([GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#engine)) |
-| Assigning an agent | Checks project access lets the agent work here ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)), then opens one run through it with the assigner recorded as the person behind it |
+| Assigning an agent | Checks the project's policies let the agent work here ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine)), then opens one run through it with the assigner recorded as the person behind it |
 | Types and kinds | A type — built in or from a Team pack — declares `fields[]` (name, kind of value, required), `task_kinds[]` (each with `fields[]` and `default_checks[]`), labels, default rules, suggested agents and skills, `default_checks[]` and a report template. `POST /` and `POST /tasks` check `fields` against them |
-| The Lead agent | The `projects_team` row with `lead_agent` set. `POST /{key}/thread` opens a run of it, the speaker behind it, with the project's purpose, goals, fields, open tasks and open proposals as context. It proposes through `projects.proposals.create` (kinds `task` · `group` · `check` · `relation` · `plan` · `goal` · `team`); a proposal is listed in the Needs you of the project's people; accepting one writes what it proposes, `created_by_kind = proposal`. It assigns an open task to another agent on the team through `projects.tasks.assign`, the run reaching project access ∩ that agent's ceiling; the engine refuses it every act only a person gives |
+| The Lead agent | The `projects_team` row with `lead_agent` set. `POST /{key}/thread` opens a run of it, the speaker behind it, with the project's purpose, goals, fields, open tasks and open proposals as context. It proposes through `projects.proposals.create` (kinds `task` · `group` · `check` · `relation` · `plan` · `goal` · `team`); a proposal is listed in the Needs you of the project's people; accepting one writes what it proposes, `created_by_kind = proposal`. It assigns an open task to another agent on the team through `projects.tasks.assign`, the run reaching the project's policies ∩ that agent's ceiling; the engine refuses it every act only a person gives |
 | Recommendations and asks | `POST /{key}/recommendations` and `POST /{key}/asks` — and the agent function `projects.asks.create`, from inside a run — write a proposal of kind `recommendation` · `ask` with its sources' lineage ([GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#engine)), and open a run of the assistant to triage it — it proposes a task, or proposes declining with a reason. A person on the team accepting it writes a task of kind *Recommendation*, or for an ask a task in this project, a `projects_task_asks` row and a `related` relation |
 | An answered ask | When the task an ask made closes, its result is posted to the asking task's thread, through `lineage.may_see` for each reader |
 | Checks | On `result_posted`, for each `projects_task_checks` row the engine opens a run of the project's assistant running the check's workflow, `role = evaluate`, linked to the task; the run writes one `projects_check_results` row. A task with no assistant runs its checks through the built-in Assistant. A send-back and a new result start every check again; a failed check is never re-run on its own |
@@ -389,7 +388,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | `projects.tasks.assign` | The agent function by which the project assistant assigns an open task to another agent on the team; refused for any other caller or assignee |
 | `projects.tasks.claim` | The agent function that claims an open task of a project whose team it is on. It reads the strictest of the project's and the agent's `projects_pickup` modes: *Allow* writes the claim with `agreed_by_id` = the setter and opens the run with the setter recorded, `projects.tasks.claimed`; *Ask* raises *Start this task?* in the Needs you of the project's people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)) and claims on *Start it*, `agreed_by_id` = who answered; *Deny* refuses |
 | A claim lapses | When `expires_at` passes with no run opened, the claim row is removed, `projects.tasks.claim_lapsed` is written and the task reads open |
-| The budget cap | The tokens of every run a project's *Allow* opened are summed against `budget_tokens`; at the cap, a claim reads *Ask* until a person on the team raises it |
+| What pick-up spends | Every run a project's *Allow* opens counts against the project's *Tokens a month* ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#engine)); at it, pick-up claims nothing and the project's runs are held until Manage on Projects raises it or the month turns |
 | Slots | When a person on the team is deactivated, their `projects_team` row passes to the successor; a task assigned to them goes to the successor or back to *Open*, as [AC-F07 › Succession](../../../../os/access/features/AC-F07-ownership/feature.md#mechanisms) calls. A `projects_pickup` row they set moves `set_by_id` to the successor, and its runs act for them |
 | History is one tree | Assembled from the event store and the run's nodes — never from trace ids, whose retention is days. A delegated child run nests under the step that opened it; the *on behalf of* line is written from the root run; skills are *offered* (a fact of the prompt) or *reported* (the model's claim). A run's content is withheld as [AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) says |
 | Order | `GET /{key}/order` derives, among siblings: `wave` (dependency hops from the start, a group's wait counted as a hop) · `blocked_by[]` (the unmet dependencies and groups, named) · `critical_path` (the longest `on = success` chain). A parent waits on all its sub-tasks |
@@ -403,7 +402,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 |---|---|---|
 | § 6 Data and storage | Fourteen tables in Invana's own store; no new store | — |
 | § 8 APIs and events | The routes and events above, under `projects` | NFR-PERF-3 |
-| § 10 AI and agents | Agent functions `projects.tasks.create`, `projects.tasks.claim`, `projects.proposals.create` and `projects.asks.create`; the project assistant runs on the project's thread and triages recommendations and asks; checks run each in an evaluator run of their own; every run in a project reaches project access ∩ the agent's ceiling, the person recorded; the Lead agent coordinates and only proposes; only a person closes a task | — |
+| § 10 AI and agents | Agent functions `projects.tasks.create`, `projects.tasks.claim`, `projects.proposals.create` and `projects.asks.create`; the project assistant runs on the project's thread and triages recommendations and asks; checks run each in an evaluator run of their own; every run in a project reaches the project's policies ∩ the agent's ceiling, the person recorded; the Lead agent coordinates and only proposes; only a person closes a task | — |
 | § 12 Qualities | Privacy: a project's content reads to its team and to Read on Projects; copies inside it through lineage; a task's run content follows run privacy | — |
 
 ## Decisions
@@ -416,11 +415,11 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | Details is the one place a project is edited | Name, purpose and fields edit in place; key, maker and times are facts |
 | Archiving is reversible | *Unarchive* sits where *Archive* was; the state rides on the name as a muted *archived* badge, not inside the counts line |
 | The detail has no footer | Each act sits where its subject is: a task is written in Tasks, a dependency or a group is drawn on the Order tab, archive is in Details |
-| The team is one tab | *Team* holds people and agents side by side, the project assistant marked *Lead agent*; project access sits beside it |
+| The team is one tab | *Team* holds people and agents side by side, the project assistant marked *Lead agent*; the project's policies sit beside it |
 | No roles inside a project | Every person on the team may do everything inside it; the only tag is the Lead agent, which coordinates and proposes |
-| The wizard's step is *Access* | The step sets the whole of project access — graph databases, models, agents, workers, what may leave — not graph databases alone |
+| The wizard's step is *Access* | The step makes the project's first Access Policy — Graph Data, models, AI models, agents, skills and plugins, fleet, what may leave — through *New policy*'s form, inline, not graph databases alone |
 | The project assistant is in the assistant region | Its thread opens in the right region of the project, where the assistant always sits ([design language](../../../../design-language.md)) |
-| New project is a modal in steps | From the switcher's *New* or Projects, a modal with a step strip, because it asks five separate decisions ([design-language › Overlays](../../../../design-language.md#3-overlays--three-tiers)): **1 About** — name, description, the type as a grouped card grid and its fields, key, what it started from · **2 Goals** — the decision it helps make and what success looks like, drafted by the assistant from the description, edited by the person · **3 Access** — project access from a template, the form adjusted, *Edit as policy* for the matrix · **4 Team** — people and agents side by side, one agent tagged Lead agent · **5 Review** — every answer with *Edit*, then *Create*. The type's default rules, suggested agents and skills, task kinds, default checks and report template are applied (PJ-02) |
+| New project is a modal in steps | From the switcher's *New* or Projects, a modal with a step strip, because it asks five separate decisions ([design-language › Overlays](../../../../design-language.md#3-overlays--three-tiers)): **1 About** — name, description, the type as a grouped card grid and its fields, key, what it started from · **2 Goals** — the decision it helps make and what success looks like, drafted by the assistant from the description, edited by the person · **3 Access** — the project's first Access Policy made from an Access template, the form adjusted, *Edit as policy* for the matrix · **4 Team** — people and agents side by side, one agent tagged Lead agent · **5 Review** — every answer with *Edit*, then *Create*. The type's default rules, suggested agents and skills, task kinds, default checks and report template are applied (PJ-02) |
 | Settings are the team's | A project is the organisation's; every person on its team changes its settings, and Manage on Projects may, so no project waits on one person |
 | Head for everyone, content for the team | Every person sees that a project exists, its type and its counts; what it holds reads to its team and to Read on Projects — never hidden, never a list of its own |
 | A person accepts | A result is accepted by a person on the team, never by an agent |
@@ -447,7 +446,8 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | Item | Why not |
 |---|---|
 | Sub-projects | Branches, groups and relations carry it |
-| Roles inside a project | Every person on the team may do everything inside it; project access bounds its runs |
+| Roles inside a project | Every person on the team may do everything inside it; the project's policies bound its runs |
+| Project templates — later | A template for a whole project — its goals, task kinds, team agents and an Access template — is not built now; a project's type and its default Access template carry what is needed |
 | Connectors on a project | Agents bring their work connections ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
 | Objectives and per-task criteria | A task's body says what done means; checks prove what can be proved; a person on the team accepts |
 | Task dependencies across levels or projects | Order is derived among siblings; groups carry waits across projects |

@@ -90,8 +90,8 @@ afterwards what it did. Without that, a deployment is either open to every agent
 
 | Decision | Detail |
 |---|---|
-| Access Policies only, no roles | What anyone may do is the Access Policies attached to them, built from [the permission catalogue](features/AC-F02-access-policies/feature.md#the-permission-catalogue) — the one source of what may be granted; no feature restates who may. *Super user* is locked and always held; the starter policies are data ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
-| Policies attach to people, teams, projects and agents | A person holds the Allows on them and their teams, minus the Denies; a project's policy bounds its runs; an agent's is its ceiling, never a grant. A run reaches the person behind it ∩ the project's policy ∩ the agent's ceiling ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
+| Access Policies only, no roles | What anyone may do is the Access Policies attached to them, built from [the permission catalogue](features/AC-F02-access-policies/feature.md#the-permission-catalogue) — the one source of what may be granted; no feature restates who may. *Super user* is locked and always held; the Access templates are data ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
+| Policies attach to people, teams, projects and agents | A person holds the Allows on them and their teams, minus the Denies; a project holds policies the same way, and they bound its runs; an agent's is its ceiling, never a grant. Inside a project a run reaches the project's policies ∩ the agent's ceiling; outside one, the person behind it ∩ the ceiling ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
 | Everyone sees, the policy decides | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy denies is withheld, and the engine refuses — hiding is never the guard ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
 | Default deny · Deny wins | What no rule allows is refused; Deny over Ask over Allow, across policies and along a caller chain |
 | Declare, never grant | Skills, workflows, plugins, Team packs and runtimes declare what they need; only an Access Policy grants it |
@@ -119,7 +119,7 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Control Plane | The graph databases, plugins, tools and AI models a rule names; the Inbox where asks wait; limits; the worker sandbox that enforces `fs/` · `cmd/` · `net/` |
 | Graph Plane | The project memory, agent learnings and org knowledge a `memory/` rule names |
 | Agents | The agents whose ceilings policies are, the built-in agents, personal agents, the runs asks are raised from |
-| Projects | The projects a `project/` rule names, each project's policy, and a run's project for its run scope |
+| Projects | The projects a `project/` rule names, each project's policies, and a run's project for its run scope |
 | Ontology | The kinds a rule on `data/…` names and the sensitive properties that never reach an external model |
 
 ## Not building

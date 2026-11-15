@@ -205,7 +205,7 @@ Attaching a policy is `invana policy attach` ([AC-F02 › CLI](../AC-F02-access-
 
 | Mechanism | How |
 |---|---|
-| The system user | One `access_users` row, `kind = system`, no password, written at start; it owns the built-in agents, the built-in and starter policies, workflows and skills ([AC-F07](../AC-F07-ownership/feature.md#engine)) |
+| The system user | One `access_users` row, `kind = system`, no password, written at start; it owns the built-in agents, the built-in policies and the Access templates, workflows and skills ([AC-F07](../AC-F07-ownership/feature.md#engine)) |
 | The first account | `invana createsuperuser` writes the first person and attaches *Super user* to them ([AC-F02 › CLI](../AC-F02-access-policies/feature.md#cli)) |
 | A service user | An `access_users` row of `kind = service`, no email, no password; its owners are `access_owners` rows of `resource_type = service_user` written in the same transaction ([AC-F07](../AC-F07-ownership/feature.md#engine)). Its keys are its only credential ([AC-F10](../AC-F10-keys/feature.md#engine)); a sign-in as it is refused like a wrong password |
 | An agent is a user | Each agent has an `access_users` row of `kind = agent` linked by `agent_id`, so History and ownership name it as one user; its ceiling is attached to the agent, never to this row, and it never signs in |
