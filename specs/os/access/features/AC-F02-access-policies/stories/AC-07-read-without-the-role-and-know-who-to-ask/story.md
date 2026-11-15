@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every act; this story is what the others see | — |
-| Operator | Read every surface their role reaches; look, ask, open boards, re-run their own runs, through the agents granted to them. A Modeller also acts on the model and records | Each act the role does not hold disabled — *Needs the Modeller role — ask Priya or Lee*; a detail sheet says *You can read this. Changing it needs …* |
+| Operator | Read every surface their role reaches; look, ask, open boards, re-run their own runs, through the agents granted to them. A Modeller also acts on the model and records | Each act the role does not hold disabled — *Needs the Modeller role — ask Priya or Lee*; a detail page says *You can read this. Changing it needs …* |
 
 ## Flow
 
@@ -35,7 +35,7 @@ flowchart TD
   x -->|Ask an Admin| inb(["AC-F05 · an ask in the Admins' Needs you · Asked"])
   inb -->|allowed| g(["The role changes · the act works without signing in again"])
   inb -->|declined · expired| d2(["Still disabled · the answer named"])
-  o -->|a detail sheet| ro["You can read this. Changing it needs the Admin role"]
+  o -->|a detail page| ro["You can read this. Changing it needs the Admin role"]
   o -->|a surface the role may not read| ab["Absent"]
   w([A write whose role was taken away after the screen loaded]) --> e["The engine refuses · names the role and the Admins"] --> x
 ```
@@ -44,12 +44,12 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-07.1 | An Operator | they open any mode, sheet or overlay their role reaches | it reads in full; nothing they may read is hidden |
-| AC-07.2 | An Operator in *People and access* | the sheet is read | every policy, rule, role, team and built-in agent reads; one line names who can change them — *You can read every policy. Priya and Lee can change them* |
+| AC-07.1 | An Operator | they open any mode, modal or overlay their role reaches | it reads in full; nothing they may read is hidden |
+| AC-07.2 | An Operator in *Access* | the section is read | every policy, rule, role, team and built-in agent reads; one line names who can change them — *You can read every policy. Priya and Lee can change them* |
 | AC-07.3 | Any act the reader's role does not hold, anywhere in Studio | it is drawn | it is disabled, never hidden; its tooltip and accessible description name the role and who holds it — *Needs the Admin role — ask Priya or Lee*; tried through the API, it is refused, naming the role |
 | AC-07.4 | The people named | the reader is one of them, or there are more than three | the reader is left out; past three it reads *Priya, Lee or 3 others* |
 | AC-07.5 | A role nobody else holds | the refusal draws | it reads *Ask an Admin* |
-| AC-07.6 | A detail sheet whose changes the reader's role does not hold — a skill, an agent, a model, a policy | it opens | one line says *You can read this. Changing it needs the Modeller role — ask Priya* |
+| AC-07.6 | A detail page whose changes the reader's role does not hold — a skill, an agent, a model, a policy | it opens | one line says *You can read this. Changing it needs the Modeller role — ask Priya* |
 | AC-07.7 | A surface the reader's role may not read at all | the frame draws | it is absent, never shown empty |
 | AC-07.8 | An Operator | they look, ask, open boards, or re-run their own run | it works, as for an Admin |
 | AC-07.9 | A write whose role was taken away after the screen loaded | it is tried | the engine refuses it, naming the role and who holds it, and the act turns disabled |
@@ -63,13 +63,13 @@ flowchart TD
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| People and access, read only | Admin | — | — | — | — | — | — | — |
-| People and access, read only | Operator | settings.people · Locked · Built in only | settings.people · Locked · Nothing matches | settings.people · Locked · Loading | settings.people · Locked | settings.people · Locked · Role lost | — | settings.people · Locked |
+| Access, read only | Admin | — | — | — | — | — | — | — |
+| Access, read only | Operator | settings.people · Locked · Built in only | settings.people · Locked · Nothing matches | settings.people · Locked · Loading | settings.people · Locked | settings.people · Locked · Role lost | — | settings.people · Locked |
 | *Ask an Admin*, pressed | Admin | — | — | — | — | — | — | — |
 | *Ask an Admin*, pressed | Operator | — | — | — | settings.people · Locked · Asked | — | — | — |
 | A mode, read only | Admin | — | — | — | model.models | — | — | — |
 | A mode, read only | Operator | — | — | — | model.models · Read only | — | — | model.models · Read only |
-| A sheet, read only | Admin | — | — | — | agents.agents · Detail | — | — | — |
-| A sheet, read only | Operator | — | — | — | agents.agents · Detail · Read only | — | — | agents.agents · Detail · Read only |
+| A detail page, read only | Admin | — | — | — | agents.agents · Detail | — | — | — |
+| A detail page, read only | Operator | — | — | — | agents.agents · Detail · Read only | — | — | agents.agents · Detail · Read only |
 | An act no agent reaches | Admin | — | — | — | — | settings.agent_access · Locked · No agent reaches it | — | — |
 | An act no agent reaches | Operator | — | — | — | — | settings.agent_access · Locked · No agent reaches it | — | settings.agent_access · Locked · No agent reaches it |

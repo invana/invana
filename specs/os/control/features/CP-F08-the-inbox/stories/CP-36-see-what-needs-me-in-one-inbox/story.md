@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 ```mermaid
 flowchart LR
   c([The header Inbox badge: Needs you, or a dot for Updates]) --> dd(["CP-69 · The Inbox dropdown"])
-  dd -->|Open the Inbox| i["The Inbox sheet — Needs you · Running · Updates · Done"]
+  dd -->|Open the Inbox| i["The full Inbox, in the large modal — Needs you · Running · Updates · Done"]
   t([A toast: a new ask or question]) -->|Review| i
   i -->|nothing| e["Nothing needs you"]
   i --> n["Needs you: asks, then runs waiting on my answer, then project work · open ops alerts sent to me"]
@@ -65,8 +65,8 @@ flowchart LR
 | CP-36.17 | An open ops alert sent to the reader (CP-59) | Needs you is read | it is listed until it closes; when it closes it reads closed, naming what closed it, and moves to Updates |
 | CP-36.18 | A run the reader is behind | someone else stops it (CP-58) | the reader gets an update naming who stopped it, which opens the run |
 | CP-36.19 | Nothing waits on the reader and an update is unread | the header is read | the Inbox badge is a dot, with no number |
-| CP-36.20 | The Inbox dropdown | the reader picks *Open the Inbox* | the Inbox sheet opens on Needs you, its nav Needs you · Running · Updates · Done |
-| CP-36.21 | An Admin in the Inbox sheet | they filter *All open alerts* | every open ops alert in the deployment lists, whoever it was sent to; an Operator is not offered the filter |
+| CP-36.20 | The Inbox dropdown | the reader picks *Open the Inbox* | the full Inbox opens in the large modal on Needs you, its nav Needs you · Running · Updates · Done |
+| CP-36.21 | An Admin in the full Inbox | they filter *All open alerts* | every open ops alert in the deployment lists, whoever it was sent to; an Operator is not offered the filter |
 
 ## Screens
 

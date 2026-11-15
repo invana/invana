@@ -27,7 +27,7 @@ Journeys this feature is a step of: [J05 · Join a team](../../../../journeys/J0
 
 ```mermaid
 flowchart TD
-  start([Settings › Access › People]) --> users["AC-22 · Every user: kind · role · teams · agents granted · default agent"]
+  start([Access › Who]) --> users["AC-22 · Every user: kind · role · teams · agents granted · default agent"]
   users --> who{"Is the reader an Admin?"}
   who -->|no| ro["Everything reads · each write names the Admin role and the Admins"]
   who -->|yes| role["AC-22 · Set a person's role"]
@@ -87,7 +87,7 @@ flowchart TD
 |---|---|
 | First use | Users: the first Admin, the system user and the built-in agents. Teams: *No teams yet — grant a whole team its agents at once* with *New team* |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; lists show loading rows; counts read `—` until the engine gives them |
+| Loading | The section opens at once; lists show loading rows; counts read `—` until the engine gives them |
 | Has data | Users one row each, by kind; teams one row each; the selected one beside them |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused save says why in place, naming the person, the team or the agent |
 | Agent working or proposing | — no agent changes the Directory; a grant's preview shows who gains or loses each agent before it is saved |
@@ -233,11 +233,11 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| The Directory is tabs of one sheet | *Settings › Access* — *Users* and *Teams* beside *Access Policies* and *Roles*; a user or a team drills in and the crumb grows |
+| The Directory is Access › Who | *Users* and *Teams*, beside *What they may do* (*Access Policies* · *Roles*); a user or a team drills in and the crumb grows |
 | Deactivate, never delete | A person who leaves is deactivated, so their work, authorship and History keep a name |
 | The successor is part of deactivating | The Admin names the successor in the same act; one person takes every place the leaver held, so nothing is left to chase afterwards |
 | Two Admins, never one | An Admin who is away or leaves never locks the deployment; a fresh deployment with one Admin is told to name a second |
-| Agents appear as users | One list answers "who acts here"; an agent's row opens its sheet, where its policies are |
+| Agents appear as users | One list answers "who acts here"; an agent's row opens its page, where its policies are |
 | An Admin sets the default agent | A person reads their default agent in *You*; an Admin sets it in the Directory, so what every screen reads through stays an Admin's choice |
 
 ## Open questions

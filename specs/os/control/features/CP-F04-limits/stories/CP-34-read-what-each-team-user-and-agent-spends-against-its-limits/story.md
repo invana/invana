@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Limits]) --> m["The deployment: tokens this month · today · runs right now — against each limit"]
+  s([Workers › Limits]) --> m["The deployment: tokens this month · today · runs right now — against each limit"]
   m --> by["By team · user · agent: tokens and runs this month, runs at once — against its limits"]
   by -->|a figure| runs(["Runs, filtered to what it counts (CP-50)"])
   by -->|near a limit| nl["Says so · only an Admin raises it"]

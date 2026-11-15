@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Workers › Where steps wait]) --> g["Each group: steps waiting · oldest · workers · suggested"]
+  s([Workers › Groups › Where steps wait]) --> g["Each group: steps waiting · oldest · workers · suggested"]
   g -->|a group short| c["Says so · how many would clear it"]
   c -->|Add workers| add(["CP-10 · on that group"])
   g -->|no worker in a group| nw["No workers — start one"]

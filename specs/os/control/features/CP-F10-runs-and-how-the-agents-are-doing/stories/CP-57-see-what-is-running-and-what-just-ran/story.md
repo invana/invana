@@ -35,7 +35,7 @@ flowchart LR
   r -->|Stop · anyone else| d["Disabled, naming who may stop it"]
   r -->|session budget reached| ct["Same row, same number · continuing in session n"]
   r -->|it ends| done["Done: how it ended"]
-  done -->|open| sh(["The run's sheet · How it got here"])
+  done -->|open| sh(["The run's page · How it got here"])
   done -->|See every run| all(["Agents › Runs"])
 ```
 
@@ -55,9 +55,9 @@ flowchart LR
 | CP-57.10 | A run the reader is not behind, the reader not an Admin | they reach *Stop* | it is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 | CP-57.11 | A run that ends | Running is open | it moves to Done with how it ended — served · cannot answer · out of tokens · out of time · stopped · failed — its time and its tokens |
 | CP-57.12 | Runs ended today | Done opens | they list newest first; *See every run* opens Agents › Runs |
-| CP-57.13 | A row | the person opens it | the run opens as its sheet (CP-50), and *How it got here* shows its steps and sources |
+| CP-57.13 | A row | the person opens it | the run opens as its page (CP-50), and *How it got here* shows its steps and sources |
 | CP-57.14 | Each run | it is read | it names where it came from — Ask, a task, a schedule, a project, the API — and the person behind it |
-| CP-57.15 | A run whose content the reader may not read | Running and Done are read | it lists with its agent, the person behind it, its status and its tokens; what it was about reads *withheld*; opened, its sheet reads its head and *withheld*, and a link to a step reads *Not found* |
+| CP-57.15 | A run whose content the reader may not read | Running and Done are read | it lists with its agent, the person behind it, its status and its tokens; what it was about reads *withheld*; opened, its page reads its head and *withheld*, and a link to a step reads *Not found* |
 | CP-57.16 | A number the engine did not record | it is shown | it reads `—`, never `0` |
 | CP-57.17 | *Mine* with none of the reader's runs going | Running is read | it reads *Nothing of yours is running*, with *Show everyone's* |
 | CP-57.18 | The engine cannot read the runs | Running opens | it says what it could not read, with *Try again* |
@@ -71,5 +71,5 @@ flowchart LR
 | Inbox › Running | Operator | inbox · Running · Nothing is running | inbox · Running · Nothing of yours | inbox · Loading | inbox · Running · Not yours to stop | inbox · Could not load | inbox · Running | inbox · Running · Content withheld |
 | Inbox › Done | Admin | inbox · Done · Nothing ended today | — | inbox · Loading | inbox · Done | inbox · Could not load | — | — |
 | Inbox › Done | Operator | inbox · Done · Nothing ended today | — | inbox · Loading | inbox · Done | inbox · Could not load | — | inbox · Done · Content withheld |
-| A run's sheet | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
-| A run's sheet | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Not yours to stop | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A run's page | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
+| A run's page | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Not yours to stop | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |

@@ -59,9 +59,9 @@ flowchart LR
 | AG-35.13 | An Operator or Modeller | they look for *Grant* | it reads *Ask an Admin*; their default reads *Your default*, with no act to change it |
 | AG-35.14 | An agent's run | the person opens *How it got here* | its steps name the agent and the version that ran |
 | AG-35.15 | An agent's version | its row opens | runs, served, p95 and tokens a run, against the version before, as the engine stores them |
-| AG-35.16 | Agents | the person picks *Map* | every agent draws with the skills it holds and the functions, workflows and data they reach; a node opens its sheet |
+| AG-35.16 | Agents | the person picks *Map* | every agent draws with the skills it holds and the functions, workflows and data they reach; a node opens its page |
 | AG-35.17 | Helpers made inside runs | Agents opens | they are hidden until *Show helpers*, then listed with the run that made them |
-| AG-35.18 | A Team pack an Admin turned on that brings agents | Agents opens | each of its agents lists as *Team pack*, naming the pack, owned by the platform; it reads *Not granted to you* until an Admin grants it, and its sheet names the pack's policies still waiting for an Admin to apply (CP-20) |
+| AG-35.18 | A Team pack an Admin turned on that brings agents | Agents opens | each of its agents lists as *Team pack*, naming the pack, owned by the platform; it reads *Not granted to you* until an Admin grants it, and its page names the pack's policies still waiting for an Admin to apply (CP-20) |
 | AG-35.19 | A Team pack turned off or removed | Agents opens | its agents read *Paused* while it is off and *Retired* once it is removed, keeping their rows and names |
 
 ## Screens
@@ -70,8 +70,8 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Agents — the catalogue | Admin | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | — |
 | Agents — the catalogue | Operator | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | agents.agents · Not granted to you |
-| Who may use it, on the sheet | Admin | agents.agents · Detail · Granted by role | — | agents.agents · Detail · Loading | agents.agents · Detail · Who may use it | agents.agents · Detail · Could not load | — | — |
-| Who may use it, on the sheet | Operator | agents.agents · Detail · Granted by role | — | agents.agents · Detail · Loading | agents.agents · Detail · Who may use it | agents.agents · Detail · Could not load | — | agents.agents · Detail · Not granted to you |
+| Who may use it, on the page | Admin | agents.agents · Detail · Granted by role | — | agents.agents · Detail · Loading | agents.agents · Detail · Who may use it | agents.agents · Detail · Could not load | — | — |
+| Who may use it, on the page | Operator | agents.agents · Detail · Granted by role | — | agents.agents · Detail · Loading | agents.agents · Detail · Who may use it | agents.agents · Detail · Could not load | — | agents.agents · Detail · Not granted to you |
 | Grant, in the Directory | Admin | settings.people · Agent grants | — | settings.people · Loading | settings.people · Agent grants | settings.people · Could not load | — | — |
 | Grant, in the Directory | Operator | — | — | — | — | — | — | settings.people · Read only |
 | Your default | Admin | — | — | — | agents.agents · Default | — | — | — |

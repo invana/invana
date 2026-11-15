@@ -163,9 +163,9 @@ all of them run on [the operating system](#the-operating-system). How each looks
 
 | Code | Capability | Pillar | Tier | Lets a person |
 |---|---|---|---|---|
-| `SE` | [Semantics](capabilities/semantics/product.md) | Ontology | mode · sheet | Say what the data means across every graph database — models, meaning and sensitive properties, taxonomies, standards, links and identity match rules, rules, inference — drafted, reviewed and published |
-| `RC` | [Records](capabilities/records/product.md) | Intelligence | modal · sheet | Know the records in the graph databases and how each got there — loads, quality against the model, fixes, merges, provenance, annotations |
-| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal · sheet | Build agents and skills, test them, turn plans into workflows, schedule them, and recall what they learned from Memory |
+| `SE` | [Semantics](capabilities/semantics/product.md) | Ontology | mode · modal | Say what the data means across every graph database — models, meaning and sensitive properties, taxonomies, standards, links and identity match rules, rules, inference — drafted, reviewed and published |
+| `RC` | [Records](capabilities/records/product.md) | Intelligence | mode · modal | Know the records in the graph databases and how each got there — loads, quality against the model, fixes, merges, provenance, annotations |
+| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal | Build agents and skills, test them, turn plans into workflows, schedule them, and recall what they learned from Memory |
 | `EX` | [Explore](capabilities/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, what-if reasoning labelled predicted |
 | `PJ` | [Projects](capabilities/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports, alerts |
 

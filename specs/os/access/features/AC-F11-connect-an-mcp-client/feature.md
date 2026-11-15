@@ -35,7 +35,7 @@ flowchart TD
   use -->|token expires| ren(["Renewed by the client · refresh rotates"])
   use -->|a retired refresh reused| reuse(["The client is revoked · History"])
   me([Settings › You › Connected clients]) --> list["AC-36 · Own connected clients"]
-  ad([People and access › Connected clients]) --> who{"Admin?"}
+  ad([Access › Who › Connected clients]) --> who{"Admin?"}
   who -->|no| lk(["Locked · names the Admins"])
   who -->|yes| all["AC-36 · Every connected client"]
   list --> rv["AC-36 · Revoke · password"]
@@ -82,7 +82,7 @@ sequenceDiagram
 | Register a client · read the metadata | Anyone who can reach the deployment — no credential; rate-limited | — |
 | Connect a client as oneself — consent | Every person with an active account — Operator, Modeller, Admin — in a session, with the password again | A service user, an agent and the system user never sign in, so never consent; a service user uses a key |
 | Read and revoke one's own connected clients | Every signed-in person, in a session; revoking with the password again | — |
-| Read every connected client · revoke any | Admin, in a session; revoking with the password again | *People and access › Connected clients* locked — *Needs the Admin role — ask Priya or Lee*; another person's client is absent (`404`) |
+| Read every connected client · revoke any | Admin, in a session; revoking with the password again | *Access › Who › Connected clients* locked — *Needs the Admin role — ask Priya or Lee*; another person's client is absent (`404`) |
 | Call the MCP server | A connected client, as its person · a key, as key ∩ owner | `401` with where to find the metadata |
 
 ## States
@@ -95,7 +95,7 @@ sequenceDiagram
 | Has data | The consent card; one row per connected client: name · returns to · connected · last used |
 | Failed | A bad authorize request is an error page naming what was wrong; a list that could not load says so, with *Try again* |
 | Agent working or proposing | — no agent connects or revokes a client |
-| No access | An Operator or a Modeller reads *People and access › Connected clients* as locked, naming the Admin role |
+| No access | An Operator or a Modeller reads *Access › Who › Connected clients* as locked, naming the Admin role |
 
 ## Rules
 
@@ -236,7 +236,7 @@ The code change is [migrations.md](../../../../migrations.md) M16.
 | Consent each time | A client that connects again is asked again and becomes a new connection; nothing is remembered silently |
 | Revoking stops its runs | A revoked connection's queued and running runs stop with it, so ending a client ends what it set going |
 | The person is told | A connection an Admin revokes is an Update in its person's Inbox, naming the client and the Admin |
-| Connected clients sit beside keys | *Settings › You › Connected clients*, and for Admins *People and access › Connected clients* |
+| Connected clients sit beside keys | *Settings › You › Connected clients*, and for Admins *Access › Who › Connected clients* |
 
 ## Open questions
 

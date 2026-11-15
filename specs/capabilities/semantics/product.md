@@ -64,13 +64,13 @@ terms and standards it follows, what must always hold and what may be derived �
 | Kinds — the list; a kind · Properties · Meaning · Standards | mode | `model.kinds` · `model.kinds · Detail` · `model.kinds · Detail · Meaning` |
 | Relationships — the list; a relationship on its model | mode | `model.relationships` · `model.relationships · Detail` |
 | A draft and its publish | mode · modal | `model.models · Draft` · `model.models · Publish` |
-| Taxonomies — broader kinds and value hierarchies | sheet | `model.taxonomies` |
+| Taxonomies — broader kinds and value hierarchies | modal | `model.taxonomies` |
 | Standards — the install's library; a standard; a new one | mode · modal | `model.standards` · `model.standards · Detail` · `model.standards · New` |
 | Health and history | mode | `model.health` |
 | A new model · export and import | modal | `model.models · New` · `model.models · Export` · `model.models · Import` |
-| Rules — rules on kinds and properties, requests | sheet | `model.rules` |
-| Views — the list; a view; a new one | sheet · modal | `model.views` · `model.views · Detail` · `model.views · New` |
-| Derivations and derived facts | sheet | `model.inference` |
+| Rules — rules on kinds and properties, requests | modal | `model.rules` |
+| Views — the list; a view; a new one | modal | `model.views` · `model.views · Detail` · `model.views · New` |
+| Derivations and derived facts | modal | `model.inference` |
 
 ## Decisions
 
@@ -117,7 +117,7 @@ terms and standards it follows, what must always hold and what may be derived �
 | Item | Why not |
 |---|---|
 | A model registry | A model exports as one file; files and git are the registry |
-| Merging linked records | A merge is lossy with no undo; a person merges two records in Records |
+| Merging linked records | A merge is lossy with no undo; a person merges two records in Graph Data |
 | Writing records from Semantics | The contract describes; loads write, and derived facts are written by Inference into Records |
 | OSI (Open Semantic Interchange) | It standardises BI metrics, not graph models |
 | Full OWL DL reasoning in core | Only as an outside plugin; rule-based inference is SE-F08 |

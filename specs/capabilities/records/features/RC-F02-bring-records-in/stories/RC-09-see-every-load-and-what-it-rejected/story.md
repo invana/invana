@@ -33,7 +33,7 @@ flowchart LR
   mv -->|read-only connection| x2["Refused at the start, naming the connection setting"]
   mv -->|a rule refuses the model| x3["Cannot answer — names the rule, nothing written"]
   mv -->|yes| r["A run: check each record · write · resolve links · keep the model version"]
-  r --> imp["Records › Loads"]
+  r --> imp["Model › Graph Data › Loads"]
   imp --> o["A load: outcome · steps · what was rejected · log · what landed"]
   o --> rj["Rejected, grouped by reason → sample rows, the exact field"]
   o --> wl["What landed: Checked against Model@v3 · counts per kind"]

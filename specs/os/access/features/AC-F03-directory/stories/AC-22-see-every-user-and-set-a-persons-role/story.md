@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Access › People]) --> l["Every user · tabs All · People · Service users · Agents · System"]
+  s([Access › Who]) --> l["Every user · tabs All · People · Service users · Agents · System"]
   l --> f["Filter by name, kind, role or team"]
   f -->|no one matches| fe["Nothing matches · Clear filters"]
   l -->|a person| p["Their role · teams · agents granted, and how · default agent"]
@@ -35,7 +35,7 @@ flowchart TD
   r -->|no| pw{"Sign in again"}
   pw --> ok(["From their next step · History"])
   p -->|Grant an agent · Take away| g["Pick an agent"] --> gp["AC-39 · Preview: what the person gains or loses"] --> pw
-  l -->|an agent| a(["The agent's sheet · its Access Policies (AC-11)"])
+  l -->|an agent| a(["The agent's page · its Access Policies (AC-11)"])
   l -->|the system user| sys(["What Invana ships · AC-F07"])
   l -->|not an Admin| ro(["Reads · writes disabled, naming the Admins"])
 ```
@@ -46,7 +46,7 @@ flowchart TD
 |---|---|---|---|
 | AC-22.1 | A signed-in person | they open *Users* | every user reads one row each — name · username · kind (*Person* · *Agent* · *Service user* · *System*) · role · teams · agents granted · default agent · *Deactivated* where it applies — with tabs *All · People · Service users · Agents · System* and the engine's counts |
 | AC-22.2 | A fresh deployment | *Users* is read | the first Admin, the system user and each built-in agent read; the system user reads *Owns what Invana ships · never signs in* and has no role |
-| AC-22.3 | An agent's or the system user's row | it is read | it shows no role and offers no *Change role*; an agent's row opens its sheet, with the Access Policies attached to it (AC-11) |
+| AC-22.3 | An agent's or the system user's row | it is read | it shows no role and offers no *Change role*; an agent's row opens its page, with the Access Policies attached to it (AC-11) |
 | AC-22.4 | An Admin | they change a person's role and sign in again | the person holds that role from their next step, including a run already going, and Studio clears what it held for them; the role changes which acts they may start, never what an agent reaches; *History* records who changed whom, from what, to what, and when (AC-F06) |
 | AC-22.5 | Two active Admins | either's role is changed away from Admin | it is refused — *There are always two Admins — make another first* |
 | AC-22.13 | A deployment with one active Admin | *Users* is read by an Admin | it reads *Name a second Admin — there are always two*, with the people who could be made one |

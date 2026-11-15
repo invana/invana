@@ -25,8 +25,8 @@ Journeys this feature is a step of: [J06 · Set what an agent may touch](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › Access › Agents]) --> ag["AC-12 · Every agent — what it can do, and why not"]
-  ag -->|Open in Agents| agx(["AG-F01 · the agent's sheet"])
+  start([Access › What they may do › Agents]) --> ag["AC-12 · Every agent — what it can do, and why not"]
+  ag -->|Open in Agents| agx(["AG-F01 · the agent's page"])
   ag --> touch["AC-13 · What it may touch — each resource, its effect, the rule and policy that set it · each declared need, met or missing · its ceilings"]
   touch -->|Change · an Admin| pol(["AC-04 · the policy, at that rule"])
   touch -->|Change · not an Admin| ro(["The policy reads · editing names the Admins"])
@@ -88,7 +88,7 @@ sequenceDiagram
 |---|---|
 | First use | The built-in agents, each with its built-in policy; an agent made here with no policy attached reads *Holds no policy — every act is denied* |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; lists show loading rows; counts read `—` until the engine gives them |
+| Loading | The section opens at once; lists show loading rows; counts read `—` until the engine gives them |
 | Has data | Each agent, what it can actually do and why not; each resource with its effect and the rule and policy that set it; each declared need, met or missing; the ceilings a run would add |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | A denied agent asking for more in Needs you |
@@ -211,7 +211,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Agents are read here, built in Agents | *People and access › Agents* reads each agent's access; *Open in Agents* opens its sheet |
+| Agents are read here, built in Agents | *Access › What they may do › Agents* reads each agent's access; *Open in Agents* opens its page |
 | One view for everyone | *What it can do* reads the same for every reader, since no rule depends on the person; a reader may add a caller, a project or a key to see the ceilings a run would add |
 | An ask for more allows this step of this run only | A lasting change is an Admin's saved rule; the ask offers an Admin *Draft a rule*, which opens a draft with *Who it changes* (AC-06) |
 

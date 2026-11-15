@@ -65,9 +65,9 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | Surface | Tier | Board |
 |---|---|---|
 | Home — first use and set-up | page | `start.home` · `start.home · Set-up` |
-| Workloads — by user, agent and team, in Settings › Operations | page | `settings.workloads` |
-| Runs — how the agents are doing, every run | sheet | `agents.agents` · `agents.runs` |
-| A run | sheet | `agents.runs · Detail` · `agents.runs · Detail · Answer` |
+| Workloads — by user, agent and team, in Agents › Runs | modal | `settings.workloads` |
+| Runs — how the agents are doing, every run | modal | `agents.agents` · `agents.runs` |
+| A run | modal | `agents.runs · Detail` · `agents.runs · Detail · Answer` |
 | Ops alerts — the list, an alert, thresholds | modal | `control.alerts` · `control.alerts · Detail` · `control.alerts · Settings` |
 | Graph databases — the list, one graph database | modal | `settings.databases` · `settings.databases · Detail` |
 | Connect a graph database | modal | `settings.databases · Connect` · `settings.databases · Connect · Files` · `settings.databases · Connect · Shape` · `settings.databases · Connect · Ready` |

@@ -39,7 +39,7 @@ flowchart TD
   n -->|How it got here| tr(["The agent's steps and sources"])
   d --> r["Running · my runs going now"] -->|a run| run(["CP-50 · the run"])
   d --> u["Updates · newest first"] -->|open one| g(["What it is about · marked read"])
-  d -->|Open the Inbox| sh(["CP-36 · the Inbox sheet"])
+  d -->|Open the Inbox| sh(["CP-36 · the full Inbox"])
   d -->|outside click · Esc| x(["Closed · nothing moves"])
 ```
 
@@ -61,7 +61,7 @@ flowchart TD
 | CP-69.12 | Nothing waits on the reader | the dropdown opens | Needs you reads *Nothing needs you*, as good news |
 | CP-69.13 | The lists still loading | the dropdown opens | it opens at once, rows loading in place, the badge the last count read |
 | CP-69.14 | The engine cannot read the Inbox | the dropdown opens | it says what it could not read, with *Try again* |
-| CP-69.15 | The dropdown | the person picks *Open the Inbox* | the dropdown closes and the Inbox sheet opens (CP-36.20) |
+| CP-69.15 | The dropdown | the person picks *Open the Inbox* | the dropdown closes and the full Inbox opens in the large modal (CP-36.20) |
 | CP-69.16 | An Operator | they read a card whose act needs another person | the act reads *Ask {approver}*, naming who it waits on |
 
 ## Screens

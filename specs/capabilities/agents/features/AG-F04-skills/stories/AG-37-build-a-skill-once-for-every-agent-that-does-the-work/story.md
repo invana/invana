@@ -31,7 +31,7 @@ flowchart LR
   s([Library › Skills]) -->|New skill| nw["New skill — 1 a name · what it is · when to use · 2 planned or guided"]
   nw -->|name already in the catalogue| nx
   nw -->|Create draft| d["The draft, open on its instructions — the platform's, made by its maker"]
-  s -->|a skill| sh["The skill's sheet — who made it in the head"]
+  s -->|a skill| sh["The skill's page — who made it in the head"]
   s -->|a built-in skill| bi["Built in · System — no Edit"]
   bi -->|Copy| d
   d --> n["A name · what it is · when to use it"]
@@ -63,13 +63,13 @@ flowchart LR
 | AG-37.4 | A draft with no *when to use* | a Modeller or an Admin publishes | publishing is refused, naming *when to use* |
 | AG-37.5 | A skill | it is read | what it is and when to use it read as two fields; *when to use* is the sentence the planner matches on |
 | AG-37.6 | A published version | a Modeller or an Admin edits the skill | the edit is a draft of the next version; the published version never changes, and every run that named it still opens it |
-| AG-37.7 | A skill with only a draft | an agent it is added to runs | the skill is not offered; the list and the sheet read *draft* |
+| AG-37.7 | A skill with only a draft | an agent it is added to runs | the skill is not offered; the list and the page read *draft* |
 | AG-37.8 | A version | it is saved | it is kept whole as a standard skill folder — `SKILL.md` with `name` and `description` in its front matter, Invana's own fields (when to use, how it runs, model version, a guided skill's needs) under `metadata:`, the instructions as its body, and `references/`, `scripts/` and `assets/` beside it; Invana's plan, evals and usage stay beside the folder, never inside it |
 | AG-37.9 | A file in `references/` | a step that needs it runs | it is given to that step as context; it is never drawn as a step |
 | AG-37.10 | A line that needs a library | the plan is drawn | it maps only to a function an Admin approved (AG-40); until then the line is flagged and publishing waits |
 | AG-37.11 | The default skills | Skills opens | each default skill is listed *Built in*, owned by *System*, its plan drawn; it has no Edit or Delete, an edit through the API or the command line is refused — *{skill} is built in — copy it to change it* — and *Copy* makes a custom skill under a new name, owned by the person who copied it and added to no agent |
 | AG-37.12 | Instructions that draw no step | the draft is drawn | it says a playbook with no steps is a rule, and offers to move it to the rules (SE-F07) |
-| AG-37.13 | A published skill | its sheet opens | *What it needs* lists every function and workflow its plan calls, with its bound, and every resource it needs — the plugin or tool it runs, the workflow, the kinds it reads or writes and in which graph database — read from the plan |
+| AG-37.13 | A published skill | its page opens | *What it needs* lists every function and workflow its plan calls, with its bound, and every resource it needs — the plugin or tool it runs, the workflow, the kinds it reads or writes and in which graph database — read from the plan |
 | AG-37.14 | An Operator | they open Skills or a skill | everything reads; *New skill*, *Copy* and every write are disabled, naming the role — *Needs the Modeller role — ask an Admin*; the API and the command line refuse the same way |
 | AG-37.15 | A file in `scripts/` | the draft is saved | it runs unchanged, and only once an Admin approved its exact content (CP-F06); until then it reads *Waiting for an Admin* and a skill that calls it does not publish |
 | AG-37.16 | A new skill | it is created | it is *Planned* unless *Guided* was picked in *New skill*; a Modeller or an Admin may switch it later, and the choice is written under `metadata:` in `SKILL.md` |

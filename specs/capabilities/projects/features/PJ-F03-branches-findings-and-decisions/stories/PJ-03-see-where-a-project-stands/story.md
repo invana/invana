@@ -47,7 +47,7 @@ flowchart LR
 |---|---|---|---|
 | PJ-03.1 | A project just created | a person who can see it opens it | the overview reads its question and type, and one branch — the question as asked — open, with *No findings yet* |
 | PJ-03.2 | A project with branches | the overview opens | each branch shows its number (*b1*), title, status (open · pursuing · parked · dropped · merged) and balance (*3 supports · 1 contradicts*), in the words of the project's type |
-| PJ-03.3 | Findings that cite loads | the overview opens | *Loads cited* lists each load those findings cite, by its name, id and content hash, each opening the load in Records (RC-F02); there is no second list to keep |
+| PJ-03.3 | Findings that cite loads | the overview opens | *Loads cited* lists each load those findings cite, by its name, id and content hash, each opening the load in Model › Graph Data › Loads (RC-F02); there is no second list to keep |
 | PJ-03.4 | Findings added from a what-if answer ([EX-33](../../../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)) | the overview opens | each branch's balance counts them apart, labelled *predicted*, so a prediction never reads as an observation |
 | PJ-03.5 | A project with open tasks | the overview opens | it counts the open tasks and lists them, each opening its task |
 | PJ-03.6 | A branch with proposals waiting | the overview opens | the branch shows *N proposals waiting*, opening that branch's proposals |

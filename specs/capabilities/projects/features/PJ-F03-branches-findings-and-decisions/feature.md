@@ -161,7 +161,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | Impact reads as the person | An impact reach is one run of the built-in Assistant with the reader behind it, under its Access Policies; a kind the reader's agent may not read is never reached; every read is in the ledger |
 | How sure is the evidence's | How many of the findings it starts from a person reviewed, and the sources of the loads they cite — upload, CLI, API or by hand — and their licences — never a score |
 | Reach only | Impact reads what a decision touches; it predicts nothing — a what-if is a question in Explore ([EX-F05](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md)). No figure in any currency |
-| Loads cited | The loads a branch's findings cite — no second list. A load undone in Records flags every finding and decision that cites it |
+| Loads cited | The loads a branch's findings cite — no second list. A load undone in Graph Data flags every finding and decision that cites it |
 | Run privacy | The run and steps behind a finding, a proposal or a lineage node read to the person behind the run and, for a run of a project, to anyone whose default agent may see every source ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)); anyone else reads that it ran, its status and its tokens |
 | Archived | An archived project reads; every act is disabled |
 | Numbers are the engine's | Branch, finding, decision and proposal numbers, balances, impact counts and *current · recorded* are stored or counted by the engine; Studio formats them |

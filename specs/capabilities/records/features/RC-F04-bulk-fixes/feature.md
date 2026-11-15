@@ -20,7 +20,7 @@ depends_on: [RC-F01, RC-F03]
 
 ```mermaid
 flowchart TD
-  start([Records or a Quality rule]) --> sel["RC-03 · The records to change"]
+  start([Graph Data › Browse by kind or a Quality rule]) --> sel["RC-03 · The records to change"]
   sel --> ch["RC-03 · Set · clear · map one property"]
   ch --> pv["RC-03 · Preview: before → after, record by record · what the model refuses"]
   pv --> g{Modeller or Admin · the connection writes?}
@@ -57,7 +57,7 @@ flowchart TD
 
 | State | What the person sees |
 |---|---|
-| First use | No records picked: pick from Records or a Quality rule |
+| First use | No records picked: pick from Browse by kind or a Quality rule |
 | Empty after a filter | The picked records match nothing to change: the preview says so |
 | Loading | The preview builds record by record |
 | Has data | Before → after for each record, and what the model would refuse |
@@ -92,7 +92,7 @@ flowchart TD
 
 | Question | Who answers |
 |---|---|
-| EX-F06 › Not building says bulk changes are an upload in Records; here a fix sets, clears or maps one property, with no upload. Recommend: a fix as written here, and EX-F06's row reads *bulk changes are a fix in Data (RC-F04)* | Ravi |
+| EX-F06 › Not building says bulk changes are an upload in Graph Data; here a fix sets, clears or maps one property, with no upload. Recommend: a fix as written here, and EX-F06's row reads *bulk changes are a fix in Data (RC-F04)* | Ravi |
 ## Not building
 
 | Item | Why not |

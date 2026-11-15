@@ -26,7 +26,7 @@ Every role reads annotations and changes its own; an Admin deletes any ([the rol
 
 ```mermaid
 flowchart LR
-  a([Records › Annotations]) --> l[Every annotation · filter]
+  a([Model › Graph Data › Annotations]) --> l[Every annotation · filter]
   l -->|open| b([Its records on a board])
   l -->|edit or delete| d{Its author?}
   d -->|yes| ok([Changed · in History])

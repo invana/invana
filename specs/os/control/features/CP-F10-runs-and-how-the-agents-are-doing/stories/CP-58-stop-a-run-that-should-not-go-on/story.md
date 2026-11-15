@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ```mermaid
 flowchart TD
-  r([A run still going · its sheet, Running or an ops alert]) --> m{"Behind it · an Admin?"}
+  r([A run still going · its page, Running or an ops alert]) --> m{"Behind it · an Admin?"}
   m -->|no| d["Stop run disabled, naming who may"]
   m -->|yes| c["Stop #n? Its helpers stop too · what already finished"]
   c -->|Cancel| r
@@ -41,7 +41,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-58.1 | A run still going, read by the person behind it or an Admin | its sheet or Inbox › Running is read | *Stop run* is offered |
+| CP-58.1 | A run still going, read by the person behind it or an Admin | its page or Inbox › Running is read | *Stop run* is offered |
 | CP-58.2 | *Stop run* | it is chosen | a confirm reads *Stop #{n}? Its helpers stop too*, with the steps already finished |
 | CP-58.3 | The confirm | *Stop* is chosen | dispatch ends; calls already sent finish and are recorded; the run reads *stopped*, naming who stopped it, and each helper *stopped with its parent* |
 | CP-58.4 | A stopped run | its asks are read | each pending ask closed as expired and left *Needs you* |

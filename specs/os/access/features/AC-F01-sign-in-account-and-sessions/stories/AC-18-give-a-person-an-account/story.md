@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F01](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Make a person's account — email, username, name, password and role — from the command line or, signed in, from Settings › Access › People or the API with the password again; set a new password for an account from the command line | — |
+| Admin | Make a person's account — email, username, name, password and role — from the command line or, signed in, from Access › Who or the API with the password again; set a new password for an account from the command line | — |
 | Operator | — | *New person* is absent from People; making an account through the API is refused, naming the Admin role; the sign-in card reads *Ask your admin for an account* (AC-01.8) |
 
 ## Flow
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F01](../../feature.md)
 ```mermaid
 flowchart TD
   a([An Admin at the shell, or signed in]) --> c["Make an account: email · username · name · password · role"]
-  st([Settings › Access › People · New person]) --> c
+  st([Access › Who · New person]) --> c
   c -->|in Studio| pa["Password again"] -->|wrong| pa
   c -->|email or username taken| t["Refused, naming which is taken"] --> c
   c -->|username breaks the rules| u["Refused, naming the rule"] --> c
@@ -50,11 +50,11 @@ flowchart TD
 | AC-18.6 | Someone at the shell | they run `invana users update-password` for an email or a username | the password is set; the person's other sessions end, their keys keep working (AC-02.4) and a lock on their email clears (AC-34.7) |
 | AC-18.7 | An email or a username no account has | a new password is set for it | it says no account has it, and changes nothing |
 | AC-18.8 | An Operator or a Modeller, or any call made with a key | an account is made through the API | it is refused — making an account is an Admin's, from a session |
-| AC-18.9 | An Admin in Settings › Access › People | they press *New person*, fill 1 email, username and name · 2 the role · 3 a first password, and enter their own password again | it is made as AC-18.3 makes it, each refusal of AC-18.4 and AC-18.5 shown in place on its field; no email is sent |
+| AC-18.9 | An Admin in Access › Who | they press *New person*, fill 1 email, username and name · 2 the role · 3 a first password, and enter their own password again | it is made as AC-18.3 makes it, each refusal of AC-18.4 and AC-18.5 shown in place on its field; no email is sent |
 
 ## Screens
 
-In Studio an account is made from Settings › Access › People › *New person*; the command line and the API make it too.
+In Studio an account is made from Access › Who › *New person*; the command line and the API make it too.
 A service user is made in the Directory ([AC-33](../../../AC-F03-directory/stories/AC-33-make-a-service-user-for-automation/story.md)).
 
 | Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |

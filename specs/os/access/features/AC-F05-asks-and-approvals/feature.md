@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J03 · Give an agent work and decide on the
 
 ```mermaid
 flowchart TD
-  sheet([An agent's sheet › Approvers]) --> named["AC-26 · An Admin names the people or teams who answer its asks"]
+  pg([An agent's page › Approvers]) --> named["AC-26 · An Admin names the people or teams who answer its asks"]
   named -->|a single person| warn["Warns · one person away from no approver"]
   named -.-> route
   ev([A step meets Ask · an agent asks for more · a send · a breaking publish · a change to access]) --> route["AC-15 · Routed to the named approvers of the agent whose rule asked · never the person it benefits"]

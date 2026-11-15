@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J05 · Join a team](../../../../journeys/J0
 
 ```mermaid
 flowchart TD
-  start([Settings › Access › Policies]) --> list["AC-03 · Every Access Policy and the agents it is attached to"]
+  start([Access › What they may do › Access Policies]) --> list["AC-03 · Every Access Policy and the agents it is attached to"]
   list --> who{"Is the reader an Admin?"}
   who -->|no| ro["AC-07 · Every policy reads · each write names the Admins"]
   who -->|yes| open["AC-04 · A policy's rules: effect · verb · resource"]
@@ -127,7 +127,7 @@ sequenceDiagram
 |---|---|
 | First use | Only the built-in policies, each attached to its built-in agent, marked *Built in*; *New policy* and *Draft with the assistant* lead |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; lists show loading rows; counts read `—` until the engine gives them |
+| Loading | The section opens at once; lists show loading rows; counts read `—` until the engine gives them |
 | Has data | Access Policies one row each, the selected one beside them: its rules as sentences, the agents it is attached to, its owner and maker, and its versions; a policy file from an import reads *Waiting for an Admin to apply* |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused save says why in place, naming the rule or the name |
 | Agent working or proposing | *Draft from the assistant · Not saved*, with who it changes, before anything changes; a change waiting on a second Admin reads *Waiting for a second Admin* |
@@ -349,7 +349,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Access Policies are a tab of a sheet | *Settings › Access* opens as a sheet; *Access Policies* is a tab, beside *Roles* and the Directory's tabs; a policy drills in and the crumb grows |
+| Access Policies live in Access › What they may do | The Access summoner opens the large modal at Access; *Access Policies* sits beside *Roles* and *Agents* in *What they may do*, the Directory in *Who*; a policy drills in and the crumb grows |
 | Rules read as sentences | A rule reads as a sentence — *Allow reading Customer in every graph database*, *Ask before writing any data*, *Allow running git on a worker* — and its exact form is one click deeper |
 | Built-in agents are narrowed, never edited | A built-in policy stays attached to its built-in agent; an Admin narrows the agent by attaching a custom policy with a Deny, since the strictest rule wins |
 | A built-in agent is granted like any agent | A built-in agent starts granted to every person whose role holds the feature it acts for; an Admin may take the grant away in the Directory |

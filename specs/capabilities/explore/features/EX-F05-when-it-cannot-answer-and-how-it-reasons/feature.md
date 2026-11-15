@@ -345,7 +345,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A simulator in the core | The science is a team's; a simulator ships in a Team pack |
 | Parameter sweeps | One change per what-if; a sweep is several questions |
 | Editing or deleting a simulation | It is the record of a run; ask again |
-| Crawling or scheduled scraping | A search serves one question; collecting the web is the customer's pipeline, loaded through Records |
+| Crawling or scheduled scraping | A search serves one question; collecting the web is the customer's pipeline, loaded through Model › Graph Data › Loads |
 | Third-party or predicted claims mixed into record citations | A citation resolves to a record; a reference to a source or a simulation is a different check |
 | A tree view of forks · merging a fork back | The banner, the forked-into lines and the list mark show each link; two threads are two histories |
 | Forking another person's conversation · forking mid-run | Conversations are their asker's; a running reply has nothing to branch from |

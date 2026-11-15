@@ -45,7 +45,7 @@ flowchart LR
   m --> cf["Confirm split descriptions and model versions"]
   cf -->|Import n| s(["Saved as drafts, the platform's — tested and published like any agent"])
   a -->|an Operator| no(["Import disabled · names the Modeller role"])
-  e([An agent's or skill's sheet · Library › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields under metadata"])
+  e([An agent's or skill's page · Library › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields under metadata"])
 ```
 
 ## Acceptance criteria
@@ -64,13 +64,13 @@ flowchart LR
 | AG-39.10 | Nothing refused | the Modeller presses *Import n* | every agent and skill is saved as a draft, owned by the platform and made by the Modeller, granted to nobody; a skill with no tests imports and waits for them before it publishes |
 | AG-39.11 | An agent, a skill or the whole catalogue | a Modeller presses *Export* | agent `.md` files and `SKILL.md` folders are written, Invana's fields under `metadata:`; the plan is not exported, and no `AGENTS.md`, TOML or Claude plugin is ever written |
 | AG-39.12 | Files being read | the dry run is in progress | it reads *Reading the files…* and each row fills in as it is mapped |
-| AG-39.13 | An Operator | they open Library › Skills or a sheet | *Import* and *Export* are disabled — *Needs the Modeller role — ask an Admin*; the engine refuses the same from the API |
+| AG-39.13 | An Operator | they open Library › Skills or an agent's or skill's page | *Import* and *Export* are disabled — *Needs the Modeller role — ask an Admin*; the engine refuses the same from the API |
 | AG-39.14 | An `AGENTS.md` | it is read | it becomes one draft agent whose instructions are its body, named after the folder it sat in, for the importer to confirm |
 | AG-39.15 | A Codex TOML agent file | it is read | it is converted to the agent `.md` shape, each field it maps shown beside its source, and a field with no place named as left out |
 | AG-39.16 | A Claude plugin — a folder with `.claude-plugin/plugin.json` | it is read | its agents and skills come in as AG-39.3 and AG-39.4; each MCP server its `.mcp.json` names is listed for an Admin to add in Settings (CP-02), never added by the import; a server started as a local process is refused, naming that Invana reaches servers by address |
 | AG-39.17 | A hook, a command, a settings file or any other file a plugin carries | it is read | it is left out, naming what it is, that Invana runs no hooks or commands, and that only Access Policies grant reach |
 | AG-39.18 | An Access Policy file in the import | *Import n* saves it | it lands as a draft reading *Waiting for an Admin to apply* and decides nothing; every Admin finds it in *Needs you*; a Modeller's *Apply* is disabled, naming the Admin role (AC-04.17) |
-| AG-39.19 | An imported agent | its sheet opens | it reads *Imported*, with who imported it and from which file; *How it got here* on the import shows each mapped field beside its source |
+| AG-39.19 | An imported agent | its page opens | it reads *Imported*, with who imported it and from which file; *How it got here* on the import shows each mapped field beside its source |
 
 ## Screens
 

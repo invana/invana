@@ -32,7 +32,7 @@ flowchart TD
   t -->|Take off| off["Who it changes"] --> pw2{"Sign in again"} --> gone(["The agent loses it at its next check"])
   t -->|built in on its built-in agent| fixed["No Take off · narrow with a Deny policy"]
   t -->|not an Admin| ask["Disabled · names the Admins"]
-  ag([An agent's sheet › Access Policies]) --> t
+  ag([An agent's page › Access Policies]) --> t
 ```
 
 ## Acceptance criteria
@@ -40,7 +40,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-11.1 | A policy | *Attached to* is read | each agent reads with its name, *Built in*, *Shared* or *Personal* and who made it, who attached the policy and when; built-in agents first, then by name |
-| AC-11.2 | An agent's sheet | its *Access Policies* are read | every policy attached to it reads, with a link to each, and *What it may do* (AC-F04) |
+| AC-11.2 | An agent's page | its *Access Policies* are read | every policy attached to it reads, with a link to each, and *What it may do* (AC-F04) |
 | AC-11.3 | An Admin | they attach a policy to an agent | *Who it changes* shows for that agent first, with the people and teams granted it; after signing in again, the agent holds it at its next check — or once a second Admin approves, when that is set (AC-04.18) |
 | AC-11.4 | An Admin | they take a policy off an agent | *Who it changes* shows first; after signing in again, the agent loses it at its next check |
 | AC-11.5 | An agent with no policy attached | a step of its run is checked | it is denied — no rule reaches it — and the refusal names the agent and that no policy is attached |

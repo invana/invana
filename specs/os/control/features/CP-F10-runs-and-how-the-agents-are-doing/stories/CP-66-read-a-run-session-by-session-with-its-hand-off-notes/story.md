@@ -31,7 +31,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 
 ```mermaid
 flowchart TD
-  r([A run's sheet · Sessions]) --> ld{"Loaded?"}
+  r([A run's page · Sessions]) --> ld{"Loaded?"}
   ld -->|could not load| f["What could not be read · Try again"]
   ld --> n{"How many sessions?"}
   n -->|one| one["Session 1 · runs with · model set and reported · connection · worker · tokens · why it ended"]
@@ -44,7 +44,7 @@ flowchart TD
   note --> l{"lineage.may_see for the note? (GP-F02)"}
   l -->|no| nw(["The note's head · its body withheld, naming the first source"])
   l -->|yes| body["What is done · what is next · what it read"]
-  body -->|it forked a run| fk(["The forked run #M, its own sheet"])
+  body -->|it forked a run| fk(["The forked run #M, its own page"])
   c -->|yes| st["A session's steps"] --> hig(["How it got here · its steps and sources"])
 ```
 
@@ -61,7 +61,7 @@ flowchart TD
 | CP-66.7 | A run of one session | *Sessions* is read | it reads that one session's head, and no hand-off note |
 | CP-66.8 | A run whose content the reader may not read (AC-31) | *Sessions* is read | every session's head reads; each note's head reads with its body *withheld*; the session's steps are withheld |
 | CP-66.9 | A run still going that reached its session budget | *Sessions* is read | the ended session reads *session budget*, the next one is live, counting tokens against the session budget, and the run keeps its number; no ask is raised |
-| CP-66.10 | A hand-off note a fork started from | it is read | it names the run the fork started, `#M`, which opens as its own sheet |
+| CP-66.10 | A hand-off note a fork started from | it is read | it names the run the fork started, `#M`, which opens as its own page |
 | CP-66.11 | A session the reader may read | its steps are opened | *How it got here* shows its steps and sources |
 | CP-66.12 | An Operator or a Modeller not behind a run outside any project | they follow a direct link to one of its hand-off notes | it reads *Not found*; the route answers 404 with *Not found.* |
 | CP-66.13 | A session that ended *refused* | it is read | it names what was refused — a file, a program or a host — and the rule, for a reader who may read the run; a session head for anyone else |

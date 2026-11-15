@@ -350,10 +350,10 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | MCP carries tools, A2A carries tasks | An A2A task asks back, has states and returns what it made; an MCP outside agent is a server's tools called as one request and one answer each |
 | Calls go out from workers | From workers that can reach it; nothing passes through a hosted service |
 | A helper lives for the work | It retires when the work closes; a helper makes helpers only when its own policies allow Run `agent/*` |
-| An agent's helpers read over a window | Its sheet lists the helpers it made in 7, 30 or 90 days, each with its run; who made whom inside one run is the run's |
-| Outside agents are a filter of the Agents list | The Agents sheet's *Agents* list filtered to *Outside* lists them, and *Add an outside agent* sits on that filter; it is the board `agents.agents · Outside`. There is no separate Outside agents place in the sheet's nav |
+| An agent's helpers read over a window | Its page lists the helpers it made in 7, 30 or 90 days, each with its run; who made whom inside one run is the run's |
+| Outside agents are a filter of the Agents list | Agents › All agents filtered to *Outside* lists them, and *Add an outside agent* sits on that filter; it is the board `agents.agents · Outside`. There is no separate Outside agents place in the Agents section's nav |
 | Continuation is the run going on | At its session budget a run continues in a fresh session from a hand-off note — body in the blob store, row in Postgres. It is not an ask, not an exit reason and not a new run; the run's number, agent version, runtime and person behind it stay |
-| A note is read on the run | Between two sessions on the run's sheet; its head always reads, its body as far as the reader's agent may see its sources |
+| A note is read on the run | Between two sessions on the run's page; its head always reads, its body as far as the reader's agent may see its sources |
 | A fork is a person's act | Only a person forks, from a note they may read; an agent never forks its own run |
 | Federation means outside agents | Over A2A or MCP only; within the deployment it is delegation |
 

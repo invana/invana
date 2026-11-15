@@ -24,7 +24,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 ```mermaid
 flowchart TD
   me([Settings › You › Keys]) --> list["AC-10 · Own keys and the keys of service users one owns"]
-  ad([People and access › Keys]) --> who{"Admin?"}
+  ad([Access › Who › Keys]) --> who{"Admin?"}
   who -->|no| lk(["Locked · names the Admin role"])
   who -->|yes| all["AC-10 · Every key in the deployment"]
   list --> mint["AC-10 · New key: name · owner · expiry · narrow to"]
@@ -55,7 +55,7 @@ flowchart TD
 |---|---|---|
 | Read one's own keys and the keys of service users one owns | Every signed-in person — Operator, Modeller, Admin | — |
 | Mint · revoke one's own key, or a key of a service user one owns | Every signed-in person, in a session, with the password again | — |
-| Read every key in the deployment · revoke any | Admin, in a session; revoking with the password again | *People and access › Keys* locked — *Needs the Admin role — ask Priya or Lee*; another person's key is absent (`404`) |
+| Read every key in the deployment · revoke any | Admin, in a session; revoking with the password again | *Access › Who › Keys* locked — *Needs the Admin role — ask Priya or Lee*; another person's key is absent (`404`) |
 | Any key act with a key | No one — keys are managed from a session | Refused — *This needs a person's session, not a key* |
 
 ## States
@@ -68,7 +68,7 @@ flowchart TD
 | Has data | One row per key: name · owner · last four · narrowed to · expires · last used; expired and revoked keys marked |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused mint says why in place |
 | Agent working or proposing | — no agent mints or revokes a key |
-| No access | An Operator or a Modeller reads *People and access › Keys* as locked, naming the Admin role; their own keys are on *Settings › You › Keys* |
+| No access | An Operator or a Modeller reads *Access › Who › Keys* as locked, naming the Admin role; their own keys are on *Settings › You › Keys* |
 
 ## Rules
 
@@ -184,7 +184,7 @@ The code change is [migrations.md](../../../../migrations.md) M14.
 
 | Decision | Detail |
 |---|---|
-| Keys are their own feature | A credential for software is not a Directory entry; keys live on *Settings › You › Keys* and, for Admins, *People and access › Keys* |
+| Keys are their own feature | A credential for software is not a Directory entry; keys live on *Settings › You › Keys* and, for Admins, *Access › Who › Keys* |
 | A key starts at Read only | The minter widens it on purpose — to *Everything I may do* or named rules — and sees what it will do before it is made |
 | A key's rules only Allow | A key narrows; Ask and Deny are its owner's agents' policies' to say. What a key's rules do not name, it cannot do |
 | No key marked for agents | Every act already runs through an agent and its Access Policies; a key needs no mark of its own to be held to them |

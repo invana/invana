@@ -58,7 +58,7 @@ flowchart TD
 | AG-52.8 | A target's versions | the person opens its history | each version shows what suggested it, who decided, and how it fared |
 | AG-52.9 | The same kind of suggestion rejected repeatedly | the person reads Evidence | the repeated rejections and their notes are visible |
 | AG-52.10 | Several suggested changes selected | the person looks for an act on all | there is none: each is decided on its own |
-| AG-52.11 | A decision | it is made | Settings › Access › History records who decided, when, and the note |
+| AG-52.11 | A decision | it is made | Access › Record › History records who decided, when, and the note |
 | AG-52.12 | A person who holds no Modeller role and is not an Admin | they open a suggested change | accept, edit and reject are disabled, naming the role it needs and an Admin to ask; through the API it is refused |
 | AG-52.13 | A suggested change to the model | a Modeller or an Admin accepts it | it is staged on the model's draft and published through the model's own review (SE-F02); nothing changes the model from Agents |
 | AG-52.14 | A published model change | its window passes | the outcome reads the engine's stored answer accuracy and latency for that window before and after it — improved · unchanged · worsened · unmeasured |

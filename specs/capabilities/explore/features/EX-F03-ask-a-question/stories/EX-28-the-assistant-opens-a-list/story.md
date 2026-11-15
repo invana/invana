@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Ask for Runs, Agents, Inbox › Needs you or Settings › Access › History with filters, and open it | — |
+| Admin | Ask for Runs, Agents, Inbox › Needs you or Access › Record › History with filters, and open it | — |
 | Operator | The same, through the agents they may use — the list opens with what they may read, counted under their rights; a Modeller the same | A name they cannot see is said as not found, never as forbidden; a run whose content they may not read lists with *withheld* (CP-F10) |
 
 ## Flow

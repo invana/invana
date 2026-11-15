@@ -27,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  t([People and access › Agents › an agent]) --> w["What it may touch · grouped: data · memory · projects · skills · workflows · agents · plugins · tools · on a worker"]
+  t([Access › What they may do › Agents › an agent]) --> w["What it may touch · grouped: data · memory · projects · skills · workflows · agents · plugins · tools · on a worker"]
   w --> row["Each resource: Read · Write · Run — Allow · Ask · Deny · the rule, its policy, who saved it"]
   w --> cl["Ceilings a run adds: key · run scope · graph database mode"]
   w --> nd["Declared needs · each skill, plugin and workflow it uses · met or missing"]

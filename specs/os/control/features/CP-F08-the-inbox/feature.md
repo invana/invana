@@ -14,7 +14,7 @@ depends_on: [AC-F05, CP-F11, PJ-F01, PJ-F03, PJ-F06]
 # The Inbox — what needs me, and notifications
 
 > Every ask that waits on a person (AC-F05), every open ops alert sent to them (CP-F11) and everything else that
-> should reach them arrives in one Inbox for the deployment — a header dropdown to decide in place, a sheet to read it
+> should reach them arrives in one Inbox for the deployment — a header dropdown to decide in place, the large modal to read it
 > all — by rules people write, and leaves Invana on the channels an Admin sets up and each person chooses. It also
 > serves the one live counts source every badge and count in Studio reads. The decision it helps make: *what needs me
 > first?*
@@ -39,7 +39,7 @@ flowchart TD
   cnt --> dd["CP-69 · The Inbox dropdown · Needs you · Running · Updates"]
   dd -->|Acknowledge · Send back · Allow tokens| inplace(["Decided in place"])
   dd -->|Accept that writes| conf(["A confirm modal · what changes"])
-  dd -->|Open the Inbox| inbox["CP-36 · The Inbox sheet · Needs you · Running · Updates · Done"]
+  dd -->|Open the Inbox| inbox["CP-36 · The full Inbox, in the large modal · Needs you · Running · Updates · Done"]
   inbox -->|nothing waits| calm(["Nothing needs you"])
   inbox --> ask(["AC-15 · Decide the ask"])
   inbox --> upd["CP-36 · An update opens what it is about · marked read"]
@@ -68,7 +68,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 
 | Act | Role | Everyone else sees |
 |---|---|---|
-| Read one's own Inbox — the dropdown, and the sheet's Needs you · Running · Updates · Done | Operator · Modeller · Admin | — |
+| Read one's own Inbox — the dropdown, and the full Inbox's Needs you · Running · Updates · Done | Operator · Modeller · Admin | — |
 | Read one's own counts — Needs you, runs going, open alerts sent to one | Operator · Modeller · Admin | — |
 | Read the deployment's counts — every run going, every open alert, acts blocked today — and filter the Inbox to *All open alerts* | Admin | The counts are one's own; *All open alerts* is not offered |
 | Decide an ask in place in the dropdown — *Allow tokens* among them | As AC-F05: the people the ask is routed to | *Ask {approver}* — and the engine refuses it |
@@ -87,8 +87,8 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 |---|---|
 | First use | Needs you: *Nothing needs you*, as good news. Updates with no rule written: *Nothing needs you*, with *New rule* — failures reach a person only through a rule. Rules: *No rules yet*, with *New rule* |
 | Empty after a filter | Needs you or Updates filtered by product, kind or *Unread* with no match: *Nothing matches*, with *Clear filters* |
-| Loading | The dropdown and the sheet open at once with rows loading in place; the badge is the last count read |
-| Has data | The dropdown: Needs you as cards to decide in place · Running · Updates. The sheet: Needs you — asks first, nearest deadline first (AC-F05); Running; Updates newest first, unread marked; Done. Rules one row each; channels with their masked target and *ready* |
+| Loading | The dropdown and the full Inbox open at once with rows loading in place; the badge is the last count read |
+| Has data | The dropdown: Needs you as cards to decide in place · Running · Updates. The full Inbox: Needs you — asks first, nearest deadline first (AC-F05); Running; Updates newest first, unread marked; Done. Rules one row each; channels with their masked target and *ready* |
 | Failed | The list could not load, saying why, with *Try again*. A channel that failed a send names the error on its delivery |
 | Agent working or proposing | An agent's ask in Needs you, as AC-F05 shows it |
 | No access | An ask routed to someone else reads, as AC-F05 says. Rules and channels read; a rule for others and every channel write are disabled for everyone but an Admin, naming the Admins |
@@ -101,7 +101,7 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | One list of what waits | Needs you holds every ask a person, an agent or a run makes of a person — access · budget · delegation · send · question · more than a policy allows (AC-14) · a person's act set to Ask — a held delivery of a finished run, a breaking model publish, project work — a task in review, to its author and the person behind its run (PJ-12); *Start this task?* (PJ-15), an agent's open proposal (PJ-05) and a new lead (PJ-19), each to the project's members — and each open alert sent to the reader ([CP-F11](../CP-F11-ops-alerting/feature.md)). The header Inbox badge carries one count, *Needs you*: asks waiting on the reader + runs waiting on the reader's answer + open ops alerts sent to the reader; unread Updates are a dot, never a number |
 | An alert leaves Needs you when it closes | It reads closed, naming what closed it, and moves to Updates |
 | A stopped run tells the person behind it | When someone else stops a run, the person behind it gets an update naming who stopped it ([CP-58](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-58-stop-a-run-that-should-not-go-on/story.md)) |
-| The dropdown first | The header Inbox opens a 640 px dropdown — Needs you · Running · Updates — to decide in place; *Open the Inbox* opens the sheet — Needs you · Running · Updates · Done. Only what needs *you*: system state is Operations' ([CP-F09](../CP-F09-overview/feature.md)) |
+| The dropdown first | The header Inbox opens a 640 px dropdown — Needs you · Running · Updates — to decide in place; *Open the Inbox* opens the full Inbox in the large modal — Needs you · Running · Updates · Done. Only what needs *you*: system state is Operations' ([CP-F09](../CP-F09-overview/feature.md)) |
 | Low-risk acts in place, writes confirm | *Acknowledge*, *Send back* and *Allow tokens* answer on the card; an *Accept* that writes Graph Data or the model opens a confirm modal listing what changes |
 | One counts source | Every count Studio shows — the badge, *n running*, the footer, the dropdowns, the browser title *(n) Invana* — is one engine read and one live stream; Studio never counts ([design-language › Counts](../../../../design-language.md#counts)) |
 | Questions lead Needs you | A question asked back of the person sits first: it holds a run until it is answered. Then every other ask and each open ops alert, oldest first |
@@ -199,9 +199,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 404 | Reading another person's channel choices | *Not found.* | CP-46.10 |
 | 403 | `?alerts=all` by anyone but an Admin | *This needs the Admin role.* | CP-36.21 |
 | 422 | A rules file with a refused rule — nothing in it applied | *{rule} · {field}: {why}.* | CP-37.17 |
-| 403 | The counts stream opened with a key or a connected client's token | *This needs a person's session, not a key.* | AC-48.19 |
-| 401 | The counts stream opened with no `Authorization` header — a token in the address included | *This session has ended — sign in again.* | AC-48.19 |
-| 429 | An eleventh counts stream for a session, or a twenty-first for an account | *Too many open tabs — close one and try again.* | AC-48.20 |
+| 403 | The counts stream opened with a key or a connected client's token | *This needs a person's session, not a key.* | AC-48.23 |
+| 401 | The counts stream opened with no `Authorization` header — a token in the address included | *This session has ended — sign in again.* | AC-48.23 |
+| 429 | An eleventh counts stream for a session, or a twenty-first for an account | *Too many open tabs — close one and try again.* | AC-48.24 |
 
 ### CLI
 
@@ -254,7 +254,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A person picks their own channels | Asks and alerts for a person follow that person's choices; Teams and webhooks reach a place, so they are a rule's, never a person's |
 | One line and a link | A channel never carries content, so no channel needs to be trusted with what a run read, and every decision is made signed in |
 | Updates are notifications | The Inbox's Updates are the reader's notifications; Needs you never holds an update |
-| The Inbox is a dropdown, then a sheet | The header Inbox opens a dropdown that decides in place; the full Inbox is a sheet opened from it — never a leftNav summoner |
+| The Inbox is a dropdown, then the large modal | The header Inbox opens a dropdown that decides in place; the full Inbox opens from it in the large modal's frame, with its own nav — never a leftNav summoner |
 | The badge counts what needs you | The badge is Needs you only; unread Updates show as a dot, so the number always means *someone waits on you* |
 | One counts source, live | Every count is the engine's, served by one read and one stream, so the badge, *n running*, the footer and the title never disagree |
 

@@ -84,7 +84,7 @@ sequenceDiagram
 
 | Rule | Detail |
 |---|---|
-| Rules and views is one sheet | Opened from Model: *Rules* (SE-F07) · *Views* (what agents may see) · *Requests* (SE-13), the open requests counted in its head |
+| Rules and views is one large modal | Opened from Model: *Rules* (SE-F07) · *Views* (what agents may see) · *Requests* (SE-13), the open requests counted in its head |
 | Outside this view is not cannot answer | A question that needs what the view keeps out reads *outside this view*, naming what it was grounded in and the rule or view in the way — a setting the person can widen. *Cannot answer* is kept for what Graph Data does not hold |
 | A view narrows, never widens | A view may hide models, kinds and properties, slice a model, pick the AI model that decides, say what may leave, cap how old a cached answer may be and say who may be asked and how often. It never widens a rule on a property; one that would is refused at save, naming the rule |
 | Five layers | A view narrows along graph data · AI models · outside services · cache · people; worker capacity is not a layer |

@@ -74,7 +74,7 @@ flowchart LR
 | AG-19.17 | A publish | History opens | *Regenerated — vN* lists steps added, removed and changed against the version before, or says *The plan did not change with this version*; *Who picks it up* lists every agent it is added to as *next run* |
 | AG-19.18 | History | the editor presses *Roll back* on an earlier version, with a reason | a new version copies that version's instructions, model version and plan, through the evals; the version it copied is named on it |
 | AG-19.19 | An open draft, or the current version | the editor rolls back | it is refused, naming the draft or that there is nothing to restore; the draft is never overwritten |
-| AG-19.20 | An Operator | they open a skill | the sheet opens with *You can read this skill. Editing needs the Modeller role — ask an Admin*; every tab reads; the editor is read-only and each act is disabled |
+| AG-19.20 | An Operator | they open a skill | the page opens with *You can read this skill. Editing needs the Modeller role — ask an Admin*; every tab reads; the editor is read-only and each act is disabled |
 | AG-19.21 | A guided skill | Instructions or Flow opens | no plan is drawn; the Plan preview and Flow read *Guided — the model follows the instructions; each run shows the steps it took*, and *What it needs* lists the needs under `metadata:` |
 | AG-19.22 | A guided draft | its editor switches it to *Planned* | the plan is drawn as AG-19.1, and Publish waits for it like any draft |
 | AG-19.23 | A published planned version whose kept plan is gone | a run opens it | the plan is compiled again from the version's text, its answers and the function and workflow versions it named, and is the same plan |

@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Alerts › Thresholds]) --> l["Each kind: its threshold · its window · whom it reaches"]
+  s([Workers › Alerts › Thresholds]) --> l["Each kind: its threshold · its window · whom it reaches"]
   l -->|not an Admin| ro["Reads · Edit disabled, naming the Admins"]
   l -->|Edit · Admin| e["Threshold · window"]
   e -->|outside its range| r["Names the field and its range"]

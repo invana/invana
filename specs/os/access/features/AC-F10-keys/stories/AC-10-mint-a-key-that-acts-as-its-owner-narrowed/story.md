@@ -20,14 +20,14 @@ Tasks: [task.md](task.md) · Feature: [AC-F10](../../feature.md)
 | Lens | Can | Otherwise sees |
 |---|---|---|
 | Admin | Mint and revoke their own keys and the keys of service users they own; read every key in the deployment and revoke any. Each mint and revoke asks for the password again | — |
-| Operator | Mint and revoke their own keys and the keys of service users they own. Each mint and revoke asks for the password again | *Owner* offers only themselves and the service users they own; *People and access › Keys* is locked, naming the Admin role |
+| Operator | Mint and revoke their own keys and the keys of service users they own. Each mint and revoke asks for the password again | *Owner* offers only themselves and the service users they own; *Access › Who › Keys* is locked, naming the Admin role |
 
 ## Flow
 
 ```mermaid
 flowchart TD
   me([Settings › You › Keys]) --> l{"Any keys?"}
-  ad([People and access › Keys — Admin]) --> al["Every key: name · owner · narrowed to · expires · last used"]
+  ad([Access › Who › Keys — Admin]) --> al["Every key: name · owner · narrowed to · expires · last used"]
   l -->|none| e["No keys yet — what a key is for · New key"]
   l -->|some| k["Name · owner · last four · narrowed to · expires · last used"]
   e --> n["New key: name · owner · expires 30 · 90 · 365 days or never · narrow to — Read only to start"]
@@ -74,8 +74,8 @@ sequenceDiagram
 | AC-10.12 | A call made with a key | it tries to mint or revoke a key, change a password, change access or connect a client | it is refused — *This needs a person's session, not a key* |
 | AC-10.13 | An owner's password change | their keys are used | they still work; only sessions end |
 | AC-10.14 | A key in a URL | a call carries it there | it is not accepted — a key travels only in the `Authorization` header |
-| AC-10.15 | *People and access › Keys*, read by an Admin | it is read | every key in the deployment — live, expired or revoked: name · owner · narrowed to · expires · last used · who minted it; filtered by owner and state |
-| AC-10.16 | An Operator or a Modeller | they open *People and access › Keys* | it is locked, naming the Admin role and the Admins; their own keys and their service users' keys are on *Settings › You › Keys* |
+| AC-10.15 | *Access › Who › Keys*, read by an Admin | it is read | every key in the deployment — live, expired or revoked: name · owner · narrowed to · expires · last used · who minted it; filtered by owner and state |
+| AC-10.16 | An Operator or a Modeller | they open *Access › Who › Keys* | it is locked, naming the Admin role and the Admins; their own keys and their service users' keys are on *Settings › You › Keys* |
 | AC-10.17 | *New key* | it opens | *Narrow to* starts at *Read only*; the minter may choose *Everything I may do* or name rules — verb and resource — and sees what the key will be able to do before it is made |
 | AC-10.18 | *Never* as the expiry | it is chosen | the form says a key that never expires lives until it is revoked; the list shows *Never* beside it |
 | AC-10.19 | A key | it calls the deployment's MCP server | it acts there as key ∩ owner, exactly as on the API ([AC-F11](../../../AC-F11-connect-an-mcp-client/feature.md)) |

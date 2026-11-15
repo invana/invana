@@ -65,7 +65,7 @@ flowchart TD
 | AG-63.10 | An Operator | they open Library › Skills | *Import* is disabled — *Needs the Modeller role — ask an Admin*; the engine refuses the same from the API |
 | AG-63.11 | The files being read | the dry run is in progress | it reads *Reading the files…*; each folder's group and each row fill in as they are mapped |
 | AG-63.12 | Nothing refused | the Modeller presses *Import n* | every agent and skill is saved as a draft, owned by the platform and made by the Modeller, granted to nobody until an Admin grants it; History records the import with the folders it read |
-| AG-63.13 | An agent the import made | its sheet opens | it reads *Imported*, naming the folder and file it came from; *How it got here* on the import shows each mapped field beside its source and each file left out with why |
+| AG-63.13 | An agent the import made | its page opens | it reads *Imported*, naming the folder and file it came from; *How it got here* on the import shows each mapped field beside its source and each file left out with why |
 
 ## Screens
 

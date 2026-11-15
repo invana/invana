@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Workloads · or the Operations dropdown's Workloads]) --> l{"Loaded?"}
+  s([Agents › Runs › Workloads · or the Operations dropdown's Workloads]) --> l{"Loaded?"}
   l -->|no| f["What could not be read · Retry"]
   l -->|nothing ran| e["Nothing ran yet · what starts a run"]
   l -->|yes| t["Tiles: running · waiting · failed · tokens · this month against the deployment's limit · ops alerts open"]

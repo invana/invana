@@ -9,9 +9,8 @@ boards: [shell.operations]
 
 # CP-70 · See what the deployment is doing from the header
 
-**As** an Admin **I want** one glance from any screen at what runs, what waits, what it spends against its budgets and
-whether workers, AI models and graph databases are well **so that** I see trouble before anyone tells me, without
-leaving my work.
+**As** an Admin **I want** one glance from any screen at what runs, what waits, whether the workers keep up and where
+this month's tokens stand against the budget **so that** I see trouble before anyone tells me, without leaving my work.
 
 Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 
@@ -19,30 +18,25 @@ Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 
 | Lens | Can | Otherwise sees |
 |---|---|---|
-| Admin | Open the Operations dropdown on the deployment: every tile and section; *Stop* a run as [CP-58](../../../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-58-stop-a-run-that-should-not-go-on/story.md) allows; follow its links | — |
-| Operator | Operator · Modeller: open it on their own runs and the agents they own, with one line of system health; *Stop* their own runs | Workers, AI models, graph databases, the queue and other people's runs are not listed — the one health line stands for them |
+| Admin | Open the Operations dropdown on the deployment: every tile and every run going; *Stop* a run as [CP-58](../../../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-58-stop-a-run-that-should-not-go-on/story.md) allows; follow its links | — |
+| Operator | Operator · Modeller: open it on their own runs; *Stop* their own runs; follow *Agents › Runs* | The Queue, Workers and Tokens tiles, other people's runs and the *Workers* link are absent, not empty |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  h([The header ● n running · or the footer's]) --> d["Operations dropdown"]
+  h([The header ● n running · or the footer's]) --> d["Operations dropdown · about 720 px"]
   f([Nothing runs]) --> idle["● Idle · grey dot · keeps its place"] --> d
-  d -->|loading| ld["Tiles and sections drawn at once · fill in place"]
+  d -->|loading| ld["Tiles and Running now drawn at once · fill in place"]
   d -->|could not load| fl["What could not be read · Try again"]
-  d -->|Admin| t["Tiles: agents running and idle · tokens today and this month against the budget · needs a person · queue waiting and oldest · workers busy, idle, draining · AI models · graph databases"]
-  t --> run["Running now and queued · step · tokens · time · worker group · Stop"]
+  d -->|Admin| t["Tiles: Running and queued · Queue waiting and oldest · Workers busy of total and lost · Tokens this month against the budget"]
+  t --> run["Running now · agent · who is behind it · step progress · Stop"]
   run -->|Stop| st(["CP-58 · Stop the run"])
-  t --> ag["Agents against their budgets · amber at 80%"]
-  t --> wk["Workers by group"]
-  t --> ai["AI models by pinned version · latency · error rate"]
-  t --> gd["Graph databases · health"]
-  t --> al["Open and recently closed alerts"]
-  t -->|needs a person| ib(["The Inbox (CP-69)"])
-  run -->|All runs| ar(["Agents › Runs (CP-50)"])
-  wk -->|Settings| so(["Settings › Operations"])
-  t -->|Workloads| wl(["Settings › Operations › Workloads (CP-47)"])
-  d -->|Operator| op["My runs and my agents · one line of system health"]
+  run -->|Agents › Runs| ar(["The large modal at Agents › Runs (CP-50)"])
+  t -->|Workers| so(["The large modal at Workers"])
+  d -->|Operator| op["Running · my runs now · step progress · Stop"]
+  op -->|Agents › Runs| ar
+  d -->|nothing ran yet| e["Nothing has run yet · what starts a run"]
   d -->|outside click · Esc| x(["Closed · nothing moves"])
 ```
 
@@ -52,21 +46,20 @@ flowchart TD
 |---|---|---|---|
 | CP-70.1 | Runs going | the header is read | it reads *● n running*, the engine's count, live; the footer reads the same |
 | CP-70.2 | Nothing running | the header is read | it reads *Idle* with a grey dot and keeps its place |
-| CP-70.3 | Any screen | the person clicks *● n running* in the header or the footer | the Operations dropdown opens anchored to it, no scrim; outside click or Esc closes it |
-| CP-70.4 | An Admin | the dropdown opens | tiles read agents running and idle · tokens today and this month against the deployment's budget · needs a person · queue waiting and the oldest · workers busy, idle and draining · AI models · graph databases — each as the engine counted it |
-| CP-70.5 | Runs going or queued | *Running now* is read | each run with its agent, the person behind it, its step of its steps, tokens, time and worker group, and *Stop* where the reader may stop it; queued runs below, with how long each has waited |
-| CP-70.6 | Agents with a budget | the agents section is read | each agent's tokens today and its meter of tokens against its budget; a meter at 80% or more is amber, as the engine marks it; an agent with no limit reads *No limit* |
-| CP-70.7 | Worker groups | the workers section is read | each group with its workers busy, idle and draining |
-| CP-70.8 | AI models | the section is read | each pinned exact version with its latency and error rate over the last hour, as the engine computed them |
-| CP-70.9 | Graph databases | the section is read | each with its health ([CP-40](../../../CP-F05-graph-databases/stories/CP-40-see-every-graph-database-and-its-health/story.md)) |
-| CP-70.10 | Alerts | the section is read | open alerts, then those closed in the last day, each opening its alert (CP-59) |
-| CP-70.11 | *Needs a person* above zero | the person picks it | the Inbox dropdown opens (CP-69); the asks themselves stay in the Inbox |
-| CP-70.12 | The dropdown | the person follows *All runs*, *Workloads* or *Settings* | Agents › Runs (CP-50), Settings › Operations › Workloads (CP-47) or Settings › Operations opens; Operations is never a summoner of its own |
-| CP-70.13 | An Operator | the dropdown opens | it lists their own runs and the agents they own, and one line of system health — *Workers, AI models and graph databases are healthy* or what is not |
-| CP-70.14 | Any figure | it is read | it is a count or tokens — never currency |
-| CP-70.15 | Runs start and end while it is open | it is read | the figures move in place, at most once a second |
-| CP-70.16 | The read fails | the dropdown opens | it says what could not be read, in the engine's words, with *Try again* |
-| CP-70.17 | A run the reader may not read | it is listed for an Admin | its agent, the person behind it, its status and tokens read; its content stays withheld (AC-31) |
+| CP-70.3 | Any screen | the person clicks *● n running* in the header or the footer | the Operations dropdown opens anchored to it, about 720 px wide, no scrim; outside click or Esc closes it |
+| CP-70.4 | An Admin | the dropdown opens | four tiles read *Running* with how many are queued · *Queue* — waiting, and how long the oldest has waited · *Workers* — busy of total, and how many are lost · *Tokens this month* against the deployment's budget — each as the engine counted it |
+| CP-70.5 | Runs going | *Running now* is read | each run with its agent, the person behind it, its step progress — step *n of m* — and *Stop* where the reader may stop it |
+| CP-70.6 | A run in *Running now* | the reader presses *Stop* | it stops as CP-58 says; the run leaves the list and the tiles move |
+| CP-70.7 | No monthly budget set | the *Tokens this month* tile is read | it reads the month's tokens and *No limit* |
+| CP-70.8 | The dropdown | the reader follows *Agents › Runs*, or an Admin follows *Workers* | the large modal opens at Agents › Runs (CP-50) or at Workers; Operations is never a summoner of its own |
+| CP-70.9 | The dropdown | an Admin looks for agents against their budgets, workers by group, AI models, graph databases or alerts | none is in the dropdown; each is read in the large modal — Workers, Agents, Settings › Connections — and the dropdown stays a quick overview |
+| CP-70.10 | The dropdown | an Admin wants to add workers, change a limit, tune an alert or drain a worker | none is offered in place; *Workers* opens the large modal, where the act is taken — *Stop* on a run is the dropdown's one act |
+| CP-70.11 | An Operator | the dropdown opens | it reads *Running* and *Running now* for their own runs only; the Queue, Workers and Tokens tiles and the *Workers* link are absent |
+| CP-70.12 | Any figure | it is read | it is a count or tokens — never currency |
+| CP-70.13 | Runs start and end while it is open | it is read | the figures move in place, at most once a second |
+| CP-70.14 | The read fails | the dropdown opens | it says what could not be read, in the engine's words, with *Try again* |
+| CP-70.15 | A run the reader may not read | it is listed for an Admin | its agent, the person behind it and its step progress read; its content stays withheld (AC-31) |
+| CP-70.16 | Nothing has ever run | the dropdown opens | the tiles read their counts, and *Running now* says nothing has run yet and that a question, a task or a schedule starts a run |
 
 ## Screens
 
@@ -74,5 +67,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | *● n running* | Admin | shell.operations · Idle | — | — | shell.operations | — | shell.operations | — |
 | *● n running* | Operator | shell.operations · Idle | — | — | shell.operations · Operator | — | shell.operations · Operator | — |
-| The Operations dropdown | Admin | shell.operations · Nothing ran yet | — | shell.operations · Loading | shell.operations | shell.operations · Could not load | shell.operations · Near a budget | — |
+| The Operations dropdown | Admin | shell.operations · Nothing ran yet | — | shell.operations · Loading | shell.operations | shell.operations · Could not load | shell.operations · Stop | — |
 | The Operations dropdown | Operator | shell.operations · Operator · Nothing ran yet | — | shell.operations · Loading | shell.operations · Operator | shell.operations · Could not load | shell.operations · Operator | shell.operations · Operator |

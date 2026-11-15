@@ -147,8 +147,8 @@ A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-owners
 |---|---|
 | First use | Skills with only the default skills, each marked *Built in*, owned by *System*; *New skill* and a line on what a skill is; a new draft with the four headings, *Nothing needed yet* and *Nothing to draw yet*; Usage, Exceptions and Tests read *Not run yet*; Evals reads *No eval set — nothing checked* |
 | Empty after a filter | — |
-| Loading | The sheet's head and tabs drawn at once; the body loads in place; the Plan preview reads *Drawing…* over the last plan drawn |
-| Has data | A skill as a sheet: its head, who made it, its state and *Guided* or *Planned*, then Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History |
+| Loading | The page's head and tabs drawn at once; the body loads in place; the Plan preview reads *Drawing…* over the last plan drawn |
+| Has data | A skill as a page: its head, who made it, its state and *Guided* or *Planned*, then Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History |
 | Failed | The tab names what it could not read, in the engine's words; a refused publish, draw or add names its check where the act was |
 | Agent working or proposing | The plan being drawn; the planner asking which reading a sentence means; the assistant proposing eval cases; an eval run with its cases filling in; an *Adopt* proposal |
 | No access | Every tab reads; the editor is read-only and each act is disabled, naming the Modeller role; a built-in skill offers *Copy* |
@@ -189,7 +189,7 @@ A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-owners
 | Applied is the model's own report | The surface says so; Invana never claims a skill was applied well |
 | Counts are per version, across the deployment | A new version's counts start at zero; earlier versions keep theirs; every count is over every run in the deployment |
 | Tokens, never currency | Every budget, cost and count of spend is in tokens ([glossary › Token budget](../../../../glossary.md#what-may-happen)); the size of what a skill adds to an ask is in characters |
-| The engine counts | Offered, applied, the share applied, *too few to read*, change against live and every number on the sheet are the engine's; Studio formats them |
+| The engine counts | Offered, applied, the share applied, *too few to read*, change against live and every number on the page are the engine's; Studio formats them |
 | Leans on | The catalogue (AG-F02) · import, export and approved functions (AG-F08) · skill scripts (CP-F06) · building an agent (AG-F01) · runs and *Improve this skill* (CP-F10 · CP-56) · helpers (AG-F05) · plans and workflows (AG-F06) · suggested changes (AG-F09) · rules (SE-F07) · Access Policies (AC-F02) · declared needs and the gate (AC-F04) · ownership (AC-F07) · plugins (CP-F02) · graph databases (CP-F05) · evals and the eval gate (AG-F10) · AI models (CP-F01) |
 
 The default skills — built in, owned by the system user, each added to its built-in agent at start:
@@ -349,9 +349,9 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 
 | Decision | Detail |
 |---|---|
-| Skills live in the Library | The Library sheet's *Skills*, beside Plugins · Connectors · Packs; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
+| Skills live in the Library | Library › Skills in the large modal, beside Plugins · Team packs; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
 | How it runs is in the head | *Guided* or *Planned* beside the state; a Modeller or an Admin switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
-| A skill is a sheet | Opened from Library › Skills; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
+| A skill is a page in the Library | Opened from Library › Skills; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
 | The head says its state and its owner | The name, then *draft · empty*, *draft vN*, or *vN · published* with *draft vN+1* beside it, and its owner — *Platform*, or *System* on a built-in — with who made it; acts are *Run a test* and *Publish* on a draft, *Edit instructions* on a published skill with no draft, *Copy* on a built-in |
 | A skill is a document | Instructions is one editor (Edit · Preview) with two cards beside it — *What it needs* and *Plan preview* — over a console (Tests · Evals · Problems · Log) that folds to its tab strip |
 | New skill opens on its instructions | An *untitled* draft with the four headings — Goal · Arguments · Steps · When things go wrong — since a draft has nothing else to show |

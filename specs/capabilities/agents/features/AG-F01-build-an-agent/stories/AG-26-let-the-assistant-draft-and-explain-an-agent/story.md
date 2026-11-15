@@ -48,7 +48,7 @@ flowchart LR
 | AG-26.1 | *New agent* with what it should do in plain words | the builder asks the Assistant to draft it | the Assistant proposes instructions, skills to add, voice, effort and the Access Policies to ask an Admin for, each part shown apart with *Apply* and *Discard*; nothing is saved until a part is applied |
 | AG-26.2 | A proposal being drafted | the modal is open | it says the Assistant is drafting and fills in each part as it lands; the form stays editable |
 | AG-26.3 | A proposed part | the builder presses *Apply* | it joins the draft and can be edited like anything typed; *Discard* leaves the draft as it was |
-| AG-26.4 | An agent's sheet | the builder asks for a change — *make it ask before sending* | the Assistant proposes what would move, shown against what is saved, and applies nothing until the builder does; a change to what it may touch is proposed as a policy change for an Admin to save |
+| AG-26.4 | An agent's page | the builder asks for a change — *make it ask before sending* | the Assistant proposes what would move, shown against what is saved, and applies nothing until the builder does; a change to what it may touch is proposed as a policy change for an Admin to save |
 | AG-26.5 | A proposal that would widen what the agent may touch or its limits | it is shown | the widening is marked as an Admin's act, never applied with the rest |
 | AG-26.6 | A draft | the builder asks the Assistant to run its evals | it asks first, then runs the agent's eval set in the practice graph database and reports the checks; it never publishes |
 | AG-26.7 | Any signed-in person | they ask why a skill is refused, why a run was refused or what a limit does | the Assistant explains, citing the settings, the rule and policy, and the refusal it read |
@@ -64,7 +64,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The Assistant's draft in New agent | Admin | agents.agents · New | — | — | agents.agents · New · Proposal | agents.agents · New · Could not draft | agents.agents · New · Drafting | — |
 | The Assistant's draft in New agent | Operator | — | — | — | — | — | — | agents.agents · New agent disabled |
-| A proposed change on the sheet | Admin | — | — | — | agents.agents · Detail · Proposal | agents.agents · Detail · Could not draft | agents.agents · Detail · Drafting | — |
-| A proposed change on the sheet | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |
+| A proposed change on the page | Admin | — | — | — | agents.agents · Detail · Proposal | agents.agents · Detail · Could not draft | agents.agents · Detail · Drafting | — |
+| A proposed change on the page | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |
 | An explanation | Admin | — | — | — | agents.agents · Detail · Explained | agents.agents · Detail · Could not load | agents.agents · Detail · Drafting | — |
 | An explanation | Operator | — | — | — | agents.agents · Detail · Explained | agents.agents · Detail · Could not load | agents.agents · Detail · Drafting | — |

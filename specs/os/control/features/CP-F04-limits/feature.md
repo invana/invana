@@ -26,7 +26,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Limits]) --> lim["CP-11 · Limits for the deployment, each team, user and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
+  s([Workers › Limits]) --> lim["CP-11 · Limits for the deployment, each team, user and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
   lim -->|not an Admin| ro(["Reads · Edit disabled, naming the Admins"])
   s --> use["CP-34 · What each team, user and agent spends against its limits"]
   use -->|at a limit| al(["An ops alert (CP-59)"])

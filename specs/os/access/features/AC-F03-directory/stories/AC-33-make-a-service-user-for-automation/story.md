@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  u([People and access › Users › Service users]) --> who{"Admin?"}
+  u([Access › Who › Service users]) --> who{"Admin?"}
   who -->|no| ro(["Reads · New service user disabled, naming the Admins"])
   who -->|yes| n["New service user: username · name · description · role — Operator to start · owners"]
   n -->|username taken or breaks the rules| r1["Refused in place, naming why"]

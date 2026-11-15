@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Access › Leaving and keeping]) --> l["Each store: period · set by · last pruned · held"]
+  s([Access › Keeping]) --> l["Each store: period · set by · last pruned · held"]
   l -->|not an Admin| ro(["Reads · acts disabled, naming the Admins"])
   l -->|Set| p{"Keep · or a number of days"}
   p -->|under a day| r1["Refused · keep at least a day"]
@@ -56,7 +56,7 @@ flowchart TD
 | AC-44.9 | A hold | an Admin lifts it and signs in again | the store's prunes resume and every erasure waiting on it runs, oldest first; History records who lifted it and when |
 | AC-44.10 | An Operator or a Modeller | they open *Leaving and keeping* | each store, hold and setting reads; *Set*, *Place a hold* and *Lift* are disabled, naming the Admin role and the Admins; the API refuses the write |
 | AC-44.11 | A retention or hold change made with a key | it is sent | it is refused — it needs a person's session |
-| AC-44.12 | The settings could not load or save | the sheet opens or a change is sent | it reads what failed, with *Try again*; nothing changes |
+| AC-44.12 | The settings could not load or save | the section opens or a change is sent | it reads what failed, with *Try again*; nothing changes |
 
 ## Screens
 

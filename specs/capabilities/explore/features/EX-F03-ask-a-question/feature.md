@@ -162,7 +162,7 @@ runs through may read.
 | Run — its steps, the plan's compiled step per graph database, a question asked back and the answer to it | Write · read ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | The published model, its descriptions, identity link rules and sensitive properties | Read |
 | Records — the option rows of a question asked back, the counts behind a list | Read, under the agent's Access Policies |
-| Lists — Runs · Agents · Inbox › Needs you · Settings › Access › History — and their filters | Read |
+| Lists — Runs · Agents · Inbox › Needs you · Access › Record › History — and their filters | Read |
 | Ledger rows — every call to an AI model and a graph database | Write, by the engine ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
 
 ## Engine

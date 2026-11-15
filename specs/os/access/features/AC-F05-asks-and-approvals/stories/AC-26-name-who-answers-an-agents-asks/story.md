@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 ```mermaid
 flowchart TD
-  a([An agent's sheet › Approvers]) --> n{"Any named?"}
+  a([An agent's page › Approvers]) --> n{"Any named?"}
   n -->|none| adm["The Admins answer · a no approver alert on each ask"]
   n -->|some| l["The people and teams named"]
   adm --> ch["Change approvers · pick people or teams"]

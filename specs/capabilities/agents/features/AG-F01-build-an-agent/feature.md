@@ -31,7 +31,7 @@ flowchart TD
   new -->|the assistant drafts from the plain words| as["AG-26 · A proposal: instructions, skills, voice, effort — Apply or Discard"]
   as --> new
   new -->|name already used| nx["Refused, naming the agent that has it"]
-  new -->|Create agent| draft["AG-21 · A draft, as a sheet: Setup · Flow · Versions — the platform's, made by its maker"]
+  new -->|Create agent| draft["AG-21 · A draft, as a page: Setup · Flow · Versions — the platform's, made by its maker"]
   start -->|an Operator| no["Reads; acts disabled — needs the Modeller role, ask an Admin"]
   start -->|a built-in agent| bi["Reads Built in, owned by System — Copy instead of Edit"]
   bi -->|Copy| draft
@@ -118,10 +118,10 @@ A shared agent is the platform's and a personal agent is its person's; making or
 
 | State | What the person sees |
 |---|---|
-| First use | Agents with only the built-in agents, each *Built in*, owned by *System*; *New agent* and a line on what an agent is. A new agent's sheet with no skill reads that it answers with the built-in plans alone; one with no Access Policy reads *May touch nothing yet* |
+| First use | Agents with only the built-in agents, each *Built in*, owned by *System*; *New agent* and a line on what an agent is. A new agent's page with no skill reads that it answers with the built-in plans alone; one with no Access Policy reads *May touch nothing yet* |
 | Empty after a filter | *No agents match* — the filters (kind · status · made by · helpers shown) named, with *Clear filters* |
-| Loading | The sheet's head and tabs drawn at once; the body loads in place |
-| Has data | An agent as a sheet: its head with its owner — *Platform*, *System* or the person of a personal agent — who made it, and its state, then Setup (instructions, voice, skills, runs with, model version and effort, access, limits, where it runs, lifecycle) · Flow · Versions; a live agent's tokens this month against its limit, and its recent runs with the runtime and the model each reported |
+| Loading | The page's head and tabs drawn at once; the body loads in place |
+| Has data | An agent as a page: its head with its owner — *Platform*, *System* or the person of a personal agent — who made it, and its state, then Setup (instructions, voice, skills, runs with, model version and effort, access, limits, where it runs, lifecycle) · Flow · Versions; a live agent's tokens this month against its limit, and its recent runs with the runtime and the model each reported |
 | Failed | The tab names what it could not read, in the engine's words; a refused save names the field and why |
 | Agent working or proposing | The Assistant drafting the agent, then its proposal beside the form; an eval run in the practice graph database with its checks filling in |
 | No access | Every tab reads; each act is disabled, naming the Modeller role; a built-in agent offers *Copy* |
@@ -134,7 +134,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | What it may touch is its Access Policies | Every Read · Write · Run comes from a rule on an Access Policy an Admin attaches to it ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)); the agent holds no rule, list of functions or mode of its own. Default deny: an agent with no policy attached may touch nothing |
 | Checked before it runs | A step whose function, workflow or data no rule allows is refused before anything is dispatched — nothing is spent ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
 | What binds a run | The agent's Access Policies ∩ every caller's on a delegated run; its limits ∩ the deployment's, and for a personal run the person's and their teams' ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#rules)). A refusal names the bound and whose it was |
-| Limits live in one place | Tokens a run and a month, runs at once, helpers and depth are the agent's limits in [CP-F04](../../../../os/control/features/CP-F04-limits/feature.md), set by an Admin; the sheet reads them. Effort — steps, replans, questions — is the agent's own |
+| Limits live in one place | Tokens a run and a month, runs at once, helpers and depth are the agent's limits in [CP-F04](../../../../os/control/features/CP-F04-limits/feature.md), set by an Admin; the page reads them. Effort — steps, replans, questions — is the agent's own |
 | Tighten, never loosen | An agent may propose a tighter Access Policy or a lower limit; widening either is a person's act ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) |
 | The platform owns the work | A built-in or shared agent is owned by the platform and keeps who made it; what an agent makes in a run is the platform's, made by the person behind the run through the agent ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)). Making an agent grants nothing over it |
 | A personal agent is its person's | It is granted to them alone, runs only in the runs they start, and its person edits it; only a Modeller or an Admin makes one. Sharing it makes it the platform's, made by them, and an Admin grants it to others ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)) |
@@ -161,7 +161,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | Pausing kills nothing | Runs in flight finish; open work is named item by item before the act |
 | One default | The deployment has one default agent, which can answer questions; an Admin sets it ([AG-F02](../AG-F02-the-agents-catalogue/feature.md#rules)) |
 | No AI model offered | *New agent* says no model version is offered yet, linking Settings › Connections › AI models |
-| The engine counts | Tokens this month, served, p95 and every number on the sheet are the engine's; Studio formats them |
+| The engine counts | Tokens this month, served, p95 and every number on the page are the engine's; Studio formats them |
 | Leans on | Skills (AG-F04) · evals (AG-F10) · runs and their sessions (CP-F10) · helpers, delegation and hand-off notes (AG-F05) · the catalogue and the default (AG-F02) · Access Policies (AC-F02) · grants (AC-F03) · what an agent may touch (AC-F04) · named approvers (AC-F05) · ownership (AC-F07) · what left the platform (AC-F09) · AI models (CP-F01) · runtime plugins (CP-F02) · workers, the sandbox and workspaces (CP-F03) · limits (CP-F04) · the practice graph database (CP-F05) |
 
 ## Data touched
@@ -294,7 +294,7 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | A copy | `POST /copies` copies a built-in agent's current version — instructions, voice, effort, model pin and its skills' bindings — into a new `custom` draft named by the copier, `copied_from_id` set, owned `via = copied`, with no Access Policy attached and no grant |
 | A run records the agent | `agent_id` · `agent_version` · `model_version` and every key of `effective_effort` it opened with ride the run and its trace (CP-F10); each session writes its `runtime`, `runtime_version` and `model_set`, and `model_reported` when it ends ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)); the limits that bound it are CP-F04's |
 | Installed | `runtime_state.installed` is true for `invana` always; for `claude_code` or `codex` when its runtime plugin is on ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#engine)) and at least one worker group's `runtimes[]` carries it ([CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#engine)); `why_not` names which is missing. Read on every open, never stored on the agent |
-| Choosing a runtime | `PATCH /agents/{name}` with `runtime` checks *Installed* first and refuses `409` naming the Admins; the value is part of the draft and publishes with the next version, through the eval gate (AG-F10). A runtime that stops being installed later leaves the agent's value as it is: the sheet marks it *not installed*, and a run that opens waits for a worker group that carries it, then fails ([CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#mechanisms)) |
+| Choosing a runtime | `PATCH /agents/{name}` with `runtime` checks *Installed* first and refuses `409` naming the Admins; the value is part of the draft and publishes with the next version, through the eval gate (AG-F10). A runtime that stops being installed later leaves the agent's value as it is: the page marks it *not installed*, and a run that opens waits for a worker group that carries it, then fails ([CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#mechanisms)) |
 | Where a run goes | A run on `invana` is walked by the plan interpreter, its steps on any worker group whose labels cover them; a run on `claude_code` or `codex` takes a worker of a group that carries the runtime, in the task's workspace, inside the sandbox ([CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#mechanisms)) |
 | The model told and reported | At session start the worker tells the runtime the run's `model_version`; at session end the runtime's report is written to `model_reported`. `differs` is true when the two are not the same version, computed by the engine; nothing is refused for it. A runtime that refuses the model it is told fails the session, naming both |
 | External by its runtime | A runtime plugin whose `model_runs = external` makes every call to the runtime a ledger row with `target_kind = runtime` and `locality = external`; every tool result, file and task text sent to it passes the outbound check first ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#mechanisms)) |
@@ -328,18 +328,18 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | Decision | Detail |
 |---|---|
 | New agent is a create modal of numbered sections | One page — **1** Name (optional) · **2** the type as a grouped card grid, one card per runtime — Invana's, Claude Code, Codex, as *Runs with* offers them · **3** its details once a type is picked — and one act ([design-language › Overlays](../../../../design-language.md#3-overlays--four-tiers)) |
-| New agent is a modal, the agent a sheet | *New agent* asks for a name and what it should do in plain words, and suggests which Access Policies to ask an Admin for; *Create agent* saves a draft and opens it as a sheet |
-| The sheet's tabs | Setup · Flow · Versions. Setup holds instructions, voice, skills, runs with, model version and effort, access, limits, where it runs and lifecycle |
+| New agent is a modal, the agent a page | *New agent* asks for a name and what it should do in plain words, and suggests which Access Policies to ask an Admin for; *Create agent* saves a draft and opens it as a page in Agents |
+| The page's tabs | Setup · Flow · Versions. Setup holds instructions, voice, skills, runs with, model version and effort, access, limits, where it runs and lifecycle |
 | Runs with is three choices | Invana · Claude Code · Codex, on Setup beside the model version; one is chosen, Invana by default. A runtime that is not installed reads disabled with why and the Admins to ask; each reads where its model runs |
 | The runtime is part of a version | Changing *Runs with* is a draft of the next version and publishes through the eval gate, like moving the pin; a run keeps the runtime it opened with across all its sessions |
 | Set and reported, side by side | Setup shows the model set; the agent's recent runs show, per session, the model reported beside it, marked *differs* when they are not the same. A difference is shown, never refused — Invana cannot check an outside runtime's model before it runs |
 | A helper runs as its parent | A helper made in a run takes its parent's runtime and model set |
 | Built-in agents run with Invana | A copy takes Invana; the copier may change it on the draft |
 | The head says its state and its owner | The name, *Draft* or *vN · live*, its owner — *Platform*, *System* on a built-in, or the person of a personal agent — with who made it, and its acts: *Run the evals* and *Publish* on a draft, *Copy* on a built-in |
-| Access is read on the sheet, changed in the Access Plane | Access lists the Access Policies attached, what the agent may touch (AC-13), who may use it (AC-F03) and its named approvers (AC-26); *Attach a policy* opens AC-11 for an Admin |
-| Limits are read on the sheet, set in the Control Plane | Limits reads the agent's rows of CP-F04 beside what binds a run, with *Edit in Usage and limits* for an Admin |
+| Access is read on the page, changed in the Access Plane | Access lists the Access Policies attached, what the agent may touch (AC-13), who may use it (AC-F03) and its named approvers (AC-26); *Attach a policy* opens AC-11 for an Admin |
+| Limits are read on the page, set in the Control Plane | Limits reads the agent's rows of CP-F04 beside what binds a run, with *Edit in Usage and limits* for an Admin |
 | Draft, evaluate, publish | Every change is a draft of the next version; *Run the evals* runs its eval set (AG-F10); *Publish version N* makes it live |
-| One draft across the sheet | Edits on every part of Setup are one draft and one Save; Save sends only what moved; adding a skill is its own act, so a refusal names the one skill |
+| One draft across the page | Edits on every part of Setup are one draft and one Save; Save sends only what moved; adding a skill is its own act, so a refusal names the one skill |
 | Flow is drawn from records | Triggers → the agent → its skills → the agents it may hand work to; its foot says it is drawn from the agent's instructions, skills and Access Policies and that a run may replan within them, never wider |
 | Reach is read, never stored | What it may touch, what each skill needs and what is missing are read on every open |
 | Callable over MCP | A trigger under where it runs; disabled for a draft; a caller still acts as the person behind it through the agents they may use ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
@@ -374,7 +374,7 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | Dials that take any value | That is the written voice with a worse editor |
 | A length dial | How long an answer runs is the answer's shape (EX-F04) |
 | Rules, modes or a function list on the agent | Every rule lives on an Access Policy attached to it ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#not-building)) |
-| Limits set on the agent's sheet | One place for limits ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) |
+| Limits set on the agent's page | One place for limits ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) |
 | Editing a built-in agent | What Invana ships stays as shipped; *Copy* makes one to change |
 | Cloning an agent with its history | Starting from a copy of its current version is the honest path |
 | Bounds argued at run time | A bound that can be argued with is not one |
@@ -393,6 +393,6 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | *Try it once* on New agent | An agent is tried by its evals in the practice graph database (AG-F10) |
 | An estimate of what a run will cost | The engine stores none, and Studio never derives a number |
 | A default way of reasoning on the agent | How to approach a question is picked for that one question (*Act as*, EX-F05); an agent carries none |
-| Mapping each resource to a worker group on *Where it runs* | Worker groups follow the kinds of work an agent's functions do and the runtime it runs with (CP-F03); the sheet reads them, it does not assign them |
+| Mapping each resource to a worker group on *Where it runs* | Worker groups follow the kinds of work an agent's functions do and the runtime it runs with (CP-F03); the page reads them, it does not assign them |
 | A capacity forecast | The engine stores no forecast, and Studio never derives a number |
 | Sections inside the voice (*How it speaks* · *Caution* · *When unsure*) | The voice is one block of words; caution and what to do when unsure are instructions and Access Policies |

@@ -31,7 +31,7 @@ flowchart TD
   s -->|to do| go["Its idea · why · how · the command · Open where it is made"]
   s -->|blocked| bl["Names the step that unblocks it"]
   s -->|without the role| ask["Ask an Admin · Ask a Modeller"]
-  go -->|done in Graph databases, Model, Records, AI models or a terminal| re["Set-up re-reads · the next step is chosen"]
+  go -->|done in Graph databases, Model, Graph Data, AI models or a terminal| re["Set-up re-reads · the next step is chosen"]
   re --> l
   l -->|four done| a(["The first answer · set-up steps aside · the first-run question in the composer"])
 ```
@@ -43,7 +43,7 @@ flowchart TD
 | CP-24.1 | A deployment with required steps outstanding | set-up opens | it lists the four required steps — a graph database is connected and on · a model is published · Graph Data holds records · an AI model answers — with progress as *2 of 4* |
 | CP-24.2 | A step whose fact exists | set-up reads | it is checked, whoever made the fact and from wherever — Studio, the command line or another person |
 | CP-24.3 | A step to do | the person selects it | it shows its idea, why it matters, what it opens, two or three moves, the command filled in, and how to tell it worked |
-| CP-24.4 | A step to do | the person opens it | the place that makes its fact opens — Graph databases, Model, Records or AI models; set-up has no form of its own |
+| CP-24.4 | A step to do | the person opens it | the place that makes its fact opens — Graph databases, Model, Graph Data or AI models; set-up has no form of its own |
 | CP-24.5 | Bringing records in with no published model | set-up reads | the records step is blocked and names *Publish a model* |
 | CP-24.6 | A surface a step shuts | the person opens it | it says which step opens it — *Ask opens when an AI model answers* — with the act that does it |
 | CP-24.7 | Offers | set-up reads | they are listed after the required steps with no status, and never counted in progress |

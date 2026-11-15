@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([A skill's or an agent's sheet › Evals]) --> may{"A Modeller or an Admin?"}
+  start([A skill's or an agent's page › Evals]) --> may{"A Modeller or an Admin?"}
   may -->|no| ro["Cases, results and alerts read; acts disabled, naming the role"]
   may -->|yes| set{"AG-56 · Has cases?"}
   set -->|no| pr["AG-56 · Write a case · Propose from the instructions"]
@@ -239,13 +239,13 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 
 | Decision | Detail |
 |---|---|
-| Evals is a tab on both sheets | A skill's sheet and an agent's sheet each carry Evals and Tests; the same tiles, cases and gate on both |
+| Evals is a tab on both pages | A skill's page and an agent's page each carry Evals and Tests; the same tiles, cases and gate on both |
 | Studio draws the gate's answer | A refused publish, roll back or model move is drawn where the act was, with *Run the evals* when the gate asks for a run; Studio never predicts it |
 | A judged score is labelled and kept apart | Its score warns and never blocks, and is never added to a count of hard checks |
 | The gate's thresholds | A failed hard check blocks; tokens or time more than 20% over live, or a judged score 0.5 below it, warns with the numbers |
 | An edit cannot ship a regression | A case prefers a check the engine runs on the answer's query over a judged score; an answer that claims what it cites no record for fails its case (*cites records*) |
 | A sensitive ask is promoted by a person who read it | Promoting is a person's act on a run they may read |
-| The eval token budget sits with the limits | It reads on Settings › Operations › Limits beside the limits per team, user and agent, apart from them |
+| The eval token budget sits with the limits | It reads on Workers › Limits beside the limits per team, user and agent, apart from them |
 | No practice graph database is not a refusal | The evals read the real graph database in its read mode, so a publish is never blocked on an Admin naming one; the run says which it read |
 
 ## Open questions

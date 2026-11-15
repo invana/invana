@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Workers › Where work is]) --> f["Started → let in → running → waiting · counts for each"]
+  s([Workers › Queue]) --> f["Started → let in → running → waiting · counts for each"]
   f --> w["Waiting: on a person · on an ask · on a limit · on an AI model · on workers"]
   w --> one["A waiting run: why · for how long · what is ahead"]
   one --> run(["Opens the run (CP-F10)"])

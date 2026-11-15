@@ -15,7 +15,7 @@ boards: [settings.policies, inbox, agents.runs]
 
 ```mermaid
 flowchart TD
-  A([Settings › Access › Policies]) --> R["AC-03 · Read every Access Policy and the agents it is attached to"]
+  A([Access › What they may do › Access Policies]) --> R["AC-03 · Read every Access Policy and the agents it is attached to"]
   R --> B["AC-04 · Write a rule: Allow · Ask · Deny × Read · Write · Run × type/name, for a team or everyone"]
   B -->|a built-in policy| BX["Copied to change, never edited"] --> B
   B --> C["AC-06 · Who it changes — agents that gain, agents that lose, skills and workflows that break"]

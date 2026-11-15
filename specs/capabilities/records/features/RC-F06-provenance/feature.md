@@ -72,7 +72,7 @@ flowchart TD
 |---|---|
 | First use | A record Invana never wrote or changed: *Present in the graph database before Invana wrote to it* · *No changes made in Invana* |
 | Empty after a filter | — |
-| Loading | Provenance and history load with the record's sheet |
+| Loading | Provenance and history load with the record's page |
 | Has data | Each value with what wrote it and when; changes newest first: when · who · run · before → after · why |
 | Failed | *Could not load provenance* or *Could not load history*, and *Try again* |
 | Agent working or proposing | — |

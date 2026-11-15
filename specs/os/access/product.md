@@ -63,16 +63,16 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Sign in — a password, or the company's SSO, then a second factor | page | `access.signin` |
 | Sign in again — the password or the SSO for a risky act | modal | `access.signin · Sign in again` |
 | Connect an MCP client — consent | page | `access.consent` |
-| Access Policies | sheet | `settings.policies` |
-| Roles — what each role may do | sheet | `settings.roles` |
-| Directory — users, service users, teams, the agents granted to each, every key and connected client | sheet | `settings.people` |
+| Access Policies | modal | `settings.policies` |
+| Roles — what each role may do | modal | `settings.roles` |
+| Directory — users, service users, teams, the agents granted to each, every key and connected client | modal | `settings.people` |
 | Owners of what a person owns | modal | `settings.me · Owners` |
 | You — profile, default agent, sessions, keys, connected clients | modal | `settings.me` |
 | An ask in Needs you | modal | `inbox` |
-| Access usage — what each agent touched, access never used, the quarterly access review | sheet | `access.usage` |
-| What left the platform — the ledger | sheet | `access.ledger` |
+| Access usage — what each agent touched, access never used, the quarterly access review | modal | `access.usage` |
+| What left the platform — the ledger | modal | `access.ledger` |
 | History | modal | `settings.history` |
-| Leaving and keeping — retention per store, legal holds, a departed person's name, subjects forgotten | sheet | `settings.keeping` |
+| Leaving and keeping — retention per store, legal holds, a departed person's name, subjects forgotten | modal | `settings.keeping` |
 | Forget a subject | modal | `settings.keeping · Forget` |
 | Export everything held about a person | modal | `settings.people · Export their data` |
 | No access | every surface | The Operator lens of each board, `<board> · Locked` — the act names the check that refused it: the role it needs, the rule and its policy, or the approver who decides |

@@ -37,7 +37,7 @@ flowchart LR
   ld -->|block · breaks it| b["Refused record by record — names the standard and the term"]
   ld -->|warn| w["Written, saying it breaks the standard"]
   ld -->|report or holds| r(["Written · scored"])
-  c -->|problems| q(["Fixed in Records — RC-12"])
+  c -->|problems| q(["Fixed in Graph Data — RC-12"])
   pub -->|a newer standard version| pin["Stays on its version — v2 is newer"]
   a -->|not a Modeller or an Admin| na["Reads · Needs the Modeller role — ask an Admin"]
 ```

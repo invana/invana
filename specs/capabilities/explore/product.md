@@ -55,7 +55,7 @@ they cannot defend. Without a board to keep it on, every answer is lost the mome
 | A dashboard | mode | `explore.dashboards · Detail` |
 | Why? | peek | `explore.board · Why` |
 | Share | modal | `explore.board · Share` |
-| Compare | sheet | `agents.runs · Detail · Compare` |
+| Compare | modal | `agents.runs · Detail · Compare` |
 
 ## Decisions
 

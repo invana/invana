@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Settings › Invana]) --> g["General: the deployment's name · its version"]
+  s([Settings › General]) --> g["General: the deployment's name · its version"]
   g -->|Rename| r{Admin?}
   r -->|no| na["Ask {Admin}"]
   r -->|yes| sv(["Saved · History records it"])
@@ -42,10 +42,10 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-71.1 | A deployment | a person opens Settings › Invana › General | the deployment's name and the version it runs read on preference rows |
+| CP-71.1 | A deployment | a person opens Settings › General | the deployment's name and the version it runs read on preference rows |
 | CP-71.2 | An Admin | they rename the deployment | the new name is saved, reads in General and on the sign-in page, and the change is a row in History |
 | CP-71.3 | An Operator | they open General | the name and version read; *Rename* reads *Ask {Admin}*, and the engine refuses a rename the same way |
-| CP-71.4 | Any person | they pick Light, Dark or *As the deployment* in Settings › Invana › Appearance or the avatar menu | Studio and every canvas redraw in that theme on the next frame, and the choice follows the person to another device |
+| CP-71.4 | Any person | they pick Light, Dark or *As the deployment* in Settings › Appearance or the avatar menu | Studio and every canvas redraw in that theme on the next frame, and the choice follows the person to another device |
 | CP-71.5 | An Admin | they set the deployment's default theme | every person on *As the deployment* takes it on their next load |
 | CP-71.6 | An Operator | they open Appearance | they pick their own theme; the deployment's default reads *Ask {Admin}* |
 | CP-71.7 | A theme choice the engine could not save | it fails | the row says it could not save and why; the theme stays as it was |

@@ -28,7 +28,7 @@ Roles are [the role table](../../../AC-F02-access-policies/feature.md#the-role-t
 
 ```mermaid
 flowchart TD
-  s([People and access › What left]) -->|nothing yet| e["No calls yet"]
+  s([Access › Record › What left]) -->|nothing yet| e["No calls yet"]
   s --> h["Head: data-bearing calls to external targets in the window · refused · left out"]
   s --> r["Calls, today: when · agent · person behind · target · local or external · class · records · tokens"]
   r -->|Data-bearing to external targets · Refused · Left out · target · agent · person · window| f{"Matches?"}

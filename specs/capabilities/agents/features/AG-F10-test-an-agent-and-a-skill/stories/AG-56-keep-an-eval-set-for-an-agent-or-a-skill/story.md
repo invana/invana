@@ -47,7 +47,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-56.1 | An agent's or a skill's sheet | Evals opens | the set's cases read, each a question with its checks and *passing* or *failing*; a judged rubric names the model version that judges it |
+| AG-56.1 | An agent's or a skill's page | Evals opens | the set's cases read, each a question with its checks and *passing* or *failing*; a judged rubric names the model version that judges it |
 | AG-56.2 | No case | Evals opens | it reads *No eval set — nothing checked*, with *Write a case* and *Propose from the instructions* |
 | AG-56.3 | A Modeller or an Admin writing a case | they add checks | each check is hard and counted — cites records · says *cannot answer* when it should · a rule held · expected records present · tokens under N · time under N |
 | AG-56.4 | A set | a Modeller or an Admin sets a judge model version and a rubric | the judge is offered only from the versions Settings › Connections › AI models offers, each marked *Local* or *External* |

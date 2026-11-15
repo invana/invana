@@ -66,7 +66,7 @@ flowchart TD
 | AG-29.16 | A live agent | a Modeller or an Admin presses *Retire* | the same list names a task in review as blocked and each schedule that starts it as paused; *Why* is asked and kept in Versions; once retired it never takes work, its row stays so every run, trace and helper resolves, and its name stays taken |
 | AG-29.17 | The deployment's default agent | a Modeller or an Admin retires it | it is refused until an Admin makes another agent the default |
 | AG-29.18 | A helper an agent created | the work it was made for closes | it retires itself |
-| AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its sheet is disabled |
+| AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its page is disabled |
 | AG-29.20 | An ask to a paused or retired agent | it is sent | it is refused, naming the state, and *How it got here* shows the refused step and why |
 | AG-29.21 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume* and *Retire* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
 | AG-29.22 | A paused agent with a run already queued | the run's turn comes | it starts and finishes; only work that arrives after the pause is refused |

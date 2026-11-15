@@ -38,7 +38,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-51.1 | A run of more than 50 agents | its sheet opens | the parts are the same as any run's; its numbers read agents · live · queued · finishing a minute · tokens · time left |
+| CP-51.1 | A run of more than 50 agents | its page opens | the parts are the same as any run's; its numbers read agents · live · queued · finishing a minute · tokens · time left |
 | CP-51.2 | A big run | its numbers read | *Agents finished a minute*, *Agents live* against the deployment's runs-at-once limit, and *By role* — each role with its count, p50 and p95 |
 | CP-51.3 | A big run | the person picks *By role* in who did what | one card per role with a status bar, and one cell per agent; a cell opens that agent's run |
 | CP-51.4 | A run of 50 agents or fewer | who did what opens | it draws the tree alone; *By role* is not offered |
@@ -46,8 +46,8 @@ flowchart LR
 | CP-51.6 | No agent finished in the last ten minutes | the numbers read | time left is absent, never a guess |
 | CP-51.7 | A role whose agents recorded no tokens | *By role* reads | its p50 and p95 read `—` |
 | CP-51.8 | Agents waiting for workers | the numbers read | they say the run waits on workers, naming which |
-| CP-51.9 | A big run still going | its sheet is open | the numbers refresh every few seconds |
-| CP-51.10 | A big run whose content the reader may not read | its sheet opens | that it ran, its agent, the person behind it, its status and its tokens read; who did what and *By role* read *withheld* |
+| CP-51.9 | A big run still going | its page is open | the numbers refresh every few seconds |
+| CP-51.10 | A big run whose content the reader may not read | its page opens | that it ran, its agent, the person behind it, its status and its tokens read; who did what and *By role* read *withheld* |
 | CP-51.11 | A big run still going | the reader is not behind it and not an Admin | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 
 ## Screens

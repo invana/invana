@@ -56,7 +56,7 @@ flowchart TD
 | AC-06.11 | A draft attached to agents before it is saved | *Who it changes* is read | it is drawn against those agents; the attachment takes effect when it is saved |
 | AC-06.12 | A saved change | History is read | it shows who saved it, when and why (AC-F06) |
 | AC-06.13 | A draft from the assistant | the Admin opens *How it got here* | it shows the sentence, the rules the assistant proposed, and the checks they passed |
-| AC-06.14 | An Operator | they open a draft or the sheet | the draft reads; *Draft with the assistant* and *Save* are disabled, naming the Admin role and the Admins |
+| AC-06.14 | An Operator | they open a draft or the section | the draft reads; *Draft with the assistant* and *Save* are disabled, naming the Admin role and the Admins |
 
 ## Screens
 

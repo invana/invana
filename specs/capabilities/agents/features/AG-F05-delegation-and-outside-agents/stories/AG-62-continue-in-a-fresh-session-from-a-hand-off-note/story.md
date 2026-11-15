@@ -42,7 +42,7 @@ flowchart TD
   s2 -->|stopped before it starts| stop(["Stopped · the note kept · no session 2"])
   s2 --> b
   s2 -->|tokens a run, time or steps reached| lim(["Ends for that limit"])
-  n([A note on the run's sheet]) --> may{"The reader's agent may read every source?"}
+  n([A note on the run's page]) --> may{"The reader's agent may read every source?"}
   may -->|no| wh(["Head only · body withheld, naming the first source"])
   may -->|yes| rd["Done · next · read"]
   rd -->|Fork| fk{"Behind the run, or an Admin?"}
@@ -54,7 +54,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-62.1 | A run in its first session | its tokens reach the session budget ([CP-F04](../../../../../../os/control/features/CP-F04-limits/feature.md)) | the session writes a hand-off note and the run goes on in *Session 2* — the same run, the same number, never an ask; the run's sheet reads *Continued in session 2* |
+| AG-62.1 | A run in its first session | its tokens reach the session budget ([CP-F04](../../../../../../os/control/features/CP-F04-limits/feature.md)) | the session writes a hand-off note and the run goes on in *Session 2* — the same run, the same number, never an ask; the run's page reads *Continued in session 2* |
 | AG-62.2 | A hand-off note | the person behind the run opens it | it reads three parts — what is done, what is next, what it read — with each source named, the session it ends and the one it starts, when it was written, its tokens and whether the runtime or Invana wrote it |
 | AG-62.3 | A fresh session | it starts | it starts from the note and the run's task, never the earlier session's transcript, in the same workspace, on the same runtime and agent version, behind the same person |
 | AG-62.4 | A run that continued | it ends | its exit reason is its last session's — *Continued* is never an exit reason; its tokens are every session's together, and reaching its tokens a run, time or steps ends it for that limit, whatever session it is in |

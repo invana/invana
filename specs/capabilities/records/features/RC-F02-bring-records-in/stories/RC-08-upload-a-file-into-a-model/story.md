@@ -27,7 +27,7 @@ Loading records is the Modeller's and the Admin's ([the role table](../../../../
 
 ```mermaid
 flowchart LR
-  a([Records › Loads › Bring records in · Upload]) --> g{Modeller or Admin?}
+  a([Model › Graph Data › Loads › Bring records in · Upload]) --> g{Modeller or Admin?}
   g -->|no| na["Upload disabled — Needs the Modeller role"]
   g -->|yes| f["Drop a file"]
   f --> m["Pick the model · the key column · the licence"]
@@ -41,7 +41,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| RC-08.1 | Records › Loads › Bring records in with no file | it opens | a drop zone says what a file needs — a header row, a key column and a licence — and which published models it can load into |
+| RC-08.1 | Model › Graph Data › Loads › Bring records in with no file | it opens | a drop zone says what a file needs — a header row, a key column and a licence — and which published models it can load into |
 | RC-08.2 | A file dropped | the browser reads it | it shows the file's rows and columns and *What it becomes*: each column, the kind and property it maps to, an example value, before anything is written |
 | RC-08.3 | A file and a model | the person sets up the load | they pick the model, the key column and the licence; *Load* waits until all are set |
 | RC-08.4 | Rows without a key, or two rows with one key | the person loads | the load is refused, naming the first five rows; nothing is written |

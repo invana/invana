@@ -58,7 +58,7 @@ flowchart LR
 | PJ-06.5 | An agent | it adds a finding | the finding reads *Added by* the agent, *Unreviewed*, shows no reviewer, and links to the steps it came from in the thinking graph ([AG-F09](../../../../../agents/features/AG-F09-learn-from-memory/feature.md)) |
 | PJ-06.6 | An agent's finding | a person who may read its run opens *How it got here* | it shows the run's steps and sources behind the statement, each marked *Challenge this* |
 | PJ-06.7 | An unreviewed finding | a person presses *Review* | it reads reviewed by that person, and a rule requiring person-reviewed evidence now accepts it |
-| PJ-06.8 | A finding cites a load since undone in Records | someone opens it | it is marked *a load undone*, with who undid it and why, and the finding stays |
+| PJ-06.8 | A finding cites a load since undone in Graph Data | someone opens it | it is marked *a load undone*, with who undid it and why, and the finding stays |
 | PJ-06.9 | A finding | newer evidence arrives | the finding is not edited or deleted — no screen offers it and a call to change it is refused: a newer finding is added beside it and both stay |
 | PJ-06.10 | A finding added from an Explore answer | it opens here | it shows the answer's records, queries and the loads they came from ([EX-12](../../../../../explore/features/EX-F02-share-and-present-an-answer/stories/EX-12-add-an-answer-to-a-project/story.md)) |
 | PJ-06.11 | A finding citing a record of a kind the reader's agents may not read | they open it | that cite reads *Withheld*; the statement, the stance and every other cite read |

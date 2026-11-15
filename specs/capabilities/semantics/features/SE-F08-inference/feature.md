@@ -28,7 +28,7 @@ flowchart TD
   d -->|Preview| pv["What it would derive now, counted by the engine"]
   pv -->|Save rule| q["Queued — a run on a worker"]
   q -->|failed| ff["The run failed — its reason · Run again"]
-  q --> r(["Derived facts kept in Records, labelled derived"])
+  q --> r(["Derived facts kept in Graph Data, labelled derived"])
   r --> h["How it got here: the rule version and each premise"]
   r --> lv["Each derived property takes the highest level of its premises"]
   r -->|write-back on| wb(["Also written to the graph database, marked derived"])

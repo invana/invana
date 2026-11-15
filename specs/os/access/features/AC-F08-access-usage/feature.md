@@ -23,7 +23,7 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › Access › Usage]) --> list["AC-28 · Every agent: reads · writes · runs · people behind · in a window"]
+  start([Access › Record › Usage]) --> list["AC-28 · Every agent: reads · writes · runs · people behind · in a window"]
   list -->|nothing has run| none["No usage yet — a run writes the first call"]
   list -->|a filter matches nothing| nm["Nothing matches · Clear filters"]
   list --> one["AC-28 · One agent: each resource used, how often, for whom, the last run"]
@@ -57,7 +57,7 @@ flowchart TD
 |---|---|
 | First use | *No usage yet — a run writes the first call* |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; counts read `—` until the engine gives them |
+| Loading | The section opens at once; counts read `—` until the engine gives them |
 | Has data | Each agent with its reads, writes and runs in the window and the people behind them; one agent's resources, each with its count and last use; access never used |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | Runs still going count as they settle; a running run reads *running* beside its count |
@@ -150,7 +150,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| A tab beside Access Policies | *Usage* is a tab of *Settings › Access*; an agent opens beside the list |
+| Usage sits in Access › Record | *Usage* sits beside *History* and *What left* in *Access › Record*; an agent opens beside the list |
 | 90 days by default for unused | A shorter window flags access used monthly or quarterly as unused |
 
 ## Open questions

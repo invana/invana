@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F08](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([People and access › Usage]) -->|nothing has run| e["No usage yet"]
+  s([Access › Record › Usage]) -->|nothing has run| e["No usage yet"]
   s --> l["Every agent: reads · writes · runs · people behind · last used — in a window"]
   l -->|window · person · team · kind| f{"Matches?"}
   f -->|no| nm["Nothing matches · Clear filters"]

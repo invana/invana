@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  p([People and access › Teams]) --> t{"Any teams?"}
+  p([Access › Who › Teams]) --> t{"Any teams?"}
   t -->|none| e["No teams yet — grant a whole team its agents at once · New team"]
   t -->|some| l["Each team: people · agents granted"]
   e --> n["New team: name · what it is for"]

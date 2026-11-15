@@ -43,7 +43,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-36.1 | A draft | its sheet opens | the head reads *Draft* with *Run the evals* and *Publish version N*; Lifecycle reads the live version and since when, and this draft with how many changes it holds |
+| AG-36.1 | A draft | its page opens | the head reads *Draft* with *Run the evals* and *Publish version N*; Lifecycle reads the live version and since when, and this draft with how many changes it holds |
 | AG-36.4 | A draft whose eval run failed a hard check | the builder presses *Publish* | publishing is refused, naming the failing case and its check (AG-F10) |
 | AG-36.5 | A draft whose eval run warned | the builder publishes | they are asked for a reason, kept with the version |
 | AG-36.6 | A draft with no eval case | the builder publishes | it publishes, and the version says nothing was checked |

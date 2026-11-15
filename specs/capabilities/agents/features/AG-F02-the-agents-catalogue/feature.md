@@ -171,9 +171,9 @@ The code changes are [migrations.md](../../../../migrations.md) M37 (Team pack a
 
 | Decision | Detail |
 |---|---|
-| Agents is a sheet | The Agents summoner opens a sheet whose nav is Agents · Runs · Schedules; an agent opens as a detail page in it — its header, one act, tabs and a metadata column |
-| Agents is the catalogue | One list of every agent, each row its name, what it does, kind, live version, who made it, who may use it and *Granted to you* or *Not granted to you*; the row opens the agent's sheet (AG-F01) |
-| Who may use it is shown, changed in the Directory | The row and the sheet read the people and teams it is granted to; an Admin's *Grant* opens the Directory on that agent |
+| Agents is a section of the large modal | The Agents summoner opens the large modal at Agents, its nav All agents · Runs · Schedules; an agent opens as a detail page in it — its header, one act, tabs and a metadata column |
+| Agents is the catalogue | One list of every agent, each row its name, what it does, kind, live version, who made it, who may use it and *Granted to you* or *Not granted to you*; the row opens the agent's page (AG-F01) |
+| Who may use it is shown, changed in the Directory | The row and the agent's page read the people and teams it is granted to; an Admin's *Grant* opens the Directory on that agent |
 | A person sees why they may use it | *Granted to you* names *directly* or the team that gives it |
 | The default is marked, set in the Directory | *Your default* sits on the person's default agent; who has which default is set in the Directory, one place for what every screen reads through |
 | Team pack agents list beside the built-in ones | A team finds the agents its pack brought where it finds every other, marked with the pack |
@@ -192,7 +192,7 @@ The code changes are [migrations.md](../../../../migrations.md) M37 (Team pack a
 |---|---|
 | A copy of an agent per team or per person | One definition, one live version; teams differ by the agents granted to them |
 | A version pinned per team or person | A version reaches every run that opens after it publishes |
-| Granting an agent from its sheet | Grants are the Directory's, one place to read who may use what |
+| Granting an agent from its page | Grants are the Directory's, one place to read who may use what |
 | A role for an agent | It would let an agent do whatever that role may |
 | Removing a built-in agent | What the product needs stays; an Admin takes its grants away instead |
 | A deployment-wide default agent | Each person has their own default, set by an Admin ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)) |

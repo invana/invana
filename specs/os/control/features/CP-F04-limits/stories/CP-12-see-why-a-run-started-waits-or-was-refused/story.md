@@ -39,7 +39,7 @@ flowchart TD
   tok -->|yes| cap{"A free slot in its capacity?"}
   cap -->|no| pw["Waiting · names the capacity"]
   cap -->|yes| in(["Admitted"])
-  s([Settings › Operations › Workers › Starts]) --> list["Each start: admitted · waiting · refused · the limit and whose"]
+  s([Workers › Queue › Starts]) --> list["Each start: admitted · waiting · refused · the limit and whose"]
 ```
 
 ## Acceptance criteria

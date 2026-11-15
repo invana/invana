@@ -28,7 +28,7 @@ Fixing one record changes data, never the model or its standards, so every role 
 
 ```mermaid
 flowchart LR
-  a([Records › Quality · To decide]) --> q{Any problem?}
+  a([Model › Graph Data › Quality · To decide]) --> q{Any problem?}
   q -->|no| e["Nothing to decide"]
   q -->|yes| l["Each: kind · standard@v or constraint · property · problem · score"]
   l -->|narrow to one kind| n["That kind's problems · its total"]

@@ -25,7 +25,7 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › Access › What left]) -->|nothing called yet| none["No calls yet"]
+  start([Access › Record › What left]) -->|nothing called yet| none["No calls yet"]
   start --> list["AC-30 · Every call: when · agent · person behind · target · local or external · schema-only or data-bearing · records · tokens"]
   list -->|Data-bearing to external targets · Refused · Left out · a target · an agent · a window| f{"Matches?"}
   f -->|no| nm["Nothing matches · Clear filters"]
@@ -94,7 +94,7 @@ sequenceDiagram
 |---|---|
 | First use | *No calls yet — the first question writes the first row* |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters*; *Export* disabled |
-| Loading | The sheet opens at once; rows load in place; counts read `—` until the engine gives them |
+| Loading | The section opens at once; rows load in place; counts read `—` until the engine gives them |
 | Has data | Calls newest first, today unless a window is chosen; a head counting data-bearing calls to external targets, refused calls and calls with something left out in the window |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | Rows arrive as calls happen; a call whose result is still coming reads *waiting on the result*; a step stopped by the outbound check reads in its run, naming the property |
@@ -220,7 +220,7 @@ exports and report publishing each pass their exit through it.
 
 | Decision | Detail |
 |---|---|
-| A tab beside Usage | *What left* is a tab of *Settings › Access*; a call opens beside the list |
+| What left sits in Access › Record | *What left* sits beside *History* and *Usage* in *Access › Record*; a call opens beside the list |
 | The preset an auditor asks for first | *Data-bearing to external targets* is the first preset, with its count for the window; *Refused* and *Left out* follow |
 | Withheld, not hidden | A call of a run the reader may not read still lists, so nothing seems missing; only its content is withheld |
 | Run privacy lives here | The Access Plane owns who may read a run's content; every surface that shows content calls the one check |

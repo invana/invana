@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Workers]) --> g["Each group: runs on · labels · workers · busy · waiting · state"]
+  s([Workers › Groups]) --> g["Each group: runs on · labels · workers · busy · waiting · state"]
   g -->|no workers anywhere| nw["Steps run inside the engine · Add workers"]
   g --> grp["A group: every worker · state · running now · heartbeat"]
   grp -->|filter by state| f["No worker matches"]

@@ -64,7 +64,7 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Read workloads by user, agent and team | Settings › Operations › Workloads | CP-47 | `settings.workloads` |
+| 1 | Read workloads by user, agent and team | Agents › Runs › Workloads | CP-47 | `settings.workloads` |
 | 2 | Say which ops alerts reach whom, and on which channels | Control Plane · Inbox and notifications | CP-37 | `inbox` |
 | 3 | An ops alert fires — a task failed, blocked, needing input or stopped moving, a connection failed, a security event, or a platform kind — and reaches the people its kind names and the Admins | Control Plane · Ops alerting · Inbox | CP-59 · CP-67 · CP-36 | `control.alerts` · `inbox` |
 | 4 | See what is running and what just ran | Control Plane · Runs | CP-57 | `agents.runs` |

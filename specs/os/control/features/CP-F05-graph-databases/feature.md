@@ -140,7 +140,7 @@ names the acts.
 | Removing never touches the data | Removing a graph database removes Invana's records of it; the database's own data is untouched. It is refused while a rule, a match rule or a workflow names it |
 | Set-up is the deployment's | Four required steps — a graph database is connected and on · a model is published · Graph Data holds records · an AI model answers. Each is done because its fact exists, whoever made it and from wherever; only a skipped offer is stored |
 | Each step opens a gate | *Connected* — reading the graph databases · *Modelled* — loading data and links between models · *Grounded* — answers that cite a record · *Answering* — asking, the Assistant and every agent run. A surface waits on the one gate it needs and names the step that opens it |
-| Set-up owns no forms | Each step opens the place that makes its fact — Graph databases, Model, Records, AI models — with its command beside it |
+| Set-up owns no forms | Each step opens the place that makes its fact — Graph databases, Model, Graph Data, AI models — with its command beside it |
 | Agents read the schema, never records, to draft | The draft model comes from the kinds, properties and counts the database reports ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) |
 | How a connector reads and writes | One package per database, two languages, one shape of answer, declared unsupported acts, the database's own vector index and the join across graph databases are [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md)'s |
 | Leans on | How a connector reads and writes ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) · signing in again ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md)) · Access Policies on `data/…` ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md)) · History ([AC-F06](../../../access/features/AC-F06-history/feature.md)) · drafting a model ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) · loads ([RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md)) · AI models ([CP-F01](../CP-F01-ai-models/feature.md)) |
@@ -274,7 +274,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Installed connectors read in the Library | Library › Connectors (`settings.connectors`, CP-17) lists each installed graph connector with *Used by n graph databases*; installing one is a package, never an act in Studio |
+| Installed connectors read in Settings › Connections | Settings › Connections › Connectors (`settings.connectors`, CP-17) lists each installed graph connector with *Used by n graph databases*; installing one is a package, never an act in Studio |
 | Graph databases are the deployment's | Settings › Connections › Graph databases; one list, Admin acts, everyone reads |
 | Connecting is one modal of sections | Name (optional) · the type as a grouped card grid · its details once a type is picked · Shape once the test passes — one page and one act, *Connect*; it shows a person's own data back to them before anything is saved |
 | A blank name takes the type's | The engine names it after its type, made unique (`neo4j`, `neo4j_2`), and shows that name before *Connect*, so every graph database still has the fixed name rules use |
@@ -286,7 +286,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Home is the only place before set-up | Until a graph database is connected or someone picks *Try it on demo data*, mode switches are disabled and the leftNav holds no views; an Operator is offered *Ask {Admin}* where an Admin sees *Connect a graph database* |
 | Connecting starts in two places | Settings › Connections › Graph databases and Home before set-up — never the switcher's *New* |
 | The first-run question carries into the first ask | *What are you trying to decide?* is kept in the browser and put in the Assistant's composer when set-up is done — never sent by itself |
-| Connectors live in the Library | The Library sheet's *Connectors* lists every installed connector with *Used by n agents*; the graph databases themselves are Settings › Connections › Graph databases |
+| Connectors live in Settings › Connections | *Settings › Connections › Connectors* lists every installed connector with *Used by n agents*; the graph databases themselves are Settings › Connections › Graph databases |
 | Connectors need no switch | Installed is offered; a connector reaches a graph database, not the outside, so it is not a plugin |
 
 ## Open questions

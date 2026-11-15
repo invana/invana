@@ -47,7 +47,7 @@ flowchart LR
 | CP-50.3 | The list | the person picks *Live*, *Waiting* or *Ended*, or where it started | only those runs list, each filter shown as a chip with ×, and *Clear all*; the filters ride the link |
 | CP-50.4 | Filters that match nothing | the list is read | *0 of N runs match* with *Clear all* |
 | CP-50.5 | Nothing ran | Runs opens | it says what a run is, and that a question, a task or a schedule starts one |
-| CP-50.6 | A row | the person opens it | the run opens as a sheet titled `Run #N`: its agent, the person behind it, status, what started it (*Task by {person} · "…"*, *asked by {person}*), tokens against its budget as a meter, *Re-run*, *Stop run* and *Compare* |
+| CP-50.6 | A row | the person opens it | the run opens as a page titled `Run #N`: its agent, the person behind it, status, what started it (*Task by {person} · "…"*, *asked by {person}*), tokens against its budget as a meter, *Re-run*, *Stop run* and *Compare* |
 | CP-50.7 | A run's numbers | they read | time · tokens · agents · steps · what it produced · records touched, with a bar per agent over time, its state in words, and steps a minute |
 | CP-50.8 | Who did what | it reads | who made whom: the task or question, the agent, every helper with its state and its tokens against what it was given |
 | CP-50.9 | Steps | they read | one card per step of the plan, in order, with calls, how many ran side by side, time and counts in and out on each edge |
@@ -56,8 +56,8 @@ flowchart LR
 | CP-50.12 | Data touched | it reads | per graph database, the kinds read, written and refused · web domains and pages, refused and why · tokens by model version · secrets used, by name, and where |
 | CP-50.13 | History | it reads | the run's history rows (AC-F06), filtered to it |
 | CP-50.14 | An ask the run waits on, routed to the reader | the run is read | it is listed under *Waiting on you* and opens it in *Needs you* |
-| CP-50.15 | A run still going | its sheet is open | it reads *running* with time so far, its agents and steps filling in, refreshed every few seconds |
-| CP-50.16 | A run still going that the reader may stop — they are behind it or are an Admin | its sheet is open | *Stop run* is offered and stops it as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says; an ended run offers no *Stop run* |
+| CP-50.15 | A run still going | its page is open | it reads *running* with time so far, its agents and steps filling in, refreshed every few seconds |
+| CP-50.16 | A run still going that the reader may stop — they are behind it or are an Admin | its page is open | *Stop run* is offered and stops it as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says; an ended run offers no *Stop run* |
 | CP-50.17 | An ended run with asks pending | it ends | each ask closes as expired and leaves *Needs you* |
 | CP-50.18 | A run whose steps were cleared by retention | Steps is read | it says the steps were cleared; the numbers keep their stored values |
 | CP-50.19 | A number the engine did not record | it is shown | it reads `—`, never `0` |

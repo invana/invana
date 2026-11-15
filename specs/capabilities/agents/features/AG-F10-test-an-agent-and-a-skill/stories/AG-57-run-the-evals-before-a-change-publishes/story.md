@@ -53,7 +53,7 @@ flowchart LR
 | AG-57.5 | Tokens or time over 20% above live, or a judged score 0.5 below it | a Modeller or an Admin publishes | it warns with the numbers and asks for a reason, kept with the version |
 | AG-57.6 | No settled eval run over this exact draft and model version, or one still running | a Modeller or an Admin publishes, makes live, rolls back or moves a pin | it is refused, naming the case count, with *Run the evals*; Studio never predicts the gate |
 | AG-57.7 | No active case | a Modeller or an Admin publishes | it publishes, and the gate says *No eval set — nothing checked* |
-| AG-57.8 | An eval run or a test in progress | the sheet is open | the cases fill in as each ends; the rest of the sheet stays usable |
+| AG-57.8 | An eval run or a test in progress | the page is open | the cases fill in as each ends; the rest of the page stays usable |
 | AG-57.9 | A finished eval run | a person opens a case | it opens the case's run on each side; *How it got here* shows its steps and sources |
 | AG-57.10 | A guided skill, a planned skill or an agent | a Modeller or an Admin runs the evals or publishes | the same cases, checks and gate apply |
 | AG-57.11 | An Operator | they open Tests or Evals | everything reads; *Run a test* and *Run the evals* are disabled, naming the role |

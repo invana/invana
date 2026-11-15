@@ -37,7 +37,7 @@ flowchart TD
   use -->|not connected or expired| ref(["Refused before the call · Connect your account · an Inbox row"])
   ok -->|the server stops renewing it| exp(["Expired · Reconnect · an Inbox row"])
   ok -->|Disconnect · password again| dc(["Removed · the next call is refused"])
-  a([People and access › Personal connections]) -->|Admin| all(["Every person's personal connections · Disconnect any"])
+  a([Access › Who › Personal connections]) -->|Admin| all(["Every person's personal connections · Disconnect any"])
 ```
 
 ## Acceptance criteria
@@ -54,7 +54,7 @@ flowchart TD
 | CP-43.8 | A service user's run, a schedule or a picked-up task | a step calls a server whose agent has no work connection there | it is refused before the call; no personal connection is used (CP-63.4) |
 | CP-43.9 | Connecting or disconnecting | it is done without the password, with a wrong one, or with a key | it is refused — *Enter your password again to do this* |
 | CP-43.10 | A person | they disconnect their account | it is removed at once; the next call for their runs is refused as in CP-43.5; History records it |
-| CP-43.11 | An Admin | they open *People and access › Personal connections* and disconnect a person's account with their password | it is removed; the person is told in the Inbox; History names the Admin |
+| CP-43.11 | An Admin | they open *Access › Who › Personal connections* and disconnect a person's account with their password | it is removed; the person is told in the Inbox; History names the Admin |
 | CP-43.12 | An Operator | they read another person's account by any path | it is absent (`404`) |
 | CP-43.13 | A person deactivated (AC-23) | it is done | every personal connection of theirs is disconnected |
 

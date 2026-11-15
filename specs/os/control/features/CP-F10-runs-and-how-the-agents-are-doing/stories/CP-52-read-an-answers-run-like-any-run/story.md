@@ -39,7 +39,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | CP-52.1 | A question asked of the Assistant | it is answered | the answer is a run in Runs, from *Ask*, run by the Assistant on behalf of whoever asked |
-| CP-52.2 | An answer's run | its sheet opens | its head reads *asked by {person}* with the conversation's name |
+| CP-52.2 | An answer's run | its page opens | its head reads *asked by {person}* with the conversation's name |
 | CP-52.3 | An answer's run | a step opens | it is drawn as the answer's *How it got here* draws it — the same step, the same parts |
 | CP-52.4 | An answer's run | it is read | *How it got here* shows its steps and sources |
 | CP-52.5 | The person who asked, or someone it is shared with | they press *Open the conversation* | the conversation opens at that answer |

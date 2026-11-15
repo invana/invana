@@ -21,7 +21,7 @@ depends_on: [SE-F02, SE-F05, SE-F07, SE-F10]
 
 ```mermaid
 flowchart TD
-  start([Records › Quality]) --> run["RC-02 · Check the records against the published model"]
+  start([Model › Graph Data › Quality]) --> run["RC-02 · Check the records against the published model"]
   run --> any{Anything broken?}
   any -->|no| ok(["Every record fits the model — when it was checked"])
   any -->|yes| sum["RC-02 · Counts by kind and by rule"]

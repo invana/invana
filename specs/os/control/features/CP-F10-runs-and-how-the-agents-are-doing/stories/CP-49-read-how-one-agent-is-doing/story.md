@@ -32,7 +32,7 @@ flowchart LR
   n --> w{"7 · 30 · 90 days"}
   w --> n
   n --> r["Runs a day · tokens a day · why runs ended · recent runs"]
-  r -->|a run| s(["The run's sheet"])
+  r -->|a run| s(["The run's page"])
   r -->|content not theirs to read| x["Its head · withheld"]
   r -->|all runs| l(["Agents › Runs, filtered to this agent"])
 ```
@@ -49,7 +49,7 @@ flowchart LR
 | CP-49.6 | A draft that never ran | it is picked | it says it has not run yet, with no tiles |
 | CP-49.7 | An agent with no monthly limit | its numbers open | *Tokens this month* reads the tokens alone, with *no monthly limit* |
 | CP-49.8 | Conversations with the agent | an Operator opens its numbers | their own conversations are listed, newest first; the count across the deployment names no one else's |
-| CP-49.9 | The engine cannot read the agent's numbers | they open | it says what it could not read; the rest of the sheet still reads |
+| CP-49.9 | The engine cannot read the agent's numbers | they open | it says what it could not read; the rest of the page still reads |
 | CP-49.10 | Token counts | any number is shown | it prints as `k`, `M` or `B`; a value that rounds up is printed on the next rung (`1M`, never `1000k`) |
 | CP-49.11 | A recent run whose content the reader may not read | the agent's recent runs are read | it lists with when, the person behind it, its status and its tokens; what was asked reads *withheld* |
 
@@ -59,7 +59,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Agents — an agent picked | Admin | agents.agents · Draft | — | agents.agents · Loading | agents.agents | agents.agents · Could not load | agents.agents · Running | — |
 | Agents — an agent picked | Operator | agents.agents · Draft | — | agents.agents · Loading | agents.agents | agents.agents · Could not load | agents.agents · Running | agents.agents |
-| An agent's numbers on its sheet | Admin | agents.agents · Detail · Untested draft | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Could not load | — | — |
-| An agent's numbers on its sheet | Operator | agents.agents · Detail · Untested draft | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Content withheld |
+| An agent's numbers on its page | Admin | agents.agents · Detail · Untested draft | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Could not load | — | — |
+| An agent's numbers on its page | Operator | agents.agents · Detail · Untested draft | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Content withheld |
 | Runs filtered to the agent | Admin | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | — |
 | Runs filtered to the agent | Operator | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |

@@ -35,7 +35,7 @@ flowchart TD
   k -->|not mine to open| hid["Never a hit"]
   c([The command line]) --> se["CP-30 · invana search"]
   se --> hits(["Hits, closest first · access applied first"])
-  st([Settings › Invana]) --> gen["CP-71 · General: the deployment's name · its version"]
+  st([Settings › General]) --> gen["CP-71 · General: the deployment's name · its version"]
   st --> app["CP-71 · Appearance: Light · Dark · As the deployment"]
   gen -->|rename, not an Admin| ask(["Ask {Admin}"])
   app -->|the default, not an Admin| ask
@@ -183,7 +183,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | ⌘K is the one door | *Do, open or ask anything* — acts, records and sections in one palette, with no products to switch between |
 | ⌘K matches in the browser | It reads the lists each mode already serves, once per opening, and matches as the person types; a record with no address of its own opens its section |
 | The command line searches in the engine | One engine search applies the access first, then ranks by name as ⌘K does |
-| Settings › Invana is General and Appearance | General holds the deployment's name and version; Appearance the person's theme and, for an Admin, the deployment's default. The avatar menu's *Appearance* opens the same rows |
+| Settings opens on General and Appearance | General holds the deployment's name and version; Appearance the person's theme and, for an Admin, the deployment's default. The avatar menu's *Appearance* opens the same rows |
 | Ask is the last ⌘K entry | Whenever something is typed and the Assistant is among the agents the person may use |
 | Without the role reads, never hides | An act is disabled with the role it needs and who holds it |
 
@@ -191,7 +191,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| What else Settings › Invana › General holds beyond the name and version — recommend nothing more until a story needs it | Ravi, at the spec review |
+| What else Settings › General holds beyond the name and version — recommend nothing more until a story needs it | Ravi, at the spec review |
 
 ## Not building
 

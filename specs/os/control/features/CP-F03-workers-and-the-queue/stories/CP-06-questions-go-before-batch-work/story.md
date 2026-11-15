@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Workers › Where work is]) --> o["Order: questions · project tasks · batch"]
+  s([Workers › Queue]) --> o["Order: questions · project tasks · batch"]
   o --> g["Each person's share of the workers"]
   g -->|a person with nothing waiting| lend(["Their share is lent to those whose work waits"])
   g -->|everyone's work waiting| eq(["Shared equally"])

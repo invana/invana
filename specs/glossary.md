@@ -10,18 +10,20 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **Graph Data** | Everything the deployment's graph databases hold, read in place and joined on identity links — one per deployment. Never created, opened, selected or listed: it is not an object. Always capitalised | graph data |
+| **Graph Data** | Everything the deployment's graph databases hold, read in place and joined on identity links — one per deployment. Never created, opened, selected or listed: it is not an object. Always capitalised. On screen also the Model group *Graph Data* — Browse by kind · Loads · Quality · Annotations | graph data |
 | **graph database** | One configured connection to a Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune or TinkerGraph database, through its connector — read-only or read + write, switched on or off | graph database |
 | **Read-only · Read + write** | A graph database's mode, set by an Admin: agents only read it · agents may also write to it — annotations, derived facts, loads, fixes. Reads always run in the database's read mode | connection mode |
 | **Practice graph database** | A graph database an Admin names for testing agents and skills, never the one people ask | practice graph database |
 | **Explore · Model · Projects** | The three modes of Studio, named in the wordmark | — |
-| **Records · Agents · Library · Settings** | The summoners at the foot of the leftNav — each opens its sheet over the work | — |
-| **Library** | The sheet of what agents are built from and reach out with — Skills · Plugins · Connectors · Packs — each with *Used by n agents* | skills · plugins · connector packages · Team packs |
-| **Operations** | What the deployment is doing now — runs, the queue, budgets, workers, AI models, graph databases, alerts — the dropdown behind the header's *● n running*; also the Settings group of Workers · Limits · Alerts | fleet · overview |
-| **Access** *(the header lock)* | An Admin's glance at who and which agents act now, what a policy blocked today and what acts for a person; also the Settings group of People · Policies · History | access summary |
+| **Agents · Workers · Library · Access · Settings** | The summoners at the foot of the leftNav — each opens the one large modal over the work at its own section | — |
+| **Large modal** | The modal, inset from the window edges, that holds every summoner's place — its own nav, the path, at most one action and Close (Esc); moving between sections never closes it | — |
+| **Workers** | The section of the large modal for the machines agents run on — Groups · All workers · Queue · Limits · Alerts | worker pool |
+| **Library** | The section of the large modal for what agents are built from and reach out with — Skills · Plugins · Team packs — each with *Used by n agents* | skills · plugins · Team packs |
+| **Operations** | What the deployment is doing now — runs, the queue, workers, tokens this month — the quick-overview dropdown behind the header's *● n running*; its links open the large modal at Workers and Agents › Runs, where every deeper act happens | fleet · overview |
+| **Access** | The section of the large modal for who may do what — Now · Who · What they may do · Record · Keeping; the header lock is an Admin's glance at it: what each person and agent is touching in the last hour, and what a policy blocked | access summary |
 | **Switcher** | The dropdown behind ☰ and the mode name: Go to · New · Recent · Pinned | — |
 | **Recent · Pinned** | The items a person opened, newest first, kept for them by the engine · the ones they starred | recents · pins |
-| **Invana · You · Connections · Operations · Access · Notifications** | The groups of Settings: the deployment's general settings and appearance · the person's own account · graph databases and AI models · workers, limits and alerts · people, policies and History · what reaches whom | deployment settings · profile |
+| **General · Appearance · You · Connections · Notifications** | The groups of Settings: the deployment's general settings · how Studio looks · the person's own account · graph databases, AI models, the MCP server and connectors · what reaches whom | deployment settings · profile |
 | **Board** | A named, saved working surface — drawn on a canvas, or a dashboard of panels | Board (`renders: canvas · declared`) |
 | **canvas** | The pannable drawing of nodes and relationships on a board | canvas |
 | **Assistant** | The one conversational surface, on the right of every mode | Assistant |
@@ -38,7 +40,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Link between models** | A declared meeting of two models — the same entity, or a relationship across them | Stitch · anchor · relationship link |
 | **Constraint** | One property's range with a unit, or one standard's values, on one kind — Reject or Flag for review when a record breaks it | Property constraint (validation rule) |
 | **What the database holds** | The kinds, properties and counts read from the graph database, with when — compared with the model, never the model | Physical mirror · introspection |
-| **Records** | The nodes and relationships Graph Data holds, read in place from the graph databases — never copied — each one of a kind in a published model; *Records* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
+| **Records** | The nodes and relationships Graph Data holds, read in place from the graph databases — never copied — each one of a kind in a published model; *Model › Graph Data › Browse by kind* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
 | **Identity link · Match rule** | Two records in different graph databases that are the same entity · the rule a Modeller declares for a pair of kinds that says when they are; links come from rules, never from a guess | identity link · match rule |
 | **Version** | One immutable, hashed state of a model, standard, skill, workflow or agent | Version |
 | **Sensitivity** | A property's level — **public** · **internal** · **confidential** · **personal** — set in its kind's Meaning by a Modeller; *internal* until set. Access Policies may reach one level of a kind; a derived value takes the highest level of what it came from | Sensitivity |
@@ -232,7 +234,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Not on screen | Say instead |
 |---|---|
-| Agent Builder · Fleet · IAM · Activity · Graph settings | Agents · Operations · Settings › Operations › Workers · Settings › Access · Inbox · Settings › Connections — product names are never places |
+| Agent Builder · Fleet · IAM · Activity · Graph settings | Agents · Operations · Workers · Access · Inbox · Settings › Connections — product names are never places |
 | Policy statement · policy effect | A **rule** of an Access Policy · Allow, Ask or Deny |
 | viewer · contributor · iam-admin | *Operator* · the person's role — *Operator*, *Modeller* or *Admin* · *Admin* |
 | World | An Access Policy rule on `data/…` · a sensitive property |
@@ -292,17 +294,17 @@ names and the form each takes in every layer are
 | **System graph** | The store of Invana's own graph — a bundled ArcadeDB governed by the system ontology. It holds **Memory** with its lineage, the ledger's edges and identity links, never customer data, and is never part of Graph Data. It follows Postgres, the source of truth, and is rebuilt from it |
 | **System ontology** | The read-only, versioned ontology Invana ships that governs the system graph |
 | **Identity link** | Two records in different graph databases that are the same entity, materialised in the system graph from a **match rule** a Modeller declares for a pair of kinds — agents may propose rules, never links. Never guessed |
-| **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown in *Settings › Connections*, *Settings › Operations* and the *Library*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
+| **Deployment settings** | The deployment's configuration — graph databases, AI models, plugins, MCP servers, outside agents, limits — shown in *Settings › Connections*, *Workers* and the *Library*. Agents and outside agents are Agents' (`agents`); the rest is the Control Plane's (`control`) |
 | **Operating system** | What runs every deployment: the **Control Plane**, the **Access Plane** and the **Graph Plane** — the packages `control` · `access` · `graph`. A vision and docs word; in code its parts are packages beside the capabilities |
 | **Control Plane** | What runs, where and within which limits — runs, workers and the queue, graph databases, limits, AI models, plugins and the MCP server, ops alerts, the Inbox. Product code `CP` |
 | **Access Plane** | Who may act, through which agent, and what they did — sign-in, keys, Access Policies, the Directory, ownership, asks, the ledger's views, History. Product code `AC` |
 | **Graph Plane** | What Invana reads and what it remembers — **Data**: Graph Data, read in place through a connector per graph database and joined on identity links · **Memory**: Invana's own graph of the work, in the system graph. Product code `GP`. A vision and docs word: on screen a person reads *Graph Data* and *Memory* ([os/graph](os/graph/product.md)) |
 | **Lineage** | What a copy — an answer, a finding, a report, a snapshot, a transcript, a note, a memory node or an export — was read from: its **sources**, as Access Policy resources with their level, recorded with the copy and kept as edges in Memory. A copy shows to a person only when their default agent may Read every source; else it is withheld. Its level is the highest of its sources' ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) |
 | **Raw query** | A Cypher or Gremlin query a person writes in the Console: a static check against the agent's rules, a read-only session, a result filter, and Gremlin steps only — no scripts or lambdas ([GP-F01](os/graph/features/GP-F01-data/feature.md)) |
-| **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Records** summoner. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
+| **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Graph Data** group of Model. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
 | **Worker pool** | The deployment's workers, in groups that share labels — the Control Plane's, [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md). On screen *Workers*. How each agent is doing is Agents' (`agents`), never the pool's |
 | **Rule** | One statement that is always true, scoped `deployment` (an **invariant**) or `project` (a **working** rule). Offered to steps; a rule with a **check** is also enforced `block · warn · report` at the acts the check names. A **policy rule** is a line of an Access Policy, never this |
-| **Library** *(runtime)* | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. A code and docs word; on screen *Library* is the sheet of Skills · Plugins · Connectors · Packs. Never the journal — that is **Runs**. |
+| **Library** *(runtime)* | The **definitions** a run is built from: reusable **flows**, the closed **catalogue** of functions, and projection **templates**. A code and docs word; on screen *Library* is the large modal's section of Skills · Plugins · Team packs. Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. On disk it is an **Agent Skills folder** — `SKILL.md` plus `references/`, `scripts/`, `assets/` — stored whole per version, and it is the source. It runs **planned** — drawn into a plan before anything runs, the plan a cache compiled from its text, never edited or exported — or **guided**, with no plan, the model following its instructions with the functions its agent may use. |
 | **Versioned record** | A record whose published form is immutable, so a change mints a new **version**: a skill, a rule, a plan, an agent, a model, a standard. A draft is not a version. |
 | **Change log** | Every version of every versioned record — who, when, why, the diff, the effect after. It is the Events list narrowed to the events that mint a version, never a second record. A **change** is one such event. Never "audit log" for this narrower list, never "revision history". |
@@ -405,8 +407,8 @@ owns them, so code, docs, artboards, URLs and e2e locators all say the same thin
 | Region | Is |
 |---|---|
 | **`header`** | the full-width row at the top — `header.left` · `header.center` · `header.right` |
-| **`leftNav`** | the icon column — one icon per mode or overlay that has a `leftSection` panel — `leftNav.top` · `leftNav.topNavItems` · `leftNav.middle` · `leftNav.bottom` · `leftNav.bottomNavItems` |
-| **`leftSection`** | the resizable left column — holds the open panel |
+| **`leftNav`** | the labelled nav down the left — the current mode's views (icon · label · count) and the summoners at its foot; collapses to icons only ([design language § 2](design-language.md#2-the-layout)) — `leftNav.top` · `leftNav.topNavItems` · `leftNav.middle` · `leftNav.bottom` · `leftNav.bottomNavItems` |
+| **`leftSection`** | the resizable left column — holds the tree of the view in front |
 | **`mainSection`** | the open pages |
 | **`rightSection`** | the resizable right column — the Assistant |
 | **`bottomSection`** | the resizable bottom column — the Console |

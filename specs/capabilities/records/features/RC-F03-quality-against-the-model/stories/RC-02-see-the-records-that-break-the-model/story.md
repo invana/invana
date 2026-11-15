@@ -26,7 +26,7 @@ Every role runs a check and reads what breaks the model ([the role table](../../
 
 ```mermaid
 flowchart LR
-  a([Records › Quality]) --> c[Check against the published model]
+  a([Model › Graph Data › Quality]) --> c[Check against the published model]
   c -->|nothing broken| ok([Every record fits · when checked])
   c -->|broken| s[Counts by kind and rule] --> r[Records that break one rule]
   r --> fx([Fix them · RC-F04])

@@ -193,7 +193,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Approval lives on the skill's sheet | A *Scripts* list on the skill's folder, each script readable in full, with *Approve* and *Decline* for an Admin |
+| Approval lives on the skill's page | A *Scripts* list on the skill's folder, each script readable in full, with *Approve* and *Decline* for an Admin |
 | Admins are asked | A script waiting for approval is an ask in Inbox › Needs you for every Admin; the first answer settles it |
 | The sandbox is the install's | Its caps and its packages are set once for the install and read on every script step |
 | A fingerprint, not a version | Approval keys on the script's content, so moving it between skill versions unchanged asks nothing |

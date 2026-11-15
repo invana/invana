@@ -15,7 +15,7 @@ two lenses (below).
 | `investigator` | **Investigator** — an auditor or case worker | Work a case from its leads to a decision, every piece of evidence kept with its chain of custody — who brought it in, from which load, and who touched it | Projects · Explore | Operator |
 | `curator` | **Data curator** | Bring records in, check them against the model and its standards, fix and trace them | Records | Modeller |
 | `builder` | **Agent builder** | Build agents, skills and workflows, test them, read how they are doing | Agents | Modeller |
-| `admin` | **Admin** | Run the deployment: connect graph databases and set their mode, add people and teams, grant agents, write Access Policies, run AI models, workers, plugins and limits, watch the Control Plane | Settings › Invana | Admin |
+| `admin` | **Admin** | Run the deployment: connect graph databases and set their mode, add people and teams, grant agents, write Access Policies, run AI models, workers, plugins and limits, watch the Control Plane | Settings › General | Admin |
 
 ## Names not used for a persona
 

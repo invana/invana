@@ -75,7 +75,7 @@ sequenceDiagram
   E-->>S: every number as stored · content only if the reader may read it
   P->>S: Re-run — retuned
   S->>E: a new run on the chosen versions and budget
-  E-->>S: run #N+1 · its own sheet
+  E-->>S: run #N+1 · its own page
   P->>S: Compare
   E-->>S: what differs — versions, answer, time, tokens
 ```
@@ -160,7 +160,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 | First use | Nothing ran: tiles read `0` or `—`, *Nothing ran in the last 30 days*, and what a run is — a question, a task or a schedule starts one |
 | Empty after a filter | *0 of N runs match*, the filters named as chips, *Clear all* |
 | Loading | The head and its acts drawn at once; the body loads in place |
-| Has data | Tiles against the window before, the runs list, a run's sheet with its sessions and hand-off notes, each agent's and skill's numbers |
+| Has data | Tiles against the window before, the runs list, a run's page with its sessions and hand-off notes, each agent's and skill's numbers |
 | Failed | What could not be read, in the engine's words; a refused act names why; a session that failed names why it ended |
 | Agent working or proposing | A run in flight: *running*, time so far, its agents and steps filling in, its current session counting tokens against the session budget, refreshed every few seconds; a run continuing reads *continuing in session {n}* |
 | No access | A run whose content the reader may not read shows that it ran, its status, its tokens and its session heads, with its content and hand-off notes withheld; acts they may not take are disabled, naming who may |
@@ -238,7 +238,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | `control_runs` | `number?` · `parent_run_id?` · `todo_id?` · `plan_id` · `task_id?` (the plan step a child row runs) · `task_key?` (its function) · `step_key?` (its plan step's key) · `agent_id?` · `agent_version` · `model_version` · `ontology_version` · `role` (`plan` · `execute` · `evaluate`) · `plan_snapshot` · `plan_revision` · `plan_origin` (`template:<key>@<v>` · `generated`) · `triggered_by` (`user` · `schedule` · `task` · `delegation` · `automation` · `canvas` · `mcp` · `system`) · `author_kind` · `author_id` · `on_behalf_of_user_id?` (the person behind it; none for a schedule's or a pick-up's run) · `key_id?` (the [key](../../../access/features/AC-F10-keys/feature.md#engine) whose call opened it) · `client_connection_id?` (the [connected client](../../../access/features/AC-F11-connect-an-mcp-client/feature.md#engine) whose call opened it) · `team_ids[]` (their teams at open) · `graph_databases[]` (each one read or written) · `session_id?` · `lane` · `iteration` · `attempt` · `status` · `outcome` · `exit_reason` · `stopped_by_id?` · `cursor` · `args` · `input` · `output` · `result` · `error` · `idem_key` · `trace_id` · `queued_at` · `started_at` · `finished_at` · `queue_ms` · `work_ms` · `ask_ms` · `wait_ms` · `duration_ms` · `tokens_in` · `tokens_out` · `run_tokens_in` · `run_tokens_out` · `run_tokens` · `steps_done` · `steps_total` · `replans` · `clarifications` · `escrow_tokens` · `escrow_returned` · `skills_offered[]` · `skills_applied[]` · `rules_offered[]` · `rules_cited[]` · `rerun_of_run_id?` | One table for every run and every step: a root has no `parent_run_id` and a `number` for the deployment, never reused; a step, a lane, an iteration and an attempt are rows under it — (`parent_run_id`, `task_id`, `lane`, `iteration`, `attempt`) unique. Every number is written when its fact settles |
 | `control_run_sessions` | `run_id` · `seq` (1, 2, …) · `runtime` (`invana` · `claude_code` · `codex`) · `runtime_version` · `model_set` (the agent's pin) · `model_reported?` (what the runtime said it ran on) · `connection_kind?` (`work` · `personal`) · `connection_id?` · `worker_id?` · `workspace_id?` · `started_at` · `ended_at?` · `ended_because?` (`finished` · `session_budget` · `stopped` · `failed` · `refused`) · `tokens_in` · `tokens_out` · `handoff_in_id?` · `handoff_out_id?` | One row per session of a root run; (`run_id`, `seq`) unique. `handoff_in_id` and `handoff_out_id` are [AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine)'s `agents_handoff_notes`; `connection_id` a [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#engine) connection; `worker_id` and `workspace_id` [CP-F03](../CP-F03-workers-and-the-queue/feature.md#engine)'s |
-| `control_run_stream` | `seq` (the resume cursor) · `run_id` · `ts` · `frame_type` · `payload` | A run's frames in order, for the live sheet and Running |
+| `control_run_stream` | `seq` (the resume cursor) · `run_id` · `ts` · `frame_type` · `payload` | A run's frames in order, for the live run page and Running |
 | `control_run_prompts` | `run_id` · `task_id` · `kind` (`clarification` · `approval` · `verdict`) · `question` · `options` · `deadline_s?` · `answered_by_kind?` · `answered_by_id?` · `answer?` · `answered_at?` | A question a run asks and its answer. A verdict may be answered by an agent or a person; an approval only by a person |
 | `control_run_artifacts` | `run_id` · `task_id` · `key` · `media_type` · `size_bytes` · `digest` (sha256) · `uri` | What a run produced, addressed by digest in the blob store; the run row carries the digest, never the payload |
 
@@ -282,7 +282,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /runs/{id}/trace` | The run — `body` · `ask_kind` · `outcome` · `agent_version` · `plan_origin` · `plan_revision` · `triggered_by` · `trace_id` · `clarifications` · `replans` · times · tokens · `budget` (every ceiling, the run's as frozen) · `result`; each step — `task_key` · `step_key` · `lane` · `attempt` · `max_attempts` · `args` (bound) · `bound` · `input` · `output` · `result` · `error` · times · tokens · share of the run · skills and rules offered and applied · `child_run_id` | CP-50 · CP-52 |
 | `GET /runs/{id}/tasks/{task_key}` | One step: its resolved input, its result document, its artifacts and its log slice | CP-50 |
 | `GET /runs/{id}/chain` | A run's descendant count, worst outcome and summed tokens | CP-57 |
-| `GET /runs/{id}/stream?after=` | Frames from `seq` on — the live sheet resumes from its last cursor; a reader who may not read the content gets status and tokens frames only | CP-50 · CP-57 |
+| `GET /runs/{id}/stream?after=` | Frames from `seq` on — the live run page resumes from its last cursor; a reader who may not read the content gets status and tokens frames only | CP-50 · CP-57 |
 | `GET /runs/compare?a=&b=` | What differs — versions, answer, time, tokens | CP-55 |
 | `POST /runs/{id}/stop` | Stop the run; its helpers end *stopped with its parent*; the person behind it is told when someone else stopped it | CP-58 |
 | `POST /runs/{id}/rerun` | `{versions: same · current · retune, retune?: {agent_version, model_version, max_tokens_run}}` → `{run_id, rerun_of_run_id, model_version, stream_url}` | CP-54 |
@@ -381,12 +381,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, the Agents sheet's *Runs*; agents are built in Agents, skills in the Library |
+| Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, Agents › Runs in the large modal; agents are built in Agents, skills in the Library |
 | Running now is everyone's glance | The header's *● n running* opens Operations ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) with each run's step, tokens, time, worker group and *Stop*; the Inbox's Running holds the reader's own |
 | Runs opens on what needs you | Tiles — runs today against the same day last week · failed today · needs you · p95 over 7 days · tokens this month against the agents' monthly limits · success over 7 days — then *Needs attention*, runs a day over 30 days and what changed recently |
 | Needs attention | Failing workflows first, then agents, then degraded agents; an agent whose latest failure is a listed workflow's run is not listed again; each item has one act that opens where it is answered |
-| A run is a sheet | A run opens as a sheet over the work: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
-| Sessions are a part of the sheet | *Sessions* lists each session in order, a hand-off note between two; a run of one session reads that one session, with no note |
+| A run is a page | A run opens as a page in Agents › Runs, in the large modal over the work: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
+| Sessions are a part of the page | *Sessions* lists each session in order, a hand-off note between two; a run of one session reads that one session, with no note |
 | A step opens inside its run | Its input, output, what it touched and its log; a step that fanned out opens on its first part with *All parts* beside it |
 | A step's detail reads by layer | Bands in order — Touches · Slice · What it sent · Attempts · Model · Cache; a layer the run touched nothing in draws its band dark, never hidden |
 | Queued behind a schedule | A run waiting its turn shows its place in the queue; one held on a person reads *a person is waiting* |
@@ -401,7 +401,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A change is the engine's | `↑ 38%`, `▲ 1.2 pt` or *flat* — under 2% or 0.1 pt reads flat; run time and tokens up read worse, success up reads better, counts are neutral |
 | A failed run is the way into a better skill | *Improve this skill* opens the skill's draft with the run added as a test and a way back to the run |
 | Spend in tokens | No cost is shown anywhere, even when a provider prices tokens |
-| Running is the Inbox's, the list is Runs' | Inbox › Running answers *what is moving now*; Agents › Runs is where every run is found, filtered and opened. A run opens as one sheet wherever it is listed |
+| Running is the Inbox's, the list is Runs' | Inbox › Running answers *what is moving now*; Agents › Runs is where every run is found, filtered and opened. A run opens as one page wherever it is listed |
 | Done is today | Done lists the runs that ended today, the reader's day; older runs are in Runs |
 | Mine first | Running lists the runs the reader is behind first, then everyone else's |
 
@@ -417,11 +417,11 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | A cost per run, agent or model | Tokens only |
 | Custom windows or date ranges | 7, 30 and 90 days answer *since it shipped* |
-| *Roll back* from how agents are doing | A version rolls back on its own sheet, after its tests (AG-36) |
+| *Roll back* from how agents are doing | A version rolls back on its own page, after its tests (AG-36) |
 | A provider's release feed | Invana does not poll vendors; an Admin offers the version they want (CP-F01) |
 | Who pins each model version | AI models (CP-F01) |
 | An icicle of a big run | Who did what and by role answer *who made whom* and *how each role is doing* |
-| Saved copies of a run | A settled run never changes; its sheet reads it any time |
+| Saved copies of a run | A settled run never changes; its page reads it any time |
 | A section of its own for big runs | A run of hundreds of agents is a run, started like any other |
 | An estimate before a big run starts | The engine stores none, and Studio never derives a number (AG-F01) |
 | Stopping many runs at once | A stop is read and confirmed one run at a time; switching an agent, a plugin or a graph database off stops new work |

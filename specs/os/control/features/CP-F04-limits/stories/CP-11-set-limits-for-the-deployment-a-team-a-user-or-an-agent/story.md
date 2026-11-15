@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Limits]) --> t["Limits: the deployment · each team · user · agent — each limit's ceiling · used now · meter"]
+  s([Workers › Limits]) --> t["Limits: the deployment · each team · user · agent — each limit's ceiling · used now · meter"]
   t -->|not an Admin| ro(["Reads · Edit disabled, naming the Admins"])
   t -->|Edit · an Admin| e["Tokens a month · a run · a session (deployment and agents) · runs at once · helpers · depth · worker time · worker groups · queue or refuse · may ask for more"]
   e --> v{"Valid?"}

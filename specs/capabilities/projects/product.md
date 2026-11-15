@@ -57,7 +57,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | A task | mode | `projects.tasks · Detail` · `projects.tasks · Detail · How it got here` |
 | Options and a decision | mode · modal | `projects.branches` · `projects.branches · Decide` |
 | A finding | peek | `projects.branches · Finding` |
-| A report | sheet | `projects.report` |
+| A report | modal | `projects.report` |
 | A project's alerts | mode | `projects.alerts` |
 | A project as a map | mode | `graph.memory · Project map` ([GP-08](../../os/graph/features/GP-F02-memory/stories/GP-08-see-a-project-as-a-map-and-what-is-moving-on-it/story.md)) |
 

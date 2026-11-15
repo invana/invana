@@ -26,12 +26,12 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Settings › Access › History]) -->|nothing yet| e["No acts yet"]
+  s([Access › Record › History]) -->|nothing yet| e["No acts yet"]
   s --> r["Rows, today: when · who ▸ through which agents · act · touched · allowed or refused · run"]
   r -->|Everything · People · Agents · Refused · window| f{"Matches?"}
   f -->|no| z["0 of N match · Clear all"]
   r -->|a row| d["Chain of custody · the act and its rule · hash and previous · the acts around it"]
-  d -->|Open the step| run(["The run's sheet, on that step"])
+  d -->|Open the step| run(["The run's page, on that step"])
   r -->|a person or agent| a["Their acts, writes, refusals, and the helpers they acted through"]
   r -->|a record| rec["Every act on it · who can see it now"]
   r -->|Export| x(["CSV or JSON Lines, with each row's hash"])
@@ -51,7 +51,7 @@ flowchart LR
 | AC-16.6 | History | the reader picks *People*, *Agents* or *Refused*, or a window — today · last 24 hours · 7 days · 30 days · any time | only those rows list, the filter shown with a way to clear it; with no window chosen it reads today |
 | AC-16.7 | Filters that match nothing | History is read | it reads *0 of N match*, with *Clear all* |
 | AC-16.8 | A row | the reader opens it | its detail opens beside the list: who started it and each agent with how it got there, the function and its version, where it ran · the act, its arguments and the rule that allowed or refused it, its policy and version · its hash, the previous hash and whether the chain held · the acts around it |
-| AC-16.9 | A row from a run | the reader presses *Open the step* | the run's sheet opens on that step |
+| AC-16.9 | A row from a run | the reader presses *Open the step* | the run's page opens on that step |
 | AC-16.10 | A person or an agent and a window | By actor is read | it counts their acts, writes, outside reads, secrets used and refusals, and lists the helpers they acted through, one kind grouped as *Order checker ×4* |
 | AC-16.11 | A record's address and a window | By record is read | it lists every act on that record, counts reads, writes, refusals, people and agents, and says which agents may read and write its kind now, and for which teams |
 | AC-16.12 | Refusals | they are read | refused today as a share of all acts, counts by reason, refused a day over 30 days, the most refused functions, and each rule that held |

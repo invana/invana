@@ -24,7 +24,7 @@ depends_on: [EX-F01]
 ```mermaid
 flowchart TD
   ex([On a board — annotate while investigating · RC-13]) --> keep["Kept as an Annotation record, in Invana"]
-  start([Records › Annotations]) --> list["RC-07 · Every annotation · by record · author · kind"]
+  start([Model › Graph Data › Annotations]) --> list["RC-07 · Every annotation · by record · author · kind"]
   keep --> list
   list -->|filter matches nothing| ef["Nothing matches — the filter named · Clear"]
   list -->|open one| rec(["Its records, on a board"])

@@ -105,7 +105,7 @@ flowchart TD
 
 | Decision | Detail |
 |---|---|
-| Standards is a sheet of Model | *Library* · *Import*; who holds a standard is its page's *Used by* |
+| Standards is a large modal of Model | *Library* · *Import*; who holds a standard is its page's *Used by* |
 | Packs are applied, not browsed | A pack is a standard file an Admin applies; there is no registry to check for newer packs |
 | Import previews first | Reading a file previews at once — the source, its terms and values, the name it publishes under, the mapping, notes and skips; *Import as a standard* waits for a preview |
 | Several schemes are a choice | A file with several schemes offers a picker; one import is one scheme |

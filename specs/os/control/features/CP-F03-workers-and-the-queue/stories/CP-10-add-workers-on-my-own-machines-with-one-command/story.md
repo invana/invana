@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Operations › Workers › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
+  s([Workers › Groups › Add workers]) --> wh["Where: Docker · Python · Kubernetes"]
   wh --> g{"Group"}
   g -->|existing| ge["Its labels · slots · plugins · runtimes · secret names · outbound domains"]
   g -->|new| gn["Name · labels · slots a worker · plugins · runtimes · secret names · outbound domains"]

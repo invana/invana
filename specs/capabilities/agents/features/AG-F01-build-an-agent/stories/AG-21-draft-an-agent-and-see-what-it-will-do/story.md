@@ -33,7 +33,7 @@ flowchart LR
   a -->|a built-in agent| bi["Built in · System"] -->|Copy| d
   n -->|name already used| x1["Refused, naming the agent that has it"]
   n -->|no AI model offered| x3["Says so, links Settings › Connections › AI models — still saves"]
-  n -->|Create agent| d["A draft, as a sheet · Setup — the platform's, made by its maker"]
+  n -->|Create agent| d["A draft, as a page · Setup — the platform's, made by its maker"]
   d --> sk["Skills — add from the deployment's skills, suggested ones first"]
   sk -->|a need its policies do not allow| m["Refused under the skill, naming the need and the rule"]
   d --> acc["Access — Access Policies attached · what it may touch · who may use it · named approvers"]
@@ -53,7 +53,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AG-21.1 | A Modeller or Admin in Agents | they open *New agent* | a modal asks for a name and what it should do in plain words, and lists the saved Access Policies with the ones its words suggest marked *Suggested* — to ask an Admin for, never attached here |
-| AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template, the platform's and made by its maker, and opens as a sheet on Setup with a *Draft* chip; the suggested policies wait on Access, marked *Suggested*, until an Admin attaches them |
+| AG-21.2 | A filled *New agent* | they press *Create agent* | a draft is saved from a template, the platform's and made by its maker, and opens as a page on Setup with a *Draft* chip; the suggested policies wait on Access, marked *Suggested*, until an Admin attaches them |
 | AG-21.3 | A name another agent already has, retired or not, or one not lowercase and hyphenated | they save | it is refused, naming the agent that has it or the rule for a name |
 | AG-21.4 | A draft with no Access Policy attached | Access opens | it reads *May touch nothing yet*, with *Ask an Admin* — and for an Admin *Attach a policy* (AC-11) |
 | AG-21.5 | No AI model offered in the deployment | they create an agent | it saves and says it has no model to think with, linking Settings › Connections › AI models |
@@ -71,7 +71,7 @@ flowchart LR
 | AG-21.19 | Edits on several parts of Setup | they press Save | one version is saved, carrying only what moved; adding a skill is saved on its own so a refusal names that skill |
 | AG-21.21 | A draft that never ran | a Modeller or an Admin presses *Discard draft* and confirms | it is deleted and Agents opens; an agent that has run is refused, naming *Retire* |
 | AG-21.22 | An Operator | they open an agent | every tab reads; *New agent*, *Copy*, every edit and *Discard draft* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
-| AG-21.23 | A sheet whose engine read fails | it opens | the tab names what it could not read, in the engine's words; the rest of the sheet still reads |
+| AG-21.23 | A page whose engine read fails | it opens | the tab names what it could not read, in the engine's words; the rest of the page still reads |
 | AG-21.24 | A run refused by the agent's Access Policies or limits | the person opens *How it got here* | its steps show the refused step, the bound — the rule and policy, or the limit and whose it was |
 | AG-21.29 | An ask the agent may not take for this person — not granted to them, or a policy refuses it before any run opens | it is sent | the reply reads *This question was not run*, naming why; no run opens and nothing is spent |
 | AG-21.30 | Effort set to 0 | a run reads it | 0 is the value — *0 questions* never asks; only an empty cell takes the value shown beside it |

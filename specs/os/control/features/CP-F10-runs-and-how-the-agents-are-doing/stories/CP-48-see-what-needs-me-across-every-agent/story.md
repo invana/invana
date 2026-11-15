@@ -27,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 flowchart LR
   a([Agents › Runs]) --> t["Tiles · Needs attention · runs a day · changed recently"]
   t -->|nothing ran| e["Tiles read 0 or —; what a run is"]
-  t -->|failing| r(["Open run — the run's sheet"])
+  t -->|failing| r(["Open run — the run's page"])
   t -->|waiting| i(["Review — Inbox › Needs you"])
   t -->|degraded| p(["Investigate — how the agents are doing"])
   t -->|a version changed| c(["Compare it with the version before"])

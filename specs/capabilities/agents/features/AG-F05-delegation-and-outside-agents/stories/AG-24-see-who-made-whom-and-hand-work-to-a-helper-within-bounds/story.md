@@ -65,7 +65,7 @@ flowchart LR
 | AG-24.18 | A helper or a delegated agent | it takes a step | its own policies ∩ every caller's bind, the same whoever is behind the run; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose rule denied it |
 | AG-24.19 | A helper an agent makes | it is made | it lives only for the work, holds no grant of its own, is in its run's delegation chain, and may make helpers only if its policies allow Run `agent/*` |
 | AG-24.21 | An agent of the deployment not granted to the person behind the run, and not already in its chain | the agent delegates to it | it is refused before it starts, naming the agent and who grants agents; an outside agent is reached only by a rule on Run `agent/<name>` and is Ask by default |
-| AG-24.20 | An agent's sheet | its helpers are read | every helper it made in the last 7, 30 or 90 days lists with the run it was made in, its state and its tokens against what it was given; a retired helper stays listed |
+| AG-24.20 | An agent's page | its helpers are read | every helper it made in the last 7, 30 or 90 days lists with the run it was made in, its state and its tokens against what it was given; a retired helper stays listed |
 
 ## Screens
 
