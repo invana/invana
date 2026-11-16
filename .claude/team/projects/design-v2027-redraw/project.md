@@ -3,7 +3,7 @@ name: design-v2027-redraw
 status: running
 branch: design-redesign/P17-audit-every-board-drawn-every-link-resol
 scope: design-v2027-redraw
-artifact_publish: off
+artifact_publish: auto approve
 ---
 
 # Design — redraw Invana v2027.11.0 in full, on the approved navigation
@@ -25,7 +25,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | What | Where | Use it for |
 |---|---|---|
 | The canvas | `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX` — mirror `.design/canvas-invana/project/` (seeded from live version `1794727248-917f`, identical on 2026-11-16) | The deliverable |
-| The review artifact | Not created yet — Ravi creates and pins it, and gives its URL here. Never `PgtkC6KygGZz2u8fYq1LWX` | The one artifact a session may publish the mirror to, under the rule *Artifacts: read freely, publish only on Ravi's word* |
+| The review artifact | `https://claude.ai/artifact/VhXDTAAHV7z4hCRJuQEHHD` — holds the mirror after P01 (version 2). Never `PgtkC6KygGZz2u8fYq1LWX` | The one artifact a session may publish the mirror to, under the rule *Artifacts: read freely, publish only on Ravi's word* |
 | The approved proposal | `https://claude.ai/artifact/Fjfg52oUYZQDryQanykk9m` v21 — generators `.design/canvas-nav-proposals/b_nav.py` (page B: nav, left content, large modal, dropdowns) · `c_iam.py` (page C: Access Policies, New policy, project access and team, New project wizard) · `d_modes.py` (page D: Agents mode, glance, tuning in the frame, Settings › Workers); every v21 board (pages A–D) synced into `.design/canvas-nav-proposals/project/` on 2026-11-16 — read boards there, never the live artifact | The shell, the nav and every board it already drew — port the markup, never re-invent it |
 | The previous version | *Invana Products* `https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg` (352 boards, 13 pages) — generators `.design/canvas-products/p_*.py`, boards in `.design/canvas-products/project/`, each board's page in that folder's `canvas.json`. Read only — never edited or published | Main-area content: Modeller → Model · Datasets → Graph Data · Agent Builder → Agents · Activity → Runs and Record · IAM → Access · Fleet → Settings › Fleet and Workers |
 
@@ -49,6 +49,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | Kit only, tokens only | `InvanaUI` from the mirror's bundle; tokens only; budgets in tokens, never currency; runs show exact model versions; results from different graph databases side by side, never joined |
 | Leave the rest alone | Never edit another phase's boards or the components after P01 — a component change is a hand-off note and a recommendation |
 | Render check | Before a phase is done, every board it touched renders with no page error: `cd .design/canvas-nav-proposals/harness && node shot.mjs ../../canvas-invana/project <out> <board>.dc.html` |
+| Publish at phase end | After the render check and the gates pass, the phase's lead publishes the mirror to the *review artifact* (under *Artifacts: read freely, publish only on Ravi's word*): 1. Artifact `read` of its URL first. 2. Artifact `publish` with `url` = the review artifact, `root` = the absolute path of `.design/canvas-invana`, `file_path` = `project/canvas.json`, `files` = only the `project/` files the phase changed, `null` for each board it removed. Never send `index.html`, `SKILL.md` or the artifact type's own files |
 
 ## Gates
 
