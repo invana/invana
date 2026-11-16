@@ -207,7 +207,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | P06 | Large modal — Access | P05 | done | 2026-11-16 | gates green · reviews passed |
 | P07 | Large modal — Settings: General, You, Connections, Notifications, About | P06 | done | 2026-11-16 | gates green · reviews passed |
 | P08 | Large modal — Settings: Plugins, Fleet, Workers, Limits, Alerts | P07 | done | 2026-11-16 | gates green · reviews passed |
-| P09 | Audit — every nav item and modal section drawn, every link resolves | P08 | in progress | 2026-11-16 |  |
+| P09 | Audit — every nav item and modal section drawn, every link resolves | P08 | done | 2026-11-16 | gates green · reviews passed |
 
 ## Hand-off notes
 
