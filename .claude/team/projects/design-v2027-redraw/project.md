@@ -195,6 +195,36 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | Budget | |
 | Steps | 1. Coverage table. 2. Fix gaps. 3. Render every board. 4. Gates |
 
+### P18 · Model map, kind tabs and the draft from the data
+
+| | |
+|---|---|
+| Agent | designer |
+| Read | `specs/capabilities/semantics/features/SE-F06-links-and-mappings/feature.md` · SE-F02 · SE-F01 · `specs/glossary.md` (*Link between models*, never *stitch*) · the previous version's boards `.design/canvas-products/project/modeller.global_model.dc.html` · `.global_model.dark` · `.global_model.stitch` · `.stitches` · `.global_model.diff` · `.model.type` · `.model.type.constraint` · `.draft` (read-only references) · the mirror's `model.models.dc.html` |
+| Stories | SE-01 · SE-02 · SE-03 · SE-04 · SE-05 · SE-08 |
+| Done when | On `model.models`: (1) the map shows every published model as a tinted labelled frame around its kinds, links between models dashed across frames, a toolbar of Show and Detail, a zoom with Fit and a minimap, and the dark theme (SE-01.1 · .2 · .9 · .13); (2) a selected link reads whole — its two ends, the keys it joins on, *joined n of n*, queries that crossed it in 30 days, who declared it — and draws thick, dashed, green (SE-03.14; reference MO-03); (3) Comparing shows v1 against the v2 draft on the map (SE-05.8; reference MO-05); (4) a kind opens in main with Properties · Indexes · Constraints · Mappings and a property table with Index and Constraint columns, including *+ staged* (SE-02.14 · .15; reference MO-02); (5) the constraint dialog — range and unit or a standard's values, Reject or Flag for review, *Today n records break it* (SE-08; reference MO-08); (6) a model drafted from the data — the model staged, the assistant on the right naming what it read and each choice with its evidence, *Review and publish* (SE-04.13; reference MO-04). Every cell of those stories' `## Screens` exists in the mirror; the words are glossary words; `check.py` reports no "not drawn" warning for them. No Operator lens differs except *Needs the Modeller role — ask an Admin* on every change act |
+| Lands | The mirror only — `model.models` and `model.health` pages; no new board file, every place keeps one board and every state is a switch |
+| Boards | `model.models · has data` (map, light and dark) · `model.models · Detail` · `model.models · Link` · `model.models · Links` · `model.models · Comparing` · `model.models · Draft · Assistant docked` · `model.models · Draft · Constraint` · `model.models · Draft · Constraint counting` · `model.models · Draft · Constraint breaks today` · `model.kinds · Detail` · `model.kinds · Detail · Indexes` · `model.kinds · Detail · Edit` (the previous version's MO-01 · MO-02 · MO-03 · MO-04 · MO-05 · MO-08) |
+| Review | |
+| Approve | Ravi — reviews the canvas once published |
+| Budget | |
+| Steps | 1. List what the mirror's `model.models` already draws against the criteria. 2. Draw the map toolbar, minimap and zoom, tinted frames and dark theme. 3. Draw the selected link. 4. Draw Comparing on the map. 5. Draw the kind's tabs and property table. 6. Draw the constraint dialog states. 7. Draw the draft from the data. 8. Gates |
+
+### P19 · Health visuals and publish check
+
+| | |
+|---|---|
+| Agent | designer |
+| Read | `specs/capabilities/semantics/features/SE-F10-health-and-history/feature.md` · SE-F02 · the previous version's boards `.design/canvas-products/project/modeller.models.usage.dc.html` · `.models.overview.empty` · `.draft.publish` · `.draft.migration` (read-only references) · the mirror's `model.health.dc.html` and `model.models.dc.html` |
+| Stories | SE-07 · SE-05 |
+| Done when | On `model.health`: (1) the Usage tab draws queries per kind as bars grouped by model, each kind marked Unused or Hot, with the links between models no query crossed beside them and *View as table* for the same rows (SE-07.26); (2) the Overview with no published model says so with *From an ontology* and *New model* (SE-07.14); (3) Usage on a graph database that cannot explain queries reads *not available on <database>* for the slow signal only (SE-07.27). On `model.models`: the Publish and Breaking publish states are checked against SE-05.11 and SE-05.12 (what changes, who reads it, the migration previewed, approval requested) and a gap is drawn only if one is found — a note in the hand-off says what was already drawn. The Overview, Database, Performance, Growth, History and saved-report states are left as they are. `check.py` reports no "not drawn" warning for these stories |
+| Lands | The mirror only — `model.models` and `model.health` pages; no new board file, every place keeps one board and every state is a switch |
+| Boards | `model.health · Usage` · `model.health · Usage · Not available` · `model.health · No model yet` · `model.models · Publish` · `model.models · Publish · Breaking` (the previous version's MO-07 · MO-05) |
+| Review | |
+| Approve | Ravi — reviews the canvas once published |
+| Budget | |
+| Steps | 1. Check the mirror's Publish and Breaking states against SE-05.11 and SE-05.12. 2. Draw the Usage bars and the not-available state. 3. Check the Overview empty state. 4. Fix any publish gap. 5. Gates |
+
 ## Log
 
 | ID | Phase | Needs | Status | Date | Notes |
@@ -208,6 +238,8 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | P07 | Large modal — Settings: General, You, Connections, Notifications, About | P06 | done | 2026-11-16 | gates green · reviews passed |
 | P08 | Large modal — Settings: Plugins, Fleet, Workers, Limits, Alerts | P07 | done | 2026-11-16 | gates green · reviews passed |
 | P09 | Audit — every nav item and modal section drawn, every link resolves | P08 | done | 2026-11-16 | gates green · reviews passed |
+| P18 | Model map, kind tabs and the draft from the data | P09 | pending |  |  |
+| P19 | Health visuals and publish check | P18 | pending |  |  |
 
 ## Hand-off notes
 
