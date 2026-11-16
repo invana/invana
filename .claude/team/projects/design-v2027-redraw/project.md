@@ -201,7 +201,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 |---|---|---|---|---|---|
 | P01 | Foundation — pages, shell components, Index |  | done | 2026-11-16 | gates green · reviews passed |
 | P02 | Shell, Sign-in & Home, Explore | P01 | done | 2026-11-16 | gates green · reviews passed |
-| P03 | Model and Graph Data | P02 | in progress | 2026-11-16 |  |
+| P03 | Model and Graph Data | P02 | done | 2026-11-16 | gates green · reviews passed |
 | P04 | Projects | P03 | pending |  |  |
 | P05 | The Agents mode, the Agents glance and the Inbox | P04 | pending |  |  |
 | P06 | Large modal — Access | P05 | pending |  |  |
