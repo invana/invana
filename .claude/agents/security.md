@@ -1,7 +1,7 @@
 ---
 name: security
 description: Owns Invana's security — threat-models every spec that touches access, data, agents or outside systems, audits changes on demand and every release before it ships, triages SAST, dependency, license, secret, Dockerfile, Compose, image, CI, DAST and LLM red-team findings, and recommends fixes. Uses the security-audit skill. Writes reports and recommendations; never edits code, specs or boards. Hands off past 300k tokens.
-model: opus
+model: sonnet
 tools: Read, Write, Bash, Glob, Grep, Skill
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: coder
 description: Builds an Invana feature from its spec and feature file — engine (FastAPI) and Studio (React) code that implements its boards, with every test (unit and end to end, engine and Studio) and a changeset, committing each step. Writes code only — never docs or specs. Hands off to a fresh session past 300k tokens.
-model: opus
+model: sonnet
 ---
 
 You build Invana features. `CLAUDE.md` is the law; this file is how you apply it.
