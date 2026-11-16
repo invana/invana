@@ -54,6 +54,8 @@ flowchart LR
 | SE-07.10 | An index the engine suggests for a model's kind and an Admin | they pick *Add index to draft* | the index is staged on that model's draft; nothing is written to the database until it is published |
 | SE-07.11 | A database that cannot explain queries or list its indexes | Performance or Database opens | that column or section says *not available on <database>*; cold properties are not called |
 | SE-07.12 | The Growth tab | it opens | records over time stack by model, or by kind for one model, moving only on days something wrote, each mark naming the read, load or link commit that wrote |
+| SE-07.26 | The Usage tab with 50 or more queries in the window | it opens | queries per kind draw as bars grouped by model, each kind marked with its signal — Unused · Hot — and the links between models crossed by no query listed beside them; *View as table* shows the same rows as a table |
+| SE-07.27 | A graph database that cannot explain queries | the Usage tab opens | counts, callers and *Unused* read as usual; the *Hot and slow* signal reads *not available on <database>* and no kind is called slow |
 | SE-07.13 | A published model with nothing loaded | Usage or Growth opens | it names the model with *Bring records in* — no chart of zeros |
 | SE-07.14 | No published model | Overview opens | it says so with *From an ontology* and *New model*; Usage, Performance and Growth say why they are empty |
 | SE-07.15 | A reading the engine does not measure yet | its tab opens | it reads *Not measured yet*, naming what it reads from |
@@ -86,3 +88,5 @@ flowchart LR
 | Saved report | Operator | — | — | model.health · Loading | model.health · Saved report | model.health · Could not load | — | — |
 | The draft · index or drift added | Admin | — | — | — | model.models · Draft | — | — | — |
 | The draft · index or drift added | Operator | — | — | — | — | — | — | — |
+| Health · Usage · slow signal | Admin | — | — | model.health · Loading | model.health · Usage · Not available | — | — | — |
+| Health · Usage · slow signal | Operator | — | — | model.health · Loading | model.health · Usage · Not available | — | — | model.health · Read only |

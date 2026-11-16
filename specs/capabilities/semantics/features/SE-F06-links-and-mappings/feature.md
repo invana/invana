@@ -248,6 +248,9 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | A drag links only on purpose | A plain drag moves a kind; **Shift**-drag from a kind onto a kind in another model, or the header's *Link mode* toggle, declares a link. The drag never adds a line: a link is a declared row and returns as data, dashed and staged |
 | A link stays in one graph database | The card's *Target* lists every published model; one bound to another graph database is disabled — *In {database} — a link joins two models in one graph database*. A Shift-drag onto a kind in such a model draws nothing and the footer says why. Linking across graph databases is later, so nothing is designed for it now |
 | The link card docks | An accepted drag docks its card on the right, not in a modal, so both frames stay in view while the keys are named; the dock closes when the card does |
+| The map has a minimap and zoom | A minimap of every frame and a zoom with *Fit* belong to the map, so a deployment of many models stays readable at any Detail |
+| A selected link is thick, dashed and green | The link read whole is the one drawn heavy; the others dim, so its two ends stay in view |
+| The property table carries Index and Constraint columns | A kind's page shows what the database holds for a property beside its type and where it came from; *+ staged* marks what only the draft holds |
 
 ## Open questions
 

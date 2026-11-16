@@ -51,6 +51,7 @@ flowchart LR
 | SE-04.10 | A read has finished | the person opens *How it got here* on what the graph database holds | it shows the run that read it, the person behind it, when, the calls it made marked schema-only, and what was left out and why |
 | SE-04.11 | An Operator | they open Model's health | *Read the database* is disabled with *Needs the Modeller role — ask an Admin*; what each graph database holds still reads |
 | SE-04.12 | A drafted model | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
+| SE-04.13 | A model drafted from a graph database | the draft opens beside the assistant | the assistant says what it read — *Read n nodes · sampled n* — and, for each choice it made, the evidence and the result: *airport.code is unique → key*, *route.dist mixes int and float → float*; every count is the engine's, and *Review and publish* sits under the message |
 
 ## Screens
 

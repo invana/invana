@@ -216,6 +216,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The picker is the all-kinds preview | Up to 500 classes are listed with their property counts; above 500 the picker takes names |
 | A first version changed everything | The first published version is compared against nothing, so every kind reads as added |
 | Broader kind, meaning only | A subclass in an ontology becomes a kind whose *Broader kind* is its parent — meaning only (SE-F04); each kind carries its ancestors' properties as its own, so storage and queries stay flattened |
+| The draft explains itself | The assistant's first message names what was read and the sample, then each choice with its evidence — counts are the engine's, never the model's own |
 
 ## Open questions
 

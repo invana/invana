@@ -54,6 +54,8 @@ flowchart LR
 | SE-02.11 | Published models | a person opens Model › Models | the left section is a tree: every model, and under it its Kinds, each with the record count the engine sends; picking a kind opens the kind |
 | SE-02.12 | Published models | a person expands a model in the Models tree | its Relationships list under its Kinds, each naming the two kinds it joins; picking one opens it on its model |
 | SE-02.13 | A kind's Properties tab | it opens | each property reads its type, *Must be*, whether it is the key, and where it comes from — *Authored*, *Read from {graph database}*, *A starter*, *From {ontology}* with its source IRI, or *A model file* — with the version that added it and who published it |
+| SE-02.14 | A kind's Properties tab | it opens | each property row also reads its index — *unique*, *range*, *point* or none — and its constraint, with *+ staged* on one only the draft holds; the tab titles carry their counts |
+| SE-02.15 | A kind's Indexes tab | it opens | each index lists its kind (unique · range · point), its properties and whether it is published or staged; a Modeller or an Admin adds one in a draft (SE-05), and an Operator reads them |
 
 ## Screens
 
@@ -71,3 +73,5 @@ flowchart LR
 | Kinds in the Models tree | Operator | model.models · Tree · No kinds yet | model.models · Tree · No kind matches | model.models · Tree · Loading | model.models · Tree | model.models · Tree · Could not load | — | model.models · Tree · Read only |
 | Relationships in the Models tree | Admin | model.models · Tree · No relationships yet | model.models · Tree · No relationship matches | model.models · Tree · Relationships loading | model.models · Tree · Relationships | model.models · Tree · Relationships could not load | — | — |
 | Relationships in the Models tree | Operator | model.models · Tree · No relationships yet | model.models · Tree · No relationship matches | model.models · Tree · Relationships loading | model.models · Tree · Relationships | model.models · Tree · Relationships could not load | — | model.models · Tree · Read only |
+| A kind · Indexes | Admin | model.kinds · Detail · No indexes | — | model.kinds · Detail · Loading | model.kinds · Detail · Indexes | model.kinds · Detail · Could not load | — | — |
+| A kind · Indexes | Operator | model.kinds · Detail · No indexes | — | model.kinds · Detail · Loading | model.kinds · Detail · Indexes · Read only | model.kinds · Detail · Could not load | — | model.kinds · Detail · Indexes · Read only |

@@ -61,7 +61,7 @@ flowchart LR
 | SE-03.11 | Staged links | the person picks *Discard* | they go and nothing was written |
 | SE-03.12 | An active link | new records are loaded | the load joins them by the link's rule without anyone re-running it |
 | SE-03.13 | A rule that denies either model, no connection, or a read-only one | the person counts, commits or removes | it is refused with the reason; nothing is counted around it and the link stays as it was |
-| SE-03.14 | An active link | the person selects it | it reads whole: its ends with their records, the rule with *n joined* or *n relationships*, the queries that crossed it in 30 days, who declared it, when and where from, and its history — declared, committed |
+| SE-03.14 | An active link | the person selects it | it reads whole: its ends with their records, the rule with *n joined* or *n relationships*, the queries that crossed it in 30 days, who declared it, when and where from, and its history — declared, committed; on the map the selected link draws thick, dashed and green and the other links dim |
 | SE-03.15 | An active link | the person picks *Remove link* and confirms | a run withdraws exactly the relationships it wrote, then the link goes and is listed under *Removed* with who removed it, when and what was withdrawn |
 | SE-03.16 | A relationship the link wrote | the person opens *How it got here* on it | it names the link, its rule and when it was written |
 | SE-03.17 | A model republished | its links show | they carry onto the new version; links on the version it replaced stay as history and are not counted twice |

@@ -195,6 +195,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | History reads effect after | Each version: when · by · what changed · why · effect after — *1 kind now warns · 6 records* or *2 kinds hold*, else the runs and tokens while it was published. *Compare vA and vB* and each row's *Compare* open the map's Comparing bar |
 | All models, all history | At all models, History lists every model's versions with a model column, newest first |
 | The query log keeps 90 days | The widest window; older rows are pruned by the engine |
+| Usage draws before it lists | Bars per kind, grouped by model, with the signal marked; the table is *View as table*. The rows are the engine's `rows[]` and `stitches[]` — no new read |
+| *Hot and slow* needs the database to explain a query | Where it cannot, that one signal reads *not available on <database>*; the other signals do not depend on it |
 
 ## Open questions
 

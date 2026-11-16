@@ -51,6 +51,7 @@ flowchart LR
 | SE-01.10 | A deployment with no model | the person opens Model | the map says *No model yet* with *New model* |
 | SE-01.11 | An Operator | they open the map | it reads in full; *Link models* and *New model* are disabled with *Needs the Modeller role — ask an Admin* |
 | SE-01.12 | Published models and active links | the person opens the whole model's list | Each kind and relationship is listed with the models that contribute it and whether a link joins it as the same thing, counted by the engine |
+| SE-01.13 | The map | it shows | a toolbar holds *Show* and *Detail*; a zoom control with *Fit* and a minimap of every frame sit at its corners, the minimap marking the view; picking a place on the minimap moves the view there |
 
 ## Screens
 
