@@ -20,7 +20,7 @@ depends_on: [SE-F02]
 
 ```mermaid
 flowchart TD
-  start([Model › Graph Data › Browse by kind]) --> k["RC-01 · Pick a model and a kind — from the graph databases the default agent may Read"]
+  start([Model › Graph Data › Records]) --> k["RC-01 · Pick a model and a kind — from the graph databases the default agent may Read"]
   start -->|a link to a kind it may not Read| wh(["RC-01 · Withheld · names the rule"])
   k --> any{Any records?}
   any -->|none| e0["No records of this kind yet — where records come from"]
@@ -83,7 +83,7 @@ flowchart TD
 
 | Decision | Detail |
 |---|---|
-| Graph Data is a group of Model | Model's *Graph Data* group: Browse by kind lists the kinds grouped by model, from the graph databases the person's default agent may read, then Loads · Quality · Annotations; a record opens in main with a breadcrumb |
+| Graph Data is a group of Model | Model's *Graph Data* group: Records lists the kinds grouped by model, from the graph databases the person's default agent may read, then Loads · Quality · Annotations; a record opens in main with a breadcrumb |
 | Writes are checked, never free-edited | Every write from Graph Data is checked against the model before it lands; there is no free-edit grid ([RC-F02](../RC-F02-bring-records-in/feature.md) · [EX-F06](../../../explore/features/EX-F06-annotate-and-edit-the-data/feature.md)) |
 | Key order | Records page in the order of their kind's key, so a page is stable between visits |
 | Open on a board | A record opens on a new board from here, with its neighbours one step out |

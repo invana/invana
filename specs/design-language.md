@@ -45,7 +45,7 @@ The regions are the shell's (`AppLayoutV2`); only what fills them changes.
 | Item | Shows | Opens | Who |
 |---|---|---|---|
 | ☰ Invana {Mode} ▾ | One control: the wordmark with the current mode — *Invana Explore* · *Invana Model* · *Invana Projects* · *Invana Agents*; plain *Invana* on Home | The switcher | Everyone |
-| The crumb | *view › item* after the wordmark, never the mode: *Models › Airways model › Airport* · *Browse by kind › Airways › Airport* · *Boards › Hub routes* · *Projects › Winter delays review › Tasks*; each level links one level up | That level | Everyone |
+| The crumb | *view › item* after the wordmark, never the mode: *Models › Airways model › Airport* · *Records › Airways › Airport* · *Boards › Hub routes* · *Projects › Winter delays review › Tasks*; each level links one level up | That level | Everyone |
 | ⌘K | *Do, open or ask anything* — the shortcut layer for everything not in the leftNav, Help included ([CP-F07](os/control/features/CP-F07-find-your-way/feature.md)) | ⌘K | Everyone |
 | *● n running* | Runs going now; *Idle* with a grey dot when nothing runs — it keeps its place | The Operations dropdown ([CP-F09](os/control/features/CP-F09-overview/feature.md)) | Everyone; a person without Read on Runs reads their own |
 | *Access* | A lock; a count only when an act was blocked today | The Access dropdown ([AC-F06](os/access/features/AC-F06-history/feature.md)) | Everyone; what a person may not read is withheld, each row's acts disabled with who can grant them |
@@ -70,7 +70,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 |---|---|
 | Home | — |
 | Explore | Boards · Conversations · Dashboards · Queries |
-| Model | Models · Standards · Health · **Rules and meaning**: Rules · Views · Taxonomies · Inference · **Graph Data**: Browse by kind · Loads · Quality · Annotations |
+| Model | Models · Standards · Health · **Rules and meaning**: Rules · Views · Taxonomies · Inference · **Graph Data**: Records · Loads · Quality · Annotations |
 | Projects | Projects · My tasks · Reviews · Schedules |
 | Agents | Agents · Skills · Runs · Schedules |
 
@@ -82,7 +82,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | Views | The views, grouped by who uses them ([SE-F09](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md)) |
 | Taxonomies | Per model: its broader kinds and value hierarchies ([SE-F04](capabilities/semantics/features/SE-F04-taxonomies/feature.md)) |
 | Inference | The derivations, grouped by rule ([SE-F08](capabilities/semantics/features/SE-F08-inference/feature.md)) |
-| Browse by kind | The kinds, grouped by model |
+| Records | The kinds, grouped by model |
 | Projects | Active · Draft · Done |
 | Agents (view) | Every agent, grouped Built in · Team pack · Custom · Outside — outside agents a group, never a view ([AG-F02](capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md)); an agent opens as its page in main |
 | Skills | Skills · Workflows (Built in · Approved, by what each touches) · Functions (*Tools they call*) · Approaches · Projection templates; a skill, a workflow and a function each open as their page in main ([AG-F04](capabilities/agents/features/AG-F04-skills/feature.md) · [AG-F06](capabilities/agents/features/AG-F06-plans-and-workflows/feature.md)) |
@@ -100,7 +100,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | The switcher is the one mode switch | The leftNav holds no mode switch; the *☰ Invana {Mode} ▾* control opens [the switcher](#the-switcher) |
 | Collapsed, it still says what needs you | Icons only: the lit view stays lit, a view whose count needs you carries a dot, hover shows its label; leftSection is unchanged |
 | Rules and meaning is a group of Model | Rules · Views · Taxonomies · Inference are views of Model like any other — each its own leftSection, a rule, a view, a taxonomy or a derivation opening in main; none opens in the large modal |
-| Graph Data is a group of Model | Browse by kind lists the kinds grouped by model, from the graph databases the person's default agent may read; Loads · Quality · Annotations follow. A record and a load open in main with a breadcrumb ([Records](capabilities/records/product.md)) |
+| Graph Data is a group of Model | Records lists the kinds grouped by model, from the graph databases the person's default agent may read; Loads · Quality · Annotations follow. A record and a load open in main with a breadcrumb ([Records](capabilities/records/product.md)) |
 | A mode's Schedules is a filter | Projects › Schedules is the one Schedules list filtered to that mode's kind, and every schedule while there is one kind ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
 | Before set-up | Mode switches are disabled until set-up starts; Home is the only place ([CP-22](os/control/features/CP-F05-graph-databases/stories/CP-22-start-a-fresh-deployment-from-a-question/story.md)) |
 
@@ -330,7 +330,7 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 | Home · Graphs · Onboarding | **Home** — *What are you trying to decide?*, the set-up steps until the deployment is ready (*n of 4*), then the first answer | page |
 | Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
 | Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships, and the links between models) · Standards · Health · Rules and meaning (Rules · Views · Taxonomies · Inference) · Graph Data | mode |
-| Datasets · Imports | **Graph Data** — a group of Model: Browse by kind (kinds grouped by model, from the graph databases the person may read) · Loads · Quality · Annotations; a record and a load open in main | mode |
+| Datasets · Imports | **Graph Data** — a group of Model: Records (kinds grouped by model, from the graph databases the person may read) · Loads · Quality · Annotations; a record and a load open in main | mode |
 | Agent Builder · Fleet · Skills · Plugins | **Agents** mode — Agents · Skills (with its Workflows) · Runs (with *How they are doing*) · Schedules; an agent, a skill, a workflow and a run open in main. Its glance is the Agents summoner. Plugins, the Fleet map and Workloads, and Workers are Settings | mode · modal |
 | Team packs | **Settings › Connections › Team packs**, each with *Used by n agents* | modal |
 | Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's; the depth is Agents › Runs and Settings › Workers | dropdown |

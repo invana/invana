@@ -52,7 +52,7 @@ from.
 
 | Surface | Tier | Board |
 |---|---|---|
-| Graph Data › Browse by kind — kinds grouped by model | mode | `data.records` |
+| Graph Data › Records — kinds grouped by model | mode | `data.records` |
 | A record — Values · Provenance · History · Annotations | mode | `data.records · Detail` |
 | Bring records in — upload, add by hand, every load and what it rejected | modal | `data.loads · Upload` · `data.loads · Add by hand` |
 | Quality — what breaks the model and the standards | mode | `data.quality` |
@@ -79,7 +79,7 @@ from.
 | Provenance reads History | Who wrote each value is read from the deployment's one append-only event store, owned by [AC-F06](../../os/access/features/AC-F06-history/feature.md) and filtered to the record — never a second store |
 | Annotations are instances of a built-in model | An annotation is a record of the built-in *Annotation* kind, kept by Invana, never in the customer's graph database. Explore creates them while investigating; Records keeps and manages them ([RC-F07](features/RC-F07-annotations/feature.md)) |
 | Merging is chosen, never inferred | A person picks the records that are one; Invana never decides two records are the same |
-| Graph Data lives in Model | On screen the capability is Model's *Graph Data* group — Browse by kind · Loads · Quality · Annotations — never a summoner; a record and a load open in main |
+| Graph Data lives in Model | On screen the capability is Model's *Graph Data* group — Records · Loads · Quality · Annotations — never a summoner; a record and a load open in main |
 | Screen words | *Graph Data* names the place; *record* and *Load* are on screen; *Records* is the capability's docs name; *instance* is a vision and docs word |
 
 ## Depends on
