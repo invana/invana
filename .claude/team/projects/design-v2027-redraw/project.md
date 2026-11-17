@@ -1,6 +1,6 @@
 ---
 name: design-v2027-redraw
-status: paused
+status: ready
 branch: design-redesign/P17-audit-every-board-drawn-every-link-resol
 scope: design-v2027-redraw
 artifact_publish: auto approve
@@ -195,6 +195,21 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | Budget | |
 | Steps | 1. Coverage table. 2. Fix gaps. 3. Render every board. 4. Gates |
 
+### P10 · Model — the Models tree by graph database, links on the canvas
+
+| | |
+|---|---|
+| Agent | designer |
+| Read | P09's hand-off notes · `design-story` · `specs/capabilities/semantics/features/SE-F06-links-and-mappings/feature.md` (*The left section is the Models tree*) · SE-01 · SE-02 · SE-03 · `specs/design-language.md` (Models view, *Views and their leftSection*) · `specs/glossary.md` (*Link between models*, never *stitch*) · Products page *Invana Modeller*: read its board titles in `.design/canvas-products/project/canvas.json`, open only the 3–5 nearest — `modeller.global_model` · `.global_model.dark` · `.global_model.stitch` (MO-03 — *A stitch selected — its two ends, what it joins, whether queries cross it*, generator `.design/canvas-products/p_*.py`: the visual reference, redrawn on the new shell, never its markup or retired patterns) · `.stitches` · `.global_model.diff` · the mirror's `model.models.dc.html` · `@invana/canvas` graph rendering (the Explore boards' graph, the mirror's bundle) |
+| Stories | SE-01 · SE-02 · SE-03 |
+| Done when | (1) `model.models` opens by default showing the Models tree — each model's Kinds and Relationships, then a visible *Links between models* entry with its count (SE-F06 *The left section is the Models tree*) — and the *Links between models* section in main, not only behind the State switch. (2) The Models tree is grouped by graph database — each graph database a folder holding the models bound to it (SE-F06 *The left section is the Models tree*, SE-01.14); a link stays inside one folder (SE-F06 *One graph database*) and different graph databases sit side by side, never joined. A folder is a graph database, not a new group: no group act, nesting or rule is drawn. (3) The model map is drawn on `@invana/canvas` as a graph — a model's kinds as nodes inside its tinted frame, relationships solid inside the frame, links between models as drawn edges across frames: dashed (SE-01.2); a selected active link thick, dashed, green, the others dim (SE-03.14). Drawn by default on `model.models` (not behind a State switch): a toolbar and a bar with *Show: all n models · Lens · Detail* (SE-01.3 · .4 · .13), a minimap with zoom % and *Fit* at the bottom left (SE-01.13). A selected link opens a right panel: *Ends* (the two kinds, colour-keyed to their models) · *Joins on* (match, joined) · *Crossed by queries* (n in 30 days) · declared by and when · *Open in…* (SE-03.14). A footer status line: version active · draft · staged count · valid — SE-01.6 words the footer `n models · n kinds · n links between models` and SE-03 does not word the rest, so draw the board's line with design-language footer rules and note it as unspecified in the hand-off. Staged and active links are told apart only as SE-03 words them (staged until *Commit*, SE-03.10). No hand-drawn boxes or lines stand in for the graph (Design rules). (4) Every SE-01, SE-02 and SE-03 state still reachable as a View · State · Lens switch on this one board, both lenses, linked — the Link, Link card, Link counting and Link joins states among them. `model.kinds` and `model.relationships` stay removed, no link to them. (5) Render check on `model.models` with no page error; gates `specs` and `links` green. (6) **Last step: the mirror is published to the review artifact — see Steps 7**; P02–P09 sessions did not publish and the project-lead had to, so this phase is not done until the publish result is in the hand-off notes |
+| Lands | The mirror: `model.models.dc.html` and `canvas.json` (and any board file a repointed link touches) |
+| Boards | `model.models` — View · State · Lens: Tree · Links between models · Map (light and dark) · Link · Link card · Link counting · Link joins · every other SE-01 · SE-02 · SE-03 state it already has |
+| Review | none |
+| Approve | Ravi — reviews the canvas once published |
+| Budget | |
+| Steps | 1. List what `model.models` already draws against SE-01, SE-02, SE-03 and the Models-tree rule. 2. Make the tree (graph-database folders) and *Links between models* the default view. 3. Redraw the map on `@invana/canvas` after MO-03, links as edges, toolbar, minimap, selected-link panel, footer line. 4. Note in the hand-off what the spec does not word. 5. Keep every state a switch; repoint links. 6. Render check; gates `specs` and `links`. 7. **PUBLISH — the last step, never skipped.** (a) Artifact `read` of `https://claude.ai/artifact/VhXDTAAHV7z4hCRJuQEHHD`. (b) Artifact `publish` with `url` = `https://claude.ai/artifact/VhXDTAAHV7z4hCRJuQEHHD`, `root` = the absolute path of `.design/canvas-invana`, `file_path` = `project/canvas.json`, `files` = only the `project/` files the phase changed, `null` for each board removed; never `index.html` or `SKILL.md`. This header carries `artifact_publish: auto approve` (checked 2026-11-17, unchanged), so the session publishes itself and writes the new version in its hand-off note. Only if the header says otherwise: note it and stop, never publish |
+
 ### P18 · Model map, kind tabs and the draft from the data
 
 | | |
@@ -238,7 +253,8 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | P07 | Large modal — Settings: General, You, Connections, Notifications, About | P06 | done | 2026-11-16 | gates green · reviews passed |
 | P08 | Large modal — Settings: Plugins, Fleet, Workers, Limits, Alerts | P07 | done | 2026-11-16 | gates green · reviews passed |
 | P09 | Audit — every nav item and modal section drawn, every link resolves | P08 | done | 2026-11-16 | gates green · reviews passed |
-| P18 | Model map, kind tabs and the draft from the data | P09 | pending |  |  |
+| P10 | Model — the Models tree by graph database, links on the canvas | P09 | pending |  |  |
+| P18 | Model map, kind tabs and the draft from the data | P10 | pending |  |  |
 | P19 | Health visuals and publish check | P18 | pending |  |  |
 
 ## Hand-off notes
@@ -250,3 +266,4 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 
 | Date | Phase | Question | Options | Recommend | Answer |
 |---|---|---|---|---|---|
+| 2026-11-17 | P10 | Models in groups shown as folders: no spec says models are grouped or filed in folders (SE-F06 lists a model's Kinds and Relationships; design-language groups views and kinds *by model*; SE-F09 declines folders for views). What does a group of models mean? | A. Draw only what the spec has — each model a collapsible tree node, Browse by kind grouped by model, no folders of models. B. Spec it first (group name, who makes one, nesting, access), then draw folders. C. Draw folders as an idea, flagged unspecified | A, then B only if Ravi wants groups — a spec change, not a drawing choice  Ravi, 2026-11-17: a folder is a graph database (an existing concept), not a new group. No group spec. Options B and C are moot; spec words the grouping (SE-F06, SE-01.14). Closed |
