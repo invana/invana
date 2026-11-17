@@ -189,7 +189,7 @@ every one.
 | Rule | Detail |
 |---|---|
 | A shared canvas lives in `@invana-studio/canvases` | A canvas two or more modules render lives in `studio/packages/canvases/`, owned by neither. It takes data, config and seams as props and knows none of its callers — no page import, no query hook, no engine type; each caller adapts its own record |
-| A host adds nothing to the canvas | No children, toolbar items or camera hooks from a page. What a page needs beyond the drawing — a draft bar, a form — sits around the canvas in the page's layout. Selection is the one channel in and out, plus a gesture the board itself offers |
+| A host adds nothing to the canvas | No children, toolbar items or camera hooks from a page. What a page needs beyond the drawing — a draft bar, a form — sits around the canvas in the page's layout, or the layout floats the toolbar, bars and right panel over the canvas. Selection is the one channel in and out, plus a gesture the board itself offers |
 | Detail is a config patch | A Detail switch applies its patch, then re-runs the layout, since a new node size needs new positions |
 | Every run fits the camera | Each layout the board starts — new data, a Detail switch — fits the camera as the nodes move, and never past 100%, so a small drawing is not framed at 2× on a wide page. A narrowing region pans, never refits (above) |
 | The theme is Studio's | No theme toggle on a canvas. `CanvasThemeSync source="tokens"` hands the canvas one theme whose palette is the live tokens — backdrop, cards, text, hairlines, rings and the categorical ramp `--color-data-N` — on every theme change; the canvas library's own palette is not used |
