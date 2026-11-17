@@ -253,7 +253,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | P07 | Large modal — Settings: General, You, Connections, Notifications, About | P06 | done | 2026-11-16 | gates green · reviews passed |
 | P08 | Large modal — Settings: Plugins, Fleet, Workers, Limits, Alerts | P07 | done | 2026-11-16 | gates green · reviews passed |
 | P09 | Audit — every nav item and modal section drawn, every link resolves | P08 | done | 2026-11-16 | gates green · reviews passed |
-| P10 | Model — the Models tree by graph database, links on the canvas | P09 | in progress | 2026-11-17 |  |
+| P10 | Model — the Models tree by graph database, links on the canvas | P09 | done | 2026-11-17 | gates green · reviews passed |
 | P18 | Model map, kind tabs and the draft from the data | P10 | pending |  |  |
 | P19 | Health visuals and publish check | P18 | pending |  |  |
 
