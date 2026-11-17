@@ -52,6 +52,7 @@ flowchart LR
 | SE-01.11 | An Operator | they open the map | it reads in full; *Link models* and *New model* are disabled with *Needs the Modeller role — ask an Admin* |
 | SE-01.12 | Published models and active links | the person opens the whole model's list | Each kind and relationship is listed with the models that contribute it and whether a link joins it as the same thing, counted by the engine |
 | SE-01.13 | The map | it shows | a toolbar holds *Show* and *Detail*; a zoom control with *Fit* and a minimap of every frame sit at its corners, the minimap marking the view; picking a place on the minimap moves the view there |
+| SE-01.14 | Published models in more than one graph database | the left section lists them | models are grouped by graph database, each a folder holding the models bound to it; picking a model or a link opens it in main; a link joins models inside one folder only, and graph databases stay side by side, never joined |
 
 ## Screens
 

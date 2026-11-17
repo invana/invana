@@ -77,7 +77,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | View | Its leftSection |
 |---|---|
 | Boards | Mine · Shared with me · Archived |
-| Models | Every model, a tree of its Kinds and Relationships, then *Links between models* with their count — Kinds and Relationships are not views of their own; links between models are declared here and on the model map ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| Models | Every model, grouped by graph database (one folder each), a tree of its Kinds and Relationships, then *Links between models* with their count — Kinds and Relationships are not views of their own; links between models are declared here and on the model map ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
 | Rules | Everywhere · each project · on properties · Requests, its open count beside it ([SE-F07](capabilities/semantics/features/SE-F07-rules/feature.md)) |
 | Views | The views, grouped by who uses them ([SE-F09](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md)) |
 | Taxonomies | Per model: its broader kinds and value hierarchies ([SE-F04](capabilities/semantics/features/SE-F04-taxonomies/feature.md)) |
