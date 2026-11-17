@@ -36,7 +36,7 @@ flowchart TD
   n -->|a run they may not read| wd(["Head only · content withheld"])
   n -->|a decision| src["Follow to its sources · findings · steps · evidence · records"]
   src --> rec["Records read fresh through the agent's Access Policies"]
-  rec -->|a policy refuses one| rw(["Counted as withheld"])
+  rec -->|a policy refuses one| rw(["Left out · no count · no note"])
   n --> mk(["Mark good or bad — AG-55"])
 ```
 
@@ -50,7 +50,7 @@ flowchart TD
 | GP-03.4 | A filter nothing matches | it is applied | it says nothing matches, names the filter and offers *Clear filters* |
 | GP-03.5 | Any node | the person opens it | it shows its kind, its outcome labels and marks, its links and — when they may read it — its content |
 | GP-03.6 | A decision | the person follows it to its sources | the findings it weighed, the steps they came from, and the evidence and record IDs they cite are drawn as a path |
-| GP-03.7 | A record on that path | the person opens it | it is read fresh through the agent's Access Policies; a record the policies refuse is never shown, and the path says how many were withheld |
+| GP-03.7 | A record on that path | the person opens it | it is read fresh through the agent's Access Policies; a record the policies refuse is left out, with no count and no note |
 | GP-03.8 | A node older than 180 days | it is opened | it reads in full and says *Not recalled — older than 180 days* |
 | GP-03.9 | A node of a run the reader may not read | it is opened | it shows that it ran, its status, its tokens, the plan or workflow, its labels and record IDs; the content is withheld, naming who may read it |
 | GP-03.10 | The system graph behind | the page opens | it says how far behind it is and when it last caught up, and draws what it holds |

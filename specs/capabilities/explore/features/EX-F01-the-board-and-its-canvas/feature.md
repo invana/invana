@@ -90,7 +90,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Open a board · look, pan, zoom, select | Every role — Operator, Modeller, Admin; what it draws reads through the person's default agent | *Not found* for a board that does not exist; a source the default agent may not Read: *Withheld — your agent may not read {resource}* |
+| Open a board · look, pan, zoom, select | Every role — Operator, Modeller, Admin; what it draws reads through the person's default agent | *Not found* for a board that does not exist; a board or answer built on a source the default agent may not Read is *Not found* |
 | Expand a node · count the kinds | Every role, through the Assistant, within its Access Policies | A kind a rule denies: refused, naming the rule · no Assistant: *{person} may not use Assistant — ask an Admin* |
 | Change the layout · style · hide · switch modes | Every role, with the Assistant; a change is kept on the board as a version naming who made it | No Assistant: *{person} may not use Assistant — ask an Admin* |
 | Create a dashboard · pin, refresh, unpin a tile | Every role, with the Assistant; a tile refreshes through the agent that answered it | Disabled — *{person} may not use Assistant — ask an Admin* |
@@ -111,7 +111,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | Has data | The drawing, the row, the rail, the dock, the footer's counts |
 | Failed | What failed in a sentence and the next act — a failed query opens the console on its Log; a graph database off or down is named; the board is untouched |
 | Agent working or proposing | An answer drawing onto the board: the reply is live in the thread, the board adds what it brings |
-| No access | A board that does not exist is *Not found*; on a board they open, an act they may not take is disabled, naming the role, the missing agent or the rule; a source their default agent may not Read is *Withheld* |
+| No access | A board that does not exist is *Not found*; on a board they open, an act they may not take is disabled, naming the role, the missing agent or the rule; a board or answer built on a source their default agent may not Read is *Not found* |
 
 ## Rules
 
@@ -227,7 +227,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Board kinds | One registry in the engine, a row per kind: `renders` (`canvas` · `declared`), `subject_required`, what `subject_id` names. Drawn: `data` · `model` · `plan` · `workflow` (a plan's steps) · `envelope` · `lineage`. Declared: `run` · `task_run` · `plan_runs` · `compare` ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) · `skill` · `skill_usage` ([AG-F04](../../../agents/features/AG-F04-skills/feature.md)) · `rule` · `requests` ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) · `models` ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)). There is no `agent` kind — an agent opens as its own page. A new kind is written here first, never added in code |
 | What a gesture writes | `model` stages add · connect · delete; `plan` writes a dependency when a card is dropped on a card; `data` stages add · connect · edit · delete in Edit mode (EX-F06). `workflow`, `envelope`, `lineage` and every declared kind only select. A declared board is drawn from a closed set of panels |
-| Who opens a board | Every signed-in person: a board has no access list. A route answers *Not found* only for a board that does not exist; what the board holds is returned as far as `lineage.may_see(person, copy)` allows, the rest *withheld*, naming the resource |
+| Who opens a board | Every signed-in person: a board has no access list. A route answers *Not found* only for a board that does not exist; what the board holds is returned as far as `lineage.may_see(person, copy)` allows, the rest absent, naming nothing |
 | Who changes a board | Every role with the Assistant, through it; each kept change is a version naming who made it |
 | Who made it | The person who creates a board, or the person behind the run that made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#mechanisms)); the board's owner is the platform |
 | A live declared board has no row | It is built from its subject on every open; the first report kept creates its row. A board whose subject is gone stays and reads *this run is gone* |

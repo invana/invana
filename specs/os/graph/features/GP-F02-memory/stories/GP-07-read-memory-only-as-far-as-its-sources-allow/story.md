@@ -22,7 +22,7 @@ person's agent is their default agent ([AC-F02 › Rules › The default agent](
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Browse the thinking graph; open a node whose memory place and every source their default agent may Read | A node withheld: its head only, naming the resource their agent may not read |
+| Admin | Browse the thinking graph; open a node whose memory place and every source their default agent may Read | A node whose place their agent may not Read: its head only. A node with a source their agent may not Read is absent, with no note |
 | Operator | The same; a Modeller reads the same | The same |
 
 ## Flow
@@ -32,7 +32,7 @@ flowchart TD
   n([Open a memory node]) --> pl{"Default agent may Read the node's place · memory/project · memory/agent · memory/org?"}
   pl -->|no| h1(["Head only · Withheld — your agent may not read the place"])
   pl -->|yes| sr{"May Read every source the node inherits?"}
-  sr -->|no| h2(["Head only · Withheld — your agent may not read the resource"])
+  sr -->|no| h2(["Absent · no note"])
   sr -->|yes| full(["The node in full · its sources"])
   x([A proposal arrives from another project]) --> cr["It carries its sources' lineage"]
   cr --> sr
@@ -45,13 +45,13 @@ flowchart TD
 |---|---|---|---|
 | GP-07.1 | A memory node | it is made | it records the resources of its sources — the records' levels, the runs, the findings and decisions it came from — and its level is the highest among them |
 | GP-07.2 | A memory node | a person opens it | it reads in full only when their default agent may Read the node's place — `memory/project/{project}` · `memory/agent/{agent}` · `memory/org` — **and** every source it inherits |
-| GP-07.3 | A node whose place the person's default agent may Read but one source it may not | it is opened | its head shows — kind, labels, marks, time, who made it; its content reads *Withheld — your agent may not read {resource}* |
-| GP-07.4 | A thinking graph with such nodes | it is drawn | the node is drawn with its head and links, so the graph's shape does not hide that something is withheld; the count of withheld nodes is named |
+| GP-07.3 | A node whose place the person's default agent may Read but one source it may not | it is listed or opened | it is absent from lists and the graph and reads *Not found* by link, with no note |
+| GP-07.4 | A thinking graph with such nodes | it is drawn | those nodes and their links are left out, with no count and no note |
 | GP-07.5 | A proposal that arrives from another project — a learning, a finding, a decision | it is made | it carries its sources' lineage; a person reads it only when their default agent may Read each source, whichever project holds it |
 | GP-07.6 | An agent | it recalls memory to plan or answer | it recalls only the nodes its own policies and its sources' allow, the same check as a person's; a node it may not read is never recalled and never counted as evidence |
 | GP-07.7 | A person's default agent | its rules change | the next read of every node follows the new rules |
 | GP-07.8 | An org-knowledge node promoted by a person | it is opened | it reads like any node — a promotion widens where it lives, never what its sources allow |
-| GP-07.9 | A decision followed to its sources | a source is withheld from the person | the path draws it as withheld, naming the resource, and counts it (GP-03.7) |
+| GP-07.9 | A decision followed to its sources | a source is hidden from the person | the path leaves it out, with no count and no note (GP-03.7) |
 | GP-07.10 | A node with no recorded sources | it is read | it is not shown (GP-06.7) |
 | GP-07.11 | An agent's outcome that recalled memory | its run is read | How it got here shows each node it recalled, its sources and its level |
 

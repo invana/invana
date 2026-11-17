@@ -51,6 +51,7 @@ flowchart LR
 | RC-08.8 | A file the browser cannot read | it is dropped | it says why, with *Choose another* |
 | RC-08.9 | An Operator | they open Bring records in | *Upload* is disabled with *Needs the Modeller role — ask an Admin* |
 | RC-08.10 | A document, a paper or any file that is not rows with a header | it is dropped | it is refused before anything is read: *Only rows that fit a kind can be loaded — extract them first*; nothing is written |
+| RC-08.11 | A load whose rows name a kind or a property that *Hidden from agents* hides from the loader's agent | it starts | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is written ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 
 ## Screens
 

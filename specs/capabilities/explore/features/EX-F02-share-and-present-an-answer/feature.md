@@ -34,7 +34,7 @@ flowchart TD
   sh --> open{Does the board or snapshot still exist?}
   open -->|no| nf["Not found — a link carries no access"]
   open -->|yes| lin{"Does the person's default agent read every source of the copy?"}
-  lin -->|no| red["Redacted — it lists, its content reads Withheld, naming what the agent may not read"]
+  lin -->|no| red["Not found — as for a copy that does not exist"]
   lin -->|yes| seen([They see the board and its answers, or the snapshot as it was])
   d -->|a project| pj{"An agent they may use, a project they may add to?"}
   pj -->|no| ask["Disabled — names the agent or the project's members"]
@@ -84,7 +84,7 @@ tells the people and teams picked and gives them its link, and a link carries no
 | Has data | The Share dialog with who it is shared with; the presenter with its steps; the finding on its branch |
 | Failed | *Could not keep the snapshot* with the reason · a step that cannot play, with *Skip* |
 | Agent working or proposing | The answer still running: no Share and no Add to a project on the reply |
-| No access | A link to a board or snapshot that does not exist is *Not found*; *Share* without the Assistant is disabled, naming the role or the agent; a shared answer whose sources the person's default agent may not read lists but its content reads *Withheld — your agent may not read {resource}* |
+| No access | A link to a board or snapshot that does not exist is *Not found*; *Share* without the Assistant is disabled, naming the role or the agent; a shared answer whose sources the person's default agent may not read reads *Not found* |
 
 ## Rules
 
@@ -92,7 +92,7 @@ tells the people and teams picked and gives them its link, and a link carries no
 |---|---|
 | Only a settled answer travels | Share and Add to a project sit on a settled answer's reply line; a running, failed or stopped answer has neither |
 | Shared with people, never with a link | A board, or one snapshot of it, is shared with named users and teams: each is told in the Inbox and the board lists under their *Shared with me*; a team share tells whoever is on the team then. The link gives no access of its own — it opens the board for any signed-in person, its content as far as their default agent reads |
-| A copy shows as far as the person's agent reads | A shared board, a live link, a snapshot and a presented answer are copies: each records the resources it was read from ([lineage](../../../../os/graph/features/GP-F02-memory/feature.md#engine)). Whoever opens one sees its content only when their default agent may Read every source; otherwise it lists — what it is, when, who made it — and its content reads *Withheld — your agent may not read {resource}*, naming each. A copy's level is the highest of its sources' |
+| A copy shows as far as the person's agent reads | A shared board, a live link, a snapshot and a presented answer are copies: each records the resources it was read from ([lineage](../../../../os/graph/features/GP-F02-memory/feature.md#engine)). Whoever opens one sees its content only when their default agent may Read every source; otherwise it does not exist for them: absent from lists, *Not found* by link, naming nothing. A copy's level is the highest of its sources' |
 | Sharing opens no run | A shared board's answers read as copies, through lineage; the content of the runs behind them — queries and *How it got here* — stays with the person behind each run, as run privacy says ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules) · [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Outside people get a file | PNG, CSV or Markdown; an export carries only what the board and its runs already hold and never reads a graph database again. It passes the outbound check with lineage: confidential and personal values are left out and the file names what was left out |
 | A snapshot is frozen | It keeps the board's records, the answer, its citations and the loads its records came from, and never re-reads them; pruning the run later changes nothing |
@@ -153,7 +153,7 @@ tells the people and teams picked and gives them its link, and a link carries no
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | — | None of its own; opening, sharing and keeping a snapshot meet EX-F01's (*Not found.* · *{person} may not use {agent} — ask an Admin.*), adding a finding PJ-F03's | — | EX-15.6 · EX-15.10 · EX-15.12 · EX-12.5 |
-| — | A copy a person's default agent may not read is never refused: it is redacted, with the content reading *Withheld — your agent may not read {resource}* | — | EX-15.16 · EX-15.17 |
+| — | A copy a person's default agent may not read is never refused: it is absent from lists and *Not found* by link | — | EX-15.16 · EX-15.17 |
 
 ### CLI
 
@@ -167,7 +167,7 @@ tells the people and teams picked and gives them its link, and a link carries no
 |---|---|
 | A snapshot | One `explore_board_versions` row on the answer's `run` board: `cause = report`, `label` *Snapshot — {the question}*, the reply's `message_id`. Studio composes the document in the browser; the engine stores it whole. Its link opens the page `run:{run}@{version}` |
 | What a snapshot holds | A header — the question, the chip *Snapshot*, the graph databases it read, when it was taken · `narrative`, the answer's words · one panel per answer part: `table` · `metric` · `bars` · a `table` titled *Board* with the drawing's records and its node and relationship counts · `text` *No records* for an empty answer · `citations`, each query with its graph database, language and record count · `list` *Loads*, each load's id, content hash and whether it is undone |
-| Lineage on a snapshot | A snapshot's version row records its sources — the resources the answer's queries read, in [Access Policies' grammar](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms) with the level — through `lineage.record(copy, sources)`; opening a snapshot, a live link or a presented answer calls `lineage.may_see(person, copy)`, and a copy the person's agent may not read in full is returned redacted: its head, and each part's content *withheld* naming the resource |
+| Lineage on a snapshot | A snapshot's version row records its sources — the resources the answer's queries read, in [Access Policies' grammar](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms) with the level — through `lineage.record(copy, sources)`; opening a snapshot, a live link or a presented answer calls `lineage.may_see(person, copy)`, and a copy the person's agent may not read in full is answered as *Not found* |
 | An export is checked | Each PNG, CSV or Markdown goes through `outbound.check(payload, target)` with lineage before it is sent to the browser's download: values at a confidential or personal level are left out, and the file's header names the properties left out and their levels |
 | A share | `PUT /boards/{board}/shares` writes one `explore_board_shares` row per user or team, with the snapshot's `version_id` when a snapshot is shared; each person or team picked is notified through the Inbox, a team through who is on it then; a share is a notice and a list entry, never a gate |
 | The walkthrough | `settings.walkthrough` on the board, autosaved and versioned with it. A step is `id` · `title` · `narration` · `data` (what its reply added to the drawing) · `view.focus` · `view.camera` · `meta.reply_id` (absent on an authored step) · `annotation_ids` (an authored step's) |

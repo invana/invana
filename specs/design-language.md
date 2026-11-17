@@ -24,7 +24,7 @@ that work and go away again.
 | 6 | **Four modes, not nine products** | The person never picks a product from a launcher. Explore, Model, Projects and Agents are modes of one Studio, named in the wordmark — *Invana Explore*, *Invana Model*, *Invana Projects*, *Invana Agents* — so the person always sees which mode they are in, and switched from the switcher; everything else is summoned. Agents is the place to build and run agents, and shows only to those who may ([Agents is for those who build and run agents](#views-and-their-leftsection)) |
 | 7 | **The agent proposes, the person decides** | Invana is built for decisions ([vision](vision.md)). An agent does the work from what the person says and comes back with a proposal or a choice with a recommendation; the person answers with a click. No blank forms where an agent could draft |
 | 8 | **Traceable on demand** | Every answer, proposal and act can show how it got there — steps, sources, assumptions, who did what — through *Why?*, *How it got here* and the full run. Never on the first screen; always one click away |
-| 9 | **Everyone sees, the policy decides** | Every mode, view and act shows to everyone. An act a person's Access Policies do not allow is disabled, naming the permission and who can grant it; data a policy denies is withheld — absent from a picker, dropped and counted — never shown; the engine refuses whatever the screen shows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)). Nothing is hidden by who a person is |
+| 9 | **Everyone sees, the policy decides** | Every mode, view and act shows to everyone. An act a person's Access Policies do not allow is disabled, naming the permission and who can grant it; data a policy hides does not exist for the person — absent from a picker, no column, no count, no hint; only a person who reads Access Policies sees what is hidden; the engine refuses whatever the screen shows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)). Nothing is hidden by who a person is |
 
 ## 2. The layout
 
@@ -70,7 +70,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 |---|---|
 | Home | — |
 | Explore | Boards · Conversations · Dashboards · Queries |
-| Model | Models · Standards · Health · **Rules and meaning**: Rules · Lenses · Taxonomies · Inference · **Graph Data**: Records · Loads · Quality · Annotations |
+| Model | Models · Standards · Health · **Rules and meaning**: Rules · Taxonomies · Inference · **Graph Data**: Records · Loads · Quality · Annotations |
 | Projects | Projects · My tasks · Reviews · Schedules |
 | Agents | Agents · Skills · Runs · Schedules |
 
@@ -78,8 +78,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 |---|---|
 | Boards | Mine · Shared with me · Archived |
 | Models | Every model, grouped by graph database (one folder each), a tree of its Kinds and Relationships, then *Links between models* with their count — Kinds and Relationships are not views of their own; links between models are declared here and on the model map ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
-| Rules | Everywhere · each project · on properties · Requests, its open count beside it ([SE-F07](capabilities/semantics/features/SE-F07-rules/feature.md)) |
-| Lenses | The lenses, grouped by who uses them ([SE-F09](capabilities/semantics/features/SE-F09-lenses-of-the-graph/feature.md)) |
+| Rules | Everywhere · each project · Requests, its open count beside it ([SE-F07](capabilities/semantics/features/SE-F07-rules/feature.md)) |
 | Taxonomies | Per model: its broader kinds and value hierarchies ([SE-F04](capabilities/semantics/features/SE-F04-taxonomies/feature.md)) |
 | Inference | The derivations, grouped by rule ([SE-F08](capabilities/semantics/features/SE-F08-inference/feature.md)) |
 | Records | The kinds, grouped by model |
@@ -99,7 +98,7 @@ A header dropdown of about 1180 px, from the *☰ Invana {Mode} ▾* control ([C
 | The Agents summoner is a glance; the Agents mode is the workspace | Building, testing and reading runs happen in the Agents mode, running workers in Settings › Workers; the summoner shows only enough to stay on the work in front, and every deeper act is *Open in Agents*, which closes the modal and switches mode — a worker act is *Open in Settings*, at Settings › Workers |
 | The switcher is the one mode switch | The leftNav holds no mode switch; the *☰ Invana {Mode} ▾* control opens [the switcher](#the-switcher) |
 | Collapsed, it still says what needs you | Icons only: the lit view stays lit, a view whose count needs you carries a dot, hover shows its label; leftSection is unchanged |
-| Rules and meaning is a group of Model | Rules · Lenses · Taxonomies · Inference are views of Model like any other — each its own leftSection, a rule, a lens, a taxonomy or a derivation opening in main; none opens in the large modal |
+| Rules and meaning is a group of Model | Rules · Taxonomies · Inference are views of Model like any other — each its own leftSection, a rule, a taxonomy or a derivation opening in main; none opens in the large modal |
 | Graph Data is a group of Model | Records lists the kinds grouped by model, from the graph databases the person's default agent may read; Loads · Quality · Annotations follow. A record and a load open in main with a breadcrumb ([Records](capabilities/records/product.md)) |
 | A mode's Schedules is a filter | Projects › Schedules is the one Schedules list filtered to that mode's kind, and every schedule while there is one kind ([AG-F07](capabilities/agents/features/AG-F07-schedules/feature.md)) |
 | Before set-up | Mode switches are disabled until set-up starts; Home is the only place ([CP-22](os/control/features/CP-F05-graph-databases/stories/CP-22-start-a-fresh-deployment-from-a-question/story.md)) |
@@ -298,7 +297,7 @@ sections never closes it.
 | Product names as places (Agent Builder, IAM, Activity) · *Fleet* as a product | Agents · Operations · Workers · Access · Inbox — *Fleet* is only the name of a section of Settings |
 | Policy statement · effect | A rule of an Access Policy · Allow, Ask or Deny |
 | Roles of any kind (viewer · contributor · builder · modeller · owner · iam-admin) | The Access Policy — *Explore*, *Shape the model*, *Run the deployment* — or the permission an act needs |
-| World · view of the graph | A **lens** — or, for a rule on data or a sensitive property, an Access Policy rule |
+| World · view of the graph | An **Access Policy** rule — what may be seen is never a named view; a lens is parked |
 | Guardrail · invariant | A rule (*must always hold*) |
 | Envelope · bound | *What it may do* |
 | Ledger | *What left the platform* · *Access usage* · History (*what people and agents did*) |
@@ -329,7 +328,7 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 |---|---|---|
 | Home · Graphs · Onboarding | **Home** — *What are you trying to decide?*, the set-up steps until the deployment is ready (*n of 4*), then the first answer | page |
 | Explorer | **Explore** mode — Boards · Conversations · Dashboards · Queries; the memory graphs open as board tabs ([GP-F02](os/graph/features/GP-F02-memory/feature.md#decisions)); tools on right-click | mode |
-| Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships, and the links between models) · Standards · Health · Rules and meaning (Rules · Lenses · Taxonomies · Inference) · Graph Data | mode |
+| Modeller | **Model** mode — the Semantics capability: Models (a tree of each model's Kinds and Relationships, and the links between models) · Standards · Health · Rules and meaning (Rules · Taxonomies · Inference) · Graph Data | mode |
 | Datasets · Imports | **Graph Data** — a group of Model: Records (kinds grouped by model, from the graph databases the person may read) · Loads · Quality · Annotations; a record and a load open in main | mode |
 | Agent Builder · Fleet · Skills · Plugins | **Agents** mode — Agents · Skills (with its Workflows) · Runs (with *How they are doing*) · Schedules; an agent, a skill, a workflow and a run open in main. Its glance is the Agents summoner. Plugins, the Fleet map and Workloads, and Workers are Settings | mode · modal |
 | Team packs | **Settings › Connections › Team packs**, each with *Used by n agents* | modal |

@@ -42,7 +42,7 @@ flowchart LR
   l --> o{Does the board or snapshot still exist?}
   s --> o
   o -->|yes| lin{Does the person's agent read every source?}
-  lin -->|no| red([Listed · content Withheld, naming what the agent may not read])
+  lin -->|no| red([Not found · as for a copy that does not exist])
   lin -->|yes| seen([The board and its answers · or the snapshot as it was])
   o -->|no| nf([Not found])
 ```
@@ -67,7 +67,7 @@ flowchart LR
 | EX-15.14 | The dialog on a shared board | a person reads *Shared with* | each user and team is listed with who shared it and when, each with *Stop sharing*; stopping takes it off their *Shared with me* |
 | EX-15.15 | A live link opened by a person who was not behind its runs | they open an answer's *How it got here* | it reads that the answer ran, its agent, its status and its tokens — *Content withheld*; its steps and queries read only to the person behind the run; nothing in it can be changed |
 | EX-15.16 | A shared answer, a live link or a snapshot | it is made | it records the resources it was read from — kind, graph database and level — as its sources, and its level is the highest of them |
-| EX-15.17 | A shared answer or snapshot with a source the person's default agent may not Read | they open it | it lists — the question, when, who made it — and its content reads *Withheld — your agent may not read {resource}*, naming each resource; nothing of the withheld content loads, and an Admin meets the same rule through their own default agent |
+| EX-15.17 | A shared answer or snapshot with a source the person's default agent may not Read | they open it | it reads *Not found*, as for a copy that does not exist; nothing loads and nothing names a source, and an Admin meets the same rule through their own default agent |
 | EX-15.18 | A shared answer or snapshot whose sources the person's default agent may Read in full | they open it | it shows as it was, in full |
 | EX-15.19 | An export — PNG, CSV or Markdown — of an answer carrying a confidential or personal value | the person exports | the value is left out of the file, and the file and the dialog name each property and level left out; the export is recorded with its sources |
 ## Screens
@@ -78,7 +78,5 @@ flowchart LR
 | Share | Operator | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | explore.board · Share · Not an owner |
 | A shared link opened | Admin | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | — |
 | A shared link opened | Operator | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | explore.board · Share · Not found |
-| A shared link opened, sources withheld | Admin | — | — | — | explore.board · Share · Shared board · Redacted | — | — | — |
-| A shared link opened, sources withheld | Operator | — | — | — | explore.board · Share · Shared board · Redacted | — | — | explore.board · Share · Shared board · Redacted |
 | An export · values left out | Admin | — | — | — | explore.board · Share · Export · Redacted | — | — | — |
 | An export · values left out | Operator | — | — | — | explore.board · Share · Export · Redacted | — | — | — |

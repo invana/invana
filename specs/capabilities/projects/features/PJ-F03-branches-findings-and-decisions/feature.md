@@ -134,7 +134,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | Has data | The overview, tree, branch, finding, impact, decisions and lineage as their stories describe |
 | Failed | The page could not load, saying why, with *Try again*; an act the engine refuses names the reason and changes nothing; an impact reach that cannot read a graph database names it |
 | Agent working or proposing | A proposal waits on its branch, an agent's finding reads *Unreviewed*; each opens *How it got here*; an impact reach says which hop it is on |
-| No access | A project the reader may not read shows its head only, the rest *Withheld*. A run the reader may not read shows that it ran, its status and its tokens — *Content withheld*. A record the reader's agents may not read is not shown |
+| No access | A project the reader may not read shows its head only, the rest *Withheld*. A run the reader may not read shows that it ran, its status and its tokens — *Content withheld*. A record the reader's agents may not read is absent, with no note |
 
 ## Rules
 
@@ -310,7 +310,7 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | Accepting a proposal | Accepting a decision proposal runs the full decide as the accepting person; a refusal leaves it open. No route takes an agent as the decider |
 | A merge with no findings named | Carries every finding linked to the source |
 | A load undone | Read on every read of a finding or decision that cites it, never stored |
-| Records read as the reader | A record cite opens, and a lineage or impact reads, through the built-in Assistant with the reader behind it; a kind its policies deny is left out, `records_withheld` counted |
+| Records read as the reader | A record cite opens, and a lineage or impact reads, through the built-in Assistant with the reader behind it; a kind its policies hide is left out, uncounted |
 | Run content withheld | A run or step cite the reader may not read ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) returns `{run_id, status, tokens, content_withheld: true}` |
 | Lineage | `GET /{key}/decisions/{n}/lineage` walks the thinking graph from the decision ([AG-F09 `GET /thinking/decisions/{id}/sources`](../../../agents/features/AG-F09-learn-from-memory/feature.md#routes)) and adds each cited load's authors and source file from RC-F02 — every node a stored record, nothing inferred |
 | The impact reach | One run of the built-in Assistant, the caller behind it. Hop 0 is the records the branch's findings cite, every stance; each hop expands at most 12 records — the most reached first — each to at most 50 neighbours, through one query step per graph database, never joined; a record already reached is not counted again. The run writes `rings[]` as each hop lands; `sample` is set when a bound cut it. A graph database unreachable or switched off is skipped and named in `unread[]`. Every read is a ledger row |

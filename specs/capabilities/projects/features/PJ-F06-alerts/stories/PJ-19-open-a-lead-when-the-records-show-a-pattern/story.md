@@ -23,7 +23,7 @@ on every project the person can see; writing the alert rule is a Modeller's or a
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every lead of a project they can see, the rule and the records behind it; take or dismiss a lead | A matched record of a kind their agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
+| Admin | Read every lead of a project they can see, the rule and the records behind it; take or dismiss a lead | A matched record of a kind their agents may not read is absent; on an archived project *Take* and *Dismiss* are disabled |
 | Operator | The same; take a task lead for a person or an agent they may use; a Modeller the same | As Admin. An agent they may not use is disabled in *Take* — *You may not use {agent} — ask an Admin* |
 
 ## Flow
@@ -40,7 +40,7 @@ flowchart TD
   t -->|Dismiss, with a reason| d(["Dismissed · reason kept"])
   t -->|Dismiss, no reason| r["Refused · asks for the reason"]
   t -->|project archived| x["Take and Dismiss disabled, saying it is archived"]
-  l -->|a record the reader's agents may not read| wh["Withheld"]
+  l -->|a record the reader's agents may not read| wh["Record absent"]
 ```
 
 ## Acceptance criteria
@@ -56,7 +56,7 @@ flowchart TD
 | PJ-19.7 | A lead | it is opened | *How it got here* shows the rule, its condition, the load or change and the records that matched |
 | PJ-19.8 | A project the person may not read | they look at its leads | they read how many there are, and each lead's content reads *Withheld — join the team or ask {who can grant}*; nothing reads *Not found* |
 | PJ-19.9 | A new lead | the project's people open the Inbox | it is listed in their *Needs you*; taking or dismissing it clears it for all of them |
-| PJ-19.10 | A matched record of a kind the reader's agents may not read | they open the lead | that record reads *Withheld*; the rule and every other record read |
+| PJ-19.10 | A matched record of a kind the reader's agents may not read | they open the lead | that record is absent, with no note; the rule and every other record read |
 | PJ-19.11 | An archived project | someone opens a lead | it reads; *Take* and *Dismiss* are disabled, saying the project is archived |
 | PJ-19.12 | A branch lead | a person dismisses it with a reason | a *drop* decision is recorded in their name with the reason as its rationale, checked by the rules (PJ-07); a rule that blocks it leaves the lead open, naming the rule |
 | PJ-19.13 | Something going wrong with the platform, not the records | it happens | it opens no lead here; it is an alert of its kind ([CP-F11](../../../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) |
@@ -67,5 +67,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Alerts | Admin | projects.alerts · No alerts yet | projects.alerts · No leads match | projects.alerts · Loading | projects.alerts | projects.alerts · Could not load | — | — |
 | Alerts | Operator | projects.alerts · No alerts yet | projects.alerts · No leads match | projects.alerts · Loading | projects.alerts | projects.alerts · Could not load | — | projects.alerts · Archived |
-| A lead | Admin | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Lead | projects.tasks · Detail · Dismiss refused | projects.tasks · Detail · How it got here | projects.tasks · Detail · Lead · Record withheld |
-| A lead | Operator | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Lead | projects.tasks · Detail · Dismiss refused | projects.tasks · Detail · How it got here | projects.tasks · Detail · Lead · Record withheld |
+| A lead | Admin | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Lead | projects.tasks · Detail · Dismiss refused | projects.tasks · Detail · How it got here | — |
+| A lead | Operator | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Lead | projects.tasks · Detail · Dismiss refused | projects.tasks · Detail · How it got here | — |

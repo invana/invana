@@ -23,7 +23,7 @@ The role × feature table is [AC-F02 › The role table](../../../../../access/f
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Open the map of any project their default agent may Read; open any node on it | A node whose run or sources they may not read: its head only, content withheld |
+| Admin | Open the map of any project their default agent may Read; open any node on it | A node whose run they may not read: its head only, content withheld. A node whose sources their agent may not Read is absent |
 | Operator | The same; a Modeller the same | A project their default agent may not Read: its head only — *Withheld — your agent may not read `memory/project/{key}`*. A node they may not read: its head only |
 
 ## Flow
@@ -37,7 +37,8 @@ flowchart TD
   any -->|yes| map["The map: groups and their waits · tasks by state · runs · findings · decisions · related projects at the edge"]
   map --> mv["Moving now: runs open · claims held · checks running"]
   map --> node["Open a node"]
-  node -->|a run they may not read, or a source their agent may not| hd["Head only · content withheld"]
+  node -->|a run they may not read| hd["Head only · content withheld"]
+  node -->|a source their agent may not Read| ha["Absent · no note"]
   node -->|readable| full["Its content · How it got here"]
   map -->|the system graph behind| bh(["Says how far behind · draws what it holds"])
   map -->|the system graph down| dn(["Map unavailable, saying why · the project's tabs still read"])
@@ -51,7 +52,7 @@ flowchart TD
 | GP-08.2 | A project with work | its Map opens | it draws the project, its groups and the waits between them, its tasks coloured by state, the runs that worked them, the findings and decisions it holds, and its related projects at the edge, each with its relation |
 | GP-08.3 | Work going on | the Map is open | *Moving now* lists the runs open, the claims held and the checks running, each opening its node, and the map marks them; it is re-read while the map is open |
 | GP-08.4 | A node | the person opens it | its kind, state, labels and links read, and *How it got here* opens its run for those who may read it |
-| GP-08.5 | A run node the reader may not read, or a node whose sources their default agent may not Read | it is drawn | its head reads — kind, state, when — and its content is withheld, naming the resource |
+| GP-08.5 | A run node the reader may not read | it is drawn | its head reads — kind, state, when — and its content is withheld, naming who may read it; a node whose sources their default agent may not Read is not drawn, with no count and no note |
 | GP-08.6 | A project the reader's default agent may not Read | they open its Map | it reads the project's head only — *Withheld — your agent may not read `memory/project/{key}`* |
 | GP-08.7 | A related project | it is drawn at the edge | it shows its head and the relation; opening it opens that project's Map, read as far as the reader's default agent may |
 | GP-08.8 | The system graph behind | the Map loads | it says how far behind and draws what it holds |

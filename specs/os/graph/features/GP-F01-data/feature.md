@@ -37,7 +37,7 @@ flowchart TD
   j --> o(["Vertices · edges · records, one shape · cited"])
   rq([A raw query]) --> l["GP-05 · Static check · read-only session · result filter · Gremlin steps only"]
   l -->|a kind the agent may not Read · a script · a lambda| lr(["Refused before it runs · names the rule or the construct"])
-  l --> lo(["Rows · what the agent may not read dropped and counted as withheld"])
+  l --> lo(["Rows · what the agent may not read left out · no count · no note"])
   rw --> vs["GP-02 · Find similar records"]
   vs -->|no index · other dimensions| vr(["Refused · names the property, the index or both dimensions"])
   vs -->|nothing embedded| ne(["Nothing embedded"])
@@ -58,7 +58,7 @@ sequenceDiagram
   C->>G: Cypher or Gremlin, in a read-only session for a read
   G-->>C: driver records
   C-->>E: vertices, edges and records of one shape
-  E->>E: drop what the agent may not read, counted · each graph database's rows kept apart
+  E->>E: leave out what the agent may not read, uncounted · each graph database's rows kept apart
   E-->>A: the result, cited
 ```
 
@@ -74,7 +74,7 @@ sequenceDiagram
 ## Access
 
 Every act here is an agent's, checked against its Access Policies on `data/<graph database>/<kind>` — for a property,
-`data/<graph database>/<kind>/<property>` and `data/<graph database>/<kind>/@<level>`, the level being its sensitivity
+`data/<graph database>/<kind>/<property>`
 ([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); the person's
 role decides only whether they may start the act that asks for it.
 
@@ -95,7 +95,7 @@ role decides only whether they may start the act that asks for it.
 | Has data | Vertices, edges and records of one shape, each cited to its graph database |
 | Failed | The database's own message, naming its connector and the graph database; an act the vendor cannot do, named |
 | Agent working or proposing | A step running in a run, shown in How it got here |
-| No access | Refused before it starts, naming the rule; what a result holds that the agent may not read is dropped and counted as withheld |
+| No access | Refused before it starts, naming the rule, for a write or an unlabelled pattern; what a result holds that the agent may not read is left out, uncounted |
 
 ## Rules
 
@@ -106,7 +106,7 @@ role decides only whether they may start the act that asks for it.
 | A read never writes | Every read opens a read-only session — the driver's read access mode, a read-only transaction, or Gremlin's `ReadOnlyStrategy` — so a write in it fails at the database, not only in Invana, whatever the graph database's mode ([GP-04](stories/GP-04-trust-that-a-read-never-writes/story.md)). A write session opens only for a write step the agent's rules allow on a read + write graph database |
 | A connector is certified | A connector is listed as supported only when it passes the certification test: a write attempted in a read session is refused by the database, run against a live database |
 | A raw query passes four layers | A static check · a read-only session · a result filter · Gremlin steps only ([GP-05](stories/GP-05-run-a-raw-query-within-what-the-agent-may-read/story.md)); a raw query reaches nothing a typed plan could not |
-| Only what the agent may read leaves a read | A kind the agent may not Read is refused before it runs; a property whose level the agent may not Read is dropped from the result and named as withheld, never the whole read refused |
+| Only what the agent may read leaves a read | A kind the agent may not Read fails before it runs as one that does not exist; a property the agent may not Read is left out of the result, uncounted, never the whole read refused |
 | A person's switch is theirs | A person's own graph-database switch applies only to the runs that person starts; an Admin's switch is a ceiling ([CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) |
 | One package per database | `invana-<db>`, installed beside the engine; the engine depends on no driver |
 | Two languages | openCypher and Gremlin, each complete in the engine; a package adds a driver and what the language cannot say |
@@ -191,7 +191,7 @@ records of each graph database — its connection, mode, switches and health —
 | Read session | Part of the connector contract: `read_session()` returns a session the database holds read-only — Bolt `READ` access mode with a read-only transaction, a Gremlin traversal source with `ReadOnlyStrategy`, or the vendor's equivalent. `write_session()` opens only for a write step on a `read_write` graph database, after the step's policy check, for that step only. Every graph database is reached with its one credential (CP-F05); the session, not a second login, is what makes a read safe |
 | Certification test | One test every connector must pass before it is listed as supported, run against a live database, never mocked: a write attempted in a read session is refused by the database. A connector that fails it loads `failed`, naming the test; `invana version` shows each connector's result |
 | Raw query — static check | The query is parsed in its language. Every labelled node or relationship pattern needs Read on `data/<graph database>/<kind>`; an unlabelled node or relationship pattern needs Read on `data/<graph database>/*`. A refusal comes before the wire and names the rule, its policy and who set it. A kind the agent may Read only in part passes here and is filtered at the result |
-| Raw query — result filter | Every returned node and relationship is checked: a kind the agent may not Read is dropped, a property whose level the agent may not Read is dropped, and the reply names the kinds and levels and counts what it withheld. The count is on the ledger row and in the step |
+| Raw query — result filter | Every returned node and relationship is checked: a kind the agent may not Read is left out, a property the agent may not Read is left out; the reply, the ledger row and the step carry no count and name no kind or level |
 | Raw query — Gremlin steps only | A Gremlin query is steps: no Groovy script, no lambda, no `eval`; the parser refuses the construct before the wire, naming it. Cypher is parsed whole |
 | Raw query — the writes | A raw write is a step of the Query console, which asks first ([EX-F03](../../../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)); it runs in a write session only on a read + write graph database |
 | Supported databases | openCypher — Neo4j (`neo4j`) · Memgraph (`memgraph`) · ArcadeDB (`arcadedb-cypher`) · Gremlin — JanusGraph (`janusgraph`) · Amazon Neptune (`neptune`) · TinkerGraph (`tinkergraph`) · ArcadeDB (`arcadedb-gremlin`); vector search where the database has an index |
@@ -207,7 +207,7 @@ records of each graph database — its connection, mode, switches and health —
 | Vector search | A queryset in each language connector, overridden per vendor; the database's own index. Results are records with scores, cited; an index with nothing embedded returns none, worded *nothing embedded*. Memgraph declares none |
 | Conformance | One shared suite every package runs against a live database, never mocked; a method left unimplemented fails it, named |
 | Steps apart | One query step per graph database, in its own language, run at once; each step's rows are returned under its graph database and never joined, bounded by NFR-PERF-5 |
-| Committing a link | `stitch-commit@1`, no agent and no lens, the deployment's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
+| Committing a link | `stitch-commit@1`, no agent, the deployment's Access Policies admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
 | What each kind writes | *Same thing* writes `SAME_AS` source → target, read undirected; a keyed relationship writes its `edge_type`; a row-sourced relationship writes nothing at commit — committing loads its rows, the files' place read back from the load's run |
 | Nothing written says so | A link that wrote nothing — a side the rules refuse — commits, says why, and never reports success; the others still solve |
 | Every later load joins | A load's link step runs the same `MERGE`, scoped to that load's stamp; writing again never writes twice |

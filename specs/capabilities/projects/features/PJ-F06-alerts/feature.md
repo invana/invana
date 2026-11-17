@@ -36,7 +36,7 @@ flowchart TD
   tri -->|take it| work(["Worked as any task or branch (PJ-F01 · PJ-F03)"])
   tri -->|dismiss, with a reason| dis(["Dismissed · the reason kept · the rule's counts move"])
   tri -->|project archived| ro["Reads · Take and Dismiss disabled, saying it is archived"]
-  lead -->|a matched record of a kind the reader's agents may not read| wr["Withheld"]
+  lead -->|a matched record of a kind the reader's agents may not read| wr["Record absent"]
   ops([Something goes wrong with the platform]) -.->|not a lead| cp(["An alert kind — CP-F11"])
 ```
 
@@ -70,7 +70,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 |---|---|---|
 | Write an alert rule and the project it opens leads in | Modeller · Admin ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) | As SE-F07 |
 | Read a project's leads and the rule behind each | Anyone who may read the project | A project they may not read: its leads count, their content *Withheld — join the team or ask {who can grant}* |
-| Read the records a lead matched | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A record of a kind the reader's agents may not read reads *Withheld* |
+| Read the records a lead matched | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A record of a kind the reader's agents may not read is absent |
 | Take or dismiss a lead | Anyone who can see the project — Operator · Modeller · Admin | On an archived project, *Take* and *Dismiss* are disabled, saying it is archived |
 | Open a lead | The engine, on a rule's match — never an agent's own act | — |
 
@@ -84,7 +84,7 @@ Who may do what is the [role table](../../../../os/access/features/AC-F02-access
 | Has data | Leads newest first: the rule, the records matched, how many matches, opened when, open · taken · dismissed |
 | Failed | The list could not load, saying why, with *Try again*; a dismissal with no reason is refused |
 | Agent working or proposing | An agent assigned a taken lead works it as any task (PJ-F01) |
-| No access | A project the reader may not read shows its leads' count only; a matched record the reader's agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
+| No access | A project the reader may not read shows its leads' count only; a matched record the reader's agents may not read is absent; on an archived project *Take* and *Dismiss* are disabled |
 
 ## Rules
 
@@ -180,7 +180,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Take | A task lead writes its assignee through PJ-F01's assign — an agent opens its run with the taker behind it; `state = taken` |
 | Dismiss | A task lead is cancelled through PJ-F01 with `reason` as its note; a branch lead records a *drop* decision through PJ-F03 as the dismisser, `reason` its rationale; a rule that blocks it leaves the lead open. `state = dismissed` only once that write succeeds |
 | Rule counts | Leads per rule, taken and dismissed are counted from `projects_leads` and served to SE-F07's rule page |
-| Records read as the reader | `records[]` are opened through the agents the reader may use; a kind their policies deny is returned as `withheld` |
+| Records read as the reader | `records[]` are opened through the agents the reader may use; a kind their policies hide is left out, uncounted |
 | Reading a project | Every read here reads the project through the caller's default agent, as [PJ-F01 › Mechanisms](../PJ-F01-projects-and-tasks/feature.md#mechanisms) says |
 
 ## System impact

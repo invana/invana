@@ -27,7 +27,7 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Admin — holds Manage on Access | Add people and teams, write Access Policies and attach them to people, teams, projects and agents, see what each person can do and why, review each agent's access every quarter, read who did what; deactivate a person who leaves and name their successor; set how long each store is kept, hold it, forget a subject and export what is held about a person |
 | Analyst · Decision maker | Sign in; keep their own account, sessions, keys and connected clients; see what they may do and the policy behind each permission, and their default agent; answer the asks they are named for |
 | Agent builder | See what an agent may touch and why; name who answers its asks; make a personal agent |
-| Modeller | Read the policies that keep a kind or a sensitive property from agents |
+| Modeller | Nothing of Access Policies without Read on `access/policies` |
 
 ## Goals
 
@@ -92,12 +92,12 @@ afterwards what it did. Without that, a deployment is either open to every agent
 |---|---|
 | Access Policies only, no roles | What anyone may do is the Access Policies attached to them, built from [the permission catalogue](features/AC-F02-access-policies/feature.md#the-permission-catalogue) — the one source of what may be granted; no feature restates who may. *Super user* is locked and always held; the Access templates are data ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
 | Policies attach to people, teams, projects and agents | A person holds the Allows on them and their teams, minus the Denies; a project holds policies the same way, and they bound its runs; an agent's is its ceiling, never a grant. Inside a project a run reaches the project's policies ∩ the agent's ceiling; outside one, the person behind it ∩ the ceiling ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
-| Everyone sees, the policy decides | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy denies is withheld, and the engine refuses — hiding is never the guard ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
+| Everyone sees, the policy decides | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy hides does not exist for them, and the engine refuses — hiding is never the guard ([AC-F02 › Rules](features/AC-F02-access-policies/feature.md#rules)) |
 | Default deny · Deny wins | What no rule allows is refused; Deny over Ask over Allow, across policies and along a caller chain |
 | Declare, never grant | Skills, workflows, plugins, Team packs and runtimes declare what they need; only an Access Policy grants it |
 | Ceilings only narrow | A key, a run's scope, a credential's scope, a graph database's mode and the worker sandbox narrow what policies allow; none widens it ([AC-F04](features/AC-F04-what-an-agent-may-touch/feature.md)) |
 | Teams are flat and own nothing | A team is a list of people that holds policies; no team holds another, and a team owns no resource |
-| Only a person saves access | An agent may propose a rule — tighter or looser — and a person with Edit on Access saves it or not; no agent saves or attaches a policy. Every signed-in person reads every policy, rule and team: a person must see a rule to know whom to ask |
+| Only a person saves access | An agent may propose a rule — tighter or looser — and a person with Edit on Access saves it or not; no agent saves or attaches a policy. Reading policies, rules and *Hidden from agents* needs Read on `access/policies`, so nobody else sees what is hidden; the permission catalogue and every refusal still name who can grant |
 | A second person's yes, when set | A deployment setting, off by default: when on, a change to an Access Policy, an attachment or a work connection waits for another person's yes ([AC-F02](features/AC-F02-access-policies/feature.md#rules)) |
 | A leaver names a successor | Deactivating a person names a successor, who takes every place they held on the work; their personal-connection data is erased and their name kept or pseudonymised, by one deployment setting ([AC-F03](features/AC-F03-directory/feature.md) · [AC-F12](features/AC-F12-leaving-and-keeping/feature.md)) |
 | Kept until an Admin says otherwise | Memory, History, the ledger, the query log and recall each keep everything until an Admin sets a period; a legal hold on memory or History stops retention and erasure; a subject is forgotten through lineage; History is never edited ([AC-F12](features/AC-F12-leaving-and-keeping/feature.md)) |

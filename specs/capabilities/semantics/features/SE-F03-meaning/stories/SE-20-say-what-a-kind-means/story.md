@@ -11,7 +11,7 @@ boards: [model.kinds, model.models]
 
 **As** a modeller **I want** each kind and property to carry its definition, the synonyms people ask with, its unit,
 the outside terms it is the same as and how sensitive it is **so that** a question in anyone's words finds the right
-kind, an answer can be compared with data elsewhere, and agents read only the properties their rules reach.
+kind, an answer can be compared with data elsewhere, and agents read only the properties their Access Policies reach.
 
 Tasks: [task.md](task.md) · Feature: [SE-F03](../../feature.md)
 
@@ -39,7 +39,7 @@ flowchart LR
   s -->|a level lowered| w["Shown as a widening · History records it"]
   s -->|Publish| p(["Questions in those words find this kind · each level in force"])
   r -->|a proposed synonym| pr["Accept into the draft · Dismiss"] --> c
-  p -->|an agent reads the kind| rd(["Properties its rules do not reach are withheld · counted"])
+  p -->|an agent reads the kind| rd(["Outbound checks read each level"])
 ```
 
 ## Acceptance criteria
@@ -58,10 +58,9 @@ flowchart LR
 | SE-20.10 | A Modeller or an Admin on a property | they set its level to public, internal, confidential or personal | the level is staged on the draft and in force when the model publishes; a property nobody set reads *internal* |
 | SE-20.11 | A level that is not one of the four, or a level on a property its kind does not carry | it is staged | it is refused, naming the level or the property |
 | SE-20.12 | A draft that lowers a property's level | it is reviewed before publish | the change shows as a widening, naming the property, the old and the new level; once published, History records who lowered it, from what, to what |
-| SE-20.13 | An agent whose Access Policies Allow Read `data/*` and Deny Read `data/*/*/@personal` | it reads a kind with a personal property | the personal property is left out of the result and the result says how many properties it withheld — the read is not refused ([AC-F02](../../../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)) |
 | SE-20.14 | A call to an external AI model, an outside tool or an outside agent that would carry a confidential or personal property | it is made | it is refused before it leaves, naming the property and its level ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
 | SE-20.15 | An export, a published report or a message to an MCP client that would carry a confidential or personal property | it is made | the value is left out and what was left out is named ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
-| SE-20.16 | A level change | the model publishes | the one level holds for every agent and every exit; no policy file sets or changes it |
+| SE-20.16 | A level change | the model publishes | the one level holds for every exit and every derived value; no policy file sets or changes it |
 
 ## Screens
 

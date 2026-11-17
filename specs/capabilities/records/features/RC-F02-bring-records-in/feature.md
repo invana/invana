@@ -133,7 +133,7 @@ flowchart TD
 | The packaged plans `model-import@1` · `bundle-import@1` · `bulk-load@1` and the functions their steps call | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md) |
 | Workers and the queue a load runs on | [CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md) |
 | History — every value a load wrote | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
-| The lens a load runs under, and the touches it records | [SE-F09 › Engine](../../../semantics/features/SE-F09-lenses-of-the-graph/feature.md#engine) |
+| The Access Policies a load runs under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Active links between models a load resolves | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | The task raised for a bundle's broken file | [PJ-F01 › Engine](../../../projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | The simulation run a `source = run` load saves | [EX-F05 › Engine](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine) |
@@ -170,6 +170,7 @@ flowchart TD
 | 403 | A rule refuses writing into the model | *Cannot answer — `{rule}` refuses writing into `{model}`.* | RC-09.3 |
 | 403 | The caller is an Operator | *Needs the Modeller role — ask an Admin.* | RC-08.9 |
 | 415 | A file that is not rows with a header — a document, a paper, free text | *Only rows that fit a kind can be loaded — extract them first.* | RC-08.10 |
+| 422 | A load that names a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | RC-08.11 |
 | 422 | Rows without a key, or two rows with one key, in an upload | *{n} rows have no key or repeat one — the first five: {rows}.* | RC-08.4 |
 | 409 | A record added by hand whose key already exists | *`{key}` already exists — a new record never overwrites one.* | RC-11.4 |
 | 409 | Undo of a bulk load, or of a load already undone | *This load cannot be undone — {reason}.* | RC-09.20 |
@@ -197,7 +198,7 @@ flowchart TD
 | Provenance stamps | Every node and relationship written carries `_inv_load_id` · `_inv_model_id` · `_inv_record_id` · `_inv_file` · `_inv_run_id`; a node's peek reads them off the element with no request. An element with none was written by a bulk load or before Invana ([RC-F06](../RC-F06-provenance/feature.md#engine) reads them) |
 | A loaded link row carries both marks | A relationship a link file writes carries the load's stamps and its link's, as [SE-F06 › Engine](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) says |
 | Link rows from a file | A file ships a link's rows in `stitches/<RELATIONSHIP>.json` (`{id, from, to, properties}`); the deployment must hold an active link naming this load's model and that relationship, or the file is reported `no_stitch_for_edge` and nothing of it is written |
-| A load is governed | The run freezes the deployment's lens at open; Write engages the version the open pinned and records one touch with what it wrote; Stitch touches every model its relationships joined; Validate and Snapshot touch nothing. A rule that refuses the model ends the load *cannot answer*, naming it, before anything is written ([SE-F09 › Engine](../../../semantics/features/SE-F09-lenses-of-the-graph/feature.md#engine)) |
+| A load is governed | The run freezes the policies that reach it at open; Write engages the version the open pinned and records what it wrote; Stitch reaches every model its relationships joined; Validate and Snapshot write nothing. A policy that refuses the model ends the load *Not allowed by your access*, naming it, before anything is written ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#property-access)) |
 | A failure is its step's | A failure is attributed to the step in flight; the database's refusal of a write becomes a diagnosis with the next step, never a stack trace |
 | The version holds | A model published mid-run does not switch the run; it keeps and reports the version it opened with |
 | Cancel | Accepted records stay; the run is `cancelled` and the report says where it stopped; a bundle says which files had finished |

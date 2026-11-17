@@ -71,7 +71,6 @@ flowchart TD
 | Five parts | **Definition** — one or two sentences · **Synonyms** — the words people ask with, unique across the published models · **Unit** — per number property, from a fixed list · **Outside terms** — an address (IRI), a schema.org type or property, or a *same as* address elsewhere · **Level** — per property, one of four |
 | Four levels | `public` · `internal` · `confidential` · `personal`, set per property of a kind in Meaning. A property no one has set is `internal`. *Sensitive* means confidential or personal |
 | A level is set in a draft | A Modeller or an Admin sets it in the model's draft; it is published with the model, in force from that version, and never changes a record. A level is the model's, never a policy file's |
-| Access Policies read the level | A read of a property is checked as `data/<graph database>/<kind>/@<level>` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)); an agent that may not Read that level does not receive the property, and the result counts it withheld |
 | Confidential and personal stay inside | They never go to an external AI model, an outside tool or an outside agent; what an export, a published report, an MCP client, an outside runtime or a channel carries leaves them out, and says what it left out ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
 | A derived value keeps the highest level | A derived fact's property takes the highest level of the properties it was derived from; a derivation never lowers it ([SE-F08](../SE-F08-inference/feature.md)) |
 | Lowering a level is a widening | A draft that lowers a property's level shows it as a widening — more agents and more exits reach it — in the review before publish, and History records who lowered it, from what, to what |
@@ -152,8 +151,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 
 | Mechanism | How |
 |---|---|
-| The level of a property | `sensitivity.of(kind, property)` reads the property's row in the published version the deployment reads now; no row, or an empty level, is `internal`. It is the one function the access check, the outbound check and lineage call |
-| The resource a read is checked as | A property read names `data/<graph database>/<kind>/@<level>` for [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms)'s `decide()`; this feature supplies only `<level>` |
+| The level of a property | `sensitivity.of(kind, property)` reads the property's row in the published version the deployment reads now; no row, or an empty level, is `internal`. It is the one function the outbound check and lineage call |
 | Published with the model | A level is staged on the draft and frozen when it publishes; a version in force never changes, so a read meets one level per property |
 | A lowered level | The draft review marks the change as a widening ([SE-F02](../SE-F02-change-and-publish-a-model/feature.md)); the publish writes the History row with who, from and to |
 | Derived values | A derivation reads `sensitivity.of` for each premise and writes the highest to the derived fact's property ([SE-F08 › Engine](../SE-F08-inference/feature.md#engine)) |

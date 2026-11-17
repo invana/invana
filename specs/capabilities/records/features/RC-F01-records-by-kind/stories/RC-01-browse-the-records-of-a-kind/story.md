@@ -20,7 +20,7 @@ Every role browses records ([the role table](../../../../../../os/access/feature
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse, filter and open the records of any kind | — |
-| Operator | Browse, filter and open the records of any kind a lens of the graph lets them see, in the graph databases their default agent may Read | Kinds a lens hides, and kinds in a graph database their default agent may not Read, are absent; a direct link reads *Withheld* |
+| Operator | Browse, filter and open the records of any kind their Access Policies let them see, in the graph databases their default agent may Read | Kinds their Access Policies do not allow, and kinds in a graph database their default agent may not Read, are absent; a direct link reads *Not found* |
 
 ## Flow
 
@@ -32,7 +32,7 @@ flowchart LR
   fl -->|yes| l
   l -->|open| r([The record's page])
   l -->|could not load| f[Could not load · Try again]
-  a -->|a kind its default agent may not Read| w([Withheld · names the rule])
+  a -->|a kind its default agent may not Read| w([Not found · as for a kind that does not exist])
 ```
 
 ## Acceptance criteria
@@ -43,16 +43,16 @@ flowchart LR
 | RC-01.2 | A filter on a property | it matches nothing | *Nothing matches* names the filter, with *Clear* |
 | RC-01.3 | A record in the list | it is opened | its page shows every value the published model gives its kind |
 | RC-01.4 | A kind with no records | it is picked | the page says there are none yet and where records come from |
-| RC-01.5 | A kind a lens of the graph hides | an Operator opens the picker | the kind is absent |
+| RC-01.5 | A kind an Operator's Access Policies do not allow them to Read | they open the picker | the kind is absent |
 | RC-01.6 | The records cannot be read | the page opens | *Could not load the records* shows with *Try again* |
 | RC-01.7 | Kinds in two graph databases, and a default agent whose Access Policies allow Read on only one | the person opens the picker | only the kinds of that graph database are listed, grouped by model; the other's kinds are absent |
-| RC-01.8 | A kind in a graph database the person's default agent may not Read | they open a direct link to it | the engine refuses the read and the page reads *Withheld — {agent} may not read {kind} in {graph database}*, naming the rule; no record is shown |
+| RC-01.8 | A kind in a graph database the person's default agent may not Read | they open a direct link to it | the page reads *Not found*, as for a kind that does not exist; nothing names the rule and no record is shown |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Records | Admin | data.records · No records yet | data.records · Nothing matches | data.records · Loading | data.records | data.records · Could not load | — | — |
-| Records | Operator | data.records · No records yet | data.records · Nothing matches | data.records · Loading | data.records | data.records · Could not load | — | data.records · Kind hidden |
-| A kind the default agent may not read | Admin | — | — | — | — | — | — | data.records · Withheld |
-| A kind the default agent may not read | Operator | — | — | — | — | — | — | data.records · Withheld |
+| Records | Operator | data.records · No records yet | data.records · Nothing matches | data.records · Loading | data.records | data.records · Could not load | — | — |
+| A kind the default agent may not read, by direct link | Admin | — | — | — | — | — | — | data.records · Not found |
+| A kind the default agent may not read, by direct link | Operator | — | — | — | — | — | — | data.records · Not found |

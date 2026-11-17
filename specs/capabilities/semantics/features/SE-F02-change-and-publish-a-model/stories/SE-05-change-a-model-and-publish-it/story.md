@@ -72,6 +72,8 @@ flowchart LR
 | SE-05.25 | An open draft | the person adds or removes an index, or a unique or exists constraint, on a kind's property | It is staged like any change and named in the comparison; adding an index only adds, and a unique or exists constraint breaks |
 | SE-05.26 | A draft and a Modeller or an Admin | they publish from the command line | The command says whether the draft adds or breaks; one that adds publishes, one that breaks opens the same review as Studio, and `--dry-run` writes nothing |
 | SE-05.27 | An open draft | the person gives a property a type its graph database's server version cannot hold | It is refused where it was picked, naming the type and the server version; nothing is staged |
+| SE-05.28 | A draft with a kind whose label another model in the same graph database already holds | the person publishes | it is refused before anything is written, naming the label and the model that holds it — *{label} belongs to {model} — link the two with a same thing link instead.* |
+| SE-05.29 | A draft that changes a kind or a property *Hidden from agents* hides from the publisher's agent | it is published | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is published ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 
 ## Screens
 

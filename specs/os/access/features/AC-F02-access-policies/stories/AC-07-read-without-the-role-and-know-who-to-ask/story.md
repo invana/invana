@@ -45,7 +45,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-07.1 | An Operator | they open any mode, modal or overlay their role reaches | it reads in full; nothing they may read is hidden |
-| AC-07.2 | An Operator in *Access* | the section is read | every policy, rule, role, team and built-in agent reads; one line names who can change them — *You can read every policy. Priya and Lee can change them* |
+| AC-07.2 | An Operator in *Access* | the section is read | roles, teams and the Directory read; Access Policies, *Hidden from agents* and the built-in agents' ceilings read *No access* (AC-07.15) |
 | AC-07.3 | Any act the reader's role does not hold, anywhere in Studio | it is drawn | it is disabled, never hidden; its tooltip and accessible description name the role and who holds it — *Needs the Admin role — ask Priya or Lee*; tried through the API, it is refused, naming the role |
 | AC-07.4 | The people named | the reader is one of them, or there are more than three | the reader is left out; past three it reads *Priya, Lee or 3 others* |
 | AC-07.5 | A role nobody else holds | the refusal draws | it reads *Ask an Admin* |
@@ -57,6 +57,7 @@ flowchart TD
 | AC-07.11 | A person whose role holds the act, but no agent granted to them reaches it | they try it | it is refused before anything runs, naming what is missing and who grants agents |
 | AC-07.12 | A person whose act an agent's rule refuses | they read the refusal | it names the rule, its policy and the Admins who can change it |
 | AC-07.13 | A person who lacks the role an act needs | they press *Ask an Admin* | one ask for that role appears in the Admins' Needs you (AC-F05); never decided by the asker; the act reads *Asked*, and pressing again joins the open ask |
+| AC-07.15 | A person without Read on `access/policies`, an Operator included | they open an Access Policy, *Hidden from agents*, the built-in agents or a check, or ask the API | it reads *No access* — *This needs Read on access/policies — ask Priya or Lee* — and nothing says what a policy holds or hides |
 | AC-07.14 | A person given a role | they reach an act it holds | it works, without signing in again |
 
 ## Screens
@@ -73,3 +74,5 @@ flowchart TD
 | A detail page, read only | Operator | — | — | — | agents.agents · Detail · Read only | — | — | agents.agents · Detail · Read only |
 | An act no agent reaches | Admin | — | — | — | — | settings.agent_access · Locked · No agent reaches it | — | — |
 | An act no agent reaches | Operator | — | — | — | — | settings.agent_access · Locked · No agent reaches it | — | settings.agent_access · Locked · No agent reaches it |
+| An Access Policy, without Read | Admin | — | — | — | — | — | — | — |
+| An Access Policy, without Read | Operator | — | — | — | — | — | — | settings.policies · No access |

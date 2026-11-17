@@ -76,7 +76,7 @@ flowchart TD
 | Has data | Each annotation: what it says, its records, author, when |
 | Failed | *Could not load annotations* and *Try again* |
 | Agent working or proposing | The assistant's annotations a person added show as the assistant's; proposals still in a conversation are not listed |
-| No access | Annotations on kinds a lens hides are absent |
+| No access | Annotations on kinds the person's Access Policies do not allow are absent |
 
 ## Data touched
 

@@ -101,6 +101,7 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | One graph database | A link joins two models bound to the same graph database ([SE-F01](../SE-F01-start-a-model/feature.md#rules)), and writes its relationships there. Two models in different graph databases are never linked: the drag and the card refuse it, naming both graph databases. A link, a join or an answer across graph databases is later |
+| A label belongs to one model | A kind's label in a graph database is one model's; several models may sit in one graph database, each with its own labels. Another model shares that label only through a *Same thing* link between models, never by declaring it too ([SE-F02](../SE-F02-change-and-publish-a-model/feature.md#rules)). A link between models stays inside one graph database; links across graph databases are a later direction, not a rule |
 | Declared, never guessed | Every link is declared by a person, on a key on each side matched exactly or ignoring case; nothing is inferred, no similarity score, no key guessed from a name |
 | Two kinds of link | *Same thing* — two kinds are one entity, both kept, joined by a *same as* relationship. *Relationship* — a relationship between two kinds, its ends found by a key on each side, or by its own rows in a load — never both |
 | Linking never merges | Both records stay; questions cross the link, inside its graph database |
@@ -148,7 +149,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 |---|---|
 | Models and their published versions | [SE-F01](../SE-F01-start-a-model/feature.md#engine) · [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Each kind's latest record count · the queries that crossed a link | [SE-F10](../SE-F10-health-and-history/feature.md#engine) |
-| The deployment's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-lenses-of-the-graph/feature.md#engine) |
+| The deployment's Access Policies a count, commit or removal runs under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Loads that join new records and bring a relationship's rows · record stamps | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Standards a mapping names | [SE-F05](../SE-F05-standards/feature.md#engine) |
 | Committing and withdrawing a link's relationships | [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md#engine) |
@@ -204,7 +205,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Mechanism | How |
 |---|---|
-| Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the deployment's rules on properties, awaited; a rule naming a kind or key the rules deny comes back refused, never counted around |
+| Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the person's and the agent's Access Policies, awaited; a rule naming a kind or key the policies deny comes back refused, never counted around |
 | Committing and removing write through Data | *Commit* starts `stitch-commit@1` and *Remove link* `stitch-withdraw@1`; what each kind writes, the marks on every relationship, joining later loads, counting `edges` and withdrawing exactly what a link wrote — are [GP-F01 › Mechanisms](../../../../os/graph/features/GP-F01-data/feature.md#mechanisms). A staged link's row is deleted with no run |
 | A touch per side | Counting, committing and withdrawing record one touch per model with the relationships written into it; a side a rule refuses skips that link only; a model checked but not written gets no touch |
 | A new version carries its links | Publishing re-binds active links to the new version; links on the replaced version stay as history, not counted twice |

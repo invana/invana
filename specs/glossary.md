@@ -34,12 +34,12 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 
 | Word | Means | Domain term |
 |---|---|---|
-| **Model** | The kinds of node and relationship Graph Data holds, and their properties — each model bound to one graph database | Domain model |
+| **Model** | The kinds of node and relationship Graph Data holds, and their properties — each model bound to one graph database, which may hold several; a kind's label belongs to one model, and another shares it only through a *same thing* link between models | Domain model |
 | **Kind** | One type of node or relationship in a model | node type · edge type |
 | **Draft** | Unpublished changes; a floating bar says how many | Draft |
 | **Publish** | Make a draft the model everyone asks against | Publish |
 | **Link between models** | A declared meeting of two models in the same graph database — the same entity, or a relationship across them, on a key on each side. Never across graph databases ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) | Stitch · anchor · relationship link · identity link · match rule |
-| **Lens** | What an answer may rest on — models, slices, hidden kinds and properties, the AI model per role, what may leave — picked per question and only ever narrowing a rule on a property, never widening it; *Model › Rules and meaning › Lenses* lists them ([SE-F09](capabilities/semantics/features/SE-F09-lenses-of-the-graph/feature.md)). Said *outside this lens* when a question needs what it keeps out | View · world · view of the graph |
+| **Lens** | *Parked, not on screen.* A named, versioned selection of the model that a question would be asked through; it selects and never grants — Access Policies alone decide what may be seen ([SE-F09](capabilities/semantics/features/SE-F09-lenses-of-the-graph/feature.md)). Kept so *view* and *world* are not brought back | View · world · view of the graph |
 | **Constraint** | One property's range with a unit, or one standard's values, on one kind — Reject or Flag for review when a record breaks it | Property constraint (validation rule) |
 | **What the database holds** | The kinds, properties and counts read from the graph database, with when — compared with the model, never the model | Physical mirror · introspection |
 | **Records** | The nodes and relationships Graph Data holds, read in place from the graph databases — never copied — each one of a kind in a published model; *Model › Graph Data › Records* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
@@ -79,7 +79,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Access usage** | What each agent read, wrote and ran, and the access it holds but never used | ledger (reads) |
 | **What left the platform** | What went to which AI model, tool, outside agent, client, channel or file, from which run, for whom — each call schema-only or data-bearing, sent, refused or with something left out | ledger (outbound) |
 | **Outbound check** | The one check everything leaving for an external target passes: nothing confidential or personal leaves — a call is refused, a document or a result leaves without those values, naming them | outbound sensitivity check |
-| **Withheld** | What a person's default agent may not read, shown as there but without its content — a value, a property, a copy or a run's content — naming why | redacted |
+| **Withheld** | What a person may not open of a run, a project or another person's connection, shown as there but without its content, naming why. Data an Access Policy hides is never withheld: it does not exist for the person | redacted |
 | **Left out** | What the outbound check took out of a document or a result before it left, named in it | redacted on egress |
 | **Work connection** | A service identity on an outside server — a token, or a service account over OAuth — an Admin makes once and a Modeller or an Admin attaches to agents; shared work uses only these | service credential |
 | **Personal connection** | A person's own account on an outside server, used only in the runs they start and their helpers; what it returns shows only to them | user OAuth connection |
@@ -238,7 +238,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | Agent Builder · IAM · Activity · Graph settings | Agents · Operations · Workers · Access · Inbox · Settings › Connections — product names are never places; *Fleet* is said only as the Settings section |
 | Policy statement · policy effect | A **rule** of an Access Policy · Allow, Ask or Deny |
 | viewer · contributor · iam-admin | The Access Policy — *Explore*, *Shape the model*, *Run the deployment* — or the permission an act needs |
-| World · view of the graph | A **lens** — or, for a rule on `data/…` or a sensitive property, an Access Policy rule |
+| World · view of the graph | An **Access Policy** rule — what may be seen is never a named view; a lens is parked |
 | Guardrail · invariant | A rule (*must always hold*) |
 | Envelope | *What it may do* |
 | Ledger | *What left the platform* · *Access usage* · History (*what people and agents did*) |
@@ -299,7 +299,7 @@ names and the form each takes in every layer are
 | **Control Plane** | What runs, where and within which limits — runs, workers and the queue, graph databases, limits, AI models, plugins and the MCP server, ops alerts, the Inbox. Product code `CP` |
 | **Access Plane** | Who may act, through which agent, and what they did — sign-in, keys, Access Policies, the Directory, ownership, asks, the ledger's views, History. Product code `AC` |
 | **Graph Plane** | What Invana reads and what it remembers — **Data**: Graph Data, read in place through a connector per graph database · **Memory**: Invana's own graph of the work, in the system graph. Product code `GP`. A vision and docs word: on screen a person reads *Graph Data* and *Memory* ([os/graph](os/graph/product.md)) |
-| **Lineage** | What a copy — an answer, a finding, a report, a snapshot, a transcript, a note, a memory node or an export — was read from: its **sources**, as Access Policy resources with their level, recorded with the copy and kept as edges in Memory. A copy shows to a person only when their default agent may Read every source; else it is withheld. Its level is the highest of its sources' ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) |
+| **Lineage** | What a copy — an answer, a finding, a report, a snapshot, a transcript, a note, a memory node or an export — was read from: its **sources**, as Access Policy resources with their level, recorded with the copy and kept as edges in Memory. A copy shows to a person only when their default agent may Read every source; else it does not exist for them. Its level is the highest of its sources' ([GP-F02](os/graph/features/GP-F02-memory/feature.md)) |
 | **Raw query** | A Cypher or Gremlin query a person writes in the Console: a static check against the agent's rules, a read-only session, a result filter, and Gremlin steps only — no scripts or lambdas ([GP-F01](os/graph/features/GP-F01-data/feature.md)) |
 | **Capability** | The level under a pillar — what a person works in: Semantics · Records · Agents · Explore · Projects, the packages `semantics` · `records` · `agents` · `explore` · `projects`. In Studio Semantics is the **Model** mode and Records the **Graph Data** group of Model. The word in prose and docs; in the spec tooling its synonym is **product** — `product.md`, the `product:` key — and those files keep their names |
 | **Worker pool** | The deployment's workers, in groups that share labels — the Control Plane's, [CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md). On screen *Workers*. How each agent is doing is Agents' (`agents`), never the pool's |

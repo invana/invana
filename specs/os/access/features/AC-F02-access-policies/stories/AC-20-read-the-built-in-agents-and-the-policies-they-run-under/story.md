@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every built-in agent and its policies; *Copy* a built-in policy; attach a custom policy to a built-in agent (AC-11) | A built-in agent and its built-in policy have no *Edit*, *Rename*, *Delete* or *Take off* |
-| Operator | Read every built-in agent, what it acts for and its policies; a Modeller the same | *Copy* and *Attach* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Nothing here without Read on `access/policies`; a person who holds it reads every built-in agent, what it acts for and its policies | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Copy* and *Attach* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -47,7 +47,7 @@ flowchart TD
 | AC-20.6 | A person not granted the built-in agent an act runs as | they try the act | it is refused before it runs, naming the agent and who grants agents (AC-07) |
 | AC-20.7 | A new deployment | it starts | every built-in agent exists with its built-in policy attached, and is granted to every person whose role holds the feature it acts for |
 | AC-20.8 | The Query console | a query in the Console writes data | the write asks first, by its built-in policy; every query it runs is recorded |
-| AC-20.9 | An Operator | they open *Built-in agents* | every agent and policy reads; *Copy* and *Attach* are disabled, naming the Admin role and the Admins |
+| AC-20.9 | A person without Read on `access/policies` | they open *Built-in agents* or a built-in policy | it reads *No access*, naming Read on `access/policies` and who can grant it; a person with Read and without Edit reads every agent and policy, with *Copy* and *Attach* disabled |
 | AC-20.10 | The list cannot load | it opens | it says why, with *Try again* |
 
 ## Screens
@@ -55,8 +55,8 @@ flowchart TD
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Built-in agents | Admin | — | — | settings.agent_access · Loading | settings.agent_access · Built-in agents | settings.agent_access · Could not load | — | — |
-| Built-in agents | Operator | — | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Built-in agents | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Built-in agents |
+| Built-in agents | Operator | — | — | — | — | — | — | settings.agent_access · No access |
 | A built-in agent | Admin | — | — | settings.agent_access · Loading | settings.agent_access · Built-in agent | settings.agent_access · Built in refused | — | — |
-| A built-in agent | Operator | — | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Built-in agent | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Built-in agent |
+| A built-in agent | Operator | — | — | — | — | — | — | settings.agent_access · No access |
 | A person's act, no grant | Admin | — | — | — | — | settings.agent_access · Locked · Agent not granted | — | — |
 | A person's act, no grant | Operator | — | — | — | — | settings.agent_access · Locked · Agent not granted | — | settings.agent_access · Locked · Agent not granted |

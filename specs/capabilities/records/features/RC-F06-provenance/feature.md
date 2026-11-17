@@ -57,14 +57,14 @@ flowchart TD
 | Every write lands there | A load, a board's save, a fix, a merge and a derivation each write their changes to History |
 | The database's own records | A value Invana never wrote reads *Present in the graph database before Invana wrote to it* — never a guess |
 | Provenance is not lineage | Provenance is *where a value came from* — a load, an edit, a person, an agent. Lineage is *what a copy was read from* — an answer, a finding, a report, a snapshot, a note, an export. Provenance feeds lineage: a copy's sources are resources in [Access Policies' grammar](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms), and a record's provenance is what tells which load or run a source was ([GP-F02 › Engine](../../../../os/graph/features/GP-F02-memory/feature.md#engine)) |
-| A value shows as far as the reader's agent reads | A value whose level the person's default agent may not Read shows in provenance and history as *Withheld — your agent may not read {resource}*; what wrote it and when stay readable |
+| A value shows as far as the reader's agent reads | A value the person's default agent may not Read is absent from provenance and history — no row, no count, no note; what wrote the other values and when stay readable |
 | An undone load says so | A value whose load was undone and that nothing changed since is gone; one kept because a later write changed it names both |
 
 ## Access
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and history | Every signed-in person — Operator, Modeller, Admin — as far as their default agent reads each value | A value at a level their agent may not Read: *Withheld — your agent may not read {resource}* |
+| Read records, their provenance and history | Every signed-in person — Operator, Modeller, Admin — as far as their default agent reads each value | A value their agent may not Read is absent, with no trace |
 
 ## States
 
@@ -76,7 +76,7 @@ flowchart TD
 | Has data | Each value with what wrote it and when; changes newest first: when · who · run · before → after · why |
 | Failed | *Could not load provenance* or *Could not load history*, and *Try again* |
 | Agent working or proposing | — |
-| No access | A run or member the person may not see is named, not opened: *a run by an agent you cannot see* · *a member you cannot see*; a value their agent may not read: *Withheld — your agent may not read {resource}* |
+| No access | A run or member the person may not see is named, not opened: *a run by an agent you cannot see* · *a member you cannot see* |
 
 ## Data touched
 
@@ -139,7 +139,7 @@ flowchart TD
 | Derived | A value from a derived fact names its rule version and premises; a value from a `source = run` load names that run and the loads it was pinned to (`record_load_inputs`) |
 | An undone load | A value its undone load wrote that a later write kept names the later write and flags the load *load undone* |
 | What the reader may open | A run or a member the reader may not read is named, never opened — *a run by an agent you cannot see* · *a member you cannot see* |
-| Values the reader may not read | Both routes read each value through the person's default agent: a property whose level `decide()` does not Allow is returned as *withheld*, with the resource, and counted; the load, run, person and time stay |
+| Values the reader may not read | Both routes read each value through the person's default agent: a property `decide()` does not Allow is left out of the reply, uncounted; the load, run, person and time of every other value stay |
 | One set of rows | `/history` and History filtered to the record are one query on the event store |
 
 ## System impact

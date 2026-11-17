@@ -107,6 +107,7 @@ table names the acts.
 | An agent stages like a person | A run's changes join the same draft and the same publish |
 | A published version never changes | Changing it publishes the next version; answers and loads that used the old one still resolve to it |
 | Breaking, change by change | A draft breaks when any one change does: a kind removed · a property removed · a property's type changed · a property narrowed (list to single, list to set, a unique or exists constraint, a range or a standard's values added or changed) · a relationship's ends narrowed · its multiplicity changed · a key added, removed or changed · a kind's validation, parent or abstract flag changed. Adding, widening, removing a constraint that is not a key, an index or a description only adds |
+| A label belongs to one model | Two models in one graph database never declare the same label. A kind whose label another model of that graph database already holds is refused at publish; the other model's kind is brought in through a *Same thing* link between models instead ([SE-F06](../SE-F06-links-and-mappings/feature.md#rules)) |
 | A model never published only adds | There is nothing in its graph database it can break |
 | One way past a breaking change | A review: a preview that writes nothing, a named approver's yes, then the change runs. Nothing bypasses it |
 | Statements need read + write | Publishing pushes constraints and indexes to the model's graph database only when it is read + write; on a read-only one the version publishes and each statement reads *not pushed — read-only*, so drift (SE-F10) is measured against the version |
@@ -198,8 +199,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | A change to a draft another person holds | *{person} holds this draft — it reads only.* | SE-05.6 |
 | 422 | A property type the connected server version cannot hold | *{type} is not available on {database} {version}.* | SE-05.27 |
 | 409 | Publishing a draft with nothing staged | *Nothing to publish.* | SE-05.10 |
+| 409 | Publishing a draft with a kind whose label another model in the same graph database holds | *{label} belongs to {model} — link the two with a same thing link instead.* | SE-05.28 |
 | 409 | Publishing a model whose kinds use a property type the server cannot hold | *{model} uses {types}, which {database} {version} cannot hold.* | SE-05.24 |
 | 409 | A breaking publish with no approver but the requester, or with a review already open on the model | *Nobody but you can approve this — ask an Admin to name an approver for the Modeller agent.* · *{model} already has a review open — {review}.* | SE-05.13 |
+| 422 | A publish that writes a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | SE-05.29 |
 | 422 | A range on a text property, a minimum above the maximum, or a term with no values | *{property}: {why}.* | SE-08.7 |
 | 422 | A record a load or a board edit writes outside a published `reject` constraint — on the writing route | *`{Kind}.{property}` breaks its constraint {label}: {value}.* | SE-08.11 |
 

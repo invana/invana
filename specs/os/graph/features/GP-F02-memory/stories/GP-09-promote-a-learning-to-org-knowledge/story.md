@@ -23,7 +23,7 @@ promoting, declining and retiring org knowledge is a Modeller's and an Admin's (
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every proposal and every piece of org knowledge their default agent may Read; promote, decline and retire | A proposal whose sources their default agent may not Read: its head only, withheld |
+| Admin | Read every proposal and every piece of org knowledge their default agent may Read; promote, decline and retire | A proposal whose sources their default agent may not Read is absent |
 | Operator | Read proposals and org knowledge as far as their default agent may Read `memory/org` and the sources; a Modeller may promote, decline and retire, as an Admin | *Promote*, *Decline* and *Retire* disabled — *Modellers and Admins only* |
 
 ## Flow
@@ -40,7 +40,7 @@ flowchart TD
   d -->|Decline, with a note| dc(["Declined · kept with why"])
   d -->|an Operator| no["Promote and Decline disabled: Modellers and Admins only"]
   pr -->|Retire, with a note| rt(["Retired · not recalled · kept"])
-  l -->|sources the reader's agent may not Read| wh["Head only · Withheld"]
+  l -->|sources the reader's agent may not Read| wh["Absent · no note"]
 ```
 
 ```mermaid
@@ -66,7 +66,7 @@ sequenceDiagram
 | GP-09.4 | A proposal | a Modeller or an Admin declines it with a note | it reads *Declined*, by whom and why, and is never recalled |
 | GP-09.5 | Promoted org knowledge | a Modeller or an Admin retires it with a note | it reads *Retired*, is not recalled by any run that starts after, and stays listed with who retired it and why |
 | GP-09.6 | An Operator | they open a proposal | it reads; *Promote*, *Decline* and *Retire* are disabled — *Modellers and Admins only*; a call is refused the same way |
-| GP-09.7 | A proposal or org knowledge whose sources the reader's default agent may not Read | it is listed | its head reads — when, which agent, its state — and its statement reads *Withheld — your agent may not read {resource}* |
+| GP-09.7 | A proposal or org knowledge whose sources the reader's default agent may not Read | it is listed | it is absent from the list, with no count and no note |
 | GP-09.8 | A proposal | a person who may read its run opens *How it got here* | it shows the run's steps and the learning behind it; anyone else reads that it ran, its status and its tokens |
 | GP-09.9 | An agent | it tries to promote, decline or retire | it cannot: only a person decides org knowledge; no function offers an agent the act |
 | GP-09.10 | A team | anything is proposed | there is no team memory: org knowledge is the deployment's, and agent learnings stay on their agent |
@@ -75,9 +75,9 @@ sequenceDiagram
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Org knowledge | Admin | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | graph.memory · Org knowledge · Withheld |
+| Org knowledge | Admin | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | — |
 | Org knowledge | Operator | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | graph.memory · Org knowledge · Not a Modeller |
-| A proposal | Admin | — | — | graph.memory · Org knowledge · Proposal loading | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Could not promote | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Proposal withheld |
+| A proposal | Admin | — | — | graph.memory · Org knowledge · Proposal loading | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Could not promote | graph.memory · Org knowledge · Proposal | — |
 | A proposal | Operator | — | — | graph.memory · Org knowledge · Proposal loading | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Could not promote | graph.memory · Org knowledge · Proposal | graph.memory · Org knowledge · Not a Modeller |
 | Retired | Admin | — | — | — | graph.memory · Org knowledge · Retired | — | — | — |
 | Retired | Operator | — | — | — | graph.memory · Org knowledge · Retired | — | — | — |

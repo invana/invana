@@ -21,7 +21,7 @@ depends_on: [SE-F02]
 ```mermaid
 flowchart TD
   start([Model › Graph Data › Records]) --> k["RC-01 · Pick a model and a kind — from the graph databases the default agent may Read"]
-  start -->|a link to a kind it may not Read| wh(["RC-01 · Withheld · names the rule"])
+  start -->|a link to a kind it may not Read| wh(["RC-01 · Not found · as for a kind that does not exist"])
   k --> any{Any records?}
   any -->|none| e0["No records of this kind yet — where records come from"]
   any -->|yes| list["RC-01 · Records in key order · total · filter by property"]
@@ -42,14 +42,14 @@ flowchart TD
 |---|---|
 | Records are read through the model | Only kinds of a published model are listed; what the database holds outside any model is Semantics' health, not Records |
 | Read through the default agent | Every read is the person's default agent's, checked on `data/<graph database>/<kind>` ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)). A kind in a graph database it may not Read is absent from the picker; a direct read of one is refused by the engine, naming the rule. Each kind reads from the one graph database its model is bound to; nothing is joined across graph databases |
-| A lens of the graph applies | A kind or property a lens hides is absent here as it is everywhere |
+| Access Policies apply | A kind a policy does not allow is absent here as it is everywhere; a property a policy hides is absent, with no column and no count |
 | The engine counts | The total is the engine's, never counted by Studio |
 
 ## Access
 
 | Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and history | Every signed-in person, as far as their Access Policies allow Read `data/<graph database>/<kind>` | A kind it may not Read is absent; a direct link to it reads *Withheld — {agent} may not read {kind} in {graph database}* |
+| Read records, their provenance and history | Every signed-in person, as far as their Access Policies allow Read `data/<graph database>/<kind>` | A kind it may not Read is absent; a direct link to it reads *Not found*, as for a kind that does not exist |
 | Open a record on a board | Operator — every member | — |
 
 ## States
@@ -62,7 +62,7 @@ flowchart TD
 | Has data | Rows with the kind's key and its first properties; the total the engine counted |
 | Failed | *Could not load the records* and *Try again* |
 | Agent working or proposing | — |
-| No access | A kind a lens of the graph hides, or one in a graph database the person's default agent may not Read, is absent from the picker; a direct link to it reads *Withheld* |
+| No access | A kind the person's Access Policies do not allow, or one in a graph database the person's default agent may not Read, is absent from the picker; a direct link to it reads *Not found* |
 
 ## Data touched
 

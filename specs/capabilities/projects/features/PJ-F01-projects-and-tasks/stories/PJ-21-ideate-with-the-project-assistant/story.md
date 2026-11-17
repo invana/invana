@@ -76,7 +76,7 @@ sequenceDiagram
 | PJ-21.9 | A proposal and a person not on the team | they open it | it reads; *Accept* and *Reject* are disabled — *Join the team to change it*; a call is refused the same way |
 | PJ-21.10 | The assistant's run | a read its Access Policies refuse | the reply says what it could not read, naming the rule; the project grants it nothing beyond its policies |
 | PJ-21.11 | The assistant | it proposes | it never accepts its own proposal; no screen or call offers an agent acceptance |
-| PJ-21.12 | A recommendation or a proposal citing another project's copy | it is read | it shows as far as the reader may read its sources ([GP-F02](../../../../../../os/graph/features/GP-F02-memory/feature.md#rules)), else *Withheld — your agent may not read {resource}* |
+| PJ-21.12 | A recommendation or a proposal citing another project's copy | it is read | it shows as far as the reader may read its sources ([GP-F02](../../../../../../os/graph/features/GP-F02-memory/feature.md#rules)), else that copy is absent, with no note |
 | PJ-21.13 | The thread failing to load, or the run failing | it happens | the thread says why, with *Try again*; a message already sent stays |
 | PJ-21.14 | The project assistant, the Lead agent | it would accept a proposal, approve its own plan or write a task on the project | the engine refuses it — *Only a person on the team decides — {agent} may propose it.* — and it lands as a proposal in the project's people' Needs you |
 

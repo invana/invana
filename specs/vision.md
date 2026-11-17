@@ -143,7 +143,7 @@ three planes.
 | **Nothing leaves unseen** | Every call to a model, tool or graph database is in the ledger; a sensitive property never goes to an external model |
 | **Learns from outcomes** | Every plan, run, finding and decision is kept in Memory; what served is recalled first, and what failed is kept as what to avoid |
 | **General-purpose** | Nothing in the platform is domain-specific. A team's ontology, its agents and skills and its project types ship together as a Team pack |
-| **Everyone sees, the policy decides** | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy denies is withheld, and the engine refuses ([personas](personas.md)) |
+| **Everyone sees, the policy decides** | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy hides does not exist for them, and the engine refuses ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
 [glossary.md](glossary.md).

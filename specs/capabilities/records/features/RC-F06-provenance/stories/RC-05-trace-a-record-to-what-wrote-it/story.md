@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F06](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any record's provenance and open its loads and runs | — |
-| Operator | Read the provenance of any record their default agent may read; open loads and runs they may read. A Modeller the same | A run they may not read is named, not opened; a value at a level their agent may not Read: *Withheld — your agent may not read {resource}* |
+| Operator | Read the provenance of any record their default agent may read; open loads and runs they may read. A Modeller the same | A run they may not read is named, not opened |
 
 ## Flow
 
@@ -46,7 +46,7 @@ flowchart LR
 | RC-05.6 | A run by an agent the Operator may not read | *Provenance* opens | the run is named, not opened |
 | RC-05.7 | Provenance cannot be read | the tab opens | *Could not load provenance* shows with *Try again* |
 | RC-05.8 | A value saved from a simulation's result | *Provenance* opens | it is labelled *derived*, naming the run it came from and the loads that run was pinned to |
-| RC-05.9 | A property whose level the person's default agent may not Read | *Provenance* opens | the value reads *Withheld — your agent may not read {resource}*, with the resource in Access Policies' grammar; what wrote it and when stay readable, and the count of withheld values shows |
+| RC-05.9 | A property whose level the person's default agent may not Read | *Provenance* opens | the value is absent — no row, no count, no note; what wrote the other values and when stay readable |
 | RC-05.10 | A copy of a record's values — an answer, a finding, a report, a snapshot, a note or an export | someone asks where it came from | its sources are the records and loads this provenance names, recorded as lineage ([GP-F02](../../../../../../os/graph/features/GP-F02-memory/feature.md#engine)); provenance is where a value came from, lineage what a copy was read from |
 
 ## Screens
@@ -55,5 +55,3 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | A record · Provenance | Admin | — | — | data.records · Detail · Loading | data.records · Detail · Provenance | data.records · Detail · Could not load | — | — |
 | A record · Provenance | Operator | — | — | data.records · Detail · Loading | data.records · Detail · Provenance | data.records · Detail · Could not load | — | data.records · Detail · Run not readable |
-| A record · Provenance, a value withheld | Admin | — | — | — | data.records · Detail · Provenance · Redacted | — | — | — |
-| A record · Provenance, a value withheld | Operator | — | — | — | data.records · Detail · Provenance · Redacted | — | — | data.records · Detail · Provenance · Redacted |

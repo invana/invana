@@ -63,7 +63,7 @@ flowchart LR
 | SE-12.15 | A Modeller | they set the scope | *Everywhere* and *A project* are both offered, and the rule saves at either |
 | SE-12.16 | An Operator | they open a rule | it reads; *Save rule* and *Stop offering it* are disabled with *Needs the Modeller role — ask an Admin* |
 | SE-12.17 | A Modeller or an Admin | they list, show or apply rules from a file on the command line | The same scopes, checks and modes as the dialog, and a refusal names the field |
-| SE-12.18 | A Modeller or an Admin | they pick *New rule* | it asks what the rule holds — *A property* (SE-11) · *A statement* · *A standard* (SE-19) · *A derivation* (SE-22) · *An alert* — and opens that rule's dialog |
+| SE-12.18 | A Modeller or an Admin | they pick *New rule* | it asks what the rule holds — *A statement* · *A standard* (SE-19) · *An alert* — and opens that rule's dialog |
 
 ## Screens
 

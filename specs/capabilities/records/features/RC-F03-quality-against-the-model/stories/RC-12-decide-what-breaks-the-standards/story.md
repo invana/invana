@@ -51,7 +51,7 @@ flowchart LR
 | RC-12.5 | A person of any role, a problem, and an agent granted to them that may write the record | they fix it with another value and a reason | the value is written as one run, the reason its *why*, and the record's provenance names the fix (RC-F06) |
 | RC-12.6 | A record changed since the item opened | the fix is saved | it is refused, asking the person to reload and fix again |
 | RC-12.7 | A fixed record that conforms | the queue reloads | the item has left it |
-| RC-12.8 | Kinds a lens hides | the queue opens | they are counted as not readable, never left out silently |
+| RC-12.8 | Kinds the person's Access Policies do not allow | the queue opens | they are left out of rows and totals, with no count and no note |
 | RC-12.9 | A problem on a record the person's agent may not write | they open it | it reads; *Fix* is disabled, naming the Access Policy that stops it |
 | RC-12.10 | A graph database whose connection is read-only | a fix is saved | it is refused, naming the connection setting; nothing is written |
 | RC-12.11 | A fix whose value still breaks the rule, or with no reason | it is saved | it is refused, naming the rule or asking for the reason; nothing is written |

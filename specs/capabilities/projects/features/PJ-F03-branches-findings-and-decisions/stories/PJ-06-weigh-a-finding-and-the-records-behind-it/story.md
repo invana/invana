@@ -24,7 +24,7 @@ on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add a finding to any branch they can see; review any finding; open every finding, the records behind it through the agents they may use, and every run behind it | A record of a kind their agents may not read reads *Withheld*; on an archived project every act is disabled |
+| Admin | Add a finding to any branch they can see; review any finding; open every finding, the records behind it through the agents they may use, and every run behind it | A record of a kind their agents may not read is absent from the evidence; on an archived project every act is disabled |
 | Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
 
 ## Flow
@@ -43,7 +43,7 @@ flowchart LR
   f -->|a run or a step cited| tr["How it got here: the run's steps and sources"]
   tr -->|reader may not read the run| wh["Ran · status · tokens · Content withheld"]
   f -->|a record cited| rc["Opens the record in Explore, through the reader's agent"]
-  rc -->|a kind their agent may not read| rw["Withheld"]
+  rc -->|a kind their agent may not read| rw["Cite absent"]
   f -->|fails to load| x["Could not load · Try again"]
 ```
 
@@ -61,7 +61,7 @@ flowchart LR
 | PJ-06.8 | A finding cites a load since undone in Graph Data | someone opens it | it is marked *a load undone*, with who undid it and why, and the finding stays |
 | PJ-06.9 | A finding | newer evidence arrives | the finding is not edited or deleted — no screen offers it and a call to change it is refused: a newer finding is added beside it and both stay |
 | PJ-06.10 | A finding added from an Explore answer | it opens here | it shows the answer's records, queries and the loads they came from ([EX-12](../../../../../explore/features/EX-F02-share-and-present-an-answer/stories/EX-12-add-an-answer-to-a-project/story.md)) |
-| PJ-06.11 | A finding citing a record of a kind the reader's agents may not read | they open it | that cite reads *Withheld*; the statement, the stance and every other cite read |
+| PJ-06.11 | A finding citing a record of a kind the reader's agents may not read | they open it | that cite is absent, with no note; the statement, the stance and every other cite read |
 | PJ-06.12 | The engine cannot return the finding, or refuses an add | the page loads or the add is made | it says *Could not load* / *Could not add the finding* with the reason and *Try again*; nothing is added |
 | PJ-06.13 | A finding added from a what-if answer ([EX-33](../../../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)) | it is read anywhere | it reads *predicted* beside its stance, and its cites name the evidence labelled *predicted* |
 | PJ-06.14 | A finding whose run the reader may not read — they are not behind it, do not own its agent and are not an Admin | they open *How it got here* | it reads that the run ran, its status and its tokens; the steps read *Content withheld* |
@@ -72,7 +72,7 @@ flowchart LR
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A finding | Admin | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | projects.projects · Detail · Not found |
-| A finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | projects.branches · Finding · Record withheld |
+| A finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | — |
 | A load undone | Admin | — | — | — | projects.branches · Finding · Load undone | — | — | — |
 | A load undone | Operator | — | — | — | projects.branches · Finding · Load undone | — | — | — |
 | Add a finding | Admin | projects.branches · Finding · New | — | projects.branches · Finding · New · Adding | projects.branches · Finding · New · Filled | projects.branches · Finding · New · Add refused | — | — |

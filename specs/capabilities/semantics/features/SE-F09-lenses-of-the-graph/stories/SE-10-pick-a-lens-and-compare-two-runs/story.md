@@ -2,12 +2,14 @@
 id: SE-10
 title: Pick a lens and compare two runs
 feature: SE-F09
-status: idea
+status: later
 personas: [modeller, analyst]
-boards: [model.lenses, explore.board, agents.runs]
+boards: []
 ---
 
 # SE-10 · Pick a lens and compare two runs
+
+**Parked.** Access Policies alone decide what may be seen; this story is taken up again only with its feature ([SE-F09 › Parked design](../../feature.md#parked-design)).
 
 **As** a modeller or an analyst **I want** to keep named lenses of Graph Data — what an answer may rest on — pick one
 when I ask, and compare two runs of one question side by side **so that** I know what each answer was allowed to read,
@@ -76,17 +78,9 @@ flowchart TD
 
 ## Screens
 
+Parked — no board is drawn.
+
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Lenses | Admin | model.lenses · Everything | model.lenses · No lens matches | model.lenses · Loading | model.lenses | model.lenses · Could not load | — | — |
-| Lenses | Operator | model.lenses · Everything | model.lenses · No lens matches | model.lenses · Loading | model.lenses | model.lenses · Could not load | — | model.lenses · Read only |
-| A lens | Admin | — | — | model.lenses · Detail · Loading | model.lenses · Detail | model.lenses · Detail · Unpublished version | — | — |
-| A lens | Operator | — | — | model.lenses · Detail · Loading | model.lenses · Detail | model.lenses · Detail · Unpublished version | — | model.lenses · Detail · Read only |
-| New lens | Admin | model.lenses · New | — | — | model.lenses · New · Filled | model.lenses · New · Refused | — | — |
-| New lens | Operator | — | — | — | — | — | — | model.lenses · Read only |
-| Edit a lens | Admin | — | — | — | model.lenses · Detail · Edit | model.lenses · Detail · Edit · Refused | — | — |
-| Edit a lens | Operator | — | — | — | — | — | — | model.lenses · Read only |
-| A lens in the composer | Admin | explore.board · Lens · Everything | — | — | explore.board · Lens picked | explore.board · Lens · Cannot be cast | explore.board · Lens · Outside this lens | — |
-| A lens in the composer | Operator | explore.board · Lens · Everything | — | — | explore.board · Lens picked | explore.board · Lens · Cannot be cast | explore.board · Lens · Outside this lens | — |
-| Compare | Admin | — | — | agents.runs · Detail · Compare · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Compare · Could not load | agents.runs · Detail · Compare · Second run running | — |
-| Compare | Operator | — | — | agents.runs · Detail · Compare · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Compare · Could not load | agents.runs · Detail · Compare · Second run running | agents.runs · Detail · Compare · Content withheld |
+| Lenses | Admin | — | — | — | — | — | — | — |
+| Lenses | Operator | — | — | — | — | — | — | — |
