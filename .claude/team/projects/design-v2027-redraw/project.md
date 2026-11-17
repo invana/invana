@@ -271,7 +271,7 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | P10 | Model — the Models tree by graph database, links on the canvas | P09 | done | 2026-11-17 | gates green · reviews passed |
 | P11 | Model — the full canvas | P10 | done | 2026-11-17 | gates green · review artifact v12 published · live: awaiting Ravi |
 | P18 | Model map, kind tabs and the draft from the data | P11 | done | 2026-11-17 | gates green · reviews passed |
-| P19 | Health visuals and publish check | P18 | in progress | 2026-11-17 |  |
+| P19 | Health visuals and publish check | P18 | done | 2026-11-17 | gates green · reviews passed |
 
 ## Hand-off notes
 
