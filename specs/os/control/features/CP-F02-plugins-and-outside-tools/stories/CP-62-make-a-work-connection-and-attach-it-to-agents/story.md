@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Make, renew and remove a work connection, with the password again; approve another Admin's change when a second Admin's yes is on; attach and take off a work connection on any agent | The Admin who made a change cannot approve it |
 | Operator | Read every work connection — its server, label, state, who made it and the agents it is attached to — on the server and on each agent. A Modeller also attaches and takes off a work connection on an agent | *Make a work connection*, *Renew* and *Remove* are disabled, naming the Admins; *Attach* is disabled for an Operator, naming the Modeller role |
@@ -68,7 +68,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A server's work connections | Admin | settings.plugins · Servers · No work connections | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Work connections | settings.plugins · Servers · Connection expired | — | — |
 | A server's work connections | Operator | settings.plugins · Servers · No work connections · Read only | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Work connections · Read only | settings.plugins · Servers · Connection expired | — | settings.plugins · Servers · Work connections · Read only |

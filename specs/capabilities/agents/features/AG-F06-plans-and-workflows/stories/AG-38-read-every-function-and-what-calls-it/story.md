@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every function, its contract, its needs, its calls and what calls it | — |
 | Operator | Read every function, its contract, its needs and what calls it — a contract, not a permission; read the calls of runs whose content they may read; a Modeller the same | A call from another person's run reads that it ran, its status and its tokens. Nothing on it adds, edits, switches or runs a function, for anyone |
@@ -67,7 +67,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Functions | Admin | agents.skills · Functions, not used yet | agents.skills · No functions match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | Functions | Operator | agents.skills · Functions, not used yet | agents.skills · No functions match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |

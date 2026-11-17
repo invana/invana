@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F05](../../feature.md)
 
 Importing a standard is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Import a vocabulary as a new standard, or as the next version of any | — |
 | Operator | Read the standards. A Modeller imports a vocabulary as an Admin does | *Import* absent — *Needs the Modeller role — ask an Admin* |
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Import from SKOS | Admin | model.standards · New · Import SKOS | — | model.standards · New · Reading the vocabulary | model.standards · New · SKOS preview | model.standards · New · SKOS refused | — | — |
 | Import from SKOS | Operator | model.standards · New · Import SKOS | — | model.standards · New · Reading the vocabulary | model.standards · New · SKOS preview | model.standards · New · SKOS refused | — | model.standards · Not the creator |

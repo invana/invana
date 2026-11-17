@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 Drafting and changing an agent follow building one ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); explaining is every signed-in person's.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask the Assistant to draft an agent, propose changes to any agent not built in, run its evals in the practice graph database and explain; apply or discard every proposal | — |
 | Modeller | Ask for drafts and proposals on any agent not built in, and apply or discard them; ask for an explanation of any agent | On a built-in agent, a request to change it is answered with an explanation and *I can't change this agent — it is built in; copy it* |
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The Assistant's draft in New agent | Admin | agents.agents · New | — | — | agents.agents · New · Proposal | agents.agents · New · Could not draft | agents.agents · New · Drafting | — |
 | The Assistant's draft in New agent | Operator | — | — | — | — | — | — | agents.agents · New agent disabled |

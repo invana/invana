@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 Loading a bundle is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Check and load any bundle; read its run | — |
 | Operator | Check a bundle offline; read a bundle's run. A Modeller loads it as an Admin does | Loading refused before anything is written — *Needs the Modeller role — ask an Admin* |
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A bundle in loads | Admin | data.loads · Upload · No loads yet | data.loads · Upload · No loads match | data.loads · Upload · Loads loading | data.loads · Upload · Bundle | data.loads · Upload · Loads could not load | — | — |
 | A bundle in loads | Operator | data.loads · Upload · No loads yet | data.loads · Upload · No loads match | data.loads · Upload · Loads loading | data.loads · Upload · Bundle | data.loads · Upload · Loads could not load | — | — |

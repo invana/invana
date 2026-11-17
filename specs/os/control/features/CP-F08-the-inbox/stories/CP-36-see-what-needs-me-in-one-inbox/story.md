@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read their own Needs you, Running, Updates and Done; mark updates read; open what each is about; filter *All open alerts* | — |
 | Operator | Operator · Modeller: read their own Needs you, Running, Updates and Done; mark updates read; open what each is about ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | An item they cannot act on reads, its act disabled with its reason; *All open alerts* is not offered |
@@ -70,7 +70,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The header Inbox badge | Admin | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | — | — | — |
 | The header Inbox badge, Updates only | Admin | — | — | — | inbox.dropdown · Updates dot | — | — | — |

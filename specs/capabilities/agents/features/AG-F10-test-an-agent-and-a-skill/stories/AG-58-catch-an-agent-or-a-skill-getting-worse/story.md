@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 Running drift now is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); an alert reaches the people [its kind names](../../../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every drift run; get the alert as its kind names the Admins; run drift now on any agent or skill not built in | — |
 | Operator | Read every drift run and its result. A Modeller runs drift now as an Admin does | *Run drift now* disabled, naming the role — *Needs the Modeller role — ask an Admin* | *Run drift now* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Drift on a skill's Evals | Admin | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Drift | agents.skills · Detail · Could not load | agents.skills · Detail · Eval running | — |
 | Drift on a skill's Evals | Operator | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Drift | agents.skills · Detail · Could not load | agents.skills · Detail · Eval running | agents.skills · Detail · Drift |

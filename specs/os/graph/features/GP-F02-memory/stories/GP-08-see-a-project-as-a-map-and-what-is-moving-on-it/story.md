@@ -21,7 +21,7 @@ The role × feature table is [AC-F02 › The role table](../../../../../access/f
 (*projects and tasks*); a node reads as far as the reader's default agent may Read its place and its sources
 ([GP-F02 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the map of any project their default agent may Read; open any node on it | A node whose run or sources they may not read: its head only, content withheld |
 | Operator | The same; a Modeller the same | A project their default agent may not Read: its head only — *Withheld — your agent may not read `memory/project/{key}`*. A node they may not read: its head only |
@@ -61,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A project's map | Admin | graph.memory · Project map · Fills as work runs | graph.memory · Project map · Nothing in this window | graph.memory · Project map · Loading | graph.memory · Project map | graph.memory · Project map · Unavailable | graph.memory · Project map · Moving now | — |
 | A project's map | Operator | graph.memory · Project map · Fills as work runs | graph.memory · Project map · Nothing in this window | graph.memory · Project map · Loading | graph.memory · Project map | graph.memory · Project map · Unavailable | graph.memory · Project map · Moving now | graph.memory · Project map · Withheld |

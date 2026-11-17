@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 *Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the tree; fork any open, pursuing or parked branch into children; accept or reject an agent's fork proposal | A dropped or merged branch cannot be forked — *Revisit it with a new decision first*; on an archived project every act is disabled |
 | Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
@@ -63,7 +63,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The tree | Admin | projects.branches · Just the question | — | projects.branches · Loading | projects.branches | projects.branches · Could not load | projects.branches · Fork proposed | projects.projects · Detail · Not found |
 | The tree | Operator | projects.branches · Just the question | — | projects.branches · Loading | projects.branches | projects.branches · Could not load | projects.branches · Fork proposed | projects.projects · Detail · Not found |

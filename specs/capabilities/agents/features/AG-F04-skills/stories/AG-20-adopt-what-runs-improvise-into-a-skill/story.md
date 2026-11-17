@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md) · Its evals: [
 
 Adopting a handler is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every skill's exceptions; adopt a handler into any skill not built in | A built-in skill's exceptions read, with *Copy* in place of *Adopt* |
 | Operator | Read every skill's exceptions and usage. A Modeller adopts a handler as an Admin does | *Adopt* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -47,7 +47,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Exceptions | Admin | agents.skills · Detail · No exceptions recorded | — | agents.skills · Detail · Loading | agents.skills · Detail · Exceptions | agents.skills · Detail · Could not load | agents.skills · Detail · Adopt | — |
 | Exceptions | Operator | agents.skills · Detail · No exceptions recorded | — | agents.skills · Detail · Loading | agents.skills · Detail · Exceptions | agents.skills · Detail · Could not load | agents.skills · Detail · Exceptions | agents.skills · Detail · Exceptions |

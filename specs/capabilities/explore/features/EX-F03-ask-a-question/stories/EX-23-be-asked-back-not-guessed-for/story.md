@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Answer a question asked back on their own run, in the thread or in Inbox › Needs you, or type something else | — |
 | Operator | The same, on their own runs; a Modeller the same — only a person answers ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | A question asked back on another person's run is not shown to them |
@@ -59,7 +59,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The question in the thread | Admin | — | explore.board · Cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
 | The question in the thread | Operator | — | explore.board · Cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |

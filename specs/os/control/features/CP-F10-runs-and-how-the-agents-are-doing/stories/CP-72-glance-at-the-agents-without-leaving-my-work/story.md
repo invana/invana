@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Full access: open the Agents glance; answer each ask routed to them; *Pause* and *Stop* any run ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)); *Assign* a task to any agent; read the Workers band and its scale advice; *Open in Agents* at an agent or a run; *Open in Settings* at the Workers band | A run whose content they may not read lists *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 | Operator | Read only: open the Agents glance and read every band; answer an ask routed to them; each other act responds to their Access Policies — *Pause* and *Stop* on runs they are behind, *Assign* where they may work on the project | Every act their policies do not allow is shown disabled, naming the permission it needs and who can grant it; a run whose content they may not read lists *withheld* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The Agents glance | Admin | shell.agents · Nothing yet | — | shell.agents · Loading | shell.agents | shell.agents · Could not load | shell.agents · Waits on you | — |
 | The Agents glance | Operator | shell.agents · Nothing yet | — | shell.agents · Loading | shell.agents · Read only | shell.agents · Could not load | shell.agents · Waits on you | shell.agents · Content withheld |

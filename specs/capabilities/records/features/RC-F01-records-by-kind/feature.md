@@ -42,7 +42,7 @@ flowchart TD
 |---|---|
 | Records are read through the model | Only kinds of a published model are listed; what the database holds outside any model is Semantics' health, not Records |
 | Read through the default agent | Every read is the person's default agent's, checked on `data/<graph database>/<kind>` ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)). A kind in a graph database it may not Read is absent from the picker; a direct read of one is refused by the engine, naming the rule. Each kind reads from the one graph database its model is bound to; nothing is joined across graph databases |
-| A view of the graph applies | A kind or property a view hides is absent here as it is everywhere |
+| A lens of the graph applies | A kind or property a lens hides is absent here as it is everywhere |
 | The engine counts | The total is the engine's, never counted by Studio |
 
 ## Access
@@ -62,7 +62,7 @@ flowchart TD
 | Has data | Rows with the kind's key and its first properties; the total the engine counted |
 | Failed | *Could not load the records* and *Try again* |
 | Agent working or proposing | — |
-| No access | A kind a view of the graph hides, or one in a graph database the person's default agent may not Read, is absent from the picker; a direct link to it reads *Withheld* |
+| No access | A kind a lens of the graph hides, or one in a graph database the person's default agent may not Read, is absent from the picker; a direct link to it reads *Withheld* |
 
 ## Data touched
 

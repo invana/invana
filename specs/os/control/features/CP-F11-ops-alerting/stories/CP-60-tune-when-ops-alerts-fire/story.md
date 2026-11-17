@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and set each kind's threshold; read, write, switch off and remove History alerts | — |
 | Operator | Operator · Modeller: read each kind, its threshold and whom it reaches; read every History alert ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit*, *New History alert* and a History alert's switch disabled — *Needs the Admin role — ask {admins}* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Thresholds | Admin | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Out of range | — | — |
 | Thresholds | Operator | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Could not load | — | settings.alerts · Settings · Edit disabled |

@@ -21,7 +21,7 @@ A dashboard is *Acts* for Operator, Modeller and Admin, as a board is ([the role
 It is the organisation's, made by a person; a tile refreshes through the agent that answered it, so it reads only what
 that agent may Read.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create, rename and delete dashboards; pin an answer; refresh, reorder and unpin tiles | — |
 | Operator | The same, through the agents they may use; a Modeller the same | Without the Assistant: *Pin to dashboard*, *Refresh* and *Delete* disabled — *{person} may not use Assistant — ask an Admin*. A tile whose agent they may not use: its answer reads, *Refresh* is disabled — *{person} may not use {agent} — ask an Admin* |
@@ -57,7 +57,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Dashboards on the left | Admin | explore.dashboards · No dashboards yet | explore.dashboards · No dashboard matches | explore.dashboards · Loading | explore.dashboards | explore.dashboards · Could not load | — | — |
 | Dashboards on the left | Operator | explore.dashboards · No dashboards yet | explore.dashboards · No dashboard matches | explore.dashboards · Loading | explore.dashboards | explore.dashboards · Could not load | — | explore.dashboards · No Assistant |

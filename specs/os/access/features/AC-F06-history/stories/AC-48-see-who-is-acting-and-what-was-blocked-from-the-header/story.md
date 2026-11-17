@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the Access dropdown: its tiles and swimlanes; follow its links. In Access › Now: read who acts, what was blocked today and the delegations in force; open a blocked act's policy; *Revoke* a delegation with the password again | — |
 | Operator | Operator · Modeller: read their own roles and delegations under *Your access* in the avatar menu; revoke their own | No *Access* button in the header — it is absent, not disabled; Access › Now reads *Ask {Admin}* |
@@ -80,7 +80,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The Access dropdown | Admin | shell.access · Nobody touched anything | — | shell.access · Loading | shell.access | shell.access · Could not load | shell.access · Blocked in the timeline | — |
 | The Access dropdown | Operator | — | — | — | — | — | — | shell.access · No button |

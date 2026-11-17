@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any record's provenance and open its loads and runs | — |
 | Operator | Read the provenance of any record their default agent may read; open loads and runs they may read. A Modeller the same | A run they may not read is named, not opened; a value at a level their agent may not Read: *Withheld — your agent may not read {resource}* |
@@ -51,7 +51,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A record · Provenance | Admin | — | — | data.records · Detail · Loading | data.records · Detail · Provenance | data.records · Detail · Could not load | — | — |
 | A record · Provenance | Operator | — | — | data.records · Detail · Loading | data.records · Detail · Provenance | data.records · Detail · Could not load | — | data.records · Detail · Run not readable |

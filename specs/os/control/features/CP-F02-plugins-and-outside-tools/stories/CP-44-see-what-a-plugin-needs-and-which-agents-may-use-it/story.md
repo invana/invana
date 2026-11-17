@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every function's needs and, for any person, which of the agents granted to them may use it and what is missing | — |
 | Operator | The same reads, for themselves and any person — everyone reads access ([AC-F02](../../../../../access/features/AC-F02-access-policies/feature.md#decisions)); a Modeller the same | — |
@@ -54,7 +54,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A function's needs | Admin | — | — | settings.plugins · Loading | settings.plugins · Needs | settings.plugins · Could not load | — | — |
 | A function's needs | Operator | — | — | settings.plugins · Loading | settings.plugins · Needs | settings.plugins · Could not load | — | — |

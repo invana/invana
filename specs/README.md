@@ -339,8 +339,8 @@ What Invana does and why — the operating system, the capabilities, features, u
 | | SE-19 | [Hold a kind or property to a standard](capabilities/semantics/features/SE-F07-rules/stories/SE-19-hold-a-kind-to-a-standard/story.md) | idea | [—](capabilities/semantics/features/SE-F07-rules/stories/SE-19-hold-a-kind-to-a-standard/task.md) |
 | **SE-F08** | | [Inference](capabilities/semantics/features/SE-F08-inference/feature.md) | idea | |
 | | SE-22 | [Derive facts from a rule](capabilities/semantics/features/SE-F08-inference/stories/SE-22-derive-facts-from-a-rule/story.md) | idea | [—](capabilities/semantics/features/SE-F08-inference/stories/SE-22-derive-facts-from-a-rule/task.md) |
-| **SE-F09** | | [Views of the graph](capabilities/semantics/features/SE-F09-views-of-the-graph/feature.md) | idea | |
-| | SE-10 | [Pick a view and compare two runs](capabilities/semantics/features/SE-F09-views-of-the-graph/stories/SE-10-pick-a-view-and-compare-two-runs/story.md) | idea | [—](capabilities/semantics/features/SE-F09-views-of-the-graph/stories/SE-10-pick-a-view-and-compare-two-runs/task.md) |
+| **SE-F09** | | [Lenses of the graph](capabilities/semantics/features/SE-F09-lenses-of-the-graph/feature.md) | idea | |
+| | SE-10 | [Pick a lens and compare two runs](capabilities/semantics/features/SE-F09-lenses-of-the-graph/stories/SE-10-pick-a-lens-and-compare-two-runs/story.md) | idea | [—](capabilities/semantics/features/SE-F09-lenses-of-the-graph/stories/SE-10-pick-a-lens-and-compare-two-runs/task.md) |
 | **SE-F10** | | [Health and history](capabilities/semantics/features/SE-F10-health-and-history/feature.md) | idea | |
 | | SE-07 | [See each model's health](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-07-see-each-models-health/story.md) | idea | [—](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-07-see-each-models-health/task.md) |
 | | SE-09 | [Read a model's history](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-09-read-a-models-history/story.md) | idea | [—](capabilities/semantics/features/SE-F10-health-and-history/stories/SE-09-read-a-models-history/task.md) |

@@ -22,7 +22,7 @@ A copy shows to a person only when the person's **default agent** may Read every
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table); a run's
 transcript has its own privacy rule on top ([AC-F09](../../../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a copy and its sources when their default agent may Read every source; read any copy's list row | A redacted copy: its kind, when and who made it; content *Withheld — your agent may not read {resource}* — an Admin's role is no key to a source their default agent may not read |
 | Operator | The same; a Modeller reads the same | The same redaction; to read it, ask an Admin to change what their default agent may Read ([AC-38](../../../../../access/features/AC-F03-directory/stories/AC-38-choose-a-persons-default-agent/story.md)) |
@@ -61,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A copy's sources | Admin | — | — | graph.memory · Lineage · Loading | graph.memory · Lineage | graph.memory · Lineage · Could not load | — | graph.memory · Lineage · Withheld |
 | A copy's sources | Operator | — | — | graph.memory · Lineage · Loading | graph.memory · Lineage | graph.memory · Lineage · Could not load | — | graph.memory · Lineage · Withheld |

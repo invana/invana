@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 what a person reads of a project is what they may read, and its settings are its team's and the
 Admins' ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | See every project's head; read the projects they may read; edit any project's name and purpose in place, archive and unarchive it | A project they may not read: its head only — *Withheld — join the team or ask {who can grant}* |
 | Operator | See every project's head; read the projects they may read; edit, archive and unarchive the projects whose team they are on; a Modeller the same | On a project whose team they are not on: *Edit*, *Archive* and *Unarchive* disabled — *Join the team to change it*. A project they may not read: its head only, withheld |
@@ -68,7 +68,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Projects | Admin | projects.projects · No projects yet | projects.projects · Nothing matches | projects.projects · Loading | projects.projects | projects.projects · Could not load | projects.projects · Tasks running | — |
 | Projects | Operator | projects.projects · No projects yet | projects.projects · Nothing matches | projects.projects · Loading | projects.projects | projects.projects · Could not load | projects.projects · Tasks running | — |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read how every agent, skill, plan and model version is doing; open the runs behind a figure; open a change to compare | — |
 | Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): the same — every figure reads and opens its runs | A run behind a figure whose content they may not read lists with its head and *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
@@ -56,7 +56,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | How they are doing — tiles, trend, rows | Admin | agents.runs · How they are doing · Nothing ran | — | agents.runs · How they are doing · Loading | agents.runs · How they are doing | agents.runs · How they are doing · Could not load | agents.runs · How they are doing · Degraded | — |
 | How they are doing — tiles, trend, rows | Operator | agents.runs · How they are doing · Nothing ran | — | agents.runs · How they are doing · Loading | agents.runs · How they are doing | agents.runs · How they are doing · Could not load | agents.runs · How they are doing · Degraded | agents.runs · How they are doing |

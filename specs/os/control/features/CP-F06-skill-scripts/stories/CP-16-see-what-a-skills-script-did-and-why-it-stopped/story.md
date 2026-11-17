@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 Running a test is the Modeller's and the Admin's ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); a script step reads as the run's content does (AC-31), the role adding none.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the script steps of a run whose content they may read; run a test of a draft that calls a script | A run whose content they may not read: a script step shows only that it ran, its status and its time |
 | Operator | Read the script steps of a run whose content they may read — one they are behind, or a project's run whose sources their default agent may read (AC-31) | *Run a test* disabled — *Needs the Modeller role — ask Priya or Lee*; with the Modeller role, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
@@ -57,7 +57,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A script step on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Script step | agents.runs · Detail · Script stopped | agents.runs · Detail · Script running | — |
 | A script step on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Script step | agents.runs · Detail · Script stopped | agents.runs · Detail · Script running | agents.runs · Detail · Content withheld |

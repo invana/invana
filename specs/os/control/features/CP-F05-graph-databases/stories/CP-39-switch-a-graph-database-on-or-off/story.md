@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Turn a graph database on or off for the deployment; turn one off or on for their own runs | — |
 | Operator | Turn a graph database off, or back on, for the runs they are behind | The deployment's switch reads, with who set it and when; it reads *Ask an Admin* |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Switches in the list | Admin | settings.databases · New and off | — | settings.databases · Loading | settings.databases | settings.databases · Could not switch | — | — |
 | Switches in the list | Operator | settings.databases · New and off · Read only | — | settings.databases · Loading | settings.databases · My switch | settings.databases · Off for the deployment | — | settings.databases · Read only |

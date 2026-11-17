@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 Making a policy needs Edit on Access; giving it to people or teams, Manage on Access; giving it to a project, Manage on
 Projects for it — [AC-F02 › Access](../../feature.md#access).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *New policy*: name it, start from an Access template or Blank, set each tab of *What it allows* or *Edit as policy*, pick who holds it — people, teams and projects in one picker — read the whole policy back in Review and *Create policy* after a confirm, signing in again | — |
 | Operator | Read every template and every policy, tab by tab and as the matrix | *New policy* disabled — *Needs Edit on Access — ask Priya or Lee*; with Edit on Access but not Manage on Access, people and teams in *Who holds it* are disabled, naming the permission; a project without Manage on Projects for it, likewise; the policy is created unattached |
@@ -82,7 +82,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | New policy · Start | Admin | settings.policies · New · Start | — | settings.policies · New · Start · Loading templates | settings.policies · New · Start · Template picked | settings.policies · New · Start · Name taken | — | — |
 | New policy · Start | Operator | — | — | — | — | — | — | settings.policies · Locked · New disabled |

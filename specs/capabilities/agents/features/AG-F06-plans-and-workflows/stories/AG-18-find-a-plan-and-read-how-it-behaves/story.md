@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 Reading is every signed-in person's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every workflow, its page, versions and export; read the plan of a run they are behind or, for a project's run, whose sources their default agent may see | The plan of another run: that it ran, its status and its tokens — *Content withheld* |
 | Operator | Read every workflow, its page, versions and export; read the plan of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
@@ -82,7 +82,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Workflows | Admin | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Workflows | agents.skills · Could not load | — | — |
 | Workflows | Operator | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Workflows | agents.skills · Could not load | — | — |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Find every record they may open, run any act, ask the Assistant | — |
 | Operator | Find every record they may open, run the acts their role allows, ask the Assistant when it is among the agents they may use | A record they may not open is never a hit; an act their role lacks is listed disabled, naming the role it needs |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | ⌘K | Admin | shell.command · Nothing typed | shell.command · Nothing found | shell.command · Loading | shell.command | shell.command · A group failed | — | — |
 | ⌘K | Operator | shell.command · Nothing typed | shell.command · Nothing found | shell.command · Loading | shell.command | shell.command · A group failed | — | shell.command · Act disabled |

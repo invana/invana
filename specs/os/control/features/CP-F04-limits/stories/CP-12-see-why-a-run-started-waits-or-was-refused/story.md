@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every start and what decided it | — |
 | Operator | Operator · Modeller: read every start and what decided it ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | — |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Starts | Admin | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Starts | settings.workers · Could not load | — | — |
 | Starts | Operator | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Starts | settings.workers · Could not load | — | — |

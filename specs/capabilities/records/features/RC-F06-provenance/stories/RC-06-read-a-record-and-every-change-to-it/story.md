@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any record and its history, and open the run behind each change | — |
 | Operator | Read any record their default agent may read, and its history. A Modeller the same | A change by a member they cannot see reads *a member you cannot see*; a value at a level their agent may not Read: *Withheld — your agent may not read {resource}* |
@@ -49,7 +49,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A record · Values | Admin | — | — | data.records · Detail · Loading | data.records · Detail | data.records · Detail · Could not load | — | — |
 | A record · Values | Operator | — | — | data.records · Detail · Loading | data.records · Detail | data.records · Detail · Could not load | — | — |

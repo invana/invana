@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 Holding a kind to a standard is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Hold any kind or property to a standard, change its mode or mapping, or let it go, in a draft; read every score | — |
 | Operator | Read the standards a kind or property holds and its scores. A Modeller holds and lets go as an Admin does | *Hold to a standard* absent — *Needs the Modeller role — ask an Admin* |
@@ -64,7 +64,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Hold to a standard | Admin | data.quality · Checks · Hold to a standard | — | data.quality · Checks · Loading | data.quality · Checks · Hold to a standard | data.quality · Checks · Hold refused | — | — |
 | Hold to a standard | Operator | — | — | — | — | — | — | model.kinds · Detail · Standards read only |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add any settled answer they may read to a branch of any project | — |
 | Operator | Add a settled answer whose run they may read to a branch of a project they may add findings to ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)); a Modeller the same | A project they may not add to is not offered; with none, *Add to a project* is disabled, naming the project's members |
@@ -45,7 +45,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Add to a project | Admin | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | — |
 | Add to a project | Operator | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | explore.board · No access |

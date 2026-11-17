@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Stage, revert and discard changes; save them to a read + write graph database through the Record editor | A read-only graph database: Save disabled, naming it and its mode |
 | Operator | Stage, revert and discard changes on the board; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Edit on the board*) | *Save n changes* disabled — *Needs the Modeller role — ask an Admin*; the changes stay on the board |
@@ -64,7 +64,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Changes | Admin | explore.board · Edit · No changes | — | explore.board · Edit · Saving | explore.board · Edit | explore.board · Edit · Save failed | explore.board · Edit · Waiting for approvers | explore.board · Edit · Read-only database |
 | Changes | Operator | explore.board · Edit · No changes | — | — | explore.board · Edit | — | — | explore.board · Edit · Read only |

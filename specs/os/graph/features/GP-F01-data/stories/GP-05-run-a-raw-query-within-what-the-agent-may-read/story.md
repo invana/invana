@@ -20,7 +20,7 @@ A raw query is a step of the built-in **Query console** agent ([EX-08](../../../
 is the person's side of it); its four layers are this story's. Roles are
 [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run a raw query as the Query console, within what its policies allow Read; a write waits on its approvers and runs only on a read + write graph database | A refusal naming the rule, its policy and who set it; the count of what was withheld |
 | Operator | The same for a read, when they may use the Query console; a Modeller may also send a write, as Admin | A write: *Edit on the board needs the Modeller role*. Not granted the Query console: disabled, naming the Admins |
@@ -62,7 +62,7 @@ flowchart TD
 The surface is the Query console of [EX-08](../../../../../../capabilities/explore/features/EX-F03-ask-a-question/stories/EX-08-write-the-query-myself/story.md);
 this story adds its refusals and its withheld count.
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A raw query refused or filtered | Admin | — | — | explore.board · Console · Running | explore.board · Console · Withheld count | explore.board · Console · Query refused | explore.board · Console · Write waiting on approvers | — |
 | A raw query refused or filtered | Operator | — | — | explore.board · Console · Running | explore.board · Console · Withheld count | explore.board · Console · Query refused | — | explore.board · Console · Query console not granted |

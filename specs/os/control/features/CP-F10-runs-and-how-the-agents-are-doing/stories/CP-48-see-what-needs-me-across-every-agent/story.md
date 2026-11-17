@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every tile, *Needs attention* and what changed; follow each item's act | — |
 | Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): read every tile, *Needs attention* and what changed; follow each item's act to where it is answered | An act they may not take there is disabled, naming who may; a run whose content they may not read opens with its content *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Runs — tiles, Needs attention, changed recently | Admin | agents.runs · Nothing ran | — | agents.runs · Loading | agents.runs | agents.runs · Could not load | agents.runs · Running | — |
 | Runs — tiles, Needs attention, changed recently | Operator | agents.runs · Nothing ran | — | agents.runs · Loading | agents.runs | agents.runs · Could not load | agents.runs · Running | agents.runs |

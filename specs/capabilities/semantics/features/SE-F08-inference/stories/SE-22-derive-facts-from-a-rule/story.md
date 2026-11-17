@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F08](../../feature.md)
 
 Running a derivation is the Modeller's and the Admin's; write-back is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read derivations and derived facts; create, change, stop or run a derivation; turn on write-back | — |
 | Operator | Read derivations and the derived facts whose premises their default agent may read. A Modeller also creates, changes, stops and runs a derivation; write-back stays an Admin's | *New rule · A derivation*, *Run again* and *Stop* disabled — *Needs the Modeller role — ask an Admin*; *Write back* disabled — *Needs the Admin role — ask an Admin* |
@@ -62,7 +62,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Derivations | Admin | model.inference · No derivations | model.inference · No match | model.inference · Loading | model.inference | model.inference · Run failed | model.inference · Running | — |
 | Derivations | Operator | model.inference · No derivations | model.inference · No match | model.inference · Loading | model.inference · Read only | model.inference · Run failed | model.inference · Running | model.inference · Read only |

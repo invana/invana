@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create boards; rename, delete, restore any board; schedule the question through an agent they may use | — |
 | Operator | The same; a Modeller the same | Without the Assistant: *Rename*, *Delete* and *Restore* disabled — *{person} may not use Assistant — ask an Admin*. A link to a board that does not exist: *Not found* |
@@ -63,7 +63,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Boards on the left | Admin | explore.board · Ask | explore.board · Boards · No board matches | explore.board · Boards · Loading | explore.board · Boards | explore.board · Boards · Failed | — | — |
 | Boards on the left | Operator | explore.board · Ask | explore.board · Boards · No board matches | explore.board · Boards · Loading | explore.board · Boards | explore.board · Boards · Failed | — | — |

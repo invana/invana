@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Grant an agent to a team or a person, or take it away; add a person to a team or take one off; read the preview of each before saving, signing in again | — |
 | Operator | Read every team's agents and every person's agents and how each reaches them; a Modeller reads the same | *Grant an agent*, *Take away*, *Add people* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -59,7 +59,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A team — its agents | Admin | settings.people · Teams · A team · No agents | — | settings.people · Teams · Loading | settings.people · Teams · A team · Agents | settings.people · Teams · Could not load | — | — |
 | A team — its agents | Operator | settings.people · Teams · Locked · A team · No agents | — | settings.people · Teams · Locked · Loading | settings.people · Teams · Locked · A team · Agents | settings.people · Teams · Locked · Could not load | — | settings.people · Teams · Locked · A team · Agents |

@@ -2,7 +2,7 @@
 
 Who Invana's stories are for. A story's *As* names one of these; its front-matter `personas:` lists their keys. A
 persona is a person's job — what they come to do. What they may do is the Access Policies attached to them and their
-teams, drawn as two lenses (below).
+teams, drawn as two access levels (below).
 
 ## The people
 
@@ -22,7 +22,7 @@ teams, drawn as two lenses (below).
 |---|---|---|
 | User | **Analyst** | every persona is a user; the job is asking |
 | Data modeler | **Modeller**, or **Data curator** when the work is gathering data | two jobs, two personas |
-| Operator, as a job (*see what ran, what it touched, what it cost*) | **Agent builder** or **Admin**, reading Runs | *Operator* is a lens — read only — never a job |
+| Operator, as a job (*see what ran, what it touched, what it cost*) | **Agent builder** or **Admin**, reading Runs | *Operator* is an access level — read only — never a job |
 | Evaluator | **Agent builder** | proving a skill change is not worse is part of building it |
 | Install admin · Platform engineer · an owner of one part of the deployment | **Admin** | there is one deployment, run by its Admins; no part of it has an owner of its own |
 
@@ -35,15 +35,15 @@ teams, drawn as two lenses (below).
 | Is trying it out | A deployment with demo data |
 | Was added | A deployment someone else set up, with the agents they may use, opened at their first answer |
 
-## The two lenses
+## The two access levels
 
 There are no roles: what a person may do is their Access Policies, read against [the permission
-catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue). Every story's *Who can* and every board are drawn for two lenses.
+catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue). Every story's *Who can* and every board are drawn for two access levels.
 
-| Lens | Who | Sees |
+| Access | Who | Sees |
 |---|---|---|
 | **Admin** — full access | A person whose policies allow every act the story names — *Super user*, or the Access template that fits | Every act |
 | **Operator** — read only | A person whose policies allow reading and nothing more — *Read only*, every newcomer's policy | Every place and act; each act disabled, naming the permission and who can grant it, or *Ask &lt;approver&gt;*; data a policy denies withheld, never shown |
 
-A person between the two — one permission but not another — is a criterion in the story, never a third lens on the
+A person between the two — one permission but not another — is a criterion in the story, never a third access level on the
 canvas.

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every row, the counts over the deployment, by actor, by record and refusals; a row's arguments when they may read its run; export | — |
 | Operator | Read their own acts and the rows of runs they may read, with the filters; export those rows | The rest is counted, not shown: *N rows today belong to runs you cannot read — counted, not shown*; the counts over the deployment are not shown |
@@ -75,7 +75,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | History — rows | Admin | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Everything | settings.history · Chain broken | settings.history · Agents | — |
 | The head after a prune | Admin | — | — | — | settings.history · From a checkpoint | settings.history · Checkpoint broken | — | — |

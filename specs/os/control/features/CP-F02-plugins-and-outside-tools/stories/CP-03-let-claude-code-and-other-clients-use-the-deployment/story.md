@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Serve or stop serving an agent or a record tool; read the address, how to connect and every call | — |
 | Operator | Read the address, what is served and how to connect; call the server through their default agent with a connected client (AC-F11) or a key (AC-F10); read their own calls; a Modeller the same | The served switches read, naming the Admins; another person's calls are absent |
@@ -70,7 +70,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | MCP server | Admin | settings.mcp · Nothing served | — | settings.mcp · Loading | settings.mcp | settings.mcp · Could not load | — | — |
 | MCP server | Operator | settings.mcp · Nothing served · Read only | — | settings.mcp · Loading | settings.mcp · Read only | settings.mcp · Could not load | — | settings.mcp · Read only |

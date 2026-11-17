@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Draft with the assistant; save, save anyway, cancel or discard | — |
 | Operator | — ; a Modeller is the same | *Draft with the assistant* and *Save* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A draft policy | Admin | settings.policies · New · Draft with the assistant | — | settings.policies · New · Drafting | settings.policies · Draft | settings.policies · Rule refused | settings.policies · New · Draft from the assistant | — |
 | A draft policy | Operator | — | — | — | settings.policies · New · Locked | — | — | settings.policies · New · Locked |

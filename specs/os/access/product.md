@@ -75,7 +75,7 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Leaving and keeping — retention per store, legal holds, a departed person's name, subjects forgotten | modal | `settings.keeping` |
 | Forget a subject | modal | `settings.keeping · Forget` |
 | Export everything held about a person | modal | `settings.people · Export their data` |
-| No access | every surface | The Operator lens of each board, `<board> · Locked` — the act names the check that refused it: the permission it needs and who can grant it, the rule and its policy, or the approver who decides |
+| No access | every surface | The Operator access of each board, `<board> · Locked` — the act names the check that refused it: the permission it needs and who can grant it, the rule and its policy, or the approver who decides |
 
 ## Rules
 

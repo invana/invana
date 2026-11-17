@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every policy; *New policy* and *Draft with the assistant* | — |
 | Operator | Read every policy, its rules and the agents it is attached to; a Modeller reads the same | *New policy* and *Draft with the assistant* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -53,7 +53,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Access Policies — the list | Admin | settings.policies · Built in only | settings.policies · Nothing matches | settings.policies · Loading | settings.policies | settings.policies · Could not load | — | — |
 | Access Policies — the list | Operator | settings.policies · Locked · Built in only | settings.policies · Locked · Nothing matches | settings.policies · Locked · Loading | settings.policies · Locked | settings.policies · Locked · Could not load | — | settings.policies · Locked |

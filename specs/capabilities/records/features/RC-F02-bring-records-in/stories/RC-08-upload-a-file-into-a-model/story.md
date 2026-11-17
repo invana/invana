@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 Loading records is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Upload a file into any published model and load it | — |
 | Operator | Read the loads. A Modeller uploads as an Admin does | *Upload* disabled — *Needs the Modeller role — ask an Admin* |
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Upload | Admin | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | — |
 | Upload | Operator | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | data.loads · Upload · Needs the model grant |

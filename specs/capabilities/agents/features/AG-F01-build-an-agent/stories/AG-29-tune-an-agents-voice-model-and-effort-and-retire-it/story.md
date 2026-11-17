@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 Tuning and retiring an agent is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Settings › Connections › AI models | A built-in agent's settings read; *Copy* in place of every edit |
 | Modeller | Every act an Admin has here, except offering model versions | Offering model versions reads *Ask an Admin* |
@@ -76,7 +76,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Voice | Admin | agents.agents · Detail · Default voice | — | agents.agents · Detail · Loading | agents.agents · Detail · Voice | agents.agents · Detail · Could not save | agents.agents · Detail · Previewing | — |
 | Voice | Operator | agents.agents · Detail · Default voice | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |

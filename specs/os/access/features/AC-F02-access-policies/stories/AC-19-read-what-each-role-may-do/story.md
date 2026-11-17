@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the role table; set a person's role in the Directory (AC-F03) | The table has no *Edit* — it is fixed |
 | Operator | Read the role table and their own role; a Modeller the same | — |
@@ -51,7 +51,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Roles | Admin | — | settings.roles · Nothing matches | settings.roles · Loading | settings.roles | settings.roles · Could not load | — | — |
 | Roles | Operator | — | settings.roles · Nothing matches | settings.roles · Loading | settings.roles · Your role marked | settings.roles · Could not load | — | — |

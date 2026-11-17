@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Accept, accept with edits, or reject with a note any suggested change; read each version's outcome | — |
 | Operator | Read the suggested change and each version's outcome. A Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): decide those on a skill, workflow, agent or answer template, and those on the model's rules or meaning through its review | The three acts disabled — *Needs the Modeller role — ask an Admin*; an index needs an Admin, named; a plan proposed for approval waits on the agent's named approvers, named |
@@ -67,7 +67,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Deciding a suggested change | Admin | inbox · Nothing suggested | — | inbox · Publishing | inbox · Suggested change | inbox · Stale base | inbox · Waits on approvers | — |
 | Deciding a suggested change | Operator | inbox · Nothing suggested | — | inbox · Loading | inbox · Suggested change | inbox · Stale base | inbox · Waits on approvers | inbox · Suggested change, read only |

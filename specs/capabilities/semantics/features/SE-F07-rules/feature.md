@@ -99,23 +99,23 @@ flowchart TD
 | Stays in Graph Data fails closed | It keeps record values out of every AI model and third-party call in the run, not only the one property's |
 | A hold is a constraint | A kind or property holding a standard is a constraint naming its values, versioned with the model; a newer standard version never moves it (SE-19) |
 | A refusal files a request | A run that needs a protected property ends *cannot answer*, naming the rule, and the ask lands in Requests; the same open ask by the same person or agent adds to one request |
-| Allow edits the rule | *Allow* adds a view to the rule's exceptions; runs asked in that view do not carry the rule. It is the rule's one exception and is named on it |
+| Allow edits the rule | *Allow* adds a lens to the rule's exceptions; runs asked in that lens do not carry the rule. It is the rule's one exception and is named on it |
 | Because | One optional line said to whoever the rule stops |
 | Versioned | Changing a rule publishes its next version; a past run, load and check name the version they read |
 | Stop offering, not delete | *Stop offering it* stops offering and checking; its versions and past citations stay, and *Offer it again* reverses it |
-| Impact before saving | The engine reads the last 30 days of the rule's acts back through it — the count read, the count broken and the newest five — worded *would have stopped* · *would have warned on* · *would have reported*; for a rule on a property, the views and schedules that read it today |
+| Impact before saving | The engine reads the last 30 days of the rule's acts back through it — the count read, the count broken and the newest five — worded *would have stopped* · *would have warned on* · *would have reported*; for a rule on a property, the lenses and schedules that read it today |
 | A statement opens its rule | On a step and in *How it got here*, each rule is its statement — the version the step was given — and opens the rule's evidence |
 | Cited is self-reported | Where a rule was cited says so: *N steps said they used it. Nothing checks they used it well* — shown only when a step cited it |
 | The engine counts every number | Broken in 30 days, what a rule would stop, scores against a standard, the open requests — Studio formats, never derives |
 | Every edit is recorded | Creating, editing, stopping, allowing and resolving are events with before and after, in History |
-| Leans on | SE-F02 — constraints on a property · SE-F05 — the standards a kind holds · SE-F08 — derivations · SE-F09 — views a rule may allow · RC-F02 — loads · RC-F03 — the records that break a rule · AC-F02 — enforcing act rules · PJ-F01 — a project's rules on its Details · PJ-F06 — alerts · Agents › Runs — a step's offered and cited rules |
+| Leans on | SE-F02 — constraints on a property · SE-F05 — the standards a kind holds · SE-F08 — derivations · SE-F09 — lenses a rule may allow · RC-F02 — loads · RC-F03 — the records that break a rule · AC-F02 — enforcing act rules · PJ-F01 — a project's rules on its Details · PJ-F06 — alerts · Agents › Runs — a step's offered and cited rules |
 
 ## Data touched
 
 | Record | Read or write |
 |---|---|
 | Rule — kind, scope, order, offered or not, its current version | Read · write |
-| Rule version — statement or target, check, mode, because, the views it is allowed in, when published | Read · write |
+| Rule version — statement or target, check, mode, because, the lenses it is allowed in, when published | Read · write |
 | A hold — kind or property, standard version, mapping, mode | Read · write |
 | Scores per kind and standard version — records, conforming, score, problems | Read · write (engine) |
 | Request — the ask, who asked through what, the rule it met, its resolution | Read · write |
@@ -140,7 +140,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Record | Owner |
 |---|---|
-| A rule on a property — a `model_lenses` row, `kind = guardrail`, `scope = graph`, with `target` · `access` · `leaves` · `allowed_in` | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
+| A rule on a property — a `model_lenses` row, `kind = guardrail`, `scope = graph`, with `target` · `access` · `leaves` · `allowed_in` | [SE-F09](../SE-F09-lenses-of-the-graph/feature.md#engine) |
 | A step's offered and cited rules · the runs a request was filed from | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | Loads a check reads at | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Project decisions a check reads at · a project's rules on its Details | [PJ-F03](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md#engine) · [PJ-F01](../../../projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
@@ -162,7 +162,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /guardrails` · `POST /guardrails` · `PATCH /guardrails/{id}` · `DELETE /guardrails/{id}` | Rules on a property: `items` · `total` · `may_edit`, each `id` · `name` · `key` · `target` · `access` · `leaves` · `allowed_in[{id, name}]` · `types` · `refused_7d` · `sentence` · `created_at` · `updated_at` · create, edit, remove one | SE-11 |
 | `GET /guardrails/{id}` | The same, plus `applies_to[{model, type, property}]` · `refusals[{request_id, who, where, at}]` (the latest twenty) · `refusals_total` · `history[{action, actor, at, details}]` | SE-11 |
 | `GET /guardrails/targets` | `[{target, model, type, property}]` — every `Kind.property` the picker offers | SE-11 |
-| `POST /guardrails/impact` | `{worlds[{id, name}], schedules[{id, name}], sentence}` — who reads the target today and would not afterwards | SE-11 |
+| `POST /guardrails/impact` | `{lenses[{id, name}], schedules[{id, name}], sentence}` — who reads the target today and would not afterwards | SE-11 |
 | `GET /requests?status=&kind=` · `POST /requests` | A page of requests, plus `open` (whatever the filter) and `may_resolve` · *Ask for a change* | SE-13 |
 | `POST /requests/{id}/resolve` | `{action: allow · model · decline, world_id?, model_id?, note?}` → the request | SE-13 |
 
@@ -175,7 +175,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `model.rules.check` | A failed `warn` or `report`: `act` · `subject` · `mode` · `version` · `reason` |
 | `model.requests.create` · `model.requests.resolve` | A request filed · resolved |
 
-A rule on a property writes [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine)'s `model.lenses.*` events.
+A rule on a property writes [SE-F09](../SE-F09-lenses-of-the-graph/feature.md#engine)'s `model.lenses.*` events.
 
 ### Refusals
 
@@ -186,7 +186,7 @@ A rule on a property writes [SE-F09](../SE-F09-views-of-the-graph/feature.md#eng
 | 409 | A rule on a property another rule already holds | *{rule} already holds {target}.* | SE-11.5 |
 | 409 | An act a `block` rule refuses — on the act's route; every blocking rule in one refusal, nothing written | *{act} is blocked: {rule} — {because} ({reason}).* | SE-12.9 |
 | 409 | *Allow* on a request whose rule was deleted | *Its rule is gone — decline it instead.* | SE-13.10 |
-| 409 | *Allow* in a view deleted meanwhile | *{view} is gone — pick another view.* | SE-13.11 |
+| 409 | *Allow* in a lens deleted meanwhile | *{lens} is gone — pick another lens.* | SE-13.11 |
 | 409 | Resolving a request already resolved | *Already resolved.* | SE-13.12 |
 
 ### CLI
@@ -194,13 +194,13 @@ A rule on a property writes [SE-F09](../SE-F09-views-of-the-graph/feature.md#eng
 | Command | Does |
 |---|---|
 | `invana requests list [--status] [--kind]` | The deployment's requests |
-| `invana requests resolve <id> --decline · --allow <view> · --model [<model>] [--note]` | Resolve one |
+| `invana requests resolve <id> --decline · --allow <lens> · --model [<model>] [--note]` | Resolve one |
 
 ### Mechanisms
 
 | Mechanism | How |
 |---|---|
-| Where each kind lives | **Constraint** — a property's range is a [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) `model_constraints` row and a hold is versioned with the model (SE-19), both checked when a record is loaded or changed; never a `model_rules` row · **Act rule** — a statement, `kind = act`, read by `enforce` at its acts, or a rule on a property, a [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) `model_lenses` row enforced on every run · **Derivation** — `kind = derivation`, its form and *when … then …* the version's `statement` and `params`, run by [SE-F08](../SE-F08-inference/feature.md#engine) · **Alert** — `kind = alert`, its condition, the kinds it watches and the project, task or branch it opens leads in the version's `params`; evaluated on a queue worker after a load or change settles, never blocking the write, and the lead opened by [PJ-F06](../../../projects/features/PJ-F06-alerts/feature.md#engine) |
+| Where each kind lives | **Constraint** — a property's range is a [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) `model_constraints` row and a hold is versioned with the model (SE-19), both checked when a record is loaded or changed; never a `model_rules` row · **Act rule** — a statement, `kind = act`, read by `enforce` at its acts, or a rule on a property, a [SE-F09](../SE-F09-lenses-of-the-graph/feature.md#engine) `model_lenses` row enforced on every run · **Derivation** — `kind = derivation`, its form and *when … then …* the version's `statement` and `params`, run by [SE-F08](../SE-F08-inference/feature.md#engine) · **Alert** — `kind = alert`, its condition, the kinds it watches and the project, task or branch it opens leads in the version's `params`; evaluated on a queue worker after a load or change settles, never blocking the write, and the lead opened by [PJ-F06](../../../projects/features/PJ-F06-alerts/feature.md#engine) |
 | The checks | `load.conforms` (`standard` as `publisher/name`, `min_score` 0 to 1, default 1) and `load.licence` (`allowed`, compared case-blind), read at a load, on *Everywhere* rules · `evidence.reviewed` and `evidence.not_undone`, read at a project decision, on *Everywhere* and project rules |
 | `enforce` | Reads every active checked rule in scope before the act writes; every block in one refusal; a failed `warn` or `report` writes `model.rules.check` |
 | Offered and cited | A step is given the rules in order, each with its version id; its citations are stored on the step and counted per version (`rule_citation_counts`), offers per rule (`rule_offer_counts`). Until the deployment has offers, the offered and never-cited tiles are absent, not 0 |
@@ -246,7 +246,7 @@ A rule on a property writes [SE-F09](../SE-F09-views-of-the-graph/feature.md#eng
 
 | Item | Why not |
 |---|---|
-| Statement rules a step must obey while it runs | A run is bounded by *What it may do*, its view and the rules on properties; a statement's check is read at acts, never mid-run |
+| Statement rules a step must obey while it runs | A run is bounded by *What it may do*, its lens and the rules on properties; a statement's check is read at acts, never mid-run |
 | A free-text or scripted check | A check is a fixed list an auditor can read |
 | A rule checked at a finding | A finding is evidence, not an act; the decision citing it is where a rule reads it |
 | Choosing the acts a check is read at | The check names its acts |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's numbers, its runs and why each ended | — |
 | Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): read every agent's numbers, its runs and why each ended; their own conversations with it | Others' conversations with the agent are counted, never listed; a recent run whose content they may not read lists with its head and *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
@@ -55,7 +55,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Agents — an agent picked | Admin | agents.agents · Draft | — | agents.agents · Loading | agents.agents | agents.agents · Could not load | agents.agents · Running | — |
 | Agents — an agent picked | Operator | agents.agents · Draft | — | agents.agents · Loading | agents.agents | agents.agents · Could not load | agents.agents · Running | agents.agents |

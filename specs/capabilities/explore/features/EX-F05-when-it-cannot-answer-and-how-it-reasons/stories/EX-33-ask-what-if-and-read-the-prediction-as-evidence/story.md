@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask *what if* or pick *What-if*, read the predicted part and its run, add it to a project, save it as derived records on a read + write graph database | — |
 | Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs the Modeller role — ask an Admin*. Another person's run: that it ran, its status and its tokens |
@@ -69,7 +69,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | What-if in the composer | Admin | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · What-if picked | — | explore.board · Ask · Assumptions before the run | — |
 | What-if in the composer | Operator | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · What-if picked | — | explore.board · Ask · Assumptions before the run | — |

@@ -20,7 +20,7 @@ A memory node inherits its sources' resources ([GP-06](../GP-06-see-where-any-ex
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table); the
 person's agent is their default agent ([AC-F02 › Rules › The default agent](../../../../../access/features/AC-F02-access-policies/feature.md#rules)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse the thinking graph; open a node whose memory place and every source their default agent may Read | A node withheld: its head only, naming the resource their agent may not read |
 | Operator | The same; a Modeller reads the same | The same |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A memory node | Admin | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |
 | A memory node | Operator | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |

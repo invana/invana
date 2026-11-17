@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every graph database; reconnect one; open one; *Connect a graph database* | — |
 | Operator | Read every graph database — never its credential | *Reconnect* and *Connect a graph database* read *Ask an Admin* |
@@ -50,7 +50,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Graph databases | Admin | settings.databases · None yet | settings.databases · No match | settings.databases · Loading | settings.databases | settings.databases · Could not load | — | — |
 | Graph databases | Operator | settings.databases · None yet · Read only | settings.databases · No match | settings.databases · Loading | settings.databases · Read only | settings.databases · Could not load | — | settings.databases · Read only |

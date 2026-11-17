@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 Reading Evidence is every role's; changing the item is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read Evidence for every skill, workflow, plan, rule, refusal and failure; open the runs behind each count that they may read ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); act on the item | A run they may not read opens withheld |
 | Operator | Read the same Evidence and open the runs behind it that they may read; a Modeller changes the item as an Admin does | A run they may not read opens withheld; changing the item is read only — *Needs the Modeller role — ask an Admin* |
@@ -64,7 +64,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Evidence | Admin | agents.skills · Evidence, no runs | agents.skills · Evidence, nothing wrong | agents.skills · Evidence loading | agents.skills · Evidence | agents.skills · Failed | agents.skills · Evidence, suggestion open | — |
 | Evidence | Operator | agents.skills · Evidence, no runs | agents.skills · Evidence, nothing wrong | agents.skills · Evidence loading | agents.skills · Evidence | agents.skills · Failed | agents.skills · Evidence, suggestion open | — |

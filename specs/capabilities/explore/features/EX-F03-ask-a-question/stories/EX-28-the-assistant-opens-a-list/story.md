@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask for Runs, Agents, Inbox › Needs you or Access › Record › History with filters, and open it | — |
 | Operator | The same, through the agents they may use — the list opens with what they may read, counted under their rights; a Modeller the same | A name they cannot see is said as not found, never as forbidden; a run whose content they may not read lists with *withheld* (CP-F10) |
@@ -57,7 +57,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The card in the thread | Admin | — | explore.board · List card, 0 rows | explore.board · Working | explore.board · List card | explore.board · Name not found | explore.board · Working | — |
 | The card in the thread | Operator | — | explore.board · List card, 0 rows | explore.board · Working | explore.board · List card | explore.board · Name not found | explore.board · Working | explore.board · Name not found |

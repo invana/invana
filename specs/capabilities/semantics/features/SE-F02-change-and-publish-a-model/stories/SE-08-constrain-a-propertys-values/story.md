@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F02](../../feature.md)
 
 Changing a property's constraint is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, change and remove a property's constraint in a draft, and see what breaks it today | — |
 | Operator | Read each property's constraint on the kind. A Modeller changes constraints as an Admin does | No edit act on a property — *Needs the Modeller role — ask an Admin* |
@@ -61,7 +61,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A kind · Must be | Admin | model.kinds · Detail · No constraints | — | — | model.kinds · Detail | — | — | — |
 | A kind · Must be | Operator | model.kinds · Detail · No constraints | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Read only |

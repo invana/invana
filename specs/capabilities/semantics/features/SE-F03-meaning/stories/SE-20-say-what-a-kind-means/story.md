@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F03](../../feature.md)
 
 Changing meaning is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read meaning and every property's level; change them in a draft; accept or dismiss a proposed synonym | — |
 | Operator | Read meaning and levels. A Modeller changes them as an Admin does | *Change in a draft*, *Set level* and *Accept into the draft* disabled — *Needs the Modeller role — ask an Admin* |
@@ -65,7 +65,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A kind · Meaning | Admin | model.kinds · Detail · Meaning · No meaning yet | — | model.kinds · Detail · Meaning · Loading | model.kinds · Detail · Meaning | model.kinds · Detail · Meaning · Could not load | model.kinds · Detail · Meaning · Proposed synonym | — |
 | A kind · Meaning | Operator | model.kinds · Detail · Meaning · No meaning yet | — | model.kinds · Detail · Meaning · Loading | model.kinds · Detail · Meaning · Read only | model.kinds · Detail · Meaning · Could not load | model.kinds · Detail · Meaning · Read only | model.kinds · Detail · Meaning · Read only |

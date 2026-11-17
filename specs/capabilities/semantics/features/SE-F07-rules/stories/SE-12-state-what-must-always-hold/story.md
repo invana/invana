@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 Writing a rule, *Everywhere* or on a project, is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every rule and its evidence; create, edit, stop offering and offer again rules at both scopes | — |
 | Operator | Read every rule in force and its evidence. A Modeller acts as an Admin on *Everywhere* and *A project* | *New rule*, *Save rule* and *Stop offering it* disabled — *Needs the Modeller role — ask an Admin* |
@@ -67,7 +67,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Rules | Admin | model.rules · No rules | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | — |
 | Rules | Operator | model.rules · No rules | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | model.rules · Rules read only |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open *New model*, start from a description, a file or a starter, and land on the new draft | — |
 | Operator | See the models and their drafts; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *New model* and *Import* disabled — *Needs the Modeller role — ask an Admin* |
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | New model | Admin | model.models · New | — | model.models · New · Reading the file | model.models · New · Starters | model.models · New · Name taken | — | — |
 | New model | Operator | — | — | — | — | — | — | model.models · New · No access |

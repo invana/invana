@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a big run's rates, roles and every agent in it; stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | — |
 | Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): read a big run's rates, roles and every agent in it when they are behind it or own its agent; stop it then ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other big run: that it ran, its agent, the person behind it, its status and its tokens — the rest *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop run* disabled, naming who may stop it |
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A big run — numbers and rates | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Many agents | agents.runs · Detail · Failed | agents.runs · Detail · Many agents running | — |
 | A big run — numbers and rates | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Many agents | agents.runs · Detail · Failed | agents.runs · Detail · Many agents running | agents.runs · Detail · Content withheld |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the owner and maker of anything; share their own personal agents | A platform-owned or built-in resource has no owner acts — *The organisation's* |
 | Operator | Read the owner and maker of anything; with Create on Agents, share their own personal agents | On someone else's personal agent, no *Share* |
@@ -51,7 +51,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Owner | Admin | settings.me · Owners · Made by you | — | settings.me · Owners · Loading | settings.me · Owners | settings.me · Owners · Could not save | — | — |
 | Owner | Operator | settings.me · Owners · Made by you | — | settings.me · Owners · Loading | settings.me · Owners | settings.me · Owners · Could not save | — | settings.me · Owners · Locked · Owners |

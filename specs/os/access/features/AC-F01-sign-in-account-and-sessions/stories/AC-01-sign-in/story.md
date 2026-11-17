@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Sign in with their email and password; lands on Home | — |
 | Operator | Sign in with their email and password; lands on Home | A person without an account reads *Ask your admin for an account* |
@@ -50,7 +50,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Sign in | Admin | access.signin | — | access.signin · Signing in | access.signin | access.signin · Could not sign in | — | — |
 | Sign in | Operator | access.signin | — | access.signin · Signing in | access.signin | access.signin · Could not sign in | — | access.signin · No account |

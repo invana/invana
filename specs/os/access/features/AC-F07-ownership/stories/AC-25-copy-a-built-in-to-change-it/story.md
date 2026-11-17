@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Copy any built-in; an agent copy is their personal agent, any other copy the organisation's, made by them | — |
 | Operator | Read every built-in, its owner *System* and its version; a Modeller copies a built-in agent, skill or workflow | *Copy* disabled, naming the role it needs — *Needs the Modeller role* for an agent, a skill or a workflow, *Needs the Admin role* for a policy — and who holds it |
@@ -53,7 +53,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A built-in's owner and Copy | Admin | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | settings.me · Owners · Could not copy | — | — |
 | A built-in's owner and Copy | Operator | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | — | — | settings.me · Owners · Locked · Copy needs a role |

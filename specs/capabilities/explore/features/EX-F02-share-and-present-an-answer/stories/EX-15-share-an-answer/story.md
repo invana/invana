@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 Sharing is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Share any board's answer with users and teams, stop sharing, export PNG · CSV · Markdown; open any link | — |
 | Operator | The same; a Modeller the same | Without the Assistant: *Share with* disabled — *{person} may not use Assistant — ask an Admin*; export still works. A link to a board or snapshot that does not exist: *Not found* |
@@ -72,7 +72,7 @@ flowchart LR
 | EX-15.19 | An export — PNG, CSV or Markdown — of an answer carrying a confidential or personal value | the person exports | the value is left out of the file, and the file and the dialog name each property and level left out; the export is recorded with its sources |
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Share | Admin | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | — |
 | Share | Operator | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | explore.board · Share · Not an owner |

@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F10](../../feature.md)
 
 Acting on what Health finds is the Modeller's and the Admin's; a suggested index is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every tab for all models or one, save a report, and act on what it finds — read the database, add a drift to a draft, add a suggested index to a draft (an Admin alone), archive a model | — |
 | Operator | Read every tab for all models or one, and save a report. A Modeller acts on drift, archives and restores as an Admin does; a suggested index stays an Admin's | The acts are absent; drift rows read *Needs the Modeller role — ask an Admin*; a suggested index reads *Needs the Admin role — ask an Admin* |
@@ -72,7 +72,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Health · Overview | Admin | model.health · No model yet | model.health · Nothing in window | model.health · Loading | model.health | model.health · Could not load | — | — |
 | Health · Overview | Operator | model.health · No model yet | model.health · Nothing in window | model.health · Loading | model.health | model.health · Could not load | — | model.health · Read only |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the overview; open the runs behind any figure and read them in full | — |
 | Operator | Read the same overview and open the runs behind a figure | A run they are not behind and whose agent they do not own opens as that it ran, its status and its tokens — content *withheld* (AC-31) |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Workloads | Admin | settings.fleet · Workloads · Nothing ran yet | settings.fleet · Workloads · No one ran | settings.fleet · Workloads · Loading | settings.fleet · Workloads | settings.fleet · Workloads · Could not load | settings.fleet · Workloads · Live | — |
 | Workloads | Operator | settings.fleet · Workloads · Nothing ran yet | settings.fleet · Workloads · No one ran | settings.fleet · Workloads · Loading | settings.fleet · Workloads | settings.fleet · Workloads · Could not load | settings.fleet · Workloads · Live | — |

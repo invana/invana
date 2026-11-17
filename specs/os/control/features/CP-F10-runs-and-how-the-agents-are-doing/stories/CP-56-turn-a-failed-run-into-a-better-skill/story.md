@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *Improve this skill* from any failed run | — |
 | Operator | A Modeller: *Improve this skill* from a failed run they may read. An Operator: read the failed run they may read | An Operator sees *Request a change* where *Improve this skill* would stand, sent to the Modellers and the Admins with the run attached ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table): skills are the Modeller's and the Admin's); a failed run whose content they may not read shows neither ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
@@ -51,7 +51,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A failed step on the run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step failed | agents.runs · Detail · Could not load | agents.runs · Detail · Proposing a fix | — |
 | A failed step on the run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Request a change | agents.runs · Detail · Could not load | agents.runs · Detail · Proposing a fix | agents.runs · Detail · Content withheld |

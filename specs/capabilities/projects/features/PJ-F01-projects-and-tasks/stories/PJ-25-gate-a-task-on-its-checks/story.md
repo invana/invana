@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 checks are added by anyone who may write the task; a result is accepted by the project's people
 ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add or take off a task's checks before a result is posted; read every check's result; send back a task whose checks failed on a project they review | Not a person on the team: *Send back* disabled — *Join the team to change it* |
 | Operator | The same, on every task they may read; a Modeller the same | Not a person on the team: *Send back* disabled — *Join the team to change it*. A check's run they may not read: that it ran, its outcome and its tokens — *Content withheld* |
@@ -81,7 +81,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A task's checks | Admin | projects.tasks · Detail · Checks · None | — | projects.tasks · Detail · Checks · Loading | projects.tasks · Detail · Checks | projects.tasks · Detail · Checks · Workflow refused | projects.tasks · Detail · Checking | — |
 | A task's checks | Operator | projects.tasks · Detail · Checks · None | — | projects.tasks · Detail · Checks · Loading | projects.tasks · Detail · Checks | projects.tasks · Detail · Checks · Workflow refused | projects.tasks · Detail · Checking | projects.tasks · Detail · Withheld |

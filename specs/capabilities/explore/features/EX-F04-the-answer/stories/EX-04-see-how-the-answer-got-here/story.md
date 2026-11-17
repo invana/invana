@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open *Why?* and *How it got here* on any answer; copy a compiled query and run it in the composer through the Query console | — |
 | Operator | The same on an answer they may read — their own, or one shared with them; running a copied query needs the Query console; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *the answer*) | Another person's answer: that it ran, its status and its tokens — the trace reads *Content withheld* ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
@@ -62,7 +62,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Why? | Admin | — | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
 | Why? | Operator | — | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 Versioning, retiring, moving a pin and copying are the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); a workflow is the platform's, so making one grants nothing over it.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any workflow: propose its next version, retire a version, move a pin, copy it | A built-in: *Retire* and *Propose a version* absent — *Copy* to change it |
 | Operator | Read every version. A Modeller does what an Admin does | *Copy*, *Retire*, *Propose a version* and *Move the pin* disabled — *Needs the Modeller role — ask an Admin* |
@@ -65,7 +65,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A workflow — Versions | Admin | agents.skills · Workflow · Versions, the first | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Versions | agents.skills · Workflow · Could not load | agents.skills · Workflow · Version waiting on approvers | — |
 | A workflow — Versions | Operator | agents.skills · Workflow · Versions, the first | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Versions | agents.skills · Workflow · Could not load | agents.skills · Workflow · Version waiting on approvers | agents.skills · Workflow · Acts disabled |

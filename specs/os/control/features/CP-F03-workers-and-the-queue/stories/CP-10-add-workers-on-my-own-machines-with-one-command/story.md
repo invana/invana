@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add workers: pick where, a group (or make one), mint a join key, run the command, watch it join | — |
 | Operator | — | *Add workers* disabled — *Needs the Admin role — ask {admins}* |
@@ -63,7 +63,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Add workers · 1 Where | Admin | settings.workers · Add workers | — | — | settings.workers · Add workers · Where picked | — | — | — |
 | Add workers · 1 Where | Operator | — | — | — | — | — | — | settings.workers · Read only |

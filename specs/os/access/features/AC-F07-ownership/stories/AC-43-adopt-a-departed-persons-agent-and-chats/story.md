@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | As a successor: read the departed person's chats, which are theirs now; adopt a retired personal agent of the person they succeeded | Another successor's chats and agents are not offered |
 | Operator | As a successor: read the departed person's chats, which are theirs now; a Modeller also adopts a retired personal agent of the person they succeeded | *Adopt* disabled — *Needs the Modeller role — ask Priya or Lee*; the agent stays retired |
@@ -59,7 +59,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | What I took over | Admin | settings.me · Took over nothing | — | settings.me · Loading | settings.me · Took over | settings.me · Could not load | — | — |
 | What I took over | Operator | settings.me · Took over nothing | — | settings.me · Loading | settings.me · Took over | settings.me · Could not load | — | — |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every pending ask and its content; decide an ask routed to them, or escalated to them | An ask routed to others reads, its acts disabled, naming who it waits on — the Admin role does not widen it until it is escalated |
 | Operator | Read every pending ask; read the content of asks routed to them and of runs they are behind; decide an ask routed to them; a Modeller the same | An ask routed to others reads, its acts disabled, naming who it waits on; on a run that is not theirs to read, its content is withheld |
@@ -76,7 +76,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Needs you — an ask | Admin | inbox · Nothing needs you | inbox · Nothing matches | inbox · Loading | inbox | inbox · Could not load | inbox · An agent asks to send | — |
 | Needs you — an ask | Operator | inbox · Nothing needs you | inbox · Nothing matches | inbox · Loading | inbox | inbox · Could not load | inbox · An agent asks to send | inbox · Not yours to answer |

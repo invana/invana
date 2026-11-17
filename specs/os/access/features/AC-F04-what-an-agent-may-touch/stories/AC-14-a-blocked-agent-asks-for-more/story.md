@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every ask for more; decide one they are named for — *Allow for this run* or *Decline*; *Draft a rule* to make a lasting change (AC-06) | An ask not routed to them reads, its acts disabled, naming who it waits on |
 | Operator | Read the asks for more of runs they are behind; decide one they are named for — *Allow for this run* or *Decline* | An ask not routed to them reads, its acts disabled, naming who it waits on; *Draft a rule* is disabled, naming the Admin role |
@@ -66,7 +66,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | An ask for more | Admin | — | — | inbox · Loading | inbox · Asks for more | inbox · Already decided | inbox · An agent asks for more | — |
 | An ask for more | Operator | — | — | inbox · Loading | inbox · Asks for more | inbox · Already decided | inbox · An agent asks for more | inbox · Not yours to answer |

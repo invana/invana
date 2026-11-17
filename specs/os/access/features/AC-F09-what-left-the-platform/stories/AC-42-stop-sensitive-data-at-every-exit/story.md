@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F09](../../feature.md)
 Roles are [the role table](../../../AC-F02-access-policies/feature.md#the-role-table). The check has no switch: no
 role turns it off.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every target with its locality; mark an AI model local or external in AI models; read every refused and left-out exit in *What left* | — |
 | Operator | Read every target with its locality; read the refused and left-out exits of runs they may read (AC-31); see in their own run which step was stopped and why; a Modeller the same, and sets a property's level in Meaning (SE-20) | Marking a model is disabled, naming the Admins; exits of runs they may not read show their target, verdict and tokens, content withheld |
@@ -63,7 +63,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Targets and their locality | Admin | access.ledger · Targets | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Targets | access.ledger · Could not load | — | — |
 | Targets and their locality | Operator | access.ledger · Targets | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Targets | access.ledger · Could not load | — | access.ledger · Targets |

@@ -15,7 +15,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the lock and what is left; open the step that does it — *Connect a graph database* or *Open Model* to publish the model | — |
 | Operator | Read the lock and what is left. A Modeller also opens *Open Model* to publish the model | *Ask an Admin* in place of the step's act; a step only an Admin takes names the Admin role ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) |
@@ -50,7 +50,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The lock | Admin | explore.board · Ask · Locked | — | explore.board · Ask · Loading | start.home · Set-up | explore.board · Ask · Set-up not finished | — | — |
 | The lock | Operator | explore.board · Ask · Locked | — | explore.board · Ask · Loading | start.home · Set-up | explore.board · Ask · Set-up not finished | — | explore.board · Ask · Locked, ask the owner |

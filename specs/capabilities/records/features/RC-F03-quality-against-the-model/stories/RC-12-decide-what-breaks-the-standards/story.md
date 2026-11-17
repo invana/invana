@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F03](../../feature.md)
 
 Fixing one record changes data, never the model or its standards, so every role may start it ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *quality*); which records the fix reaches is the agent's Access Policies alone.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every problem; fix any, on a connection that writes | — |
 | Operator | Read every problem on kinds they may read; fix, on a connection that writes. A Modeller does the same | A record the agent granted to them may not write: *Fix* disabled, naming the Access Policy that stops it |
@@ -51,14 +51,14 @@ flowchart LR
 | RC-12.5 | A person of any role, a problem, and an agent granted to them that may write the record | they fix it with another value and a reason | the value is written as one run, the reason its *why*, and the record's provenance names the fix (RC-F06) |
 | RC-12.6 | A record changed since the item opened | the fix is saved | it is refused, asking the person to reload and fix again |
 | RC-12.7 | A fixed record that conforms | the queue reloads | the item has left it |
-| RC-12.8 | Kinds a view hides | the queue opens | they are counted as not readable, never left out silently |
+| RC-12.8 | Kinds a lens hides | the queue opens | they are counted as not readable, never left out silently |
 | RC-12.9 | A problem on a record the person's agent may not write | they open it | it reads; *Fix* is disabled, naming the Access Policy that stops it |
 | RC-12.10 | A graph database whose connection is read-only | a fix is saved | it is refused, naming the connection setting; nothing is written |
 | RC-12.11 | A fix whose value still breaks the rule, or with no reason | it is saved | it is refused, naming the rule or asking for the reason; nothing is written |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | To decide | Admin | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |
 | To decide | Operator | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |

@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F05](../../feature.md)
 
 Writing and publishing a standard is the Modeller's and the Admin's; applying a shipped pack is the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every standard; write one; publish the next version of any; apply a shipped pack | — |
 | Operator | Read every standard. A Modeller writes and publishes a standard as an Admin does | *Write a standard*, *Import* and *New version* absent — *Needs the Modeller role — ask an Admin*; a pack refused — *Needs the Admin role* |
@@ -57,7 +57,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Standards | Admin | model.standards · No standards yet | model.standards · No standard matches | model.standards · Loading | model.standards | model.standards · Could not load | — | — |
 | Standards | Operator | model.standards · No standards yet | model.standards · No standard matches | model.standards · Loading | model.standards | model.standards · Could not load | — | — |

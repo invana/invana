@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 within the projects the person may read; inside a project, with the agents its access allows, each run reaching the project's policies ∩ the agent's ceiling; a task with no project, with the agents granted to them; a result is accepted by the
 project's people on the team; a run's content follows [AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Write a task of a kind the project uses, assign it to a person or an agent — one the project's access allows, or with no project one granted to them — start, answer an agent's question, cancel; accept or send back a result — on any project | A task on a project they may not read: its head only, withheld. — |
 | Operator | As a person on the project — or on a task with no project — the same, with the agents the project's access allows — or, with no project, those granted to them; as a person on the team, start and work the tasks assigned to them and post their results; read a task's run as [AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) allows; a Modeller the same | An agent the project's access does not allow is disabled in the picker — *Not allowed in this project*; with no project, an agent not granted to them — *Not granted to you*. Writing a task, *Accept* and *Send back* disabled when not a person on the team — *Join the team to change it* · *Join the team to change it*. A run they may not read: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
@@ -112,7 +112,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Tasks | Admin | projects.tasks · No tasks yet | projects.tasks · No tasks match | projects.tasks · Loading tasks | projects.tasks · Tasks | projects.tasks · Could not load tasks | projects.tasks · Tasks running | — |
 | Tasks | Operator | projects.tasks · No tasks yet | projects.tasks · No tasks match | projects.tasks · Loading tasks | projects.tasks · Tasks | projects.tasks · Could not load tasks | projects.tasks · Tasks running | — |

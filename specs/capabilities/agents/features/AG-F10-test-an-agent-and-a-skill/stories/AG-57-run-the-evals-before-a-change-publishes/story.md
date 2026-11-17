@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 Running tests and evals is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent or skill not built in: run a test, run the evals | A built-in's eval runs read, with *Copy* |
 | Operator | Read every test run, eval run, its tiles and its verdict. A Modeller does what an Admin does | *Run a test* and *Run the evals* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -62,7 +62,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A skill's Tests — the console and the tab | Admin | agents.skills · Detail · Not run yet | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Could not load | agents.skills · Detail · Testing | — |
 | A skill's Tests — the console and the tab | Operator | agents.skills · Detail · Not run yet | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Could not load | agents.skills · Detail · Testing | agents.skills · Detail · Tests |

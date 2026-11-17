@@ -22,7 +22,7 @@ query it runs ([AG-F02](../../../../../agents/features/AG-F02-the-agents-catalog
 agent. It passes four layers — a static check, a read-only session, a result filter, and for Gremlin steps only —
 which are [GP-05](../../../../../../os/graph/features/GP-F01-data/stories/GP-05-run-a-raw-query-within-what-the-agent-may-read/story.md)'s.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Type and run read queries on any graph database the Query console may read; send a write, which waits on the Query console's approvers and runs only on a read + write graph database | A write to a read-only graph database: refused — *{name} is read-only — {why}* |
 | Operator | Type and run read queries, when they may use the Query console; a Modeller also sends a write, as Admin | A write: refused — *Edit on the board needs the Modeller role* ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)). Not granted the Query console: Cypher and Gremlin disabled — *{person} may not use Query console — ask an Admin* |
@@ -86,7 +86,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The composer in a query | Admin | explore.board · Console · Empty query | — | explore.board · Console · Running | explore.board · Console | explore.board · Console · Query error | explore.board · Console · Write waiting on approvers | explore.board · Console · Write refused |
 | The composer in a query | Operator | explore.board · Console · Empty query | — | explore.board · Console · Running | explore.board · Console | explore.board · Console · Query error | — | explore.board · Console · Write refused |

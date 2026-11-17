@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's access; attach a policy to it (AC-11) | — |
 | Operator | Read every agent's access, its policies and its refusals; a Modeller reads the same | *Attach a policy* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -63,7 +63,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Agents — the list | Admin | settings.agent_access · Built-in agents only | settings.agent_access · Nothing matches | settings.agent_access · Loading | settings.agent_access · Agents | settings.agent_access · Could not load | — | — |
 | Agents — the list | Operator | settings.agent_access · Locked · Built-in agents only | settings.agent_access · Locked · Nothing matches | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Agents | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Agents |

@@ -148,7 +148,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 |---|---|
 | Models and their published versions | [SE-F01](../SE-F01-start-a-model/feature.md#engine) · [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Each kind's latest record count · the queries that crossed a link | [SE-F10](../SE-F10-health-and-history/feature.md#engine) |
-| The deployment's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
+| The deployment's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-lenses-of-the-graph/feature.md#engine) |
 | Loads that join new records and bring a relationship's rows · record stamps | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Standards a mapping names | [SE-F05](../SE-F05-standards/feature.md#engine) |
 | Committing and withdrawing a link's relationships | [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md#engine) |

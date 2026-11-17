@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every plugin; turn one on or off for the deployment; turn one off or on for their own runs | — |
 | Operator | Read every plugin, its functions, versions, skills and workflows, and both switches; turn a plugin off, or back on, for the runs they start; a Modeller the same | The deployment's switch reads, with who set it and when — *Ask an Admin — Priya or Lee* |
@@ -72,7 +72,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Plugins | Admin | settings.plugins · New and off | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins | settings.plugins · Could not load | — | — |
 | Plugins | Operator | settings.plugins · New and off · Read only | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Could not load | — | settings.plugins · Read only |

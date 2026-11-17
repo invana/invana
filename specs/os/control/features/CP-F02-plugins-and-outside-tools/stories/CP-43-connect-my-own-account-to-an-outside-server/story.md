@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Connect and disconnect their own personal connections; read every person's personal connections and disconnect any — each with the password again | — |
 | Operator | Connect and disconnect their own personal connections, with the password again; a Modeller the same | Another person's personal connections are absent. A project key has no personal connection |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Your personal connections | Admin | settings.me · Connections · No accounts connected | — | settings.me · Connections · Loading | settings.me · Connections · Personal connections | settings.me · Connections · Account expired | — | — |
 | Your personal connections | Operator | settings.me · Connections · No accounts connected | — | settings.me · Connections · Loading | settings.me · Connections · Personal connections | settings.me · Connections · Account expired | — | — |

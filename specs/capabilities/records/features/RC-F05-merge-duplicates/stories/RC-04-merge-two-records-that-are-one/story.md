@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F05](../../feature.md)
 
 Merging is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Compare and merge two records of one kind | — |
 | Operator | Compare two records. A Modeller merges as an Admin does | *Merge* disabled — *Needs the Modeller role — ask an Admin* |
@@ -44,7 +44,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Merge | Admin | data.records · Merge · Pick two | — | data.records · Merge · Loading | data.records · Merge | data.records · Merge · Refused | — | — |
 | Merge | Operator | data.records · Merge · Pick two | — | data.records · Merge · Loading | data.records · Merge · Compare only | — | — | data.records · Merge · Merge disabled |

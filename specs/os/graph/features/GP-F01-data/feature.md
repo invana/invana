@@ -207,7 +207,7 @@ records of each graph database — its connection, mode, switches and health —
 | Vector search | A queryset in each language connector, overridden per vendor; the database's own index. Results are records with scores, cited; an index with nothing embedded returns none, worded *nothing embedded*. Memgraph declares none |
 | Conformance | One shared suite every package runs against a live database, never mocked; a method left unimplemented fails it, named |
 | Steps apart | One query step per graph database, in its own language, run at once; each step's rows are returned under its graph database and never joined, bounded by NFR-PERF-5 |
-| Committing a link | `stitch-commit@1`, no agent and no view, the deployment's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
+| Committing a link | `stitch-commit@1`, no agent and no lens, the deployment's rules admitting each side; one `MERGE` per link, each relationship carrying `_inv_origin` · `_inv_link_id` · `_inv_rule` · `_inv_at` |
 | What each kind writes | *Same thing* writes `SAME_AS` source → target, read undirected; a keyed relationship writes its `edge_type`; a row-sourced relationship writes nothing at commit — committing loads its rows, the files' place read back from the load's run |
 | Nothing written says so | A link that wrote nothing — a side the rules refuse — commits, says why, and never reports success; the others still solve |
 | Every later load joins | A load's link step runs the same `MERGE`, scoped to that load's stamp; writing again never writes twice |

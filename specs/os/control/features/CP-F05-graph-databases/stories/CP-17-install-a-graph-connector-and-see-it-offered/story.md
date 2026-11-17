@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Install or remove a connector package on the engine's machine; read which connectors are installed | — |
 | Operator | Read which connectors are installed, with their language, in a graph database's details and in `invana version` | Installs nothing — installing happens on the engine's machine, outside Invana |
@@ -53,7 +53,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The connector choice | Admin | settings.databases · Connect · No connector installed | — | — | settings.databases · Connect | settings.databases · Connect · Connector failed | — | — |
 | The connector choice | Operator | — | — | — | — | — | — | — |

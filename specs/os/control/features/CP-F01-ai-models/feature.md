@@ -196,7 +196,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | AI models live in Settings › Connections › AI models | It lists every endpoint and version; an endpoint's detail is a modal; adding one is a create modal of numbered sections — name (optional), the provider as a card grid, its details | 
 | Health shows in Operations | Each pinned exact version's latency and error rate over the last hour reads in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)), computed by the engine |
 | Local is a claim the engine checks | An Admin says local; the engine believes it only while the address resolves inside the deployment |
-| One default model | With no per-question picker and no view of the graph, the default is what answers when an agent pins nothing |
+| One default model | With no per-question picker and no lens of the graph, the default is what answers when an agent pins nothing |
 | A ping is a run | Who proved an endpoint worked, when, and what it said, is a run like any other |
 | A model is ranked when offered | Cost and capability ranks come from the published rate; a deployment on a negotiated rate sets its own; a subscription endpoint ranks in the middle |
 | One model per call | No automatic failover — a silent switch changes what produced an answer |

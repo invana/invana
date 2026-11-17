@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every user; set a person's role; grant an agent to a person or take it away, after its preview; set a person's default agent (AC-38). Each change asks them to sign in again | An Admin's role is fixed while only two Admins are active |
 | Operator | Read every user, their role, their teams, the agents granted to them and their default agent; a Modeller reads the same | *Change role* and *Grant an agent* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Users | Admin | settings.people · First Admin | settings.people · Nothing matches | settings.people · Loading | settings.people | settings.people · Could not load | — | — |
 | Users | Operator | settings.people · Locked · Users · First Admin | settings.people · Locked · Users · Nothing matches | settings.people · Locked · Users · Loading | settings.people · Locked · Users | settings.people · Locked · Users · Could not load | — | settings.people · Locked · Users |

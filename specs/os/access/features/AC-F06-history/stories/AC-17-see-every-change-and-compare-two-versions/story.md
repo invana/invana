@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every change and compare any two versions of any record | — |
 | Operator | Read every change and compare any two versions of a record they can open | A record they cannot open reads as absent. Restoring is on the record's own page, by its own role |
@@ -61,7 +61,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | History › Changes | Admin | settings.history · No changes yet | settings.history · Nothing matches | settings.history · Loading | settings.history | settings.history · Could not load | — | — |
 | History › Changes | Operator | settings.history · No changes yet | settings.history · Nothing matches | settings.history · Loading | settings.history | settings.history · Could not load | — | settings.history |

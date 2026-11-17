@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Mark an endpoint local or external, with the password again to mark it local | — |
 | Operator | Read each endpoint's and version's *Local* or *External* mark ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Local · External* reads; changing it is disabled — *Needs the Admin role — ask {admins}* |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | AI models — local or external | Admin | settings.ai · No endpoint | settings.ai · No match | settings.ai · Loading | settings.ai · Local or external | settings.ai · Stays external | — | — |
 | AI models — local or external | Operator | settings.ai · No endpoint | settings.ai · No match | settings.ai · Loading | settings.ai · Local or external | settings.ai · Could not load | — | settings.ai · Read only |

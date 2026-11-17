@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every act; this story is what the others see | — |
 | Operator | Read every surface their role reaches; look, ask, open boards, re-run their own runs, through the agents granted to them. A Modeller also acts on the model and records | Each act the role does not hold disabled — *Needs the Modeller role — ask Priya or Lee*; a detail page says *You can read this. Changing it needs …* |
@@ -61,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Access, read only | Admin | — | — | — | — | — | — | — |
 | Access, read only | Operator | settings.people · Locked · Built in only | settings.people · Locked · Nothing matches | settings.people · Locked · Loading | settings.people · Locked | settings.people · Locked · Role lost | — | settings.people · Locked |

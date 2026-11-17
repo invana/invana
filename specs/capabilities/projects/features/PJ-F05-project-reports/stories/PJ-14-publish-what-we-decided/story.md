@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F05](../../feature.md)
 *Reports* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Draft from the records, edit and save the draft, publish a version, read and export every version, on any project they can see | On an archived project, *Draft from the records*, *Edit* and *Publish* are off |
 | Operator | The same; a Modeller the same | On an archived project, *Draft from the records*, *Edit* and *Publish* are off; a project they may not read: its reports list, their content withheld |
@@ -66,7 +66,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A project › Report | Admin | projects.report · No report yet | — | projects.report · Loading | projects.report | projects.report · Publish refused | — | — |
 | A project › Report | Operator | projects.report · No report yet | — | projects.report · Loading | projects.report | projects.report · Publish refused | — | projects.report · Archived |

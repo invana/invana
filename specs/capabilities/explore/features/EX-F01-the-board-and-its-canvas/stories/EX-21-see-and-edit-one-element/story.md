@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any element on a board they open; in Edit, change it, add one, and apply the change to the board; save it (EX-20) | — |
 | Operator | Read any element; in Edit, change, add and apply on the board — an edit stays on the board until saved; a Modeller also saves it (EX-20) | Saving to a graph database: *Save n changes* disabled — *Needs the Modeller role — ask an Admin* |
@@ -58,7 +58,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Element panel · view | Admin | explore.board · Menu · Nothing picked | — | explore.board · Menu · Loading | explore.board · Menu | — | — | — |
 | Element panel · view | Operator | explore.board · Menu · Nothing picked | — | explore.board · Menu · Loading | explore.board · Menu | — | — | — |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every section; *Connect* saves the graph database read-only and off | — |
 | Operator | — | *Connect a graph database* reads *Ask an Admin*; the modal never opens for them |
@@ -58,7 +58,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Name and type | Admin | settings.databases · Connect | — | — | settings.databases · Connect · Type picked | settings.databases · Connect · Name taken | — | — |
 | Name and type | Operator | — | — | — | — | — | — | settings.databases · Read only |

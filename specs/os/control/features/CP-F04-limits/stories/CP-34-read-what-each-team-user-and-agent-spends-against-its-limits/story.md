@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every team's, user's, agent's and the deployment's spend against its limits; change a limit from its row (CP-11) | — |
 | Operator | Operator · Modeller: read the same spend against every limit ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
@@ -55,7 +55,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Usage | Admin | settings.limits · Usage · Nothing run yet | settings.limits · Usage · Nothing matches | settings.limits · Usage · Loading | settings.limits · Usage | settings.limits · Usage · Could not load | — | — |
 | Usage | Operator | settings.limits · Usage · Nothing run yet | settings.limits · Usage · Nothing matches | settings.limits · Usage · Loading | settings.limits · Usage · Read only | settings.limits · Usage · Could not load | — | settings.limits · Usage · Read only |

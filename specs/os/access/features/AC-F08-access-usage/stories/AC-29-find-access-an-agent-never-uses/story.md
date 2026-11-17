@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's unused access; *Draft a narrower policy* (AC-06) | — |
 | Operator | Read an agent's usage over the runs they may read (AC-13); a Modeller reads every agent's unused access as an Admin does, without drafting | *Unused* is not offered to an Operator. *Draft a narrower policy* is disabled for a Modeller, naming the Admin role and the Admins |
@@ -53,7 +53,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Unused access | Admin | access.usage · Unused · Everything used | — | access.usage · Unused · Loading | access.usage · Unused | access.usage · Unused · Could not load | — | — |
 | Unused access | Operator | access.usage · Unused · Everything used | — | access.usage · Unused · Loading | access.usage · Unused · Read only | access.usage · Unused · Could not load | — | access.usage · Locked · Not offered |

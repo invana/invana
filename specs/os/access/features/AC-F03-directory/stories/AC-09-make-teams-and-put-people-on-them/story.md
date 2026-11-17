@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Make, rename, describe and delete a team; put people on it and take them off; grant it an agent or take one away | A team an agent's approvers name has no *Delete* until they change |
 | Operator | Read every team, its people, the agents granted to it and the agents whose asks it answers; a Modeller reads the same | *New team*, *Add people*, *Grant an agent* and *Delete* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Teams and a team | Admin | settings.people · Teams · No teams yet | settings.people · Teams · Nothing matches | settings.people · Teams · Loading | settings.people · Teams · A team | settings.people · Teams · Could not load | — | — |
 | Teams and a team | Operator | settings.people · Teams · Locked · No teams yet | settings.people · Teams · Locked · Nothing matches | settings.people · Teams · Locked · Loading | settings.people · Teams · Locked · A team | settings.people · Teams · Locked · Could not load | — | settings.people · Teams · Locked · A team |

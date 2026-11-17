@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F06](../../feature.md)
 on every project the person can see; writing the alert rule is a Modeller's or an Admin's
 ([SE-F07](../../../../../semantics/features/SE-F07-rules/feature.md)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every lead of a project they can see, the rule and the records behind it; take or dismiss a lead | A matched record of a kind their agents may not read reads *Withheld*; on an archived project *Take* and *Dismiss* are disabled |
 | Operator | The same; take a task lead for a person or an agent they may use; a Modeller the same | As Admin. An agent they may not use is disabled in *Take* — *You may not use {agent} — ask an Admin* |
@@ -63,7 +63,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Alerts | Admin | projects.alerts · No alerts yet | projects.alerts · No leads match | projects.alerts · Loading | projects.alerts | projects.alerts · Could not load | — | — |
 | Alerts | Operator | projects.alerts · No alerts yet | projects.alerts · No leads match | projects.alerts · Loading | projects.alerts | projects.alerts · Could not load | — | projects.alerts · Archived |

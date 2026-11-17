@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, edit, rename and remove an endpoint; ping it; offer and stop offering a version; make one the default | — |
 | Operator | Operator · Modeller: read every endpoint, version, local or external, status, the default and who pins it ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Add an endpoint*, *Ping* and each act disabled — *Needs the Admin role — ask {admins}*; keys are never shown |
@@ -76,7 +76,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | AI models | Admin | settings.ai · No endpoint | settings.ai · Nothing matches | settings.ai · Loading | settings.ai | settings.ai · Withdrawn | — | — |
 | AI models | Operator | settings.ai · No endpoint | settings.ai · Nothing matches | settings.ai · Loading | settings.ai · Read only | settings.ai · Withdrawn | — | settings.ai · Read only |

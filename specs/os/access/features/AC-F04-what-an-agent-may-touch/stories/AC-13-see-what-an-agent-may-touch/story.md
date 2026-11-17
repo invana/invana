@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every resource and every declared need; *Change* opens the policy at that rule to edit (AC-04) | — |
 | Operator | Read every resource and every declared need | *Change* opens the policy read-only; editing is disabled, naming the Admin role and the Admins |
@@ -66,7 +66,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | What it may touch | Admin | settings.agent_access · What it may touch · Holds no policy | settings.agent_access · What it may touch · Nothing matches | settings.agent_access · What it may touch · Loading | settings.agent_access · What it may touch | settings.agent_access · What it may touch · Could not load | — | — |
 | What it may touch | Operator | settings.agent_access · Locked · What it may touch · Holds no policy | settings.agent_access · Locked · What it may touch · Nothing matches | settings.agent_access · Locked · What it may touch · Loading | settings.agent_access · Locked · What it may touch | settings.agent_access · Locked · What it may touch · Could not load | — | settings.agent_access · Locked · What it may touch |

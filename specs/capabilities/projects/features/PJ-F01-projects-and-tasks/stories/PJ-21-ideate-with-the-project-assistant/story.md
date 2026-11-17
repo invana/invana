@@ -22,7 +22,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 the thread reads through the person's default agent, and a proposal is accepted by the project's people
 ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Talk with the assistant of any project they may read; raise a recommendation; accept or reject a proposal on a project whose team they are on | Not a person on the team: *Accept* and *Reject* disabled — *Join the team to change it* |
 | Operator | The same; a Modeller the same | Not a person on the team: *Accept* and *Reject* disabled — *Join the team to change it*. A project they may not read: the thread reads *Withheld* |
@@ -82,7 +82,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The assistant's thread | Admin | projects.projects · Assistant · What is this project for? | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Thread | projects.projects · Assistant · Could not load | projects.projects · Assistant · Thinking | projects.projects · Assistant · No assistant yet |
 | The assistant's thread | Operator | projects.projects · Assistant · What is this project for? | — | projects.projects · Assistant · Loading | projects.projects · Assistant · Thread | projects.projects · Assistant · Could not load | projects.projects · Assistant · Thinking | projects.projects · Assistant · Withheld |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the Inbox dropdown; decide in place the asks routed to them; *Acknowledge* an alert sent to them; confirm an *Accept* that writes; open the Inbox | — |
 | Operator | Operator · Modeller: the same, on their own asks, alerts, project work and runs | An act they may not take reads *Ask {approver}*, naming who it waits on — and the engine refuses it ([AC-F05](../../../../../access/features/AC-F05-asks-and-approvals/feature.md#refusals)) |
@@ -66,7 +66,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The Inbox dropdown | Admin | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | inbox.dropdown · Could not load | inbox.dropdown · A proposal | — |
 | The Inbox dropdown | Operator | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | inbox.dropdown · Could not load | inbox.dropdown · A proposal | inbox.dropdown · Ask an approver |

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 *Portable — bring in* in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | All a Modeller can; apply the Access Policy files the folder brought (AC-04); grant the imported agents (AC-22) | — |
 | Modeller | Drop a project's folder or a zip of it, read what Invana found in each agent tool's folder, confirm or leave out each file, import | Policy files read *Waiting for an Admin to apply*; *Apply* and *Grant* are disabled, naming the Admin role |
@@ -69,7 +69,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Import — a project's folder | Admin | agents.skills · Import | — | agents.skills · Import · Reading the files | agents.skills · Import · Tool folders found | agents.skills · Import · No agents found | agents.skills · Import · Mapping | — |
 | Import — a project's folder | Operator | — | — | — | — | — | — | agents.skills · Import disabled |

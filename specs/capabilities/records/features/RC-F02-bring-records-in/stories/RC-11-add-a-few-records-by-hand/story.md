@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 Adding records is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add records to any kind of a published model | — |
 | Operator | — A Modeller adds records as an Admin does | *Add records* disabled — *Needs the Modeller role — ask an Admin* |
@@ -49,7 +49,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Add records by hand | Admin | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | — |
 | Add records by hand | Operator | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | data.loads · Add by hand · Needs the model grant |

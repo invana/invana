@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 Linking models is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Link two published models, commit or discard staged links, and remove a link | — |
 | Operator | Read every link, its rule, its counts and its history. A Modeller links, commits and removes as an Admin does | *Link models* disabled and a drag between models refused — *Needs the Modeller role — ask an Admin* |
@@ -71,7 +71,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Link two models | Admin | model.models · Link card | — | model.models · Link counting | model.models · Link joins | model.models · Link refused | — | — |
 | Link two models | Operator | — | — | — | — | — | — | model.models · Link refused |

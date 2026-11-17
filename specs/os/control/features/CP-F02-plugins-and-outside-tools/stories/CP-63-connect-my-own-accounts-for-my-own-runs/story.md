@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | The same as every person for their own connections and switches; read which runs used any person's personal connection | — |
 | Operator | Read, for each of their personal connections, the runs that used it; turn a plugin off for the runs they start (CP-04); a Modeller the same | Another person's connections and the runs that used them are absent; what another person's personal connection returned reads withheld |
@@ -58,7 +58,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Runs that used my connection | Admin | settings.me · Connections · Not used yet | — | settings.me · Connections · Loading | settings.me · Connections · Runs that used it | settings.me · Connections · Could not load | — | — |
 | Runs that used my connection | Operator | settings.me · Connections · Not used yet | — | settings.me · Connections · Loading | settings.me · Connections · Runs that used it | settings.me · Connections · Could not load | — | — |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md)
 
 Making and editing a skill is the Modeller's and the Admin's; a skill is the platform's, so making one grants nothing over it ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create a skill; on any skill not built in: name it, say what it is and when to use it, choose guided or planned, keep files beside its instructions, delete it while it never published; copy a built-in skill | A built-in skill has no Edit or Delete — *Built in — copy it to change it* |
 | Operator | Read every skill, who made it, versions and what it needs. A Modeller does what an Admin does | *New skill*, *Copy* and *Delete* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -82,7 +82,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Skills — the list | Admin | agents.skills · Shipped only | — | agents.skills · Loading | agents.skills | agents.skills · Could not load | — | — |
 | Skills — the list | Operator | agents.skills · Shipped only | — | agents.skills · Loading | agents.skills · Read only | agents.skills · Could not load | — | agents.skills · Read only |

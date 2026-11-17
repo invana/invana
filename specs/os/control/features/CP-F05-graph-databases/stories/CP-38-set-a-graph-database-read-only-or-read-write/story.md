@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set read + write, signing in again; set read-only | — |
 | Operator | Read each graph database's mode, who set it and when | *Change* reads *Ask an Admin*, naming the Admins |
@@ -49,7 +49,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Mode | Admin | settings.databases · Detail · Read-only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write | settings.databases · Detail · Could not change mode | — | — |
 | Mode | Operator | settings.databases · Detail · Read-only · Read only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write · Read only | settings.databases · Detail · Could not load | — | settings.databases · Detail · Read + write · Read only |

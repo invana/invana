@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, test and remove a channel; replace its secret — each with the password again | — |
 | Operator | Read every channel — its kind, masked target and whether it is ready | *Add channel*, *Test* and *Remove* are disabled — *Needs the Admin role — ask Priya or Lee*. A secret never reads back to anyone |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Where it can go | Admin | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications · Channels | settings.notifications · Channel failed | — | — |
 | Where it can go | Operator | settings.notifications · In app only · Read only | — | settings.notifications · Loading | settings.notifications · Channels · Read only | settings.notifications · Channel failed | — | settings.notifications · Channels · Read only |

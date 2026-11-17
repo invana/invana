@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F04](../../feature.md)
 
 Placing kinds and values is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the trees; set a broader kind; add or change a value hierarchy, in a draft | — |
 | Operator | Read the trees. A Modeller places kinds and values as an Admin does | *Set a broader kind* and *Add a value hierarchy* absent — *Needs the Modeller role — ask an Admin* |
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Taxonomies | Admin | model.taxonomies · Nothing placed yet | model.taxonomies · No match | model.taxonomies · Loading | model.taxonomies | model.taxonomies · Could not load | — | — |
 | Taxonomies | Operator | model.taxonomies · Nothing placed yet | model.taxonomies · No match | model.taxonomies · Loading | model.taxonomies · Read only | model.taxonomies · Could not load | — | model.taxonomies · Read only |

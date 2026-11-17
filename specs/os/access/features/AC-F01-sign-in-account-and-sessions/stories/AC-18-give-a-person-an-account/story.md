@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Make a person's account — email, username, name, password and role — from the command line or, signed in, from Access › Who or the API with the password again; set a new password for an account from the command line | — |
 | Operator | — | *New person* is absent from People; making an account through the API is refused, naming the Admin role; the sign-in card reads *Ask your admin for an account* (AC-01.8) |
@@ -56,7 +56,7 @@ flowchart TD
 
 In Studio an account is made from Access › Who › *New person*; the command line and the API make it too.
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | New person · 1 Who · 2 Role | Admin | settings.people · New person | — | — | settings.people · New person · Filled | settings.people · New person · Taken | — | — |
 | New person · 1 Who · 2 Role | Operator | — | — | — | — | — | — | settings.people · New person · Locked · Users |

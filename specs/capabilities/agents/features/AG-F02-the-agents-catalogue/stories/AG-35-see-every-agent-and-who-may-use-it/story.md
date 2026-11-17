@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F02](../../feature.md)
 
 The catalogue is *Acts* for every role in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); granting and default agents are the Directory's.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the whole catalogue; use the agents granted to them; grant an agent to a person or a team, and set a person's default, in the Directory | — |
 | Modeller | Read the whole catalogue; use the agents granted to them | *Grant* reads *Ask an Admin*; an agent not granted to them reads *Not granted to you — ask an Admin* |
@@ -66,7 +66,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Agents — the catalogue | Admin | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | — |
 | Agents — the catalogue | Operator | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | agents.agents · Not granted to you |

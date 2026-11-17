@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 Starting a workflow is every role's, through the agents granted to the person ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run or dry run a published workflow version with arguments, through an agent granted to them whose policies allow Run `workflow/<key>`; stop the run as any run | — |
 | Operator | The same; a Modeller the same | No agent granted to them is allowed: *Run* disabled — *No agent you may use may run {key} — ask an Admin* |
@@ -71,7 +71,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Run a workflow | Admin | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.skills · Workflow · Run | agents.skills · Workflow · Run, refused | agents.skills · Workflow · Run, dry run | — |
 | Run a workflow | Operator | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.skills · Workflow · Run | agents.skills · Workflow · Run, refused | agents.skills · Workflow · Run, dry run | agents.skills · Workflow · Run disabled |

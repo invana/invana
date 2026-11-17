@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a script in full; approve it, decline it with a reason, revoke an approval | — |
 | Operator | Read every script and its approval | *Approve*, *Decline* and *Revoke* are absent; a waiting script reads *Waiting for an Admin*, naming the Admins. The Modeller role does not add them |
@@ -51,7 +51,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Scripts — on the skill | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Scripts | agents.skills · Detail · Script declined | — | — |
 | Scripts — on the skill | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Scripts read only | agents.skills · Detail · Script declined | — | agents.skills · Detail · Scripts read only |

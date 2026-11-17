@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read who made whom on any run; write the rules on Run `agent/<name>` that let an agent hand work on; answer a delegation ask that falls or escalates to Admins | — |
 | Modeller | Read who made whom on the runs whose content they may read; answer a delegation ask they are a named approver for | The rules read; changing them reads *Ask an Admin*; an ask routed to someone else reads, naming who it waits on |
@@ -69,7 +69,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Who did what on a run | Admin | agents.runs · Detail · One agent | — | agents.runs · Detail · Loading | agents.runs · Detail · Who did what | agents.runs · Detail · Refused at a bound | agents.runs · Detail · Helpers running | — |
 | Who did what on a run | Operator | agents.runs · Detail · One agent | — | agents.runs · Detail · Loading | agents.runs · Detail · Who did what | agents.runs · Detail · Refused at a bound | agents.runs · Detail · Helpers running | agents.runs · Detail · Ran, content hidden |

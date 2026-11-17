@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Re-run any ended question or typed query, as it was, on today's versions or retuned | — |
 | Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): re-run an ended question or typed query they are behind | *Re-run* on any other run is disabled: *Only {person} or an Admin can re-run this run.* |
@@ -57,7 +57,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Re-run dialog | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Re-run | agents.runs · Detail · Re-run refused | agents.runs · Detail · Running | — |
 | Re-run dialog | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Re-run | agents.runs · Detail · Re-run refused | agents.runs · Detail · Running | agents.runs · Detail · Not yours to re-run |

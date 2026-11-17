@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Rename the deployment; set the deployment's default theme; pick their own theme | — |
 | Operator | Read the deployment's name and version; pick their own theme; a Modeller the same | *Rename* and the default theme read, their acts reading *Ask {Admin}* |
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | General | Admin | settings.general · Default name | — | settings.general · Loading | settings.general | settings.general · Could not save | — | — |
 | General | Operator | settings.general · Default name | — | settings.general · Loading | settings.general · Read only | settings.general · Could not load | — | settings.general · Read only |

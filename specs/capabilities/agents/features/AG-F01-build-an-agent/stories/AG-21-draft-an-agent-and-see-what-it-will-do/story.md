@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 Building an agent is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); an agent is the platform's, so making one grants nothing over it.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create an agent and copy a built-in one; on any agent not built in: edit its draft, add and remove skills, set effort and triggers, discard a draft; attach Access Policies (AC-11) and set its limits (CP-F04) | A built-in agent has no Edit — *Built in — copy it to change it* |
 | Modeller | Create an agent — the platform's, made by them — and copy a built-in one; do what an Admin does except attaching policies and setting limits; choose what any agent not built in runs with and its model version ([AG-61](../AG-61-choose-what-an-agent-runs-with/story.md)) | *Attach a policy* and *Edit in Usage and limits* read *Ask an Admin* |
@@ -85,7 +85,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Agents | Admin | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | — |
 | Agents | Operator | agents.agents · Only the built-in agents | agents.agents · No agents match | agents.agents · Loading | agents.agents | agents.agents · Could not load | — | agents.agents · New agent disabled |

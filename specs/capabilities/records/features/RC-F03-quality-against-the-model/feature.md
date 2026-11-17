@@ -68,7 +68,7 @@ flowchart TD
 | Has data | Scores and counts by kind and rule; each rule opens its records; the queue lists each problem |
 | Failed | *Could not load the records* and *Try again* |
 | Agent working or proposing | A check running: what it has read so far, and *Stop* |
-| No access | Kinds a view hides are left out of the counts, and the page says so |
+| No access | Kinds a lens hides are left out of the counts, and the page says so |
 
 ## Data touched
 
@@ -95,7 +95,7 @@ flowchart TD
 | Published versions, kinds, keys, validation rules and what each breaks to (`on_break`) | [SE-F02 › Engine](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Standard versions and their terms | [SE-F05](../../../semantics/features/SE-F05-standards/feature.md) |
 | Rules in scope and the `enforce` check a fix passes | [SE-F07 › Engine](../../../semantics/features/SE-F07-rules/feature.md#engine) |
-| The view an Operator reads through | [SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
+| The lens an Operator reads through | [SE-F09 › Engine](../../../semantics/features/SE-F09-lenses-of-the-graph/feature.md#engine) |
 | Runs, their steps and stop | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
 | History — the value a fix writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
 
@@ -142,7 +142,7 @@ flowchart TD
 | Scored per kind | A record conforms when it breaks nothing; each kind's `score` is its share of conforming records, stored when the check settles |
 | A standard's term | A held standard's term is checked as the validation rule names it: `missing` — required and empty · `not_allowed` — not one of its codes · `wrong_type` — not its type |
 | The queue is the last check | *To decide* reads the open problems (`fixed_at` null) of each model's last settled check; a new check replaces them |
-| Kinds a view hides | A check counts every kind; a read through a view leaves the hidden kinds out of rows and totals and counts them in `unreadable`, which the page names |
+| Kinds a lens hides | A check counts every kind; a read through a lens leaves the hidden kinds out of rows and totals and counts them in `unreadable`, which the page names |
 | A fix | Passes `enforce` (SE-F07), writes the value as one run with `why`, re-checks that record, and sets `fixed_at` when it conforms — the item leaves the queue. `seen_at` older than the record's last write is refused |
 | Breaks on load | A load's `reject` breaks never reach the graph; its `flag` breaks are written and listed by the next check |
 

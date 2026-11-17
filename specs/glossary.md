@@ -39,6 +39,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | **Draft** | Unpublished changes; a floating bar says how many | Draft |
 | **Publish** | Make a draft the model everyone asks against | Publish |
 | **Link between models** | A declared meeting of two models in the same graph database — the same entity, or a relationship across them, on a key on each side. Never across graph databases ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) | Stitch · anchor · relationship link · identity link · match rule |
+| **Lens** | What an answer may rest on — models, slices, hidden kinds and properties, the AI model per role, what may leave — picked per question and only ever narrowing a rule on a property, never widening it; *Model › Rules and meaning › Lenses* lists them ([SE-F09](capabilities/semantics/features/SE-F09-lenses-of-the-graph/feature.md)). Said *outside this lens* when a question needs what it keeps out | View · world · view of the graph |
 | **Constraint** | One property's range with a unit, or one standard's values, on one kind — Reject or Flag for review when a record breaks it | Property constraint (validation rule) |
 | **What the database holds** | The kinds, properties and counts read from the graph database, with when — compared with the model, never the model | Physical mirror · introspection |
 | **Records** | The nodes and relationships Graph Data holds, read in place from the graph databases — never copied — each one of a kind in a published model; *Model › Graph Data › Records* lists them by kind; only structured rows that fit a kind become records | Instance — node · relationship |
@@ -237,7 +238,7 @@ terms in [Domain terms](#domain-terms) — the third column names the one each s
 | Agent Builder · IAM · Activity · Graph settings | Agents · Operations · Workers · Access · Inbox · Settings › Connections — product names are never places; *Fleet* is said only as the Settings section |
 | Policy statement · policy effect | A **rule** of an Access Policy · Allow, Ask or Deny |
 | viewer · contributor · iam-admin | The Access Policy — *Explore*, *Shape the model*, *Run the deployment* — or the permission an act needs |
-| World | An Access Policy rule on `data/…` · a sensitive property |
+| World · view of the graph | A **lens** — or, for a rule on `data/…` or a sensitive property, an Access Policy rule |
 | Guardrail · invariant | A rule (*must always hold*) |
 | Envelope | *What it may do* |
 | Ledger | *What left the platform* · *Access usage* · History (*what people and agents did*) |

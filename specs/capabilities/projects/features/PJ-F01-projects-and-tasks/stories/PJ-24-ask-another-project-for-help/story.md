@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 a person asks when they may read both projects; the other project's people on the team accept
 ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask any project they may read for help from a task they may read; accept or reject an ask on a project whose team they are on | A project they may not read is not offered as a target |
 | Operator | The same; a Modeller the same | Not a person on the asked project: the ask reads there, *Accept* and *Reject* disabled — *Join the team to change it* |
@@ -77,7 +77,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Ask another project | Admin | projects.projects · Ask for help | projects.projects · Ask for help · No project matches | projects.projects · Ask for help · Loading projects | projects.projects · Ask for help · Filled | projects.projects · Ask for help · Refused | — | — |
 | Ask another project | Operator | projects.projects · Ask for help | projects.projects · Ask for help · No project matches | projects.projects · Ask for help · Loading projects | projects.projects · Ask for help · Filled | projects.projects · Ask for help · Refused | — | projects.projects · Ask for help · Refused |

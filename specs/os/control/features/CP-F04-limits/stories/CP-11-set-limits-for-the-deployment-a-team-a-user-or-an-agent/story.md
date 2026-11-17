@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every limit with what is used now; set, change or clear the deployment's, a team's, a user's or an agent's limits | — |
 | Operator | Operator · Modeller: read every limit, what is used now and its meter ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
@@ -79,7 +79,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Limits — the deployment, teams, users and agents | Admin | settings.limits · Default limits | settings.limits · Nothing matches | settings.limits · Loading | settings.limits | settings.limits · Could not save | — | — |
 | Limits — the deployment, teams, users and agents | Operator | settings.limits · Default limits · Read only | settings.limits · Nothing matches | settings.limits · Loading | settings.limits · Read only | settings.limits · Could not load | — | settings.limits · Read only |

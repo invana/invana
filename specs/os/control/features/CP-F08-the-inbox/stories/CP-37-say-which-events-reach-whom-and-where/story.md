@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read, write, switch off and delete every rule; name any user, team, role, *the person behind the run*, *the agent's named approvers* or channel | — |
 | Operator | Operator · Modeller: read every rule and channel; write, switch and delete their own rules that reach only themselves ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | Other recipients, a team, a role, a channel, *Add channel* and another person's switch and *Edit* disabled — *Needs the Admin role — ask {admins}*, naming the rule's creator |
@@ -63,7 +63,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | What reaches whom — rules | Admin | settings.notifications · No rules yet | — | settings.notifications · Loading | settings.notifications | settings.notifications · Could not load | — | — |
 | What reaches whom — rules | Operator | settings.notifications · No rules yet | — | settings.notifications · Loading | settings.notifications · Read only | settings.notifications · Could not load | — | settings.notifications · Read only |

@@ -61,7 +61,7 @@ new piece of work.
 | Agent | Does | Runs with | Skills | On a project |
 |---|---|---|---|---|
 | `product-manager` · **Product manager** | Turns ideas, bugs and recommendations into stories — who can, flow, criteria, screens — and the system design; proposes tasks and their order; takes up recommendations | Invana | `product-spec` · `system-design` · `recommend` | The project assistant ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)): every proposal is a member's to accept |
-| `designer` · **Designer** | Draws exactly the boards a story names, every state and lens, from the team's design kit | Invana | `design-story` · `recommend` | Picks up the tasks of the *Design* group |
+| `designer` · **Designer** | Draws exactly the boards a story names, every state and access level, from the team's design kit | Invana | `design-story` · `recommend` | Picks up the tasks of the *Design* group |
 | `coder` · **Coder** | Builds the story — code, every test and a changeset — in the task's workspace, and opens a pull request | Claude Code or Codex ([AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md)), set by a Modeller | `build-feature` · `build-ui` · `recommend` | Picks up the tasks of the *Build* group and *Bug* tasks |
 | `qa` · **QA** | Runs the tests and reviews the code against the criteria; compares what was built against its boards; writes PASS or FAIL | Invana | `code-review` · `design-qa` · `recommend` | Its reviews are checks on a task ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
 | `security` · **Security** | Threat-models a story that touches access, data, agents or an outside system; audits a change before it is accepted | Invana | `security-audit` · `recommend` | Its audit is a check on a task |
@@ -81,11 +81,11 @@ new piece of work.
 |---|---|---|---|
 | `product-spec` | Writes or changes a product, a feature, a story or a journey: reads what exists, asks in one batch with a recommendation, flags breaking changes, writes from the templates, runs the spec check | Product manager | Guided |
 | `system-design` | Writes the high-level design, the non-functional requirements and a feature's low-level design | Product manager | Guided |
-| `design-story` | Draws one story's boards — its flow, every state and lens — from the design kit only | Designer | Guided |
+| `design-story` | Draws one story's boards — its flow, every state and access level — from the design kit only | Designer | Guided |
 | `build-feature` | Builds a designed story: its scope, decisions, access, tests never mocked, a changeset, one commit per step | Coder | Guided |
 | `build-ui` | The team's UI rules: compose from the design kit, tokens only, one story per component | Coder | Guided |
 | `code-review` | Reviews a change against its story's criteria and the team's standards; PASS or FAIL | QA | Guided |
-| `design-qa` | Compares each built screen with its board in every state and lens; PASS or FAIL | QA | Guided |
+| `design-qa` | Compares each built screen with its board in every state and access level; PASS or FAIL | QA | Guided |
 | `security-audit` | Threat-models a story; audits a change — code, dependencies, secrets, the running API, the agents | Security | Guided |
 | `recommend` | Raises a Recommendation task for what is outside the agent's task or rights | Every agent | Planned |
 

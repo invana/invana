@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's usage over every run | — |
 | Operator | Read an agent's usage over runs they are behind and agents they own | The rest counted, not shown — *N runs are not yours to read* |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Usage — every agent | Admin | access.usage · No usage yet | access.usage · Nothing matches | access.usage · Loading | access.usage | access.usage · Could not load | access.usage · Running | — |
 | Usage — every agent | Operator | access.usage · No usage yet | access.usage · Nothing matches | access.usage · Loading | access.usage · Counted, not shown | access.usage · Could not load | access.usage · Running | access.usage · Counted, not shown |

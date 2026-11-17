@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 Starting a project needs Create on Projects, and makes the project's first Access Policy; widening it needs Manage on
 Projects — [PJ-F01 › Access](../../feature.md#access).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Start a project of any type the deployment offers; make its Access Policy from an Access template and adjust any of it; put people, teams and agents on its team and tag one Lead agent | — |
 | Operator | Start a project when they hold Create on Projects; adjust access only within what they may grant — the rest is asked for | Without Create on Projects, *New project* is disabled, naming the permission and who can grant it; a widening they may not grant reads *Will ask {who can grant}* |
@@ -85,7 +85,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | New project · About | Admin | projects.projects · New · About | — | projects.projects · New · Loading types | projects.projects · New · About filled | projects.projects · New · Field refused | — | — |
 | New project · About | Operator | projects.projects · New · About | — | projects.projects · New · Loading types | projects.projects · New · About filled | projects.projects · New · Field refused | — | — |

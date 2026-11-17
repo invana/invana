@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 *Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the Decisions page across every project they can see; open a decision, its project and its lineage; export the rows | A decision of a project they may not read lists its project, number and date; its content reads *Withheld* — Admins are not exempt |
 | Operator | The same, and export the rows; a Modeller the same | A decision of a project they may not read lists, its content *Withheld*. Nothing on the page is an act to refuse |
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Every decision | Admin | projects.branches · Decide · Every decision · None yet | — | projects.branches · Decide · Every decision · Loading | projects.branches · Decide · Every decision | projects.branches · Decide · Every decision · Could not load | — | — |
 | Every decision | Operator | projects.branches · Decide · Every decision · None yet | — | projects.branches · Decide · Every decision · Loading | projects.branches · Decide · Every decision | projects.branches · Decide · Every decision · Could not load | — | — |

@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 Proposing and reading are every signed-in person's, on a run they are behind ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Propose the plan of a run they are behind that served; read where every workflow and function comes from | On a run they are not behind: *Propose as a workflow* is not shown |
 | Operator | Propose the plan of a run they are behind; read where every workflow and function comes from; a Modeller the same | On a run they are not behind: *Propose as a workflow* is not shown |
@@ -72,7 +72,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Propose as a workflow, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a workflow | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | — |
 | Propose as a workflow, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a workflow | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | agents.runs · Detail · Content withheld |

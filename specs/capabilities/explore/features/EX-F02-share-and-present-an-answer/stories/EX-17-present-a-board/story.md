@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Present any board, from the first step or any reply's step | — |
 | Operator | Present any board — presenting is read-only; a Modeller the same | A link to a board that does not exist: *Not found* |
@@ -55,7 +55,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Presenting | Admin | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |
 | Presenting | Operator | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |

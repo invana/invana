@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F09](../../feature.md)
 
 Roles are [the role table](../../../AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every call — kinds, fields, record IDs and query, never a value; verify a value against a call; export | — |
 | Operator | Read the calls of runs they may read (AC-31); verify and export those; a Modeller the same | Other calls list with their time, agent, target, class, verdict and tokens; content reads *withheld — only {person behind}, or someone whose agent may read its sources, reads it* |
@@ -65,7 +65,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | What left — calls | Admin | access.ledger · No calls yet | access.ledger · Nothing matches | access.ledger · Loading | access.ledger | access.ledger · Could not load | access.ledger · Waiting on the result | — |
 | What left — calls | Operator | access.ledger · No calls yet | access.ledger · Nothing matches | access.ledger · Loading | access.ledger · Withheld rows | access.ledger · Could not load | access.ledger · Waiting on the result | access.ledger · Withheld rows |

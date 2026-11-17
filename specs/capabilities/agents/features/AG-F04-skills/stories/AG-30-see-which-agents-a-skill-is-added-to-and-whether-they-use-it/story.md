@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md)
 
 Adding a skill to an agent is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add any skill to any agent, remove it, read every count | — |
 | Operator | Read which agents it is added to, which are refused and why, what it needs, and every count. A Modeller does what an Admin does | *Add to an agent* and *Remove* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -75,7 +75,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Agents — added · refused · not added | Admin | agents.skills · Detail · Added to no agent | — | agents.skills · Detail · Loading | agents.skills · Detail · Agents | agents.skills · Detail · Add refused | — | — |
 | Agents — added · refused · not added | Operator | agents.skills · Detail · Added to no agent | — | agents.skills · Detail · Loading | agents.skills · Detail · Agents | agents.skills · Detail · Add refused | — | agents.skills · Detail · Agents |

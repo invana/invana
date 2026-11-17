@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read an ontology, pick its kinds, preview the mapping and open it as a draft | — |
 | Operator | See the models and their drafts; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *New model* disabled — *Needs the Modeller role — ask an Admin* |
@@ -59,7 +59,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | New model · from an ontology | Admin | model.models · New · Ontology | model.models · New · Ontology no match | model.models · New · Reading the ontology | model.models · New · Ontology preview | model.models · New · Ontology unreadable | — | — |
 | New model · from an ontology | Operator | — | — | — | — | — | — | model.models · New · No access |

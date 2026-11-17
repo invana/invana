@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 *Portable — bring in* in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | All a Modeller can; apply the Access Policy files an import brought (AC-04) | — |
 | Modeller | Import a zip, a folder or a Claude plugin, confirm what each file becomes, import; export one agent, one skill or all | A policy file reads *Waiting for an Admin to apply*; *Apply* is disabled, naming the Admin role |
@@ -74,7 +74,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Import | Admin | agents.skills · Import | — | agents.skills · Import · Reading the files | agents.skills · Import · What came in | agents.skills · Import · Refused line | agents.skills · Import · Mapping | — |
 | Import | Operator | — | — | — | — | — | — | agents.skills · Import disabled |

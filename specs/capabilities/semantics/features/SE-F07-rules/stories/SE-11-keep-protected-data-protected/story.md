@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 Writing a rule on a property is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every rule on a property, its refusals and history; create, edit and delete one | — |
 | Operator | Read every rule on a property, its refusals and history. A Modeller writes rules as an Admin does | *New rule*, *Edit rule* and *Delete* absent, not disabled; one line reads *Needs the Modeller role — ask an Admin* |
@@ -63,7 +63,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Rules | Admin | model.rules · No rules on properties | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | — |
 | Rules | Operator | model.rules · No rules on properties | model.rules · Rules filter empty | model.rules · Loading | model.rules | model.rules · Could not load | — | model.rules · Rules read only |

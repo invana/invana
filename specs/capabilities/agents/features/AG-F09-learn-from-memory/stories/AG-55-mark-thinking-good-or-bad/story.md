@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Mark a run, plan, workflow or recalled item they may read good or bad; withdraw any mark | *Mark* disabled on a run they may not read, naming who may |
 | Operator | An Operator or a Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): mark from a run they are behind or, for a project's run, whose sources their default agent may see; withdraw their own mark | *Mark* disabled, naming who may — whoever may read the run's content; *Withdraw* absent on someone else's mark |
@@ -55,7 +55,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Mark on a run's Thinking tab | Admin | agents.runs · Detail · Thinking · Not marked | — | agents.runs · Detail · Thinking · Marking | agents.runs · Detail · Thinking · Marked | agents.runs · Detail · Thinking · Mark needs a note | — | — |
 | Mark on a run's Thinking tab | Operator | agents.runs · Detail · Thinking · Not marked | — | agents.runs · Detail · Thinking · Marking | agents.runs · Detail · Thinking · Marked | agents.runs · Detail · Thinking · Mark needs a note | — | agents.runs · Detail · Thinking · Mark disabled |

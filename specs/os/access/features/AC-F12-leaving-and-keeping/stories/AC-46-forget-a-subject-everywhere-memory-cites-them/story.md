@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Forget a subject — a graph database, a kind and a record ID, with a reason — after its preview, signing in again; read the subjects forgotten | — |
 | Operator | — ; a Modeller the same | *Forget a subject* and the subjects forgotten are not offered |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Forget a subject | Admin | settings.keeping · Forget · Nothing cites it | — | settings.keeping · Forget · Counting | settings.keeping · Forget · Preview | settings.keeping · Forget · Could not finish | — | settings.keeping · Forget · On hold |
 | Forget a subject | Operator | — | — | — | — | — | — | settings.keeping · Forget · Locked · Keeping |

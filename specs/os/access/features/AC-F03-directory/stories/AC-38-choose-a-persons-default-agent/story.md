@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every person's default agent; set it to an agent granted to that person, signing in again | An agent not granted to the person is not offered |
 | Operator | Read their own default agent in *You* and everyone's in *Users*; a Modeller reads the same | *Change default agent* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -51,7 +51,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A person — default agent | Admin | settings.people · Default is the Assistant | — | settings.people · Loading | settings.people · Default agent | settings.people · Not granted | — | — |
 | A person — default agent | Operator | settings.people · Locked · Default is the Assistant | — | settings.people · Locked · Loading | settings.people · Locked · Default agent | settings.people · Locked · Could not load | — | settings.people · Locked · Default agent |

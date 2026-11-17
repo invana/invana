@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 Answering a request is the Modeller's and the Admin's; any signed-in person files one ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every request; *Allow*, *Draft it* or *Decline* one | — |
 | Operator | Read every request; file one with *Ask for a change*. A Modeller answers requests as an Admin does | Rows without *Allow*, *Draft it* or *Decline* — *Needs the Modeller role — ask an Admin* |
@@ -33,7 +33,7 @@ flowchart LR
   o --> k{What it met}
   k -->|a rule on a property| al["Allow · Decline"]
   k -->|could not answer · asked for a change| dr["Draft it · Decline"]
-  al -->|Allow| pv["Pick a view"] --> d1(["Done · allowed in the view"])
+  al -->|Allow| pv["Pick a lens"] --> d1(["Done · allowed in the lens"])
   dr -->|Draft it| nm(["New model, described by the ask · done · modelled"])
   al -->|Decline| d2(["Done · declined"])
   o -->|the rule's name| r(["The rule, the request above it — SE-11"])
@@ -50,23 +50,23 @@ flowchart LR
 | SE-13.4 | A run refused by a rule on a property, or ending *cannot answer · not in Graph Data*, asked by a person or an agent | it settles | a request is filed by the engine; an eval or a test files none |
 | SE-13.5 | The same open ask by the same person or agent | it is asked again | it adds to the one request's count and last asked, never a second row |
 | SE-13.6 | A person in Explore | they pick *Ask for a change* | a request is filed with their words |
-| SE-13.7 | A request a rule on a property caused | a Modeller or an Admin picks *Allow* and a view | the view joins the rule's exceptions and the row moves to Done reading *allowed in <view>* |
+| SE-13.7 | A request a rule on a property caused | a Modeller or an Admin picks *Allow* and a lens | the lens joins the rule's exceptions and the row moves to Done reading *allowed in <lens>* |
 | SE-13.8 | Any other request | they pick *Draft it* | New model opens described by the ask; creating the draft moves the row to Done reading *modelled in <model>* |
 | SE-13.9 | Any request | they pick *Decline* | the row moves to Done reading *declined* |
 | SE-13.10 | A request whose rule was deleted | they pick *Allow* | it is refused: *its rule is gone* — decline it instead |
-| SE-13.11 | A view deleted meanwhile | they allow in it | it is refused naming the view |
+| SE-13.11 | A lens deleted meanwhile | they allow in it | it is refused naming the lens |
 | SE-13.12 | A request resolved by someone else first | they act on it | it says *already resolved* and the list re-reads |
 | SE-13.13 | A resolution | it is made | History records who resolved it, how and when |
 | SE-13.14 | An Operator | they open Requests | the rows read without *Allow*, *Draft it* or *Decline*, and a line reads *Needs the Modeller role — ask an Admin* |
-| SE-13.15 | A Modeller or an Admin | they list or resolve requests from the command line | The same three resolutions as Studio — allow in a view, draft it, decline — under the same access |
+| SE-13.15 | A Modeller or an Admin | they list or resolve requests from the command line | The same three resolutions as Studio — allow in a lens, draft it, decline — under the same access |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Requests | Admin | model.rules · No requests | — | model.rules · Requests loading | model.rules · Requests | model.rules · Request refused | — | — |
 | Requests | Operator | model.rules · No requests | — | model.rules · Requests loading | model.rules · Requests | model.rules · Could not load | — | model.rules · Requests read only |
-| Allow in a view | Admin | — | — | — | model.rules · Allow in a view | model.rules · Request refused | — | — |
-| Allow in a view | Operator | — | — | — | — | — | — | model.rules · Requests read only |
+| Allow in a lens | Admin | — | — | — | model.rules · Allow in a lens | model.rules · Request refused | — | — |
+| Allow in a lens | Operator | — | — | — | — | — | — | model.rules · Requests read only |
 | A rule from a request | Admin | — | — | model.rules · Detail · Property rule · Loading | model.rules · Detail · Property rule · From a request | model.rules · Request refused | — | — |
 | A rule from a request | Operator | — | — | model.rules · Detail · Property rule · Loading | model.rules · Detail · Property rule · From a request | model.rules · Could not load | — | model.rules · Detail · Property rule · Read only |

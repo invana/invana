@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 [The role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table) — *Plugins and MCP —
 the install switch* is the Admin's.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every pack and what it adds; install or remove a pack; switch it as any plugin (CP-04); apply its Access Policy files after *Who it changes* (AC-04); grant its agents (AC-22) | — |
 | Modeller | Read every pack, what it adds, whether it is installed, both switches and its policy files waiting to apply | *Install*, *Remove* and *Apply* are disabled, naming the Admins |
@@ -65,7 +65,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Team packs | Admin | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs | settings.packs · Pack clashes | — | — |
 | Team packs | Operator | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs · Read only | settings.packs · Could not load | — | settings.packs · Packs · Read only |

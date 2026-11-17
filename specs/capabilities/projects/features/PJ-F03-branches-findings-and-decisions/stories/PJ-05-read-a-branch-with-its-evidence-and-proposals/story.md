@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 on every project the person may read; a proposal is accepted or rejected by the project's people
 ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every branch; file a task on it; accept or reject a proposal on a project they lead; open a finding, a decision, and the run behind a proposal as far as run privacy allows | On an archived project every act is disabled. Not a person on the team: *Accept* and *Reject* disabled — *Join the team to change it* |
 | Operator | The same; a Modeller the same | As Admin. A run they may not read: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
@@ -70,7 +70,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A branch | Admin | projects.branches · A branch · No findings yet | — | projects.branches · A branch · Loading | projects.branches · A branch | projects.branches · A branch · Could not load | projects.branches · A branch · Proposal waiting | projects.projects · Detail · Withheld |
 | A branch | Operator | projects.branches · A branch · No findings yet | — | projects.branches · A branch · Loading | projects.branches · A branch | projects.branches · A branch · Could not load | projects.branches · A branch · Proposal waiting | projects.projects · Detail · Withheld |

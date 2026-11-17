@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md) · Its evals: [
 
 Publishing and rolling back is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Publish a version of any agent not built in, roll back to an earlier one | A built-in agent has no *Publish* — *Built in — copy it to change it* |
 | Operator | Read every version, its reason and its eval result. A Modeller does what an Admin does | *Publish* and *Roll back* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A draft's head and Lifecycle | Admin | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Publish refused | agents.agents · Detail · Evals running | — |
 | A draft's head and Lifecycle | Operator | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Publish refused | agents.agents · Detail · Evals running | agents.agents · Detail · Read only |

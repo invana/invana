@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 *Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Record a verdict and a decision on any branch they can see; supersede the current decision | Nobody edits or deletes a decision; on an archived project *Decide* is disabled |
 | Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
@@ -71,7 +71,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Decide | Admin | — | — | projects.branches · Decide · Recording | projects.branches · Decide | projects.branches · Decide · Could not record | projects.branches · Decide · From a proposal | — |
 | Decide | Operator | — | — | projects.branches · Decide · Recording | projects.branches · Decide | projects.branches · Decide · Could not record | projects.branches · Decide · From a proposal | projects.branches · Decide · Archived |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 The role × feature table is [AC-F02 › The role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Install and remove a runtime plugin; switch it on or off; pick the worker groups that carry it (CP-10) | — |
 | Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it; a Modeller reads the same | *Install* and *Remove* disabled — *This needs an Admin — ask {admins}* |
@@ -61,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Runtimes | Admin | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes | settings.plugins · Install refused | — | — |
 | Runtimes | Operator | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes · Read only | settings.plugins · Could not load | — | settings.plugins · Runtimes · Read only |

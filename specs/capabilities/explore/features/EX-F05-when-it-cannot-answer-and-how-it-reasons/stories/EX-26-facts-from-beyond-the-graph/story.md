@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read third-party claims and nodes and their references; *Keep* a third-party node on a read + write graph database | — |
 | Operator | Read third-party claims and nodes and their references, on answers they may read. A Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Edit on the board*) | *Keep* disabled — *Needs the Modeller role — ask an Admin* |
@@ -82,7 +82,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Third-party in the answer | Admin | explore.board · Graph Data only | — | explore.board · Searching | explore.board · Third-party | explore.board · Search refused | explore.board · Working | — |
 | Third-party in the answer | Operator | explore.board · Graph Data only | — | explore.board · Searching | explore.board · Third-party | explore.board · Search refused | explore.board · Working | — |

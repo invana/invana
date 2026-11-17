@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 Starting a link or a new model is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the map, pick what it shows and its detail, and start a link or a new model from it | — |
 | Operator | Read the map, pick what it shows and its detail. A Modeller starts a link or a new model as an Admin does | *Link models* and *New model* disabled — *Needs the Modeller role — ask an Admin* |
@@ -56,7 +56,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The map | Admin | model.models · No model yet | model.models · Detail | model.models · Laying out | model.models | model.models · Could not load | — | — |
 | The map | Operator | model.models · No model yet | model.models · Detail | model.models · Laying out | model.models · Read only | model.models · Could not load | — | model.models · Read only |

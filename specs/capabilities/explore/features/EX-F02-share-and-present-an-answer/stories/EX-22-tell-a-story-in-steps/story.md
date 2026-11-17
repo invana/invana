@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); the walkthrough is part of the board.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, word, move and remove authored steps on any board; present them | — |
 | Operator | The same; a Modeller the same | Without the Assistant: the steps read and play; *Add a step here* is disabled — *{person} may not use Assistant — ask an Admin* |
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The walkthrough | Admin | explore.board · Present · No annotations | — | — | explore.board · Present · Authoring | explore.board · Present · Refused | — | — |
 | The walkthrough | Operator | explore.board · Present · No annotations | — | — | explore.board · Present · Authoring | explore.board · Present · Refused | — | explore.board · Present · Read only |

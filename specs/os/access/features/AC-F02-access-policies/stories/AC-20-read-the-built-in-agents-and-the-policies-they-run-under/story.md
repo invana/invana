@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every built-in agent and its policies; *Copy* a built-in policy; attach a custom policy to a built-in agent (AC-11) | A built-in agent and its built-in policy have no *Edit*, *Rename*, *Delete* or *Take off* |
 | Operator | Read every built-in agent, what it acts for and its policies; a Modeller the same | *Copy* and *Attach* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -52,7 +52,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Built-in agents | Admin | — | — | settings.agent_access · Loading | settings.agent_access · Built-in agents | settings.agent_access · Could not load | — | — |
 | Built-in agents | Operator | — | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Built-in agents | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Built-in agents |

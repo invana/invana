@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)), through the Assistant.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Expand, hide, style on any board; read and restore any board's history; reads run as the Assistant, within its Access Policies | A kind a rule denies the Assistant: the expansion refused, naming the rule |
 | Operator | The same; a Modeller the same | Without the Assistant: expand, styling and *Restore* disabled — *{person} may not use Assistant — ask an Admin*; History still reads |
@@ -67,7 +67,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Right-click · Expand | Admin | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |
 | Right-click · Expand | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |

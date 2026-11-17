@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 Reading is every signed-in person's; the acts follow [the role table](../../feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read *Kept from agents*; write a Deny rule on `data/<graph database>/<kind>` or on one level of it in a policy (AC-04); set a property's level in Meaning | — |
 | Operator | Read *Kept from agents*. A Modeller also sets a property's level in Meaning and asks an Admin for a Deny rule | *New rule* disabled — *Needs the Admin role — ask Priya or Lee*; *Set level* disabled — *Needs the Modeller role — ask an Admin* |
@@ -62,7 +62,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Kept from agents | Admin | settings.policies · Nothing kept | — | settings.policies · Loading | settings.policies · Kept from agents | settings.policies · Could not load | — | — |
 | Kept from agents | Operator | settings.policies · Locked · Nothing kept | — | settings.policies · Locked · Loading | settings.policies · Locked · Kept from agents | settings.policies · Locked · Could not load | — | settings.policies · Locked · Kept from agents |

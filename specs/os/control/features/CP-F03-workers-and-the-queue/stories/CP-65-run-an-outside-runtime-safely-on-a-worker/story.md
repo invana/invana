@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 The role × feature table is [AC-F02 › The role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every session on every worker, its workspace and every sandbox refusal; change the agent's worker rules ([AC-37](../../../../../access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)) | — |
 | Operator | Start a run of an agent they are granted; read their own runs' sessions and refusals; a Modeller reads the same | Another person's run: its sessions' heads, content *withheld*, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
@@ -70,7 +70,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A run's sessions and sandbox refusals | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sandbox refused | agents.runs · Detail · Session running | — |
 | A run's sessions and sandbox refusals | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sandbox refused | agents.runs · Detail · Session running | agents.runs · Detail · Withheld |

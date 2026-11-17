@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F09](../../feature.md)
 Roles are [the role table](../../../AC-F02-access-policies/feature.md#the-role-table). No role reads a run's content
 by itself.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the content of runs they are behind, and of a project's runs whose sources their default agent may read; read every ledger row's kinds, fields, IDs and query, never a value | Any other run: that it ran, its agent, the person behind it, its status and its tokens |
 | Operator | Read the content of runs they are behind, and of a project's runs whose sources their default agent may read; a Modeller the same | Any other run: that it ran, its agent, the person behind it, its status and its tokens — content reads *withheld — only {person behind}, or someone whose agent may read its sources, reads it* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
 | A run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |

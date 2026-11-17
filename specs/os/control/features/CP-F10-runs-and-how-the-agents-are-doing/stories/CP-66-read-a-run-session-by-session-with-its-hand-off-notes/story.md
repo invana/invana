@@ -22,7 +22,7 @@ Roles are [the role table](../../../../../access/features/AC-F02-access-policies
 (*Runs — read, stop and re-run*). Who reads a run's content is
 [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every run's session heads; read a session's steps and a hand-off note's body as AC-31 says — the role adds none — and only as far as the note's sources allow | A run whose content they may not read: its session heads; each note's head, its body *withheld* |
 | Operator | An Operator or a Modeller: read every run's session heads; read a session's steps and a hand-off note's body of a run they are behind, or of a project's run whose sources their default agent may read, as far as the note's sources allow | Any other run: its session heads; each note's head, its body *withheld — only {person behind}, or someone whose agent may read its sources, reads it*; a direct link to a note reads *Not found* |
@@ -70,7 +70,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A run — Sessions | Admin | agents.runs · Detail · Sessions · One session | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sessions · Could not load | agents.runs · Detail · Sessions · Continuing | agents.runs · Detail · Sessions · Content withheld |
 | A run — Sessions | Operator | agents.runs · Detail · Sessions · One session | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sessions · Could not load | agents.runs · Detail · Sessions · Continuing | agents.runs · Detail · Sessions · Content withheld |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the run of any answer; open its conversation when it is theirs or shared with them | *Open the conversation* is absent on someone else's, unless it is shared |
 | Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): read the run of an answer they asked; open their own conversation, or one shared with them | Someone else's answer's run: that it ran, by the Assistant, the person behind it, its status and its tokens — its content *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Open the conversation* absent unless it is shared |
@@ -49,7 +49,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | An answer's run | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Not their conversation |
 | An answer's run | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |

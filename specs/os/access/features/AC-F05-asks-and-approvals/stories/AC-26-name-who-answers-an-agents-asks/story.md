@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Name and change any agent's approvers, a built-in agent's included, signing in again | Naming one person alone warns, and is still allowed |
 | Operator | Read every agent's approvers; a Modeller reads the same | *Change approvers* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -61,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Approvers | Admin | agents.agents · Detail · Approvers · No approver | — | agents.agents · Detail · Approvers · Loading | agents.agents · Detail · Approvers | agents.agents · Detail · Approvers · Not a person | agents.agents · Detail · Approvers · One person warns | — |
 | Approvers | Operator | agents.agents · Detail · Approvers · No approver | — | agents.agents · Detail · Approvers · Loading | agents.agents · Detail · Approvers | agents.agents · Detail · Approvers · Could not load | — | agents.agents · Detail · Locked · Approvers |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 *Portable — bring in* in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); approving code is the Admin's, as approving a skill's script is (CP-F06).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add a library, read the functions Invana proposes, edit, approve or leave out each | — |
 | Modeller | Add a library, read and edit the functions Invana proposes | *Approve* is disabled — proposals read *Waiting for an Admin* |
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Tools they call | Admin | agents.skills · No libraries | — | agents.skills · Loading | agents.skills | agents.skills · Could not load | — | — |
 | Tools they call | Operator | agents.skills · No libraries | — | agents.skills · Loading | agents.skills | agents.skills · Could not load | — | agents.skills |

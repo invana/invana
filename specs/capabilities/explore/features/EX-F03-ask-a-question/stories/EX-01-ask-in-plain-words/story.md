@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask through any agent they may use, ask again from a recent question, open a kept board from the start, run a function a plan gap offers | — |
 | Operator | The same, through the agents they may use; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | No agent they may use: the composer disabled — *{person} may not use Assistant — ask an Admin*. A function the agent may not run: offered disabled, naming the rule |
@@ -74,7 +74,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The question box | Admin | explore.board · Ask · Never asked | — | explore.board · Ask · Loading | explore.board · Ask | explore.board · Ask · No AI model | — | — |
 | The question box | Operator | explore.board · Ask · Never asked | — | explore.board · Ask · Loading | explore.board · Ask | explore.board · Ask · No AI model | — | explore.board · Ask · No agent to ask through |

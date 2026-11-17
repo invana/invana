@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F07](../../feature.md) · The board: [
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read, write, hide and show annotations on a read + write graph database; add the assistant's to the graph database or dismiss them; change or delete their own; delete anyone's, with a reason | A read-only graph database: Annotate off, naming it and its mode |
 | Operator | The same, except deleting another person's annotation; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *annotations*) | Someone else's annotation: change and delete off — *Only its author or an Admin can change it* |
@@ -76,7 +76,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Annotations on the board | Admin | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Read-only database |
 | Annotations on the board | Operator | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Someone else's |

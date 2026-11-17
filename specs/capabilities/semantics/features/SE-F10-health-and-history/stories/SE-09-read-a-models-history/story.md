@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F10](../../feature.md)
 
 Restoring an earlier version is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every version's history, compare two versions, and restore an earlier one as a draft | — |
 | Operator | Read every version's history and compare two versions. A Modeller restores as an Admin does | *Restore* disabled — *Needs the Modeller role — ask an Admin* |
@@ -50,7 +50,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | History | Admin | model.health · One version | model.health · No history in window | model.health · Loading | model.health · History | model.health · Could not load | — | — |
 | History | Operator | model.health · One version | model.health · No history in window | model.health · Loading | model.health · History | model.health · Could not load | — | model.health · History read only |

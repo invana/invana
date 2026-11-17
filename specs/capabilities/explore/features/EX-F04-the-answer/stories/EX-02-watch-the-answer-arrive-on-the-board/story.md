@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Watch, cancel and re-run their own runs; read and stop anyone's run (CP-F10); load an answer to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project* | — |
 | Operator | Watch, cancel and re-run their own runs; load to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project*; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *the answer*) | Another person's run: that it ran, its status and its tokens — content withheld |
@@ -62,7 +62,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The reply and its steps | Admin | — | explore.board · Nothing held | explore.board · Working | explore.board | explore.board · Step failed | explore.board · Working | — |
 | The reply and its steps | Operator | — | explore.board · Nothing held | explore.board · Working | explore.board | explore.board · Step failed | explore.board · Working | explore.board · Content withheld |

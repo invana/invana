@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 relating is a setting, its team's, on projects the person may read
 ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Relate any project to another they may read; start a project from a task or finding; remove a relation | A project they may not read is not offered |
 | Operator | The same, on a project whose team they are on; start a project from any task or finding they may read; a Modeller the same | On a project whose team they are not on, *Relate* and *Remove* are disabled — *Join the team to change it* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Related | Admin | projects.projects · Detail · Related · None yet | — | projects.projects · Detail · Related · Loading | projects.projects · Detail · Related | projects.projects · Detail · Related · Refused | — | — |
 | Related | Operator | projects.projects · Detail · Related · None yet | — | projects.projects · Detail · Related · Loading | projects.projects · Detail · Related | projects.projects · Detail · Related · Refused | — | projects.projects · Detail · Related · Not a person on the team |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F01](../../feature.md)
 Nobody chooses this: it is how every read runs. The only person-facing acts are reading the proof in a run and, for an
 Admin, which connectors passed the certification test.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read in any run's *How it got here* that a read step ran in a read-only session; read which connectors passed the certification test | — |
 | Operator | Read in *How it got here* that a read step ran in a read-only session; a Modeller reads the same ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | — |
@@ -56,7 +56,7 @@ flowchart TD
 
 No board: the proof is a line of the step in *How it got here*, which is its run's story.
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A read step's session | Admin | — | — | — | — | — | — | — |
 | A read step's session | Operator | — | — | — | — | — | — | — |

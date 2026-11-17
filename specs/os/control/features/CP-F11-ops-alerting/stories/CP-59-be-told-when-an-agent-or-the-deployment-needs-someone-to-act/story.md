@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every ops alert; read every alert; act on what it is about; close one with a note | — |
 | Operator | Operator · Modeller: receive alerts about agents they are a named approver of, runs they are behind, their own limit, schedules they created and History alerts that name them or their team — alerts about tasks and connections are [CP-67](../CP-67-get-told-when-work-stops-or-a-connection-fails/story.md)'s ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
@@ -77,7 +77,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Ops alerts | Admin | settings.alerts · No alerts | settings.alerts · No match | settings.alerts · Loading | settings.alerts | settings.alerts · Could not load | settings.alerts · Counting | — |
 | Ops alerts | Operator | settings.alerts · No alerts | settings.alerts · No match | settings.alerts · Loading | settings.alerts | settings.alerts · Could not load | settings.alerts · Counting | — |

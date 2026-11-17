@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a policy's rules and versions; write a new or a copied policy; edit and delete a custom policy; *Copy* any policy; apply a policy file an import or a Team pack brought in; approve another Admin's change when a second Admin's yes is set. Saving asks them to sign in again | A built-in policy has no *Edit*, *Rename* or *Delete* — *Copy to change*; their own waiting change has no *Approve* |
 | Operator | Read a policy's rules and versions; a Modeller reads the same, and may bring in an import whose policy files wait for an Admin | *New policy*, *Edit*, *Copy*, *Apply* and *Delete* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -77,7 +77,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A policy — its rules | Admin | settings.policies · New | — | settings.policies · Loading | settings.policies | settings.policies · Rule refused | — | settings.policies · Built in |
 | A policy — its rules | Operator | — | — | settings.policies · New · Locked · Loading | settings.policies · New · Locked | settings.policies · New · Locked · Could not load | — | settings.policies · New · Locked |

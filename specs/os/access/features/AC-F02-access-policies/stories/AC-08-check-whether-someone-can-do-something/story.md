@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Check any person through any agent | — |
 | Operator | Check any person through any agent; a Modeller the same | — |
@@ -56,7 +56,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Can someone do this? | Admin | settings.policies · Ask a check | — | settings.policies · Checking | settings.policies · No, names the rule | settings.policies · Could not check | — | — |
 | Can someone do this? | Operator | settings.policies · Locked · Ask a check | — | settings.policies · Locked · Checking | settings.policies · Locked · No, names the rule | settings.policies · Locked · Could not check | — | — |

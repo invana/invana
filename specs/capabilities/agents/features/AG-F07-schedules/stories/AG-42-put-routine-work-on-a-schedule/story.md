@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F07](../../feature.md)
 
 Schedules are *Acts* for every role in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); a person acts on a schedule through its agent, granted to them.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create, edit, pause, resume, run now and delete a schedule whose agent is granted to them; read every schedule and firing, and open a run as [AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules) allows | On a schedule whose agent is not granted to them, every act disabled — *Uses {agent}, which is not granted to you* |
 | Operator | The same; a Modeller the same | The same |
@@ -73,7 +73,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Schedules | Admin | agents.schedules · Nothing is scheduled | — | agents.schedules · Loading | agents.schedules | agents.schedules · Could not load | agents.schedules · Running | — |
 | Schedules | Operator | agents.schedules · Nothing is scheduled · Read only | — | agents.schedules · Loading | agents.schedules · Read only | agents.schedules · Could not load | agents.schedules · Running | agents.schedules · Read only |

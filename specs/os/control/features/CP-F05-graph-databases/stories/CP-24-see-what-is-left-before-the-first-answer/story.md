@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every step; open each one where its fact is made; skip or bring back an offer | — |
 | Operator | Read every step, its idea and its command | Each step's act reads the role it needs — *Ask an Admin* for graph databases and AI models, *Ask a Modeller* for the model and records, naming who holds it |
@@ -56,7 +56,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Set-up | Admin | start.home · Set-up | — | start.home · Set-up · Loading | start.home · Set-up · Two of four | start.home · Set-up · Could not load | start.home · Set-up · Drafting below | — |
 | Set-up | Operator | start.home · Set-up | — | start.home · Set-up · Loading | start.home · Set-up · Two of four | start.home · Set-up · Could not load | start.home · Set-up · Drafting below | start.home · Set-up · Ask an Admin |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set *Keep* or *Pseudonymise* for departed people's names, signing in again; read before deactivating a person what will be erased (AC-23) | — |
 | Operator | Read the setting; read a departed person's work under their name or their code; a Modeller reads the same | *Change* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -58,7 +58,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A departed person's name | Admin | settings.keeping · Keep | — | settings.keeping · Loading | settings.keeping · Pseudonymise | settings.keeping · Could not save | — | — |
 | A departed person's name | Operator | settings.keeping · Locked · Keeping · Keep | — | settings.keeping · Locked · Keeping · Loading | settings.keeping · Locked · Keeping | — | — | settings.keeping · Locked · Keeping |

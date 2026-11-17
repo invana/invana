@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Export everything held about any person, active or deactivated, signing in again; read the exports made | — |
 | Operator | — ; a Modeller the same | *Export their data* is not offered on a person's row |
@@ -53,7 +53,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Export their data | Admin | settings.people · Export their data · Nothing done yet | — | settings.people · Export their data · Exporting | settings.people · Export their data | settings.people · Export their data · Could not export | — | — |
 | Export their data | Operator | — | — | — | — | — | — | settings.people · Export their data · Locked · A person |

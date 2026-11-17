@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 Keeping an eval set is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent or skill not built in: write, accept and retire cases, set the judge and rubric, ask for proposed cases, promote a run's answer to a case | A built-in's set reads, with *Copy* — *Built in — copy it to change it* |
 | Operator | Read every eval set, its cases, checks, judge and rubric. A Modeller does what an Admin does; promote only from a run they may read | *Write a case*, *Propose from the instructions*, *Promote to eval* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -63,7 +63,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A skill's Evals | Admin | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Judge refused | agents.skills · Detail · Proposing cases | — |
 | A skill's Evals | Operator | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Could not load | agents.skills · Detail · Proposing cases | agents.skills · Detail · Evals |

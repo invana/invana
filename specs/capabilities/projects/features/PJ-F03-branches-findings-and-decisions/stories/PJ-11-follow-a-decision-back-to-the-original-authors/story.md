@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 *Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the lineage of any decision they can see; open every node's source, every run among them | A project they may not read: its head only, the lineage *Withheld — join the team or ask {who can grant}* |
 | Operator | The same; a Modeller the same | A run they are not behind, whose agent they do not own, reads *Content withheld* in the lineage. There is no act on a lineage to refuse |
@@ -58,7 +58,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Lineage | Admin | projects.branches · Decide · Lineage · Cites nothing | projects.branches · Decide · Lineage · Nothing from this source | projects.branches · Decide · Lineage · Loading | projects.branches · Decide · Lineage | projects.branches · Decide · Lineage · Could not load | — | projects.projects · Detail · Withheld |
 | Lineage | Operator | projects.branches · Decide · Lineage · Cites nothing | projects.branches · Decide · Lineage · Nothing from this source | projects.branches · Decide · Lineage · Loading | projects.branches · Decide · Lineage | projects.branches · Decide · Lineage · Could not load | — | projects.branches · Decide · Lineage · Content withheld |

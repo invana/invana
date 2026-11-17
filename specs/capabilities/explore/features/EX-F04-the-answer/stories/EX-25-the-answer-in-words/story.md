@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the words of any answer, open a citation | — |
 | Operator | The same, on answers they may read — their own, or one shared with them; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *the answer*) | Another person's answer: that it ran, its status and its tokens — content withheld ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
@@ -61,7 +61,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The words | Admin | — | explore.board · Nothing held | explore.board · Writing the answer | explore.board | explore.board · Records only | explore.board · Writing the answer | — |
 | The words | Operator | — | explore.board · Nothing held | explore.board · Writing the answer | explore.board | explore.board · Records only | explore.board · Writing the answer | — |

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F11](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and revoke their own connected clients; read every connected client in the deployment and revoke any. Each revoke asks for the password again | — |
 | Operator | Read and revoke their own connected clients, with the password again | *Access › Who › Connected clients* locked, naming the Admin role; another person's clients are absent |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Your connected clients | Admin | settings.me · No clients yet | — | settings.me · Loading | settings.me · Connected clients | settings.me · Could not load | — | — |
 | Your connected clients | Operator | settings.me · No clients yet | — | settings.me · Loading | settings.me · Connected clients | settings.me · Could not load | — | — |

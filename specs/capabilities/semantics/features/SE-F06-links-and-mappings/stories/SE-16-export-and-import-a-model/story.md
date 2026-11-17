@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 Importing and restoring a model is the Modeller's and the Admin's; exporting is every signed-in person's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Export a model with or without its records, import a model file as a new model, and restore an earlier version | — |
 | Operator | Export a model with or without its records, the records being those their default agent may read. A Modeller imports and restores as an Admin does | *Import a model file* disabled — *Needs the Modeller role — ask an Admin* |
@@ -62,7 +62,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Export | Admin | model.models · Export | — | model.models · Exporting | model.models · Export | model.models · Export failed | — | — |
 | Export | Operator | model.models · Export | — | model.models · Exporting | model.models · Export | model.models · Export failed | — | — |

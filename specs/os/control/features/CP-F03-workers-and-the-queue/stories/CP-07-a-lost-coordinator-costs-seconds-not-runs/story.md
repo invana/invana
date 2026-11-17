@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every coordinator, the runs it holds and when it last renewed | — |
 | Operator | Read every coordinator, the runs it holds and when it last renewed | — |
@@ -43,7 +43,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Coordinators | Admin | settings.workers · One coordinator | — | settings.workers · Loading | settings.workers · Coordinators | settings.workers · Coordinator lost | — | — |
 | Coordinators | Operator | settings.workers · One coordinator | — | settings.workers · Loading | settings.workers · Coordinators | settings.workers · Coordinator lost | — | — |

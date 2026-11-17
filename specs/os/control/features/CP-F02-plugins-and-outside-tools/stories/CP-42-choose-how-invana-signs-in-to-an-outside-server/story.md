@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Choose how Invana signs in to each outside server and whether people may connect their own; set or clear a shipped tool's secrets — each with the password again | — |
 | Operator | Read how each server signs in, whether people may connect their own, and whether each secret is set; a Modeller reads the same | Every credential act is disabled, naming the Admins. A secret's value is never shown to anyone |
@@ -61,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | How a server signs in | Admin | settings.plugins · Servers · Sign-in not set | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Sign-in | settings.plugins · Servers · Sign-in refused | — | — |
 | How a server signs in | Operator | settings.plugins · Servers · Sign-in · Read only | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Sign-in · Read only | settings.plugins · Servers · Could not load | — | settings.plugins · Servers · Sign-in · Read only |

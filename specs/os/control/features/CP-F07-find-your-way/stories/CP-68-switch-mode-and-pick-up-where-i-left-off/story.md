@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the switcher; go to any mode, Agents included; start a conversation, a board or a project; read, search, pin and open their own recent items | — |
 | Operator | The same, on their own recent items: every mode, Agents included; *New project* as their Access Policies allow | An act their Access Policies do not allow is listed disabled, naming the permission it needs and who can grant it; another person's recent items are never shown |
@@ -69,7 +69,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The switcher | Admin | shell.switcher · Nothing yet | shell.switcher · Nothing matches | shell.switcher · Loading | shell.switcher | shell.switcher · Could not load | — | — |
 | The switcher | Operator | shell.switcher · Nothing yet | shell.switcher · Nothing matches | shell.switcher · Loading | shell.switcher | shell.switcher · Could not load | — | shell.switcher · Act disabled |

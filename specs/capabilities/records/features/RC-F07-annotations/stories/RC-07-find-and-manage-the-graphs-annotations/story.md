@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F07](../../feature.md)
 
 Every role reads annotations and changes its own; an Admin deletes any ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *annotations*).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every annotation; edit or delete any, with a reason kept | — |
 | Operator | Read every annotation; edit or delete their own; a Modeller the same | Off on others' — *Only Priya Nair can change it* |
@@ -46,7 +46,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Annotations | Admin | data.annotations · Nothing annotated | data.annotations · Nothing matches | data.annotations · Loading | data.annotations | data.annotations · Could not load | — | — |
 | Annotations | Operator | data.annotations · Nothing annotated | data.annotations · Nothing matches | data.annotations · Loading | data.annotations | data.annotations · Could not load | — | data.annotations · Not the author |

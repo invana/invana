@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a graph database, see what it holds, and start a draft model from it | — |
 | Operator | See what each graph database holds and the drafts on the map; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *Read the database* and *Start a model from it* disabled — *Needs the Modeller role — ask an Admin* |
@@ -55,7 +55,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Connect a graph database · the database | Admin | settings.databases · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Unreachable | — | — |
 | Connect a graph database · the database | Operator | — | — | — | — | — | — | — |

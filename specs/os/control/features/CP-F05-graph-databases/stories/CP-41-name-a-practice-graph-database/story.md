@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Name a graph database as practice for another, or unname it | — |
 | Operator | Read which graph databases are practice, and for which | *Make practice* reads *Ask an Admin*, naming the Admins |
@@ -49,7 +49,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Practice | Admin | settings.databases · Detail · Make practice | — | settings.databases · Detail · Loading | settings.databases · Practice | settings.databases · Detail · Cannot be practice | — | — |
 | Practice | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Practice · Read only | — | — | settings.databases · Detail · Read only |

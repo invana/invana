@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 *Projects and tasks* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
 which kinds a project uses is a setting, its team's ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Turn any of the type's task kinds on or off on any project; write a task of any kind the project uses | — |
 | Operator | Turn kinds on or off on a project they lead; write a task of any kind the project uses; a Modeller the same | On a project they do not lead, the kind switches read, disabled — *Join the team to change it* |
@@ -57,7 +57,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Task kinds | Admin | projects.projects · Detail · Task kinds · Only the two | — | projects.projects · Detail · Task kinds · Loading | projects.projects · Detail · Task kinds | projects.projects · Detail · Task kinds · Kind in use | — | — |
 | Task kinds | Operator | projects.projects · Detail · Task kinds · Only the two | — | projects.projects · Detail · Task kinds · Loading | projects.projects · Detail · Task kinds | projects.projects · Detail · Task kinds · Kind in use | — | projects.projects · Detail · Task kinds · Not a person on the team |

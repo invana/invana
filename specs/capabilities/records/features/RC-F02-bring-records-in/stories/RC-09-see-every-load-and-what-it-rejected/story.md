@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 Loading and undoing a load are the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); every role reads the loads.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Load into any model; read and export every load; undo any load | — |
 | Operator | Read and export every load in the deployment — its outcome, what was rejected, its log and what landed. A Modeller also loads from the command line or the API and undoes loads, as an Admin does | Loading refused before anything is written — *Needs the Modeller role — ask an Admin*; *Undo load* disabled with the same reason |
@@ -72,7 +72,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Loads | Admin | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
 | Loads | Operator | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |

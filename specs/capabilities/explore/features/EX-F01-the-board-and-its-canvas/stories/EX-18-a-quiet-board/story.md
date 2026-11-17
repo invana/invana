@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); saving edits is *Edit on the board*.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every mode, every tool, every menu item on any board | — |
 | Operator | Look, pick a mode, open every menu on any board; a Modeller the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs the Modeller role — ask an Admin*. A link to a board that does not exist: *Not found* |
@@ -59,7 +59,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The board | Admin | explore.board · Ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | — |
 | The board | Operator | explore.board · Ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | explore.board · No access |

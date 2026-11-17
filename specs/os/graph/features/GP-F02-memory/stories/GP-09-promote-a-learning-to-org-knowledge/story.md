@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 The role × feature table is [AC-F02 › The role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table);
 promoting, declining and retiring org knowledge is a Modeller's and an Admin's ([GP-F02 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every proposal and every piece of org knowledge their default agent may Read; promote, decline and retire | A proposal whose sources their default agent may not Read: its head only, withheld |
 | Operator | Read proposals and org knowledge as far as their default agent may Read `memory/org` and the sources; a Modeller may promote, decline and retire, as an Admin | *Promote*, *Decline* and *Retire* disabled — *Modellers and Admins only* |
@@ -73,7 +73,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Org knowledge | Admin | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | graph.memory · Org knowledge · Withheld |
 | Org knowledge | Operator | graph.memory · Org knowledge · None yet | graph.memory · Org knowledge · Nothing matches | graph.memory · Org knowledge · Loading | graph.memory · Org knowledge | graph.memory · Org knowledge · Could not load | graph.memory · Org knowledge · Proposed | graph.memory · Org knowledge · Not a Modeller |

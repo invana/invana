@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 Every person on a project's team may change its team; Manage on Projects may on any project. There are no roles inside
 a project, and joining grants nothing outside it ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any project: add users, teams and the agents the project's policies let work here, tag one Lead agent, take one off; approve a join where the project is set to *Adding people needs approval* | — |
 | Operator | The same on a project they are on; a join on a project that needs approval is asked for | On a project they are not on, *Team* reads, its acts disabled — *Join the team or ask {who can grant}*; an agent access does not allow is disabled — *May not work here* |
@@ -69,7 +69,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Team | Admin | projects.projects · Detail · Team · Only the creator | — | projects.projects · Detail · Team · Loading | projects.projects · Detail · Team | projects.projects · Detail · Team · Last person refused | projects.projects · Detail · Team · Lead agent proposing | — |
 | Team | Operator | projects.projects · Detail · Team · Only the creator | — | projects.projects · Detail · Team · Loading | projects.projects · Detail · Team | projects.projects · Detail · Team · Last person refused | projects.projects · Detail · Team · Lead agent proposing | projects.projects · Detail · Team · Not on the team |

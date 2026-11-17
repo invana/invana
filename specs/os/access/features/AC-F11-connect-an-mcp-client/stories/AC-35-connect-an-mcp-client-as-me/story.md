@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F11](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | — |
 | Operator | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | A person without an account reads *Ask your admin for an account* on sign-in; a client that is no one person connects with a project key, never this way |
@@ -87,7 +87,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Consent | Admin | access.consent | — | access.consent · Loading | access.consent | access.consent · Bad request | — | — |
 | Consent | Operator | access.consent | — | access.consent · Loading | access.consent | access.consent · Bad request | — | access.signin · No account |

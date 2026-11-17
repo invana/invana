@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Change a model in a draft, compare it, publish a change that only adds, request approval for a breaking one; approve or decline one as a named approver of the Modeller agent who did not ask | — |
 | Operator | Read the model, its draft, the comparison and its reviews; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*); anyone named an approver of the Modeller agent approves | *Change in a draft* disabled — *Needs the Modeller role — ask an Admin*; *Publish* hidden |
@@ -75,7 +75,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The map · Comparing | Admin | model.models | — | model.models · Comparing loading | model.models · Comparing | — | — | — |
 | The map · Comparing | Operator | model.models | — | model.models · Comparing loading | model.models · Comparing | — | — | model.models · Read only |

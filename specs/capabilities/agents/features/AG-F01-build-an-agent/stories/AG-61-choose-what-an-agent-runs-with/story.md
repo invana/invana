@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 Building an agent in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
 Operator *Reads*, Modeller and Admin *Act*. Installing a runtime on a worker group is an Admin's, in the Control Plane.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Choose what any agent not built in runs with and set its model version; read where each runtime's model runs and which worker groups carry it; install a runtime (Control Plane, CP-F02 · CP-F03) | A built-in agent offers *Copy* — *Built in — copy it to change it* |
 | Modeller | As Admin on any agent not built in, except installing a runtime | A runtime that is not installed reads disabled — *{runtime} is not installed — ask {admins}* |
@@ -67,7 +67,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Runs with and the model set | Admin | agents.agents · Detail · Runs with Invana | — | agents.agents · Detail · Loading | agents.agents · Detail · Runs with | agents.agents · Detail · Runtime not installed | — | — |
 | Runs with and the model set | Operator | agents.agents · Detail · Runs with Invana | — | agents.agents · Detail · Loading | agents.agents · Detail · Runs with | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |

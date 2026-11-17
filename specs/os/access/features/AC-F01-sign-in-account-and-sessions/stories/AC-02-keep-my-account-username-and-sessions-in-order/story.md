@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Their own account: name, email, time zone, username, password; sign out here or everywhere. Signs in again for every risky act | Another person's account is not in Studio; a person who leaves is deactivated ([AC-23](../../../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)) |
 | Operator | Their own account: name, email, time zone, username, password; sign out here or everywhere. Signs in again for every risky act | Another person's account is not in Studio |
@@ -75,7 +75,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Profile | Admin | settings.me | — | settings.me · Loading | settings.me | settings.me · Could not save | — | — |
 | Profile | Operator | settings.me | — | settings.me · Loading | settings.me | settings.me · Could not save | — | — |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Switch an answer's template; author, copy, change, publish and delete projection templates | — |
 | Operator | Switch the template of an answer of theirs; read the projection templates. A Modeller also authors them, as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *skills*) | *+* and each authoring act disabled — *Needs the Modeller role — ask an Admin* |
@@ -72,7 +72,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The answer's card | Admin | — | explore.board · Nothing held | explore.board · Working | explore.board · Chart | explore.board · Chart · Shape refused | — | — |
 | The answer's card | Operator | — | explore.board · Nothing held | explore.board · Working | explore.board · Chart | explore.board · Chart · Shape refused | — | — |

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 *Projects and tasks* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
 pick-up is a setting of the project, its team's; a picked-up run reaches the project's policies ∩ the agent's ceiling — who set *Allow* or pressed *Start it* is recorded, never used for reach ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set the pick-up mode of any project and each team agent's narrower mode — *Allow* only for agents the project's access lets work there; answer an agent's ask to start; see every claim | *Allow* for an agent the project's access does not allow is refused — *Not allowed in this project* |
 | Operator | As a person on the team: set the mode — *Allow* only for agents the project's access lets work there — and answer an ask to start; read the mode, every claim and every ask; a Modeller the same | Not on the team: the mode controls and *Start it* are disabled — *Join the team to change it* |
@@ -103,7 +103,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Pick-up | Admin | projects.projects · Detail · Pick-up · No team agents | — | projects.projects · Detail · Pick-up · Loading | projects.projects · Detail · Pick-up | projects.projects · Detail · Pick-up · Could not save | projects.projects · Detail · Pick-up · Claims running | — |
 | Pick-up | Operator | projects.projects · Detail · Pick-up · No team agents | — | projects.projects · Detail · Pick-up · Loading | projects.projects · Detail · Pick-up | projects.projects · Detail · Pick-up · Could not save | projects.projects · Detail · Pick-up · Claims running | projects.projects · Detail · Pick-up · Not a person on the team |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 Adding an outside agent is the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add an outside agent, choose its credential, turn it on or off, read its card again, set its limits, remove one no run reached | — |
 | Modeller | Read every outside agent, its skills, who added it and limits, never its secret | *Add an outside agent* and every act disabled — *Needs the Admin role* |
@@ -64,7 +64,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Outside agents | Admin | agents.agents · Outside · No outside agents | agents.agents · Outside · No outside agents match | agents.agents · Outside · Loading | agents.agents · Outside | agents.agents · Outside · Could not load | — | — |
 | Outside agents | Operator | agents.agents · Outside · No outside agents | agents.agents · Outside · No outside agents match | agents.agents · Outside · Loading | agents.agents · Outside · Read only | agents.agents · Outside · Could not load | — | agents.agents · Outside · Read only |

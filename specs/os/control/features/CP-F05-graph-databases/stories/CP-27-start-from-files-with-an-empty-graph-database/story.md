@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Drop files, answer the agent's questions, accept or change the model, connect and load | — |
 | Operator | — | The modal never opens for them (CP-25.11) |
@@ -53,7 +53,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | 2 · Drop files | Admin | settings.databases · Connect · Files · No files yet | — | settings.databases · Connect · Files · Reading | settings.databases · Connect · Files | settings.databases · Connect · Files · Cannot read | settings.databases · Connect · Files · A column asked | — |
 | 2 · Drop files | Operator | — | — | — | — | — | — | — |

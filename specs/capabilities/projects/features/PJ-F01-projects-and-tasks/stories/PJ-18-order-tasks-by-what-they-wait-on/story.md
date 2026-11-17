@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 *Projects and tasks* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person may read ([PJ-F01 › Access](../../feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Draw and remove a dependency, choose its condition; make a group, put tasks in it, make it wait on another group; read the order, the groups, the waves and the critical path | On an archived project, *Draw a dependency* and *Remove* disabled, saying it is archived |
 | Operator | The same, on every project they may read; a group may wait on a group of another project only when they may read both; a Modeller the same | On an archived project, *Draw a dependency*, *New group* and *Remove* disabled, saying it is archived. A project they may not read is not offered as a group's wait |
@@ -85,7 +85,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Order | Admin | projects.projects · Detail · Order · No tasks to order | — | projects.projects · Detail · Order · Loading | projects.projects · Detail · Order | projects.projects · Detail · Order · Loop refused | projects.projects · Detail · Order · Tasks running | — |
 | Order | Operator | projects.projects · Detail · Order · No tasks to order | — | projects.projects · Detail · Order · Loading | projects.projects · Detail · Order | projects.projects · Detail · Order · Loop refused | projects.projects · Detail · Order · Tasks running | projects.projects · Detail · Order · Archived |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Pick an approach with *Act as*, remove an assumption before the run, drop one from an answer and re-run; author, copy and publish approaches in Agents › Skills | — |
 | Operator | Pick an approach, remove assumptions, drop one and re-run, on their own runs; read approaches in Agents › Skills. A Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *skills*) | *+* disabled — *Needs the Modeller role — ask an Admin* |
@@ -65,7 +65,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Act as, in the composer | Admin | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · Act as | — | explore.board · Ask · Assumptions before the run | — |
 | Act as, in the composer | Operator | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · Act as | — | explore.board · Ask · Assumptions before the run | — |

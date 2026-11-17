@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Write `fs/` · `cmd/` · `net/` rules on a custom policy; read what each agent may touch on a worker | — |
 | Operator | Read every `fs/` · `cmd/` · `net/` rule and what each agent may touch on a worker; a Modeller reads the same | *Edit* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Worker rules on a policy | Admin | settings.policies · No worker rules | — | settings.policies · Loading | settings.policies · Worker rules | settings.policies · Rule refused | — | — |
 | Worker rules on a policy | Operator | settings.policies · Locked · No worker rules | — | settings.policies · Locked · Loading | settings.policies · Locked · Worker rules | settings.policies · Locked · Could not load | — | settings.policies · Locked · Worker rules |

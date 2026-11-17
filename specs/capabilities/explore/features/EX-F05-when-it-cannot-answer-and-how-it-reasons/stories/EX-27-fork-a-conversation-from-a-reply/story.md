@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *Fork from here* on a settled reply of their own conversation; follow a fork to its parent and a parent to its forks | Another person's conversation: no *Fork from here* |
 | Operator | The same, on their own conversations; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *ask a question*) | Another person's conversation: no *Fork from here* |
@@ -59,7 +59,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Fork from here, on a reply | Admin | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |
 | Fork from here, on a reply | Operator | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |

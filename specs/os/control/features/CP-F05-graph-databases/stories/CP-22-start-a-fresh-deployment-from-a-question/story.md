@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Answer the question · *Connect a graph database* · *Try it on demo data* when a demo graph database is on | — |
 | Operator | Answer the question · *Try it on demo data* when a demo graph database is on | *Ask {Admin}* stands where *Connect a graph database* would, naming an Admin, and raises the ask |
@@ -53,7 +53,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Home | Admin | start.home · First use | — | start.home · Loading | start.home · Demo data | start.home · Could not load | — | — |
 | Home | Operator | start.home · First use · Ask an Admin | — | start.home · Loading | start.home · Demo data | start.home · Could not load | — | start.home · First use · Ask an Admin |

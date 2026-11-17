@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a cannot answer or a plan gap, watch a step retry or repair, run a function the plan gap offers, follow *Load data*, ask what it offers instead | — |
 | Operator | The same on their own runs, except *Load data* — *bring records in* needs the Modeller role; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Load data* disabled — *Needs the Modeller role — ask an Admin*; the questions it offers instead stay. Another person's run: that it ran, its status and its tokens |
@@ -67,7 +67,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The reply in the thread | Admin | explore.board · Cannot · Nothing loaded | explore.board · Cannot | explore.board · Working | explore.board · Cannot · Modelled but empty | explore.board · Cannot · Stopped | — | — |
 | The reply in the thread | Operator | explore.board · Cannot · Nothing loaded | explore.board · Cannot | explore.board · Working | explore.board · Cannot · Modelled but empty | explore.board · Cannot · Stopped | — | explore.board · Cannot · Load data disabled |

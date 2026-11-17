@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set, change or clear the deployment's eval token budget | — |
 | Modeller | Read the budget and what is spent | Editing disabled — *Needs the Admin role* |
@@ -50,7 +50,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The eval token budget | Admin | settings.limits · Usage · No eval budget | — | settings.limits · Usage · Loading | settings.limits · Usage · Eval token budget | settings.limits · Usage · Could not load | — | — |
 | The eval token budget | Operator | settings.limits · Usage · No eval budget | — | settings.limits · Usage · Loading | settings.limits · Usage · Read only | settings.limits · Usage · Could not load | — | settings.limits · Usage · Read only |

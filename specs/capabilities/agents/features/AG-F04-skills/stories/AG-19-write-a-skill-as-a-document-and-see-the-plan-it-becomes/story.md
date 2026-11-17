@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md)
 
 Editing a skill is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any skill not built in: edit the draft, add functions, answer the planner's questions, choose for a flagged line, set the model version, discard the draft, publish, roll back — in Studio or on the command line | A built-in skill reads; *Copy* in place of *Edit instructions* |
 | Operator | Read the instructions, Plan preview, What it needs, Flow and History. A Modeller does what an Admin does | The editor is read-only; *Add functions*, *Discard draft*, *Publish*, *Edit instructions* and *Roll back* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
@@ -86,7 +86,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Instructions — editor, What it needs, Plan preview | Admin | agents.skills · Detail · New draft | — | agents.skills · Detail · Loading | agents.skills · Detail · Draft | agents.skills · Detail · Does not hold together | agents.skills · Detail · Drawing | — |
 | Instructions — editor, What it needs, Plan preview | Operator | agents.skills · Detail · Read only | — | agents.skills · Detail · Loading | agents.skills · Detail · Read only | agents.skills · Detail · Could not load | agents.skills · Detail · Drawing | agents.skills · Detail · Read only |

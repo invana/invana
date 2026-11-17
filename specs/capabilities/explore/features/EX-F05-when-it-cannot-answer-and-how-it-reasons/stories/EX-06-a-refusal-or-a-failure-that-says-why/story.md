@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any refusal and the policy and rule behind it, read a diagnosis and its evidence, follow its next step — open the run, check the graph database, bring records in, open the policy | — |
 | Operator | Read the same on their own runs, open the run, and ask an Admin; a Modeller the same, and *bring records in* as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Open the policy* and *Check the graph database* disabled — *Needs the Admin role — ask an Admin*. Another person's run: that it ran, its status and its tokens |
@@ -66,7 +66,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A refusal in the thread | Admin | — | — | — | explore.board · Cannot · Refused | — | explore.board · Cannot · Waiting for approvers | — |
 | A refusal in the thread | Operator | — | — | — | explore.board · Cannot · Refused | — | explore.board · Cannot · Waiting for approvers | explore.board · Cannot · Refused, ask an Admin |

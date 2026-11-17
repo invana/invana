@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 Changing a model or a kind is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open a model and a kind, and from a kind change it in a draft; rename a model and change its description | — |
 | Operator | Open a model and a kind and read them. A Modeller changes a model or a kind as an Admin does | *Change in a draft* and *Rename* disabled — *Needs the Modeller role — ask an Admin* |
@@ -59,7 +59,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A kind | Admin | model.kinds · Detail · No properties | — | model.kinds · Detail · Loading | model.kinds · Detail | model.kinds · Detail · Could not load | — | — |
 | A kind | Operator | model.kinds · Detail · No properties | — | model.kinds · Detail · Loading | model.kinds · Detail · Read only | model.kinds · Detail · Could not load | — | model.kinds · Detail · Read only |

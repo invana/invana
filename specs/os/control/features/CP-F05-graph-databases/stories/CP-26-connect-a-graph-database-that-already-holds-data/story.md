@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Pick the connector, give the details, test, accept or change the agent's draft | — |
 | Operator | — | The modal never opens for them (CP-25.11) |
@@ -56,7 +56,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | 2 · Connect | Admin | settings.databases · Connect · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Test failed | — | — |
 | 2 · Connect | Operator | — | — | — | — | — | — | — |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F04](../../feature.md)
 
 Running a fix is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Preview and run a fix | — |
 | Operator | Preview a fix. A Modeller runs it as an Admin does | *Run* disabled — *Needs the Modeller role — ask an Admin* |
@@ -46,7 +46,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A fix | Admin | data.records · Fix · Nothing picked | data.records · Fix · Nothing to change | data.records · Fix · Building preview | data.records · Fix | data.records · Fix · Partly written | — | — |
 | A fix | Operator | data.records · Fix · Nothing picked | data.records · Fix · Nothing to change | data.records · Fix · Building preview | data.records · Fix · Preview only | — | — | data.records · Fix · Run disabled |

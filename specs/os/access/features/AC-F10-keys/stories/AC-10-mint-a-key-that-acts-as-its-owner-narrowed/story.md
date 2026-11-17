@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Mint and revoke their own personal keys, and the keys of any project they hold Manage on Projects for; read every key in the deployment and revoke any (Manage on Access). Each mint and revoke asks for the password again | — |
 | Operator | Mint and revoke their own personal keys; read the keys of the projects they are on. Each mint and revoke asks for the password again | A project's *New key* disabled — *Needs Manage on Projects — ask Priya or Lee*; *Access › Who › Keys* locked, naming Manage on Access and who can grant it |
@@ -94,7 +94,7 @@ sequenceDiagram
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Your keys | Admin | settings.me · No keys yet | — | settings.me · Loading | settings.me · Keys | settings.me · At the ceiling | — | — |
 | Your keys | Operator | settings.me · No keys yet | — | settings.me · Loading | settings.me · Keys | settings.me · At the ceiling | — | — |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
 | Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; a Modeller the same | *Add a server* and *Read its tools again* are disabled, naming the Admins |
@@ -68,7 +68,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Outside servers | Admin | settings.plugins · Servers · No servers | settings.plugins · Nothing matches | settings.plugins · Servers · Loading | settings.plugins · Servers | settings.plugins · Servers · Could not load | — | — |
 | Outside servers | Operator | settings.plugins · Servers · No servers · Read only | settings.plugins · Nothing matches | settings.plugins · Servers · Loading | settings.plugins · Servers · Read only | settings.plugins · Servers · Could not load | — | settings.plugins · Servers · Read only |

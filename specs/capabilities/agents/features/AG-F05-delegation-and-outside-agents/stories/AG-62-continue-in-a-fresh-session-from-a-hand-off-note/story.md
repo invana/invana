@@ -21,7 +21,7 @@ Runs — read, stop and re-run in [the role table](../../../../../../os/access/f
 *Own* for Operator and Modeller, *Acts* for Admin. A note's body reads only as far as the reader's default agent may
 read its sources ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); no role grants content.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every run's sessions and each note's head; a note's body as anyone else — when the run belongs to a project and their default agent may read every source; stop any run, between sessions too; fork a run from a note they may read; set the session budget (CP-F04) | A note they may not read: its head, body *withheld*, naming the first source; *Fork* not offered |
 | Modeller | As Operator | As Operator |
@@ -70,7 +70,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The run's sessions and notes | Admin | agents.runs · Detail · One session | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Note sources not recorded | agents.runs · Detail · Continuing | — |
 | The run's sessions and notes | Operator | agents.runs · Detail · One session | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Note sources not recorded | agents.runs · Detail · Continuing | agents.runs · Detail · Content withheld |

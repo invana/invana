@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Change description, address, user, password or database after a passing test; reconnect; read the types again; declare a server version or accept an untested one; remove it — signing in again for a credential change and for removal | — |
 | Operator | Read the graph database — connector, server version, address, user, database, mode, switch, status | The password field is absent; *Save*, *Test connection*, *Reconnect*, *Read types again*, *Declare version*, *Accept this version* and *Remove* read *Ask an Admin* |
@@ -72,7 +72,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Connection | Admin | — | — | settings.databases · Detail · Loading | settings.databases · Detail | settings.databases · Detail · Test failed | — | — |
 | Connection | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Detail · Read only | settings.databases · Detail · Unreachable · Read only | — | settings.databases · Detail · Read only |

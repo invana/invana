@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Deactivate a person, naming a successor; choose whether the leaver's tasks go to the successor or back to *Open*; reactivate them. Each asks them to sign in again | Their own row has no *Deactivate*; an Admin's row has none while only two Admins are active |
 | Operator | Read who is deactivated, by whom, when and who succeeded them; a Modeller reads the same | *Deactivate* and *Reactivate* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -65,7 +65,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Deactivate — what they hold · successor | Admin | settings.people · Deactivate · Holds nothing | — | settings.people · Deactivate · Loading | settings.people · Deactivate | settings.people · Deactivate · Could not save | — | settings.people · Two Admins |
 | Deactivate — what they hold · successor | Operator | — | — | — | — | — | — | settings.people · Locked · A person |

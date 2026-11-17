@@ -22,7 +22,7 @@ Adding an answer from Explore as a finding is [EX-12](../../../../../explore/fea
 *Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add a finding to any branch they can see; review any finding; open every finding, the records behind it through the agents they may use, and every run behind it | A record of a kind their agents may not read reads *Withheld*; on an archived project every act is disabled |
 | Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
@@ -69,7 +69,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A finding | Admin | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | projects.projects · Detail · Not found |
 | A finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | projects.branches · Finding · Could not load | projects.branches · Finding · Added by an agent | projects.branches · Finding · Record withheld |

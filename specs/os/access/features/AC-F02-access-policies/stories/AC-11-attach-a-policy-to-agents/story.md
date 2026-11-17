@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the agents a policy is attached to; attach it to an agent; take it off. Each asks them to sign in again | A built-in policy on its built-in agent has no *Take off* |
 | Operator | Read the agents a policy is attached to; a Modeller reads the same | *Attach to an agent* and *Take off* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -51,7 +51,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Attached to | Admin | settings.policies · Not attached | settings.policies · Nothing matches | settings.policies · Loading | settings.policies | settings.policies · Could not load | — | — |
 | Attached to | Operator | settings.policies · Locked · Not attached | settings.policies · Locked · Nothing matches | settings.policies · Locked · Loading | settings.policies · Locked | settings.policies · Locked · Could not load | — | settings.policies · Locked |

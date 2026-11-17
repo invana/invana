@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and set each store's period, or *Keep*; place and lift a legal hold on memory or History, with a reason. Each change asks them to sign in again | — |
 | Operator | Read each store's period, the holds and who set them; a Modeller reads the same | *Set*, *Place a hold* and *Lift* disabled — *Needs the Admin role — ask Priya or Lee* |
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Stores and holds | Admin | settings.keeping · Keep everything | — | settings.keeping · Loading | settings.keeping | settings.keeping · Could not load | settings.keeping · Waiting on a hold | — |
 | Stores and holds | Operator | settings.keeping · Locked · Keeping · Keep everything | — | settings.keeping · Locked · Keeping · Loading | settings.keeping · Locked · Keeping | settings.keeping · Locked · Keeping · Could not load | settings.keeping · Locked · Keeping · Waiting on a hold | settings.keeping · Locked · Keeping |
