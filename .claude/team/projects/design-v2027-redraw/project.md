@@ -1,6 +1,6 @@
 ---
 name: design-v2027-redraw
-status: running
+status: paused
 branch: design-redesign/P17-audit-every-board-drawn-every-link-resol
 scope: design-v2027-redraw
 artifact_publish: auto approve
@@ -230,30 +230,30 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | | |
 |---|---|
 | Agent | designer |
-| Read | `specs/capabilities/semantics/features/SE-F06-links-and-mappings/feature.md` · SE-F02 · SE-F01 · `specs/glossary.md` (*Link between models*, never *stitch*) · the previous version's boards `.design/canvas-products/project/modeller.global_model.dc.html` · `.global_model.dark` · `.global_model.stitch` · `.stitches` · `.global_model.diff` · `.model.type` · `.model.type.constraint` · `.draft` (read-only references) · the mirror's `model.models.dc.html` |
-| Stories | SE-01 · SE-02 · SE-03 · SE-04 · SE-05 · SE-08 |
-| Done when | On `model.models`: (1) the map shows every published model as a tinted labelled frame around its kinds, links between models dashed across frames, a toolbar of Show and Detail, a zoom with Fit and a minimap, and the dark theme (SE-01.1 · .2 · .9 · .13); (2) a selected link reads whole — its two ends, the keys it joins on, *joined n of n*, queries that crossed it in 30 days, who declared it — and draws thick, dashed, green (SE-03.14; reference MO-03); (3) Comparing shows v1 against the v2 draft on the map (SE-05.8; reference MO-05); (4) a kind opens in main with Properties · Indexes · Constraints · Mappings and a property table with Index and Constraint columns, including *+ staged* (SE-02.14 · .15; reference MO-02); (5) the constraint dialog — range and unit or a standard's values, Reject or Flag for review, *Today n records break it* (SE-08; reference MO-08); (6) a model drafted from the data — the model staged, the assistant on the right naming what it read and each choice with its evidence, *Review and publish* (SE-04.13; reference MO-04). Every cell of those stories' `## Screens` exists in the mirror; the words are glossary words; `check.py` reports no "not drawn" warning for them. No Operator lens differs except *Needs the Modeller role — ask an Admin* on every change act |
-| Lands | The mirror only — `model.models` and `model.health` pages; no new board file, every place keeps one board and every state is a switch |
-| Boards | `model.models · has data` (map, light and dark) · `model.models · Detail` · `model.models · Link` · `model.models · Links` · `model.models · Comparing` · `model.models · Draft · Assistant docked` · `model.models · Draft · Constraint` · `model.models · Draft · Constraint counting` · `model.models · Draft · Constraint breaks today` · `model.kinds · Detail` · `model.kinds · Detail · Indexes` · `model.kinds · Detail · Edit` (the previous version's MO-01 · MO-02 · MO-03 · MO-04 · MO-05 · MO-08) |
+| Read | P11's hand-off notes · `design-story` · `specs/capabilities/semantics/features/SE-F06-links-and-mappings/feature.md` · SE-F02 · SE-F01 · `specs/glossary.md` (*Link between models*, never *stitch*) · the previous version's boards `.design/canvas-products/project/modeller.global_model.dc.html` · `.model.type` · `.model.type.constraint` · `.draft` (read-only references) · the mirror's `model.models.dc.html` |
+| Stories | SE-02 · SE-04 · SE-05 · SE-08 |
+| Done when | The map, toolbar, minimap, tinted frames, selected link and Comparing are not part of this phase (P10 and P11 drew them); the `model.models` Models view stays one full-bleed canvas with floating bars, the right panel and the bottom drawer, and this phase changes none of that layout. On `model.models`: (1) a kind opens as a state of `model.models` (in the right panel or main, as P03 and P11 place it) with Properties · Indexes · Constraints · Mappings and a property table with Index and Constraint columns, including *+ staged* (SE-02.14 · .15; reference MO-02); (2) the constraint dialog — range and unit or a standard's values, Reject or Flag for review, *Today n records break it* (SE-08; reference MO-08); (3) a model drafted from the data — the model staged, the assistant docked on the right naming what it read and each choice with its evidence, *Review and publish* (SE-04.13; reference MO-04) (SE-04 · SE-05 as the Boards list). Every cell of those stories' `## Screens` exists in the mirror; the words are glossary words; `check.py` reports no "not drawn" warning for them. Every board works in the shell's dark and light themes. No Operator lens differs except *Needs the Modeller role — ask an Admin* on every change act |
+| Lands | The mirror only — `model.models` page; no new board file, every place keeps one board and every state is a switch |
+| Boards | `model.models` — View · State · Lens: Kind detail · Kind detail · Indexes · Kind detail · Edit · Draft · Assistant docked · Draft · Constraint · Draft · Constraint counting · Draft · Constraint breaks today (the previous version's MO-02 · MO-04 · MO-08); no board `model.kinds` or `model.relationships` |
 | Review | |
 | Approve | Ravi — reviews the canvas once published |
 | Budget | |
-| Steps | 1. List what the mirror's `model.models` already draws against the criteria. 2. Draw the map toolbar, minimap and zoom, tinted frames and dark theme. 3. Draw the selected link. 4. Draw Comparing on the map. 5. Draw the kind's tabs and property table. 6. Draw the constraint dialog states. 7. Draw the draft from the data. 8. Gates |
+| Steps | 1. List what the mirror's `model.models` already draws against these criteria. 2. Draw the kind's tabs and property table, Indexes tab included. 3. Draw the constraint dialog states. 4. Draw the draft from the data with the assistant docked. 5. Gates `specs` and `links`; render check. 6. **PUBLISH — the last step.** (a) Artifact `read` of `https://claude.ai/artifact/VhXDTAAHV7z4hCRJuQEHHD`. (b) Artifact `publish` with `url` = that review artifact, `root` = the absolute path of `.design/canvas-invana`, `file_path` = `project/canvas.json`, `files` = only the `project/` files the phase changed; never `index.html` or `SKILL.md`; this header carries `artifact_publish: auto approve`, so the session publishes itself and writes the version in its hand-off note; only if the header says otherwise: note it and stop. 7. **LIVE CANVAS — a separate step, only on Ravi's word, never automatic.** The live canvas `PgtkC6KygGZz2u8fYq1LWX` is published by Ravi, or by a session only after he says so in that turn; until then the phase stops after step 6 and the Log notes *live: awaiting Ravi* |
 
 ### P19 · Health visuals and publish check
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | `specs/capabilities/semantics/features/SE-F10-health-and-history/feature.md` · SE-F02 · the previous version's boards `.design/canvas-products/project/modeller.models.usage.dc.html` · `.models.overview.empty` · `.draft.publish` · `.draft.migration` (read-only references) · the mirror's `model.health.dc.html` and `model.models.dc.html` |
+| Read | P18's hand-off notes · `specs/capabilities/semantics/features/SE-F10-health-and-history/feature.md` · SE-F02 · the previous version's boards `.design/canvas-products/project/modeller.models.usage.dc.html` · `.models.overview.empty` · `.draft.publish` · `.draft.migration` (read-only references) · the mirror's `model.health.dc.html` and `model.models.dc.html` |
 | Stories | SE-07 · SE-05 |
-| Done when | On `model.health`: (1) the Usage tab draws queries per kind as bars grouped by model, each kind marked Unused or Hot, with the links between models no query crossed beside them and *View as table* for the same rows (SE-07.26); (2) the Overview with no published model says so with *From an ontology* and *New model* (SE-07.14); (3) Usage on a graph database that cannot explain queries reads *not available on <database>* for the slow signal only (SE-07.27). On `model.models`: the Publish and Breaking publish states are checked against SE-05.11 and SE-05.12 (what changes, who reads it, the migration previewed, approval requested) and a gap is drawn only if one is found — a note in the hand-off says what was already drawn. The Overview, Database, Performance, Growth, History and saved-report states are left as they are. `check.py` reports no "not drawn" warning for these stories |
+| Done when | On `model.health`: (1) the Usage tab draws queries per kind as bars grouped by model, each kind marked Unused or Hot, with the links between models no query crossed beside them and *View as table* for the same rows (SE-07.26); (2) the Overview with no published model says so with *From an ontology* and *New model* (SE-07.14); (3) Usage on a graph database that cannot explain queries reads *not available on <database>* for the slow signal only (SE-07.27). On `model.models`: the Publish and Breaking publish states are checked against SE-05.11 and SE-05.12 (what changes, who reads it, the migration previewed, approval requested) and a gap is drawn only if one is found — a note in the hand-off says what was already drawn. The Overview, Database, Performance, Growth, History and saved-report states are left as they are. `check.py` reports no "not drawn" warning for these stories. The `model.models` layout is unchanged: no layout change in this phase; every board works in the shell's dark and light themes |
 | Lands | The mirror only — `model.models` and `model.health` pages; no new board file, every place keeps one board and every state is a switch |
 | Boards | `model.health · Usage` · `model.health · Usage · Not available` · `model.health · No model yet` · `model.models · Publish` · `model.models · Publish · Breaking` (the previous version's MO-07 · MO-05) |
 | Review | |
 | Approve | Ravi — reviews the canvas once published |
 | Budget | |
-| Steps | 1. Check the mirror's Publish and Breaking states against SE-05.11 and SE-05.12. 2. Draw the Usage bars and the not-available state. 3. Check the Overview empty state. 4. Fix any publish gap. 5. Gates |
+| Steps | 1. Check the mirror's Publish and Breaking states against SE-05.11 and SE-05.12. 2. Draw the Usage bars and the not-available state. 3. Check the Overview empty state. 4. Fix any publish gap. 5. Gates `specs` and `links`; render check. 6. **PUBLISH — the last step.** (a) Artifact `read` of `https://claude.ai/artifact/VhXDTAAHV7z4hCRJuQEHHD`. (b) Artifact `publish` with `url` = that review artifact, `root` = the absolute path of `.design/canvas-invana`, `file_path` = `project/canvas.json`, `files` = only the `project/` files the phase changed; never `index.html` or `SKILL.md`; this header carries `artifact_publish: auto approve`, so the session publishes itself and writes the version in its hand-off note; only if the header says otherwise: note it and stop. 7. **LIVE CANVAS — a separate step, only on Ravi's word, never automatic.** The live canvas `PgtkC6KygGZz2u8fYq1LWX` is published by Ravi, or by a session only after he says so in that turn; until then the phase stops after step 6 and the Log notes *live: awaiting Ravi* |
 
 ## Log
 
@@ -269,13 +269,17 @@ Run it: `python3 .claude/skills/run-project/run.py design-v2027-redraw` (the pro
 | P08 | Large modal — Settings: Plugins, Fleet, Workers, Limits, Alerts | P07 | done | 2026-11-16 | gates green · reviews passed |
 | P09 | Audit — every nav item and modal section drawn, every link resolves | P08 | done | 2026-11-16 | gates green · reviews passed |
 | P10 | Model — the Models tree by graph database, links on the canvas | P09 | done | 2026-11-17 | gates green · reviews passed |
-| P11 | Model — the full canvas | P10 | done | 2026-11-17 | gates green · reviews passed |
+| P11 | Model — the full canvas | P10 | done | 2026-11-17 | gates green · review artifact v12 published · live: awaiting Ravi |
 | P18 | Model map, kind tabs and the draft from the data | P11 | pending |  |  |
 | P19 | Health visuals and publish check | P18 | pending |  |  |
 
 ## Hand-off notes
 
 | ID | Note |
+| P11 | The canvas is inline SVG, not `@invana/canvas`: the mirror's kit bundle cannot mount SchemaBoard (R518); live Studio uses `@invana/canvas`. The floating bars and the panel are laid over the canvas by the page layout, never added into it (*A host adds nothing to the canvas*) |
+| P11 | Spec gaps, drew what is worded: (a) SE-03.14 words no *Open in a draft* for a link, only *Remove link* (SE-03.15), so none is drawn; (b) the phase text says *Needs the Modeller role*, the board keeps *Needs Shape the model — ask Priya Shah (Admin)* since the spec has no roles; (c) the phase text names a *Lens* in the bar, SE-01.3/.4/.13 word only *Show* and *Detail*, so no Lens is drawn; (d) the bar's counts follow SE-01.6 |
+| P11 | `shot.mjs` needs an absolute project path (a relative one gives invalid asset URLs and a blank board) |
+| P11 | Products ideas taken: `modeller.global_model.stitch` → floating toolbar, counts bar, minimap, right panel layout. Rejected: its light shell (the switch is Studio's) and the word *stitch* (glossary: *link between models*). Publish: review artifact `VhXDTAAHV7z4hCRJuQEHHD` at version 12; live canvas awaiting Ravi (R519: the designer could not write this file) |
 |---|---|
 
 ## Questions for Ravi
