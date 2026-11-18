@@ -20,8 +20,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Receive every task, connection and security alert; read every alert; act on what it is about; with Edit on `worker/<group>`, close one with a note | — |
-| Operator | receive the alerts of tasks they are assignee or team place of or are asked, of their own personal connections, of work connections whose agents they approve for, and of sandbox refusals of agents they approve for — never another person's personal connection ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs Edit on the {group} worker group — ask {who can grant}*; a run's content withheld as AC-31 says |
+| Admin | Receive every task, connection and security alert; read every alert; act on what it is about; with Edit on `setting/deployment`, close one with a note | — |
+| Operator | receive the alerts of tasks they are assignee or team place of or are asked, of their own personal connections, of work connections whose agents they approve for, and of sandbox refusals of agents they approve for — never another person's personal connection ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs Edit on Deployment settings — ask {who can grant}*; a run's content withheld as AC-31 says |
 
 ## Flow
 
@@ -41,7 +41,7 @@ flowchart TD
   tk -->|unblocked · answered| cl
   cn -->|signs in again · renewed · removed| cl
   a -->|Close · Admin| nt["A note"] --> cl
-  a -->|Close · without Edit on worker/<group>| na["Close disabled, naming the permission"]
+  a -->|Close · without Edit on setting/deployment| na["Close disabled, naming the permission"]
 ```
 
 ## Acceptance criteria
@@ -59,7 +59,7 @@ flowchart TD
 | CP-67.9 | The History chain breaks, a retired token is presented again, an account is locked, or an Access Policy is saved wider than the one before | the engine sees it | an alert *security* opens naming what happened — one per reason — sent to the Admins; it stays open until an Admin closes it with a note |
 | CP-67.10 | The sandbox refuses an agent's act on a worker | the refusal is written | an alert *security* opens naming the run, the act and the target, sent to the agent's named approvers, then the Admins |
 | CP-67.11 | An alert already open on the same thing | the kind fires again | the open alert counts one more and moves to the top; no second alert opens |
-| CP-67.12 | An Operator | they read an alert | *Close* is disabled — *Needs Edit on the {group} worker group — ask {who can grant}*; the route answers 403 with the same sentence |
+| CP-67.12 | An Operator | they read an alert | *Close* is disabled — *Needs Edit on Deployment settings — ask {who can grant}*; the route answers 403 with the same sentence |
 | CP-67.13 | An alert opening or closing | it is written | History holds a row naming who it reached, and what closed it and who |
 
 ## Screens

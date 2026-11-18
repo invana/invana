@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read why any run is held; with Edit on `worker/<group>`, allow or decline an ask for more in Needs you; *Ask for more* on a run they are behind | *Ask for more* absent on a run someone else is behind |
+| Admin | Read why any run is held; with Edit on `setting/deployment`, allow or decline an ask for more in Needs you; *Ask for more* on a run they are behind | *Ask for more* absent on a run someone else is behind |
 | Operator | read why a run is held; *Ask for more* on a run they are behind, when its limit *May ask for more* ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Ask for more* absent on anyone else's run, or on a limit that does not take asks |
 
 ## Flow

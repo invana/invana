@@ -55,12 +55,12 @@ flowchart TD
   lim --> cl
   gd --> cl
   view -->|the condition cleared| cl
-  view -->|Close · with Edit on worker/<group>| note["Close with a note"] --> cl
-  view -->|Close · without Edit on worker/<group>| nc["Close disabled, naming the permission"]
+  view -->|Close · with Edit on setting/deployment| note["Close with a note"] --> cl
+  view -->|Close · without Edit on setting/deployment| nc["Close disabled, naming the permission"]
   set([Settings › Workers › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
-  t -->|without Edit on worker/<group>| ro["Reads · Edit disabled, naming the permission"]
+  t -->|without Edit on setting/deployment| ro["Reads · Edit disabled, naming the permission"]
   set --> ha["CP-60 · History alerts — what in History tells whom"]
-  ha -->|without Edit on worker/<group>| hro["Reads · New History alert disabled, naming the permission"]
+  ha -->|without Edit on setting/deployment| hro["Reads · New History alert disabled, naming the permission"]
 ```
 
 ```mermaid
@@ -89,18 +89,18 @@ sequenceDiagram
 
 ## Access
 
-The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) (*Workers* — alerts and alert rules); this table names the acts. *Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) (*Workers* for reading, *Settings* › `deployment` for acting); this table names the acts. *Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
 
 | Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Receive an alert | Whom its kind names ([The alert kinds](#the-alert-kinds)), then the Admins | Not sent |
 | Read the ops alerts list and an alert | None — every signed-in person; a run's content inside it as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
 | Act on what an alert is about — stop a run, make a fix task, answer a question, renew a connection, change a limit, switch off | As [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#access) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#access) · [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#access) · [CP-F04](../CP-F04-limits/feature.md#access) · [CP-F05](../CP-F05-graph-databases/feature.md#access) | As there |
-| *Acknowledge* an alert — *{person} is on it* | None — the people it was sent to · Edit on `worker/<group>` for any other | Not offered on an alert not sent to them |
-| Close an alert with a note | Edit on `worker/<group>` | *Close* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
-| Set each kind's threshold | Edit on `worker/<group>` | Thresholds read; *Edit* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
+| *Acknowledge* an alert — *{person} is on it* | None — the people it was sent to · Edit on `setting/deployment` for any other | Not offered on an alert not sent to them |
+| Close an alert with a note | Edit on `setting/deployment` | *Close* disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
+| Set each kind's threshold | Edit on `setting/deployment` | Thresholds read; *Edit* disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
 | Read History alerts | None — every signed-in person | — |
-| Write, change, switch off or remove a History alert | Edit on `worker/<group>` | *New History alert*, its switch and *Edit* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
+| Write, change, switch off or remove a History alert | Edit on `setting/deployment` | *New History alert*, its switch and *Edit* disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
 
 ## States
 
@@ -112,13 +112,13 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Has data | Open alerts first, newest activity first: kind, what it is about, count, since when, who it went to; Closed below, with who or what closed it |
 | Failed | What could not be read, in the engine's words; a threshold or History alert refused names the field |
 | Agent working or proposing | An open alert counting up while its run goes on; a run or a task it names reads live |
-| No access | Everything reads; *Close*, *Edit thresholds* and every History alert write are disabled for everyone without Edit on `worker/<group>`, naming the permission |
+| No access | Everything reads; *Close*, *Edit thresholds* and every History alert write are disabled for everyone without Edit on `setting/deployment`, naming the permission |
 
 ## Rules
 
 ### The alert kinds
 
-Built in, shipped with Invana, never removed. A kind's threshold is tuned with Edit on `worker/<group>` ([CP-60](stories/CP-60-tune-when-ops-alerts-fire/story.md)).
+Built in, shipped with Invana, never removed. A kind's threshold is tuned with Edit on `setting/deployment` ([CP-60](stories/CP-60-tune-when-ops-alerts-fire/story.md)).
 
 | Kind | Fires when | Reaches, then the Admins | Closes on |
 |---|---|---|---|
@@ -230,7 +230,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, without Edit on `worker/<group>` | *Needs Edit on worker/{group} — ask {who can grant}.* | CP-59.9 · CP-60.4 · CP-60.11 |
+| 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, without Edit on `setting/deployment` | *Needs Edit on Deployment settings — ask {who can grant}.* | CP-59.9 · CP-60.4 · CP-60.11 |
 | 409 | Closing an alert that is already closed | *Already closed — {by}.* | CP-59.10 |
 | 403 | Acknowledging an alert not sent to the reader, by anyone but an Admin | *This alert was not sent to you.* | API only — the dropdown offers *Acknowledge* only on alerts sent to the reader |
 | 409 | Acknowledging a closed alert | *Already closed — {by}.* | CP-69.4 |
@@ -269,6 +269,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
+| Acting on alerts is a deployment setting | Ops alerts are the deployment's, not one worker group's: closing an alert, setting a threshold and writing, changing or removing a History alert need Edit on `setting/deployment`; reading needs Read on `worker/<group>`. Refusal copy: *Needs Edit on Deployment settings — ask {who can grant}* |
 | One alerting home | Every alert is a kind here; other features raise the condition and link this feature. Records are Projects': a pattern in the records opens a lead ([PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) |
 | Built-in, tuned, never written | The kinds cover what an Admin acts on; an Admin tunes thresholds, and an act in History anyone should hear about is a History alert |
 | Named approvers, then the Admins | An alert about an agent reaches the people who answer its asks, and the Admins always — never a person because they made the agent |
