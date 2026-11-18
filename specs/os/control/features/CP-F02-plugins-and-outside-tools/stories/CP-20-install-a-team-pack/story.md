@@ -72,6 +72,6 @@ flowchart TD
 | Install a pack | Admin | settings.packs · Install | — | — | settings.packs · Install · What it brings | settings.packs · Install · Pack clashes | — | — |
 | Install a pack | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
 | A pack's policies to apply | Admin | — | — | settings.policies · Loading | settings.plugins · Policies to apply | settings.policies · Rule refused | — | — |
-| A pack's policies to apply | Operator | — | — | — | settings.plugins · Policies to apply · Read only | — | — | settings.policies · Waiting to apply |
+| A pack's policies to apply | Operator | — | — | — | settings.plugins · Policies to apply · Read only | — | — | settings.policies · No access |
 | A pack's outside servers | Admin | — | — | — | settings.plugins · Servers to add | — | — | — |
 | A pack's outside servers | Operator | — | — | — | settings.plugins · Servers to add · Read only | — | — | settings.plugins · Packs · Read only |

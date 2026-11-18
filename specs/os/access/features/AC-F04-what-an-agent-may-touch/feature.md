@@ -79,7 +79,7 @@ Permissions are [the permission catalogue](../AC-F02-access-policies/feature.md#
 
 | Act | Permission |
 |---|---|
-| Read every agent's access — what it can do, every rule that reaches it, its declared needs, its ceilings, its refusals | None — every signed-in person |
+| Read every agent's access — what it can do, every rule that reaches it, its declared needs, its ceilings, its refusals — on the page, in a check and at the command line | Read on `access/policies`; without it *No access*, naming the permission and who can grant it |
 | Attach a policy to an agent from here ([AC-11](../AC-F02-access-policies/stories/AC-11-attach-a-policy-to-agents/story.md)) · *Change* a rule ([AC-04](../AC-F02-access-policies/stories/AC-04-write-the-rules-of-an-access-policy/story.md)) | Manage on Access · Edit on Access, in a session |
 | Decide an ask for more | The agent's named approvers, then Admins, in a session — never the person it benefits ([AC-F05](../AC-F05-asks-and-approvals/feature.md)) |
 | Set the caps on asks for more | Edit on Workers, in Limits ([CP-F04](../../../control/features/CP-F04-limits/feature.md)) |
@@ -94,13 +94,13 @@ Permissions are [the permission catalogue](../AC-F02-access-policies/feature.md#
 | Has data | Each agent, what it can actually do and why not; each resource with its effect and the rule and policy that set it; each declared need, met or missing; the ceilings a run would add |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | A denied agent asking for more in Needs you |
-| No access | Every agent's access reads; attaching and *Change* are disabled, naming the permission and who can grant it |
+| No access | Without Read on `access/policies`, every agent's access reads *No access*, naming the permission and who can grant it, and nothing says what a ceiling holds or hides; with Read and without Edit or Manage, attaching and *Change* are disabled, naming the permission and who can grant it |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
-| Everyone reads an agent's access | What an agent may touch is read from Access Policies, which every signed-in person reads; a person must see a rule to know whom to ask. What an agent did — its usage, its calls and a run's content — is read as [Access usage](../AC-F08-access-usage/feature.md) and [What left the platform](../AC-F09-what-left-the-platform/feature.md) say |
+| Readers of policies read an agent's access | What an agent may touch is read from Access Policies, which only a person with Read on `access/policies` reads — every agent's ceiling carries *Hidden from agents* ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)). Anyone else reads the check that refused and who can grant. What an agent did — its usage, its calls and a run's content — is read as [Access usage](../AC-F08-access-usage/feature.md) and [What left the platform](../AC-F09-what-left-the-platform/feature.md) say |
 | What a run reaches | Inside a project: the project's policies ∩ the agent's ceiling; outside one: the person behind it ∩ the agent's ceiling — each ∩ every caller's ceiling ∩ the ceilings below ([AC-F02 › Rules](../AC-F02-access-policies/feature.md#rules)). Never more than the agent's ceiling for anyone. Outside a project the person's permissions are checked at every step; when they leave, the slot falls back to their successor, and the run waits until it has one ([AC-F07](../AC-F07-ownership/feature.md#slots-and-fallbacks)) |
 | Narrowed at every hop | Delegating is a Run on `agent/<name>`; the callee runs with the project's policies, or outside a project the person, ∩ the callee's ceiling ∩ every caller's, within the caller's depth and fan-out ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md)). The strictest effect along the chain wins. A helper an agent makes holds its maker's access, narrowed, and none of its own |
 | A project's team grants nothing | Being on a project's team, the Lead agent included, lets an agent be assigned and pick up the project's tasks; it never widens what its runs reach |
@@ -157,7 +157,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Route, after `/api/v1/access` | Does | Story |
 |---|---|---|
-| `GET /agents` | One row per agent by the list contract (`?kind=builtin · custom · external` · `?q=`): `name` · `kind` · `policies[]` · `allowed` (resources it may reach) · `needs_missing` · `refused_7d` · `made_by` · `granted_count`; helpers counted on their maker | AC-12 |
+| `GET /agents` · every route below needs Read on `access/policies` | One row per agent by the list contract (`?kind=builtin · custom · external` · `?q=`): `name` · `kind` · `policies[]` · `allowed` (resources it may reach) · `needs_missing` · `refused_7d` · `made_by` · `granted_count`; helpers counted on their maker | AC-12 |
 | `GET /agents/{name}/effective?person=&caller=&project=&key=` | What it can do — its ceiling, or for that person behind the run, called by that agent chain, within the ceilings of that project and key: `{agent, person?, callers[], ceilings[], rows[], needs[], delegates[]}`; a row `{verb, resource, effect, rule, policy, policy_version, set_by, narrowed_by?, ceiling?, why}` | AC-12 · AC-13 |
 | `GET /agents/{name}/needs` | Each skill, plugin, workflow and function the agent uses, each need, and whether it is met — missing names the rule, the ceiling or the switch | AC-13 |
 | `GET /agents/{name}/refusals` | A page of the agent's refused History rows | AC-12 |
@@ -172,7 +172,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| step | A step no rule along the chain allows, or a Deny — `policy_refused`; it fails before it runs and nothing is spent | *{agent} may not {verb} {resource} — {rule} on {policy}{, via caller}.* | AC-12.10 · AC-14.1 |
+| step | A step no rule along the chain allows — `policy_refused`; it fails before it runs and nothing is spent. A name a Deny hides never reaches this check: it fails at lookup as one that does not exist ([AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals)) | *{agent} may not {verb} {resource}.* — a reader of policies reads *— {rule} on {policy}{, via caller}* after it | AC-12.10 · AC-14.1 |
 | step | A step its rules allow but a ceiling does not — the key, the run scope or a credential's scope | *{ceiling} keeps {agent} from {verb} {resource}.* | AC-13.16 |
 | step | A step whose skill, plugin, workflow or function declares a need the agent's policies do not allow | *{thing} needs {verb} {resource} — {agent}'s policies do not allow it.* | AC-13.7 |
 | step | A Write on a read-only graph database | *{database} is read-only — {thing} needs to write.* | AC-13.8 |

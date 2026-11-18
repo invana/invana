@@ -76,6 +76,6 @@ flowchart TD
 | An agent's declared needs and skills | Admin | — | — | agents.skills · Import · Reading the files | agents.skills · Import · Needs and skills mapped | agents.skills · Import · Skill not found | agents.skills · Import · Mapping | — |
 | An agent's declared needs and skills | Operator | — | — | — | — | — | — | agents.skills · Import disabled |
 | Policy files brought in | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
-| Policy files brought in | Operator | — | — | — | — | — | — | settings.policies · Waiting to apply |
+| Policy files brought in | Operator | — | — | — | — | — | — | settings.policies · No access |
 | An imported agent | Admin | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Imported | agents.agents · Detail · Could not load | — | — |
 | An imported agent | Operator | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Imported | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |

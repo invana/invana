@@ -56,6 +56,7 @@ flowchart TD
 | GP-05.11 | A raw query | it runs, is refused or is filtered | the call is recorded in *What left the platform* (AC-F09) with the query and the layer that refused it, naming the Query console and the person who started it |
 | GP-05.12 | An Operator not granted the Query console | they open the ask kind | Cypher and Gremlin are disabled, naming the Admins (EX-08.16); the API refuses the query |
 | GP-05.13 | A raw query | its run is read | How it got here shows the query sent, the layers it passed and the sources the result carries |
+| GP-05.14 | A raw query | the caller's policies hide anything in that graph database — a Deny Read on a kind or a property, an entry of *Hidden from agents* or the person's own | it is refused before layer 1 with *Raw queries are not available on {graph database}*, naming no kind and no rule; only typed query plans run there ([AC-27.27](../../../../../access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 
 ## Screens
 

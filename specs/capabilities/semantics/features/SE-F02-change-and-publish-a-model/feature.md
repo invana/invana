@@ -202,7 +202,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | Publishing a draft with a kind whose label another model in the same graph database holds | *{label} belongs to {model} — link the two with a same thing link instead.* | SE-05.28 |
 | 409 | Publishing a model whose kinds use a property type the server cannot hold | *{model} uses {types}, which {database} {version} cannot hold.* | SE-05.24 |
 | 409 | A breaking publish with no approver but the requester, or with a review already open on the model | *Nobody but you can approve this — ask an Admin to name an approver for the Modeller agent.* · *{model} already has a review open — {review}.* | SE-05.13 |
-| 422 | A publish that writes a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | SE-05.29 |
+| 422 | A publish an agent starts that writes a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | SE-05.29 |
 | 422 | A range on a text property, a minimum above the maximum, or a term with no values | *{property}: {why}.* | SE-08.7 |
 | 422 | A record a load or a board edit writes outside a published `reject` constraint — on the writing route | *`{Kind}.{property}` breaks its constraint {label}: {value}.* | SE-08.11 |
 

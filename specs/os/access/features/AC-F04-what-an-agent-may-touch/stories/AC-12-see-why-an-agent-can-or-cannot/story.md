@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's access; attach a policy to it (AC-11) | — |
-| Operator | Read every agent's access, its policies and its refusals; a Modeller reads the same | *Attach a policy* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read every agent's access, its policies and its refusals when they hold Read on `access/policies`; without it nothing here | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Attach a policy* disabled — *Needs Manage on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -53,11 +53,12 @@ flowchart TD
 | AC-12.7 | An agent with no policy attached | *What it can do* is read | every row reads *Denied · holds no policy*, and for an Admin *Attach a policy* leads |
 | AC-12.8 | A resource a rule allows that no declared need uses | it is listed | it reads *Nothing it uses needs it* |
 | AC-12.9 | A helper an agent made | its access is read | it holds its maker's access, narrowed, and lists no policy of its own |
-| AC-12.10 | A run's step | a check refuses it | the step fails *refused* before it runs and nothing is spent, naming the rule, its policy and the agent in the chain that refused; the refusal is in *Refusals* and History (AC-F06) |
+| AC-12.10 | A run's step | a check refuses it | the step fails *refused* before it runs and nothing is spent, naming the check and the agent in the chain that refused — and, to a person with Read on `access/policies`, the rule and its policy; the refusal is in *Refusals* and History (AC-F06) |
 | AC-12.11 | *Who it may hand work to* | it is read | each agent it may run, the rule that allows it, and its effect; an outside agent reads *Ask* unless a rule allows it |
 | AC-12.12 | A callee run by a caller | its access is read with *Called by* | each row reads the strictest of the callee and every caller, and names which one narrowed it |
 | AC-12.13 | An Admin | they attach a policy from here or from the agent's page in Agents | it is one attachment (AC-11); it holds from the agent's next step |
-| AC-12.14 | An Operator or a Modeller | they open an agent | everything reads; *Attach a policy* is disabled, naming the Admin role and the Admins |
+| AC-12.14 | A person with Read on `access/policies` but not Manage on Access | they open an agent | everything reads; *Attach a policy* is disabled, naming Manage on Access and who can grant it |
+| AC-12.17 | A person without Read on `access/policies` | they open an agent's access, its effective view or its refusals, or ask the API or `invana access effective` | it reads *No access*, naming Read on `access/policies` and who can grant it; no rule, policy, setter or *Hidden from agents* entry shows (AC-27.26) |
 | AC-12.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it, the rule, its policy and version, any ceiling that narrowed it and who saved the rule, as they were when the step ran |
 | AC-12.16 | The list of agents | it fails to load | it says what could not load, with *Try again* |
 

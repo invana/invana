@@ -81,7 +81,7 @@ flowchart LR
 | A converted file — AGENTS.md, Codex TOML, a Claude plugin | Admin | — | — | agents.skills · Import · Reading the files | agents.skills · Import · Converted | agents.skills · Import · Refused file | agents.skills · Import · Mapping | — |
 | A converted file — AGENTS.md, Codex TOML, a Claude plugin | Operator | — | — | — | — | — | — | agents.skills · Import disabled |
 | A policy file brought in | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
-| A policy file brought in | Operator | — | — | — | — | — | — | settings.policies · Locked · Waiting to apply |
+| A policy file brought in | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Export — a skill | Admin | — | — | — | agents.skills · Detail · Export | agents.skills · Detail · Could not export | — | — |
 | Export — a skill | Operator | — | — | — | — | — | — | agents.skills · Detail |
 | Export — an agent | Admin | — | — | — | agents.agents · Detail · Export | agents.agents · Detail · Could not export | — | — |

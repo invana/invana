@@ -45,7 +45,7 @@ flowchart TD
 | AC-20.4 | A custom policy with a Deny attached to a built-in agent | a step of that agent is checked | the Deny holds — the strictest rule wins — and the refusal names the custom policy |
 | AC-20.5 | A person's own act in Studio — a question to the Assistant, a query in the Console, a change to the model, a plan run, an edit on the board, a load | it runs | it runs as the built-in agent for it, for that person; History and *How it got here* name the person and the agent |
 | AC-20.6 | A person not granted the built-in agent an act runs as | they try the act | it is refused before it runs, naming the agent and who grants agents (AC-07) |
-| AC-20.7 | A new deployment | it starts | every built-in agent exists with its built-in policy attached, and is granted to every person whose role holds the feature it acts for |
+| AC-20.7 | A new deployment | it starts | every built-in agent exists with its built-in policy attached, and is granted to every person whose Access Policies hold the feature it acts for |
 | AC-20.8 | The Query console | a query in the Console writes data | the write asks first, by its built-in policy; every query it runs is recorded |
 | AC-20.9 | A person without Read on `access/policies` | they open *Built-in agents* or a built-in policy | it reads *No access*, naming Read on `access/policies` and who can grant it; a person with Read and without Edit reads every agent and policy, with *Copy* and *Attach* disabled |
 | AC-20.10 | The list cannot load | it opens | it says why, with *Try again* |

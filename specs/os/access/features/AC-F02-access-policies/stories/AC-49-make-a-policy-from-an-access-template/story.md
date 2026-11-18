@@ -24,7 +24,7 @@ Projects for it — [AC-F02 › Access](../../feature.md#access).
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *New policy*: name it, start from an Access template or Blank, set each tab of *What it allows* or *Edit as policy*, pick who holds it — people, teams and projects in one picker — read the whole policy back in Review and *Create policy* after a confirm, signing in again | — |
-| Operator | Read every template and every policy, tab by tab and as the matrix | *New policy* disabled — *Needs Edit on Access — ask Priya or Lee*; with Edit on Access but not Manage on Access, people and teams in *Who holds it* are disabled, naming the permission; a project without Manage on Projects for it, likewise; the policy is created unattached |
+| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads every template and every policy, tab by tab and as the matrix | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *New policy* disabled — *Needs Edit on Access — ask Priya or Lee*; with Edit on Access but not Manage on Access, people and teams in *Who holds it* are disabled, naming the permission; a project without Manage on Projects for it, likewise; the policy is created unattached |
 
 ## Flow
 
@@ -63,7 +63,7 @@ flowchart TD
 | AC-49.2 | Start | the name is already used | it is refused in place — *{name} is taken.* — and *Next* stays off |
 | AC-49.3 | A template picked | *What it allows* opens | a horizontal tab strip sits above the content, one tab per section — **Graph Data** · **Models** · **AI models** · **Agents** · **Skills & plugins** · **Fleet / Workers** · **Projects** · **Access** · **Settings** · **Outside Invana** — every one present whatever the template, filled from it, each tab with its short status — *Read on 2 of 3 graph databases* · *Not set* — and the selected tab's content spans the full width of *What it allows*, with no column beside it ([AC-F02 › The policy form](../../feature.md#the-policy-form)) |
 | AC-49.4 | The Graph Data tab | it is read | each graph database reads *None* · *Read* · *Read + write*; opening one lists its kinds of node and of relationship, each inheriting the graph database's setting with an override *None* · *Read* · *Read + write*; opening a kind lists its properties, each *Hidden* · *Read* · *Read + write* |
-| AC-49.5 | A graph database at *Read + write*, a kind set *None*, one property *Hidden* and another *Read* | the policy is created and a holder reads and edits that graph database | the kind is absent from every picker and a query naming it fails as an unknown kind; the hidden property is absent from every record of its kind, with no column, no count and no note, and a query naming it fails as an unknown property; the *Read* property shows and its edit is refused, naming the rule; the other kinds and properties read and change |
+| AC-49.5 | A graph database at *Read + write*, a kind set *None*, one property *Hidden* and another *Read* | the policy is created and a holder reads and edits that graph database | the kind is absent from every picker and a query naming it fails as an unknown kind; the hidden property is absent from every record of its kind, with no column, no count and no note, and a query naming it fails as an unknown property; the *Read* property shows and its edit is refused, naming Edit on that property and who can grant it; the other kinds and properties read and change |
 | AC-49.6 | A relationship kind that reads, one of whose end kinds is *None* | a holder reads it | the relationship does not exist for them, never drawn to a missing end |
 | AC-49.8 | The AI models tab | it is read | *Every offered version* · *Local only* · chosen versions, each named exactly and marked *Local* or *External*; *Local only* writes one rule per local endpoint, so one added later is reached once the policy is saved again; a version not chosen is absent from the agent's model picker for the holder and refused in a run |
 | AC-49.9 | A tab or a rule naming a graph database, kind, property, model, AI model version, agent, skill, plugin, tool or project that does not exist | they press *Create policy* | it is refused, Review opening the tab that holds it and naming it |
@@ -76,22 +76,43 @@ flowchart TD
 | AC-49.16 | Review | they press *Create policy* | a confirm reads *Create {name} and give it to {n} holders?* — *Cancel* · *Create*; *Create* asks the person to sign in again, then the policy is created and attached, and History records both |
 | AC-49.17 | A project that already holds other policies, picked in *Who holds it* | the policy is created | the project holds it beside them — its Allows added, any Deny winning; *Who it changes* named the project and what it gains and loses |
 | AC-49.18 | A rule set to Ask, in a policy held by a person | a run behind that person, outside any project, reaches it | it is refused, naming the rule — Ask counts as Deny in a person's own permissions; Review read *Asks first counts as No for people* |
-| AC-49.19 | An Operator without Edit on Access | they open Access Policies | *New policy* is disabled — *Needs Edit on Access — ask Priya or Lee*; every template and policy reads tab by tab and as the matrix |
+| AC-49.19 | A person with Read on `access/policies` but not Edit on Access | they open Access Policies | *New policy* is disabled — *Needs Edit on Access — ask Priya or Lee*; every template and policy reads tab by tab and as the matrix; without Read it reads *No access* (AC-03.12) |
 | AC-49.20 | Answers on any step | the person presses Esc or Close | a confirm asks *Discard this policy?* — *Keep editing* · *Discard*; nothing is saved |
+| AC-49.21 | A property one holder's policies set *Hidden*, and a project run that person asked | the run answers them | the property is absent from the answer, the records and the counts the run shows them, though the project's own policies may reach it; another person on the team, whose policies do not hide it, reads it in the same run |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | New policy · Start | Admin | settings.policies · New · Start | — | settings.policies · New · Start · Loading templates | settings.policies · New · Start · Template picked | settings.policies · New · Start · Name taken | — | — |
-| New policy · Start | Operator | — | — | — | — | — | — | settings.policies · Locked · New disabled |
+| New policy · Start | Operator | — | — | — | — | — | — | settings.policies · No access |
 | What it allows · tabs | Admin | settings.policies · New · What it allows · From template | settings.policies · New · What it allows · No kind matches | settings.policies · New · What it allows · Loading kinds | settings.policies · New · What it allows · Kinds and properties | settings.policies · New · What it allows · Could not load | — | — |
-| What it allows · tabs | Operator | — | — | — | settings.policies · Locked · What it allows · Read only | — | — | settings.policies · Locked · What it allows · Read only |
+| What it allows · Models tab | Admin | — | — | — | settings.policies · New · What it allows · Models | — | — | — |
+| What it allows · Models tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · AI models tab | Admin | — | — | — | settings.policies · New · What it allows · AI models | — | — | — |
+| What it allows · AI models tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Agents tab | Admin | — | — | — | settings.policies · New · What it allows · Agents | — | — | — |
+| What it allows · Agents tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Skills & plugins tab | Admin | — | — | — | settings.policies · New · What it allows · Skills & plugins | — | — | — |
+| What it allows · Skills & plugins tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Fleet / Workers tab | Admin | — | — | — | settings.policies · New · What it allows · Fleet / Workers | — | — | — |
+| What it allows · Fleet / Workers tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Projects tab | Admin | — | — | — | settings.policies · New · What it allows · Projects | — | — | — |
+| What it allows · Projects tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Access tab | Admin | — | — | — | settings.policies · New · What it allows · Access | — | — | — |
+| What it allows · Access tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Settings tab | Admin | — | — | — | settings.policies · New · What it allows · Settings | — | — | — |
+| What it allows · Settings tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · Outside Invana tab | Admin | — | — | — | settings.policies · New · What it allows · Outside Invana | — | — | — |
+| What it allows · Outside Invana tab | Operator | — | — | — | — | — | — | settings.policies · No access |
+| What it allows · tabs | Operator | — | — | — | — | — | — | settings.policies · No access |
 | What it allows · Edited as policy | Admin | — | — | — | settings.policies · New · What it allows · Edited as policy | — | — | — |
-| What it allows · Edited as policy | Operator | — | — | — | settings.policies · Locked · Edited as policy | — | — | settings.policies · Locked · Edited as policy |
+| What it allows · Edited as policy | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Who holds it | Admin | settings.policies · New · Who holds it · None picked | settings.policies · New · Who holds it · Nothing matches | settings.policies · New · Who holds it · Loading | settings.policies · New · Who holds it | settings.policies · New · Who holds it · Could not load | — | settings.policies · New · Who holds it · Some disabled |
-| Who holds it | Operator | — | — | — | — | — | — | settings.policies · Locked · New disabled |
+| Who holds it | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Discard this policy? | Admin | — | — | — | settings.policies · New · Discard | — | — | — |
+| Discard this policy? | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Review | Admin | — | — | settings.policies · New · Review · Who it changes loading | settings.policies · New · Review | settings.policies · New · Review · Refused | — | — |
 | Review · Create policy | Admin | — | — | — | settings.policies · New · Review · Confirm | — | — | — |
-| Review · Create policy | Operator | — | — | — | — | — | — | settings.policies · Locked · New disabled |
-| Review | Operator | — | — | — | — | — | — | settings.policies · Locked · New disabled |
+| Review · Create policy | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Review | Operator | — | — | — | — | — | — | settings.policies · No access |

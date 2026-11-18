@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 ## Who can
 
-Answering a request is the Modeller's and the Admin's; any signed-in person files one ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Answering a request is Edit on the model — *Draft it* also Create on `model/*`; any signed-in person files one. A request filed for hidden data reads only with Read on `access/policies` ([AC-F02 › Property access](../../../../../../os/access/features/AC-F02-access-policies/feature.md#property-access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every request, including one filed for hidden data; *Draft it* or *Decline* one | — |
-| Operator | Read every request except one filed for hidden data; file one with *Ask for a change*. A Modeller answers requests as an Admin does | Rows without *Draft it* or *Decline* — *Needs the Modeller role — ask an Admin* |
+| Operator | Read every request except one filed for hidden data; file one with *Ask for a change*; answer requests when their policies hold Edit on the model | Rows without *Draft it* or *Decline* — *Needs Edit on model/orders — ask Priya or Lee* |
 
 ## Flow
 
@@ -34,7 +34,7 @@ flowchart LR
   k -->|could not answer · asked for a change| dr["Draft it · Decline"]
   dr -->|Draft it| nm(["New model, described by the ask · done · modelled"])
   dr -->|Decline| d2(["Done · declined"])
-  o -->|filed for hidden data · an Operator| hx["Absent · no note"]
+  o -->|filed for hidden data · no Read on access/policies| hx["Absent · no note"]
   o -->|resolved by someone else first| c["Already resolved — the list re-reads"]
 ```
 
@@ -52,9 +52,9 @@ flowchart LR
 | SE-13.9 | Any request | they pick *Decline* | the row moves to Done reading *declined* |
 | SE-13.12 | A request resolved by someone else first | they act on it | it says *already resolved* and the list re-reads |
 | SE-13.13 | A resolution | it is made | History records who resolved it, how and when |
-| SE-13.14 | An Operator | they open Requests | the rows read without *Draft it* or *Decline*, and a line reads *Needs the Modeller role — ask an Admin* |
-| SE-13.15 | A Modeller or an Admin | they list or resolve requests from the command line | The same two resolutions as Studio — draft it, decline — under the same access |
-| SE-13.16 | A run that ends *cannot answer · not in Graph Data* for a kind or property an Access Policy hides from the asker | it settles | a request may be filed like any other, naming what was asked and never that it is hidden; only a Modeller or an Admin sees it, and may decline it; the asker, an Operator and the list's open count never show it, and the asker learns nothing more |
+| SE-13.14 | A person without Edit on the model | they open Requests | the rows read without *Draft it* or *Decline*, and a line reads *Needs Edit on model/orders — ask Priya or Lee* |
+| SE-13.15 | A person with Edit on the model | they list or resolve requests from the command line | The same two resolutions as Studio — draft it, decline — under the same access |
+| SE-13.16 | A run that ends *cannot answer · not in Graph Data* for a kind or property an Access Policy hides from the asker | it settles | a request may be filed like any other, naming what was asked and never that it is hidden; only a person with Read on `access/policies` sees it, and with Edit on the model may decline it; the asker, every other person and the list's open count never show it, and the asker learns nothing more |
 
 ## Screens
 

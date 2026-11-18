@@ -9,9 +9,9 @@ boards: [settings.policies]
 
 # AC-06 · Draft a policy and see who it changes
 
-**As** an Admin **I want** the assistant to draft an Access Policy from a sentence, and to see which agents gain, which
-lose and which skills and workflows would break before I save **so that** I never break an agent by accident — the
-assistant proposes the policy, and I decide whether it is saved.
+**As** an Admin **I want** to see which agents gain, which lose and which skills and workflows would break before I save
+a policy, a copy or an applied file **so that** I never break an agent by accident — a draft decides nothing, and I decide
+whether it is saved.
 
 Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
@@ -19,18 +19,16 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Draft with the assistant; save, save anyway, cancel or discard | — |
-| Operator | — ; a Modeller is the same | *Draft with the assistant* and *Save* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Admin | Save, save anyway, cancel or discard a draft | — |
+| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads a draft | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Save* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Draft with the assistant]) --> w["A sentence: let the reporting agent read orders, but ask before it writes"]
-  w --> a{"The assistant's rules fit the grammar?"}
+  e([Edit a saved policy · New policy · Copy · a policy file applied]) --> a{"The rules fit the grammar?"}
   a -->|no| r["Refused, naming the rule · nothing saved"]
-  a -->|yes| d["Draft from the assistant · Not saved"]
-  e([Edit a saved policy · New policy · Copy]) --> d
+  a -->|yes| d["Draft · Not saved"]
   d --> imp["Who it changes: agents that gain · agents that lose, with 30-day use · the people and teams granted each · skills and workflows that would break"]
   imp -->|nobody loses| sv(["Save · sign in again · a new version"])
   imp -->|something lost| warn{"Save anyway?"}
@@ -43,8 +41,8 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-06.1 | An Admin | they give *Draft with the assistant* a sentence | a draft policy appears, marked *Draft from the assistant · Not saved*, named from the sentence |
-| AC-06.2 | The assistant's reply | a rule falls outside the policy grammar | nothing is saved; it says which rule was refused |
+| AC-06.1 | An Admin | they start a new policy, edit a saved one or copy one | a draft appears, marked *Draft · Not saved*, and decides nothing until saved |
+| AC-06.2 | A draft | a rule falls outside the policy grammar | nothing is saved; it says which rule was refused |
 | AC-06.3 | A draft | any step is checked | it decides nothing until saved |
 | AC-06.4 | A draft, or an edit of a saved policy | *Save* is pressed | *Who it changes* shows first: each agent it is attached to, what it gains or loses, and the people and teams granted that agent — the same change for each of them |
 | AC-06.5 | A change that removes access an agent used | *Who it changes* is read | each loss names the verb and resource and how often the agent used it in the last 30 days |
@@ -55,16 +53,15 @@ flowchart TD
 | AC-06.10 | A draft | the Admin presses *Discard* | it is gone; nothing changed |
 | AC-06.11 | A draft attached to agents before it is saved | *Who it changes* is read | it is drawn against those agents; the attachment takes effect when it is saved |
 | AC-06.12 | A saved change | History is read | it shows who saved it, when and why (AC-F06) |
-| AC-06.13 | A draft from the assistant | the Admin opens *How it got here* | it shows the sentence, the rules the assistant proposed, and the checks they passed |
-| AC-06.14 | An Operator | they open a draft or the section | the draft reads; *Draft with the assistant* and *Save* are disabled, naming the Admin role and the Admins |
+| AC-06.14 | A person with Read on `access/policies` but not Edit on Access | they open a draft or the section | the draft reads; *Save* is disabled, naming Edit on Access and who can grant it; without Read it reads *No access* |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A draft policy | Admin | settings.policies · New · Draft with the assistant | — | settings.policies · New · Drafting | settings.policies · Draft | settings.policies · Rule refused | settings.policies · New · Draft from the assistant | — |
-| A draft policy | Operator | — | — | — | settings.policies · New · Locked | — | — | settings.policies · New · Locked |
+| A draft policy | Admin | settings.policies · New | — | settings.policies · Loading | settings.policies · Draft | settings.policies · Rule refused | — | — |
+| A draft policy | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Who it changes | Admin | — | — | settings.policies · Working out who it changes | settings.policies · Nobody loses | settings.policies · What would break | — | — |
-| Who it changes | Operator | — | — | — | — | — | — | settings.policies · Locked |
+| Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |
 | New policy · 4 Who it changes | Admin | — | — | settings.policies · New · Working out who it changes | settings.policies · New · Nobody loses | settings.policies · New · What would break | — | — |
-| New policy · 4 Who it changes | Operator | — | — | — | — | — | — | settings.policies · New · Locked |
+| New policy · 4 Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |

@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every resource and every declared need; *Change* opens the policy at that rule to edit (AC-04) | — |
-| Operator | Read every resource and every declared need | *Change* opens the policy read-only; editing is disabled, naming the Admin role and the Admins |
+| Operator | Read every resource and every declared need when they hold Read on `access/policies`; without it nothing here | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Change* opens the policy read-only; editing is disabled, naming Edit on Access and who can grant it |
 
 ## Flow
 
@@ -56,7 +56,7 @@ flowchart TD
 | AC-13.9 | A need on a graph database or plugin switched off | it is read | it reads *Missing — switched off by {person}*; a step that uses it is refused before any rule is read |
 | AC-13.10 | A filter by effect or by group with no match | it is applied | *Nothing matches*, naming the filter, with *Clear filters* |
 | AC-13.11 | A resource | an Admin presses *Change* | the policy opens at that rule as a draft; nothing changes here |
-| AC-13.12 | An Operator or a Modeller | they press *Change* | the policy opens read-only; editing is disabled, naming the Admin role and the Admins |
+| AC-13.12 | A person with Read on `access/policies` but not Edit on Access | they press *Change* | the policy opens read-only; editing is disabled, naming Edit on Access and who can grant it |
 | AC-13.13 | A policy saved while a run is going | the run's next step runs | it is held to the saved version, checked when it runs; an open ask on an act it now denies closes refused, naming the rule |
 | AC-13.14 | An agent's step | it runs | the engine keeps with it the effect, the rule, its policy and version, any ceiling that narrowed it and who saved the rule; *How it got here* reads these, never today's policies |
 | AC-13.15 | *What it may touch* | it fails to load | it says what could not load, with *Try again* |

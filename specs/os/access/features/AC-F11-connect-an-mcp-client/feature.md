@@ -112,6 +112,7 @@ sequenceDiagram
 | Revoking ends it at once | Every access and refresh token of the connection ends; the client connects again from the start |
 | Sign out and password changes leave clients alone | Only revoking or deactivating the person ends a connected client |
 | Rate-limited | Registration, the token endpoint and the MCP server take at most 30 requests a minute from one address (NFR-SEC-6) |
+| A client carries *Hidden from agents* | A connected client is an agent identity: its ceiling carries *Hidden from agents* whoever connected it, and a raw-query tool of the MCP server is refused where the caller's policies hide anything in that graph database ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)) |
 | Keys still work | A key on the MCP server acts as key ∩ its owner ∩ the agent's ceiling ([AC-F10](../AC-F10-keys/feature.md)); a client that is no one person — a shared bot, an integration — uses a project key, acting with the project's policies |
 | Leans on | Sign in and signing in again (AC-F01) · the Directory (AC-F03) · Access Policies and the one evaluator (AC-F02) · keys (AC-F10) · History (AC-F06) · the ledger (AC-F09) · the MCP server and what it serves (CP-F02) |
 

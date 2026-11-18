@@ -171,6 +171,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 | Units come from a fixed list | A unit is picked, never typed, so two kinds in the same unit compare |
 | Four levels, one default | `internal` is the default so an unmarked property is not public; *sensitive* means confidential or personal, and the two stay inside the deployment |
 | A level is a model fact | It is set per property in a draft and published with the model, never by a policy file, so one level holds for every agent |
+| Levels never decide what is hidden | A level serves the outbound check, derived values and lineage; what an agent may not read is *Hidden from agents* ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#property-access)), never a level |
 | Outside terms are addresses | An outside term is stored as its address and shown by its label; the engine never fetches it |
 
 ## Open questions

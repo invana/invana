@@ -47,7 +47,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-14.1 | An agent's step whose strictest rule is Deny, or that no rule reaches | it is about to run | it is refused before it runs, naming the rule, its policy and who saved it, or *No rule*; nothing is spent |
+| AC-14.1 | An agent's step whose strictest rule is Deny, or that no rule reaches | it is about to run | it is refused before it runs, naming the check — and, to a person with Read on `access/policies`, the rule, its policy and who saved it — or *No rule*; nothing is spent |
 | AC-14.2 | A refused step | the agent asks for more | one ask appears in Needs you; the step holds and the rest of the run carries on |
 | AC-14.3 | An ask for more | it is read | it shows exactly the act the step would take; the rule that denies it, its policy and who saved it; who asked and on whose behalf; and the agent in the chain that was denied |
 | AC-14.4 | An ask for more | it is raised | it is routed to the agent's named approvers, then Admins when none can answer (AC-26), never the person behind the run nor anyone it benefits, and says which |

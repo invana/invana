@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F07](../../feature.md)
 
 ## Who can
 
-Holding a kind to a standard is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Holding a kind to a standard is Edit on the model, from [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Hold any kind or property to a standard, change its mode or mapping, or let it go, in a draft; read every score | — |
-| Operator | Read the standards a kind or property holds and its scores. A Modeller holds and lets go as an Admin does | *Hold to a standard* absent — *Needs the Modeller role — ask an Admin* |
+| Operator | Read the standards a kind or property holds and its scores; hold and let go when their policies hold Edit on the model | *Hold to a standard* absent — *Needs Edit on model/orders — ask Priya or Lee* |
 
 ## Flow
 
@@ -39,7 +39,7 @@ flowchart LR
   ld -->|report or holds| r(["Written · scored"])
   c -->|problems| q(["Fixed in Graph Data — RC-12"])
   pub -->|a newer standard version| pin["Stays on its version — v2 is newer"]
-  a -->|not a Modeller or an Admin| na["Reads · Needs the Modeller role — ask an Admin"]
+  a -->|no Edit on the model| na["Reads · Needs Edit on model/orders — ask Priya or Lee"]
 ```
 
 ## Acceptance criteria
@@ -58,7 +58,7 @@ flowchart LR
 | SE-19.10 | A standard that publishes a newer version | the hold is read | it stays on its version and reads *v2 is newer* |
 | SE-19.11 | A hold whose mapping or mode changes and publishes | the model publishes | the kind's score is recomputed by the engine |
 | SE-19.12 | A kind that holds no standard | *Standards* opens | it reads *No standards held*, with *Hold to a standard* for a Modeller or an Admin |
-| SE-19.13 | An Operator | they open a kind's *Standards* | scores read; *Hold to a standard* and *Let go* are absent and a line reads *Needs the Modeller role — ask an Admin* |
+| SE-19.13 | A person without Edit on the model | they open a kind's *Standards* | scores read; *Hold to a standard* and *Let go* are absent and a line reads *Needs Edit on model/orders — ask Priya or Lee* |
 | SE-19.14 | A Modeller or an Admin, on a hold | they pick *Let go* and publish | the hold goes, later loads are not scored against that standard, earlier scores stay readable and the model's history names who let it go |
 | SE-19.15 | A model with holds | someone checks it from the command line | each hold's score and first problems print, and the command exits non-zero when a kind breaks a *block* hold, so a pipeline can branch on it |
 

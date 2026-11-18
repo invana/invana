@@ -44,7 +44,7 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | ID | Feature | Stories | Status |
 |---|---|---|---|
 | AC-F01 | [Sign in, account and sessions](features/AC-F01-sign-in-account-and-sessions/feature.md) | AC-01 · AC-40 · AC-34 · AC-02 · AC-18 | idea |
-| AC-F02 | [Access Policies](features/AC-F02-access-policies/feature.md) | AC-03 · AC-04 · AC-37 · AC-06 · AC-07 · AC-08 · AC-11 · AC-19 · AC-20 · AC-27 | idea |
+| AC-F02 | [Access Policies](features/AC-F02-access-policies/feature.md) | AC-03 · AC-04 · AC-37 · AC-06 · AC-07 · AC-08 · AC-11 · AC-20 · AC-27 | idea |
 | AC-F03 | [Directory](features/AC-F03-directory/feature.md) | AC-22 · AC-33 · AC-09 · AC-39 · AC-38 · AC-23 | idea |
 | AC-F04 | [What an agent may touch](features/AC-F04-what-an-agent-may-touch/feature.md) | AC-12 · AC-13 · AC-14 | idea |
 | AC-F05 | [Asks and approvals](features/AC-F05-asks-and-approvals/feature.md) | AC-15 · AC-26 · AC-32 | idea |
@@ -64,7 +64,6 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | Sign in again — the password or the SSO for a risky act | modal | `access.signin · Sign in again` |
 | Connect an MCP client — consent | page | `access.consent` |
 | Access Policies | modal | `settings.policies` |
-| Permissions — the permission catalogue | modal | `settings.roles` |
 | Directory — users, teams, the policies attached to each, every key and connected client | modal | `settings.people` |
 | Owners of what a person owns | modal | `settings.me · Owners` |
 | You — profile, default agent, sessions, keys, connected clients | modal | `settings.me` |

@@ -33,7 +33,9 @@ which are [GP-05](../../../../../../os/graph/features/GP-F01-data/stories/GP-05-
 flowchart LR
   a([Composer · Cypher or Gremlin · a graph database]) --> g{May use the Query console?}
   g -->|no| ng["Disabled — ask an Admin"]
-  g -->|yes| t["Type · completions from the model"]
+  g -->|yes| hd{"Do the person's policies hide anything on this graph database?"}
+  hd -->|yes| hr["Refused · Raw queries are not available · Ask still works"]
+  hd -->|no| t["Type · completions from the model"]
   t -->|⌘↵| p{Parses?}
   p -->|no| pe["The parser's message, at its position"] --> t
   p -->|yes| k{Only kinds the model has?}
@@ -83,6 +85,7 @@ flowchart LR
 | EX-08.20 | A read whose result is all left out by the person's policies | the person runs it | it reads as zero rows — *Graph Data does not hold this* — with no hint that anything was left out (GP-05.8) |
 | EX-08.21 | Queries the person typed | they open Explore › Queries | their typed queries list newest first, each naming its graph database, its language and when it ran; opening one opens its conversation at that query |
 | EX-08.22 | A person with typed queries who is not granted the Query console | they open Queries | their queries list; running one again is disabled — *{person} may not use Query console — ask an Admin* |
+| EX-08.23 | A graph database where the person's own policies, or the Query console's ceiling for a run an agent starts, hide anything — a Deny Read on a kind or a property, an entry of *Hidden from agents* included | the person types Cypher or Gremlin on it | it is refused before it runs with *Raw queries are not available on {graph database}*, naming no kind and no rule; Ask, which makes a typed plan, still works ([AC-27.27](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 
 ## Screens
 

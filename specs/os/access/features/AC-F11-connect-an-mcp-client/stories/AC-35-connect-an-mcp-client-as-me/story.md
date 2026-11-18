@@ -84,6 +84,7 @@ sequenceDiagram
 | AC-35.14 | A person who is deactivated, or whose client is revoked | the client calls | it is refused at once (AC-23.4 · AC-36.3) |
 | AC-35.15 | A key | it calls the MCP server | it still works, as key ∩ owner (AC-10.19) |
 | AC-35.16 | One address | it calls the token endpoint or the MCP server more than 30 times a minute | the rest are refused as too many requests (AC-34.4) |
+| AC-35.17 | A connected client | it calls a raw-query tool on a graph database where its caller's policies hide anything, or names a kind or property an entry of *Hidden from agents* hides | the raw query is refused with *Raw queries are not available on {graph database}*; the name fails as one that does not exist (AC-27.25 · AC-27.27) |
 
 ## Screens
 

@@ -73,7 +73,7 @@ flowchart LR
 | SE-05.26 | A draft and a Modeller or an Admin | they publish from the command line | The command says whether the draft adds or breaks; one that adds publishes, one that breaks opens the same review as Studio, and `--dry-run` writes nothing |
 | SE-05.27 | An open draft | the person gives a property a type its graph database's server version cannot hold | It is refused where it was picked, naming the type and the server version; nothing is staged |
 | SE-05.28 | A draft with a kind whose label another model in the same graph database already holds | the person publishes | it is refused before anything is written, naming the label and the model that holds it — *{label} belongs to {model} — link the two with a same thing link instead.* |
-| SE-05.29 | A draft that changes a kind or a property *Hidden from agents* hides from the publisher's agent | it is published | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is published ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
+| SE-05.29 | A draft that changes a kind or a property *Hidden from agents* hides, published by an agent-started run | it is published | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is published; a publish a person starts through the Modeller is held to the person's own policies, not to the entry ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 
 ## Screens
 

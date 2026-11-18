@@ -86,6 +86,7 @@ Each act needs the permission named, from [the permission catalogue](../AC-F02-a
 | A project key outlives the people | It keeps working when people join or leave the team, its minter included; archiving or deleting the project revokes it. Use it for CI, integrations and MCP clients that are not one person |
 | A key holds no policy | It inherits from its owner — a person or a project — and only narrows ([AC-F02 › Rules](../AC-F02-access-policies/feature.md#rules)) |
 | History names the key | Every call and every run a key starts is in History with the key named, and its owner — for a project key, the project, where a person would be ([AC-F06](../AC-F06-history/feature.md)) |
+| A key meets *Hidden from agents* | A key reads under its owner and the agent it calls, whose ceiling carries *Hidden from agents*; a raw query through a key is refused where the owner's or the agent's policies hide anything in that graph database ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)) |
 | A key only narrows | Its own rules are Allow · verb · resource in the grammar of [Access Policies](../AC-F02-access-policies/feature.md#rules); what they do not name, the key cannot do. *Read only* is where a new key starts |
 | A key expires, or says it never does | 30, 90 or 365 days, or never; 90 is offered first. An expired key stays listed until revoked |
 | Shown once | The secret is in the mint's answer only; the engine keeps its hash and last four |

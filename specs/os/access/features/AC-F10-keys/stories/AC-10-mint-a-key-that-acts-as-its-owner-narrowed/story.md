@@ -91,6 +91,7 @@ sequenceDiagram
 | AC-10.24 | A key revoked by an Admin, not its owner | the owner opens the Inbox | an Update names the key and the Admin who revoked it — for a project key, its minter |
 | AC-10.25 | A project key | its minter leaves the team or is deactivated, or people join or leave | it keeps working, its reach still the project's policies |
 | AC-10.26 | A project with keys | it is archived or deleted | its keys are revoked in the same act; their next call is told so |
+| AC-10.27 | A key | it sends a raw query to a graph database where its owner's policies or the agent's ceiling hide anything | it is refused with *Raw queries are not available on {graph database}*, naming no kind and no rule; typed query plans run (AC-27.27) |
 
 ## Screens
 

@@ -43,7 +43,7 @@ catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-c
 | Access | Who | Sees |
 |---|---|---|
 | **Admin** — full access | A person whose policies allow every act the story names — *Super user*, or the Access template that fits | Every act |
-| **Operator** — read only | A person whose policies allow reading and nothing more — *Read only*, every newcomer's policy | Every place and act; each act disabled, naming the permission and who can grant it, or *Ask &lt;approver&gt;*; data a policy hides absent, with no trace |
+| **Operator** — read only | A person whose policies allow reading and nothing more — *Read only*, every newcomer's policy | Every place and act; each act disabled, naming the permission and who can grant it, or *Ask &lt;approver&gt;*; data a policy hides absent, with no trace. Where reading itself needs a permission the policy lacks — Access Policies need Read on `access/policies` — the place reads *No access* |
 
 A person between the two — one permission but not another — is a criterion in the story, never a third access level on the
 canvas.

@@ -72,6 +72,7 @@ flowchart LR
 | AC-16.27 | A checkpoint whose signature or link does not hold | the chain is next checked | the head reads *broken at the checkpoint of {date}* in red; rows still read |
 | AC-16.28 | History on legal hold | its period passes | no row is removed until the hold is lifted (AC-44) |
 | AC-16.29 | A row naming a person who left while names are pseudonymised | it is read or exported | it names them by their code (AC-45); its hash still verifies |
+| AC-16.30 | A refused row | a person without Read on `access/policies` reads or exports it | it reads *refused* and the reason's sentence; the rule, its policy and who set it are left out, and no row names a kind or property a Deny hides — AC-27.25 |
 
 ## Screens
 
