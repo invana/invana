@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the Inbox dropdown; decide in place the asks routed to them; *Acknowledge* an alert sent to them; confirm an *Accept* that writes; open the Inbox | — |
-| Operator | Operator · Modeller: the same, on their own asks, alerts, project work and runs | An act they may not take reads *Ask {approver}*, naming who it waits on — and the engine refuses it ([AC-F05](../../../../../access/features/AC-F05-asks-and-approvals/feature.md#refusals)) |
+| Operator | the same, on their own asks, alerts, project work and runs | An act they may not take reads *Ask {approver}*, naming who it waits on — and the engine refuses it ([AC-F05](../../../../../access/features/AC-F05-asks-and-approvals/feature.md#refusals)) |
 
 ## Flow
 

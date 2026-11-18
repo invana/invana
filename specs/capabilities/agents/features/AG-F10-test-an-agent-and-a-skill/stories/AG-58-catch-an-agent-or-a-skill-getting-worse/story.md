@@ -17,19 +17,19 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 ## Who can
 
-Running drift now is the Modeller's and the Admin's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); an alert reaches the people [its kind names](../../../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds).
+Running drift now needs Edit on `agent/<name>` or `skill/<name>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); an alert reaches the people [its kind names](../../../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every drift run; get the alert as its kind names the Admins; run drift now on any agent or skill not built in | — |
-| Operator | Read every drift run and its result. A Modeller runs drift now as an Admin does | *Run drift now* disabled, naming the role — *Needs the Modeller role — ask an Admin* | *Run drift now* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| Operator | Read every drift run and its result. With Edit on the agent or skill, runs drift now as an Admin does | *Run drift now* disabled, naming the permission — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   m([A model version moves · the model publishes · a rule or an Access Policy it reads changes · nightly]) --> d["The live version's evals again"]
-  o([A Modeller or an Admin presses Run drift now]) --> d
+  o([A person with Edit on the agent or skill presses Run drift now]) --> d
   d -->|budget spent| p(["Paused: budget reached"])
   d --> c{"Worse than the last run?"}
   c -->|fewer hard checks pass, or time or tokens past 1.5×| a(["An alert in the Inbox of the agent's named approvers, then the Admins, naming what changed and the numbers"])
@@ -45,9 +45,9 @@ flowchart LR
 | AG-58.2 | A drift run with fewer hard checks passing, or time or tokens past 1.5× the last | it settles | an alert names the agent or skill, what changed and the numbers, in *Needs you* for the people the alert kind names — the agent's named approvers, then the Admins — and in History |
 | AG-58.3 | A drift run no worse than the last | it settles | it is recorded on Evals and nothing is raised |
 | AG-58.4 | An alert | a person it reached opens it | Evals opens on the drift run beside the run before it, each case's change marked |
-| AG-58.5 | A Modeller or an Admin | they press *Run drift now* | the live version's evals run at once, naming *Run by hand* as what moved |
+| AG-58.5 | A person with Edit on the agent or skill | they press *Run drift now* | the live version's evals run at once, naming *Run by hand* as what moved |
 | AG-58.6 | No active case | a trigger fires | nothing runs, and Evals reads *No eval set — nothing checked* |
-| AG-58.7 | An Operator | they open Evals | every drift run reads; *Run drift now* is disabled, naming the role |
+| AG-58.7 | An Operator | they open Evals | every drift run reads; *Run drift now* is disabled, naming the permission |
 | AG-58.8 | A built-in agent or skill | a trigger fires | its drift runs like any other, and the alert reaches the Admins |
 
 ## Screens

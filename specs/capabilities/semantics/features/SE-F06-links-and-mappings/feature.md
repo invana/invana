@@ -24,11 +24,11 @@ flowchart TD
   start([Model]) --> map["SE-01 · The map: every published model, links between models dashed"]
   map -->|a model with nothing published| empty["An empty frame that says so"]
   map -->|a kind| k["SE-02 · The kind: its properties, records, key · Open it"]
-  k -->|Mappings · Map to a standard| mp{Modeller or Admin?}
-  mp -->|no| na2["Reads · Needs the Modeller role — ask an Admin"]
+  k -->|Mappings · Map to a standard| mp{"Holds Edit on model/<model>?"}
+  mp -->|no| na2["Reads · Needs Edit on model/{model} — ask {who can grant}"]
   mp -->|yes| ms(["SE-02 · Staged in the draft: this property is that standard's term"])
-  map -->|drag from one model to another · Link models| may{Modeller or Admin?}
-  may -->|no| na["Disabled — Needs the Modeller role — ask an Admin"]
+  map -->|drag from one model to another · Link models| may{"Holds Edit on model/<model>?"}
+  may -->|no| na["Disabled — Needs Edit on model/{model} — ask {who can grant}"]
   may -->|yes| dec["SE-03 · Link two models: same thing, or a relationship · a key on each side"]
   dec --> cnt{Records joined?}
   cnt -->|none match| fix["Matches nothing — Try another key"] --> dec
@@ -76,13 +76,13 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read the map, a model, a kind, the links between models and their history | Every signed-in person — Operator, Modeller, Admin | — |
-| Link two models · commit or discard staged links · remove a link | Modeller · Admin | *Link models* disabled — *Needs the Modeller role — ask an Admin*; a drag between models does nothing and says why |
-| Rename a model · change its description | Modeller · Admin | *Rename* disabled — *Needs the Modeller role — ask an Admin* |
-| Export a model, with or without its records | Every signed-in person — Operator, Modeller, Admin; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
-| Import a model · restore an earlier version | Modeller · Admin | *Import a model file* disabled — *Needs the Modeller role — ask an Admin* |
+| Read the map, a model, a kind, the links between models and their history | Read on `model/<model>` | — |
+| Link two models · commit or discard staged links · remove a link | Edit on `model/<model>` | *Link models* disabled — *Needs Edit on model/{model} — ask {who can grant}*; a drag between models does nothing and says why |
+| Rename a model · change its description | Edit on `model/<model>` | *Rename* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Export a model, with or without its records | Read on `model/<model>`; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
+| Import a model · restore an earlier version | Edit on `model/<model>` | *Import a model file* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## States
 
@@ -94,7 +94,7 @@ sequenceDiagram
 | Has data | Frames per model in their own hue, links dashed, the left section listing models, kinds and links |
 | Failed | A refused link names the side, kind or key, or the two graph databases when its models are in different ones; a commit or removal refused by a rule or a missing connection keeps the link as it was; an unreadable file says why |
 | Agent working or proposing | A run counting, writing or withdrawing a link's relationships; an ontology's equivalences offered as links to confirm |
-| No access | The map, kinds and links read; linking, committing, removing and importing are disabled with *Needs the Modeller role — ask an Admin* |
+| No access | The map, kinds and links read; linking, committing, removing and importing are disabled with *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## Rules
 
@@ -182,7 +182,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A link, commit, removal or import by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-03.18 · SE-16.12 |
+| 403 | A link, commit, removal or import by someone without Edit on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-03.18 · SE-16.12 |
 | 422 | A side's kind its published version does not declare (`type_not_in_version`) | *{model} v{n} has no kind {kind}.* | API only — the card offers only declared kinds |
 | 422 | A side that is a draft, the same model on both sides, or a model with nothing published (`version_is_draft`) | *A link joins two published models — {why}.* | SE-03.8 |
 | 422 | Two models bound to different graph databases (`link_across_graph_databases`) | *{source} is in {database} and {target} in {database} — a link joins two models in one graph database.* | SE-03.20 |

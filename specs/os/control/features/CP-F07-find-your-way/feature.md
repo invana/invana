@@ -30,15 +30,15 @@ flowchart TD
   sw -->|an item| open
   s --> k["CP-30 · ⌘K: do, open or ask · Help"]
   k -->|a match| open(["The record, section or act opens"])
-  k -->|an act the role lacks| dis(["Disabled · the role named, and who holds it"])
+  k -->|an act the person lacks the permission for| dis(["Disabled · the permission named, and who can grant it"])
   k -->|nothing matches| ask["Ask the Assistant: the text in its composer, never sent"]
   k -->|not mine to open| hid["Never a hit"]
   c([The command line]) --> se["CP-30 · invana search"]
   se --> hits(["Hits, closest first · access applied first"])
   st([Settings › General]) --> gen["CP-71 · General: the deployment's name · its version"]
   st --> app["CP-71 · Appearance: Light · Dark · As the deployment"]
-  gen -->|rename, not an Admin| ask(["Ask {Admin}"])
-  app -->|the default, not an Admin| ask
+  gen -->|rename, without Edit on setting/deployment| ask(["Ask {Admin}"])
+  app -->|the default, without Edit on setting/deployment| ask
 ```
 
 ## Stories
@@ -51,15 +51,15 @@ flowchart TD
 
 ## Access
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Find with ⌘K or `invana search` | Operator · Modeller · Admin; hits are only what the person may open | A record they may not open is never a hit |
-| Run an act from ⌘K | The role the act's feature names ([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | The act listed disabled, naming the role |
-| Ask the Assistant from ⌘K | A person who may use the Assistant | Absent |
-| Open the switcher; read, search, pin and unpin one's own recent items | Every signed-in person, for themselves | Another person's recent and pinned items are absent |
-| Read the deployment's name and version · pick one's own theme | Every signed-in person | — |
-| Rename the deployment · set its default theme | Admin | The rows read; the act reads *Ask {Admin}* |
-| Start a conversation, a board or a project from the switcher | The role each create's feature names | Listed disabled, naming the role |
+| Find with ⌘K or `invana search` | None — every signed-in person; hits are only what the person may open | A record they may not open is never a hit |
+| Run an act from ⌘K | The permission the act's feature names | The act listed disabled, naming the permission |
+| Ask the Assistant from ⌘K | Run on `agent/assistant` | Absent |
+| Open the switcher; read, search, pin and unpin one's own recent items | None — one's own | Another person's recent and pinned items are absent |
+| Read the deployment's name and version · pick one's own theme | None — every signed-in person | — |
+| Rename the deployment · set its default theme | Edit on `setting/deployment` | The rows read; the act reads *Ask {Admin}* |
+| Start a conversation, a board or a project from the switcher | The permission each create's feature names | Listed disabled, naming the permission |
 
 ## States
 
@@ -71,7 +71,7 @@ flowchart TD
 | Has data | ⌘K's hits grouped by where they live; the switcher's Continue cards, Pinned row and Recent by kind |
 | Failed | A group ⌘K could not read says so in its place; the others still match |
 | Agent working or proposing | — ⌘K shows no agent work of its own |
-| No access | An act the person's role lacks is listed disabled, naming the role and who holds it |
+| No access | An act the person lacks the permission for is listed disabled, naming the permission and who can grant it |
 
 ## Rules
 
@@ -92,7 +92,7 @@ flowchart TD
 | Record | Read or write |
 |---|---|
 | The lists each mode and summoner serves — boards, conversations, models and kinds, agents, skills, workflows, projects and tasks, recent runs, graph databases | Read |
-| The person's role and who holds each role | Read |
+| The person's permissions and who can grant each | Read |
 | The person's recent and pinned items | Write · read |
 
 ## Engine
@@ -112,7 +112,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | The lists each mode serves — ⌘K matches them in the browser | Each mode's own feature |
-| The reader's role and who holds each role | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
+| The reader's permissions and who can grant each | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
 | The agents the reader may use | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
 | Projects and reading one through the default agent | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Conversations and their last answer · boards and their saved layout · queries | [EX-F03](../../../../capabilities/explore/features/EX-F03-ask-a-question/feature.md#engine) · [EX-F01](../../../../capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md#engine) |
@@ -144,7 +144,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 404 | Recording or pinning an item the reader may not open, or that does not exist | *Not found.* | CP-68.9 |
 | 422 | A `kind` outside the six | *kind: one of {kinds}.* | API only — Studio sends only the six |
 | 422 | `q` empty after trimming, or over 200 characters | *Search needs 1 to 200 characters.* | API only — the command line trims and checks before it calls; ⌘K never calls it |
-| — | An act the reader's role does not hold is the role check's `403` ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#refusals)) | — | CP-30.8 |
+| — | An act the reader lacks the permission for is the permission check's `403` ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#refusals)) | — | CP-30.8 |
 
 ### CLI
 
@@ -185,7 +185,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The command line searches in the engine | One engine search applies the access first, then ranks by name as ⌘K does |
 | Settings opens on General and Appearance | General holds the deployment's name and version; Appearance the person's theme and, for an Admin, the deployment's default. The avatar menu's *Appearance* opens the same rows |
 | Ask is the last ⌘K entry | Whenever something is typed and the Assistant is among the agents the person may use |
-| Without the role reads, never hides | An act is disabled with the role it needs and who holds it |
+| Without the permission reads, never hides | An act is disabled with the permission it needs and who can grant it |
 
 ## Open questions
 

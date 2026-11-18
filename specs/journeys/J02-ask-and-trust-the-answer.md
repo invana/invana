@@ -58,7 +58,7 @@ flowchart TD
 |---|---|---|---|
 | It needs permission | The agent's Access Policies narrow what it may read; the answer says so, and the act asks a named approver | EX-06 | `explore.board · Cannot` |
 | It fails | A failed run says why in a sentence, with the act that tries again | EX-06 | `explore.board · Cannot` |
-| The person has no access | Tom asks and reads as an Operator; acts beyond it name the role they need | EX-06 | `explore.board · Cannot` |
+| The person has no access | Tom asks and reads as an Operator; acts beyond it name the permission they need | EX-06 | `explore.board · Cannot` |
 | Graph Data does not hold it | It says what is missing — never an invented answer | EX-05 | `explore.board · Cannot` |
 | A typed plan cannot express the question | The agent says so and offers a function that could; it never runs a raw query unseen | EX-05 | `explore.board · Cannot` |
 | A graph database the plan needs is switched off | Refused before it starts, naming the graph database and who switched it off | EX-06 | `explore.board · Cannot` |

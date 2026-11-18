@@ -53,13 +53,13 @@ flowchart TD
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); this is what it means here.
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); this table names the acts.
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read the overview — tiles, groups, open ops alerts | Operator · Modeller · Admin | — |
-| Read the Operations dropdown on the deployment — every run going, the queue, workers, tokens this month against the budget | Admin | Their own runs going; the other tiles and the *Workers* link are absent |
-| Open the runs behind a figure | Operator · Modeller · Admin; a run's content as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
+| Read the overview — tiles, groups, open ops alerts | None — every signed-in person, their own runs going · Read on `worker/<group>` for the rest | — |
+| Read the Operations dropdown on the deployment — every run going, the queue, workers, tokens this month against the budget | Read on `worker/<group>` and `run/*` | Their own runs going; the other tiles and the *Workers* link are absent |
+| Open the runs behind a figure | None — every signed-in person; a run's content as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
 | Act from a figure — stop a run, change a limit | As [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#access) and [CP-F04](../CP-F04-limits/feature.md#access) | As there |
 
 ## States
@@ -72,7 +72,7 @@ The role × feature table is [AC-F02 › The permission catalogue](../../../acce
 | Has data | The tiles, then one row per user, agent or team, busiest first, each with its meters |
 | Failed | What could not be read, in the engine's words, and *Retry* |
 | Agent working or proposing | Running counts move as runs start and end, repainted at most once a second |
-| No access | — every role reads the overview |
+| No access | — every signed-in person reads the overview |
 
 ## Rules
 
@@ -128,7 +128,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Route, after `/api/v1/control` | Does | Story |
 |---|---|---|
 | `GET /overview?window=today·7d·30d&tz=` | `tiles` — `running` · `waiting` · `failed` · `tokens` · `tokens_this_month` · `monthly_tokens` (the deployment's limit, null when none) · `alerts_open` (by kind) | CP-47 |
-| `GET /operations?tz=` | The Operations dropdown, scoped by role (below): `tiles` — `running` · `queued` · `queue_waiting` · `queue_oldest_at` · `workers {busy, total, lost}` · `tokens_this_month` · `monthly_tokens` (null — no limit) · `near_limit`; `running[]` — `run_id` · `agent` · `behind` · `step` · `steps` · `may_stop` | CP-70 |
+| `GET /operations?tz=` | The Operations dropdown, scoped by permission (below): `tiles` — `running` · `queued` · `queue_waiting` · `queue_oldest_at` · `workers {busy, total, lost}` · `tokens_this_month` · `monthly_tokens` (null — no limit) · `near_limit`; `running[]` — `run_id` · `agent` · `behind` · `step` · `steps` · `may_stop` | CP-70 |
 | `GET /overview/groups?by=user·agent·team&window=&tz=` | By the list contract, busiest first: `subject_kind` · `subject_id` · `name` · `running` · `waiting` · `failed` · `runs` · `tokens` · `tokens_this_month` · `monthly_tokens` (null — no limit) · `at_limit`; `team_overlap` true when `by=team` and a run counts under more than one team | CP-47 |
 
 ### Events
@@ -157,7 +157,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Teams at open | A run's `team_ids[]` is the person's teams when the run opened; a later team change never moves a past run |
 | Spend this month | Read from CP-F04's month counters, never summed here |
 | Live | Studio refreshes the tiles while open, repainting at most once a second |
-| Operations by role | An Admin reads every tile and `running[]` on the deployment. An Operator or a Modeller reads `tiles.running`, `tiles.queued` and `running[]` for runs they are behind; the other tiles are absent, never empty |
+| Operations by permission | A person with Read on `worker/<group>` and `run/*` reads every tile and `running[]` on the deployment. Anyone else reads `tiles.running`, `tiles.queued` and `running[]` for runs they are behind; the other tiles are absent, never empty |
 | Near a budget | `near_limit` is true at 80% or more of the deployment's *Tokens a month* ([CP-F04](../CP-F04-limits/feature.md)); false when no budget is set |
 | Workers | `total` counts workers joined and not removed; `busy` those running a step; `lost` those with no heartbeat for 30 s ([CP-F03](../CP-F03-workers-and-the-queue/feature.md#rules)) |
 | The header count | *● n running* reads `running` from the one counts source ([CP-F08](../CP-F08-the-inbox/feature.md#engine)), never this route |
@@ -175,7 +175,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Operations is the header's glance | The deployment's state is one dropdown from every screen, never a page or a summoner; Agents › Runs in the Agents mode and Settings › Workers in the large modal are the depth behind it |
 | Workloads is a tab of Settings › Fleet | *Settings › Fleet* — Map · Workloads, in the large modal; *Workloads* reads runs and tokens by user, agent and team. How each agent performs is a tab of Agents › Runs ([CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
-| An Operator sees their own | Their own runs going; the deployment's queue, workers and tokens are an Admin's |
+| An Operator sees their own | Their own runs going; the deployment's queue, workers and tokens need Read on `worker/<group>` |
 | A run counts under each of its teams | Teams are flat and a person may be on several; splitting a run across them would invent a share nobody set |
 | Everyone reads the counts | Counts and tokens are never content; who may read a run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s |
 

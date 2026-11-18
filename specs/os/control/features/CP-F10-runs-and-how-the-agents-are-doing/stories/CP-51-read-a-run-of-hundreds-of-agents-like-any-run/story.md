@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a big run's rates, roles and every agent in it; stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | — |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): read a big run's rates, roles and every agent in it when they are behind it or own its agent; stop it then ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other big run: that it ran, its agent, the person behind it, its status and its tokens — the rest *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop run* disabled, naming who may stop it |
+| Operator | read a big run's rates, roles and every agent in it when they are behind it or own its agent; stop it then ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other big run: that it ran, its agent, the person behind it, its status and its tokens — the rest *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop run* disabled, naming who may stop it |
 
 ## Flow
 
@@ -48,7 +48,7 @@ flowchart LR
 | CP-51.8 | Agents waiting for workers | the numbers read | they say the run waits on workers, naming which |
 | CP-51.9 | A big run still going | its page is open | the numbers refresh every few seconds |
 | CP-51.10 | A big run whose content the reader may not read | its page opens | that it ran, its agent, the person behind it, its status and its tokens read; who did what and *By role* read *withheld* |
-| CP-51.11 | A big run still going | the reader is not behind it and not an Admin | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
+| CP-51.11 | A big run still going | the reader is not behind it and without Manage on `run/<agent>` | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 
 ## Screens
 

@@ -25,8 +25,8 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  start([A deployment with no model, or a new model wanted]) --> may{Modeller or Admin?}
-  may -->|no| na["New model disabled — Needs the Modeller role · the map still reads"]
+  start([A deployment with no model, or a new model wanted]) --> may{"Holds Create on model/<model>?"}
+  may -->|no| na["New model disabled — Needs Create on model/{model} · the map still reads"]
   may -->|yes| from{Start from}
   from -->|what a graph database holds| r["SE-04 · Read a graph database"]
   r -->|empty| e["Nothing there yet — start from a description, a file or a starter"] --> from
@@ -76,12 +76,12 @@ The permission each act needs is the *Model* row of
 ([AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this
 table names the acts.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| See the models, the drafts and what each graph database holds | Operator · Modeller · Admin | — |
-| Read a graph database · start a model from it | Modeller · Admin, through the Modeller agent | *Read the database* disabled — *Needs the Modeller role — ask an Admin* |
-| New model — describe it, a file, a starter, an ontology | Modeller · Admin, through the Modeller agent | *New model* disabled — *Needs the Modeller role — ask an Admin* |
-| Connect a graph database | Admin, in Graph databases ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)) | — |
+| See the models, the drafts and what each graph database holds | Read on `model/<model>` | — |
+| Read a graph database · start a model from it | Create on `model/<model>`, through the Modeller agent | *Read the database* disabled — *Needs Create on model/{model} — ask {who can grant}* |
+| New model — describe it, a file, a starter, an ontology | Create on `model/<model>`, through the Modeller agent | *New model* disabled — *Needs Create on model/{model} — ask {who can grant}* |
+| Connect a graph database | Create on `setting/graph-databases`, in Graph databases ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)) | — |
 
 ## States
 
@@ -93,7 +93,7 @@ table names the acts.
 | Has data | The new draft open on its canvas, its kinds staged, the draft bar counting them |
 | Failed | The graph database unreachable or switched off, an unreadable file or ontology, a name taken — said in a sentence where it happened, with the next act; nothing half-made |
 | Agent working or proposing | The assistant drafting kinds from a description, docked beside the draft, each kind arriving staged |
-| No access | Every start disabled with *Needs the Modeller role — ask an Admin*; the map and drafts still read |
+| No access | Every start disabled with *Needs Create on model/{model} — ask {who can grant}*; the map and drafts still read |
 
 ## Rules
 
@@ -165,7 +165,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A write by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-04.11 · SE-06.13 · SE-15.14 · SE-07.19 |
+| 403 | A write by someone without Create on models | *Needs Create on model/{model} — ask {who can grant}.* | SE-04.11 · SE-06.13 · SE-15.14 · SE-07.19 |
 | 409 | A name already used by a model in the deployment — create, import or ontology import; nothing is written | *A model named {name} already exists — pick another name or bring it in as a new version.* (`model_name_taken`) | SE-06.8 · SE-15.11 |
 | 409 | Reading a graph database that is unreachable or switched off — before the run starts | *{database} is {unreachable, or off — switched off by whom}.* | SE-04.4 |
 | 422 | Ontology text that cannot be read, a remote context, more than 20 MB, or a kind named in `types` the ontology lacks | *{format} could not be read: {why} — {line or name}.* | SE-15.9 |

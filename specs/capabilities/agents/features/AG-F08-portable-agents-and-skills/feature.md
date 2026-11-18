@@ -14,7 +14,7 @@ depends_on: [AG-F02, AG-F04, AC-F02, CP-F02, CP-F06]
 # Portable agents and skills
 
 > Agents and skills come in and go out as the open files other agent tools already use — an agent is a Markdown
-> file with front matter, a skill is a `SKILL.md` folder — with Invana's own fields riding under `metadata:`. A Modeller
+> file with front matter, a skill is a `SKILL.md` folder — with Invana's own fields riding under `metadata:`. A person who builds agents
 > brings them in from dropped files, from an agent tool's folder — a project's `.claude/`, `.codex/` or `AGENTS.md` —
 > and from Claude plugins. Other formats are read and converted, never written. What a file declares grants nothing:
 > its Access Policy files wait for an Admin, and a library becomes functions only once an Admin approves them. The
@@ -42,12 +42,12 @@ flowchart TD
   start --> lib["AG-40 · Add a library — its package and docs"]
   lib -->|cannot be read| lx["Says why, naming the package"]
   lib --> prop["The functions Invana proposes, inputs and outputs as JSON Schema"]
-  prop -->|Admin · Approve| fn(["Read-only functions skills may call"])
-  prop -->|a Modeller| wa(["Waiting for an Admin"])
+  prop -->|Publish · Approve| fn(["Read-only functions skills may call"])
+  prop -->|without Publish · Approve| wa(["Waiting for an Admin"])
   prop -->|leave out| no(["Not a function"])
   start --> exp["AG-39 · Export one agent, one skill or all"]
   exp --> files(["Agent .md files and SKILL.md folders"])
-  start -->|an Operator| na["Import, Export and Add a library are disabled, naming the Modeller role"]
+  start -->|an Operator| na["Import, Export and Add a library are disabled, naming the permission"]
 ```
 
 ```mermaid
@@ -80,16 +80,18 @@ sequenceDiagram
 
 ## Access
 
-*Portable — bring in* is the Modeller's and the Admin's in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is the *Agents* and *Skills* rows of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) — usually held through the *Build agents* template.
 
-| Act | Role | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Import agents and skills — dropped files, a Claude plugin, an agent tool's folder · export them | Modeller · Admin | *Import* and *Export* are disabled — *Needs the Modeller role — ask an Admin* |
-| Apply an Access Policy file an import brought | Admin, as [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#access) | The file reads *Waiting for an Admin to apply* |
-| Add a library | Modeller · Admin | *Add a library* is disabled, naming the Modeller role |
-| Approve the functions a library proposes | Admin | Proposed functions read *Waiting for an Admin* |
-| Approve a skill's script | Admin ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md)) | As CP-F06 |
-| Read imported agents, skills and approved functions | Every signed-in person — Operator, Modeller, Admin | — |
+| Import agents and skills — dropped files, a Claude plugin, an agent tool's folder · export them | Create on `agent/*` and `skill/*` | *Import* and *Export* are disabled — *Needs Create on agent/* or skill/* — ask {who can grant}* |
+| Apply an Access Policy file an import brought | Edit on `access/policies`, as [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#access) | The file reads *Waiting for an Admin to apply* |
+| Add a library | Create on `plugin/*` | *Add a library* is disabled, naming the permission |
+| Approve the functions a library proposes | Publish · Approve on `skill/<name>` | Proposed functions read *Waiting for an Admin* |
+| Approve a skill's script | Publish · Approve on `skill/<name>` ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md)) | As CP-F06 |
+| Read imported agents, skills and approved functions | Read on `agent/<name>` · `skill/<name>` | — |
 
 ## States
 
@@ -101,7 +103,7 @@ sequenceDiagram
 | Has data | *What came in* with every file's kind, what it becomes and its state, grouped by the agent tool it came from; a library's proposed or approved functions |
 | Failed | A refused file or line names why and what would make it map; a folder with no agent tool's folder names what it looks for; a package that cannot be read is named |
 | Agent working or proposing | Import finding, mapping and converting the files and compiling each planned skill's plan; Invana proposing a library's functions |
-| No access | Import, Export and *Add a library* are disabled for an Operator, naming the Modeller role; everything saved reads |
+| No access | Import, Export and *Add a library* are disabled for an Operator, naming the permission; everything saved reads |
 
 ## Rules
 
@@ -183,8 +185,8 @@ sequenceDiagram
 | 409 | `POST /import/commit` while any row is refused | *Fix or leave out the refused files first.* | AG-39.10 |
 | 422 | A package that cannot be found or read | *{package} could not be read: {reason}.* | AG-40.7 |
 | step refused | A plan naming a library function no Admin approved | *{function} is not approved.* | AG-40.4 |
-| 403 | Import, export or add a library without the Modeller or Admin role | *This needs the Modeller role.* | AG-39.13 · AG-63.10 · AG-40.10 |
-| 403 | Approving a library's function without the Admin role | *This needs the Admin role.* | AG-40.12 |
+| 403 | Import or export without Create on agent/* and skill/*, or add a library without Create on plugin/* | *This needs Create on agent/* and skill/* — ask {who can grant}.* | AG-39.13 · AG-63.10 · AG-40.10 |
+| 403 | Approving a library's function without Publish · Approve on the skill | *This needs Publish · Approve on skill/{skill} — ask {who can grant}.* | AG-40.12 |
 
 ### CLI
 
@@ -220,7 +222,7 @@ The code change is [migrations.md](../../../../migrations.md) M37.
 
 | Decision | Detail |
 |---|---|
-| A Modeller brings agents in | Importing is building agents, so a Modeller or an Admin imports; what an import may reach is still only an Admin's to apply |
+| Bringing agents in is building agents | Importing is building agents, so it needs Create on agents and skills; what an import may reach is still applied only with Edit on Access |
 | Model aliases on import | `sonnet` · `opus` · `inherit` resolve to an exact offered version, shown for the importer to confirm |
 | A name already in the catalogue | Offered as a new version of it, or a rename |
 | `AGENTS.md` · `CLAUDE.md` | One draft agent, its body the instructions, named after its folder for the importer to confirm |

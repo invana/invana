@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Merge any branch into another open, pursuing or parked branch of the same project | On an archived project *Merge* is disabled |
-| Operator | The same; a Modeller the same | As Admin |
+| Operator | The same | As Admin |
 
 ## Flow
 

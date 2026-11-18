@@ -18,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every session on every worker, its workspace and every sandbox refusal; change the agent's worker rules ([AC-37](../../../../../access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)) | — |
-| Operator | Start a run of an agent they are granted; read their own runs' sessions and refusals; a Modeller reads the same | Another person's run: its sessions' heads, content *withheld*, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | Start a run of an agent they are granted; read their own runs' sessions and refusals; the same with Read on `worker/*` | Another person's run: its sessions' heads, content *withheld*, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 

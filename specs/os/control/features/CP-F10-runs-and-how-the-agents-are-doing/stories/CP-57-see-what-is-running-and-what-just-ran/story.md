@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every run in flight and every run ended today; its content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says — the role adds none; stop any run ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | A run whose content they may not read lists with what it was about *withheld* |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): list every run in flight and ended today; read a run's content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says; stop a run they are behind ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other run lists with its agent, the person behind it, its status and its tokens — what it was about *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop* disabled, naming who may stop it |
+| Admin | Read every run in flight and every run ended today; its content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says — the permission adds none; stop any run ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | A run whose content they may not read lists with what it was about *withheld* |
+| Operator | list every run in flight and ended today; read a run's content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says; stop a run they are behind ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other run lists with its agent, the person behind it, its status and its tokens — what it was about *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop* disabled, naming who may stop it |
 
 ## Flow
 
@@ -51,8 +51,8 @@ flowchart LR
 | CP-57.6 | A run with helpers | its tokens are read | they include what its helpers spent, in tokens, never currency |
 | CP-57.7 | A run waiting on a person | Running is read | it reads *waiting*, naming who it waits on, and opens the ask in Needs you |
 | CP-57.8 | Interactive runs — a board expanding a node, a provider check | Running is read | they are hidden unless *Show interactive runs* is on |
-| CP-57.9 | A run the reader is behind, or any run for an Admin | they press *Stop* | it stops as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says — it ends *stopped*, each helper *stopped with its parent*, and a History row says who stopped it |
-| CP-57.10 | A run the reader is not behind, the reader not an Admin | they reach *Stop* | it is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
+| CP-57.9 | A run the reader is behind, or any run for someone with Manage on `run/<agent>` | they press *Stop* | it stops as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says — it ends *stopped*, each helper *stopped with its parent*, and a History row says who stopped it |
+| CP-57.10 | A run the reader is not behind, the reader without Manage on `run/<agent>` | they reach *Stop* | it is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 | CP-57.11 | A run that ends | Running is open | it moves to Done with how it ended — served · cannot answer · out of tokens · out of time · stopped · failed — its time and its tokens |
 | CP-57.12 | Runs ended today | Done opens | they list newest first; *See every run* opens Agents › Runs |
 | CP-57.13 | A row | the person opens it | the run opens as its page (CP-50), and *How it got here* shows its steps and sources |

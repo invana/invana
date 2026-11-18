@@ -17,13 +17,13 @@ Tasks: [task.md](task.md) · Feature: [GP-F01](../../feature.md)
 ## Who can
 
 A raw query is a step of the built-in **Query console** agent ([EX-08](../../../../../../capabilities/explore/features/EX-F03-ask-a-question/stories/EX-08-write-the-query-myself/story.md)
-is the person's side of it); its four layers are this story's. Roles are
+is the person's side of it); its four layers are this story's. The permission each act needs is
 [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run a raw query as the Query console, within what its policies allow Read; a write waits on its approvers and runs only on a read + write graph database | A refusal naming the rule, its policy and who set it, for a write or an unlabelled pattern; what a policy hides is simply not there |
-| Operator | The same for a read, when they may use the Query console; a Modeller may also send a write, as Admin | A write: *Edit on the board needs the Modeller role*. Not granted the Query console: disabled, naming the Admins |
+| Operator | The same for a read, when they may use the Query console; with Edit on `data/<graph database>` they may also send a write, as Admin | A write: *Needs Edit on data/{graph database} — ask {who can grant}*. Not granted the Query console: disabled, naming the Admins |
 
 ## Flow
 

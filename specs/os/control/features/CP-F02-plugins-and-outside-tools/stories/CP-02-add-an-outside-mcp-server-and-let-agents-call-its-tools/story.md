@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
-| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; a Modeller the same | *Add a server* and *Read its tools again* are disabled, naming the Admins |
+| Admin | With Create on `plugin/<name>`: add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
+| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; with Create on `plugin/<name>`, the same as Admin | *Add a server* and *Read its tools again* are disabled — *Needs Create on plugin/{name} — ask {who can grant}* |
 
 ## Flow
 

@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Mark an endpoint local or external, with the password again to mark it local | — |
-| Operator | Read each endpoint's and version's *Local* or *External* mark ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Local · External* reads; changing it is disabled — *Needs the Admin role — ask {admins}* |
+| Admin | With Edit on `setting/ai-models`, mark an endpoint local or external, with the password again to mark it local | — |
+| Operator | Read each endpoint's and version's *Local* or *External* mark ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Local · External* reads; changing it is disabled — *Needs Edit on setting/ai-models — ask {who can grant}* |
 
 ## Flow
 
@@ -51,7 +51,7 @@ flowchart TD
 | CP-61.5 | A local endpoint whose address resolves outside the deployment at a call | the call is made | it is treated as external for that call, and *What left the platform* reads it as *external* (AC-30) |
 | CP-61.6 | Marking *Local* without the password, with a wrong one, or with a key | it is saved | *Enter your password again to do this*; nothing changes |
 | CP-61.7 | A call that would carry a sensitive property to an external model | the agent makes it | it is refused before it leaves, naming the property (AC-30.7) |
-| CP-61.8 | An Operator | they read AI models | the marks read; changing one is disabled — *Needs the Admin role — ask {admins}*; the route answers 403 |
+| CP-61.8 | An Operator | they read AI models | the marks read; changing one is disabled — *Needs Edit on setting/ai-models — ask {who can grant}*; the route answers 403 |
 | CP-61.9 | A filter for *Local* or *External* with no match | it is applied | *No {local · external} model versions* and *Clear* |
 | CP-61.10 | The read fails | AI models opens | what could not be read, in the engine's words, and *Retry* |
 

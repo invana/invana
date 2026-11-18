@@ -83,22 +83,22 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*board* is *Acts* for Operator, Modeller and Admin — through an agent granted to the person, within that agent's
+*board* needs no permission of its own — through an agent granted to the person, within that agent's
 Access Policies. A board is the organisation's, keeping who made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md));
 making it grants nothing. Board reads run as the built-in Assistant; saving edits is *Edit on the board*
 ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)).
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Open a board · look, pan, zoom, select | Every role — Operator, Modeller, Admin; what it draws reads through the person's default agent | *Not found* for a board that does not exist; a board or answer built on a source the default agent may not Read is *Not found* |
-| Expand a node · count the kinds | Every role, through the Assistant, within its Access Policies | A kind a rule denies: refused, naming the rule · no Assistant: *{person} may not use Assistant — ask an Admin* |
-| Change the layout · style · hide · switch modes | Every role, with the Assistant; a change is kept on the board as a version naming who made it | No Assistant: *{person} may not use Assistant — ask an Admin* |
-| Create a dashboard · pin, refresh, unpin a tile | Every role, with the Assistant; a tile refreshes through the agent that answered it | Disabled — *{person} may not use Assistant — ask an Admin* |
-| Create a board · rename, delete, restore a version | Every role, with the Assistant; the board is the organisation's, made by the person | Disabled — *{person} may not use Assistant — ask an Admin* |
-| Read who made a board | Every role | — |
+| Open a board · look, pan, zoom, select | None — every signed-in person; what it draws reads through the person's default agent | *Not found* for a board that does not exist; a board or answer built on a source the default agent may not Read is *Not found* |
+| Expand a node · count the kinds | Run on `agent/assistant`, within its Access Policies | A kind a rule denies: refused, naming the rule · no Assistant: *{person} may not use Assistant — ask an Admin* |
+| Change the layout · style · hide · switch modes | Run on `agent/assistant`; a change is kept on the board as a version naming who made it | No Assistant: *{person} may not use Assistant — ask an Admin* |
+| Create a dashboard · pin, refresh, unpin a tile | Run on `agent/assistant`; a tile refreshes through the agent that answered it | Disabled — *{person} may not use Assistant — ask an Admin* |
+| Create a board · rename, delete, restore a version | Run on `agent/assistant`; the board is the organisation's, made by the person | Disabled — *{person} may not use Assistant — ask an Admin* |
+| Read who made a board | None — every signed-in person | — |
 | Read the console · re-run a query step | Whoever may read the conversation's runs — the person behind them ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules), [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | Steps of runs they may not read: that they ran, status and tokens |
 | Open the Element panel · stage an edit in Edit mode | Anyone who opens the board | — |
-| Save staged edits to a graph database | Modeller · Admin, on a read + write graph database, through the Record editor ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)) | Save disabled — *Needs the Modeller role — ask an Admin* |
+| Save staged edits to a graph database | Edit on `data/<graph database>/<kind>`, on a read + write graph database, through the Record editor ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)) | Save disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
 | Schedule the question | Anyone, through an agent they may use ([AG-F07](../../../agents/features/AG-F07-schedules/feature.md)) | — |
 
 ## States
@@ -111,7 +111,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | Has data | The drawing, the row, the rail, the dock, the footer's counts |
 | Failed | What failed in a sentence and the next act — a failed query opens the console on its Log; a graph database off or down is named; the board is untouched |
 | Agent working or proposing | An answer drawing onto the board: the reply is live in the thread, the board adds what it brings |
-| No access | A board that does not exist is *Not found*; on a board they open, an act they may not take is disabled, naming the role, the missing agent or the rule; a board or answer built on a source their default agent may not Read is *Not found* |
+| No access | A board that does not exist is *Not found*; on a board they open, an act they may not take is disabled, naming the permission, the missing agent or the rule; a board or answer built on a source their default agent may not Read is *Not found* |
 
 ## Rules
 
@@ -170,7 +170,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Runs — each read and save opens one; who may read a run's content | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) |
 | The built-in workflows `expand-neighbours` · `count-types` · `resolve-elements` and the functions they call | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
-| The Assistant and its Access Policies — what a read may reach · the role check | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
+| The Assistant and its Access Policies — what a read may reach · the permission check | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Who made a board — the platform owns it | [AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine) |
 | Users and teams a board is shared with — who they are, who is on a team | [AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#engine) |
 | Graph databases, their switches, mode and health | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
@@ -228,7 +228,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Board kinds | One registry in the engine, a row per kind: `renders` (`canvas` · `declared`), `subject_required`, what `subject_id` names. Drawn: `data` · `model` · `plan` · `workflow` (a plan's steps) · `envelope` · `lineage`. Declared: `run` · `task_run` · `plan_runs` · `compare` ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) · `skill` · `skill_usage` ([AG-F04](../../../agents/features/AG-F04-skills/feature.md)) · `rule` · `requests` ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) · `models` ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)). There is no `agent` kind — an agent opens as its own page. A new kind is written here first, never added in code |
 | What a gesture writes | `model` stages add · connect · delete; `plan` writes a dependency when a card is dropped on a card; `data` stages add · connect · edit · delete in Edit mode (EX-F06). `workflow`, `envelope`, `lineage` and every declared kind only select. A declared board is drawn from a closed set of panels |
 | Who opens a board | Every signed-in person: a board has no access list. A route answers *Not found* only for a board that does not exist; what the board holds is returned as far as `lineage.may_see(person, copy)` allows, the rest absent, naming nothing |
-| Who changes a board | Every role with the Assistant, through it; each kept change is a version naming who made it |
+| Who changes a board | Anyone with Run on `agent/assistant`, through it; each kept change is a version naming who made it |
 | Who made it | The person who creates a board, or the person behind the run that made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#mechanisms)); the board's owner is the platform |
 | A live declared board has no row | It is built from its subject on every open; the first report kept creates its row. A board whose subject is gone stays and reads *this run is gone* |
 | Restore forks | Restoring reads a version and saves it as a new one; there is no restore route. Opening a version as its own board makes a new board and conversation, made by the person who opened it |

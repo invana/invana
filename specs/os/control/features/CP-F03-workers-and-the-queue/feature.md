@@ -36,7 +36,7 @@ flowchart TD
   flow --> ord["CP-06 · The order work is taken: questions · project tasks · batch"]
   flow --> co["CP-07 · The coordinators · a lost one's runs move on"]
   flow --> adm(["CP-F04 · Admitted, waiting or refused · rate limits · held runs"])
-  wk -->|without Admin| ro(["Reads · acts disabled · Needs the Admin role — ask {admins}"])
+  wk -->|without the permission| ro(["Reads · acts disabled · Needs {permission} on worker/{group} — ask {who can grant}"])
   add -->|the group carries a runtime| rt(["CP-64 · Claude Code · Codex installed on the group"])
   task([A task's run on an outside runtime]) --> sbx["CP-65 · A worker that carries its runtime · its workspace · the sandbox from the agent's policies"]
   sbx -->|no group carries the runtime| nr(["Waits, naming the runtime · then fails"])
@@ -101,14 +101,14 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 this is what it means here.
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read Workers — groups, workers, the runtimes each carries, where work waits, coordinators, rate limits | Operator · Modeller · Admin | — |
-| Add workers · make or change a worker group, its runtimes among them · mint and revoke join keys · drain a worker or a group | Admin | Each act disabled — *Needs the Admin role — ask {admins}* |
-| Read a run's sessions on a worker — its workspace, the sandbox's refusals | The person behind the run · Admin; content as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | That a session ran and was refused; what it touched *withheld*, naming who may read it |
+| Read Workers — groups, workers, the runtimes each carries, where work waits, coordinators, rate limits | Read on `worker/<group>` | — |
+| Add workers · make or change a worker group, its runtimes among them · mint and revoke join keys · drain a worker or a group | Create on `worker/<group>` to add workers, make a group and mint a join key · Edit to change a group or its runtimes and revoke a join key · Manage to drain a worker or a group | Each act disabled — *Needs {permission} on worker/{group} — ask {who can grant}* |
+| Read a run's sessions on a worker — its workspace, the sandbox's refusals | None — the person behind the run · Read on `run/*`, with a logged reason; content as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | That a session ran and was refused; what it touched *withheld*, naming who may read it |
 | Say what an agent may touch on a worker | The agent's Access Policies alone ([AC-37](../../../access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)); nothing on a worker grants | — |
 
 ## States
@@ -121,7 +121,7 @@ this is what it means here.
 | Has data | Each worker group with its workers, what each runs, where steps wait and how many workers would clear it |
 | Failed | A join that failed, naming the check; a lost worker, with how many steps were handed on; a step no group covers, naming the missing label; a session no group carries the runtime for, naming the runtime; a sandbox refusal, naming the file, program or host and the rule |
 | Agent working or proposing | A run waiting names its position and what it waits behind; a session in a workspace names its runtime and its worker |
-| No access | Everything reads; every act is disabled — *Needs the Admin role — ask {admins}* |
+| No access | Everything reads; every act is disabled — *Needs {permission} on worker/{group} — ask {who can grant}* |
 
 ## Rules
 
@@ -235,7 +235,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A group change, mint, revoke or drain by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-08.7 · CP-09.10 · CP-10.10 |
+| 403 | A group change, mint, revoke or drain without Create, Edit or Manage on `worker/<group>` | *Needs {permission} on worker/{group} — ask {who can grant}.* | CP-08.7 · CP-09.10 · CP-10.10 |
 | 409 | A group name already taken | *{name} is taken.* | CP-10.3 |
 | 422 | Labels outside `cpu` · `llm` · `egress` · `gpu` · `code` | *{label} is not a worker label.* | CP-10.3 |
 | 401 | A join with an expired, revoked or used-up key | *This join key {why}.* | CP-10.8 |

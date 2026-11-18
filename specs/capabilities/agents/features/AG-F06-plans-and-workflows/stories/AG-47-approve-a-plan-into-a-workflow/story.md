@@ -18,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Answering an ask is every role's, for an ask that names the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+Answering an ask needs no permission, for an ask that names the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Approve or decline a proposal when named, when the agent has no other approver to route to, or when it is escalated to them | A proposal they made themselves: *Not yours to answer — it waits on {approvers}* |
-| Operator | Approve or decline a proposal for an agent they are a named approver of — never one they proposed; a Modeller the same | *Approve* and *Decline* absent: *Not yours to answer — it waits on {approvers}* |
+| Operator | Approve or decline a proposal for an agent they are a named approver of — never one they proposed | *Approve* and *Decline* absent: *Not yours to answer — it waits on {approvers}* |
 
 ## Flow
 

@@ -100,22 +100,22 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*Ask a question* is *Acts* for Operator, Modeller and Admin — within the agents the person may use
+*Ask a question* needs no permission of its own — within the agents the person may use
 ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)) and those agents' Access Policies
 ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)). A question reads only what the agent it
 runs through may read.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Ask in plain words · answer a question asked back | Anyone, through an agent they may use — the Assistant by default | No agent they may use: the composer disabled — *{person} may not use {agent} — ask an Admin* |
 | Type a Cypher or Gremlin query | Run on `agent/query-console` | The query kinds disabled — *Needs Run on agent/query-console — ask {who can grant}* |
 | Write to a graph database from the composer | A typed write through the Query console asks first: its named approvers decide ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)); the person must hold Edit on `data/<graph database>` and the graph database must be read + write | Without it: refused — *Needs Edit on data/{graph database} — ask {who can grant}.* A read-only graph database: *{name} is read-only — {why}.* |
-| Open, search, reopen, start, rename, pin, archive and delete their own conversations · pick the conversation's agent | The person who started it | Another person's conversations are not listed; an Admin reads their runs in Agents › Runs ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
-| Read a conversation's content | The person who started it, those an answer in it is shared with ([EX-15](../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and Admins — run privacy | That it ran, its status and its tokens; content withheld |
+| Open, search, reopen, start, rename, pin, archive and delete their own conversations · pick the conversation's agent | The person who started it | Another person's conversations are not listed; anyone with Read on `run/<agent>` reads their runs in Agents › Runs ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Read a conversation's content | The person who started it, those an answer in it is shared with ([EX-15](../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and anyone with Read on `run/<agent>` — run privacy | That it ran, its status and its tokens; content withheld |
 | Set a conversation's token budget per run | The person who started it, up to the agent's own | Above the agent's: clamped, and the settings say so |
 | Switch the Assistant off for themselves | Anyone, per browser | — |
 | Have the Assistant open a list | Anyone; what it counts and opens is what the asker may read | Names it cannot resolve under the asker's rights are said as not found |
-| Finish set-up — connect a graph database, publish a model — which opens asking | An Admin connects ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)); a Modeller or an Admin publishes ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)) | The lock with *Ask an Admin* in place of the step's act |
+| Finish set-up — connect a graph database, publish a model — which opens asking | Create on `setting/graph-databases` connects ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)); a person with Publish on `model/<model>` publishes ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)) | The lock with *Ask an Admin* in place of the step's act |
 
 ## States
 
@@ -222,7 +222,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 404 | Another person's conversation, its turns or their context, read by anyone but its asker, those it is shared with and Admins | *Not found.* | EX-10.13 |
+| 404 | Another person's conversation, its turns or their context, read by anyone but its asker, those it is shared with and anyone with Read on `run/<agent>` | *Not found.* | EX-10.13 |
 | 409 `setup_incomplete` | An ask before set-up is done — CP-F05's gate | *Asking opens when {step}.* | EX-11.6 |
 | 403 | An ask through an agent the person may not use | *{person} may not use {agent} — ask an Admin.* | EX-10.11 · EX-10.23 · EX-08.16 |
 | 422 | An ask through an agent whose policies allow Read on no kind of the published model; never re-routed | *{agent} cannot read your Graph Data — pick another agent for this conversation.* | EX-10.18 |
@@ -236,7 +236,7 @@ the typed query plan ([system-design § 10](../../../../system-design.md#10-ai-a
 | refused `plan_across_graph_databases` | A plan relating kinds in different graph databases — a hop, a filter or an aggregate across them; outcome `cannot_answer`, never run | *Not yet — {kind} is in {graph database} and {kind} in {graph database}; Invana does not join across graph databases yet.* | EX-01.11 |
 | refused `plan_gap` | A question the plan grammar cannot express; outcome `cannot_answer`, never a raw query | *I cannot ask this yet — a plan cannot {what it lacks}.* | EX-01.16 |
 | refused | A plan needing a graph database switched off, or one that does not answer | *{name} is off — switched off by {person} {when}.* · *{name} is not answering.* | EX-01.18 |
-| 403 | A typed write by a person whose role does not hold *Edit on the board* | *Edit on the board needs the Modeller role.* | EX-08.13 |
+| 403 | A typed write by a person without Edit on `data/<graph database>` | *Needs Edit on data/{graph database}/{kind} — ask {who can grant}.* | EX-08.13 |
 | 409 | A typed write to a read-only graph database | *{name} is read-only — {why}.* | EX-08.14 |
 | 403 | An agent answers a question asked back | *Only a person answers a question asked back.* | EX-23.11 |
 

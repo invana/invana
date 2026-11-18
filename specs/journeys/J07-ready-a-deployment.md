@@ -16,7 +16,7 @@ boards: [settings.databases, settings.ai, settings.policies, settings.workers, s
 
 ```mermaid
 flowchart TD
-  A([Invana is deployed on Lee's machines]) --> B["AC-18 · Make the first Admin, then each person's account with one role"]
+  A([Invana is deployed on Lee's machines]) --> B["AC-18 · Make the first Admin, then each person's account with the newcomer policies"]
   B -->|an email or username taken · a rule broken| B1["Refused, naming which"] --> B
   B --> C["CP-17 · Install the connector for each kind of graph database"]
   C -->|a package fails to load · two claim one name| C1["invana version names the package and the error · not offered"] --> C
@@ -40,14 +40,14 @@ flowchart TD
   I --> J(["People sign in and ask · J01 · J05"])
   J --> K["CP-34 · Read what each team, user and agent spends against its limits"]
   K -->|near or at a limit| L(["Lee raises it in CP-11, or leaves it"])
-  B -.->|an Operator| N(["Reads what its role reaches · every set-up act names the Admins"])
+  B -.->|an Operator| N(["Reads what its policies reach · every set-up act names the Admins"])
 ```
 
 ## Steps
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Make the first Admin and each person's account, with one role | Access Plane · Directory · `invana users create` | AC-18 | — |
+| 1 | Make the first Admin and each person's account, with the newcomer policies | Access Plane · Directory · `invana users create` | AC-18 | — |
 | 2 | Install the connector package for each kind of graph database; read it in `invana version` | Control Plane · Graph databases · the engine's machine | CP-17 | — |
 | 3 | Connect each graph database, set its mode, switch it on and name a practice one | Control Plane · Graph databases | CP-25 · CP-38 · CP-39 · CP-41 | `settings.databases · Connect` · `settings.databases · Detail` |
 | 4 | Add AI models, each marked local or external | Control Plane · AI models | CP-01 | `settings.ai` |
@@ -73,5 +73,5 @@ flowchart TD
 
 ## Done when
 
-- Every person who needs Invana has an account with one role, and no account has a default password.
+- Every person who needs Invana has an account with the newcomer policies, and no account has a default password.
 - Every graph database is connected in the mode Lee chose and switched on, an AI model answers, every team holds the agents it needs under Access Policies Lee wrote, workers take every step, and each team, user and agent runs inside the limits Lee set.

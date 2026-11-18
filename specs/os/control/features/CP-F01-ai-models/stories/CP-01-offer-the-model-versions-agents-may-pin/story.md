@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add, edit, rename and remove an endpoint; ping it; offer and stop offering a version; make one the default | — |
-| Operator | Operator · Modeller: read every endpoint, version, local or external, status, the default and who pins it ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Add an endpoint*, *Ping* and each act disabled — *Needs the Admin role — ask {admins}*; keys are never shown |
+| Admin | With Create or Edit on `setting/ai-models`: add, edit, rename and remove an endpoint; ping it; offer and stop offering a version; make one the default | — |
+| Operator | Read every endpoint, version, local or external, status, the default and who pins it ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Add an endpoint*, *Ping* and each act disabled — *Needs Edit on setting/ai-models — ask {who can grant}*; keys are never shown |
 
 ## Flow
 
@@ -62,7 +62,7 @@ flowchart TD
 | CP-01.9 | An endpoint name | it is not lowercase letters, digits, hyphens and underscores | it is refused — *Use lowercase letters, digits, hyphens and underscores* |
 | CP-01.10 | A provider that rate-limits, a local model that is not running, or a rotated key | a run calls it | the run fails, naming the endpoint and the provider's message — never as *cannot answer* |
 | CP-01.11 | A ping | it runs | it is a run; History records who pinged, when and the result (AC-F06) |
-| CP-01.12 | An Operator or a Modeller | they open AI models, or call a write route | everything reads but keys; *Add an endpoint*, *Ping* and every act are disabled — *Needs the Admin role — ask {admins}* — and the route answers 403 |
+| CP-01.12 | An Operator | they open AI models, or call a write route without Create or Edit on `setting/ai-models` | everything reads but keys; *Add an endpoint*, *Ping* and every act are disabled — *Needs Edit on setting/ai-models — ask {who can grant}* — and the route answers 403 |
 | CP-01.13 | A model version | it is read | it shows *Local* or *External*, its endpoint's mark (CP-61) |
 | CP-01.14 | An Admin | they make an offered version the *Default* | it reads *Default* and no other version does; an agent that pins none runs on it |
 | CP-01.15 | An endpoint marked local | a call goes to it | it counts as local only when the engine resolves its address to loopback or a private network at that call, rebinding checked; one that resolves elsewhere is treated as external, and *What left the platform* records it so (CP-61 · AC-F09) |

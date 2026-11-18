@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Install and remove a runtime plugin; switch it on or off; pick the worker groups that carry it (CP-10) | — |
-| Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it; a Modeller reads the same | *Install* and *Remove* disabled — *This needs an Admin — ask {admins}* |
+| Admin | With Create (install) or Manage (remove) on `plugin/<name>`: install and remove a runtime plugin; switch it on or off; pick the worker groups that carry it (CP-10) | — |
+| Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it | *Install* and *Remove* disabled — *Needs Create on plugin/{name} — ask {who can grant}* |
 
 ## Flow
 

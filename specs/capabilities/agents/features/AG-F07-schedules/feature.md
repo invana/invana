@@ -82,13 +82,15 @@ sequenceDiagram
 
 ## Access
 
-Schedules are *Acts* for every role in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a schedule is the organisation's, and a person acts on it only through its agent, granted to them ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
+The permission each act needs is the *Agents* row of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a schedule is the organisation's, and a person acts on it only through its agent, granted to them ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every schedule and its firings | Every signed-in person — Operator, Modeller, Admin | — |
+| Read every schedule and its firings | None — every signed-in person | — |
 | Read a firing's run | As any run ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)) | That it ran, its agent, its status and its tokens |
-| Create, edit, pause, resume, run now or delete a schedule | Operator · Modeller · Admin, when the schedule's agent is granted to them | Only granted agents are offered to name; a schedule whose agent is not granted to the reader reads, every act disabled — *Uses {agent}, which is not granted to you* |
+| Create, edit, pause, resume, run now or delete a schedule | Run on the schedule's `agent/<name>` | Only granted agents are offered to name; a schedule whose agent is not granted to the reader reads, every act disabled — *Uses {agent}, which is not granted to you* |
 | Approve or decline an outward delivery | The agent's named approvers, then the Admins ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, naming who it waits on |
 | Read a delivered result | Who set the schedule and the named recipients, in their Inbox | — |
 

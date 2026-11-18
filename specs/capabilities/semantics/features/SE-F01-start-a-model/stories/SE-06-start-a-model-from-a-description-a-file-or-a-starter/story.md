@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open *New model*, start from a description, a file or a starter, and land on the new draft | — |
-| Operator | See the models and their drafts; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* and *Import* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | See the models and their drafts; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* and *Import* disabled — *Needs Create on model/{model} — ask {who can grant}* |
 
 ## Flow
 
@@ -43,7 +43,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-06.1 | A Modeller or an Admin | they pick *New model* | one dialog asks a name, a description, the graph database its records live in — the only one preselected when there is one — and where to start — *Describe it* · *From a file* · *From an ontology* · *From a starter* · *Import a model file* |
+| SE-06.1 | A person with Create on models | they pick *New model* | one dialog asks a name, a description, the graph database its records live in — the only one preselected when there is one — and where to start — *Describe it* · *From a file* · *From an ontology* · *From a starter* · *Import a model file* |
 | SE-06.2 | *Describe it* with a description | they pick *Open the draft* | the model and its empty draft are made, the draft canvas opens with the assistant docked, and the assistant stages kinds and relationships on the draft as it drafts them |
 | SE-06.3 | The assistant has drafted a model | the person replies in the same conversation | the assistant changes the draft; nothing is published |
 | SE-06.4 | A described model | its page opens | its head reads the description the person typed |
@@ -55,7 +55,7 @@ flowchart LR
 | SE-06.10 | A starter already in the deployment | a newer starter version ships | it is offered as a new version with what changes; it is never applied by itself |
 | SE-06.11 | A draft from a starter | the person deletes the kinds they do not need | the rest stays a draft until they publish it |
 | SE-06.12 | A model the assistant drafted | the person opens *How it got here* on the draft | it shows the conversation, the description it started from, and each kind it staged |
-| SE-06.13 | An Operator | they reach *New model* | it is disabled with *Needs the Modeller role — ask an Admin* |
+| SE-06.13 | An Operator | they reach *New model* | it is disabled with *Needs Create on model/{model} — ask {who can grant}* |
 | SE-06.14 | A model drafted from a description, a file or a starter | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
 
 ## Screens

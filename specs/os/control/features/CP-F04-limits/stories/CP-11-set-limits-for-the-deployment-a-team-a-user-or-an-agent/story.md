@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every limit with what is used now; set, change or clear the deployment's, a team's, a user's or an agent's limits | — |
-| Operator | Operator · Modeller: read every limit, what is used now and its meter ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Admin | Read every limit with what is used now; with Edit on `worker/<group>`, set, change or clear the deployment's, a team's, a user's or an agent's limits | — |
+| Operator | read every limit, what is used now and its meter ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
 
 ## Flow
 
@@ -61,7 +61,7 @@ flowchart TD
 | CP-11.7 | Runs at once lowered below what is running | it is saved | running work finishes; nothing new starts until the count is under |
 | CP-11.8 | A run that makes helpers | the helpers would pass a limit | they wait or are refused like any run, against the parent's agent, person, teams and the deployment, naming the limit and the parent |
 | CP-11.9 | A subject at its tokens a month | an agent would run | the run is held — *{subject} has used its {n} tokens this month*; a question a person asks the Assistant still answers within its tokens a run |
-| CP-11.10 | An Operator or a Modeller | they open *Usage and limits*, or call a limit's write route | every limit reads; *Edit* is disabled — *Needs the Admin role — ask {admins}* — and the route answers 403 |
+| CP-11.10 | An Operator | they open *Usage and limits*, or call a limit's write route | every limit reads; *Edit* is disabled — *Needs Edit on worker/{group} — ask {who can grant}* — and the route answers 403 |
 | CP-11.11 | An Admin | they save a limit outside its range, or one naming a team, user or agent that does not exist | it is refused — *{field}: {why}* — and nothing is saved |
 | CP-11.12 | A limit set, changed or cleared | it saves | History records who changed which subject's limit, old and new, and when (AC-F06) |
 | CP-11.13 | A limit row | it is read | each limit reads its ceiling · used now · a meter |
@@ -73,7 +73,7 @@ flowchart TD
 | CP-11.19 | A project's task, a pick-up or a schedule's firing on a project | it is admitted | the tightest of the project's, the agent's and the deployment's limits binds it, whoever set it going; no person's or team's limit holds or refuses it; a schedule's firing outside any project is bound by the agent's and the deployment's alone |
 | CP-11.20 | An Admin | they set *Tokens a session* on a team or a user, or clear the deployment's | it is refused — *Tokens a session is set for the deployment and for agents.* · *The deployment always has tokens a session.* — and nothing is saved |
 | CP-11.21 | A session that reaches its tokens a session — the agent's, else the deployment's | it is reached | the session ends and the run continues in a fresh session from a hand-off note, same run and number; nothing is asked, and its tokens a run and a month still bind the whole run |
-| CP-11.22 | Settings › Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| CP-11.22 | Settings › Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
 | CP-11.23 | A project | its limits are set — in its Access, the *Fleet / Workers* tab | only *Runs at once* and *Tokens a month* are offered; any other is refused — *A project takes runs at once and tokens a month.* — and Usage and limits lists the project beside teams, users and agents |
 | CP-11.24 | A project at its *Tokens a month*, with pick-up set to *Allow* | a team agent looks for work | it claims nothing and the project's runs are held — *{project} has used its {n} tokens this month*; there is no other pick-up cap; a person without Manage on Projects for it who sets the limit is refused, naming the permission |
 

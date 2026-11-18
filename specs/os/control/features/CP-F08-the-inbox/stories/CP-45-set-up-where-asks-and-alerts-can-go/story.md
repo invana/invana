@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add, test and remove a channel; replace its secret — each with the password again | — |
-| Operator | Read every channel — its kind, masked target and whether it is ready | *Add channel*, *Test* and *Remove* are disabled — *Needs the Admin role — ask Priya or Lee*. A secret never reads back to anyone |
+| Admin | With Create or Edit on `setting/connections`: add, test and remove a channel; replace its secret — each with the password again | — |
+| Operator | Read every channel — its kind, masked target and whether it is ready | *Add channel*, *Test* and *Remove* are disabled — *Needs Create or Edit on setting/connections — ask {who can grant}*. A secret never reads back to anyone |
 
 ## Flow
 

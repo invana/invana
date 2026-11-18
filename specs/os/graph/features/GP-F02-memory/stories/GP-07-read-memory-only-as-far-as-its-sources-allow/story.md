@@ -17,13 +17,13 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 ## Who can
 
 A memory node inherits its sources' resources ([GP-06](../GP-06-see-where-any-excerpt-came-from-and-who-may-see-it/story.md)).
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); the
+The permission each act needs is [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); the
 person's agent is their default agent ([AC-F02 › Rules › The default agent](../../../../../access/features/AC-F02-access-policies/feature.md#rules)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse the thinking graph; open a node whose memory place and every source their default agent may Read | A node whose place their agent may not Read: its head only. A node with a source their agent may not Read is absent, with no note |
-| Operator | The same; a Modeller reads the same | The same |
+| Operator | The same | The same |
 
 ## Flow
 

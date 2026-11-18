@@ -17,14 +17,14 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 a person asks when they may read both projects; the other project's people on the team accept
 ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask any project they may read for help from a task they may read; accept or reject an ask on a project whose team they are on | A project they may not read is not offered as a target |
-| Operator | The same; a Modeller the same | Not a person on the asked project: the ask reads there, *Accept* and *Reject* disabled — *Join the team to change it* |
+| Operator | The same | Not a person on the asked project: the ask reads there, *Accept* and *Reject* disabled — *Join the team to change it* |
 
 ## Flow
 

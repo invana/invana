@@ -24,7 +24,7 @@ The role × feature table is [AC-F02 › The permission catalogue](../../../../.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the map of any project their default agent may Read; open any node on it | A node whose run they may not read: its head only, content withheld. A node whose sources their agent may not Read is absent |
-| Operator | The same; a Modeller the same | A project their default agent may not Read: its head only — *Withheld — your agent may not read `memory/project/{key}`*. A node they may not read: its head only |
+| Operator | The same | A project their default agent may not Read: its head only — *Withheld — your agent may not read `memory/project/{key}`*. A node they may not read: its head only |
 
 ## Flow
 

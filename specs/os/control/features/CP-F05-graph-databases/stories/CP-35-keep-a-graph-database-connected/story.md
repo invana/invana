@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Change description, address, user, password or database after a passing test; reconnect; read the types again; declare a server version or accept an untested one; remove it — signing in again for a credential change and for removal | — |
+| Admin | With Edit on `setting/graph-databases`: change description, address, user, password or database after a passing test; reconnect; read the types again; declare a server version or accept an untested one; remove it — signing in again for a credential change and for removal | — |
 | Operator | Read the graph database — connector, server version, address, user, database, mode, switch, status | The password field is absent; *Save*, *Test connection*, *Reconnect*, *Read types again*, *Declare version*, *Accept this version* and *Remove* read *Ask an Admin* |
 
 ## Flow
@@ -61,7 +61,7 @@ flowchart TD
 | CP-35.10 | An unreachable graph database | the Admin presses *Reconnect* | it tries again and the status refreshes, saying when it last connected |
 | CP-35.11 | Remove | the Admin types a name that is not this one | it is refused, saying *Type {name} to remove it* |
 | CP-35.12 | A graph database a rule, a project or a workflow names | the Admin removes it | it is refused, naming each of them |
-| CP-35.13 | An Operator or a Modeller | they reach any act | it reads *Ask an Admin*, naming the Admins; the password field is absent |
+| CP-35.13 | An Operator | they reach any act | it reads *Ask an Admin*, naming the Admins; the password field is absent |
 | CP-35.14 | A credential change or a removal | the Admin sends it | they are asked for their password for this act; a wrong password or a key is refused and nothing changes |
 | CP-35.15 | Nothing names it | the Admin removes it, typing its name and signing in again | it is gone from the list and from Graph Data; the database's own data is untouched; History keeps who removed it, with its name |
 | CP-35.16 | A connector that cannot detect its server version | the Admin declares the version | it is saved, and the property types the model offers follow it, as a detected version would |

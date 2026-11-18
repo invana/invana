@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Present any board, from the first step or any reply's step | — |
-| Operator | Present any board — presenting is read-only; a Modeller the same | A link to a board that does not exist: *Not found* |
+| Operator | Present any board — presenting is read-only | A link to a board that does not exist: *Not found* |
 
 ## Flow
 

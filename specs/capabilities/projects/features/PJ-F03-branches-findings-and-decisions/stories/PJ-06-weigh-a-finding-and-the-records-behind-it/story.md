@@ -19,13 +19,13 @@ Adding an answer from Explore as a finding is [EX-12](../../../../../explore/fea
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add a finding to any branch they can see; review any finding; open every finding, the records behind it through the agents they may use, and every run behind it | A record of a kind their agents may not read is absent from the evidence; on an archived project every act is disabled |
-| Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
+| Operator | The same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
 
 ## Flow
 
@@ -64,7 +64,7 @@ flowchart LR
 | PJ-06.11 | A finding citing a record of a kind the reader's agents may not read | they open it | that cite is absent, with no note; the statement, the stance and every other cite read |
 | PJ-06.12 | The engine cannot return the finding, or refuses an add | the page loads or the add is made | it says *Could not load* / *Could not add the finding* with the reason and *Try again*; nothing is added |
 | PJ-06.13 | A finding added from a what-if answer ([EX-33](../../../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)) | it is read anywhere | it reads *predicted* beside its stance, and its cites name the evidence labelled *predicted* |
-| PJ-06.14 | A finding whose run the reader may not read — they are not behind it, do not own its agent and are not an Admin | they open *How it got here* | it reads that the run ran, its status and its tokens; the steps read *Content withheld* |
+| PJ-06.14 | A finding whose run the reader may not read — they are not behind it, do not own its agent and do not hold Read on `run/<agent>` | they open *How it got here* | it reads that the run ran, its status and its tokens; the steps read *Content withheld* |
 | PJ-06.15 | An archived project | someone opens a finding or the add dialog | the finding reads in full; *Add a finding* and *Review* are disabled, saying the project is archived |
 
 ## Screens

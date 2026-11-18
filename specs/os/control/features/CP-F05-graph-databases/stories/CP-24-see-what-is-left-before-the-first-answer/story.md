@@ -10,7 +10,7 @@ boards: [start.home]
 # CP-24 · See what is left before the first answer
 
 **As** an Admin readying a fresh deployment **I want** to see what still stands between it and a first answer, and why
-each step matters **so that** I can do it, or hand it to a Modeller or a terminal, without guessing.
+each step matters **so that** I can do it, or hand it to someone who can model or to a terminal, without guessing.
 
 Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every step; open each one where its fact is made; skip or bring back an offer | — |
-| Operator | Read every step, its idea and its command | Each step's act reads the role it needs — *Ask an Admin* for graph databases and AI models, *Ask a Modeller* for the model and records, naming who holds it |
+| Operator | Read every step, its idea and its command | Each step's act reads the permission it needs — *Ask an Admin* for graph databases and AI models, *Needs Edit on model/{model} — ask {who can grant}* for the model and records |
 
 ## Flow
 
@@ -30,7 +30,7 @@ flowchart TD
   s -->|done| ck["Checked · its fact named"]
   s -->|to do| go["Its idea · why · how · the command · Open where it is made"]
   s -->|blocked| bl["Names the step that unblocks it"]
-  s -->|without the role| ask["Ask an Admin · Ask a Modeller"]
+  s -->|without the permission| ask["Ask an Admin · Needs {permission} — ask {who can grant}"]
   go -->|done in Graph databases, Model, Graph Data, AI models or a terminal| re["Set-up re-reads · the next step is chosen"]
   re --> l
   l -->|four done| a(["The first answer · set-up steps aside · the first-run question in the composer"])
@@ -51,7 +51,7 @@ flowchart TD
 | CP-24.9 | The four required steps done | set-up reads | it steps aside; it stays one click away from Home |
 | CP-24.10 | A deployment mid set-up | Home draws | it shows the progress and *Continue set-up* |
 | CP-24.11 | A person signing in to a ready deployment | Home opens | they never see set-up |
-| CP-24.12 | An Operator | they reach a step's act | it reads the role it needs — *Ask an Admin* or *Ask a Modeller* — naming who holds it |
+| CP-24.12 | An Operator | they reach a step's act | it reads the permission it needs — *Ask an Admin*, or *Needs {permission} on {resource} — ask {who can grant}* — naming who can grant it |
 | CP-24.13 | The AI model failing its check | set-up reads | the step reads not done, and Explore and the console keep working — the step says so |
 
 ## Screens

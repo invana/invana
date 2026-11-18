@@ -25,8 +25,8 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([A skill's or an agent's page › Evals]) --> may{"A Modeller or an Admin?"}
-  may -->|no| ro["Cases, results and alerts read; acts disabled, naming the role"]
+  start([A skill's or an agent's page › Evals]) --> may{"Edit on the agent or skill?"}
+  may -->|no| ro["Cases, results and alerts read; acts disabled, naming the permission"]
   may -->|yes| set{"AG-56 · Has cases?"}
   set -->|no| pr["AG-56 · Write a case · Propose from the instructions"]
   pr -->|the Assistant proposes| pc["Proposed cases — accept one by one"]
@@ -49,7 +49,7 @@ flowchart TD
   dr -->|same or better| ok(["Recorded, nothing raised"])
   ev -->|the eval token budget is spent| bz["AG-59 · Scheduled runs pause; a publish-time run runs with a warning"]
   dr -->|the eval token budget is spent| pz(["AG-59 · Paused: budget reached"])
-  adm([Usage and limits]) --> bud["AG-59 · The eval token budget — an Admin sets it"]
+  adm([Usage and limits]) --> bud["AG-59 · The eval token budget — set with Edit on setting/deployment"]
 ```
 
 ```mermaid
@@ -82,16 +82,18 @@ sequenceDiagram
 
 ## Access
 
-*Test an agent and a skill* is *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+The permission each act needs is the *Agents* and *Skills* rows of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); this table names the acts;
 a built-in agent or skill is never edited, and making or owning one grants nothing ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)).
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read an eval set — cases, checks, judge, rubric — its eval runs, test runs, drift alerts and the eval token budget | Every signed-in person — Operator, Modeller, Admin | — |
-| Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | Modeller · Admin. Never on a built-in agent or skill | Each act disabled — *Needs the Modeller role — ask an Admin*; a built-in reads its set, with *Copy* |
-| Promote a run's answer to a case | Modeller · Admin, who may read the run's content ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) | *Promote to eval* disabled on the run, naming the role |
-| Set the deployment's eval token budget | Admin | The budget and what is spent read; editing disabled — *Needs the Admin role* |
-| Name the practice graph database | Admin ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | Evals read *No practice graph database — reading in read mode* |
+| Read an eval set — cases, checks, judge, rubric — its eval runs, test runs, drift alerts and the eval token budget | Read on `agent/<name>` · `skill/<name>` | — |
+| Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | Edit on `agent/<name>` or `skill/<name>`. Never on a built-in agent or skill | Each act disabled — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}*; a built-in reads its set, with *Copy* |
+| Promote a run's answer to a case | Edit on `agent/<name>` or `skill/<name>`, and who may read the run's content ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) | *Promote to eval* disabled on the run, naming the permission |
+| Set the deployment's eval token budget | Edit on `setting/deployment` | The budget and what is spent read; editing disabled — *Needs Edit on setting/deployment — ask {who can grant}* |
+| Name the practice graph database | Edit on `setting/graph-databases` ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | Evals read *No practice graph database — reading in read mode* |
 
 ## States
 
@@ -103,7 +105,7 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | Has data | The set's cases, each a question with its checks and *passing* or *failing*; the last eval run's tiles — hard checks passed, changed answers, time p95, tokens per case — against live; the test runs, newest first; the spent-of-budget line |
 | Failed | The gate's refusal where the act was, naming the case and the check; a read that failed names what, in the engine's words |
 | Agent working or proposing | The Assistant proposing cases; an eval run or a test with its cases filling in; drift running |
-| No access | Everything reads; every act is disabled, naming the role |
+| No access | Everything reads; every act is disabled, naming the permission |
 
 ## Rules
 
@@ -120,7 +122,7 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | Cases are a person's | The Assistant proposes up to five cases; each waits as *proposed* until a person accepts it. Promoting a run's answer is a person's act; an agent never promotes |
 | A case outlives its run | A retired case keeps the results it judged; a case whose run is gone keeps its question and checks |
 | Drift is checked, not guessed | The live version's evals run again when its model version moves, the model publishes, a rule or an Access Policy it reads changes, and nightly; fewer hard checks passing, or time or tokens past 1.5× the last run, raise an alert to the people the alert kind names — the agent's named approvers, then the Admins ([CP-F11](../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) — naming what changed |
-| Evals spend their own tokens | The deployment's eval token budget, set by an Admin, is apart from the limits per team, user and agent ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)); at its ceiling scheduled eval runs and drift pause and say so, and a publish-time run still runs with a warning |
+| Evals spend their own tokens | The deployment's eval token budget, set with Edit on `setting/deployment`, is apart from the limits per team, user and agent ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)); at its ceiling scheduled eval runs and drift pause and say so, and a publish-time run still runs with a warning |
 | Every call is in the ledger | Eval, judge and test calls are recorded like any run's ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)); a sensitive property never goes to an external judge |
 | Tokens, never currency | Every budget and count of spend is in tokens ([glossary › Token budget](../../../../glossary.md#what-may-happen)) |
 | The engine counts | Hard checks passed, changed answers, p95, tokens per case, *same as live* and every ratio are the engine's; Studio formats them |
@@ -173,7 +175,7 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | `POST /evals/{kind}/{id}/runs` · `GET /evals/{kind}/{id}/runs` | Run the set — the candidate beside live, or live only · its eval runs, newest first, with the verdict and `versus_live` | AG-57 |
 | `GET /{kind}s/{id}/tests` · `POST /{kind}s/{id}/tests` | Test runs, newest first — `id` · `question` · `tokens` · `duration_ms` · `outcome` · `status` · `finished_at` · `{question}` → `202 {run_id, stream_url}` | AG-57 |
 | `POST /evals/drift` | Run drift now, naming what moved | AG-58 |
-| `GET /evals/budget` · `PUT /evals/budget` | The deployment's eval token budget and what is spent this month · set it (Admin) | AG-59 |
+| `GET /evals/budget` · `PUT /evals/budget` | The deployment's eval token budget and what is spent this month · set it (Edit on `setting/deployment`) | AG-59 |
 
 `{kind}` is `agent` or `skill`; `{id}` is the agent's or skill's name.
 
@@ -196,9 +198,9 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | 422 | A judge set to the model version under test | *The judge cannot be the model it grades.* | AG-56.5 |
 | 422 | A case, set or run on a built-in agent or skill | *{subject} is built in — copy it to change it.* | AG-56.12 |
 | 403 | Promoting a run whose content the caller may not read | *Only who is behind this run, or whose default agent may see a project run's sources, reads it.* | AG-56.9 |
-| 403 | The eval token budget changed by anyone but an Admin | *This needs the Admin role.* | AG-59.3 |
-| 403 | A write by someone whose role is not Modeller or Admin | *This needs the Modeller role — ask an Admin.* | AG-56.11 · AG-57.11 |
-| 403 | A write without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-56.11 · AG-57.11 |
+| 403 | The eval token budget changed by anyone without Edit on setting/deployment | *This needs Edit on setting/deployment — ask {who can grant}.* | AG-59.3 |
+| 403 | A write by someone without Edit on the agent or skill | *This needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}.* | AG-56.11 · AG-57.11 |
+| 403 | A write without Edit on agent/{agent} or skill/{skill} | *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}.* | AG-56.11 · AG-57.11 |
 | run settles `paused: budget` | A scheduled eval run or drift with the eval token budget spent | *The eval token budget is spent for this month.* | AG-59.2 |
 
 ### CLI
@@ -246,7 +248,7 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | An edit cannot ship a regression | A case prefers a check the engine runs on the answer's query over a judged score; an answer that claims what it cites no record for fails its case (*cites records*) |
 | A sensitive ask is promoted by a person who read it | Promoting is a person's act on a run they may read |
 | The eval token budget sits with the limits | It reads on Settings › Workers › Limits beside the limits per team, user and agent, apart from them |
-| No practice graph database is not a refusal | The evals read the real graph database in its read mode, so a publish is never blocked on an Admin naming one; the run says which it read |
+| No practice graph database is not a refusal | The evals read the real graph database in its read mode, so a publish is never blocked on a person naming one; the run says which it read |
 
 ## Open questions
 

@@ -17,14 +17,14 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 relating is a setting, its team's, on projects the person may read
 ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Relate any project to another they may read; start a project from a task or finding; remove a relation | A project they may not read is not offered |
-| Operator | The same, on a project whose team they are on; start a project from any task or finding they may read; a Modeller the same | On a project whose team they are not on, *Relate* and *Remove* are disabled — *Join the team to change it* |
+| Operator | The same, on a project whose team they are on; start a project from any task or finding they may read | On a project whose team they are not on, *Relate* and *Remove* are disabled — *Join the team to change it* |
 
 ## Flow
 
@@ -54,7 +54,7 @@ flowchart TD
 | PJ-23.5 | A group that waits on another project's group (PJ-18) | it is saved | both projects list *Waits on*; removing the last such wait removes the relation |
 | PJ-23.6 | A project related to itself, or to one already related that way | it is saved | it is refused — *{project} is already {relation}*; nothing is saved |
 | PJ-23.7 | A run of a task on a project | it reads project memory | it reaches its own project, the projects related to it by any relation, and its task — nothing else, whatever its policies allow beyond ([AC-F04](../../../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
-| PJ-23.8 | An Operator or a Modeller not on the team | they open *Related* | it reads; *Relate* and *Remove* are disabled — *Join the team to change it*; a call is refused the same way |
+| PJ-23.8 | An Operator not on the team | they open *Related* | it reads; *Relate* and *Remove* are disabled — *Join the team to change it*; a call is refused the same way |
 | PJ-23.9 | A related project the reader may not read | *Related* lists it | its head reads; its content reads *Withheld — join the team or ask {who can grant}* |
 | PJ-23.10 | A relation | a person on the team removes it | both projects stop listing it, a run started after it reaches only the projects still related, and History records it; *Waits on* is removed only with its group waits |
 

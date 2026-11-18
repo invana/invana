@@ -27,8 +27,8 @@ flowchart TD
   m -->|loading| ld["The tab holds its shape"]
   m -->|failed| fl["Could not load · Try again"]
   m -->|nothing yet| e["No meaning yet — Add a definition"]
-  m -->|Change in a draft| may{Modeller or Admin?}
-  may -->|no| na["Reads · Needs the Modeller role — ask an Admin"]
+  m -->|Change in a draft| may{"Holds Edit on model/<model>?"}
+  may -->|no| na["Reads · Needs Edit on model/{model} — ask {who can grant}"]
   may -->|yes| d["Staged in the draft"]
   d -->|a property's level| lv["public · internal · confidential · personal"]
   lv -->|lowered| wd["Shown as a widening · History records it"]
@@ -46,10 +46,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read a kind's and a property's meaning, and each property's level | Every signed-in person — Operator, Modeller, Admin | — |
-| Change a definition, synonym, unit, outside term or a property's level in a draft · accept a proposed one | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |
+| Read a kind's and a property's meaning, and each property's level | Read on `model/<model>` | — |
+| Change a definition, synonym, unit, outside term or a property's level in a draft · accept a proposed one | Edit on `model/<model>` | Absent; *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## States
 
@@ -70,7 +70,7 @@ flowchart TD
 | Meaning is a tab on a kind | *Meaning* beside Properties · Indexes · Constraints · Mappings; a property's meaning sits on its row |
 | Five parts | **Definition** — one or two sentences · **Synonyms** — the words people ask with, unique across the published models · **Unit** — per number property, from a fixed list · **Outside terms** — an address (IRI), a schema.org type or property, or a *same as* address elsewhere · **Level** — per property, one of four |
 | Four levels | `public` · `internal` · `confidential` · `personal`, set per property of a kind in Meaning. A property no one has set is `internal`. *Sensitive* means confidential or personal |
-| A level is set in a draft | A Modeller or an Admin sets it in the model's draft; it is published with the model, in force from that version, and never changes a record. A level is the model's, never a policy file's |
+| A level is set in a draft | A person with Edit on the model sets it in the model's draft; it is published with the model, in force from that version, and never changes a record. A level is the model's, never a policy file's |
 | Confidential and personal stay inside | They never go to an external AI model, an outside tool or an outside agent; what an export, a published report, an MCP client, an outside runtime or a channel carries leaves them out, and says what it left out ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
 | A derived value keeps the highest level | A derived fact's property takes the highest level of the properties it was derived from; a derivation never lowers it ([SE-F08](../SE-F08-inference/feature.md)) |
 | Lowering a level is a widening | A draft that lowers a property's level shows it as a widening — more agents and more exits reach it — in the review before publish, and History records who lowered it, from what, to what |
@@ -133,7 +133,7 @@ levels; [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.m
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A change by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-20.8 |
+| 403 | A change by someone without Edit on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-20.8 |
 | 409 | A synonym another published kind has | *{synonym} already means {kind} in {model}.* | SE-20.4 |
 | 422 | An outside term that is not an address | *{field}: not an address.* | SE-20.5 |
 | 422 | A level that is not one of the four | *{level} is not a level — public, internal, confidential or personal.* | SE-20.11 |

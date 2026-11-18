@@ -19,8 +19,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | List every run and read its head and sessions; read a run's content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says — the role adds none; stop any run ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | A run whose content they may not read: its head and sessions, its content *withheld* |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): list every run and read its head and sessions; read a run's content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says; stop a run they are behind ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other run lists and opens with that it ran, its agent, the person behind it, its status, its tokens and its sessions — its content *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop run* disabled, naming who may stop it |
+| Admin | List every run and read its head and sessions; read a run's content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says — the permission adds none; stop any run ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | A run whose content they may not read: its head and sessions, its content *withheld* |
+| Operator | list every run and read its head and sessions; read a run's content as [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) says; stop a run they are behind ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) | Any other run lists and opens with that it ran, its agent, the person behind it, its status, its tokens and its sessions — its content *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); *Stop run* disabled, naming who may stop it |
 
 ## Flow
 
@@ -57,11 +57,11 @@ flowchart LR
 | CP-50.13 | History | it reads | the run's history rows (AC-F06), filtered to it |
 | CP-50.14 | An ask the run waits on, routed to the reader | the run is read | it is listed under *Waiting on you* and opens it in *Needs you* |
 | CP-50.15 | A run still going | its page is open | it reads *running* with time so far, its agents and steps filling in, refreshed every few seconds |
-| CP-50.16 | A run still going that the reader may stop — they are behind it or are an Admin | its page is open | *Stop run* is offered and stops it as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says; an ended run offers no *Stop run* |
+| CP-50.16 | A run still going that the reader may stop — they are behind it or hold Manage on `run/<agent>` | its page is open | *Stop run* is offered and stops it as [CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md) says; an ended run offers no *Stop run* |
 | CP-50.17 | An ended run with asks pending | it ends | each ask closes as expired and leaves *Needs you* |
 | CP-50.18 | A run whose steps were cleared by retention | Steps is read | it says the steps were cleared; the numbers keep their stored values |
 | CP-50.19 | A number the engine did not record | it is shown | it reads `—`, never `0` |
-| CP-50.20 | A run still going that the reader may not stop — not behind it and not an Admin | they open it | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
+| CP-50.20 | A run still going that the reader may not stop — not behind it and without Manage on `run/<agent>` | they open it | *Stop run* is disabled, naming who may stop it ([CP-58](../CP-58-stop-a-run-that-should-not-go-on/story.md)) |
 | CP-50.21 | A run whose content the reader may not read | they open it, or follow a link to one of its steps | its head reads — that it ran, its agent, the person behind it, its status and its tokens; its content reads *withheld — only {person behind}, or someone whose agent may read its sources, reads it*; a link to a step reads *Not found* |
 | CP-50.22 | A run | its answer is opened | *How it got here* shows its steps and sources |
 | CP-50.23 | A step that ran more than once | it opens | each attempt reads its own start and time, a failed attempt kept and struck through in place, and time waiting apart from time working |
@@ -79,7 +79,7 @@ flowchart LR
 | CP-50.35 | The list | the person filters by a team | only the runs whose person behind was on that team when the run opened list; joining or leaving the team since changes none of them |
 | CP-50.36 | The list | the person filters by a graph database | only the runs that read or wrote that graph database list |
 | CP-50.37 | A run whose content the reader may not read | the list is read | it lists like any run — number, agent, from, the person behind it, status, tokens and time; what was asked reads *withheld* |
-| CP-50.38 | A run a schedule or a pick-up started | someone opens it | it reads *no person behind it*, naming its agent and who set the schedule or the pick-up; *Stop run* is offered to Admins only — for anyone else it is disabled: *Only an Admin can stop this run* |
+| CP-50.38 | A run a schedule or a pick-up started | someone opens it | it reads *no person behind it*, naming its agent and who set the schedule or the pick-up; *Stop run* is offered only to those with Manage on `run/<agent>` — for anyone else it is disabled: *Only an Admin can stop this run* |
 | CP-50.39 | A run's head | it reads | it names what the run runs with (Invana · Claude Code · Codex), the model reported — marked when it differs from the model set — the connection used, *work* or *personal* by name and never a secret, and how many sessions it had; the count opens *Sessions* ([CP-66](../CP-66-read-a-run-session-by-session-with-its-hand-off-notes/story.md)) |
 | CP-50.40 | A run that continued in a fresh session | the list or its head is read | it keeps its one number; the list shows one row for it, never one per session |
 

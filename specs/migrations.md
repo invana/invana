@@ -109,7 +109,7 @@ IDs inside the capabilities do not change, but for IN-06 joining CP-F10 as CP-57
 | SH-06 | `foundation/shell/features/SH-F03-find-your-way/stories/SH-06-do-open-or-ask-anything-from-k/` | CP-30 | CP-F07 | `os/control/features/CP-F07-find-your-way/stories/CP-30-do-open-or-ask-anything-from-k/` |
 | SH-07 | `foundation/shell/features/SH-F03-find-your-way/stories/SH-07-make-the-frame-work-my-way/` | — | — | Retired — its criteria are rules of `design-language.md` or gone with the Graph unit |
 | SH-20 | `foundation/shell/features/SH-F03-find-your-way/stories/SH-20-read-without-the-grant-and-see-who-can-act/` | AC-07 | AC-F02 | `os/access/features/AC-F02-access-policies/stories/AC-07-read-without-the-access-and-know-who-to-ask/` |
-| ST-12 | `foundation/settings/features/ST-F01-this-graph/stories/ST-12-see-and-change-who-is-on-this-graph/` | AC-22 | AC-F03 | `os/access/features/AC-F03-directory/stories/AC-22-see-every-user-and-set-a-persons-role/` |
+| ST-12 | `foundation/settings/features/ST-F01-this-graph/stories/ST-12-see-and-change-who-is-on-this-graph/` | AC-22 | AC-F03 | `os/access/features/AC-F03-directory/stories/AC-22-see-every-user-and-attach-policies-to-a-person/` |
 | ST-13 | `foundation/settings/features/ST-F01-this-graph/stories/ST-13-read-what-this-graph-spends-against-its-limits/` | CP-34 | CP-F04 | `os/control/features/CP-F04-limits/stories/CP-34-read-what-this-graph-spends-against-its-limits/` |
 | ST-14 | `foundation/settings/features/ST-F01-this-graph/stories/ST-14-name-describe-and-connect-this-graph/` | CP-35 | CP-F05 | `os/control/features/CP-F05-graph-databases/stories/CP-35-keep-a-graph-database-connected/` |
 | IN-04 | `foundation/inbox/features/IN-F01-needs-you/stories/IN-04-see-what-needs-me-in-one-inbox/` | CP-36 | CP-F08 | `os/control/features/CP-F08-the-inbox/stories/CP-36-see-what-needs-me-in-one-inbox/` |
@@ -175,7 +175,7 @@ is an item whose home is not a spec — a team file or CI, raised as a recommend
 |---|---|
 | C1 · A username is 2 to 64 characters and only `u` is reserved | [AC-F01](os/access/features/AC-F01-sign-in-account-and-sessions/feature.md#decisions) |
 | C2 · An agent is a user that holds no role; it acts only through the Access Policies attached to it | [AC-F03 › Rules](os/access/features/AC-F03-directory/feature.md#rules) |
-| C3 · The floor role is Operator; the code's `viewer` waits on M1 | [AC-F02 › The permission catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) |
+| C3 · The floor access level is Operator; the code's `viewer` waits on M1 | [AC-F02 › The permission catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) |
 | C4 · A publish approval's impact is frozen when the preview settles | [SE-F02 › Mechanisms](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#mechanisms) |
 | C6 · C8 · Board kinds are six drawn and twelve declared, no `agent` kind; the glossary links the one list | [EX-F01 › Mechanisms](capabilities/explore/features/EX-F01-the-board-and-its-canvas/feature.md#mechanisms) · [glossary.md](glossary.md) |
 | C7 · The engine's word for a link between models is `stitch` — plan keys, catalogue keys and the CLI | [SE-F06 › Engine](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) |

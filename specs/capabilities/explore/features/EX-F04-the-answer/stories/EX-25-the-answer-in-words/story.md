@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the words of any answer, open a citation | — |
-| Operator | The same, on answers they may read — their own, or one shared with them; a Modeller the same ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's answer: that it ran, its status and its tokens — content withheld ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Operator | The same, on answers they may read — their own, or one shared with them; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's answer: that it ran, its status and its tokens — content withheld ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 
 ## Flow
 

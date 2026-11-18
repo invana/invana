@@ -21,8 +21,8 @@ depends_on: [RC-F06, CP-F03]
 
 ```mermaid
 flowchart TD
-  start([Model › Inference · New derivation]) --> may{Modeller or Admin?}
-  may -->|no| na["Reads · Needs the Modeller role — ask an Admin"]
+  start([Model › Inference · New derivation]) --> may{"Holds Run on model/<model>?"}
+  may -->|no| na["Reads · Needs Run on model/{model} — ask {who can grant}"]
   may -->|yes| d["SE-22 · When … then … · scope · write back to the database or not"]
   d -->|a form outside the supported rules| bad["Refused, naming what is not supported"]
   d -->|Preview| pv["What it would derive now, counted by the engine"]
@@ -58,11 +58,11 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read derivations, their runs and every derived fact with its premises | Every signed-in person — Operator, Modeller, Admin — as far as their default agent reads the premises | A premise or a property their agent may not read is absent, with no count and no note |
-| Create, change, stop or run a derivation | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |
-| Turn on write-back to the graph database for a derivation | Admin | Absent; *Needs the Admin role — ask an Admin* |
+| Read derivations, their runs and every derived fact with its premises | Read on `model/<model>` — as far as their default agent reads the premises | A premise or a property their agent may not read is absent, with no count and no note |
+| Create, change, stop or run a derivation | Run on `model/<model>` | Absent; *Needs Run on model/{model} — ask {who can grant}* |
+| Turn on write-back to the graph database for a derivation | Edit on `data/<graph database>` | Absent; *Needs Edit on data/{graph database} — ask {who can grant}* |
 
 ## States
 
@@ -86,7 +86,7 @@ sequenceDiagram
 | How it got here | A derived fact opens on its derivation version and each premise, each premise opening its own provenance |
 | A derived value keeps the highest level | Each property of a derived fact takes the highest of the levels ([SE-F03](../SE-F03-meaning/feature.md)) of the premise properties it was derived from; public, internal, confidential, personal rise in that order. A derivation cannot lower a level, and a later change to a premise's level reaches the derived fact in the next run. A premise a person's agent may not read is absent from the fact's premises, with no note |
 | Withdrawn when its premise goes | When a premise is changed or removed, the facts that rested on it are withdrawn in the next run |
-| Write-back is opt-in | Off by default; turned on per derivation by an Admin, the facts are also written to the graph database, marked derived, and removed when withdrawn |
+| Write-back is opt-in | Off by default; turned on per derivation by a person with Edit on `data/<graph database>`, the facts are also written to the graph database, marked derived, and removed when withdrawn |
 | No loops forever | A run stops when no new fact is derived; a run that passes the deployment's limit stops and says so |
 | The engine counts | Facts derived and withdrawn per run and per derivation are the engine's |
 | Leans on | RC-F06 — provenance of each fact · CP-F03 — workers and the queue · AC-F02 — who may read the premises · SE-F03 — the levels a derived value inherits |
@@ -129,7 +129,7 @@ record, never a row of [SE-F07](../SE-F07-rules/feature.md#engine)'s `model_rule
 | `GET /derivations/{id}` · `PATCH /derivations/{id}` | A derivation with its versions · publish its next version, queueing a run | SE-22 |
 | `POST /derivations/preview` | What a form would derive now, counted by the engine | SE-22 |
 | `POST /derivations/{id}/run` · `POST /derivations/{id}/stop` | Run again · stop | SE-22 |
-| `PUT /derivations/{id}/write-back` | Turn write-back on or off — an Admin | SE-22 |
+| `PUT /derivations/{id}/write-back` | Turn write-back on or off — Edit on `data/<graph database>` | SE-22 |
 
 ### Events
 
@@ -143,8 +143,8 @@ record, never a row of [SE-F07](../SE-F07-rules/feature.md#engine)'s `model_rule
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | 422 | A derivation outside OWL 2 RL, SHACL rules or the *when … then …* form — nothing saved | *{form} is not supported: {what}.* | SE-22.3 |
-| 403 | Turning on write-back by someone who is not an Admin | *Needs the Admin role — ask an Admin.* | SE-22.10 |
-| 403 | Creating, changing, stopping or running a derivation without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-22.12 |
+| 403 | Turning on write-back without Edit on the graph database | *Needs Edit on data/{graph database} — ask {who can grant}.* | SE-22.10 |
+| 403 | Creating, changing, stopping or running a derivation without Run on the model | *Needs Run on model/{model} — ask {who can grant}.* | SE-22.12 |
 
 ### Mechanisms
 
@@ -184,4 +184,4 @@ record, never a row of [SE-F07](../SE-F07-rules/feature.md#engine)'s `model_rule
 | Full OWL DL reasoning in core | Open-world reasoning does not fit validation that rejects what is not allowed; it can come as an outside plugin |
 | Statistical or learned inference | A derived fact must name the derivation and facts it came from |
 | Derivations that run inside a question | A question reads derived facts; deriving is a background run |
-| Derived facts written back by default | The graph database is the customer's; writing to it is an Admin's choice per derivation |
+| Derived facts written back by default | The graph database is the customer's; writing to it is the choice, per derivation, of a person with Edit on `data/<graph database>` |

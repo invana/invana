@@ -17,13 +17,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 which kinds a project uses is a setting, its team's ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Turn any of the type's task kinds on or off on any project; write a task of any kind the project uses | — |
-| Operator | Turn kinds on or off on a project they lead; write a task of any kind the project uses; a Modeller the same | On a project they do not lead, the kind switches read, disabled — *Join the team to change it* |
+| Operator | Turn kinds on or off on a project they lead; write a task of any kind the project uses | On a project they do not lead, the kind switches read, disabled — *Join the team to change it* |
 
 ## Flow
 
@@ -52,7 +52,7 @@ flowchart TD
 | PJ-20.4 | A task of a kind the project does not use, or a field its kind does not declare | it is saved | it is refused, naming the kind or the field and why; nothing is saved |
 | PJ-20.5 | A kind used by any task | a person on the team turns it off | it is refused, naming how many tasks use it; nothing changes |
 | PJ-20.6 | A task of a kind | it is listed or opened | its kind reads as a badge beside its title, in the type's words; shared places — My tasks, Needs you, search — show the same badge |
-| PJ-20.7 | An Operator or a Modeller not on the team | they open *Task kinds* | the kinds read; the switches are disabled — *Join the team to change it*; a call is refused the same way |
+| PJ-20.7 | An Operator not on the team | they open *Task kinds* | the kinds read; the switches are disabled — *Join the team to change it*; a call is refused the same way |
 | PJ-20.8 | A type installed by a Team pack | a project of it is created | its kinds are offered as the built-in ones are; no kind is written in Studio |
 
 ## Screens

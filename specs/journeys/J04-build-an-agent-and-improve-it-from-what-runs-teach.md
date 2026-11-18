@@ -65,7 +65,7 @@ flowchart TD
 |---|---|---|---|
 | It needs permission | A firing that would send outside asks the agent's named approvers in the Inbox; *Not this time* sends nothing. Approving a plan as a workflow is theirs too; the workflow is the organisation's, made by Sam, who asked | AC-15 · AG-31 | `inbox` |
 | It fails | A failed run reads why; *Turn it into a better skill* drafts the fix for Sam to accept | CP-56 | `agents.runs · Detail` |
-| The person has no access | Without the role building needs, Sam reads every agent, skill and workflow; building names the role it needs | AG-21 | `agents.agents · Detail` |
+| The person has no access | Without the permission building needs, Sam reads every agent, skill and workflow; building names the permission it needs | AG-21 | `agents.agents · Detail` |
 | A hard check fails | Publishing the skill is blocked, naming the check | AG-20 | `agents.skills` |
 | A firing is missed or skipped | It is kept with why; one that needs a switched-off graph database or plugin also raises an alert | AG-42 | `agents.schedules` |
 | A workflow changes | A change is a new version; runs keep the version they started on | AG-31 | `agents.runs · Detail` |

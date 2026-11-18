@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Name a graph database as practice for another, or unname it | — |
+| Admin | With Edit on `setting/graph-databases`: name a graph database as practice for another, or unname it | — |
 | Operator | Read which graph databases are practice, and for which | *Make practice* reads *Ask an Admin*, naming the Admins |
 
 ## Flow
@@ -43,7 +43,7 @@ flowchart TD
 | CP-41.2 | A practice graph database | an agent's or a skill's test runs | each step on `data/{name}/<kind>` for the graph database it stands in for reads and writes the practice one instead, as the agent's policies allow |
 | CP-41.3 | A practice graph database | a question, a board, a schedule or a workflow step names it | it is refused, saying it is for practice |
 | CP-41.4 | Practice for itself, for a practice one, or for one of another connector | an Admin saves it | it is refused, saying why |
-| CP-41.5 | An Operator or a Modeller | they reach *Make practice* | it reads *Ask an Admin*, naming the Admins |
+| CP-41.5 | An Operator | they reach *Make practice* | it reads *Ask an Admin*, naming the Admins |
 | CP-41.6 | A practice graph database | the model and answers over Graph Data are read | it is never part of them |
 | CP-41.7 | A practice graph database | an Admin unnames it | it is an ordinary graph database again, off until an Admin turns it on |
 

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask *what if* or pick *What-if*, read the predicted part and its run, add it to a project, save it as derived records on a read + write graph database | — |
-| Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs the Modeller role — ask an Admin*. Another person's run: that it ran, its status and its tokens |
+| Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; with Create on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*. Another person's run: that it ran, its status and its tokens |
 
 ## Flow
 
@@ -36,9 +36,9 @@ flowchart LR
   sm --> pr["A part marked Predicted · beside the records, never mixed"]
   pr --> how["How it got here · simulator, seed, pinned loads"]
   pr -->|Add to a project| fd(["A finding, still Predicted"])
-  pr -->|Save as derived records| sv{"Modeller · read + write · Write allowed?"}
+  pr -->|Save as derived records| sv{"Holds Edit on data/<graph database>/<kind> · read + write?"}
   sv -->|yes| dr(["Derived records · labelled derived · lineage kept"])
-  sv -->|an Operator| od["Disabled — Needs the Modeller role"]
+  sv -->|an Operator| od["Disabled — Needs Create on data/{graph database}/{kind}"]
   sv -->|read-only · no rule · a kind that does not fit| rr["Refused · named, in the dialog"]
 ```
 
@@ -57,11 +57,11 @@ flowchart LR
 | EX-33.9 | The simulator cannot use the data | the step settles | it is failed with the simulator's own sentence; the records stand as the answer and nothing is written |
 | EX-33.10 | More than 20 loads behind the starting records, or one undone or unreadable to the person | the simulate step opens | it is refused, naming the limit of 20 or the load, and nothing runs |
 | EX-33.11 | A what-if with no seed given | it runs | the seed Invana picked is kept; the same simulator version, change, pinned loads and seed give the same rows |
-| EX-33.12 | A predicted part, a Modeller or an Admin, a read + write graph database and a rule allowing the Loader Write on `data/<graph database>/<kind>` | they choose *Save as derived records* and pick the graph database and the kind | the rows are written to that graph database as records of the kind, each labelled *derived* with the simulator and its version; their lineage — the run and its pinned loads — is kept, and *How it got here* on a saved record shows it |
+| EX-33.12 | A predicted part, a person with Create on the graph database, a read + write graph database and a rule allowing the Loader Write on `data/<graph database>/<kind>` | they choose *Save as derived records* and pick the graph database and the kind | the rows are written to that graph database as records of the kind, each labelled *derived* with the simulator and its version; their lineage — the run and its pinned loads — is kept, and *How it got here* on a saved record shows it |
 | EX-33.13 | A read-only graph database picked | the person saves | it is refused in the dialog, naming the graph database and that it is read-only; nothing is written |
 | EX-33.14 | No rule allowing the Loader Write on the kind in that graph database | the person saves | it is refused in the dialog, naming the policy and the rule |
 | EX-33.15 | A kind the rows do not fit | the person saves | it is refused in the dialog, naming the field that does not fit |
-| EX-33.16 | An Operator | they read a predicted part | *Save as derived records* is disabled — *Needs the Modeller role — ask an Admin* |
+| EX-33.16 | An Operator | they read a predicted part | *Save as derived records* is disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
 | EX-33.17 | A predicted part | the person opens *How it got here* | it shows the steps, the change, the simulator and its version, the seed, the pinned loads and the tokens |
 | EX-33.18 | A predicted part | the person chooses *Add to a project* | it becomes a finding still marked *Predicted*, citing the run ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) |
 | EX-33.19 | A simulator removed since a what-if ran | the conversation is opened | the predicted part still reads, naming the simulator version it ran |

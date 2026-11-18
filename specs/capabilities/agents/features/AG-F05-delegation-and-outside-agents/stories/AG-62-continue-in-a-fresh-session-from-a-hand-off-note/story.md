@@ -18,13 +18,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 ## Who can
 
 Runs — read, stop and re-run in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*Own* for Operator and Modeller, *Acts* for Admin. A note's body reads only as far as the reader's default agent may
-read its sources ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); no role grants content.
+a person's own runs, and another's with Read or Manage on `run/<agent>`. A note's body reads only as far as the reader's default agent may
+read its sources ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); no permission grants content.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every run's sessions and each note's head; a note's body as anyone else — when the run belongs to a project and their default agent may read every source; stop any run, between sessions too; fork a run from a note they may read; set the session budget (CP-F04) | A note they may not read: its head, body *withheld*, naming the first source; *Fork* not offered |
-| Modeller | As Operator | As Operator |
 | Operator | On a run they are behind: read every session and note in full, stop it, fork it from a note. On a project's run they are not behind: read its sessions, and a note's body when their default agent may read every source | A note they may not read: its head, body *withheld*, naming the first source; *Fork* disabled — *Only the person behind this run or an Admin* |
 
 ## Flow

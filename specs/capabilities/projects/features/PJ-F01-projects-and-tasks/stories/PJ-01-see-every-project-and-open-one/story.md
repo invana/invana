@@ -16,14 +16,14 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 what a person reads of a project is what they may read, and its settings are its team's and the
 Admins' ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | See every project's head; read the projects they may read; edit any project's name and purpose in place, archive and unarchive it | A project they may not read: its head only — *Withheld — join the team or ask {who can grant}* |
-| Operator | See every project's head; read the projects they may read; edit, archive and unarchive the projects whose team they are on; a Modeller the same | On a project whose team they are not on: *Edit*, *Archive* and *Unarchive* disabled — *Join the team to change it*. A project they may not read: its head only, withheld |
+| Operator | See every project's head; read the projects they may read; edit, archive and unarchive the projects whose team they are on | On a project whose team they are not on: *Edit*, *Archive* and *Unarchive* disabled — *Join the team to change it*. A project they may not read: its head only, withheld |
 
 ## Flow
 
@@ -63,7 +63,7 @@ flowchart LR
 | PJ-01.10 | An archived project | it opens | Details shows every field read only and offers its people *Unarchive*; pressing it makes the project active and History records *unarchived*, a separate row from *archived* |
 | PJ-01.11 | The list or a project's counts | they load | every count is the engine's; none is added up in the browser |
 | PJ-01.12 | The list failing to load | the request fails | it says why, with *Try again*; rows already on screen stay |
-| PJ-01.13 | An Operator or a Modeller not on the team | they open its Details | *Edit*, *Archive* and *Unarchive* are disabled — *Join the team to change it* |
+| PJ-01.13 | An Operator not on the team | they open its Details | *Edit*, *Archive* and *Unarchive* are disabled — *Join the team to change it* |
 | PJ-01.14 | A project's Details | it is read | *Graph databases* reads *Every graph database*, or the ones it names; a person on the team who saves fewer or more has every later step of the project's runs checked against the new list, and History records from and to |
 
 ## Screens

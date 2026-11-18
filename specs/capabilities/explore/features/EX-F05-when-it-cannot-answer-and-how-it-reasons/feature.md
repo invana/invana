@@ -59,10 +59,10 @@ flowchart TD
   pr --> ans
   ans -->|an approach ran| led["EX-24 · Assumptions: proven · assumed · refused"]
   led -->|drop one| run
-  pr -->|Save as derived records| sv{"Modeller · read + write graph database · Write allowed?"}
+  pr -->|Save as derived records| sv{"Holds Edit on data/<graph database>/<kind> · read + write graph database?"}
   sv -->|yes| der(["EX-33 · Derived records, labelled derived"])
-  sv -->|no| svn["Refused · the role, the mode or the rule named"]
-  tp -->|Keep a third-party node| keep{"Modeller · read + write graph database · Write allowed?"}
+  sv -->|no| svn["Refused · the permission, the mode or the rule named"]
+  tp -->|Keep a third-party node| keep{"Holds Edit on data/<graph database>/<kind> · read + write graph database?"}
   keep -->|yes| kept(["Written as a Source, still marked Third-party"])
   keep -->|no| kna["Keep disabled or refused · the reason named"]
   ans -->|Fork from here| fork["EX-27 · A new conversation from this reply, with its board"]
@@ -109,20 +109,20 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*how it reasons* is *Acts* for Operator, Modeller and Admin. Every act also runs through an agent, within what its
+*how it reasons* needs no permission of its own. Every act also runs through an agent, within what its
 Access Policies allow. A run's content — a refusal, a diagnosis, a prediction — is its run's: run privacy is
 [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md).
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read a cannot answer, a plan gap, a refusal or a diagnosis, and follow its next step | The person behind the run; an Admin reads every one | Another person's run: that it ran, its status and its tokens |
-| Pick an approach with *Act as* · remove an assumption before the run · drop one and re-run · ask *what if* | Operator · Modeller · Admin, on their own runs | — |
-| Author, change, copy and publish an approach | Modeller · Admin — *skills* | Listed read-only in Agents › Skills; *+* disabled — *Needs the Modeller role — ask an Admin* |
+| Read a cannot answer, a plan gap, a refusal or a diagnosis, and follow its next step | The person behind the run; anyone with Read on `run/<agent>` reads every one | Another person's run: that it ran, its status and its tokens |
+| Pick an approach with *Act as* · remove an assumption before the run · drop one and re-run · ask *what if* | Anyone, on their own runs | — |
+| Author, change, copy and publish an approach | Create · Edit · Publish on `skill/<name>` | Listed read-only in Agents › Skills; *+* disabled — *Needs Edit on skill/{name} — ask {who can grant}* |
 | Read third-party claims, nodes and predicted parts, with their references | Whoever may read the answer | Content withheld |
-| *Keep* a third-party node | Modeller · Admin — *Edit on the board* — on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/Source` | *Keep* disabled — *Needs the Modeller role — ask an Admin*; refused on a read-only graph database or by a rule, naming it |
-| Save a predicted part as derived records | Modeller · Admin — *bring records in* — on a read + write graph database, through the Loader, whose Access Policies allow Write on `data/<graph database>/<kind>` | *Save as derived records* disabled — *Needs the Modeller role — ask an Admin*; refused on a read-only graph database or by a rule, naming it |
-| Change the Access Policy a refusal names | Admin ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | *Open the policy* disabled — *Needs the Admin role — ask an Admin* |
-| Set up and switch the web tool or a simulator's plugin | Admin ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) | The step names who switched it off, or that it is not set up |
+| *Keep* a third-party node | Edit on `data/<graph database>/Source`, on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/Source` | *Keep* disabled — *Needs Edit on data/{graph database}/Source — ask {who can grant}*; refused on a read-only graph database or by a rule, naming it |
+| Save a predicted part as derived records | Create on `data/<graph database>/<kind>`, on a read + write graph database, through the Loader, whose Access Policies allow Write on `data/<graph database>/<kind>` | *Save as derived records* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; refused on a read-only graph database or by a rule, naming it |
+| Change the Access Policy a refusal names | Edit on `access/policies` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | *Open the policy* disabled — *Needs Edit on access/policies — ask {who can grant}* |
+| Set up and switch the web tool or a simulator's plugin | Edit on `plugin/<name>` ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) | The step names who switched it off, or that it is not set up |
 | *Fork from here* | The person whose conversation it is | Another person's conversation: no *Fork from here* |
 
 ## States
@@ -135,7 +135,7 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 | Has data | An answer whose assumptions, third-party claims, predicted parts and fork lineage are each one click away |
 | Failed | What broke, on the step it broke on, with its evidence folded under it and one next step |
 | Agent working or proposing | The approach's assumptions above the composer before the run; the assistant's third-party nodes on the board, marked, waiting for *Keep*; a predicted part waiting for *Save as derived records* |
-| No access | A refusal names the policy and rule, the switch and who set it, or the property; *Keep* and *Save as derived records* disabled for an Operator, naming *Modeller*; another person's run shows only that it ran, its status and its tokens |
+| No access | A refusal names the policy and rule, the switch and who set it, or the property; *Keep* and *Save as derived records* disabled for an Operator, naming the permission; another person's run shows only that it ran, its status and its tokens |
 
 ## Rules
 
@@ -175,12 +175,12 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 | Record | Read or write |
 |---|---|
 | Run — how it ended, its steps' retries and repair, its diagnosis | Write (the engine) · read |
-| Approach — name, origin, when to use, method, assumptions with what changes without each, answer shape, version | Read · write (Modeller · Admin) |
+| Approach — name, origin, when to use, method, assumptions with what changes without each, answer shape, version | Read · write (Edit on `skill/<name>`) |
 | A run's approach and version, and its assumptions — claim, where it entered, whether checked and by which query, without it | Write (the engine) · read |
 | Simulation — the simulator and its version, the change, the seed, the pinned records and loads, the run | Write (the engine) · read |
-| Derived records saved from a predicted part — a load of `source = run` | Write (Modeller · Admin, through the Loader) ([RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md)) |
+| Derived records saved from a predicted part — a load of `source = run` | Write (Edit on `skill/<name>`, through the Loader) ([RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md)) |
 | A third-party claim or node — source, reference, title, kind, domain, fetched at, model, run | Write (the engine) · read |
-| A kept third-party node — its provenance, who kept it and when, what it is about | Write (Modeller · Admin, through the Record editor) · read |
+| A kept third-party node — its provenance, who kept it and when, what it is about | Write (Edit on `skill/<name>`, through the Record editor) · read |
 | A conversation's parent and the reply it forked at · its copied turns · its board | Write · read |
 | Ledger rows — every search, fetch, simulation and AI model call | Write, by the engine ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
 
@@ -250,18 +250,18 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | refused | A plugin needed is switched off — the web tool or a simulator's included; a graph database switched off is EX-F03's | *{plugin} is off — switched off by {person} {when}.* | EX-06.4 · EX-26.16 · EX-33.3 |
 | refused | A sensitive property bound for an external AI model | *{property} is sensitive — it never goes to an external model.* | EX-06.5 |
 | 422 | Two approaches on one ask | *One run, one approach.* | EX-24.9 |
-| 403 | Authoring, changing or publishing an approach without the Modeller role | *Skills needs the Modeller role.* | EX-24.15 |
+| 403 | Authoring, changing or publishing an approach without Create, Edit or Publish on the skill | *Needs Edit on skill/{name} — ask {who can grant}.* | EX-24.15 |
 | 422 | Changing the built-in *What-if* in place | *What-if is built in — copy it to change it.* | EX-24.16 |
 | step refused | No rule allows Run on the tool, or a Deny reaches it; the run goes on from Graph Data | *I'm not allowed to look that up here.* | EX-26.6 |
 | step failed | The web tool has no search address set | *Web search is not set up — an Admin sets it in Plugins.* | EX-26.17 |
-| 403 | *Keep* without the Modeller role | *Edit on the board needs the Modeller role.* | EX-26.18 |
+| 403 | *Keep* without Edit on the graph database | *Needs Edit on data/{graph database}/Source — ask {who can grant}.* | EX-26.18 |
 | 409 | *Keep* on a read-only graph database | *{graph database} is read-only — nothing can be written to it.* | EX-26.12 |
 | 403 | *Keep* where no rule allows Write on `data/<graph database>/Source` | *{policy} › {rule} does not allow writing Source.* | EX-26.13 |
 | cannot answer | A what-if with no simulator installed | *What-if needs a simulator, and none is installed.* | EX-33.2 |
 | step refused | No rule allows Run on the simulator's plugin | *{policy} › {rule} does not allow running {simulator}.* | EX-33.4 |
 | step refused | More than 20 loads to pin, or a load undone or unreadable | *A simulation reads at most 20 loads.* · *Load `{id}` {why} — nothing ran.* | EX-33.10 |
 | step failed | The simulator cannot use the data | The simulator's own sentence | EX-33.9 |
-| — | A refusal saving a predicted part as derived records — the role, a read-only graph database, a rule, a kind the rows do not fit | RC-F02's, in the dialog | EX-33.13 · EX-33.14 · EX-33.15 · EX-33.16 |
+| — | A refusal saving a predicted part as derived records — the permission, a read-only graph database, a rule, a kind the rows do not fit | RC-F02's, in the dialog | EX-33.13 · EX-33.14 · EX-33.15 · EX-33.16 |
 | 409 | A fork from a reply that is running, refused or failed | *Only a settled answer can be forked.* | EX-27.2 |
 | 404 | A fork of another person's conversation, or a simulation of a run the reader may not read | *Not found.* | EX-27.3 · EX-33.20 |
 

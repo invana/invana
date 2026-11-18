@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every ask for more; decide one they are named for — *Allow for this run* or *Decline*; *Draft a rule* to make a lasting change (AC-06) | An ask not routed to them reads, its acts disabled, naming who it waits on |
-| Operator | Read the asks for more of runs they are behind; decide one they are named for — *Allow for this run* or *Decline* | An ask not routed to them reads, its acts disabled, naming who it waits on; *Draft a rule* is disabled, naming the Admin role |
+| Operator | Read the asks for more of runs they are behind; decide one they are named for — *Allow for this run* or *Decline* | An ask not routed to them reads, its acts disabled, naming who it waits on; *Draft a rule* is disabled, naming Edit on `access/policies` |
 
 ## Flow
 
@@ -56,7 +56,7 @@ flowchart LR
 | AC-14.7 | An ask for more | the reader declines with a note, or it expires, or its run ends | the step ends refused; the note is kept |
 | AC-14.8 | An ask for more | nobody decides by its deadline | it reminds, escalates and expires refused, never allowed (AC-32) |
 | AC-14.9 | An agent already asked for an item in this run | it is denied the same item again | it does not ask again; the step is refused, naming the open or decided ask |
-| AC-14.10 | An agent | it tries to decide its own ask, or to write a policy, rule, attachment, grant, role, team, owner or approver | it is refused — *Only a person changes access* |
+| AC-14.10 | An agent | it tries to decide its own ask, or to write a policy, rule, attachment, grant, team, owner or approver | it is refused — *Only a person changes access* |
 | AC-14.11 | A person the ask is not routed to | they open it | it reads; the acts are disabled, naming who it waits on |
 | AC-14.12 | An ask for more, routed to the reader | they pick *Decline for N days*, at most 90 | the step ends refused; until then the same ask from that agent on that item is refused without asking, naming the decline |
 | AC-14.13 | A step denied on any item | the agent asks for more | it may ask once per run per item — one verb on one resource; an ask matching one already open joins it; a helper's or a delegate's asks count against its root agent; past the agent's daily cap or the deployment's, the step is refused, naming the cap |

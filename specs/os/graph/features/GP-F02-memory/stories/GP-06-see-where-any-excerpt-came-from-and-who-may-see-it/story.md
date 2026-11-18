@@ -19,13 +19,13 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 
 A copy shows to a person only when the person's **default agent** may Read every one of its sources
 ([AC-F02 › Rules › The default agent](../../../../../access/features/AC-F02-access-policies/feature.md#rules)).
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a run's
+The permission each act needs is [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a run's
 transcript has its own privacy rule on top ([AC-F09](../../../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read a copy and its sources when their default agent may Read every source; read any copy's list row | A copy with a source their default agent may not read is absent, with no note — an Admin's role is no key to a source their default agent may not read |
-| Operator | The same; a Modeller reads the same | The same; to read it, ask an Admin to change what their default agent may Read ([AC-38](../../../../../access/features/AC-F03-directory/stories/AC-38-choose-a-persons-default-agent/story.md)) |
+| Admin | Read a copy and its sources when their default agent may Read every source; read any copy's list row | A copy with a source their default agent may not read is absent, with no note — Manage on Access is no key to a source their default agent may not read |
+| Operator | The same | The same; to read it, ask an Admin to change what their default agent may Read ([AC-38](../../../../../access/features/AC-F03-directory/stories/AC-38-choose-a-persons-default-agent/story.md)) |
 
 ## Flow
 

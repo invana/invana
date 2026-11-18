@@ -18,8 +18,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read a script in full; approve it, decline it with a reason, revoke an approval | — |
-| Operator | Read every script and its approval | *Approve*, *Decline* and *Revoke* are absent; a waiting script reads *Waiting for an Admin*, naming the Admins. The Modeller role does not add them |
+| Admin | Read a script in full; with Publish on `skill/<name>`, approve it, decline it with a reason, revoke an approval | — |
+| Operator | Read every script and its approval | *Approve*, *Decline* and *Revoke* are absent; a waiting script reads *Waiting for an Admin*, naming the Admins. Edit on the skill does not add them |
 
 ## Flow
 

@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the overview of any project they can see; open its branches, findings and decisions | A project they may not read: its head only, the rest *Withheld — join the team or ask {who can grant}* — Admins are not exempt |
-| Operator | The same, and every act on the page; a Modeller the same | A project they may not read: its head only, the rest *Withheld — join the team or ask {who can grant}*. On an archived project every act is disabled, saying it is archived |
+| Operator | The same, and every act on the page | A project they may not read: its head only, the rest *Withheld — join the team or ask {who can grant}*. On an archived project every act is disabled, saying it is archived |
 
 ## Flow
 
@@ -56,7 +56,7 @@ flowchart LR
 | PJ-03.9 | A project and a person who may not read `project/{key}` | they open its address | it reads its head — name, key, type, status and counts — and the rest *Withheld — join the team or ask {who can grant}*, for an Admin as for anyone; nothing reads *Not found* |
 | PJ-03.10 | The engine cannot return the project | the page loads | it says *Could not load* with the reason and *Try again*; nothing partial is drawn as complete |
 | PJ-03.11 | An archived project | the overview opens | it reads in full; every act is disabled, saying the project is archived |
-| PJ-03.12 | An Operator or a Modeller who can see the project | they open its overview | it reads in full and every act on it is theirs, as for an Admin |
+| PJ-03.12 | An Operator who can see the project | they open its overview | it reads in full and every act on it is theirs, as for an Admin |
 
 ## Screens
 

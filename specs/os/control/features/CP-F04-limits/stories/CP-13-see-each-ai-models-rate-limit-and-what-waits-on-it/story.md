@@ -18,8 +18,8 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read each AI model's rate limit, use and what waits; set a model's rate limit | — |
-| Operator | Operator · Modeller: read each AI model's rate limit, use and what waits ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Admin | Read each AI model's rate limit, use and what waits; with Edit on `worker/<group>`, set a model's rate limit | — |
+| Operator | read each AI model's rate limit, use and what waits ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
 
 ## Flow
 
@@ -42,7 +42,7 @@ flowchart TD
 | CP-13.3 | A step waiting on a model | its wait runs out | it fails — *{model} stayed at its rate limit past {wait}* — never as *cannot answer* |
 | CP-13.4 | An Admin | they set a model version's requests or tokens a minute | it saves and applies to the next step that calls it; History records who changed it (AC-F06) |
 | CP-13.5 | No AI model offered | the view opens | it says so and links to AI models (CP-01) |
-| CP-13.6 | An Operator or a Modeller | they open *AI model limits*, or call its write route | every row reads; *Edit* is disabled — *Needs the Admin role — ask {admins}* — and the route answers 403 (CP-11.10) |
+| CP-13.6 | An Operator | they open *AI model limits*, or call its write route | every row reads; *Edit* is disabled — *Needs Edit on worker/{group} — ask {who can grant}* — and the route answers 403 (CP-11.10) |
 | CP-13.7 | A model version with no rate limit set | its row is read | it reads *No limit* |
 
 ## Screens

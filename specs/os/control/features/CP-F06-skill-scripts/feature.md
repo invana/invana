@@ -23,7 +23,7 @@ depends_on: [AG-F04, CP-F03, AC-F05]
 flowchart TD
   start([A skill draft with scripts/ — AG-F04 or an import, AG-39]) --> wait["CP-15 · Each script reads Waiting for an Admin · Admins asked in Inbox › Needs you"]
   wait --> adm{Admin reads the script}
-  adm -->|not an Admin| na["Reads the script · Approve absent — names the Admins"]
+  adm -->|without Publish on the skill| na["Reads the script · Approve absent — names the Admins"]
   adm -->|Approve| ok(["Approved for its exact content"])
   adm -->|Decline, with a reason| dec(["Declined · the skill does not publish while it calls it"])
   ok --> pub["The skill publishes — AG-19"]
@@ -64,11 +64,13 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read a skill's scripts and whether each is approved | Every signed-in person — Operator, Modeller, Admin | — |
-| Approve, decline or revoke a script | Admin | *Approve*, *Decline* and *Revoke* are absent; the script reads *Waiting for an Admin*, naming the Admins |
-| Add or change a script in a skill's draft | Modeller · Admin, as [AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md) says | As AG-F04 |
+| Read a skill's scripts and whether each is approved | Read on `skill/<name>` | — |
+| Approve, decline or revoke a script | Publish on `skill/<name>` | *Approve*, *Decline* and *Revoke* are absent; the script reads *Waiting for an Admin*, naming the Admins |
+| Add or change a script in a skill's draft | Edit on `skill/<name>`, as [AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md) says | As AG-F04 |
 | Read a script step on a run — its arguments, output, exit and limits | Whoever may read the run's content ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) | That the step ran, its status and its time — arguments and output withheld |
 
 ## States
@@ -154,7 +156,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Approve, decline or revoke by anyone but an Admin | *Only an Admin approves scripts — {admins}.* | CP-15.10 |
+| 403 | Approve, decline or revoke without Publish on `skill/<name>` | *Needs Publish on skill/{name} — ask {who can grant}.* | CP-15.10 |
 | 409 | Publishing a version whose plan calls a script not approved | *{path} is {state} — it cannot publish until an Admin approves it.* | CP-15.4 · CP-15.7 |
 | step refused | A script waiting, declined, revoked, or whose bytes differ from what was approved — in a run or *Run a test* | *{path} is not approved: {state}{, by whom}.* | CP-15.8 · CP-16.7 · CP-16.10 |
 | step failed | A script past the time, memory or output cap | *Stopped at the {cap} cap — {value}.* | CP-16.4 |

@@ -57,7 +57,7 @@ flowchart TD
   G --> E
   Q1 --> E
   FX --> E
-  A -.->|without the Admin role| NA(["Sees the runs they are behind · others show that they ran, their status and tokens"])
+  A -.->|without Read on run/*| NA(["Sees the runs they are behind · others show that they ran, their status and tokens"])
 ```
 
 ## Steps

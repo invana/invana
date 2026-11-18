@@ -31,7 +31,7 @@ flowchart TD
   s([Settings › Plugins]) --> pl["CP-04 · Every plugin: core · tool · outside server · pack · on or off · who switched it"]
   pl -->|core| always(["Always on · no switch"])
   pl -->|Admin turns a plugin on| on(["On for the deployment · from the next step"])
-  pl -->|not an Admin| ro["The deployment's switch reads · Ask an Admin"]
+  pl -->|without Manage on the plugin| ro["The deployment's switch reads · Ask an Admin"]
   pl -->|anyone · off for me| mine(["CP-63 · Off only for the runs I start"])
   pl --> nd["CP-44 · What it needs · which agents may use it"]
   nd -->|a need no policy allows · no connection| miss(["Missing · names the rule, mode or connection · AC-13"])
@@ -40,18 +40,18 @@ flowchart TD
   add --> cr["CP-42 · None · a token · OAuth · may people connect their own?"]
   cr --> wc["CP-62 · Admin makes a work connection — a service identity · sealed"]
   wc -->|a second Admin's yes is on| aw(["Waits for another Admin · not in force until then"])
-  wc --> att["CP-62 · A Modeller or an Admin attaches it to agents"]
+  wc --> att["CP-62 · A person with Edit on the agent attaches it"]
   cr -->|people may connect their own| per["CP-43 · A person connects their own account"]
   per --> own(["CP-63 · Used only in runs that person starts and their helpers"])
   add -->|listed| fz(["Tools frozen · off until an Admin turns it on"])
   fz --> rf["CP-02 · Read its tools again → a new revision"]
   pl -->|a runtime plugin · Admin| rti["CP-64 · Install Claude Code or Codex: its versions · where its model runs · what it needs"]
-  rti -->|not an Admin| rtr(["Reads · Install disabled, naming the Admins"])
+  rti -->|without Create on the plugin| rtr(["Reads · Install disabled, naming the permission"])
   rti --> rtg(["Carried by the worker groups an Admin picks (CP-10) · offered in Runs with (AG-61)"])
   rti -->|agents still run with it · Remove| rtb(["Refused, naming the agents"])
   pl -->|a Team pack| pk["CP-20 · Install: each piece offered in its own product"]
   pk -->|a piece clashes| pkc(["Names the piece · nothing installed"])
-  pk -->|not an Admin| pkr(["Reads · Install disabled, naming the Admins"])
+  pk -->|without Create on setting/team-packs| pkr(["Reads · Install disabled, naming the permission"])
   pk -->|its Access Policy files| pkp(["Drafts · Waiting for an Admin to apply · decide nothing until then (AC-04)"])
   pk -->|its agents| pka(["In the catalogue as Team pack agents · granted to nobody until an Admin grants them (AG-35)"])
   pk -->|its .mcp.json names a server| pks(["Listed for an Admin to add — CP-02 · never started"])
@@ -104,24 +104,26 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every plugin, its functions and versions, what each needs, its switches and who set them | Every signed-in person — Operator, Modeller, Admin | — |
-| Turn a plugin on or off for the deployment | Admin | The deployment's switch reads, naming who set it — *Ask an Admin — Priya or Lee* |
+| Read every plugin, its functions and versions, what each needs, its switches and who set them | Read on `plugin/<name>` | — |
+| Turn a plugin on or off for the deployment | Manage on `plugin/<name>` | The deployment's switch reads, naming who set it — *Ask an Admin — Priya or Lee* |
 | Turn a plugin off, or back on, for the runs one starts | Every signed-in person, for themselves | — |
-| Add an outside MCP server · read its tools again | Admin | *Add a server* and *Read its tools again* are disabled, naming the Admins |
-| Set how Invana signs in to an outside server · set or clear a shipped tool's secret | Admin, in a session, with the password again | Disabled, naming the Admins; a secret never reads back to anyone |
-| Make, renew or remove a work connection | Admin, in a session, with the password again; a second Admin's yes when the deployment asks for it ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#rules)) | Every work connection reads — its server, label, state and the agents it is attached to; acts disabled, naming the Admins |
-| Attach a work connection to an agent · take it off | Modeller · Admin, as building an agent | Reads on the agent; disabled, naming the Modeller role |
-| Read every work connection and the agents each is attached to | Every signed-in person | — |
-| Connect or disconnect one's own personal connection to an outside server | Every person with an active account, in a session, with the password again | An agent, the system user and a project key have no personal connection; shared work never uses one |
-| Read and disconnect any person's personal connection | Admin, in a session, with the password again | Another person's personal connection is absent |
-| Install or remove a Team pack | Admin | *Install* and *Remove* are disabled, naming the Admins |
-| Apply an Access Policy file a Team pack brought | Admin, as [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#access) | The file reads *Waiting for an Admin to apply*; *Apply* is disabled, naming the Admin role |
-| Install or remove a runtime plugin · read every runtime, what it declares and which groups carry it | Admin installs and removes · Operator, Modeller and Admin read | *Install* and *Remove* are disabled, naming the Admins |
-| Read the deployment's MCP server — address, what it serves, how to connect | Every signed-in person | — |
-| Serve or stop serving an agent or a record tool over the MCP server | Admin | The switches read, naming the Admins |
-| Read the MCP server's recent calls | Every signed-in person, their own calls · Admin, every call | Another person's calls are absent |
+| Add an outside MCP server · read its tools again | Create on `plugin/<name>` | *Add a server* and *Read its tools again* are disabled — *Needs Create on plugin/{name} — ask {who can grant}* |
+| Set how Invana signs in to an outside server · set or clear a shipped tool's secret | Edit on `plugin/<name>`, in a session, with the password again | Disabled — *Needs Edit on plugin/{name} — ask {who can grant}*; a secret never reads back to anyone |
+| Make, renew or remove a work connection | Manage on `plugin/<name>`, in a session, with the password again; a second Admin's yes when the deployment asks for it ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#rules)) | Every work connection reads — its server, label, state and the agents it is attached to; acts disabled — *Needs Manage on plugin/{name} — ask {who can grant}* |
+| Attach a work connection to an agent · take it off | Edit on `agent/<name>`, as building an agent | Reads on the agent; disabled — *Needs Edit on agent/{name} — ask {who can grant}* |
+| Read every work connection and the agents each is attached to | Read on `plugin/<name>` | — |
+| Connect or disconnect one's own personal connection to an outside server | None — one's own; in a session, with the password again | An agent, the system user and a project key have no personal connection; shared work never uses one |
+| Read and disconnect any person's personal connection | Manage on `plugin/<name>`, in a session, with the password again | Another person's personal connection is absent |
+| Install or remove a Team pack | Create on `setting/team-packs` to install · Edit to remove | *Install* and *Remove* are disabled — *Needs Create on setting/team-packs — ask {who can grant}* |
+| Apply an Access Policy file a Team pack brought | Edit on `access/policies`, as [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#access) | The file reads *Waiting for an Admin to apply*; *Apply* is disabled — *Needs Edit on access/policies — ask {who can grant}* |
+| Install or remove a runtime plugin · read every runtime, what it declares and which groups carry it | Create on `plugin/<name>` installs · Manage removes · Read on `plugin/<name>` reads | *Install* and *Remove* are disabled — *Needs Create on plugin/{name} — ask {who can grant}* |
+| Read the deployment's MCP server — address, what it serves, how to connect | None — every signed-in person | — |
+| Serve or stop serving an agent or a record tool over the MCP server | Manage on `plugin/<name>` | The switches read — *Needs Manage on plugin/{name} — ask {who can grant}* |
+| Read the MCP server's recent calls | None — one's own calls · Read on `run/*`, every call | Another person's calls are absent |
 | Call the MCP server | A connected client as its person ([AC-F11](../../../access/features/AC-F11-connect-an-mcp-client/feature.md)) · a key as key ∩ owner ([AC-F10](../../../access/features/AC-F10-keys/feature.md)) | `401`, saying where to find the metadata |
 | Say yes to an outside tool call | As [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md) | As AC-F05 |
 
@@ -135,7 +137,7 @@ sequenceDiagram
 | Has data | Plugins with both switches and who set them · each function with its version and needs · outside servers with their tools, revision and how Invana signs in · each server's work connections and the agents each is attached to · a person's personal connections and the runs that used them · what the MCP server serves and its recent calls |
 | Failed | A server that cannot be reached or an address refused, named with what failed; a plugin not installed, naming its extra; a connection whose sign-in expired, *Reconnect*; a call refused, naming the rule or the missing connection |
 | Agent working or proposing | A run reaching an outside tool waits for a yes in Needs you (AC-F05) |
-| No access | Every list reads; the deployment's switches, *Add a server*, connections and serving are disabled, naming the role they need |
+| No access | Every list reads; the deployment's switches, *Add a server*, connections and serving are disabled, naming the permission they need |
 
 ## Rules
 
@@ -151,7 +153,7 @@ sequenceDiagram
 | No domain in the core | A domain arrives whole as a pack. The Life sciences pack carries the `science` tools — PubMed, UniProt, PubChem — and the genomic simulator with its starter, meaning and project types |
 | Core is always on | A core plugin has no switch at either level |
 | New starts off | A tool plugin, an outside server and an installed pack start off until an Admin turns them on |
-| Two switches | The deployment's — Admin only, a hard off for everyone and a ceiling on every run · a person's own — off narrows only the runs that person starts and their helpers, and never turns on what the deployment has off; a schedule, a pick-up and a project key's run are not narrowed by anyone's own switch |
+| Two switches | The deployment's — Manage on the plugin, a hard off for everyone and a ceiling on every run · a person's own — off narrows only the runs that person starts and their helpers, and never turns on what the deployment has off; a schedule, a pick-up and a project key's run are not narrowed by anyone's own switch |
 | Off means refused before it starts | Work that needs a plugin that is off is refused before it starts, naming who switched it off; a schedule skips its firing and raises an ops alert; a workflow that needs it is flagged and its runs refused until it is on |
 | Switching takes effect at the next step | No restart; a step already running finishes |
 | Every function declares what it needs | Each function's manifest names the verbs and resources it needs — an outside tool needs Run on its own `tool/<plugin>/<tool>`. It is usable when every need is within the agent's policies and the graph database's mode allows it; the gate is [AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)'s. A declaration grants nothing. A function that needs nothing says so with an empty list; a manifest with no `needs` does not load |
@@ -160,7 +162,7 @@ sequenceDiagram
 | Every outside call is ledgered | Outbound, with what it carried, before its result is used ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md)) |
 | Outside answers are data | A tool's result is cited with its source, carries its lineage ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) and is never followed as an instruction |
 | Credentials are never an environment variable | An outside server signs in with nothing, a token, or OAuth; every credential is sealed under the install key, never read back, and setting one asks for the password again. A shipped tool's settings — the mail server, the web search address — are the deployment's own secrets |
-| Work connections | A **work connection** is a service identity on one outside server — a token, or an OAuth sign-in as a service account — made once by an Admin and attached to agents by a Modeller or an Admin ([CP-62](stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md)). An agent holds at most one work connection per server. Shared work — a schedule, a pick-up, a project key's run, a delegation no person started — uses only work connections |
+| Work connections | A **work connection** is a service identity on one outside server — a token, or an OAuth sign-in as a service account — made once by a person with Manage on `plugin/<name>` and attached to agents by a person with Edit on the agent ([CP-62](stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md)). An agent holds at most one work connection per server. Shared work — a schedule, a pick-up, a project key's run, a delegation no person started — uses only work connections |
 | Personal connections | A **personal connection** is a person's own account on a server that allows them, over OAuth ([CP-43](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md)). It is used only in runs that person starts and their helpers — never in shared work, never for anyone else ([CP-63](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md)). What it returns is a copy whose source is that person's connection: it shows only to them ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) |
 | Which connection a call uses | The work connection attached to the agent, when there is one; otherwise, in a run a person started, that person's personal connection; otherwise the call is refused before it leaves, naming what is missing |
 | A second Admin's yes, when set | With the deployment setting on, making, renewing or removing a work connection waits for another Admin's yes and is not in force until then ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#rules)) |
@@ -265,7 +267,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /personal-connections` | The caller's personal connections — `server` · `label` · `state` · `connected_at` · `last_used_at` · `runs` (the last runs that used it); an Admin reads every person's with `?user=` | CP-43 · CP-63 |
 | `POST /personal-connections/{server}/connect` | `{password}` → the address to send the browser to, with PKCE and the server as the resource | CP-43 |
 | `GET /connections/callback` | The server's redirect for a work or a personal connection: exchanges the code, seals the tokens, returns to the page it came from | CP-43 · CP-62 |
-| `DELETE /personal-connections/{server}?user=` | Disconnect `{password}` — one's own, or any person's as an Admin | CP-43 |
+| `DELETE /personal-connections/{server}?user=` | Disconnect `{password}` — one's own, or any person's with Manage on the plugin | CP-43 |
 | `GET /mcp-server` | `url` · `transport` · `protocol_version` · how to connect (connected client and key) · `agents_served` · `tools_served` · `calls_today` | CP-03 |
 | `GET /mcp-server/served` · `PUT /mcp-server/served/{kind}/{ref}` | What may be served, each with `served` · serve or stop serving one `{served}` | CP-03 |
 | `GET /mcp-server/calls` | By the list contract, newest first — `run_id` · `at` · `person` · `client` or `key` · `tool` · `status` · `result`; the caller's own, or every call for an Admin | CP-03 |
@@ -295,8 +297,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A deployment switch, an add, a refresh, an install or remove, a credential or secret change, a work connection made, renewed or removed, or serving, by anyone but an Admin | *This needs an Admin — ask {admins}.* | CP-04.9 · CP-02.11 · CP-42.8 · CP-62.9 · CP-20.6 · CP-03.13 |
-| 403 | Attaching or taking off a work connection by an Operator | *This needs the Modeller role.* | CP-62.10 |
+| 403 | A deployment switch, an add, a refresh, an install or remove, a credential or secret change, a work connection made, renewed or removed, or serving, without the permission in Access above | *Needs {permission} on {resource} — ask {who can grant}.* | CP-04.9 · CP-02.11 · CP-42.8 · CP-62.9 · CP-20.6 · CP-03.13 |
+| 403 | Attaching or taking off a work connection without Edit on the agent | *Needs Edit on agent/{name} — ask {who can grant}.* | CP-62.10 |
 | 403 | The Admin who made a work connection approves it | *Another Admin approves this change.* | CP-62.4 |
 | 401 | A credential or secret change, a work connection made, renewed, removed or approved, or connecting or disconnecting a personal connection, without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-42.7 · CP-62.11 · CP-43.9 |
 | 409 | Attaching a second work connection on one server to an agent | *{agent} already uses {connection} on {server} — take it off first.* | CP-62.6 |
@@ -312,15 +314,15 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 404 | An unknown plugin, server or account | *Not found.* | API only — Studio lists only what exists |
 | 409 | A pack piece whose name is taken in its product | *{piece} clashes with {existing} in {product}.* | CP-20.4 |
 | start refused | A plugin folder with no `.claude-plugin/plugin.json`, with Invana's fields outside `metadata`, or carrying `hooks/` or `commands/` — the process does not start | *{plugin}: {file} — {why}.* | CP-20.10 |
-| 403 | Applying a pack's Access Policy file without the Admin role | [AC-F02 › Refusals](../../../access/features/AC-F02-access-policies/feature.md#refusals) | CP-20.8 |
+| 403 | Applying a pack's Access Policy file without Edit on `access/policies` | [AC-F02 › Refusals](../../../access/features/AC-F02-access-policies/feature.md#refusals) | CP-20.8 |
 | 409 | Removing a runtime plugin an active or paused agent runs with | *{n} agents run with {runtime} — change what they run with first.* | CP-64.6 |
 | 409 | Installing a runtime plugin for a runtime already installed | *{runtime} is already installed by {plugin}.* | CP-64.7 |
 | start refused | A runtime plugin whose manifest does not declare its versions, where its model runs or its needs | *{plugin}: a runtime declares its versions, where its model runs and its needs.* | CP-64.8 |
-| 403 | Installing or removing a runtime plugin by anyone but an Admin | *This needs an Admin — ask {admins}.* | CP-64.9 |
+| 403 | Installing or removing a runtime plugin without Create or Manage on `plugin/<name>` | *Needs Create on plugin/{name} — ask {who can grant}.* | CP-64.9 |
 | start refused | A function whose manifest has no `needs` key, or a need outside the resource grammar — the process does not start | *{plugin}: {function} does not declare its needs.* | CP-44.5 |
 | step refused | A function needing a shipped tool's secret that is not set | *{plugin} needs {secret} — an Admin sets it.* | CP-42.6 |
 | step refused | A call from a run a person started, whose agent has no work connection on the server, and whose person has no personal connection there, or an expired one | *Connect your {server} account to let {agent} use it.* | CP-43.5 · CP-43.7 |
-| step refused | A call from shared work — a schedule, a pick-up, a project key's run — whose agent has no work connection on the server | *{agent} has no work connection on {server} — a Modeller or an Admin attaches one.* | CP-62.7 · CP-63.4 |
+| step refused | A call from shared work — a schedule, a pick-up, a project key's run — whose agent has no work connection on the server | *{agent} has no work connection on {server} — someone with Edit on the agent attaches one.* | CP-62.7 · CP-63.4 |
 | step refused | A call whose arguments carry a confidential or personal value | [AC-F09 › Refusals](../../../access/features/AC-F09-what-left-the-platform/feature.md#refusals) | CP-02.15 |
 | step failed | An outside server down at call time, or an address that now resolves somewhere refused | *{url} did not answer.* · *{url} resolves to {address}, which is refused.* | CP-02.9 · CP-02.10 |
 | 401 | A call to the MCP server with no client token and no key | [AC-F11 › Refusals](../../../access/features/AC-F11-connect-an-mcp-client/feature.md#refusals) | CP-03.5 |
@@ -334,11 +336,11 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Command | Does |
 |---|---|
 | `invana plugins list` · `show <name>` | Every plugin with its version, kind, both switches and its functions · one as JSON |
-| `invana plugins on · off <name> [--mine]` | The deployment's switch as an Admin, or the caller's own |
-| `invana plugins secret set · clear <plugin> <secret>` | A shipped tool's secret, as an Admin; the value and the password from a prompt, never a flag |
-| `invana plugins install · remove <pack>` | Install or remove a Team pack, as an Admin |
-| `invana plugins mcp add <url> --name <name> --auth none · token · oauth [--personal]` · `mcp refresh <name>` | Add an outside server · read its tools again, as an Admin; a token from a prompt |
-| `invana connections list` · `invana connections make <server> --name <name> --kind token` · `invana connections attach · detach <name> --agent <agent>` | Work connections: list · make, as an Admin, the token and the password from a prompt · attach and take off, as a Modeller or an Admin |
+| `invana plugins on · off <name> [--mine]` | The deployment's switch with Manage on the plugin, or the caller's own |
+| `invana plugins secret set · clear <plugin> <secret>` | A shipped tool's secret, with Edit on the plugin; the value and the password from a prompt, never a flag |
+| `invana plugins install · remove <pack>` | Install or remove a Team pack, with Create or Edit on `setting/team-packs` |
+| `invana plugins mcp add <url> --name <name> --auth none · token · oauth [--personal]` · `mcp refresh <name>` | Add an outside server · read its tools again, with Create on the plugin; a token from a prompt |
+| `invana connections list` · `invana connections make <server> --name <name> --kind token` · `invana connections attach · detach <name> --agent <agent>` | Work connections: list · make, with Manage on the plugin, the token and the password from a prompt · attach and take off, with Edit on the agent |
 
 ### Mechanisms
 
@@ -402,7 +404,7 @@ The code changes are [migrations.md](../../../../migrations.md) M15 (work and pe
 | Per server, one way to sign in | An Admin chooses none, a token or OAuth for each outside server, and whether people may connect their own over OAuth; a shipped tool's settings are the deployment's secrets |
 | The work connection wins | When an agent has a work connection on a server, every call uses it — even in a person's own run — so an agent does the same thing for everyone who may use it; a personal connection serves only where the agent has none |
 | A personal connection is its person's | It is used only in runs that person starts and their helpers, and what it returns shows only to them |
-| Attaching is building the agent | Which work connection an agent uses is part of the agent, so a Modeller or an Admin attaches it; making the service identity is an Admin's, as every credential is |
+| Attaching is building the agent | Which work connection an agent uses is part of the agent, so a person with Edit on the agent attaches it; making the service identity needs Manage on the plugin, as every credential does |
 | Credentials ask for the password again | Setting a secret, changing how a server signs in, making, renewing or removing a work connection, and connecting or disconnecting a personal connection change credentials ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#rules)) |
 | A client acts through the default agent | A connected client or a key reaches no more than the person's default agent, narrowed further by the key; what it receives is outside the deployment, so it passes the outbound check |
 | A tool's read-only hint informs, never decides | The hint reads beside each tool to help an Admin write rules; whether a call waits is the agent's policies alone |

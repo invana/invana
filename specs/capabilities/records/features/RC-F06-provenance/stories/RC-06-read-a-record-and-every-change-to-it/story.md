@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F06](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any record and its history, and open the run behind each change | — |
-| Operator | Read any record their default agent may read, and its history. A Modeller the same | A change by a member they cannot see reads *a member you cannot see* |
+| Operator | Read any record their default agent may read, and its history | A change by a member they cannot see reads *a member you cannot see* |
 
 ## Flow
 

@@ -83,19 +83,19 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+The permission catalogue is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
 (*thinking graph and memory*); who reads a run's content is
 [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s, never restated.
 
-| Act | Role | Everyone else sees |
+| Act | Permission | Everyone else sees |
 |---|---|---|
-| Browse Memory and follow a decision to its sources | Operator · Modeller · Admin | — (nodes of runs they may not read show their head only) |
+| Browse Memory and follow a decision to its sources | None — every signed-in person | — (nodes of runs they may not read show their head only) |
 | Read a node's content | Whoever may read its run ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) and whose default agent may Read the node's place and every source it inherits | That it ran, its status, its tokens, the plan or workflow, its labels and record IDs — content *withheld*, naming who may read it; a node whose place or sources their agent may not read is absent |
-| See any copy and its sources | Operator · Modeller · Admin, when their default agent may Read every source | The copy is absent from lists and *Not found* by link, with no note |
+| See any copy and its sources | None — when their default agent may Read every source | The copy is absent from lists and *Not found* by link, with no note |
 | Read a cited record | An agent the person may use, as its Access Policies allow | Left out, uncounted; never shown |
-| Open a project's map | Operator · Modeller · Admin, when their default agent may Read `memory/project/<key>` | The project's head only — *Withheld — your agent may not read `memory/project/{key}`* |
-| Read org knowledge and its proposals | Operator · Modeller · Admin, when their default agent may Read `memory/org` and every source | Org knowledge or a proposal whose place the reader's agent may not Read: its head only, content withheld; one whose sources it may not Read is absent |
-| Promote, decline or retire org knowledge | Modeller · Admin | Each act disabled — *Modellers and Admins only* |
+| Open a project's map | None — when their default agent may Read `memory/project/<key>` | The project's head only — *Withheld — your agent may not read `memory/project/{key}`* |
+| Read org knowledge and its proposals | None — when their default agent may Read `memory/org` and every source | Org knowledge or a proposal whose place the reader's agent may not Read: its head only, content withheld; one whose sources it may not Read is absent |
+| Promote, decline or retire org knowledge | Edit on `memory/org` | Each act disabled — *Needs Edit on memory/org — ask {who can grant}* |
 
 ## States
 
@@ -245,7 +245,7 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 | Lineage is Memory's, shown by every surface | Recording a copy's sources and `lineage.may_see` live here; the answer, a finding, a report, a board, a hand-off note and an export each call it, and none keeps a rule of its own |
 | Memory opens from Agents | Agents › Thinking draws the thinking graph on the canvas; a run's thinking is a tab of the run |
 | A project's map opens from the project | *Map* is a tab of the project, drawn from Memory; moving now is read live from Postgres so it is never behind |
-| Org knowledge is a Modeller's or an Admin's to promote | It reaches every agent allowed `memory/org`, as meaning reaches every model — so it takes the role that shapes what agents read |
+| Org knowledge is promoted with Edit on `memory/org` | It reaches every agent allowed `memory/org`, as meaning reaches every model — so it takes the permission that shapes what agents read |
 
 ## Open questions
 
@@ -262,4 +262,4 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 | Org knowledge written by hand | It is promoted from what an agent learned, with its sources; a person decides, never authors it |
 | Editing Memory by hand | It follows Postgres and is rebuilt from History, never repaired |
 | Guessing a copy's sources | A copy with no recorded sources is not shown; its sources are recorded when it is made, never inferred later |
-| A role that overrides lineage | An Admin reads a copy through their own default agent like anyone; an Admin who needs more changes what their default agent may Read, in History |
+| A permission that overrides lineage | An Admin reads a copy through their own default agent like anyone; an Admin who needs more changes what their default agent may Read, in History |

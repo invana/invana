@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | The same as every person for their own connections and switches; read which runs used any person's personal connection | — |
-| Operator | Read, for each of their personal connections, the runs that used it; turn a plugin off for the runs they start (CP-04); a Modeller the same | Another person's connections and the runs that used them are absent; what another person's personal connection returned reads withheld |
+| Operator | Read, for each of their personal connections, the runs that used it; turn a plugin off for the runs they start (CP-04) | Another person's connections and the runs that used them are absent; what another person's personal connection returned reads withheld |
 
 ## Flow
 
@@ -31,7 +31,7 @@ flowchart TD
   r([A step calls an outside server]) --> w{"The agent has a work connection there?"}
   w -->|yes| wk(["Called with the work connection (CP-62)"])
   w -->|no| who{"Did a person start this run, or the run it helps?"}
-  who -->|no — a schedule, a pick-up, a project key| rf(["Refused before the call · a Modeller or an Admin attaches a work connection"])
+  who -->|no — a schedule, a pick-up, a project key| rf(["Refused before the call · someone with Edit on the agent attaches a work connection"])
   who -->|yes| pc{"That person has a personal connection there?"}
   pc -->|no or expired| cn(["Refused · Connect your account (CP-43)"])
   pc -->|yes| call(["Called as that person · recorded"])

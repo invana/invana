@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Re-run any ended question or typed query, as it was, on today's versions or retuned | — |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): re-run an ended question or typed query they are behind | *Re-run* on any other run is disabled: *Only {person} or an Admin can re-run this run.* |
+| Operator | re-run an ended question or typed query they are behind | *Re-run* on any other run is disabled: *Only {person} or someone with Manage on run/{agent} can re-run this run* |
 
 ## Flow
 
@@ -35,7 +35,7 @@ flowchart LR
   a -->|a version not offered, or none recorded| x["Refused, naming the version"]
   t -->|a version not offered| x
   r -->|still running| w["Re-run waits until it ends"]
-  r -->|not behind it, not an Admin| o["Re-run disabled, naming who may"]
+  r -->|not behind it, without Manage on `run/<agent>`| o["Re-run disabled, naming who may"]
   n --> cmp(["Compare with the run it repeats"])
 ```
 
@@ -51,7 +51,7 @@ flowchart LR
 | CP-54.6 | A run still going | its page is open | *Re-run* is disabled: *Re-run is offered once the run ends.* |
 | CP-54.7 | A recorded version since retired or not offered, or a retuned version not offered | the person confirms | it is refused before it runs: *{version} is not offered.* |
 | CP-54.8 | A re-run | it runs | it is a run like any other — its tokens, its history rows, *How it got here* showing its steps and sources |
-| CP-54.9 | A run the reader is not behind, and the reader not an Admin | they read it | *Re-run* is disabled: *Only {person} or an Admin can re-run this run.* |
+| CP-54.9 | A run the reader is not behind, and the reader without Manage on `run/<agent>` | they read it | *Re-run* is disabled: *Only {person} or someone with Manage on run/{agent} can re-run this run* |
 | CP-54.10 | A run that recorded no agent or model version | *As it was* is chosen | it is refused before it runs: *This run recorded no version — choose Today's versions or Retune.* |
 | CP-54.11 | A run that is not a question or a typed query — a load, a link between models, a task's run | its page is open | *Re-run* is disabled: *Only a question or a query re-runs here — {kind} re-runs where it was started.* |
 

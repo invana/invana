@@ -73,7 +73,7 @@ new piece of work.
 | A green of its own is not evidence | A task closes on its checks, each a run of its own — never on an agent saying it is done ([PJ-F01](../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) |
 | A long build continues | At its session budget the Coder continues in a fresh session from a hand-off note ([AG-62](../capabilities/agents/features/AG-F05-delegation-and-outside-agents/stories/AG-62-continue-in-a-fresh-session-from-a-hand-off-note/story.md)) |
 | Outside an agent's rights is a recommendation | What an agent may not write it raises as a Recommendation task, a proposal for the product manager |
-| Model versions | Each agent's model version is pinned by a Modeller when it is first set up; the pack ships none |
+| Model versions | Each agent's model version is pinned when it is first set up by a person with Edit on `agent/<name>` and Run on `llm/<endpoint>/<version>`; the pack ships none |
 
 ## The skills
 
@@ -107,7 +107,7 @@ new piece of work.
 ## The Access Policy files
 
 Each agent's policy, in [AC-F02](../os/access/features/AC-F02-access-policies/feature.md#mechanisms)'s format, lands as a
-draft for an Admin to apply. The `fs/` rules follow the team's edit rights — each role writes only its own files — over
+draft for a person with Create on `setting/team-packs` to apply. The `fs/` rules follow the team's edit rights — each role writes only its own files — over
 paths relative to the task's workspace ([AC-37](../os/access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md));
 an Admin edits the paths to the repository's own before applying them. Anything a rule does not allow is denied.
 

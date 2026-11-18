@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F09](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open the Operations dropdown on the deployment: every tile and every run going; *Stop* any run as [CP-58](../../../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-58-stop-a-run-that-should-not-go-on/story.md) allows — Manage on Runs; follow its links | — |
-| Operator | Operator · Modeller: the same dropdown — every tile, every run going and both links; *Stop* the runs they are behind | *Stop* on another's run is disabled — *Needs Manage on Runs*; what each link opens responds to their policies there |
+| Operator | the same dropdown — every tile, every run going and both links; *Stop* the runs they are behind | *Stop* on another's run is disabled — *Needs Manage on Runs*; what each link opens responds to their policies there |
 
 ## Flow
 

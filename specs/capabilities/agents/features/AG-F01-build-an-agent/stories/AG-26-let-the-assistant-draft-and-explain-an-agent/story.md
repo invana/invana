@@ -22,8 +22,7 @@ Drafting and changing an agent follow building one ([the permission catalogue](.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask the Assistant to draft an agent, propose changes to any agent not built in, run its evals in the practice graph database and explain; apply or discard every proposal | — |
-| Modeller | Ask for drafts and proposals on any agent not built in, and apply or discard them; ask for an explanation of any agent | On a built-in agent, a request to change it is answered with an explanation and *I can't change this agent — it is built in; copy it* |
-| Operator | Ask the Assistant to explain an agent — a setting, a skill's need, a refusal | A request to draft or change an agent is answered with an explanation and *I can't change this agent — that needs Edit on agent/{name}* |
+| Operator | Ask the Assistant to explain an agent — a setting, a skill's need, a refusal. With Create or Edit on the agent, asks for drafts and proposals on any agent not built in, and applies or discards them | A request to draft or change an agent is answered with an explanation and *I can't change this agent — that needs Edit on agent/{name}*; on a built-in agent, the answer is *I can't change this agent — it is built in; copy it* |
 
 ## Flow
 
@@ -49,7 +48,7 @@ flowchart LR
 | AG-26.2 | A proposal being drafted | the modal is open | it says the Assistant is drafting and fills in each part as it lands; the form stays editable |
 | AG-26.3 | A proposed part | the builder presses *Apply* | it joins the draft and can be edited like anything typed; *Discard* leaves the draft as it was |
 | AG-26.4 | An agent's page | the builder asks for a change — *make it ask before sending* | the Assistant proposes what would move, shown against what is saved, and applies nothing until the builder does; a change to what it may touch is proposed as a policy change for an Admin to save |
-| AG-26.5 | A proposal that would widen what the agent may touch or its limits | it is shown | the widening is marked as an Admin's act, never applied with the rest |
+| AG-26.5 | A proposal that would widen what the agent may touch or its limits | it is shown | the widening is marked as needing Manage on `access/policies` or Edit on `worker/*`, never applied with the rest |
 | AG-26.6 | A draft | the builder asks the Assistant to run its evals | it asks first, then runs the agent's eval set in the practice graph database and reports the checks; it never publishes |
 | AG-26.7 | Any signed-in person | they ask why a skill is refused, why a run was refused or what a limit does | the Assistant explains, citing the settings, the rule and policy, and the refusal it read |
 | AG-26.8 | No AI model offered in the deployment | the builder asks for a draft | the Assistant says it cannot draft, linking Settings › Connections › AI models; the form still saves by hand |

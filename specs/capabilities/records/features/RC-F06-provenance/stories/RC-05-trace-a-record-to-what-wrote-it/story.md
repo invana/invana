@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F06](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any record's provenance and open its loads and runs | — |
-| Operator | Read the provenance of any record their default agent may read; open loads and runs they may read. A Modeller the same | A run they may not read is named, not opened |
+| Operator | Read the provenance of any record their default agent may read; open loads and runs they may read | A run they may not read is named, not opened |
 
 ## Flow
 

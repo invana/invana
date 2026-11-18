@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F05](../../feature.md)
 
 ## Who can
 
-*Reports* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Reports* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Draft from the records, edit and save the draft, publish a version, read and export every version, on any project they can see | On an archived project, *Draft from the records*, *Edit* and *Publish* are off |
-| Operator | The same; a Modeller the same | On an archived project, *Draft from the records*, *Edit* and *Publish* are off; a project they may not read: its reports list, their content withheld |
+| Operator | The same | On an archived project, *Draft from the records*, *Edit* and *Publish* are off; a project they may not read: its reports list, their content withheld |
 
 ## Flow
 

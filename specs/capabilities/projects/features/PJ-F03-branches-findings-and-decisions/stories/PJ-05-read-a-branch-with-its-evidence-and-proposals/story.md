@@ -17,14 +17,14 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person may read; a proposal is accepted or rejected by the project's people
 ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every branch; file a task on it; accept or reject a proposal on a project they lead; open a finding, a decision, and the run behind a proposal as far as run privacy allows | On an archived project every act is disabled. Not a person on the team: *Accept* and *Reject* disabled — *Join the team to change it* |
-| Operator | The same; a Modeller the same | As Admin. A run they may not read: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
+| Operator | The same | As Admin. A run they may not read: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
 
 ## Flow
 

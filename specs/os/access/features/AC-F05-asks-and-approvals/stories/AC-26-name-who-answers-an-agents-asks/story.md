@@ -16,6 +16,8 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 ## Who can
 
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../AC-F02-access-policies/feature.md#decisions)).
+
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Manage on the agent: name and change any agent's approvers, a built-in agent's included, signing in again | Naming one person alone warns, and is still allowed |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Turn a graph database on or off for the deployment; turn one off or on for their own runs | — |
+| Admin | With Edit on `setting/graph-databases`: turn a graph database on or off for the deployment; turn one off or on for their own runs | — |
 | Operator | Turn a graph database off, or back on, for the runs they are behind | The deployment's switch reads, with who set it and when; it reads *Ask an Admin* |
 
 ## Flow

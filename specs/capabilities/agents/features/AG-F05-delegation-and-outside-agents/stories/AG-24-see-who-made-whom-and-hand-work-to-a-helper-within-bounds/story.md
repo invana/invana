@@ -20,8 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read who made whom on any run; write the rules on Run `agent/<name>` that let an agent hand work on; answer a delegation ask that falls or escalates to Admins | — |
-| Modeller | Read who made whom on the runs whose content they may read; answer a delegation ask they are a named approver for | The rules read; changing them reads *Ask an Admin*; an ask routed to someone else reads, naming who it waits on |
-| Operator | As Modeller | As Modeller |
+| Operator | Read who made whom on the runs whose content they may read; answer a delegation ask they are a named approver for | The rules read; changing them reads *Ask an Admin*; an ask routed to someone else reads, naming who it waits on |
 
 ## Flow
 

@@ -132,20 +132,22 @@ sequenceDiagram
 
 ## Access
 
-Delegation and outside agents are *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
-Who an agent may hand work to is a rule on its Access Policies, which only an Admin changes.
+The permission each act needs is the *Agents* and *Plugins* rows of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+Who an agent may hand work to is a rule on its Access Policies, which needs Edit on `access/policies`.
 
-| Act | Role | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read who made whom, every hand-off and what came back on a run | Who may read the run's content — the person behind it and Admins; others see that it ran ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) | Each hand-off reads *ran*, its state and its cost, never its content |
-| Allow, Ask or Deny an agent handing work to another — a rule on Run `agent/<name>` | Admin, on an Access Policy ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The rules read on the agent's Access; changing them reads *Ask an Admin* |
+| Allow, Ask or Deny an agent handing work to another — a rule on Run `agent/<name>` | Edit on `access/policies`, on an Access Policy ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The rules read on the agent's Access; changing them reads *Ask an Admin* |
 | Approve or decline a hand-off that asks | The caller's named approvers, else the Admins with a *no approver* alert, never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, naming who it waits on |
 | Answer a helper's or an outside agent's question back | The person behind the run | The question reads, naming who it waits on |
 | Read a run's hand-off notes — what is done, what is next, what it read | The person behind the run; anyone else, an Admin included, only when the run belongs to a project and their default agent may read every source of the note ([AC-31](../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) · [GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#rules)) | The note's head — its sessions, when, its size and tokens — with its body *withheld*, naming the first source their agent may not read |
-| Fork a new run from a hand-off note | The person behind the run; an Admin who may read the note. Runs — re-run in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue): *Own* for Operator and Modeller, *Acts* for Admin | *Fork* disabled — *Only the person behind this run or an Admin*; on a note they may not read, *Fork* is not offered |
-| Set the session budget at which a run continues | Admin, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The session budget reads on the run; *Edit in Usage and limits* reads *Ask an Admin* |
-| Add an outside agent, turn it on or off, read its card again, set its credential and limits, remove it | Admin, in a session, with the password again for a credential | Outside agents read; each act disabled — *Needs the Admin role* |
-| Name an outside agent's approvers | Admin ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; *Change approvers* reads *Needs the Admin role* |
+| Fork a new run from a hand-off note | The person behind the run; an Admin who may read the note. Run content as [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) says: a person's own runs; another's needs Read on `run/<agent>` | *Fork* disabled — *Only the person behind this run or an Admin*; on a note they may not read, *Fork* is not offered |
+| Set the session budget at which a run continues | Edit on `worker/*`, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The session budget reads on the run; *Edit in Usage and limits* reads *Ask an Admin* |
+| Add an outside agent, turn it on or off, read its card again, set its credential and limits, remove it | Create on `plugin/*` to add; Manage on `plugin/<name>` for the rest — in a session, with the password again for a credential | Outside agents read; each act disabled — *Needs Create on plugin/* or Manage on plugin/{plugin} — ask {who can grant}* |
+| Name an outside agent's approvers | Manage on `agent/<name>` ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; *Change approvers* reads *Needs Manage on agent/{agent} — ask {who can grant}* |
 | Apply what an outside agent returned — merge, publish | A person, outside Invana or in the record's own feature | Invana applies none of it |
 
 ## States
@@ -205,7 +207,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Helper agents — who made them, on which run, retired with the work | Write · read |
 | A helper's or delegated run — tokens set aside and returned, why it ended, its caller chain | Write · read |
 | Delegation asks and their answers (AC-F05) | Write · read |
-| Outside agents — protocol, card or MCP server, skills on the card, credential choice, workers they call from, limits, on or off | Write · read (Admin) |
+| Outside agents — protocol, card or MCP server, skills on the card, credential choice, workers they call from, limits, on or off | Write · read (Manage on `plugin/<name>`) |
 | An outside task — state, what was sent, what was held back, what came back | Write · read |
 | Ledger rows of every task sent (AC-F09) · History rows of every hand-off (AC-F06) | Write · read |
 | Hand-off notes — the run, the sessions it joins, why it was written, its body in the blob store, its sources | Write · read |
@@ -283,7 +285,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | 422 | A document that is not an A2A agent card, or offers no A2A version Invana speaks | *Found {version}; Invana speaks A2A {pinned}.* | AG-33.9 |
 | 422 | An `mcp` outside agent naming an outside MCP server that does not exist | *{server} is not an outside MCP server here.* | AG-33.10 |
 | 409 | Removing an outside agent a run has reached | *{outside agent} has run — turn it off instead.* | AG-33.11 |
-| 403 | Adding, turning on or off, reading again, changing or removing an outside agent without the Admin role | *This needs the Admin role.* | AG-33.8 |
+| 403 | Adding, turning on or off, reading again, changing or removing an outside agent without Create on plugin/* or Manage on the plugin | *This needs Create on plugin/* or Manage on plugin/{plugin} — ask {who can grant}.* | AG-33.8 |
 | 401 | Setting an outside agent's secret without the password again | *Enter your password again to do this.* | AG-33.3 |
 | run failed | A hand-off note whose sources cannot be recorded as lineage rows — the note is not written | *The hand-off note could not record its sources — {reason}.* | AG-62.6 |
 | 403 | Forking by someone who is neither the person behind the run nor an Admin | *Only the person behind this run or an Admin.* | AG-62.11 |

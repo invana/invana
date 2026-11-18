@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Connect and disconnect their own personal connections; read every person's personal connections and disconnect any — each with the password again | — |
-| Operator | Connect and disconnect their own personal connections, with the password again; a Modeller the same | Another person's personal connections are absent. A project key has no personal connection |
+| Admin | Connect and disconnect their own personal connections; with Manage on `plugin/<name>`, read every person's personal connections and disconnect any — each with the password again | — |
+| Operator | Connect and disconnect their own personal connections, with the password again | Another person's personal connections are absent. A project key has no personal connection |
 
 ## Flow
 

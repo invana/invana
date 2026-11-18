@@ -81,18 +81,18 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*the answer* is *Acts* for Operator, Modeller and Admin. Projection templates are authored with skills in Agents ›
-Skills, so authoring them follows *skills* — *Acts* for Modeller and Admin, *Reads* for Operator. An answer's content
+*the answer* needs no permission of its own. Projection templates are authored with skills in Agents ›
+Skills, so authoring them needs Create · Edit · Publish on `skill/<name>`; reading them needs Read. An answer's content
 is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md).
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read an answer, watch its steps, cancel or re-run their own run | The person behind the run; those an answer is shared with read it; an Admin reads every one | Another person's run: that it ran, its status and its tokens — content withheld |
+| Read an answer, watch its steps, cancel or re-run their own run | The person behind the run; those an answer is shared with read it; anyone with Read on `run/<agent>` reads every one | Another person's run: that it ran, its status and its tokens — content withheld |
 | Load an answer to the board · switch its template | The person behind the run | — |
 | Open *Why?* and *How it got here* — prompts, plan, compiled queries, records | Whoever may read the answer | Content withheld |
 | Keep board · Share | The person behind the run ([EX-F02](../EX-F02-share-and-present-an-answer/feature.md)) | — |
-| Schedule this · Add to a project | The person behind the run — *Schedules* and *Projects* are *Acts* for every role ([AG-F07](../../../agents/features/AG-F07-schedules/feature.md) · [PJ-F03](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) | — |
-| Author, change, publish and delete projection templates | Modeller · Admin | The templates read; *+* disabled — *Needs the Modeller role — ask an Admin* |
+| Schedule this · Add to a project | The person behind the run — *Schedules* and *Projects* need no permission of their own ([AG-F07](../../../agents/features/AG-F07-schedules/feature.md) · [PJ-F03](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) | — |
+| Author, change, publish and delete projection templates | Edit on `skill/<name>` | The templates read; *+* disabled — *Needs Edit on skill/{name} — ask {who can grant}* |
 
 ## States
 
@@ -104,7 +104,7 @@ is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-run
 | Has data | Cited words, then the records' shape, then the meta line — *195 records · sales, crm · 9 ms* — and its acts |
 | Failed | The failed step, why, in place; a failed Answer step leaves the records as the answer |
 | Agent working or proposing | The live steps, with the agent and its plan named, and *Cancel* |
-| No access | Another person's answer: that it ran, its status and its tokens; template authoring disabled, naming *Modeller* |
+| No access | Another person's answer: that it ran, its status and its tokens; template authoring disabled, naming the permission |
 
 ## Rules
 
@@ -132,7 +132,7 @@ is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-run
 |---|---|
 | Run and its steps — state, time, tokens, prompt, rationale, plan, compiled queries, rows read, skills offered and applied, rules cited | Write (the engine) · read ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | The answer's parts — kind, order, template, citation | Write (the engine) · read |
-| Projection templates — name, kind, surface, shape it accepts, its definition, intent, version, status, origin | Read · write (Modeller · Admin) |
+| Projection templates — name, kind, surface, shape it accepts, its definition, intent, version, status, origin | Read · write (Edit on `skill/<name>`) |
 | A question asked back and its answer, as a value | Write · read |
 | Records and the loads that wrote them | Read |
 | Ledger rows — the Answer step's data-bearing call | Write, by the engine ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
@@ -189,7 +189,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 422 | A template switch to one that does not accept the part's shape | *{template} cannot draw {shape} — {why}.* | EX-03.6 |
 | 409 | Deleting a published or built-in template | *Answers read {template} — publish a new version instead.* | EX-03.15 |
 | 422 | Changing a built-in template in place | *{template} is built in — copy it to change it.* | EX-03.14 |
-| 403 | Authoring, changing, publishing or deleting a template by a person whose role does not hold *skills* | *Skills needs the Modeller role.* | EX-03.12 |
+| 403 | Authoring, changing, publishing or deleting a template by a person without Create, Edit or Publish on the skill | *Needs Edit on skill/{name} — ask {who can grant}.* | EX-03.12 |
 | step | The Answer step's call would carry a sensitive property to an external model — refused before it leaves; the run is still answered | *{property} is sensitive — it never goes to an external model.* | EX-25.7 |
 
 ### CLI

@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through the Assistant.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through the Assistant.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Expand, hide, style on any board; read and restore any board's history; reads run as the Assistant, within its Access Policies | A kind a rule denies the Assistant: the expansion refused, naming the rule |
-| Operator | The same; a Modeller the same | Without the Assistant: expand, styling and *Restore* disabled — *{person} may not use Assistant — ask an Admin*; History still reads |
+| Operator | The same | Without the Assistant: expand, styling and *Restore* disabled — *{person} may not use Assistant — ask an Admin*; History still reads |
 
 ## Flow
 

@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create boards; rename, delete, restore any board; schedule the question through an agent they may use | — |
-| Operator | The same; a Modeller the same | Without the Assistant: *Rename*, *Delete* and *Restore* disabled — *{person} may not use Assistant — ask an Admin*. A link to a board that does not exist: *Not found* |
+| Operator | The same | Without the Assistant: *Rename*, *Delete* and *Restore* disabled — *{person} may not use Assistant — ask an Admin*. A link to a board that does not exist: *Not found* |
 
 ## Flow
 

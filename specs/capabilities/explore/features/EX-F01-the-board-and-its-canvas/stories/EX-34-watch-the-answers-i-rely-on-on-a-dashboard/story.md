@@ -17,14 +17,14 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-A dashboard is *Acts* for Operator, Modeller and Admin, as a board is ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+A dashboard needs no permission of its own, as a board does ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 It is the organisation's, made by a person; a tile refreshes through the agent that answered it, so it reads only what
 that agent may Read.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create, rename and delete dashboards; pin an answer; refresh, reorder and unpin tiles | — |
-| Operator | The same, through the agents they may use; a Modeller the same | Without the Assistant: *Pin to dashboard*, *Refresh* and *Delete* disabled — *{person} may not use Assistant — ask an Admin*. A tile whose agent they may not use: its answer reads, *Refresh* is disabled — *{person} may not use {agent} — ask an Admin* |
+| Operator | The same, through the agents they may use | Without the Assistant: *Pin to dashboard*, *Refresh* and *Delete* disabled — *{person} may not use Assistant — ask an Admin*. A tile whose agent they may not use: its answer reads, *Refresh* is disabled — *{person} may not use {agent} — ask an Admin* |
 
 ## Flow
 

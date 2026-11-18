@@ -36,7 +36,7 @@ flowchart TD
   I --> X["AC-12 · How it got here names the rule that applied, its policy and who set it"]
   K --> X
   N --> X
-  A -.->|without the Admin role| NA(["Reads every policy · writing one names the Admins"])
+  A -.->|without Edit on Access| NA(["Reads every policy · writing one names the Admins"])
 ```
 
 ```mermaid

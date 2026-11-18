@@ -27,7 +27,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 ```mermaid
 flowchart TD
   s([Settings › Workers › Limits]) --> lim["CP-11 · Limits for the deployment, each team, user, project and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
-  lim -->|not an Admin| ro(["Reads · Edit disabled, naming the Admins"])
+  lim -->|without Edit on worker/<group>| ro(["Reads · Edit disabled, naming the permission"])
   s --> use["CP-34 · What each team, user and agent spends against its limits"]
   use -->|at a limit| al(["An ops alert (CP-59)"])
   start([A run starts]) --> adm["CP-12 · Admitted, waiting or refused · the limit that decided, and whose"]
@@ -55,16 +55,17 @@ flowchart TD
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
-(*Workers and the queue · limits · AI models · skill scripts*: Operator Reads · Modeller Reads · Admin Acts); this is
-what it means here.
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+(*Workers*); this table names the acts.
 
-| Act | Role | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every limit and what each team, user and agent spends against it | Operator · Modeller · Admin | — |
-| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit; the slots of *AI model calls*, *graph database calls* and *heavy steps* | Admin | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Read every limit and what each team, user and agent spends against it | Read on `worker/<group>` | — |
+| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit; the slots of *AI model calls*, *graph database calls* and *heavy steps* | Edit on `worker/<group>` | *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
 | Ask for a higher limit from a held run | The person behind the run | *Ask for more* absent; why it is held reads |
-| Allow that ask | Admin, in Needs you (AC-15) | As AC-F05 |
+| Allow that ask | Edit on `worker/<group>`, in Needs you (AC-15) | As AC-F05 |
 | Set a project's *Runs at once* and *Tokens a month* | Manage on Projects for it, in the project's Access — the policy form's *Fleet / Workers* tab ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#the-policy-form)); its creator in New project's Access step, a raise beyond what they may grant asked of those with Manage on Projects | The tab reads; its limits disabled, naming the permission and who can grant it |
 
 ## States
@@ -77,7 +78,7 @@ what it means here.
 | Has data | Each limit row: who it bounds, each limit with its ceiling, used now and a meter; each start admitted, waiting or refused with the limit that decided; each AI model's rate limit and what waits on it |
 | Failed | A limit refused names the field and its range; a run refused at a limit names the limit and whose; a rate-limit wait that ran out names the model |
 | Agent working or proposing | A run held by a limit says which, whose, how full and what is ahead, with *Ask for more* for the person behind it |
-| No access | Everything reads; *Edit* is disabled for everyone but an Admin, naming the Admins |
+| No access | Everything reads; *Edit* is disabled for everyone without Edit on `worker/<group>`, naming the permission |
 
 ## Rules
 
@@ -169,7 +170,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Setting or clearing a limit, or a model's rate limit, by anyone but an Admin — a project's, by anyone without Manage on Projects for it | *Needs the Admin role — ask {admins}.* · *This needs Manage on {project} — ask {who can grant}.* | CP-11.10 · CP-13.6 · CP-11.24 |
+| 403 | Setting or clearing a limit, or a model's rate limit, without Edit on `worker/<group>` — a project's, by anyone without Manage on Projects for it | *Needs Edit on worker/{group} — ask {who can grant}.* · *This needs Manage on {project} — ask {who can grant}.* | CP-11.10 · CP-13.6 · CP-11.24 |
 | 422 | A limit outside its range, or naming a team, user or agent that does not exist | *{field}: {why}.* | CP-11.11 |
 | 422 | A project limit other than *Runs at once* or *Tokens a month* | *A project takes runs at once and tokens a month.* | CP-11.23 |
 | 422 | *Tokens a session* on a team or a user, or cleared on the deployment | *Tokens a session is set for the deployment and for agents.* · *The deployment always has tokens a session.* | CP-11.20 |
@@ -240,6 +241,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Item | Why not |
 |---|---|
 | A limit per graph database or per Access Policy | Spend is bounded by who runs it — team, user, project, agent — and the deployment; a policy says what may be touched, never how much |
-| Anyone but an Admin raising a limit | Spend and capacity are the deployment's; *Ask for more* reaches the Admins |
+| Anyone without Edit on `worker/<group>` raising a limit | Spend and capacity are the deployment's; *Ask for more* reaches the Admins |
 | Nested teams adding up | Teams are flat; each team's limit stands on its own |
 | A cost limit | Tokens only |

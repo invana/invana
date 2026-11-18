@@ -18,14 +18,14 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
 (*Runs — read, stop and re-run*). Who reads a run's content is
 [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every run's session heads; read a session's steps and a hand-off note's body as AC-31 says — the role adds none — and only as far as the note's sources allow | A run whose content they may not read: its session heads; each note's head, its body *withheld* |
-| Operator | An Operator or a Modeller: read every run's session heads; read a session's steps and a hand-off note's body of a run they are behind, or of a project's run whose sources their default agent may read, as far as the note's sources allow | Any other run: its session heads; each note's head, its body *withheld — only {person behind}, or someone whose agent may read its sources, reads it*; a direct link to a note reads *Not found* |
+| Admin | Read every run's session heads; read a session's steps and a hand-off note's body as AC-31 says — the permission adds none — and only as far as the note's sources allow | A run whose content they may not read: its session heads; each note's head, its body *withheld* |
+| Operator | An Operator: read every run's session heads; read a session's steps and a hand-off note's body of a run they are behind, or of a project's run whose sources their default agent may read, as far as the note's sources allow | Any other run: its session heads; each note's head, its body *withheld — only {person behind}, or someone whose agent may read its sources, reads it*; a direct link to a note reads *Not found* |
 
 ## Flow
 
@@ -63,7 +63,7 @@ flowchart TD
 | CP-66.9 | A run still going that reached its session budget | *Sessions* is read | the ended session reads *session budget*, the next one is live, counting tokens against the session budget, and the run keeps its number; no ask is raised |
 | CP-66.10 | A hand-off note a fork started from | it is read | it names the run the fork started, `#M`, which opens as its own page |
 | CP-66.11 | A session the reader may read | its steps are opened | *How it got here* shows its steps and sources |
-| CP-66.12 | An Operator or a Modeller not behind a run outside any project | they follow a direct link to one of its hand-off notes | it reads *Not found*; the route answers 404 with *Not found.* |
+| CP-66.12 | An Operator not behind a run outside any project | they follow a direct link to one of its hand-off notes | it reads *Not found*; the route answers 404 with *Not found.* |
 | CP-66.13 | A session that ended *refused* | it is read | it names what was refused — a file, a program or a host — and the rule, for a reader who may read the run; a session head for anyone else |
 | CP-66.14 | A run's sessions | their tokens are read | each session's tokens are the engine's; the run's own tokens are their sum; a number not recorded reads `—`, never `0` |
 | CP-66.15 | The engine cannot read the sessions | *Sessions* opens | it says what it could not read, with *Try again* |

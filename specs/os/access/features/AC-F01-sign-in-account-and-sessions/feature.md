@@ -139,7 +139,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `access_users` — the account columns | `email?` (folded to lowercase, unique) · `username` (unique) · `password_hash?` · `first_name` · `last_name?` · `time_zone?` · `username_last_changed_at?` · `preferences` (theme, the assistant closed) · `created_at` | Install-wide. `kind`, `role` and `is_active` are the Directory's ([AC-F03](../AC-F03-directory/feature.md#engine)); only `kind = person` has an email and a password |
+| `access_users` — the account columns | `email?` (folded to lowercase, unique) · `username` (unique) · `password_hash?` · `first_name` · `last_name?` · `time_zone?` · `username_last_changed_at?` · `preferences` (theme, the assistant closed) · `created_at` | Install-wide. `kind` and `is_active` are the Directory's ([AC-F03](../AC-F03-directory/feature.md#engine)); only `kind = person` has an email and a password |
 | `access_refresh_tokens` | `user_id` · `token_hash` (unique) · `signed_in_at` (carried across rotation) · `issued_at` · `expires_at` (at most `signed_in_at` + 7 days) · `retired_at?` · `retired_why?` (`rotated` · `signed_out` · `password_changed` · `reuse` · `deactivated`) | One live row per session; the opaque value is hashed |
 | `access_sign_in_failures` | `email_folded` · `at` · `address` | Kept 15 minutes; counted per email, whether or not an account has it |
 | `access_locks` | `email_folded` (unique) · `locked_until` | One row while locked |

@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 an impact reach is a read through the Assistant, under its Access Policies, with the reader behind it.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Trace any option's impact on a project they can see, pick its hops, open any record reached | A kind the Assistant's policies deny is never reached |
-| Operator | The same; a Modeller the same | A kind the Assistant's policies deny for them is never reached; without the Assistant, *Trace* is disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same | A kind the Assistant's policies deny for them is never reached; without the Assistant, *Trace* is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 

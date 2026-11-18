@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); the walkthrough is part of the board.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); the walkthrough is part of the board.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, word, move and remove authored steps on any board; present them | — |
-| Operator | The same; a Modeller the same | Without the Assistant: the steps read and play; *Add a step here* is disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same | Without the Assistant: the steps read and play; *Add a step here* is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 

@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 ## Who can
 
-Reading Evidence is every role's; changing the item is the Modeller's and the Admin's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+Reading Evidence needs no permission; changing the item needs Edit on its target ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read Evidence for every skill, workflow, plan, rule, refusal and failure; open the runs behind each count that they may read ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); act on the item | A run they may not read opens withheld |
-| Operator | Read the same Evidence and open the runs behind it that they may read; a Modeller changes the item as an Admin does | A run they may not read opens withheld; changing the item is read only — *Needs the Modeller role — ask an Admin* |
+| Operator | Read the same Evidence and open the runs behind it that they may read; with Edit on its target, changes the item as an Admin does | A run they may not read opens withheld; changing the item is read only — *Needs Edit on {target} — ask {who can grant}* |
 
 ## Flow
 
@@ -38,7 +38,7 @@ flowchart TD
   d -->|change when to use| sk(["The skill"])
   d -->|change which agents have it| ag(["The agent"])
   d -->|a suggested change already waits| sg(["AG-51"])
-  d -->|not a Modeller or an Admin| ro(["Read only · names the Modeller role"])
+  d -->|without Edit on the target| ro(["Read only · names the permission"])
   e -->|too few runs| few(["12 runs — too few to read"])
   e -->|nothing wrong| ok(["Nothing is failing quietly · no board of zeroes"])
 ```
@@ -60,7 +60,7 @@ flowchart TD
 | AG-49.12 | Nothing failing in the window | the person opens Evidence | it says so in a sentence, not a board of zeroes |
 | AG-49.13 | A skill, workflow, plan or rule | the person opens it | the same numbers show on it as in Evidence |
 | AG-49.14 | A count | Studio shows it | it is the number the engine stored when the runs settled; Studio does not work it out |
-| AG-49.15 | An Operator | they open Evidence | they read it and open the runs they may read; changing the item is read only, naming the Modeller role |
+| AG-49.15 | An Operator | they open Evidence | they read it and open the runs they may read; changing the item is read only, naming the permission |
 
 ## Screens
 

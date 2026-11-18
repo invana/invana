@@ -17,6 +17,8 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 ## Who can
 
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../AC-F02-access-policies/feature.md#decisions)).
+
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every escalated ask; decide it once escalated; read every ask's reminders, escalation and expiry | — |

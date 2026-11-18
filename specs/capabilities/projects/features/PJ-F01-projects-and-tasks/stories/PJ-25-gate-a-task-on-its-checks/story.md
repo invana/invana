@@ -17,14 +17,14 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 checks are added by anyone who may write the task; a result is accepted by the project's people
 ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add or take off a task's checks before a result is posted; read every check's result; send back a task whose checks failed on a project they review | Not a person on the team: *Send back* disabled — *Join the team to change it* |
-| Operator | The same, on every task they may read; a Modeller the same | Not a person on the team: *Send back* disabled — *Join the team to change it*. A check's run they may not read: that it ran, its outcome and its tokens — *Content withheld* |
+| Operator | The same, on every task they may read | Not a person on the team: *Send back* disabled — *Join the team to change it*. A check's run they may not read: that it ran, its outcome and its tokens — *Content withheld* |
 
 ## Flow
 

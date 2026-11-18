@@ -26,9 +26,9 @@ flowchart TD
   start([A board with records]) --> ed["Edit mode · EX-21 changes one element"]
   ed --> ch["EX-20 · Changes: added · edited · deleted, marked on the board"]
   ch -->|revert a row · Discard all · ⌘Z| start
-  ch -->|Save n changes| role{The Modeller role?}
-  role -->|an Operator| sd["Save disabled — Needs the Modeller role · changes kept"]
-  role -->|yes| mode{The graph database read + write and switched on?}
+  ch -->|Save n changes| gate{"Holds Edit on data/<graph database>/<kind>?"}
+  gate -->|no| sd["Save disabled — Needs Edit on data/{graph database}/{kind} · changes kept"]
+  gate -->|yes| mode{The graph database read + write and switched on?}
   mode -->|read-only| ro["Save disabled — the graph database and its mode named · changes kept"]
   mode -->|switched off| off["Refused — who switched it off, and when · changes kept"]
   mode -->|yes| pol{"The Record editor may Write data/‹graph database›/‹kind›?"}
@@ -68,15 +68,15 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*Edit on the board* is *Reads* for Operator, *Acts* for Modeller and Admin. Staging an edit is the board's
+*Edit on the board* needs Edit on `data/<graph database>/<kind>`; staging needs none. Staging an edit is the board's
 ([EX-F01](../EX-F01-the-board-and-its-canvas/feature.md)); saving runs as the built-in Record editor, within its
 Access Policies.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Stage edits on the board · revert one · discard them | Anyone who opens the board ([EX-F01](../EX-F01-the-board-and-its-canvas/feature.md)) | — |
-| Save the board's edits to a graph database | Modeller · Admin, on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/<kind>` | An Operator: Save disabled — *Needs the Modeller role — ask an Admin*. A read-only graph database: Save disabled, naming it and its mode. A rule: refused, naming the policy and rule |
-| Read the save's run | The person behind it · an Admin ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | That it ran, its status and its tokens |
+| Save the board's edits to a graph database | Edit on `data/<graph database>/<kind>`, on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/<kind>` | An Operator: Save disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*. A read-only graph database: Save disabled, naming it and its mode. A rule: refused, naming the policy and rule |
+| Read the save's run | The person behind it · anyone with Read on `run/<agent>` ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | That it ran, its status and its tokens |
 
 ## States
 
@@ -88,7 +88,7 @@ Access Policies.
 | Has data | The Changes panel with its count; each change marked on the board |
 | Failed | *Could not save* with the reason and *Try again*; every change kept |
 | Agent working or proposing | — |
-| No access | Save disabled, naming the Modeller role, or the graph database and its mode; the changes stay on the board |
+| No access | Save disabled, naming Edit on data/{graph database}/{kind}, or the graph database and its mode; the changes stay on the board |
 
 ## Rules
 
@@ -96,7 +96,7 @@ Access Policies.
 |---|---|
 | Unsaved is the board's history since the last save | Undo and Redo move it; what the engine brings in, an expansion, is never unsaved |
 | The model is the schema | The engine refuses a kind or key the published model does not have, whatever Studio sends |
-| Written to the customer's graph database | A save writes to the graph database that holds each record; it needs a read + write connection and Write on `data/<graph database>/<kind>` in the Record editor's Access Policies. A read-only graph database is never written, whatever the role |
+| Written to the customer's graph database | A save writes to the graph database that holds each record; it needs a read + write connection and Write on `data/<graph database>/<kind>` in the Record editor's Access Policies. A read-only graph database is never written, whatever the permission |
 | A switched-off graph database refuses | The save is refused before it starts, naming who switched it off and when |
 | One run per save | The save is one recorded run of the Record editor, with the person behind it; each graph database it touches is a step |
 | Leans on | EX-F01 — the board, Edit mode and the Element panel · the published model edits are checked against (SE-F02) · graph databases and their modes (CP-F05) · Access Policies (AC-F02) · runs (CP-F10) · the workflow `data-edit` (AG-F06) |
@@ -146,7 +146,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 `role_required` | The person's role does not hold *Edit on the board* | *Edit on the board needs the Modeller role.* | EX-20.11 |
+| 403 `permission_required` | The person does not hold Edit on `data/<graph database>/<kind>` | *Needs Edit on data/{graph database}/{kind} — ask {who can grant}.* | EX-20.11 |
 | 409 `read_only` | A graph database the edits name is read-only; before the run opens | *{graph database} is read-only — nothing can be written to it.* | EX-20.9 |
 | 409 `switched_off` | A graph database the edits name is switched off | *{graph database} is off — switched off by {person} {when}.* | EX-20.16 |
 | 403 `policy` | No rule allows the Record editor Write on `data/<graph database>/<kind>`, or a Deny reaches it | *{policy} › {rule} does not allow writing {kind}.* | EX-20.15 |

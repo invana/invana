@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's numbers, its runs and why each ended | — |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): read every agent's numbers, its runs and why each ended; their own conversations with it | Others' conversations with the agent are counted, never listed; a recent run whose content they may not read lists with its head and *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | read every agent's numbers, its runs and why each ended; their own conversations with it | Others' conversations with the agent are counted, never listed; a recent run whose content they may not read lists with its head and *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 

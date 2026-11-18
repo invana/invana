@@ -18,13 +18,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person may read ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Draw and remove a dependency, choose its condition; make a group, put tasks in it, make it wait on another group; read the order, the groups, the waves and the critical path | On an archived project, *Draw a dependency* and *Remove* disabled, saying it is archived |
-| Operator | The same, on every project they may read; a group may wait on a group of another project only when they may read both; a Modeller the same | On an archived project, *Draw a dependency*, *New group* and *Remove* disabled, saying it is archived. A project they may not read is not offered as a group's wait |
+| Operator | The same, on every project they may read; a group may wait on a group of another project only when they may read both | On an archived project, *Draw a dependency*, *New group* and *Remove* disabled, saying it is archived. A project they may not read is not offered as a group's wait |
 
 ## Flow
 

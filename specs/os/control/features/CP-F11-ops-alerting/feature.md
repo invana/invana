@@ -55,12 +55,12 @@ flowchart TD
   lim --> cl
   gd --> cl
   view -->|the condition cleared| cl
-  view -->|Close · an Admin| note["Close with a note"] --> cl
-  view -->|Close · not an Admin| nc["Close disabled, naming the Admins"]
+  view -->|Close · with Edit on worker/<group>| note["Close with a note"] --> cl
+  view -->|Close · without Edit on worker/<group>| nc["Close disabled, naming the permission"]
   set([Settings › Workers › Alerts › Thresholds]) --> t["CP-60 · Each kind's threshold"]
-  t -->|not an Admin| ro["Reads · Edit disabled, naming the Admins"]
+  t -->|without Edit on worker/<group>| ro["Reads · Edit disabled, naming the permission"]
   set --> ha["CP-60 · History alerts — what in History tells whom"]
-  ha -->|not an Admin| hro["Reads · New History alert disabled, naming the Admins"]
+  ha -->|without Edit on worker/<group>| hro["Reads · New History alert disabled, naming the permission"]
 ```
 
 ```mermaid
@@ -89,19 +89,18 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
-(*Ops alerting*: Operator Reads · Modeller Reads · Admin Acts); this is what it means here.
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) (*Workers* — alerts and alert rules); this table names the acts. *Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Receive an alert | Whom its kind names ([The alert kinds](#the-alert-kinds)), then the Admins | Not sent |
-| Read the ops alerts list and an alert | Operator · Modeller · Admin; a run's content inside it as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
+| Read the ops alerts list and an alert | None — every signed-in person; a run's content inside it as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
 | Act on what an alert is about — stop a run, make a fix task, answer a question, renew a connection, change a limit, switch off | As [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#access) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#access) · [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#access) · [CP-F04](../CP-F04-limits/feature.md#access) · [CP-F05](../CP-F05-graph-databases/feature.md#access) | As there |
-| *Acknowledge* an alert — *{person} is on it* | The people it was sent to · Admin | Not offered on an alert not sent to them |
-| Close an alert with a note | Admin | *Close* disabled — *Needs the Admin role — ask {admins}* |
-| Set each kind's threshold | Admin | Thresholds read; *Edit* disabled, naming the Admins |
-| Read History alerts | Operator · Modeller · Admin | — |
-| Write, change, switch off or remove a History alert | Admin | *New History alert*, its switch and *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| *Acknowledge* an alert — *{person} is on it* | None — the people it was sent to · Edit on `worker/<group>` for any other | Not offered on an alert not sent to them |
+| Close an alert with a note | Edit on `worker/<group>` | *Close* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| Set each kind's threshold | Edit on `worker/<group>` | Thresholds read; *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| Read History alerts | None — every signed-in person | — |
+| Write, change, switch off or remove a History alert | Edit on `worker/<group>` | *New History alert*, its switch and *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
 
 ## States
 
@@ -113,13 +112,13 @@ The role × feature table is [AC-F02 › The permission catalogue](../../../acce
 | Has data | Open alerts first, newest activity first: kind, what it is about, count, since when, who it went to; Closed below, with who or what closed it |
 | Failed | What could not be read, in the engine's words; a threshold or History alert refused names the field |
 | Agent working or proposing | An open alert counting up while its run goes on; a run or a task it names reads live |
-| No access | Every role reads; *Close*, *Edit thresholds* and every History alert write are disabled for everyone but an Admin, naming the Admins |
+| No access | Everything reads; *Close*, *Edit thresholds* and every History alert write are disabled for everyone without Edit on `worker/<group>`, naming the permission |
 
 ## Rules
 
 ### The alert kinds
 
-Built in, shipped with Invana, never removed. A kind's threshold is the Admin's to tune ([CP-60](stories/CP-60-tune-when-ops-alerts-fire/story.md)).
+Built in, shipped with Invana, never removed. A kind's threshold is tuned with Edit on `worker/<group>` ([CP-60](stories/CP-60-tune-when-ops-alerts-fire/story.md)).
 
 | Kind | Fires when | Reaches, then the Admins | Closes on |
 |---|---|---|---|
@@ -231,7 +230,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-59.9 · CP-60.4 · CP-60.11 |
+| 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, without Edit on `worker/<group>` | *Needs Edit on worker/{group} — ask {who can grant}.* | CP-59.9 · CP-60.4 · CP-60.11 |
 | 409 | Closing an alert that is already closed | *Already closed — {by}.* | CP-59.10 |
 | 403 | Acknowledging an alert not sent to the reader, by anyone but an Admin | *This alert was not sent to you.* | API only — the dropdown offers *Acknowledge* only on alerts sent to the reader |
 | 409 | Acknowledging a closed alert | *Already closed — {by}.* | CP-69.4 |

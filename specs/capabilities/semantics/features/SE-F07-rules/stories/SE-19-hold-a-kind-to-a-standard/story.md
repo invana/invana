@@ -46,7 +46,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-19.1 | A kind in a draft, opened by a Modeller or an Admin | they pick *Hold to a standard* | they pick a standard and version (the current by default), a property for each term — same-named properties preselected — and *block*, *warn* or *report* |
+| SE-19.1 | A kind in a draft, opened by a person with Edit on the model | they pick *Hold to a standard* | they pick a standard and version (the current by default), a property for each term — same-named properties preselected — and *block*, *warn* or *report* |
 | SE-19.2 | A property held to one term of a standard | it is staged | it is a constraint naming the standard's values (SE-08), versioned with the model |
 | SE-19.3 | A mapping that names a term the standard lacks | it is staged | it is refused, naming the term |
 | SE-19.4 | A required term with no property | records are scored | every record has that term *missing*; no property is guessed |
@@ -57,9 +57,9 @@ flowchart LR
 | SE-19.9 | A *report* hold | a record that breaks it is written | it is written and scored, with nothing said |
 | SE-19.10 | A standard that publishes a newer version | the hold is read | it stays on its version and reads *v2 is newer* |
 | SE-19.11 | A hold whose mapping or mode changes and publishes | the model publishes | the kind's score is recomputed by the engine |
-| SE-19.12 | A kind that holds no standard | *Standards* opens | it reads *No standards held*, with *Hold to a standard* for a Modeller or an Admin |
+| SE-19.12 | A kind that holds no standard | *Standards* opens | it reads *No standards held*, with *Hold to a standard* for a person with Edit on the model |
 | SE-19.13 | A person without Edit on the model | they open a kind's *Standards* | scores read; *Hold to a standard* and *Let go* are absent and a line reads *Needs Edit on model/orders — ask Priya or Lee* |
-| SE-19.14 | A Modeller or an Admin, on a hold | they pick *Let go* and publish | the hold goes, later loads are not scored against that standard, earlier scores stay readable and the model's history names who let it go |
+| SE-19.14 | A person with Edit on the model, on a hold | they pick *Let go* and publish | the hold goes, later loads are not scored against that standard, earlier scores stay readable and the model's history names who let it go |
 | SE-19.15 | A model with holds | someone checks it from the command line | each hold's score and first problems print, and the command exits non-zero when a kind breaks a *block* hold, so a pipeline can branch on it |
 
 ## Screens

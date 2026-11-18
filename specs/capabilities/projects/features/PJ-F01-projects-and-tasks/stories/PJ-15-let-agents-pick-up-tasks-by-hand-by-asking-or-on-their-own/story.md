@@ -17,13 +17,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+*Projects and tasks* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 pick-up is a setting of the project, its team's; a picked-up run reaches the project's policies ∩ the agent's ceiling — who set *Allow* or pressed *Start it* is recorded, never used for reach ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set the pick-up mode of any project and each team agent's narrower mode — *Allow* only for agents the project's access lets work there; answer an agent's ask to start; see every claim | *Allow* for an agent the project's access does not allow is refused — *Not allowed in this project* |
-| Operator | As a person on the team: set the mode — *Allow* only for agents the project's access lets work there — and answer an ask to start; read the mode, every claim and every ask; a Modeller the same | Not on the team: the mode controls and *Start it* are disabled — *Join the team to change it* |
+| Operator | As a person on the team: set the mode — *Allow* only for agents the project's access lets work there — and answer an ask to start; read the mode, every claim and every ask | Not on the team: the mode controls and *Start it* are disabled — *Join the team to change it* |
 
 ## Flow
 
@@ -95,7 +95,7 @@ sequenceDiagram
 | PJ-15.13 | A task picked up by an agent | its run settles | the result is posted to the task, its checks run (PJ-25), and an agent never accepts it — a person on the team does (PJ-12) |
 | PJ-15.14 | A claimed or picked-up task | a person who may read its run opens it | *How it got here* shows the claim, who agreed, the steps and the sources; anyone else reads that it ran, its status and its tokens |
 | PJ-15.15 | A task on an archived project | an agent looks for work | it takes nothing |
-| PJ-15.16 | An Operator or a Modeller not on the team | they open Pick-up | it reads; the mode controls are disabled — *Join the team to change it* |
+| PJ-15.16 | An Operator not on the team | they open Pick-up | it reads; the mode controls are disabled — *Join the team to change it* |
 | PJ-15.17 | A person on the project, or an Admin | they choose *Allow* | it shows which team agents would start which open tasks now, and the project's *Tokens a month* they run within — used and left, set in its Access (CP-F04); it is saved only on *Confirm*, History records who set *Allow*, and an agent the project's access does not allow is refused — *Not allowed in this project* |
 | PJ-15.18 | A project a person on the team set to *Allow* | the setter leaves the team, or loses a policy of their own | *Allow* keeps running unchanged — joining or leaving never changes what the project's runs reach; the setter stays recorded; the task's text is read by the agent as data, never as instructions |
 | PJ-15.19 | A picked-up or scheduled run inside a project | it is checked | each step reaches the project's policies ∩ the agent's ceiling ∩ the run scope, like any run in the project; the person who set *Allow* or pressed *Start it* is recorded on the run and their own policies are not read; a step refused fails the task, naming the rule — pick-up never widens what the project or the agent may do |

@@ -76,14 +76,14 @@ sequenceDiagram
 Every act here is an agent's, checked against its Access Policies on `data/<graph database>/<kind>` — for a property,
 `data/<graph database>/<kind>/<property>`
 ([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); the person's
-role decides only whether they may start the act that asks for it.
+permission decides only whether they may start the act that asks for it.
 
-| Act | Role | Everyone else sees |
+| Act | Permission | Everyone else sees |
 |---|---|---|
 | Read or search a graph database | An agent the person may use, as its Access Policies allow, within the graph database's mode and switches ([CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) | Refused before it starts, naming the rule, the mode or who switched it off |
-| Write to a graph database | An agent, as its Access Policies allow Write, on a read + write graph database; a Modeller or an Admin starts it | Refused before the wire, naming the rule or the mode, or *Edit on the board needs the Modeller role* |
-| Run a raw query | Operator · Modeller · Admin, through the Query console when it is granted to them; a write needs a Modeller or an Admin | Cypher and Gremlin disabled, naming the Admins; a refusal naming the rule |
-| Read which connectors passed the certification test | Admin | — |
+| Write to a graph database | An agent, as its Access Policies allow Write, on a read + write graph database; a person with Edit on `data/<graph database>` starts it | Refused before the wire, naming the rule or the mode, or *Needs Edit on data/{graph database} — ask {who can grant}* |
+| Run a raw query | Run on `agent/query-console`; a write also needs Edit on `data/<graph database>` | Cypher and Gremlin disabled, naming the permission and who can grant; a refusal naming the rule |
+| Read which connectors passed the certification test | Read on `setting/graph-databases` | — |
 
 ## States
 
@@ -176,7 +176,7 @@ records of each graph database — its connection, mode, switches and health —
 | 403 | A raw query with an unlabelled pattern and no Read on `data/<graph database>/*` | *An unlabelled pattern reaches every kind — {agent} may not Read data/{graph database}/* — {rule} on {policy}, set by {person}.* | GP-05.3 |
 | 422 | A Gremlin query with a script, a lambda or `eval` | *{construct} is not allowed — a Gremlin query is steps only.* | GP-05.9 |
 | 409 | A raw write to a read-only graph database | *{name} is read-only — {why}.* | GP-05.6 |
-| 403 | A raw write by a person whose role does not hold *Edit on the board* | *Edit on the board needs the Modeller role.* | GP-05.6 |
+| 403 | A raw write by a person without Edit on `data/<graph database>` | *Needs Edit on data/{graph database} — ask {who can grant}.* | GP-05.6 |
 
 ### CLI
 

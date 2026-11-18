@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Set read + write, signing in again; set read-only | — |
+| Admin | With Edit on `setting/graph-databases`: set read + write, signing in again; set read-only | — |
 | Operator | Read each graph database's mode, who set it and when | *Change* reads *Ask an Admin*, naming the Admins |
 
 ## Flow
@@ -26,7 +26,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 ```mermaid
 flowchart TD
   d([A graph database · read-only]) --> c{"Change to read + write"}
-  c -->|an Operator or Modeller| ask(["Ask an Admin"])
+  c -->|an Operator| ask(["Ask an Admin"])
   c -->|an Admin| pw["Sign in again — the password for this act"]
   pw -->|wrong, or a key| no(["Refused · nothing changes"])
   pw -->|right| rw(["Read + write · History: who, when, from and to"])
@@ -43,7 +43,7 @@ flowchart TD
 | CP-38.3 | The password wrong, missing, or the act made with a key | the change is sent | it is refused and the mode is unchanged |
 | CP-38.4 | A mode change, either way | it is saved | History records who changed it, when, and from what to what |
 | CP-38.5 | A read-only graph database | a load, an edit, an annotation, a derived fact or an agent's write reaches it | it is refused before the wire, naming the graph database and its mode |
-| CP-38.6 | An Operator or a Modeller | they reach *Change* | it reads *Ask an Admin*, naming the Admins |
+| CP-38.6 | An Operator | they reach *Change* | it reads *Ask an Admin*, naming the Admins |
 | CP-38.7 | Any graph database | the list or its details draw | its mode reads in words — *Read-only* · *Read + write* — with who set it and when |
 | CP-38.8 | A read on a read + write graph database | it runs | it still runs in the driver's read mode |
 

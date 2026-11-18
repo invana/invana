@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any refusal and the policy and rule behind it, read a diagnosis and its evidence, follow its next step — open the run, check the graph database, bring records in, open the policy | — |
-| Operator | Read the same on their own runs, open the run, and ask an Admin; a Modeller the same, and *bring records in* as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Open the policy* and *Check the graph database* disabled — *Needs the Admin role — ask an Admin*. Another person's run: that it ran, its status and its tokens |
+| Operator | Read the same on their own runs, open the run, and ask an Admin; with Create on the graph database, also *bring records in*, as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Open the policy* and *Check the graph database* disabled — *Needs Edit on access/policies — ask {who can grant}*. Another person's run: that it ran, its status and its tokens |
 
 ## Flow
 
@@ -36,14 +36,14 @@ flowchart TD
   b -->|a sensitive property for an external AI model| sen["Refused · the property named"]
   r --> o{The person}
   o -->|an Admin| cr(["Open the policy"])
-  o -->|an Operator or Modeller| ao(["Needs the Admin role — ask an Admin"])
+  o -->|an Operator| ao(["Needs Edit on access/policies — ask {who can grant}"])
   b -->|runs| s{A step}
   s -->|breaks| d["What broke · on which step · its evidence"]
   d --> n{"Its next step"}
   n --> t(["Open the run"])
   n --> c(["Check the graph database"])
   n --> l(["Bring records in"])
-  n -->|needs another role| ao
+  n -->|needs another permission| ao
 ```
 
 ## Acceptance criteria
@@ -61,7 +61,7 @@ flowchart TD
 | EX-06.9 | A diagnosis | it is shown | its only action is its next step — open the run, check the graph database, or bring records in |
 | EX-06.10 | An AI provider's rate limit | retries run out | the diagnosis names the provider and the limit |
 | EX-06.11 | The same failure across runs | it recurs | the diagnosis reads the same each time |
-| EX-06.12 | An Operator, and a next step that needs the Admin role | they reach it | it is disabled — *Needs the Admin role — ask an Admin*; an Admin's *Open the policy* opens the policy at the rule |
+| EX-06.12 | An Operator, and a next step that needs Edit on access/policies | they reach it | it is disabled — *Needs Edit on access/policies — ask {who can grant}*; an Admin's *Open the policy* opens the policy at the rule |
 | EX-06.13 | A refusal or a diagnosis | the person opens *How it got here* | the run shows the policy and rule, the switch, the property, or the step with its error and its query |
 
 ## Screens

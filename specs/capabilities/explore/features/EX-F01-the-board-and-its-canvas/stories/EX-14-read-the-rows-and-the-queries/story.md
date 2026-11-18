@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read Data and Queries on any board; re-run a query step | — |
-| Operator | Read Data on a board they open; read Queries and re-run a step of their own conversation's runs, or of one shared with them; a Modeller the same | A step of a run they may not read: that it ran, its status and tokens — *Content withheld* |
+| Operator | Read Data on a board they open; read Queries and re-run a step of their own conversation's runs, or of one shared with them | A step of a run they may not read: that it ran, its status and tokens — *Content withheld* |
 
 ## Flow
 

@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F04](../../feature.md)
 
 ## Who can
 
-Making and editing a skill is the Modeller's and the Admin's; a skill is the platform's, so making one grants nothing over it ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+Making a skill needs Create on `skill/*`, editing one Edit on `skill/<name>`; a skill is the platform's, so making one grants nothing over it ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create a skill; on any skill not built in: name it, say what it is and when to use it, choose guided or planned, keep files beside its instructions, delete it while it never published; copy a built-in skill | A built-in skill has no Edit or Delete — *Built in — copy it to change it* |
-| Operator | Read every skill, who made it, versions and what it needs. A Modeller does what an Admin does | *New skill*, *Copy* and *Delete* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| Operator | Read every skill, who made it, versions and what it needs. With the permission, does what an Admin does | *New skill*, *Copy* and *Delete* disabled, naming the permission — *Needs Create or Edit on skill/{skill} — ask {who can grant}* |
 
 ## Flow
 
@@ -46,8 +46,8 @@ flowchart LR
   gi -->|names something its needs lack| gx["Publish refused, naming it"]
   i -->|no when to use| wx["Publish refused, naming the field"]
   i --> p(["Published version 1 — offered to the agents it is added to"])
-  s -->|not Modeller or Admin| ro["Reads; New skill disabled — Needs the Modeller role"]
-  sh -->|not a Modeller or an Admin| no["Reads; acts disabled — needs the Modeller role, ask an Admin"]
+  s -->|without Create on skill/*| ro["Reads; New skill disabled — Needs Create on skill/*"]
+  sh -->|without Edit on the skill| no["Reads; acts disabled — needs Create or Edit on skill/{skill}, ask {who can grant}"]
   sh -->|Delete| dl{"Ever published, or built in?"}
   dl -->|no| gone(["Deleted — taken off its agents, in History"])
   dl -->|yes| dx["Refused — Remove it from its agents"]
@@ -58,11 +58,11 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AG-37.1 | Agents › Skills | it opens | each skill reads its name, *vN* or *draft*, its whole *when to use* sentence, its plan's step count, and *Built in* or who made it |
-| AG-37.2 | A Modeller or an Admin | they press *New skill* | the *New skill* modal opens on one page — 1 a name, what it is and when to use it · 2 *Planned* or *Guided*, *Planned* picked — and *Create draft* opens the draft on Instructions holding the four headings — Goal · Arguments · Steps · When things go wrong — with *Nothing needed yet* and *Nothing to draw yet*; the skill is the platform's, made by them |
-| AG-37.3 | A draft | a Modeller or an Admin names it | the name is lowercase and hyphenated, up to 64 characters; a name another skill of the deployment has is refused, linking that skill |
-| AG-37.4 | A draft with no *when to use* | a Modeller or an Admin publishes | publishing is refused, naming *when to use* |
+| AG-37.2 | A person with Create on `skill/*` | they press *New skill* | the *New skill* modal opens on one page — 1 a name, what it is and when to use it · 2 *Planned* or *Guided*, *Planned* picked — and *Create draft* opens the draft on Instructions holding the four headings — Goal · Arguments · Steps · When things go wrong — with *Nothing needed yet* and *Nothing to draw yet*; the skill is the platform's, made by them |
+| AG-37.3 | A draft | a person with Edit on the skill names it | the name is lowercase and hyphenated, up to 64 characters; a name another skill of the deployment has is refused, linking that skill |
+| AG-37.4 | A draft with no *when to use* | a person with Publish on the skill publishes | publishing is refused, naming *when to use* |
 | AG-37.5 | A skill | it is read | what it is and when to use it read as two fields; *when to use* is the sentence the planner matches on |
-| AG-37.6 | A published version | a Modeller or an Admin edits the skill | the edit is a draft of the next version; the published version never changes, and every run that named it still opens it |
+| AG-37.6 | A published version | a person with Edit on the skill edits it | the edit is a draft of the next version; the published version never changes, and every run that named it still opens it |
 | AG-37.7 | A skill with only a draft | an agent it is added to runs | the skill is not offered; the list and the page read *draft* |
 | AG-37.8 | A version | it is saved | it is kept whole as a standard skill folder — `SKILL.md` with `name` and `description` in its front matter, Invana's own fields (when to use, how it runs, model version, a guided skill's needs) under `metadata:`, the instructions as its body, and `references/`, `scripts/` and `assets/` beside it; Invana's plan, evals and usage stay beside the folder, never inside it |
 | AG-37.9 | A file in `references/` | a step that needs it runs | it is given to that step as context; it is never drawn as a step |
@@ -70,14 +70,14 @@ flowchart LR
 | AG-37.11 | The default skills | Skills opens | each default skill is listed *Built in*, owned by *System*, its plan drawn; it has no Edit or Delete, an edit through the API or the command line is refused — *{skill} is built in — copy it to change it* — and *Copy* makes a custom skill under a new name, owned by the person who copied it and added to no agent |
 | AG-37.12 | Instructions that draw no step | the draft is drawn | it says a playbook with no steps is a rule, and offers to move it to the rules (SE-F07) |
 | AG-37.13 | A published skill | its page opens | *What it needs* lists every function and workflow its plan calls, with its bound, and every resource it needs — the plugin or tool it runs, the workflow, the kinds it reads or writes and in which graph database — read from the plan |
-| AG-37.14 | An Operator | they open Skills or a skill | everything reads; *New skill*, *Copy* and every write are disabled, naming the role — *Needs the Modeller role — ask an Admin*; the API and the command line refuse the same way |
+| AG-37.14 | An Operator | they open Skills or a skill | everything reads; *New skill*, *Copy* and every write are disabled, naming the permission — *Needs Create or Edit on skill/{skill} — ask {who can grant}*; the API and the command line refuse the same way |
 | AG-37.15 | A file in `scripts/` | the draft is saved | it runs unchanged, and only once an Admin approved its exact content (CP-F06); until then it reads *Waiting for an Admin* and a skill that calls it does not publish |
-| AG-37.16 | A new skill | it is created | it is *Planned* unless *Guided* was picked in *New skill*; a Modeller or an Admin may switch it later, and the choice is written under `metadata:` in `SKILL.md` |
+| AG-37.16 | A new skill | it is created | it is *Planned* unless *Guided* was picked in *New skill*; a person with Edit on the skill may switch it later, and the choice is written under `metadata:` in `SKILL.md` |
 | AG-37.17 | A plugin that ships skills, switched on | Skills opens | each of its skills is listed *Built in*, owned by *System*, its instructions and plan as the plugin ships them; it cannot be edited or removed, and *Copy* makes one to change |
-| AG-37.18 | A skill that never published | a Modeller or an Admin deletes it | the skill, its draft and its plan go, it is taken off every agent it was added to, and History records who deleted it |
+| AG-37.18 | A skill that never published | a person with Edit on the skill deletes it | the skill, its draft and its plan go, it is taken off every agent it was added to, and History records who deleted it |
 | AG-37.19 | A skill with a published version | anyone deletes it | it is refused — runs name its versions — with *Remove it from its agents* opening its Agents tab; nothing is deleted |
-| AG-37.20 | An Operator | they open a skill | everything reads; every act is disabled — *Needs the Modeller role — ask an Admin*; the API and the command line refuse the same way |
-| AG-37.21 | A guided draft | a Modeller or an Admin publishes | its needs are the `needs` list under `metadata:`, read on *What it needs*; a function or workflow the instructions name that the list lacks refuses the publish, naming it |
+| AG-37.20 | An Operator | they open a skill | everything reads; every act is disabled — *Needs Create or Edit on skill/{skill} — ask {who can grant}*; the API and the command line refuse the same way |
+| AG-37.21 | A guided draft | a person with Publish on the skill publishes | its needs are the `needs` list under `metadata:`, read on *What it needs*; a function or workflow the instructions name that the list lacks refuses the publish, naming it |
 | AG-37.22 | Skills in Agents | the list is read | each skill reads *Used by n agents* — the agents it is added to, as the engine counts them |
 
 ## Screens

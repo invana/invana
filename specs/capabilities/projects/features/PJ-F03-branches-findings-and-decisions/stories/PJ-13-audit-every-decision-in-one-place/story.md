@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the Decisions page across every project they can see; open a decision, its project and its lineage; export the rows | A decision of a project they may not read lists its project, number and date; its content reads *Withheld* — Admins are not exempt |
-| Operator | The same, and export the rows; a Modeller the same | A decision of a project they may not read lists, its content *Withheld*. Nothing on the page is an act to refuse |
+| Operator | The same, and export the rows | A decision of a project they may not read lists, its content *Withheld*. Nothing on the page is an act to refuse |
 
 ## Flow
 

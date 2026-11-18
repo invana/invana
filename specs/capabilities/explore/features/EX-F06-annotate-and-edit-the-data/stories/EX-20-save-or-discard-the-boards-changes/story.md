@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F06](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Stage, revert and discard changes; save them to a read + write graph database through the Record editor | A read-only graph database: Save disabled, naming it and its mode |
-| Operator | Stage, revert and discard changes on the board; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Edit on the board*) | *Save n changes* disabled — *Needs the Modeller role — ask an Admin*; the changes stay on the board |
+| Operator | Stage, revert and discard changes on the board; with Edit on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Edit on the board*) | *Save n changes* disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*; the changes stay on the board |
 
 ## Flow
 
@@ -47,12 +47,12 @@ flowchart LR
 | EX-20.3 | Unsaved changes | the person picks *Discard all* | every change goes without a question, and ⌘Z brings them back |
 | EX-20.4 | Unsaved changes | the person presses ⌘Z or ⌘⇧Z | the list moves with the board's history |
 | EX-20.5 | An expansion in Edit mode | the neighbours draw | they are not listed as unsaved |
-| EX-20.6 | A Modeller or an Admin, a read + write graph database, and a rule allowing the Record editor Write on `data/<graph database>/<kind>` | they pick *Save n changes* | rows dim, *Saving…* shows, and when the run settles the marks clear and the panel says *Saved just now*, new elements taking their database ids |
+| EX-20.6 | A person with Edit on the graph database, a read + write graph database, and a rule allowing the Record editor Write on `data/<graph database>/<kind>` | they pick *Save n changes* | rows dim, *Saving…* shows, and when the run settles the marks clear and the panel says *Saved just now*, new elements taking their database ids |
 | EX-20.7 | A change with a kind or key the model does not have | the person saves | the save is refused naming the change and the key; every change is kept |
 | EX-20.8 | A save the graph database refuses | it settles | *Could not save* shows the database's reason with *Try again*; nothing is half-saved where the database runs transactions |
 | EX-20.9 | Changes to records in a read-only graph database | the person opens Changes | Save is disabled, naming the graph database and that it is read-only; the changes stay, and the API refuses the same |
 | EX-20.10 | Unsaved changes | the person leaves the board or reloads | they are warned first that the changes will be lost |
-| EX-20.11 | An Operator | they open Changes | *Save n changes* is disabled — *Needs the Modeller role — ask an Admin*; the changes stay on the board |
+| EX-20.11 | An Operator | they open Changes | *Save n changes* is disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*; the changes stay on the board |
 | EX-20.12 | A node deleted on the board | Changes lists it | the relationships that hang on it are listed under it, and saving deletes them with it |
 | EX-20.13 | Changes staged before the model was published again | the person saves | they are checked against the model as it is now; a refusal names the change and the key |
 | EX-20.14 | A change to an element someone else deleted, or whose kind changed, since the board read it | the person saves | the save is refused naming that change; every change is kept |

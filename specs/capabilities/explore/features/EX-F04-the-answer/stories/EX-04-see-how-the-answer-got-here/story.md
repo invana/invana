@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open *Why?* and *How it got here* on any answer; copy a compiled query and run it in the composer through the Query console | — |
-| Operator | The same on an answer they may read — their own, or one shared with them; running a copied query needs the Query console; a Modeller the same ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's answer: that it ran, its status and its tokens — the trace reads *Content withheld* ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Operator | The same on an answer they may read — their own, or one shared with them; running a copied query needs the Query console; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's answer: that it ran, its status and its tokens — the trace reads *Content withheld* ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 
 ## Flow
 

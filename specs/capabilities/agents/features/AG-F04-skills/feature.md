@@ -26,8 +26,8 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([Agents › Skills]) --> may{"Modeller or Admin?"}
-  may -->|no| ro["Every skill reads; acts disabled, naming the Modeller role — ask an Admin"]
+  start([Agents › Skills]) --> may{"Edit on skill/{skill}?"}
+  may -->|no| ro["Every skill reads; acts disabled, naming the permission — ask {who can grant}"]
   may -->|yes| new["AG-37 · New skill — a draft opens on its instructions; the platform's, made by its maker"]
   new -->|name already in the catalogue| nx["Refused, linking the skill that has it"]
   start -->|a built-in skill| bi["AG-37 · Reads Built in, owned by System — no Edit"]
@@ -126,20 +126,22 @@ sequenceDiagram
 
 ## Access
 
-Skills are *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+The permission each act needs is the *Skills* row of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); this table names the acts.
 A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)): making it grants nothing over it.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every skill — instructions, Flow, what it needs, who made it, agents, usage, exceptions, evals, tests, history | Every signed-in person — Operator, Modeller, Admin | — |
-| Create a skill; copy a built-in skill — the platform's, made by the copier | Modeller · Admin | *New skill* and *Copy* are disabled, naming the role — *Needs the Modeller role — ask an Admin*; the command line refuses, naming it |
-| Edit a draft, set its model version, choose guided or planned, answer the drawing's questions, discard the draft, publish, roll back, delete a skill that never published — in Studio or on the command line | Modeller · Admin. Never on a built-in skill | The editor reads; each act is disabled — *Needs the Modeller role — ask an Admin*; a built-in skill offers *Copy* instead |
-| Adopt a handler | Modeller · Admin | Exceptions read; *Adopt* is disabled — *Needs the Modeller role — ask an Admin* |
+| Read every skill — instructions, Flow, what it needs, who made it, agents, usage, exceptions, evals, tests, history | Read on `skill/<name>` | — |
+| Create a skill; copy a built-in skill — the platform's, made by the copier | Create on `skill/*` | *New skill* and *Copy* are disabled, naming the permission — *Needs Create on skill/* — ask {who can grant}*; the command line refuses, naming it |
+| Edit a draft, set its model version, choose guided or planned, answer the drawing's questions, discard the draft, publish, roll back, delete a skill that never published — in Studio or on the command line | Edit on `skill/<name>` (Publish on it to publish or roll back). Never on a built-in skill | The editor reads; each act is disabled — *Needs Edit on skill/{skill} — ask {who can grant}*; a built-in skill offers *Copy* instead |
+| Adopt a handler | Edit on `skill/<name>` | Exceptions read; *Adopt* is disabled — *Needs Edit on skill/{skill} — ask {who can grant}* |
 | Keep its evals, run a test, run the evals | As [AG-F10](../AG-F10-test-an-agent-and-a-skill/feature.md#access) | As AG-F10 |
-| Add a skill to an agent, remove it | Modeller · Admin | The agents read; *Add to an agent* and *Remove* are disabled — *Needs the Modeller role — ask an Admin* |
-| Approve a function a skill needs from a library | Admin (AG-40) | The need reads *Waiting for an Admin* |
-| Approve a script in a skill's `scripts/` | Admin ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md)) | The script reads *Waiting for an Admin* |
-| Allow what a skill needs — a rule on an Access Policy attached to the agent | Admin ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The need reads, naming the resource and verb a rule would have to allow |
+| Add a skill to an agent, remove it | Edit on `agent/<name>` | The agents read; *Add to an agent* and *Remove* are disabled — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| Approve a function a skill needs from a library | Publish · Approve on `skill/<name>` (AG-40) | The need reads *Waiting for an Admin* |
+| Approve a script in a skill's `scripts/` | Publish · Approve on `skill/<name>` ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md)) | The script reads *Waiting for an Admin* |
+| Allow what a skill needs — a rule on an Access Policy attached to the agent | Edit on `access/policies` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The need reads, naming the resource and verb a rule would have to allow |
 
 ## States
 
@@ -151,7 +153,7 @@ A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-owners
 | Has data | A skill as a page: its head, who made it, its state and *Guided* or *Planned*, then Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History |
 | Failed | The tab names what it could not read, in the engine's words; a refused publish, draw or add names its check where the act was |
 | Agent working or proposing | The plan being drawn; the planner asking which reading a sentence means; the assistant proposing eval cases; an eval run with its cases filling in; an *Adopt* proposal |
-| No access | Every tab reads; the editor is read-only and each act is disabled, naming the Modeller role; a built-in skill offers *Copy* |
+| No access | Every tab reads; the editor is read-only and each act is disabled, naming the permission; a built-in skill offers *Copy* |
 
 ## Rules
 
@@ -296,8 +298,8 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 | 409 `skill_binding_refused` | Adding a skill whose Run `skill/<name>` or any declared need the agent's Access Policies do not allow | *{agent} may not {verb} {resource} — {rule} on {policy}.* · *{agent} may not {verb} {resource} — no rule allows it.* | AG-30.3 · AG-30.21 · AG-21.8 |
 | 409 `skill_binding_refused` | Adding a skill that needs to write to a read-only graph database | *{database} is read-only — {skill} needs to write.* | AG-30.24 |
 | — | A draw that does not hold together — a duplicate key, a binding to a step that does not run first, an output nothing declares, a function the catalogue lacks, a named workflow that is retired, given an argument it does not declare or a value of the wrong type, or that would nest past the depth limit or into a cycle, or no steps | Settles on the drawing run's result with each reason by name; nothing is written and the last plan stays | AG-19.9 · AG-19.10 · AG-19.27 |
-| 403 | A write by someone whose role is not Modeller or Admin | *This needs the Modeller role — ask an Admin.* | AG-37.14 · AG-19.26 |
-| 403 | A write on a skill without the Modeller role — including adding to or removing from an agent | *Needs the Modeller role — ask an Admin.* | AG-37.20 · AG-19.28 · AG-30.26 |
+| 403 | A write by someone without Create or Edit on the skill | *This needs Edit on skill/{skill} — ask {who can grant}.* | AG-37.14 · AG-19.26 |
+| 403 | A write on a skill without Edit on skill/{skill} — including adding to or removing from an agent | *Needs Edit on skill/{skill} — ask {who can grant}.* | AG-37.20 · AG-19.28 · AG-30.26 |
 
 ### CLI
 
@@ -350,7 +352,7 @@ A built-in skill is copied through [AC-F07](../../../../os/access/features/AC-F0
 | Decision | Detail |
 |---|---|
 | Skills live in Agents › Skills | A view of the Agents mode, beside Agents · Runs · Schedules, its Workflows within it; each skill's row reads *Used by n agents*, the engine's count of agents it is added to |
-| How it runs is in the head | *Guided* or *Planned* beside the state; a Modeller or an Admin switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
+| How it runs is in the head | *Guided* or *Planned* beside the state; a person with Edit on the skill switches it on a draft. Switching to planned draws the plan; switching to guided drops the draft's plan, and Flow says the model follows the instructions |
 | A skill is a page in Agents › Skills | Opened from the Skills list; its tabs are Instructions · Flow · What it needs · Agents · Usage · Exceptions · Evals · Tests · History, and it opens on Instructions. A link reopens the same tab |
 | The head says its state and its owner | The name, then *draft · empty*, *draft vN*, or *vN · published* with *draft vN+1* beside it, and its owner — *Platform*, or *System* on a built-in — with who made it; acts are *Run a test* and *Publish* on a draft, *Edit instructions* on a published skill with no draft, *Copy* on a built-in |
 | A skill is a document | Instructions is one editor (Edit · Preview) with two cards beside it — *What it needs* and *Plan preview* — over a console (Tests · Evals · Problems · Log) that folds to its tab strip |

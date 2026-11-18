@@ -61,18 +61,18 @@ flowchart TD
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*share* is *Acts* for Operator, Modeller and Admin — through an agent granted to the person, within that agent's
+*share* needs no permission of its own — through an agent granted to the person, within that agent's
 Access Policies. A board is the organisation's, made by a person ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)); sharing it
 tells the people and teams picked and gives them its link, and a link carries no access of its own.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Share a board's answer with users and teams — a live link or a frozen snapshot · stop sharing | Every role, with the Assistant | *Share* disabled — *{person} may not use Assistant — ask an Admin* |
+| Share a board's answer with users and teams — a live link or a frozen snapshot · stop sharing | Run on `agent/assistant` | *Share* disabled — *{person} may not use Assistant — ask an Admin* |
 | Open a shared link | Every signed-in person; what it shows reads through their default agent | *Not found* for a board or snapshot that does not exist |
-| Export PNG, CSV or Markdown | Whoever opens the board — Operator, Modeller, Admin; an export leaves the platform, so it passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | Values at a level the person's default agent may not Read are not in the file, and the file names what was left out |
+| Export PNG, CSV or Markdown | Whoever opens the board; an export leaves the platform, so it passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | Values at a level the person's default agent may not Read are not in the file, and the file names what was left out |
 | Add an answer to a project as a finding | Anyone who may read the answer's run and add a finding to the project's branch ([PJ-F03](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) | *Add to a project* disabled, naming what is missing — the project's members or the agent |
 | Present a board | Whoever opens the board | — |
-| Add, edit, move or remove an authored step | Every role, with the Assistant, as for any change to a board | No Assistant: *Add a step here* disabled — *{person} may not use Assistant — ask an Admin*; steps still read and play |
+| Add, edit, move or remove an authored step | Run on `agent/assistant`, as for any change to a board | No Assistant: *Add a step here* disabled — *{person} may not use Assistant — ask an Admin*; steps still read and play |
 
 ## States
 
@@ -84,7 +84,7 @@ tells the people and teams picked and gives them its link, and a link carries no
 | Has data | The Share dialog with who it is shared with; the presenter with its steps; the finding on its branch |
 | Failed | *Could not keep the snapshot* with the reason · a step that cannot play, with *Skip* |
 | Agent working or proposing | The answer still running: no Share and no Add to a project on the reply |
-| No access | A link to a board or snapshot that does not exist is *Not found*; *Share* without the Assistant is disabled, naming the role or the agent; a shared answer whose sources the person's default agent may not read reads *Not found* |
+| No access | A link to a board or snapshot that does not exist is *Not found*; *Share* without the Assistant is disabled, naming the permission or the agent; a shared answer whose sources the person's default agent may not read reads *Not found* |
 
 ## Rules
 
@@ -205,7 +205,7 @@ tells the people and teams picked and gives them its link, and a link carries no
 | A public or anonymous link | Every link opens inside the platform, for signed-in people only; outside people get a file |
 | A snapshot that refreshes | A frozen snapshot that changes is a live link |
 | Sharing into Slack, email or a channel | Delivery is the Inbox's; a link can be pasted anywhere and opens only for a signed-in person |
-| A share that grants more or less than the role and the default agent give | A share tells people and gives a link; what a person does is their role and their agents' |
+| A share that grants more or less than the person's permissions and the default agent give | A share tells people and gives a link; what a person does is their permissions and their agents' |
 | PDF export | Markdown and the browser's print cover it |
 | Auto-play on a timer | A walkthrough is talked over; the presenter sets the pace |
 | Rewording or reordering a reply's step | A reply step is its reply; rewording it would make the walkthrough disagree with the thread |

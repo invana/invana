@@ -54,7 +54,7 @@ flowchart TD
 |---|---|---|---|
 | It needs permission | The agent asks its named approvers in the Inbox and waits; *Not this time* sends nothing; unanswered, it reminds, escalates, then expires refused | AC-15 | `inbox` |
 | It fails | The task reads *Failed* with why; a re-run starts it again | PJ-12 | `projects.tasks · Detail` |
-| The person has no access | An agent she may not use is not offered for the task; acts her role does not hold name the role they need | PJ-12 · PJ-07 | `projects.tasks · Detail` |
+| The person has no access | An agent she may not use is not offered for the task; acts her permissions do not hold name the permission they need | PJ-12 · PJ-07 | `projects.tasks · Detail` |
 | Outside what the agent may do | Refused before it starts, naming the rule; nothing is spent | AG-24 | `projects.tasks · Detail · How it got here` |
 | The agent needs input | The task reads *Needs input*; Ana answers in its thread | PJ-12 | `projects.tasks · Detail · How it got here` |
 

@@ -19,13 +19,13 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Stop any run still going, a run with no person behind it included | — |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): stop a run they are behind | *Stop run* disabled: *Only {person} or an Admin can stop this run* — for a run with no person behind it, *Only an Admin can stop this run* |
+| Operator | stop a run they are behind | *Stop run* disabled: *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Needs Manage on run/{agent} — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  r([A run still going · its page, Running or an ops alert]) --> m{"Behind it · an Admin?"}
+  r([A run still going · its page, Running or an ops alert]) --> m{"Behind it · Manage on run/<agent>?"}
   m -->|no| d["Stop run disabled, naming who may"]
   m -->|yes| c["Stop #n? Its helpers stop too · what already finished"]
   c -->|Cancel| r
@@ -41,12 +41,12 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-58.1 | A run still going, read by the person behind it or an Admin | its page or Inbox › Running is read | *Stop run* is offered |
+| CP-58.1 | A run still going, read by the person behind it or someone with Manage on `run/<agent>` | its page or Inbox › Running is read | *Stop run* is offered |
 | CP-58.2 | *Stop run* | it is chosen | a confirm reads *Stop #{n}? Its helpers stop too*, with the steps already finished |
 | CP-58.3 | The confirm | *Stop* is chosen | dispatch ends; calls already sent finish and are recorded; the run reads *stopped*, naming who stopped it, and each helper *stopped with its parent* |
 | CP-58.4 | A stopped run | its asks are read | each pending ask closed as expired and left *Needs you* |
 | CP-58.5 | A run stopped by someone other than the person behind it | the stop lands | the person behind it gets an Inbox item naming the run, who stopped it and when |
-| CP-58.6 | Anyone else | they read the run | *Stop run* is disabled: *Only {person} or an Admin can stop this run* — for a run with no person behind it, *Only an Admin can stop this run*; the route answers 403 with the same sentence |
+| CP-58.6 | Anyone else | they read the run | *Stop run* is disabled: *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Needs Manage on run/{agent} — ask {who can grant}*; the route answers 403 with the same sentence |
 | CP-58.7 | A run that ended before the stop landed | *Stop* is chosen | *This run already ended — {reason}*; nothing changes |
 | CP-58.8 | A stop that cannot reach the workers yet | it is chosen | the run reads *stopping*, says what it finished so far, and stops when the workers answer |
 | CP-58.9 | A stop | it lands | History holds a row for the stop and one per helper, naming who stopped it and on whose run |

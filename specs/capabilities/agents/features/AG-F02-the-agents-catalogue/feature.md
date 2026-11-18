@@ -45,22 +45,24 @@ flowchart TD
 
 ## Access
 
-The catalogue is *Acts* for every role in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
+The permission each act needs is the *Agents* row of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 each person uses the agents granted to them; granting is the Directory's ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
 
-| Act | Role | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every agent — kind, status, live version, its owner and who made it, who may use it, its versions and the map | Every signed-in person — Operator, Modeller, Admin | — |
-| Use an agent — ask it, give it a task, schedule it | A person it is granted to, or to a team they are on ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#rules)) | *Ask*, *Assign* and *Schedule* disabled — *Not granted to you — ask an Admin* |
-| Grant an agent to a person or a team, take it away | Admin, in a session, with the password again ([AC-22](../../../../os/access/features/AC-F03-directory/feature.md)) | Who may use it reads; *Grant* reads *Ask an Admin* |
-| Set a person's default agent | Admin, in the Directory ([AC-38](../../../../os/access/features/AC-F03-directory/stories/AC-38-choose-a-persons-default-agent/story.md)) | *Your default* reads; changing it reads *Ask an Admin* |
+| Read every agent — kind, status, live version, its owner and who made it, who may use it, its versions and the map | Read on `agent/<name>` | — |
+| Use an agent — ask it, give it a task, schedule it | Run on `agent/<name>`, held by the person or a team they are on ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#rules)) | *Ask*, *Assign* and *Schedule* disabled — *Not granted to you — ask an Admin* |
+| Grant an agent to a person or a team, take it away | Manage on `access/policies`, in a session, with the password again ([AC-22](../../../../os/access/features/AC-F03-directory/feature.md)) | Who may use it reads; *Grant* reads *Ask an Admin* |
+| Set a person's default agent | Edit on `access/directory` ([AC-38](../../../../os/access/features/AC-F03-directory/stories/AC-38-choose-a-persons-default-agent/story.md)) | *Your default* reads; changing it reads *Ask an Admin* |
 | Build or change an agent | As [AG-F01](../AG-F01-build-an-agent/feature.md#access) | As AG-F01 |
 
 ## States
 
 | State | What the person sees |
 |---|---|
-| First use | Agents holds only the built-in agents, each *Built in*, owned by the platform, granted by role; the Assistant marked *Your default* |
+| First use | Agents holds only the built-in agents, each *Built in*, owned by the platform, granted by policy; the Assistant marked *Your default* |
 | Empty after a filter | *No agents match* — the filters (kind · status · made by · granted to me) named, with *Clear filters* |
 | Loading | Rows hold their shape |
 | Has data | Every agent with its kind — *Built in*, *Team pack* with its pack, or *Custom* — status, live version, who made it, who may use it — people and teams — and *Granted to you* or *Not granted to you*; the person's default marked |
@@ -76,7 +78,7 @@ each person uses the agents granted to them; granting is the Directory's ([AC-F0
 | Built once for the deployment | Every agent is one definition with one live version; there is no copy per team, person or graph database |
 | Granted, never invited | A person may use the agents granted to them and to every team they are on; a grant is an Admin's, read at each step ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md#rules)) |
 | A grant gives use, never access | An agent's Access Policies are its ceiling ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)); granting it to someone, or adding it to a project's team, widens nothing — a run of it reaches what the person behind it may, within that ceiling. One agent serves every project it is on |
-| An agent has no role | It acts for the person behind the run through its own Access Policies; it holds no Operator, Modeller or Admin role |
+| An agent holds no person's permissions | It acts for the person behind the run through its own Access Policies, a ceiling; it is no one's stand-in |
 | The built-in agents | One of each, owned by the platform: Assistant · Query console · Modeller · Coordinator · Record editor · Loader ([Engine › Mechanisms](#mechanisms)). Each starts granted to every person whose role holds the feature it acts for. Copied to customise, never edited |
 | Team pack agents | A Team pack an Admin turned on brings its agents into the catalogue, owned by the platform, made by the pack, at the pack's version ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)); each is granted to nobody until an Admin grants it, and reaches only what the Access Policies an Admin applied allow. Copied to customise; a newer pack version is their next version. [The Software delivery pack](../../../../packs/software-delivery.md) brings five |
 | Who made it | Every agent reads its owner — the platform, or its person for a personal agent — and who made it: *System* for a built-in, the pack for a Team pack agent, a person for the rest ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)) |
@@ -193,7 +195,7 @@ The code changes are [migrations.md](../../../../migrations.md) M37 (Team pack a
 | A copy of an agent per team or per person | One definition, one live version; teams differ by the agents granted to them |
 | A version pinned per team or person | A version reaches every run that opens after it publishes |
 | Granting an agent from its page | Grants are the Directory's, one place to read who may use what |
-| A role for an agent | It would let an agent do whatever that role may |
+| A grant to an agent beyond its ceiling | It would let an agent do whatever the grant allows |
 | Removing a built-in agent | What the product needs stays; an Admin takes its grants away instead |
 | A deployment-wide default agent | Each person has their own default, set by an Admin ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)) |
 | A router agent that classifies each ask, a fixed roster of specialists and a named skill catalogue for them | An ask goes to the agent the person picks, or the default; skills reach a step only through the agent that holds them |

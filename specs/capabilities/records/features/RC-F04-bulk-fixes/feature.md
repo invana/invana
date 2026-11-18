@@ -23,7 +23,7 @@ flowchart TD
   start([Graph Data › Records or a Quality rule]) --> sel["RC-03 · The records to change"]
   sel --> ch["RC-03 · Set · clear · map one property"]
   ch --> pv["RC-03 · Preview: before → after, record by record · what the model refuses"]
-  pv --> g{Modeller or Admin · the connection writes?}
+  pv --> g{"Holds Edit on data/<graph database>/<kind> · the connection writes?"}
   g -->|no| na["Run disabled — the reason"]
   g -->|yes| run{"Run the fix"}
   run -->|written| done(["One run · each record's History names it"])

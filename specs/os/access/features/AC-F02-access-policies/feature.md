@@ -124,7 +124,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Attach a policy to a project · widen a project's policies | Manage on Projects (`project/<project>`). Making a new project's first policy is part of starting it ([PJ-F01 › Access](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#access)); a person on its team narrows it |
 | Approve another person's change to access, when a second person's yes is set | Approve on Access — not the person who saved it |
 | Turn a second person's yes on or off | Manage on Access, signing in again — itself a change that waits for a second yes while the setting is on |
-| Set what a policy lets through for a property — *Hidden* · *Read* · *Read + write* | Edit on Access, with the policy; never in Meaning, never in a rule on the model |
+| Set what a policy lets through for a property — *Hidden* · *Read* · *Read + write* | Edit on Access, with the policy; property access is never set in Meaning or in a rule on the model |
 | Add an entry of *Hidden from agents* | Manage on Access with Read on `access/policies`, in a session, signing in again, with *Who it changes* — one step; History records it |
 | Remove an entry of *Hidden from agents* | The same, and a second Admin's yes whatever the second-yes setting; the other Admins are told |
 | Make people and teams · put people on teams | Create · Edit on Access, in the Directory ([AC-F03](../AC-F03-directory/feature.md)) |
@@ -162,7 +162,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Super user | One built-in policy: every action on every resource. The first account, made from the CLI, holds it. It is locked — never edited, renamed, copied over or deleted — and never taken off its last active holder |
 | Newcomers | A new person holds the policies the deployment names for newcomers — the setting `access.newcomer_policies`, *Read only* out of the box — set by Manage on Access. *Read only* is data: it is never named or special-cased in code. Any further policy is attached only by a holder of Manage on Access — *Super user*, or *Run the deployment* |
 | Everyone sees every place and act | Every mode, view and act shows to everyone. The policy decides what responds: an act a person lacks is shown disabled, naming the permission and who can grant it; data a policy hides does not exist for the person or the agent — a kind absent from every picker, a property with no column — and nothing says it is hidden; only a person who reads Access Policies sees what is hidden. The engine refuses any act or step the policy does not allow, naming the rule: hiding is never the guard |
-| Who can grant | The active people who hold Manage on Access — on screen *Admins* |
+| Who can grant | The active people who hold Manage on Access — on screen *Admins* ([Decisions](#decisions)) |
 | Every act is checked in one order | [The order of checks](#the-order-of-checks); a refusal names the first check that refused. The rule, its policy and who set it show only to a person with Read on `access/policies`; anyone else reads the check and who can grant |
 | Declare, never grant | A skill, a workflow, a plugin, a Team pack or a runtime declares what it needs; a declaration grants nothing. *Who it changes* names each declared need a change leaves unmet |
 | Many graph databases, each reached by rule | A deployment attaches many graph databases. A person reaches one only where a rule on `data/<graph database>/…` allows it; a run, only where the person, the project and the agent each allow it |
@@ -181,7 +181,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 ## Property access
 
 What a policy lets through for one property of a kind. Set per property, in [the policy form](#the-policy-form) or as
-rules; nothing else — no rule on the model, no level — decides what a person or an agent may see.
+rules; nothing else decides what a person or an agent may see. A property's access is never set in Meaning, and a sensitivity level, a tag the model carries ([SE-20](../../../../capabilities/semantics/features/SE-F03-meaning/stories/SE-20-say-what-a-kind-means/story.md)) that the outbound check reads, is not an access setting.
 
 | Setting | Means | Written as, on `data/<graph database>/<kind>/<property>` |
 |---|---|---|
@@ -201,7 +201,7 @@ rules; nothing else — no rule on the model, no level — decides what a person
 | A raw query is refused where anything is hidden | A raw query — the Query console's Cypher or Gremlin, an MCP raw-query tool, a key's — is refused for any caller whose policies hide anything in that graph database — a Deny Read on any kind or property of it, an entry or the person's own; a caller merely allowed fewer kinds is not refused, and the result filter of GP-05 still applies; only typed query plans run there. The refusal is one sentence whatever hides, naming no kind and no rule |
 | Search and embeddings | Search, autocomplete and vector or embedding queries apply the same check at query time: a hidden kind or property is never matched, scored, ranked or counted. Copies made before an entry was added — memory, transcripts, boards, findings, saved plans — stay as they are; *Who it changes* says so when an entry is added |
 | A person's own Hidden holds in every run | A property Hidden to a person by their own policies is absent from whatever a run shows them, inside a project too ([A project owns its access](#rules)) |
-| Nothing hides a property automatically | A property newly added to a model, or one tagged personal or confidential in Meaning, is read by agents until an Admin adds it to *Hidden from agents*. This fails open on purpose: no notice counts such properties, and the outbound check ([AC-F09](../AC-F09-what-left-the-platform/feature.md#rules)) is what stops a value leaving. A level is for the outbound check, never for hiding |
+| Nothing hides a property automatically | A property newly added to a model, or one tagged personal or confidential in Meaning, is read by agents until an Admin adds it to *Hidden from agents*. This fails open on purpose: no notice counts such properties, and the outbound check ([AC-F09](../AC-F09-what-left-the-platform/feature.md#rules)) is what stops a value leaving. A sensitivity level is a meaning tag for the outbound check, never an access setting |
 
 ## The permission catalogue
 
@@ -211,7 +211,7 @@ The one source of what may be granted. A permission is an action on a resource �
 
 | Resource | Pattern | Read | Create | Edit | Publish · Approve | Run | Manage | Takes effect for |
 |---|---|---|---|---|---|---|---|---|
-| Graph Data | `data/<graph database>[/<kind>[/<property>]]` — a kind of node or of relationship ([Property access](#property-access)) | Read its records, or the property | Add records — load, add on the board | Change records, or the property — fix (*Fix from the queue*), merge, annotate, delete | — | — | — | users · teams · projects · agents |
+| Graph Data | `data/<graph database>[/<kind>[/<property>]]` — a kind of node or of relationship ([Property access](#property-access)) | Read its records, or the property | Add records — load, add on the board | Change records, or the property — fix (*Fix from the queue*), merge, annotate, delete any annotation or record | — | — | — | users · teams · projects · agents |
 | Model | `model/<model>` | Read it — kinds, meaning, rules, history | Start a model | Change its draft — kinds, meaning, taxonomies, standards, rules, links between models | Publish a version | Run inference and health checks | — | users · teams · projects · agents |
 | AI models | `llm/<endpoint>/<version>` — the address [CP-F01](../../../control/features/CP-F01-ai-models/feature.md) gives each model version | Read it | — | — | — | Use it — pin it on an agent, and every call a run makes to it | — | users · teams · projects · agents |
 | Projects | `project/<project>` | Read a project the reader is not on | Start a project | Change its tasks, files and context — what a person on its team always may | — | — | Attach a policy to it, or widen the one it holds · archive or delete it, without being on its team | users · teams · projects · agents |
@@ -221,8 +221,8 @@ The one source of what may be granted. A permission is an action on a resource �
 | Plugins | `plugin/<name>` · `tool/<plugin>/<tool>` | Read it | Add a plugin or an MCP server | Configure it | — | Call its functions and tools | The install switch · its work connections | users · teams · projects · agents |
 | Runs | `run/<agent>` | Read runs the reader is not behind — content only with a logged reason | — | — | — | — | Stop, re-run or re-assign another's run | users · teams |
 | Workers | `worker/<group>` | Read groups, workers, the queue, limits, alerts | Add a group or a worker | Change labels, limits, alert rules | — | Place runs on the group | Drain, pause the queue | users · teams · projects · agents |
-| Settings | `setting/<section>` — `graph-databases` · `ai-models` · `connections` · `team-packs` · `deployment` · `retention` | Read it | Connect one — a graph database, an AI model, a Team pack | Change it — mode, switch, keys, retention, holds | — | — | — | users · teams |
-| Access | `access/<area>` — `policies` · `directory` · `history` · `reviews` | `policies`: Read every Access Policy, every agent's rules, ceilings and effective view, *Hidden from agents*, a refusal's rule and setter, and the checks · `history`: Read every History row (a person always reads their own) | Make a policy, a person, a team | Change a policy's draft · a team's people · deactivate, reactivate | Approve another's change to access · sign off a review | — | Attach and take off policies · name newcomers' policies · the second-yes setting · add or remove an entry of *Hidden from agents* (with Read on `policies`) | users · teams |
+| Settings | `setting/<section>` — `graph-databases` · `ai-models` · `connections` · `team-packs` · `deployment` · `retention` | Read it | Connect one — a graph database, an AI model, a Team pack | Change it — mode, switch, keys · `retention`: how long a store is kept, a hold, forget a person, export what is held about one | — | — | — | users · teams |
+| Access | `access/<area>` — `policies` · `directory` · `history` · `reviews` | `policies`: Read every Access Policy, every agent's rules, ceilings and effective view, *Hidden from agents*, a refusal's rule and setter, and the checks · `history`: Read every History row — the ledger and Access › Now (a person always reads their own) | Make a policy, a person, a team | Change a policy's draft · a team's people · deactivate, reactivate | Approve another's change to access · sign off a review | — | Attach and take off policies · name newcomers' policies · the second-yes setting · add or remove an entry of *Hidden from agents* (with Read on `policies`) · see and revoke connected clients | users · teams |
 | On a worker | `fs/<path>` · `cmd/<program>` · `net/<host>` | Read files · fetch from a host | Send to a host | Change files | — | Run a program | — | projects · agents |
 
 | Rule | Detail |
@@ -445,6 +445,7 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 |---|---|
 | Access Policies live in Access › What they may do | The Access summoner opens the large modal at Access; *Access Policies* sits beside *Permissions* and *Agents* in *What they may do*, the Directory in *Who*; a policy drills in and the crumb grows |
 | A policy is built as a matrix | The editor is the permission matrix — resources down, actions across, each cell Allow · Ask · Deny · —; a row narrows to a graph database, a kind, a model, an agent; *Rules* shows the same policy as sentences — *Allow reading Customer in every graph database* — with the exact form one click deeper |
+| *Admins* are the people who hold Manage on Access | The word on screen for whoever can grant: every refusal, escalation and fallback that reads *the Admins* means the active people who hold Manage on Access — Super user and *Run the deployment* among them. A feature never restates it; it links here. No part of the deployment has an admin of its own |
 | Policies, never roles | Access is one shape for every holder; the Access templates carry what roles carried, as data anyone with Edit on Access may change |
 | One kind of permission | A user's, a team's, a project's and an agent's policy are the same object, read by the same evaluator; a project holds one like anyone else |
 | One way in, one policy | *New policy* — Start · What it allows · Who holds it · Review — is the one plain form, for any holder; New project's Access step runs the same form inline; *Edit as policy* is the expert view |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Find every record they may open, run any act, ask the Assistant | — |
-| Operator | Find every record they may open, run the acts their role allows, ask the Assistant when it is among the agents they may use | A record they may not open is never a hit; an act their role lacks is listed disabled, naming the role it needs |
+| Operator | Find every record they may open, run the acts their permissions allow, ask the Assistant when it is among the agents they may use | A record they may not open is never a hit; an act they lack the permission for is listed disabled, naming the permission it needs |
 
 ## Flow
 
@@ -29,9 +29,9 @@ flowchart TD
   e -->|nothing| r["The open mode's sections and acts · recent records"]
   e -->|text| m["Exact · prefix · contains, grouped by where it lives"]
   m -->|a hit| o(["It opens — its address, or its section"])
-  m -->|an act| a{"Their role holds it?"}
+  m -->|an act| a{"They hold the permission?"}
   a -->|yes| run(["The act runs, or its modal opens"])
-  a -->|no| dis["Disabled · the role it needs"]
+  a -->|no| dis["Disabled · the permission it needs"]
   m -->|nothing| none["Nothing found"]
   m --> ask["Ask the Assistant — last"]
   none --> ask
@@ -49,8 +49,8 @@ flowchart TD
 | CP-30.4 | An agent the person may not use | they search its name | it is never a hit |
 | CP-30.5 | A hit with no address of its own | the person picks it | its section opens with it selected |
 | CP-30.6 | Conversations and runs with one title | they are listed | each carries its age beside its kind |
-| CP-30.7 | An act the person's role holds | they pick it | it runs, or its modal opens |
-| CP-30.8 | An act the person's role lacks | it is listed | it is disabled, naming the role it needs |
+| CP-30.7 | An act the person holds the permission for | they pick it | it runs, or its modal opens |
+| CP-30.8 | An act the person lacks the permission for | it is listed | it is disabled, naming the permission it needs |
 | CP-30.9 | Text typed, the Assistant among the agents the person may use | the list draws | *Ask the Assistant* is the last entry; picking it puts the text in the composer and focuses it, never sending |
 | CP-30.10 | Nothing matches | the list draws | it says *Nothing found*, with *Ask the Assistant* |
 | CP-30.11 | A list ⌘K could not read | it matches | that group says it could not be read; the others still match |

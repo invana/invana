@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F07](../../feature.md)
 
 ## Who can
 
-Schedules are *Acts* for every role in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a person acts on a schedule through its agent, granted to them.
+A person acts on a schedule through its agent, Run on `agent/<name>` held by them ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create, edit, pause, resume, run now and delete a schedule whose agent is granted to them; read every schedule and firing, and open a run as [AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules) allows | On a schedule whose agent is not granted to them, every act disabled — *Uses {agent}, which is not granted to you* |
-| Operator | The same; a Modeller the same | The same |
+| Operator | The same | The same |
 
 ## Flow
 
@@ -48,7 +48,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AG-42.1 | No schedules | a person opens Agents › Schedules | it reads *Nothing is scheduled* with *New schedule* |
-| AG-42.2 | A person of any role | they save a schedule naming what to do, an agent granted to them, a repeat, a time zone and where to deliver | it is saved with no project, and its next run reads in their zone |
+| AG-42.2 | Any signed-in person | they save a schedule naming what to do, an agent granted to them, a repeat, a time zone and where to deliver | it is saved with no project, and its next run reads in their zone |
 | AG-42.3 | A new schedule | its repeat is invalid, its time zone unknown, or its agent or a channel is missing | it is refused before saving, the dialog naming the field and why |
 | AG-42.4 | A saved schedule | its time comes | a run of the named agent opens with its instructions, acting as the agent, who set the schedule recorded on it, and the firing is kept as *opened* with its run |
 | AG-42.5 | A schedule whose last run is still going, *If the last run is still going* = *Skip* | its next firing comes | the firing is kept as *skipped*, saying why; with *Run anyway* a second run opens |

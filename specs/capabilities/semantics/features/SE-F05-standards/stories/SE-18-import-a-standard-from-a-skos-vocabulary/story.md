@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F05](../../feature.md)
 
 ## Who can
 
-Importing a standard is the Modeller's and the Admin's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+Importing a standard needs Edit on `model/<model>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Import a vocabulary as a new standard, or as the next version of any | — |
-| Operator | Read the standards. A Modeller imports a vocabulary as an Admin does | *Import* absent — *Needs the Modeller role — ask an Admin* |
+| Operator | Read the standards. With Edit on the model, imports a vocabulary as an Admin does | *Import* absent — *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## Flow
 
@@ -38,7 +38,7 @@ flowchart LR
   r -->|no| new(["Created with v1 — its page opens"])
   r -->|terms differ| nv(["The next version"])
   r -->|terms identical| un(["Nothing changed"])
-  a -->|an Operator| rx["Needs the Modeller role — ask an Admin"]
+  a -->|an Operator| rx["Needs Edit on model/{model} — ask {who can grant}"]
 ```
 
 ## Acceptance criteria
@@ -55,7 +55,7 @@ flowchart LR
 | SE-18.8 | Concepts | they map | the preferred label is the name or label, the notation the code (the IRI's local name when none), and each term and value keeps its source IRI |
 | SE-18.9 | Related concepts, mappings, alternative labels or collections | it previews | they are listed as not imported, with their counts; a second concept with the same code in a term is skipped and listed |
 | SE-18.10 | A preview | the person imports | a new name creates the standard with v1; an existing one gets its next version; identical terms read *Nothing changed* — and the standard's page opens |
-| SE-18.11 | An Operator | they open Standards | *Import* is absent and a line reads *Needs the Modeller role — ask an Admin*; the API refuses the import |
+| SE-18.11 | An Operator | they open Standards | *Import* is absent and a line reads *Needs Edit on model/{model} — ask {who can grant}*; the API refuses the import |
 | SE-18.12 | The name | the dialog shows it | it defaults to the slug of the scheme's title and is editable; the publisher is the person |
 
 ## Screens

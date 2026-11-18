@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read any element on a board they open; in Edit, change it, add one, and apply the change to the board; save it (EX-20) | — |
-| Operator | Read any element; in Edit, change, add and apply on the board — an edit stays on the board until saved; a Modeller also saves it (EX-20) | Saving to a graph database: *Save n changes* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | Read any element; in Edit, change, add and apply on the board — an edit stays on the board until saved; with Edit on the graph database, also saves it (EX-20) | Saving to a graph database: *Save n changes* disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
 
 ## Flow
 
@@ -45,13 +45,13 @@ flowchart LR
 | EX-21.3 | Five elements selected | the person opens the panel | it lists the five to pick one from; it never shows more than one element at a time |
 | EX-21.4 | A node open in Edit mode | the person picks *Edit* | the view is replaced in place by the form — Kind, Label, Properties, then Cancel · Apply |
 | EX-21.5 | The form open | the person picks *Add property* | only the keys of the node's kind not yet set are offered; each value's placeholder is the key's type (text · number · date) |
-| EX-21.6 | The form open | the person types a key the model does not have | it is refused, naming who can add it — a Modeller, in Model |
+| EX-21.6 | The form open | the person types a key the model does not have | it is refused, naming who can add it — someone with Edit on the model, in Model |
 | EX-21.7 | The form open | the person adds a key a second time | the second row is refused and Apply waits until it is fixed |
 | EX-21.8 | The form open | the person changes the kind | the new kind's keys become the rows; keys the new kind lacks are struck through and dropped on Apply |
 | EX-21.9 | Edit mode | the person draws a node or a relationship | it opens as *New node* or *New relationship*, its kind asked first; Cancel takes it off the board |
 | EX-21.10 | A deployment with no published model | the person opens the form | it says *Publish a model to edit the data* with *Open Model* |
 | EX-21.11 | An element whose kind or key is not in the model | its panel opens | the key stays, tagged *not in the model*; the kind can be changed to one the model has |
-| EX-21.12 | An Operator | they apply an edit | it is marked on the board; *Save n changes* is disabled — *Needs the Modeller role — ask an Admin* |
+| EX-21.12 | An Operator | they apply an edit | it is marked on the board; *Save n changes* is disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
 | EX-21.13 | A relationship open in Edit mode | the person looks for its kind | the kind is fixed, with *To change it, delete it and draw it again* |
 | EX-21.14 | A node open in the panel | it shows | where it came from shows under its properties — the load and the run that wrote it, each opening its page |
 | EX-21.15 | A sensitive property on a node | its panel opens | the property shows with a *Sensitive* tag (SE-F03); the board reads it and sends it to no AI model |

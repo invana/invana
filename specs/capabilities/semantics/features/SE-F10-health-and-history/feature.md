@@ -31,8 +31,8 @@ flowchart TD
   db -->|never read · stale| rd["Read the database (SE-04)"]
   db -->|Add it in a draft| draft(["The draft — SE-05"])
   h -->|hot and slow · failed questions| perf["Performance: per kind — failed questions, slow query shapes, suggested indexes"]
-  perf -->|Add index to draft| may{An Admin?}
-  may -->|no| na["Needs the Admin role — ask an Admin"]
+  perf -->|Add index to draft| may{"Holds Edit on setting/graph-databases?"}
+  may -->|no| na["Needs Edit on setting/graph-databases — ask {who can grant}"]
   may -->|yes| draft
   h -->|Save report| rep(["A saved report · frozen · Back to live"])
   h -->|History| hist["SE-09 · Who changed what, why, the effect after"]
@@ -52,13 +52,13 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read health — Overview, Database, Usage, Performance, Growth — and history | Every signed-in person — Operator, Modeller, Admin | — |
-| Save a report · open saved reports | Every signed-in person — Operator, Modeller, Admin | — |
-| Read the database · *Add it in a draft* | Modeller · Admin | Absent; the reading stays — *Needs the Modeller role — ask an Admin* on the drift rows |
-| *Add index to draft* — apply a suggested index | Admin | Absent; the suggestion reads — *Needs the Admin role — ask an Admin* |
-| Archive, restore or delete a model | Modeller · Admin | Absent from the model's `⋯`; *Needs the Modeller role — ask an Admin* |
+| Read health — Overview, Database, Usage, Performance, Growth — and history | Read on `model/<model>` | — |
+| Save a report · open saved reports | Read on `model/<model>` | — |
+| Read the database · *Add it in a draft* | Edit on `model/<model>` | Absent; the reading stays — *Needs Edit on model/{model} — ask {who can grant}* on the drift rows |
+| *Add index to draft* — apply a suggested index | Edit on `setting/graph-databases` | Absent; the suggestion reads — *Needs Edit on setting/graph-databases — ask {who can grant}* |
+| Archive, restore or delete a model | Edit on `model/<model>` | Absent from the model's `⋯`; *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## States
 
@@ -84,7 +84,7 @@ flowchart TD
 | Drift is matched by what a row covers | A kind, relationship, index or constraint is *in both*, *model only* or *database only* by what it covers, never by its name |
 | Growth moves only when something writes | Records are counted after every read of the database, load and link commit, each mark naming the run that wrote; never sampled on a timer |
 | Query performance per kind | Performance reads, per kind, the questions that failed — *cannot answer*, refused or erroring, each with its reason — the slow query shapes, and the advice the engine draws from them: the indexes to add, and a faster way to reach the same records (SE-07.25) |
-| Advice is a draft change, never a write | A suggested index is offered as *Add index to draft*, to an Admin alone; the next publish adds it. Explore's memory may suggest the same index (AG-F09); it lands here, never applied by an agent |
+| Advice is a draft change, never a write | A suggested index is offered as *Add index to draft*, to a person with Edit on `setting/graph-databases` alone; the next publish adds it. Explore's memory may suggest the same index (AG-F09); it lands here, never applied by an agent |
 | Archive, not delete | A published model is archived — out of the map, its versions still resolve for every answer and load that used them; only a never-published model is deleted. A model with active links cannot be archived |
 | The engine counts every number | Studio formats; history's effect after is stored when the version publishes and never recomputed |
 | Leans on | SE-F01 — reading the database · SE-F02 — the draft, the comparison, the review · SE-F06 — links · RC-F02 — loads into a model · AG-F09 — suggestions from memory · Agents › Runs — each run a number links to |
@@ -210,6 +210,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | A health score | Signals are fixed rules a person can argue with |
 | Running an index from the page | Advice lands in a draft; publishing adds it |
-| An agent applying an index | An index changes the database for every reader; an Admin applies it |
+| An agent applying an index | An index changes the database for every reader; a person with Edit on `setting/graph-databases` applies it |
 | Numbers from telemetry | The query log is Invana's own, so the page works with telemetry off |
 | Recomputing a past version's effect | What a publish affected is stored when it publishes |

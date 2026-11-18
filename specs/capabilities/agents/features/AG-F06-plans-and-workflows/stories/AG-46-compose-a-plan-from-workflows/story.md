@@ -23,7 +23,7 @@ Reading is every signed-in person's ([the permission catalogue](../../../../../.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the composed plan of a run they are behind or, for a project's run, whose sources their default agent may see — its composites and their pins, and the check over the tree | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
-| Operator | Read the composed plan of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
+| Operator | Read the composed plan of a run they are behind or, for a project's run, whose sources their default agent may see | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
 
 ## Flow
 

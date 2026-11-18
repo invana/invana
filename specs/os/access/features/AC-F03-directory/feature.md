@@ -55,7 +55,7 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| AC-22 | [See every user and attach policies to a person](stories/AC-22-see-every-user-and-set-a-persons-role/story.md) | idea |
+| AC-22 | [See every user and attach policies to a person](stories/AC-22-see-every-user-and-attach-policies-to-a-person/story.md) | idea |
 | AC-09 | [Make teams and put people on them](stories/AC-09-make-teams-and-put-people-on-them/story.md) | idea |
 | AC-39 | [Grant agents to a team and see who gains them](stories/AC-39-grant-agents-to-a-team-and-see-who-gains-them/story.md) | idea |
 | AC-38 | [Choose a person's default agent](stories/AC-38-choose-a-persons-default-agent/story.md) | idea |

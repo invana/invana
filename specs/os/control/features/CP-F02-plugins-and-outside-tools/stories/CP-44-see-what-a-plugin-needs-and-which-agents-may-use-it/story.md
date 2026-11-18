@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every function's needs and, for any person, which of the agents granted to them may use it and what is missing | — |
-| Operator | The same reads, for themselves and any person — everyone reads access ([AC-F02](../../../../../access/features/AC-F02-access-policies/feature.md#decisions)); a Modeller the same | — |
+| Operator | The same reads, for themselves and any person — everyone reads access ([AC-F02](../../../../../access/features/AC-F02-access-policies/feature.md#decisions)) | — |
 
 ## Flow
 

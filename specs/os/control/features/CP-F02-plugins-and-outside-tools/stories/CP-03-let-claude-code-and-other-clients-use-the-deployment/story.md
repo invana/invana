@@ -18,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Serve or stop serving an agent or a record tool; read the address, how to connect and every call | — |
-| Operator | Read the address, what is served and how to connect; call the server through their default agent with a connected client (AC-F11) or a key (AC-F10); read their own calls; a Modeller the same | The served switches read, naming the Admins; another person's calls are absent |
+| Admin | With Manage on `plugin/<name>`: serve or stop serving an agent or a record tool; read the address, how to connect and every call | — |
+| Operator | Read the address, what is served and how to connect; call the server through their default agent with a connected client (AC-F11) or a key (AC-F10); read their own calls | The served switches read, naming the permission — *Needs Manage on plugin/{name} — ask {who can grant}*; another person's calls are absent |
 
 ## Flow
 

@@ -110,13 +110,13 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*Branches, findings and decisions* is *Acts* for Operator, Modeller and Admin — on every project the person's default
+*Branches, findings and decisions* needs no permission of its own — on every project the person's default
 agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), reading records through the agents granted to them.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a project's branches, findings, decisions, proposals, lineage and the Decisions page | Anyone who may read `project/<key>` | The project's head; the rest reads *Withheld — join the team or ask {who can grant}* |
-| Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person who may read the project — Operator · Modeller · Admin | On an archived project, each act is disabled, saying it is archived |
+| Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person who may read the project | On an archived project, each act is disabled, saying it is archived |
 | Accept or reject a proposal | The people on the project's team ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)) | The proposal reads; *Accept* and *Reject* disabled — *Join the team to change it* |
 | Add findings, propose a fork or a decision | An agent, in a run on the project | A proposal reads as waiting, with its rationale and *How it got here* |
 | Record a verdict or a decision | A person, never an agent | An agent can only propose |

@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the lock and what is left; open the step that does it — *Connect a graph database* or *Open Model* to publish the model | — |
-| Operator | Read the lock and what is left. A Modeller also opens *Open Model* to publish the model | *Ask an Admin* in place of the step's act; a step only an Admin takes names the Admin role ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) |
+| Operator | Read the lock and what is left. With Publish on the model, also opens *Open Model* to publish the model | *Ask an Admin* in place of the step's act; a step that needs a permission the person lacks names it ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) |
 
 ## Flow
 
@@ -31,7 +31,7 @@ flowchart LR
   st -->|a graph database connected and on| db{Admin?}
   db -->|yes| c["Connect a graph database"] --> done([The step done]) --> s
   db -->|no| ask["Ask an Admin"]
-  st -->|a model published| m{Modeller or Admin?}
+  st -->|a model published| m{"Holds Edit on data/<graph database>/<kind>?"}
   m -->|yes| om["Open Model"] --> done
   m -->|no| ask
   a2([A question sent mid set-up]) --> rf["Refused · asking opens when {step}"]
@@ -42,9 +42,9 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-11.1 | A deployment whose set-up is not done — no graph database on, or no published model | anyone opens Explore | the board is the lock alone — *Asking opens when {step}* — with what is left, and no question box |
-| EX-11.2 | The lock on *a model is published*, and a Modeller or an Admin | they click *Open Model* | Model mode opens on the draft |
+| EX-11.2 | The lock on *a model is published*, and a person with Publish on the model | they click *Open Model* | Model mode opens on the draft |
 | EX-11.3 | The lock on *a graph database is connected and on*, and an Admin | they click *Connect a graph database* | Settings › Connections › Graph databases opens on *Connect* ([CP-F05](../../../../../../os/control/features/CP-F05-graph-databases/feature.md)) |
-| EX-11.4 | The lock, and an Operator | they read it | the lock offers *Ask an Admin* where the step's act would be, naming the role the step needs |
+| EX-11.4 | The lock, and an Operator | they read it | the lock offers *Ask an Admin* where the step's act would be, naming the permission the step needs |
 | EX-11.5 | The lock is showing | someone finishes the last step | the next visit opens on the question box, and the ready step says asking is open and offers the first question |
 | EX-11.6 | Set-up not done | a question is sent by any path | it is refused before it runs — *Asking opens when {step}.* |
 

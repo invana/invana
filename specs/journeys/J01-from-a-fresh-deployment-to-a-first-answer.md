@@ -69,7 +69,7 @@ flowchart TD
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | Priya is an Admin: every set-up act is hers. An Operator reaching set-up reads it, each step naming the role it needs | CP-24 | `start.home · Set-up` |
+| It needs permission | Priya is an Admin: every set-up act is hers. An Operator reaching set-up reads it, each step naming the permission it needs | CP-24 | `start.home · Set-up` |
 | It fails | A failed test names the database's own error; records that do not fit are rejected, each named | CP-26 · RC-09 | `settings.databases · Connect` · `data.loads · Upload` |
 | The person has no access | Without an account, the sign-in card reads *Ask your admin for an account* | AC-01 | `access.signin` |
 | Her database's connector is not installed | It is not offered; the step names the package that adds it, installed on the engine's machine | CP-17 | `settings.databases · Connect` |

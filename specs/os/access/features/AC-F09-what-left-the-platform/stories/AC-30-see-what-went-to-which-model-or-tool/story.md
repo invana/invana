@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F09](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is [the permission catalogue](../../../AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

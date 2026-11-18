@@ -137,7 +137,7 @@ sequenceDiagram
 | Checkpoints — the last row each prune removed, its hash and its signature | Write · read |
 | History's period and hold ([AC-F12](../AC-F12-leaving-and-keeping/feature.md#engine)) | Read |
 | Writes and their causes — actor, on whose behalf, what, the act that caused it | Read |
-| Live sessions (AC-F01) · runs going (CP-F10) · connected clients (AC-F11) · keys (AC-F10) · roles (AC-F03) · asks waiting (AC-F05) | Read |
+| Live sessions (AC-F01) · runs going (CP-F10) · connected clients (AC-F11) · keys (AC-F10) · people's policies (AC-F03) · asks waiting (AC-F05) | Read |
 | The chain's last check — when, whether it held, where it broke | Read |
 | Exports — who, the filters, the format, how many rows | Write · read |
 | Versions of skills, rules, workflows, agents, models and Access Policies, loads, and why each was made | Read |

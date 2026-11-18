@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Pick the connector, give the details, test, accept or change the agent's draft | — |
+| Admin | With Create on `setting/graph-databases`: pick the connector, give the details, test, accept or change the agent's draft | — |
 | Operator | — | The modal never opens for them (CP-25.11) |
 
 ## Flow

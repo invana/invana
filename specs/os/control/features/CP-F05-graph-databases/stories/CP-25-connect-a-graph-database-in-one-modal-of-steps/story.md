@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Every section; *Connect* saves the graph database read-only and off | — |
+| Admin | With Create on `setting/graph-databases`: every section; *Connect* saves the graph database read-only and off | — |
 | Operator | — | *Connect a graph database* reads *Ask an Admin*; the modal never opens for them |
 
 ## Flow

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Accept, accept with edits, or reject with a note any suggested change; read each version's outcome | — |
-| Operator | Read the suggested change and each version's outcome. A Modeller ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): decide those on a skill, workflow, agent or answer template, and those on the model's rules or meaning through its review | The three acts disabled — *Needs the Modeller role — ask an Admin*; an index needs an Admin, named; a plan proposed for approval waits on the agent's named approvers, named |
+| Operator | Read the suggested change and each version's outcome. With Edit on the target ({PCS}): decide those on a skill, workflow, agent or answer template, and those on the model's rules or meaning through its review | The three acts disabled — *Needs Edit on {target} — ask {who can grant}*; an index needs Edit on `setting/graph-databases`, named; a plan proposed for approval waits on the agent's named approvers, named |
 
 ## Flow
 
@@ -33,7 +33,7 @@ flowchart TD
   d -->|reject| n["A note, required · closed · the note is evidence"]
   d -->|a model change| dr(["Staged on the model's draft · its review publishes — SE-F02"])
   d -->|its base moved on| st(["Refused · the base it was made against and the current one"])
-  d -->|not a Modeller or an Admin · an index and not an Admin| na(["Read only · names the role to ask for"])
+  d -->|without Edit on the target · an index without Edit on graph databases| na(["Read only · names the permission to ask for"])
   d -->|a plan proposed for approval| ap(["Waits on the agent's named approvers"])
   p --> w["Watched against its prediction"]
   pe --> w
@@ -59,10 +59,10 @@ flowchart TD
 | AG-52.9 | The same kind of suggestion rejected repeatedly | the person reads Evidence | the repeated rejections and their notes are visible |
 | AG-52.10 | Several suggested changes selected | the person looks for an act on all | there is none: each is decided on its own |
 | AG-52.11 | A decision | it is made | Access › Record › History records who decided, when, and the note |
-| AG-52.12 | A person who holds no Modeller role and is not an Admin | they open a suggested change | accept, edit and reject are disabled, naming the role it needs and an Admin to ask; through the API it is refused |
-| AG-52.13 | A suggested change to the model | a Modeller or an Admin accepts it | it is staged on the model's draft and published through the model's own review (SE-F02); nothing changes the model from Agents |
+| AG-52.12 | A person without Edit on the target | they open a suggested change | accept, edit and reject are disabled, naming the permission it needs and who can grant it; through the API it is refused |
+| AG-52.13 | A suggested change to the model | a person with Edit on the model accepts it | it is staged on the model's draft and published through the model's own review (SE-F02); nothing changes the model from Agents |
 | AG-52.14 | A published model change | its window passes | the outcome reads the engine's stored answer accuracy and latency for that window before and after it — improved · unchanged · worsened · unmeasured |
-| AG-52.15 | An index suggestion | anyone but an Admin accepts it | it is refused, naming an Admin |
+| AG-52.15 | An index suggestion | anyone without Edit on `setting/graph-databases` accepts it | it is refused, naming the permission |
 | AG-52.16 | A suggested change proposing a plan be approved into a workflow | anyone accepts it from Needs you | it is refused, naming the agent's approvers it waits on; their approval (AG-F06) decides it |
 
 ## Screens

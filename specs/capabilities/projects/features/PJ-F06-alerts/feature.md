@@ -63,22 +63,22 @@ sequenceDiagram
 ## Access
 
 Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
-*Alerts* is *Acts* for Operator, Modeller and Admin — on every project the person can see
+*Alerts* needs no permission of its own — on every project the person can see
 ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)). Writing an alert rule is the Ontology's.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Write an alert rule and the project it opens leads in | Modeller · Admin ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) | As SE-F07 |
+| Write an alert rule and the project it opens leads in | Edit on `model/<model>` ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) | As SE-F07 |
 | Read a project's leads and the rule behind each | Anyone who may read the project | A project they may not read: its leads count, their content *Withheld — join the team or ask {who can grant}* |
 | Read the records a lead matched | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A record of a kind the reader's agents may not read is absent |
-| Take or dismiss a lead | Anyone who can see the project — Operator · Modeller · Admin | On an archived project, *Take* and *Dismiss* are disabled, saying it is archived |
+| Take or dismiss a lead | Anyone who can see the project | On an archived project, *Take* and *Dismiss* are disabled, saying it is archived |
 | Open a lead | The engine, on a rule's match — never an agent's own act | — |
 
 ## States
 
 | State | What the person sees |
 |---|---|
-| First use | *No alerts yet — an alert rule in the Ontology opens leads here*, naming the Modellers and Admins who can write one |
+| First use | *No alerts yet — an alert rule in the Ontology opens leads here*, naming who holds Edit on a model, who can write one |
 | Empty after a filter | *No leads match*, with the filter to clear |
 | Loading | The list holds its shape; rows are skeletons |
 | Has data | Leads newest first: the rule, the records matched, how many matches, opened when, open · taken · dismissed |

@@ -23,7 +23,7 @@ Reading is every signed-in person's ([the permission catalogue](../../../../../.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every workflow, its page, versions and export; read the plan of a run they are behind or, for a project's run, whose sources their default agent may see | The plan of another run: that it ran, its status and its tokens — *Content withheld* |
-| Operator | Read every workflow, its page, versions and export; read the plan of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
+| Operator | Read every workflow, its page, versions and export; read the plan of a run they are behind or, for a project's run, whose sources their default agent may see | Another person's run: that it ran, its status and its tokens — the plan reads *Content withheld* |
 
 ## Flow
 

@@ -25,14 +25,14 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([Agents]) --> may{"Modeller or Admin?"}
-  may -->|no| ro["Every agent reads; acts disabled, naming the Modeller role — ask an Admin"]
+  start([Agents]) --> may{"Edit on agent/{agent}?"}
+  may -->|no| ro["Every agent reads; acts disabled, naming the permission — ask {who can grant}"]
   may -->|yes| new["AG-21 · New agent: a name, what it should do, which Access Policies to ask for"]
   new -->|the assistant drafts from the plain words| as["AG-26 · A proposal: instructions, skills, voice, effort — Apply or Discard"]
   as --> new
   new -->|name already used| nx["Refused, naming the agent that has it"]
   new -->|Create agent| draft["AG-21 · A draft, as a page: Setup · Flow · Versions — the platform's, made by its maker"]
-  start -->|an Operator| no["Reads; acts disabled — needs the Modeller role, ask an Admin"]
+  start -->|an Operator| no["Reads; acts disabled — needs Edit on agent/{agent}, ask {who can grant}"]
   start -->|a built-in agent| bi["Reads Built in, owned by System — Copy instead of Edit"]
   bi -->|Copy| draft
   draft --> setup["Instructions · voice · skills · runs with · model version and effort · access · limits · where it runs · Flow"]
@@ -95,24 +95,26 @@ sequenceDiagram
 
 ## Access
 
-Building an agent is *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
+The permission each act needs is the *Agents* row of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); this table names the acts.
 A shared agent is the platform's and a personal agent is its person's; making or owning an agent grants nothing ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)).
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every agent — its setup, Access Policies, what it may touch, named approvers, limits, voice, what it runs with, the model set and reported, Flow, who made it and versions | Every signed-in person — Operator, Modeller, Admin | — |
-| Create an agent — the platform's, made by its maker; copy a built-in agent — a personal agent of the copier | Modeller · Admin | *New agent* and *Copy* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
-| Choose what the agent runs with and set its model version — in Studio or on the command line | Modeller · Admin. Never on a built-in agent | *Runs with* and the model version read; changing them is disabled, naming the role — *Needs the Modeller role — ask an Admin*; a built-in agent offers *Copy* |
-| Edit a draft, add or remove a skill, set voice and effort, publish, roll back, Pause, Resume, Retire, discard a draft — in Studio or on the command line | Modeller · Admin on a shared agent; its person on their personal agent. Never on a built-in agent | Each act disabled — *Needs the Modeller role — ask an Admin*; a built-in agent offers *Copy*; another person's personal agent reads without edit |
-| Install a runtime on a worker group | Admin, in the Control Plane ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md) · [CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md)) | A runtime no worker group carries reads *{runtime} is not installed — ask {admins}* |
-| Attach an Access Policy to the agent, take one off | Admin, in a session, with the password again ([AC-11](../../../../os/access/features/AC-F02-access-policies/stories/AC-11-attach-a-policy-to-agents/story.md)) | The attached policies read; *Attach a policy* reads *Ask an Admin* |
-| Name or change the agent's approvers | Admin only ([AC-26](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; changing them is disabled — *Needs the Admin role* |
-| Set the agent's limits | Admin, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The limits read; *Edit in Usage and limits* reads *Ask an Admin* |
-| Make an agent the deployment's default | Admin ([AG-F02](../AG-F02-the-agents-catalogue/feature.md)) | *Make default* disabled — *Needs the Admin role* |
-| Offer model versions to pin | Admin, in Settings › Connections › AI models ([CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md)) | A version not offered cannot be picked |
-| Name the practice graph database | Admin ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | The evals read *No practice graph database — they read in read mode* |
+| Read every agent — its setup, Access Policies, what it may touch, named approvers, limits, voice, what it runs with, the model set and reported, Flow, who made it and versions | Read on `agent/<name>` | — |
+| Create an agent — the platform's, made by its maker; copy a built-in agent — a personal agent of the copier | Create on `agent/*` | *New agent* and *Copy* disabled, naming the permission — *Needs Create on agent/* — ask {who can grant}* |
+| Choose what the agent runs with and set its model version — in Studio or on the command line | Edit on `agent/<name>`. Never on a built-in agent | *Runs with* and the model version read; changing them is disabled, naming the permission — *Needs Edit on agent/{agent} — ask {who can grant}*; a built-in agent offers *Copy* |
+| Edit a draft, add or remove a skill, set voice and effort, publish, roll back, Pause, Resume, Retire, discard a draft — in Studio or on the command line | Edit on `agent/<name>` (Publish on it to publish or roll back) on a shared agent; its person on their personal agent. Never on a built-in agent | Each act disabled — *Needs Edit on agent/{agent} — ask {who can grant}*; a built-in agent offers *Copy*; another person's personal agent reads without edit |
+| Install a runtime on a worker group | Manage on `plugin/<runtime>`, in the Control Plane ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md) · [CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md)) | A runtime no worker group carries reads *{runtime} is not installed — ask {admins}* |
+| Attach an Access Policy to the agent, take one off | Manage on `access/policies`, in a session, with the password again ([AC-11](../../../../os/access/features/AC-F02-access-policies/stories/AC-11-attach-a-policy-to-agents/story.md)) | The attached policies read; *Attach a policy* reads *Ask an Admin* |
+| Name or change the agent's approvers | Manage on `agent/<name>` ([AC-26](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; changing them is disabled — *Needs Manage on agent/{agent} — ask {who can grant}* |
+| Set the agent's limits | Edit on `worker/*`, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The limits read; *Edit in Usage and limits* reads *Ask an Admin* |
+| Make an agent the deployment's default | Edit on `setting/deployment` ([AG-F02](../AG-F02-the-agents-catalogue/feature.md)) | *Make default* disabled — *Needs Edit on setting/deployment — ask {who can grant}* |
+| Offer model versions to pin | Edit on `setting/ai-models`, in Settings › Connections › AI models ([CP-F01](../../../../os/control/features/CP-F01-ai-models/feature.md)) | A version not offered cannot be picked |
+| Name the practice graph database | Edit on `setting/graph-databases` ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | The evals read *No practice graph database — they read in read mode* |
 | Ask the assistant to explain an agent | Every signed-in person | — |
-| Ask the assistant to draft or change an agent | As creating or editing it | The assistant explains and says it cannot change the agent, naming the role |
+| Ask the assistant to draft or change an agent | As creating or editing it — Create or Edit on `agent/<name>` | The assistant explains and says it cannot change the agent, naming the permission |
 
 ## States
 
@@ -124,7 +126,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | Has data | An agent as a page: its head with its owner — *Platform*, *System* or the person of a personal agent — who made it, and its state, then Setup (instructions, voice, skills, runs with, model version and effort, access, limits, where it runs, lifecycle) · Flow · Versions; a live agent's tokens this month against its limit, and its recent runs with the runtime and the model each reported |
 | Failed | The tab names what it could not read, in the engine's words; a refused save names the field and why |
 | Agent working or proposing | The Assistant drafting the agent, then its proposal beside the form; an eval run in the practice graph database with its checks filling in |
-| No access | Every tab reads; each act is disabled, naming the Modeller role; a built-in agent offers *Copy* |
+| No access | Every tab reads; each act is disabled, naming the permission; a built-in agent offers *Copy* |
 
 ## Rules
 
@@ -137,7 +139,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | Limits live in one place | Tokens a run and a month, runs at once, helpers and depth are the agent's limits in [CP-F04](../../../../os/control/features/CP-F04-limits/feature.md), set by an Admin; the page reads them. Effort — steps, replans, questions — is the agent's own |
 | Tighten, never loosen | An agent may propose a tighter Access Policy or a lower limit; widening either is a person's act ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) |
 | The platform owns the work | A built-in or shared agent is owned by the platform and keeps who made it; what an agent makes in a run is the platform's, made by the person behind the run through the agent ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)). Making an agent grants nothing over it |
-| A personal agent is its person's | It is granted to them alone, runs only in the runs they start, and its person edits it; only a Modeller or an Admin makes one. Sharing it makes it the platform's, made by them, and an Admin grants it to others ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)) |
+| A personal agent is its person's | It is granted to them alone, runs only in the runs they start, and its person edits it; only a person with Create on `agent/*` makes one. Sharing it makes it the platform's, made by them, and an Admin grants it to others ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)) |
 | Built-in agents are copied, never edited | The built-in agents ([AG-F02](../AG-F02-the-agents-catalogue/feature.md#mechanisms)) are the system user's; *Copy* makes a custom agent — a personal agent of the copier — with no policy attached and granted to them alone |
 | Tested in the practice graph database | An agent's evals read the practice graph database that stands in for each graph database it reads ([AG-F10](../AG-F10-test-an-agent-and-a-skill/feature.md#rules)) |
 | Tokens, never currency | Every limit, meter and refusal counts tokens ([glossary › Token budget](../../../../glossary.md#what-may-happen)) |
@@ -269,8 +271,8 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | session failed | A session's runtime cannot run the model set — it refuses the model when told it | *{runtime} cannot run {model version}.* | AG-61.8 |
 | — | A run whose runtime no live worker group carries when it opens | [CP-F03 › Refusals](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#refusals) | AG-61.4 |
 | — | A file, program or host no rule allows, on a worker | [CP-F03 › Refusals](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md#refusals) | AG-61.9 |
-| 403 | A write by someone whose role is not Modeller or Admin | *This needs the Modeller role — ask an Admin.* | AG-21.22 · AG-29.21 · AG-36.14 · AG-61.11 |
-| 403 | A write on an agent without the Modeller role, or on another person's personal agent | *Needs the Modeller role — ask an Admin.* | AG-21.34 · AG-29.25 · AG-36.20 |
+| 403 | A write by someone without Create or Edit on the agent | *This needs Edit on agent/{agent} — ask {who can grant}.* | AG-21.22 · AG-29.21 · AG-36.14 · AG-61.11 |
+| 403 | A write on an agent without Edit on agent/{agent}, or on another person's personal agent | *Needs Edit on agent/{agent} — ask {who can grant}.* | AG-21.34 · AG-29.25 · AG-36.20 |
 | — | A step no rule allows, before dispatch | [AC-F04 › Refusals](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#refusals) | AG-21.14 |
 | — | A run past the agent's runs at once or tokens a month | [CP-F04 › Refusals](../../../../os/control/features/CP-F04-limits/feature.md#refusals) | AG-21.32 |
 | — | A skill whose needs the agent's policies do not allow | [AG-F04 › Refusals](../AG-F04-skills/feature.md#refusals) | AG-21.8 |
@@ -311,7 +313,7 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | Pause · Resume · Retire | `paused` refuses new work; a run already queued starts; Resume unblocks its tasks. Retire keeps the row and the name and pauses each schedule that starts the agent. A task's `start_agent_work` blocks the task when the agent is paused or retired (PJ-F01) |
 | `reach` | Each added skill's needs with met or missing, from the same `decide` AG-F04's add runs, for the rules that hold for everyone; `offered` and `applied` count this agent's runs of the current version; `prompt_chars` is served so Studio sums nothing |
 | The month meter | `tokens_in + tokens_out` over root runs that started this calendar month and their steps, eval runs left out, against the agent's `monthly_tokens` in CP-F04; no run reads `0`. `conversations` counts every conversation bound to the agent, whoever opened it |
-| The command line's role | Each command needs the role of the route it stands for |
+| The command line's permission | Each command needs the permission of the route it stands for |
 
 ## System impact
 
@@ -356,7 +358,7 @@ A built-in agent is copied through [AC-F07](../../../../os/access/features/AC-F0
 | A 0 is a value | Effort is read by presence: 0 means none; only an empty cell takes the value shown |
 | Effort is three numbers | Steps, replans and questions, each shown with the number a run reads; no preset hides them |
 | Tests are evals | An agent's tests are its eval set — the same cases, checks, judge, gate and eval token budget as a skill's ([AG-F10](../AG-F10-test-an-agent-and-a-skill/feature.md)) |
-| The command line follows Studio | `invana agents push · publish · pin` and `invana evals` pass the same gate and need the same role as Studio |
+| The command line follows Studio | `invana agents push · publish · pin` and `invana evals` pass the same gate and need the same permission as Studio |
 
 ## Open questions
 

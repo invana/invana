@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a cannot answer or a plan gap, watch a step retry or repair, run a function the plan gap offers, follow *Load data*, ask what it offers instead | — |
-| Operator | The same on their own runs, except *Load data* — *bring records in* needs the Modeller role; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Load data* disabled — *Needs the Modeller role — ask an Admin*; the questions it offers instead stay. Another person's run: that it ran, its status and its tokens |
+| Operator | The same on their own runs, except *Load data* — *bring records in* needs Create on the graph database; with it, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Load data* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; the questions it offers instead stay. Another person's run: that it ran, its status and its tokens |
 
 ## Flow
 
@@ -40,7 +40,7 @@ flowchart TD
   ca --> m{Modelled?}
   m -->|the kind is modelled, no data| me["Modelled but empty · Load data"]
   m -->|not in any model| nm["Not in the model · what Graph Data holds instead"]
-  me -->|an Operator| na["Load data disabled — Needs the Modeller role"]
+  me -->|an Operator| na["Load data disabled — Needs Create on data/{graph database}/{kind}"]
   ca --> ask(["Something it can answer · one click to ask it"])
 ```
 
@@ -58,7 +58,7 @@ flowchart TD
 | EX-05.8 | A plan that fails the check against the published model | the step runs | it shows *Repairing* on the step and plans once more with the error; a second failure stops the run with a diagnosis (EX-06) |
 | EX-05.9 | A run that stopped before it settled | it is shown | what it reached shows as steps, never as an answer |
 | EX-05.10 | A cannot answer | the person opens *How it got here* | it shows the typed plan, the compiled query per graph database, their zero rows and the model version it checked |
-| EX-05.11 | An Operator | they read a cannot answer offering *Load data* | *Load data* is disabled — *Needs the Modeller role — ask an Admin*; the question it offers instead still works |
+| EX-05.11 | An Operator | they read a cannot answer offering *Load data* | *Load data* is disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; the question it offers instead still works |
 | EX-05.12 | Runs that ended in cannot answer, failed or refused | they are counted | each is recorded as its own outcome, never as answered |
 | EX-05.13 | A question a typed plan cannot express — a shortest path, a hop deeper than the plan allows, a graph algorithm | the run settles | the reply says *I cannot ask this yet — a plan cannot* and what it lacks, calm like a cannot answer; no raw query runs ([EX-F03](../../../EX-F03-ask-a-question/feature.md)) |
 | EX-05.14 | A plan gap, and functions the agent may run that do it | the reply is shown | each function is offered, runnable from the reply as a one-function plan |

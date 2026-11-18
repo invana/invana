@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Starting a workflow is every role's, through the agents granted to the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+Starting a workflow is Run on `workflow/<key>`, through the agents granted to the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run or dry run a published workflow version with arguments, through an agent granted to them whose policies allow Run `workflow/<key>`; stop the run as any run | — |
-| Operator | The same; a Modeller the same | No agent granted to them is allowed: *Run* disabled — *No agent you may use may run {key} — ask an Admin* |
+| Operator | The same | No agent granted to them is allowed: *Run* disabled — *No agent you may use may run {key} — ask an Admin* |
 
 ## Flow
 

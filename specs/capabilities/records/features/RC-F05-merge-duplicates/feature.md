@@ -22,7 +22,7 @@ depends_on: [RC-F01]
 flowchart TD
   start([Two records of one kind]) --> side["RC-04 · Side by side · pick each value"]
   side --> rel["RC-04 · Relationships of both, moved to the survivor"]
-  rel --> g{Modeller or Admin · the connection writes?}
+  rel --> g{"Holds Edit on data/<graph database>/<kind> · the connection writes?"}
   g -->|no| na["Merge disabled — the reason"]
   g -->|yes| run{Merge}
   run -->|written| done(["One record · History names the merge and both keys"])

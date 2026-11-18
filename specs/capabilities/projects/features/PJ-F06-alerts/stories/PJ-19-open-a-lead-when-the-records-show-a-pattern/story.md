@@ -17,14 +17,14 @@ Tasks: [task.md](task.md) · Feature: [PJ-F06](../../feature.md)
 
 ## Who can
 
-*Alerts* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
-on every project the person can see; writing the alert rule is a Modeller's or an Admin's
+*Alerts* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
+on every project the person can see; writing the alert rule needs Edit on `model/<model>`
 ([SE-F07](../../../../../semantics/features/SE-F07-rules/feature.md)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every lead of a project they can see, the rule and the records behind it; take or dismiss a lead | A matched record of a kind their agents may not read is absent; on an archived project *Take* and *Dismiss* are disabled |
-| Operator | The same; take a task lead for a person or an agent they may use; a Modeller the same | As Admin. An agent they may not use is disabled in *Take* — *You may not use {agent} — ask an Admin* |
+| Operator | The same; take a task lead for a person or an agent they may use | As Admin. An agent they may not use is disabled in *Take* — *You may not use {agent} — ask an Admin* |
 
 ## Flow
 

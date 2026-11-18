@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every tile, *Needs attention* and what changed; follow each item's act | — |
-| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): read every tile, *Needs attention* and what changed; follow each item's act to where it is answered | An act they may not take there is disabled, naming who may; a run whose content they may not read opens with its content *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | read every tile, *Needs attention* and what changed; follow each item's act to where it is answered | An act they may not take there is disabled, naming who may; a run whose content they may not read opens with its content *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 

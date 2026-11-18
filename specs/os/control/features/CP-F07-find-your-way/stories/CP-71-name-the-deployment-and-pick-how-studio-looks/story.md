@@ -19,20 +19,20 @@ Tasks: [task.md](task.md) · Feature: [CP-F07](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Rename the deployment; set the deployment's default theme; pick their own theme | — |
-| Operator | Read the deployment's name and version; pick their own theme; a Modeller the same | *Rename* and the default theme read, their acts reading *Ask {Admin}* |
+| Admin | With Edit on `setting/deployment`: rename the deployment; set the deployment's default theme; pick their own theme | — |
+| Operator | Read the deployment's name and version; pick their own theme | *Rename* and the default theme read, their acts reading *Ask {Admin}* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   s([Settings › General]) --> g["General: the deployment's name · its version"]
-  g -->|Rename| r{Admin?}
+  g -->|Rename| r{"Edit on setting/deployment?"}
   r -->|no| na["Ask {Admin}"]
   r -->|yes| sv(["Saved · History records it"])
   s --> ap["Appearance: Light · Dark · As the deployment"]
   ap -->|pick| t(["Studio redraws in the theme · kept for the person"])
-  ap -->|deployment default| d{Admin?}
+  ap -->|deployment default| d{"Edit on setting/deployment?"}
   d -->|no| na
   d -->|yes| dd(["Everyone on As the deployment takes it"])
   ap -->|failed to save| f["Says it could not save · the theme stays as it was"]

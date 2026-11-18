@@ -20,8 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Approve or decline a hand-off that escalates to Admins; read every outside task, what was sent, held back and returned | — |
-| Modeller | Approve or decline a hand-off they are a named approver for; read an outside task on a run whose content they may read; answer its question back when they are behind the run | An ask routed to someone else reads, naming who it waits on; a run whose content they may not read shows the task as *ran*, its state and cost |
-| Operator | As Modeller | As Modeller |
+| Operator | Approve or decline a hand-off they are a named approver for; read an outside task on a run whose content they may read; answer its question back when they are behind the run | An ask routed to someone else reads, naming who it waits on; a run whose content they may not read shows the task as *ran*, its state and cost |
 
 ## Flow
 

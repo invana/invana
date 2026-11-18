@@ -49,14 +49,13 @@ flowchart TD
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
-(*Workers and the queue · limits · AI models · skill scripts*: Operator Reads · Modeller Reads · Admin Acts); this is
-what it means here.
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+(*Settings* and *AI models*); this table names the acts. *Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every endpoint, model version, local or external, status, the default and who pins it | Operator · Modeller · Admin | — |
-| Add, edit, rename or remove an endpoint · mark it local or external · ping it · offer or stop offering a version · choose the default | Admin, with the password again for a key or a change to local | *Add an endpoint* and each act disabled — *Needs the Admin role — ask {admins}*; the key is never shown |
+| Read every endpoint, model version, local or external, status, the default and who pins it | Read on `setting/ai-models` and `llm/<endpoint>/<version>` | — |
+| Add, edit, rename or remove an endpoint · mark it local or external · ping it · offer or stop offering a version · choose the default | Create on `setting/ai-models` to add; Edit on `setting/ai-models` to edit, rename, remove, mark, ping, offer, stop offering or choose the default — with the password again for a key or a change to local | *Add an endpoint* and each act disabled — *Needs Edit on setting/ai-models — ask {who can grant}*; the key is never shown |
 | Pin a version on an agent | As AG-29 | As AG-29 |
 
 ## States
@@ -149,7 +148,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Any write by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-01.12 |
+| 403 | Any write without Create or Edit on `setting/ai-models` | *Needs Edit on setting/ai-models — ask {who can grant}.* | CP-01.12 |
 | 401 | Setting a key or marking an endpoint local without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-61.6 |
 | 422 | An endpoint name outside `^[a-z0-9][a-z0-9_-]*$` | *Use lowercase letters, digits, hyphens and underscores.* | CP-01.9 |
 | 409 | An endpoint name already taken | *{name} is taken.* | API only — the form checks it as it is typed |

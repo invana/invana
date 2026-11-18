@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-Sharing is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
+Sharing is *Acts* for every signed-in person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Share any board's answer with users and teams, stop sharing, export PNG · CSV · Markdown; open any link | — |
-| Operator | The same; a Modeller the same | Without the Assistant: *Share with* disabled — *{person} may not use Assistant — ask an Admin*; export still works. A link to a board or snapshot that does not exist: *Not found* |
+| Operator | The same | Without the Assistant: *Share with* disabled — *{person} may not use Assistant — ask an Admin*; export still works. A link to a board or snapshot that does not exist: *Not found* |
 
 ## Flow
 

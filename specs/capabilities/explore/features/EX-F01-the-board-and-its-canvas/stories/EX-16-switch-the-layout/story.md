@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through the Assistant.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through the Assistant.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Pick a preset, change its options, reset it — kept on any board | — |
-| Operator | The same; a Modeller the same | Without the Assistant: the card is disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same | Without the Assistant: the card is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 

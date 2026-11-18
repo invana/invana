@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every plugin; turn one on or off for the deployment; turn one off or on for their own runs | — |
-| Operator | Read every plugin, its functions, versions, skills and workflows, and both switches; turn a plugin off, or back on, for the runs they start; a Modeller the same | The deployment's switch reads, with who set it and when — *Ask an Admin — Priya or Lee* |
+| Admin | Read every plugin; with Manage on `plugin/<name>`, turn one on or off for the deployment; turn one off or on for their own runs | — |
+| Operator | Read every plugin, its functions, versions, skills and workflows, and both switches; turn a plugin off, or back on, for the runs they start | The deployment's switch reads, with who set it and when — *Ask an Admin — Priya or Lee* |
 
 ## Flow
 

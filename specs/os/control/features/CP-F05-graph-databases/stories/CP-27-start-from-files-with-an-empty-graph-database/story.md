@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Drop files, answer the agent's questions, accept or change the model, connect and load | — |
+| Admin | With Create on `setting/graph-databases`: drop files, answer the agent's questions, accept or change the model, connect and load | — |
 | Operator | — | The modal never opens for them (CP-25.11) |
 
 ## Flow

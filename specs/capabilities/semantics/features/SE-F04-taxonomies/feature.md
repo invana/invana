@@ -26,8 +26,8 @@ flowchart TD
   t -->|loading| ld["The tree holds its shape"]
   t -->|failed| fl["Could not load · Try again"]
   t -->|none yet| e["Nothing placed yet — Set a broader kind · Add a value hierarchy"]
-  t -->|Set a broader kind · Add a hierarchy| may{Modeller or Admin?}
-  may -->|no| na["Reads · Needs the Modeller role — ask an Admin"]
+  t -->|Set a broader kind · Add a hierarchy| may{"Holds Edit on model/<model>?"}
+  may -->|no| na["Reads · Needs Edit on model/{model} — ask {who can grant}"]
   may -->|yes| d["Staged in the draft"]
   d -->|a cycle| cy["Refused, naming the loop"]
   d -->|from a standard's broader and narrower| std["The standard's levels — SE-F05"] --> d
@@ -42,10 +42,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read broader kinds and value hierarchies | Every signed-in person — Operator, Modeller, Admin | — |
-| Set a broader kind · add or change a value hierarchy, in a draft | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |
+| Read broader kinds and value hierarchies | Read on `model/<model>` | — |
+| Set a broader kind · add or change a value hierarchy, in a draft | Edit on `model/<model>` | Absent; *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## States
 

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a graph database, see what it holds, and start a draft model from it | — |
-| Operator | See what each graph database holds and the drafts on the map; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *Read the database* and *Start a model from it* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | See what each graph database holds and the drafts on the map; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *Read the database* and *Start a model from it* disabled — *Needs Create on model/{model} — ask {who can grant}* |
 
 ## Flow
 
@@ -32,7 +32,7 @@ flowchart LR
   m --> d{The person decides}
   d -->|Start a model from it| dr(["A draft bound to that graph database · the assistant docked · nothing published"])
   d -->|Not now| k(["Kept as what the graph database holds"])
-  d -->|no access| na["Needs the Modeller role — ask an Admin"]
+  d -->|no access| na["Needs Create on model/{model} — ask {who can grant}"]
 ```
 
 ## Acceptance criteria
@@ -49,7 +49,7 @@ flowchart LR
 | SE-04.8 | A draft started from a graph database | nobody publishes it | it stays a draft; nothing reaches the whole model everyone asks against |
 | SE-04.9 | An Access Policy rule that denies agents a kind | the graph database is read | the read still lists that kind: the Modeller agent reads the schema whole, and no record |
 | SE-04.10 | A read has finished | the person opens *How it got here* on what the graph database holds | it shows the run that read it, the person behind it, when, the calls it made marked schema-only, and what was left out and why |
-| SE-04.11 | An Operator | they open Model's health | *Read the database* is disabled with *Needs the Modeller role — ask an Admin*; what each graph database holds still reads |
+| SE-04.11 | An Operator | they open Model's health | *Read the database* is disabled with *Needs Create on model/{model} — ask {who can grant}*; what each graph database holds still reads |
 | SE-04.12 | A drafted model | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
 | SE-04.13 | A model drafted from a graph database | the draft opens beside the assistant | the assistant says what it read — *Read n nodes · sampled n* — and, for each choice it made, the evidence and the result: *airport.code is unique → key*, *route.dist mixes int and float → float*; every count is the engine's, and *Review and publish* sits under the message |
 

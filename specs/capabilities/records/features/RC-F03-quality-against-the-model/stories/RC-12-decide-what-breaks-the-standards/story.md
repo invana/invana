@@ -22,7 +22,7 @@ Fixing one record changes data, never the model or its standards, so anyone with
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every problem; fix any, on a connection that writes | — |
-| Operator | Read every problem on kinds they may read; fix, on a connection that writes. A Modeller does the same | A record the agent granted to them may not write: *Fix* disabled, naming the Access Policy that stops it |
+| Operator | Read every problem on kinds they may read; fix, on a connection that writes | A record the agent granted to them may not write: *Fix* disabled, naming the Access Policy that stops it |
 
 ## Flow
 

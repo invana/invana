@@ -49,7 +49,7 @@ flowchart TD
   inbox --> dec{"AG-52 · The person decides"}
   dec -->|accept · accept with edits| pub["The next version is published"]
   dec -->|reject, with a note| rj(["Closed · the note is evidence"])
-  dec -->|not a Modeller, not an Admin| na(["Read only — names the role and an Admin to ask"])
+  dec -->|without Edit on the target| na(["Read only — names the permission and who can grant it"])
   dec -->|its base has moved on| st(["Refused · both versions shown"])
   pub --> watch{"Watched against what it predicted"}
   watch -->|worsened| sg
@@ -92,18 +92,20 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
-(*thinking graph and memory*: Operator Acts · Modeller Acts · Admin Acts); this is what it means here. Who reads a
+The permission each act needs is [AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+(*Memory* and the target of the change); this is what it means here. Who reads a
 run's content is [AC-31](../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s, never restated.
 
-| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a recall step, a run's thinking and the nodes of its run | Whoever may read the run's content — the person behind it, and for a project's run anyone whose default agent may see its sources | That it ran, its status and its tokens; the plan or workflow it used, its outcome labels and the record IDs it cited — content *withheld*, naming who may read it |
 | Mark a run, plan, workflow or recalled item good or bad · withdraw one's own mark | Whoever may read the run's content | *Mark* disabled, naming who may |
-| Read Evidence and every suggested change | Operator · Modeller · Admin | — (the runs a count opens follow run privacy) |
-| Decide a suggested change to a skill, a workflow, an agent's skills or an answer template | Modeller · Admin | Read only — *Needs the Modeller role — ask an Admin* |
-| Decide a suggested change to a model rule or meaning | Modeller · Admin, through the model's own review ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)) | Read only — *Needs the Modeller role — ask an Admin* |
-| Decide an index suggestion | Admin | Read only — *only an Admin adds an index*, naming one |
+| Read Evidence and every suggested change | None — every signed-in person | — (the runs a count opens follow run privacy) |
+| Decide a suggested change to a skill, a workflow, an agent's skills or an answer template | Edit on its target — `skill/<name>` · `workflow/<name>` · `agent/<name>` | Read only — *Needs Edit on {target} — ask {who can grant}* |
+| Decide a suggested change to a model rule or meaning | Edit on `model/<model>`, through the model's own review ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)) | Read only — *Needs Edit on {target} — ask {who can grant}* |
+| Decide an index suggestion | Edit on `setting/graph-databases` | Read only — *Needs Edit on setting/graph-databases to add an index — ask {who can grant}* |
 | Approve a plan into a workflow that a suggested change proposes | The agent's named approvers ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, with who it waits on |
 
 ## States
@@ -116,7 +118,7 @@ run's content is [AC-31](../../../../os/access/features/AC-F09-what-left-the-pla
 | Has data | Recalled items ranked by outcome, each with its label and why; a run's rung and what it avoided; the thinking graph drawn on the canvas; counts ranked by the size of the gap; a suggested change with its difference, evidence and prediction |
 | Failed | A recall step that failed, named on the step, the plan made without it; the system graph behind or down, said with how far; a suggested change refused because its base moved on, both versions shown |
 | Agent working or proposing | A run planning — *Recalling*, then the rung it chose; a suggested change waiting in Inbox › Needs you, from a detector or an agent, named |
-| No access | A run's thinking withheld, naming who may read it; *Mark* disabled, naming who may; a suggested change read only, naming the role it needs and whom to ask |
+| No access | A run's thinking withheld, naming who may read it; *Mark* disabled, naming who may; a suggested change read only, naming the permission it needs and whom to ask |
 
 ## Rules
 
@@ -139,7 +141,7 @@ run's content is [AC-31](../../../../os/access/features/AC-F09-what-left-the-pla
 | One change, one target | A suggested change is the whole new body of one skill, workflow, agent's skills or answer template, or one change to the model's rules or meaning, against the version it changes — or a plan proposed for approval into a workflow |
 | A plan's approval is its approvers' | A suggested change may propose approving a plan into a workflow; it goes to the agent's named approvers as an ask ([AG-F06](../AG-F06-plans-and-workflows/feature.md) · [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)), never accepted from Needs you |
 | The model changes through its own review | A suggested synonym, definition, unit, broader kind, derivation, saved query shape or rule is staged on the model's draft and published through the model's own review — never applied from Agents |
-| An index is an Admin's | An index suggestion is applied only by an Admin |
+| An index needs Edit on graph databases | An index suggestion is applied only by a person with Edit on `setting/graph-databases` |
 | An agent never widens itself | An agent may suggest removing one of its own skills, never adding one; its Access Policies, limits and budget are never a suggested change's target |
 | A rejection carries a note | The note is evidence about what suggested it |
 | Accepting predicts | It states what should change, and by how much, so the outcome is judged — improved · unchanged · worsened · unmeasured; a worse outcome is a revert suggested the same way, never a rollback by itself |
@@ -225,8 +227,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 422 | A suggested change made without `basis` | *A suggested change needs its evidence.* | AG-51.6 |
 | 422 | An agent suggesting a skill for itself, or a change to its own Access Policies, limits or budget | *An agent may not widen what it may do.* | AG-51.8 |
 | 409 | `POST /suggested-changes/{change}/accept` whose `base_version` is not the target's current version | *This was made against v{base}; {target} is at v{current}.* | AG-52.4 |
-| 403 | Accepting, editing or rejecting a skill, workflow, agent or answer template change, or a model change, without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-52.12 |
-| 403 | Accepting an index suggestion by anyone but an Admin | *Only an Admin adds an index — ask {admin}.* | AG-52.15 |
+| 403 | Accepting, editing or rejecting a skill, workflow, agent or answer template change, or a model change, without Edit on the suggested change's target | *Needs Edit on {target} — ask {who can grant}.* | AG-52.12 |
+| 403 | Accepting an index suggestion by anyone without Edit on setting/graph-databases | *Needs Edit on setting/graph-databases to add an index — ask {who can grant}.* | AG-52.15 |
 | 409 | `POST /suggested-changes/{change}/accept` on a plan proposed for approval | *Approving a plan into a workflow is for {agent}'s approvers — it waits on {approvers}.* | AG-52.16 |
 | 422 | `POST /suggested-changes/{change}/reject` with no note | *A rejection needs a note.* | AG-52.3 |
 

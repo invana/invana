@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Watch, cancel and re-run their own runs; read and stop anyone's run (CP-F10); load an answer to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project* | — |
-| Operator | Watch, cancel and re-run their own runs; load to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project*; a Modeller the same ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's run: that it ran, its status and its tokens — content withheld |
+| Operator | Watch, cancel and re-run their own runs; load to the board; *Keep board* · *Share* · *Schedule this* · *Add to a project*; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's run: that it ran, its status and its tokens — content withheld |
 
 ## Flow
 

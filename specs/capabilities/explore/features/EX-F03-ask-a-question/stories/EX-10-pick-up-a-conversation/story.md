@@ -18,13 +18,13 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 ## Who can
 
 A conversation is its asker's. Its content reads for the asker, those an answer in it is shared with
-([EX-15](../../../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and Admins; anyone else
+([EX-15](../../../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and anyone with Read on `run/<agent>`; anyone else
 sees in Agents › Runs that its runs ran, their status and their tokens ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open, search, reopen, start, rename, pin, archive and delete their own conversations; pick the agent per conversation among those they may use; set a token budget per run; read any conversation's runs in Agents › Runs | — |
-| Operator | The same, for their own conversations, through the agents they may use; a Modeller the same | Another person's conversations are not listed. An agent they may not use is not offered. A budget above the agent's: clamped, and the settings say so |
+| Operator | The same, for their own conversations, through the agents they may use | Another person's conversations are not listed. An agent they may not use is not offered. A budget above the agent's: clamped, and the settings say so |
 
 ## Flow
 

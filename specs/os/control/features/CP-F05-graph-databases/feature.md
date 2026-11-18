@@ -47,7 +47,7 @@ flowchart TD
   ls --> one["CP-35 · One graph database: connection · test · reconnect · version · remove"]
   one -->|unreachable| rc["Reconnect · retried with a doubling delay"]
   ls --> pr["CP-41 · Name a practice graph database"]
-  ls -->|an Operator or Modeller| ro(["Reads every one · acts read Ask an Admin"])
+  ls -->|an Operator| ro(["Reads every one · acts read Ask an Admin"])
   sw -->|work needs one that is off| off(["Refused before it starts, naming who switched it off"])
   ans --> rw(["Agents read and write in each database's language — GP-F01"])
 ```
@@ -96,18 +96,20 @@ The permission each act needs is the permission catalogue's row for `setting/gra
 ([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this table
 names the acts.
 
-| Act | Role | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every graph database — name, connector, address, database, mode, switch, health, server version, practice; never its credential | Operator · Modeller · Admin | — |
-| Connect a graph database · change its connection · test · reconnect · read its types again · declare or accept a server version · remove it | Admin | The list and each graph database read; each act reads *Ask an Admin* |
-| Set read-only or read + write | Admin, signing in again for read + write | The mode reads; *Change* reads *Ask an Admin* |
-| Turn a graph database on or off for the deployment | Admin | The switch reads, with who set it and when; it reads *Ask an Admin* |
-| Turn a graph database off, or back on, for the runs one is behind | Every signed-in person, for themselves | — |
-| Name or unname a practice graph database | Admin | *Practice* reads; the act reads *Ask an Admin* |
-| Install or remove a connector package | Admin — on the engine's machine, outside Studio | — |
+| Read every graph database — name, connector, address, database, mode, switch, health, server version, practice; never its credential | Read on `setting/graph-databases` | — |
+| Connect a graph database · change its connection · test · reconnect · read its types again · declare or accept a server version · remove it | Create on `setting/graph-databases` to connect · Edit to change, test, reconnect, declare, accept or remove | The list and each graph database read; each act reads *Ask an Admin* |
+| Set read-only or read + write | Edit on `setting/graph-databases`, signing in again for read + write | The mode reads; *Change* reads *Ask an Admin* |
+| Turn a graph database on or off for the deployment | Edit on `setting/graph-databases` | The switch reads, with who set it and when; it reads *Ask an Admin* |
+| Turn a graph database off, or back on, for the runs one is behind | None — one's own | — |
+| Name or unname a practice graph database | Edit on `setting/graph-databases` | *Practice* reads; the act reads *Ask an Admin* |
+| Install or remove a connector package | None in Studio — done on the engine's machine, outside Invana | — |
 | Read, write or search a graph database | An agent, within the mode and both switches set here ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) | Refused before it starts, naming the rule, the mode or who switched it off |
-| Start on a fresh deployment — *Connect a graph database* | Admin | *No graph database yet — Ask an Admin* |
-| Try it on demo data | Operator · Modeller · Admin, when a demo graph database is on | — |
+| Start on a fresh deployment — *Connect a graph database* | Create on `setting/graph-databases` | *No graph database yet — Ask an Admin* |
+| Try it on demo data | Read on `setting/graph-databases`, when a demo graph database is on | — |
 
 ## States
 
@@ -218,7 +220,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Any write by a person whose role is not Admin — `role_required` | *This needs an Admin — ask {admins}.* | CP-40.6 · CP-35.13 · CP-38.6 · CP-39.7 · CP-41.5 |
+| 403 | Any write without Create or Edit on `setting/graph-databases` | *Needs Edit on setting/graph-databases — ask {who can grant}.* | CP-40.6 · CP-35.13 · CP-38.6 · CP-39.7 · CP-41.5 |
 | 401 | Read + write, a credential change or removal without the password, or with a key | *Sign in again to do this.* | CP-38.3 · CP-35.14 |
 | 409 | A name another graph database holds | *{name} is already a graph database.* | CP-25.3 |
 | 422 | A name with characters outside `[a-z0-9_]`, or a field past its length | *{field}: {why}.* | CP-25.3 |

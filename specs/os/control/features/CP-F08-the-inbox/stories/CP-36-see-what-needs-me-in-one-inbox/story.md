@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read their own Needs you, Running, Updates and Done; mark updates read; open what each is about; filter *All open alerts* | — |
-| Operator | Operator · Modeller: read their own Needs you, Running, Updates and Done; mark updates read; open what each is about ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | An item they cannot act on reads, its act disabled with its reason; *All open alerts* is not offered |
+| Operator | read their own Needs you, Running, Updates and Done; mark updates read; open what each is about ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | An item they cannot act on reads, its act disabled with its reason; *All open alerts* is not offered |
 
 ## Flow
 
@@ -61,12 +61,12 @@ flowchart LR
 | CP-36.13 | The engine cannot read the Inbox | it opens | it says what it could not read, with *Try again* |
 | CP-36.14 | A row | its product is shown | it is where the thing lives — a load Records', a task's run Projects', a link between models Model's, a typed query Explore's, any other agent run Agents' |
 | CP-36.15 | An event on a project a recipient's default agent may not Read | a rule matches it | they are told in a line and a link; opening it reads *Withheld — your agent may not read `project/{key}`* |
-| CP-36.16 | An Operator or a Modeller | they open the Inbox | they read their own items; acts they may not take are disabled with their reason |
+| CP-36.16 | An Operator | they open the Inbox | they read their own items; acts they may not take are disabled with their reason |
 | CP-36.17 | An open ops alert sent to the reader (CP-59) | Needs you is read | it is listed until it closes; when it closes it reads closed, naming what closed it, and moves to Updates |
 | CP-36.18 | A run the reader is behind | someone else stops it (CP-58) | the reader gets an update naming who stopped it, which opens the run |
 | CP-36.19 | Nothing waits on the reader and an update is unread | the header is read | the Inbox badge is a dot, with no number |
 | CP-36.20 | The Inbox dropdown | the reader picks *Open the Inbox* | the full Inbox opens in the large modal on Needs you, its nav Needs you · Running · Updates · Done |
-| CP-36.21 | An Admin in the full Inbox | they filter *All open alerts* | every open ops alert in the deployment lists, whoever it was sent to; an Operator is not offered the filter |
+| CP-36.21 | A person with Read on `run/*` in the full Inbox | they filter *All open alerts* | every open ops alert in the deployment lists, whoever it was sent to; anyone without it is not offered the filter |
 
 ## Screens
 
