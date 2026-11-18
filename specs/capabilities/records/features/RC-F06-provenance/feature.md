@@ -62,9 +62,9 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and history | Every signed-in person — Operator, Modeller, Admin — as far as their default agent reads each value | A value their agent may not Read is absent, with no trace |
+| Read records, their provenance and history | Read on `data/<graph database>/<kind>`, as far as their default agent reads each value | A value their agent may not Read is absent, with no trace |
 
 ## States
 

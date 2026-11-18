@@ -18,8 +18,8 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Name and change any agent's approvers, a built-in agent's included, signing in again | Naming one person alone warns, and is still allowed |
-| Operator | Read every agent's approvers; a Modeller reads the same | *Change approvers* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Admin | With Manage on the agent: name and change any agent's approvers, a built-in agent's included, signing in again | Naming one person alone warns, and is still allowed |
+| Operator | Read every agent's approvers | *Change approvers* disabled — *Needs Manage on agent/{name} — ask Priya or Lee* |
 
 ## Flow
 
@@ -55,7 +55,7 @@ flowchart TD
 | AC-26.7 | An ask whose only approver is the person it benefits | it is routed | it goes to the Admins without that person, with a *no approver* alert; it is never decided by the person it benefits |
 | AC-26.8 | A named approver who is deactivated, or leaves a named team | an ask is routed | they are skipped; with nobody left, AC-26.7 applies |
 | AC-26.9 | An ask nobody answers | its time runs | it reminds, is escalated to the Admins, then expires refused — never allowed (AC-32) |
-| AC-26.10 | An Operator or a Modeller | they open *Approvers* | they read; *Change approvers* is disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-26.10 | A person without Manage on the agent | they open *Approvers* | they read; *Change approvers* is disabled, naming the permission and who can grant it; the API refuses the write |
 | AC-26.11 | A change of approvers sent with a key | it is sent | it is refused — it needs a person's session |
 | AC-26.12 | An Admin | they name one person as the only approver | it warns *One absence sends this agent's asks to the Admins — add a team or a second person*; *Name anyway* saves it |
 

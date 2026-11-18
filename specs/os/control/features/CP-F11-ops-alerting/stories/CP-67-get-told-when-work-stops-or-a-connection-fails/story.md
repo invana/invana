@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every task, connection and security alert; read every alert; act on what it is about; close one with a note | — |
-| Operator | Operator · Modeller: receive the alerts of tasks they are assignee or team place of or are asked, of their own personal connections, of work connections whose agents they approve for, and of sandbox refusals of agents they approve for — never another person's personal connection ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
+| Operator | Operator · Modeller: receive the alerts of tasks they are assignee or team place of or are asked, of their own personal connections, of work connections whose agents they approve for, and of sandbox refusals of agents they approve for — never another person's personal connection ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
 
 ## Flow
 

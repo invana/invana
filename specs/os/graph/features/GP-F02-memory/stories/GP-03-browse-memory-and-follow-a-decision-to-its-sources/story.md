@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse the whole thinking graph, filter it, open any node with its content, follow a decision to its sources | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): browse and filter the whole thinking graph; open any node; content of the runs they start or whose agent they own, and of any node whose sources their default agent may Read ([GP-07](../GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) | A node of anyone else's run: that it ran, its status, its tokens, the plan or workflow, its outcome labels and record IDs — content withheld, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): browse and filter the whole thinking graph; open any node; content of the runs they start or whose agent they own, and of any node whose sources their default agent may Read ([GP-07](../GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) | A node of anyone else's run: that it ran, its status, its tokens, the plan or workflow, its outcome labels and record IDs — content withheld, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 

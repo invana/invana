@@ -52,7 +52,7 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every standard, its versions and who holds it | Every signed-in person — Operator, Modeller, Admin | — |
 | Write a standard or import one · publish the next version of a standard | Modeller · Admin | *Write a standard*, *Import* and *New version* absent; *Needs the Modeller role — ask an Admin* |

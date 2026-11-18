@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F03](../../feature.md)
 
 ## Who can
 
-Fixing one record changes data, never the model or its standards, so every role may start it ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *quality*); which records the fix reaches is the agent's Access Policies alone.
+Fixing one record changes data, never the model or its standards, so anyone with Edit on the kind may start it ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *quality*); which records the fix reaches is the agent's Access Policies alone.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
@@ -48,7 +48,7 @@ flowchart LR
 | RC-12.2 | Records that break a constraint or a standard their kind is held to | *To decide* opens | each lists the kind, the standard version or constraint, the property and the problem; each kind carries its score — the share of its records that conform; the totals and scores are the engine's |
 | RC-12.3 | The queue | the person narrows it to one kind | only that kind's problems list, with its own total; one with none reads *Nothing to decide for this kind* and offers *Clear* |
 | RC-12.4 | One problem | the person opens it | it shows the record, the term, the value and why it breaks the standard or constraint |
-| RC-12.5 | A person of any role, a problem, and an agent granted to them that may write the record | they fix it with another value and a reason | the value is written as one run, the reason its *why*, and the record's provenance names the fix (RC-F06) |
+| RC-12.5 | A person with Edit on the kind, a problem, and an agent granted to them that may write the record | they fix it with another value and a reason | the value is written as one run, the reason its *why*, and the record's provenance names the fix (RC-F06) |
 | RC-12.6 | A record changed since the item opened | the fix is saved | it is refused, asking the person to reload and fix again |
 | RC-12.7 | A fixed record that conforms | the queue reloads | the item has left it |
 | RC-12.8 | Kinds the person's Access Policies do not allow | the queue opens | they are left out of rows and totals, with no count and no note |

@@ -42,7 +42,7 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read broader kinds and value hierarchies | Every signed-in person — Operator, Modeller, Admin | — |
 | Set a broader kind · add or change a value hierarchy, in a draft | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |

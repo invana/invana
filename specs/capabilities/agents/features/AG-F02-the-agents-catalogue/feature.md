@@ -45,7 +45,7 @@ flowchart TD
 
 ## Access
 
-The catalogue is *Acts* for every role in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+The catalogue is *Acts* for every role in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 each person uses the agents granted to them; granting is the Directory's ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
 
 | Act | Role | Everyone else sees |

@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F01](../../feature.md)
 
 A raw query is a step of the built-in **Query console** agent ([EX-08](../../../../../../capabilities/explore/features/EX-F03-ask-a-question/stories/EX-08-write-the-query-myself/story.md)
 is the person's side of it); its four layers are this story's. Roles are
-[the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+[the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

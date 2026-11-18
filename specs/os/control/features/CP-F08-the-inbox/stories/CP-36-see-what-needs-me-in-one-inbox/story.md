@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read their own Needs you, Running, Updates and Done; mark updates read; open what each is about; filter *All open alerts* | — |
-| Operator | Operator · Modeller: read their own Needs you, Running, Updates and Done; mark updates read; open what each is about ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | An item they cannot act on reads, its act disabled with its reason; *All open alerts* is not offered |
+| Operator | Operator · Modeller: read their own Needs you, Running, Updates and Done; mark updates read; open what each is about ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | An item they cannot act on reads, its act disabled with its reason; *All open alerts* is not offered |
 
 ## Flow
 

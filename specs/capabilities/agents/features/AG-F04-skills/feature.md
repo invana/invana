@@ -126,10 +126,10 @@ sequenceDiagram
 
 ## Access
 
-Skills are *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
+Skills are *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)): making it grants nothing over it.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every skill — instructions, Flow, what it needs, who made it, agents, usage, exceptions, evals, tests, history | Every signed-in person — Operator, Modeller, Admin | — |
 | Create a skill; copy a built-in skill — the platform's, made by the copier | Modeller · Admin | *New skill* and *Copy* are disabled, naming the role — *Needs the Modeller role — ask an Admin*; the command line refuses, naming it |

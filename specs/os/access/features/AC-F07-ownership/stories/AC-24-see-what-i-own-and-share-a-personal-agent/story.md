@@ -42,7 +42,7 @@ flowchart TD
 | AC-24.1 | Any agent, skill, workflow, Access Policy, board, project or schedule | *Owner* is opened | it reads its owner — *Platform*, *System* or the person who owns it — and who made it, through which agent, and when |
 | AC-24.2 | A person who made something, or behind the run of an agent that made it | it is read | it is the organisation's and reads *Made by {person}*, through the agent where one made it; a delegated run's work reads the person at the head of the chain |
 | AC-24.7 | A signed-in person | they open *Settings › You › What I own and made* | their personal agents, what they made by kind and the slots they sit in — approver, project team place, assignee, setter — read; with nothing, *Nothing yet — what you make belongs to the organisation and shows here as made by you* |
-| AC-24.8 | A person who made an agent but whose role does not hold *Build an agent* | they open it | it reads; making it lets them change nothing — making widens nothing (the role table) |
+| AC-24.8 | A person who made an agent but whose policies do not allow Create on `agent/*` | they open it | it reads; making it lets them change nothing — making widens nothing (the permission catalogue) |
 | AC-24.10 | A share sent with a key | it is sent | it is refused — it needs a person's session |
 | AC-24.11 | A filter on *What I own and made* that matches nothing | it is applied | *Nothing matches* reads with *Clear filters* |
 | AC-24.12 | Owners could not load or save | the modal is used | it says what failed, with *Try again*; nothing changes |

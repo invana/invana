@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F07](../../feature.md)
 
 ## Who can
 
-Schedules are *Acts* for every role in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); a person acts on a schedule through its agent, granted to them.
+Schedules are *Acts* for every role in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a person acts on a schedule through its agent, granted to them.
 
 | Access | Can | Otherwise sees |
 |---|---|---|

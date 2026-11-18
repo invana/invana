@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Accept, accept with edits, or reject with a note any suggested change; read each version's outcome | — |
-| Operator | Read the suggested change and each version's outcome. A Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): decide those on a skill, workflow, agent or answer template, and those on the model's rules or meaning through its review | The three acts disabled — *Needs the Modeller role — ask an Admin*; an index needs an Admin, named; a plan proposed for approval waits on the agent's named approvers, named |
+| Operator | Read the suggested change and each version's outcome. A Modeller ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): decide those on a skill, workflow, agent or answer template, and those on the model's rules or meaning through its review | The three acts disabled — *Needs the Modeller role — ask an Admin*; an index needs an Admin, named; a plan proposed for approval waits on the agent's named approvers, named |
 
 ## Flow
 

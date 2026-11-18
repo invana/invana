@@ -43,7 +43,7 @@ flowchart TD
   s -->|Changes| ch["AC-17 · Every new version: who · when · why · effect after"]
   ch -->|Compare| cmp["AC-17 · Two versions side by side · fields · workflow · model · policy"]
   ch -->|first version| one["Nothing to compare"]
-  s -->|Operator · Modeller| op["Own acts and the runs they may read · the rest counted, not shown"]
+  s -->|Operator| op["Own acts and the runs they may read · the rest counted, not shown"]
   s -->|the chain fails to verify| bk["History unedited? No — broken at row N; rows still read"]
   pr([An Admin's retention period passes · AC-F12]) --> hold{"History on hold?"}
   hold -->|yes| none(["No prune"])
@@ -76,19 +76,19 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every row, the counts over the deployment, by actor, by record and refusals | Admin | — |
 | Read a row's arguments | Whoever may read its run ([AC-31](../AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) — an Admin included, by the same rule | Who, the act, the verdict and the rule; arguments *withheld* |
-| Read their own acts and the rows of runs they may read | Every signed-in person — Operator, Modeller | The rest is counted, not shown — a line says how many |
+| Read their own acts and the rows of runs they may read | None — every signed-in person | The rest is counted, not shown — a line says how many |
 | Export the rows the reader can see | Every signed-in person | — |
 | Read every change and compare two versions of a record the reader can open | Every signed-in person | A record the reader cannot open reads as absent |
 | Read the event list and its live tail | Admin — every event; everyone else — their own acts and the change events of records they can open ([What a reader of `events` gets](#mechanisms)) | Another person's sign-ins, keys, clients and refusals are never sent |
-| Restore an earlier version | Not here — the record's own page, by its own role | — |
+| Restore an earlier version | Not here — the record's own page, by the permission it needs (Edit on its resource) | — |
 | Read the Access dropdown — its tiles and what each person and agent touched in the last hour | Admin | No *Access* button in the header |
 | Read Access › Now — acting now, blocked today, delegations in force | Admin | *Ask {Admin}* |
 | Revoke a client or a key acting for a person or a project, from Access › Now | Admin, with the password again ([AC-F10](../AC-F10-keys/feature.md) · [AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) | — |
-| Read *Your access* — one's own role, agents and delegations — and revoke one's own | Every signed-in person, for themselves | Another person's is absent |
+| Read *Your access* — one's own policies, agents and delegations — and revoke one's own | Every signed-in person, for themselves | Another person's is absent |
 
 ## States
 
@@ -100,21 +100,21 @@ sequenceDiagram
 | Has data | Rows newest first, today unless a window is chosen; the head says History is unedited, when that was last checked, how long rows are kept and whether History is on hold |
 | Failed | The rows could not load, saying why, with *Try again*. The chain failing to verify: *broken at row N*, in red; rows still read |
 | Agent working or proposing | Rows arrive as acts happen; an agent's rows name the person it acted for |
-| No access | An Operator or a Modeller reads their own acts and the rows of runs they may read, a line counting the rest; the counts over the deployment are not shown |
+| No access | A person without Read on `access/history` reads their own acts and the rows of runs they may read, a line counting the rest; the counts over the deployment are not shown |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
 | One chain for the deployment | Every act in the deployment is a row in one append-only chain with a gapless sequence; there is no chain per part of the deployment |
-| One row per act | A step an agent took, a refusal, a helper it started, an ask and its decision, and every act of a person — publish, stop a run, save a policy, attach it, set a role, switch a graph database — is a row |
+| One row per act | A step an agent took, a refusal, a helper it started, an ask and its decision, and every act of a person — publish, stop a run, save a policy, attach it or take it off, switch a graph database — is a row |
 | Nothing is unrecorded | Every write in the product — a graph database, the model, a skill, a workflow, a policy, an agent, a task, a load — is in History; there is no silent write |
 | Never edited | Rows are never edited or deleted one by one; a correction is a new row |
 | Provably unedited | Each row is hashed with the one before; the chain is re-checked every 10 minutes from the latest checkpoint and the head says when it last held. An export carries each row's hash and the previous one |
 | The actor and on whose behalf | Who acted and for whom are two names, never one — *Sam ▸ Reporting agent ▸ Order checker*; names are as they were when the row was written, and a departed person's read as their code when names are pseudonymised ([AC-F12](../AC-F12-leaving-and-keeping/feature.md)) |
 | What caused what | A row links to the act that caused it, so a chain is followed up to the person who started it |
 | Secrets never enter | A credential is removed before the row is written, not hidden when read |
-| Arguments follow run privacy | A row's arguments read to whoever may read its run ([AC-31](../AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) — the role grants none; anyone else who may see the row reads who, the act, the verdict and the rule |
+| Arguments follow run privacy | A row's arguments read to whoever may read its run ([AC-31](../AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) — no permission grants it by itself; anyone else who may see the row reads who, the act, the verdict and the rule |
 | A row about a deleted record | Still reads, with the record's name as it was |
 | A refusal names its reason and its rule apart | The reason — a permission the person lacks · may not use the agent · an Access Policy rule · switched off · a read-only graph database · a sensitive property · over a limit · the site's robots.txt — and the rule in words (*Deny reading Order in sales, for Finance*). `refused_by`, `rule`, `policy_id` and `set_by_id` read only to a person with Read on `access/policies`; anyone else reads *refused* and the reason's sentence without the rule, the policy or who set it, and a name a Deny hides is never a row's `touched` — it failed at lookup as one that does not exist ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)) |
 | Kept until an Admin sets a period | Rows are kept until an Admin sets History's period ([AC-F12](../AC-F12-leaving-and-keeping/feature.md)); none is removed while History is on legal hold. Removing old rows removes a whole window, never chosen rows, and the removal is itself a row |
@@ -189,7 +189,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `GET /export?format=csv \| jsonl` · `GET /exports` | Stream the filtered rows, each with its hash and the previous one, and write an exports row · the exports, newest first | AC-16 |
 | `GET /integrity?full=` | `{verified_at, ok, last_seq, broken_seq?, keep_days?, held, checkpoint?, rows}`; `full` re-verifies from the latest checkpoint, or row 1 when none | AC-16 |
 | `GET /summary?tz=` | The Access dropdown, Admin only; `tz` an IANA zone: `tiles` — `people_signed_in` · `agents_acting` · `requests_waiting` · `blocked_today`; `window` — `from` · `to` (the last hour); `actors[]`, the most recent first — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` (an agent's) · `run_id?` · `blocked` (refused in the window) · `bars[]` — `layer` (`model` · `graph_data` · `graph_database` · `outside`) · `touched` · `from` · `to` · `refused`; `more_actors` (actors not sent) | AC-48 |
-| `GET /now?tz=` | Access › Now, Admin only; `tz` an IANA zone: `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `role?` · `run_id?` · `last_acted` (`now` · `within_15_min` · `today`); `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`client` · `key`) · `id` · `name` · `acts_for` (a person or a project) · `role` · `ends_at?` (none — never expires) · `verified` (`false` for a self-registered client) · `redirect_host?` (a client's) | AC-48 |
+| `GET /now?tz=` | Access › Now, Read on `access/history`; `tz` an IANA zone: `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `run_id?` · `last_acted` (`now` · `within_15_min` · `today`); `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`client` · `key`) · `id` · `name` · `acts_for` (a person or a project) · `ends_at?` (none — never expires) · `verified` (`false` for a self-registered client) · `redirect_host?` (a client's) | AC-48 |
 | `GET /changes/{kind}/{id}` | One record's changes: `{record_kind, record_id, name, items[ChangeEntry]}` | AC-17 |
 | `GET /changes/{kind}/{id}/compare?a=&b=` | Two versions; `a` omitted compares `b` with the one before | AC-17 |
 | `GET /events` · `GET /events/stream` | The events the reader may read ([What a reader of `events` gets](#mechanisms)) by the list contract, every filter composing with `?changes=true` · the live tail, by the same rule | AC-17 |
@@ -210,7 +210,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | 404 | A row the reader may not see is opened | *Not found.* | AC-16.21 |
 | 404 | A record's changes or compare, for a record the reader cannot open | *Not found.* | AC-17.17 |
 | 422 | A compare naming a version the record does not have | *{record} has no version {v}.* | API only — Studio offers only versions the record has |
-| 403 | The access summary or Access › Now by anyone but an Admin | *This needs the Admin role.* | AC-48.19 |
+| 403 | The access summary or Access › Now without Read on `access/history` | *This needs Read on access/history — ask {who can grant}.* | AC-48.19 |
 | 401 | *Revoke* without the password, or a wrong one | *Enter your password again to do this.* | AC-48.15 |
 | 422 | The access summary or Access › Now with a `tz` that is not an IANA zone | *tz: {value} is not a time zone.* | AC-48.27 |
 
@@ -230,18 +230,18 @@ store: every feature's *Events* table names what it writes here, and links this 
 | The live tail | A database trigger notifies every insert into `events`; the engine fans it out to the streams Studio holds open — the counts stream ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#mechanisms)) among them |
 | The access summary | Composed on read, storing nothing: *people signed in* — people with a live refresh row ([AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine)); *agents acting now* — runs queued or running ([CP-F10](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)); *requests waiting* — open asks ([AC-F05](../AC-F05-asks-and-approvals/feature.md#engine)); *blocked today* — `GET /refusals`' `refused_today`; the timeline — the History rows of the last hour (below) |
 | The timeline | From the History rows whose `at` falls in the last hour, by person or agent: an agent's entry names `behind_user_id` as whom it acts for. A row's layer maps to a timeline layer — `model` → `model`; `data` on one named graph database → `graph_database`, on Graph Data joined across them → `graph_data`; an act the `outside` preset counts → `outside`; other layers draw no bar. Rows of one actor, one timeline layer and one `touched` less than 60 s apart join one bar; a refused row is its own bar with `refused: true`. At most 20 actors are sent, the most recent first; `more_actors` counts the rest |
-| Access › Now | Composed on read, storing nothing: *acting now* — people with a live refresh row and runs queued or running, each with when it last acted (below); *blocked today* — `GET /refusals`' rows; *delegations in force* — connected clients ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#engine)) and live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), project keys among them, each with the person or project it acts for, and the role ([AC-F03](../AC-F03-directory/feature.md#engine)) |
+| Access › Now | Composed on read, storing nothing: *acting now* — people with a live refresh row and runs queued or running, each with when it last acted (below); *blocked today* — `GET /refusals`' rows; *delegations in force* — connected clients ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#engine)) and live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), project keys among them, each with the person or project it acts for ([AC-F03](../AC-F03-directory/feature.md#engine)) |
 | When one last acted | From that person's or run's writes and run starts only — never a sign-in, a token renewal or a read — as `now` (the last 2 minutes) · `within_15_min` · `today`. Nothing stores presence: no table, no event, never an address, a device or a user agent |
 | Names are untrusted | Client, key, agent and rule names and `touched` are sent as data; a self-registered client carries `verified: false` and its `redirect_host` ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#rules)) |
 | Reading the summary is recorded | The first read of the summary or Access › Now by an Admin in each clock hour writes `access.history.summary_read` and its History row; later reads in that hour write nothing |
 | `tz` | Checked against the IANA zone list before anything is read; *today* is midnight to now in that zone |
 | Revoke from Access › Now | Calls the owning feature's revoke — `DELETE /api/v1/access/clients/{id}` or `DELETE /api/v1/access/keys/{id}` — with its password check; nothing is revoked here |
-| *Your access* | The person's own role and agents from `GET /api/v1/access/auth/me`, and their own clients and keys from the owning routes |
+| *Your access* | The person's own policies and agents from `GET /api/v1/access/auth/me`, and their own clients and keys from the owning routes |
 | Who reads `events` | The change list and the live tail, notification rules ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#engine)), provenance ([RC-F06](../../../../capabilities/records/features/RC-F06-provenance/feature.md#engine)), a task's tree ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)), the outbox relay that rebuilds the system graph, and traces — each a reading; none copies it |
 | One writer of History | `record()` takes the last row under a row lock, sets `seq` and the hash, inserts. The Control Plane calls it for each step it settles and each refusal; delegation for each helper and refusal; every manager for each act a person, an agent, a key or an MCP client causes. Nothing updates or deletes a row |
 | The hash chain | `hash = sha256(prev_hash ‖ canonical JSON of the row without actor_names)`; the first `prev_hash` is 64 zeros. Names live outside the hash, so pseudonymising a departed person changes `actor_names` and every row still verifies; who acted is proven by `actor_chain`'s ids. The shared clock tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)) re-verifies every 10 minutes from the last verified row into `access_history_checks`; `?full=` re-verifies from the latest checkpoint |
 | What a reader of `events` gets | An Admin every event. Anyone else: events whose actor or `on_behalf_of_user_id` is them, and the change events of records they can open. Another person's `access.auth.*`, `access.keys.*`, `access.clients.*` and refusal events are never sent to them — on `GET /events` or on any stream fed by the live tail |
-| What a reader sees | An Admin every row; anyone else their own acts and the rows of runs `may_read_run()` allows; the rest is counted as `hidden`. `args` is withheld on a row the reader sees but whose run they may not read — an Admin's too. Counts over the whole deployment are an Admin's |
+| What a reader sees | An Admin every row; anyone else their own acts and the rows of runs `may_read_run()` allows; the rest is counted as `hidden`. `args` is withheld on a row the reader sees but whose run they may not read — an Admin's too. Counts over the whole deployment need Read on `access/history` |
 | Counts | Counts, per-day bars and top lists are SQL over the whole window; table rows read from the newest 20,000 |
 | A change with no percentage | `acts_change_pct` is absent while the 7-day daily mean is under 10 acts |
 | Export | `csv` or `jsonl` of the filtered rows with each row's hash and the previous one; a CSV cell that would run as a formula is written as text |
@@ -272,7 +272,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | Rows read today | Until a window is chosen — today · last 24 hours · 7 days · 30 days · any time; an export takes the same window |
 | A preset chip names its window | *Refused today*, *Writes in the last 7 days* — each preset says its window, with the engine's count beside it |
 | A row opens beside the list | Its detail opens over the right of History; the list still takes clicks, so another row moves it |
-| Others read less, and are told | An Operator or a Modeller sees their own acts and the runs they may read; a line counts what they cannot see. Counts over the whole deployment are an Admin's |
+| Others read less, and are told | A person without Read on `access/history` sees their own acts and the runs they may read; a line counts what they cannot see. Counts over the whole deployment need Read on `access/history` |
 | By an actor includes its helpers | Every row whose chain names the actor — helpers of one kind grouped as *Order checker ×4*, a delegated agent its own row |
 | Who may read a record now | Read from Access Policies — the agents whose rules allow Read on the record's kind and graph database, and for which teams — never from History |
 | A change shows no percentage on an empty week | The change in acts against the 7-day daily mean is absent while that mean is under 10 acts a day |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-Sharing is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
+Sharing is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
 
 | Access | Can | Otherwise sees |
 |---|---|---|

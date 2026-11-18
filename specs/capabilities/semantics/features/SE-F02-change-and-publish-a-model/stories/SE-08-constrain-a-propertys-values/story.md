@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F02](../../feature.md)
 
 ## Who can
 
-Changing a property's constraint is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Changing a property's constraint needs Edit on `model/<model>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, change and remove a property's constraint in a draft, and see what breaks it today | — |
-| Operator | Read each property's constraint on the kind. A Modeller changes constraints as an Admin does | No edit act on a property — *Needs the Modeller role — ask an Admin* |
+| Operator | Read each property's constraint on the kind. With Edit on the model, changes constraints as an Admin does | No edit act on a property — *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## Flow
 
@@ -57,7 +57,7 @@ flowchart LR
 | SE-08.13 | A record with no value for the property | it is checked | it does not break the constraint — a key says whether a value is required |
 | SE-08.14 | A constraint naming a standard | a newer standard version is published | the constraint keeps the values it copied until someone saves it again |
 | SE-08.15 | No draft open | the person reads the kind | the constraints read with no edit act, and *Open a draft* is offered |
-| SE-08.16 | An Operator | they open a kind | the constraints read; there is no edit act, and *Change in a draft* is disabled with *Needs the Modeller role — ask an Admin* |
+| SE-08.16 | A person without Edit on the model | they open a kind | the constraints read; there is no edit act, and *Change in a draft* is disabled with *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## Screens
 

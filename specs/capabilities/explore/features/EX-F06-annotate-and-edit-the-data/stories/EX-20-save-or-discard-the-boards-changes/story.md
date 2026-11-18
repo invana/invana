@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F06](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Stage, revert and discard changes; save them to a read + write graph database through the Record editor | A read-only graph database: Save disabled, naming it and its mode |
-| Operator | Stage, revert and discard changes on the board; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Edit on the board*) | *Save n changes* disabled — *Needs the Modeller role — ask an Admin*; the changes stay on the board |
+| Operator | Stage, revert and discard changes on the board; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Edit on the board*) | *Save n changes* disabled — *Needs the Modeller role — ask an Admin*; the changes stay on the board |
 
 ## Flow
 

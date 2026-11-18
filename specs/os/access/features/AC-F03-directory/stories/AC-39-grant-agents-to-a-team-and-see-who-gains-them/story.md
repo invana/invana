@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Grant an agent to a team or a person, or take it away; add a person to a team or take one off; read the preview of each before saving, signing in again | — |
-| Operator | Read every team's agents and every person's agents and how each reaches them; a Modeller reads the same | *Grant an agent*, *Take away*, *Add people* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read every team's agents and every person's agents and how each reaches them | *Grant an agent*, *Take away*, *Add people* disabled — *Needs Manage on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -54,7 +54,7 @@ flowchart TD
 | AC-39.6 | A preview | the Admin saves, signing in again | the grants change from each person's next step; Studio clears what each person who lost an agent read through it; History records the change and the people it reached |
 | AC-39.7 | A grant | it is saved | it gives the agent to the person or team and nothing else: what the agent may touch is still only its Access Policies' (AC-F02) |
 | AC-39.8 | An Admin at the command line | they grant an agent or take it away | the preview prints first, then the change, held to every check Studio is |
-| AC-39.9 | An Operator or a Modeller | they open a team or a person | grants read; every write is disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-39.9 | A person without Manage on Access | they open a team or a person | grants read; every write is disabled, naming Manage on Access and who can grant it; the API refuses the write |
 | AC-39.10 | A grant made with a key | it is sent | it is refused — it needs a person's session |
 
 ## Screens

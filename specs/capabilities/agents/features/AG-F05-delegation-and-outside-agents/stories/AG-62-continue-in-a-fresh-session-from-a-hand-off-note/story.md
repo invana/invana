@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 ## Who can
 
-Runs — read, stop and re-run in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Runs — read, stop and re-run in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *Own* for Operator and Modeller, *Acts* for Admin. A note's body reads only as far as the reader's default agent may
 read its sources ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); no role grants content.
 

@@ -95,10 +95,10 @@ sequenceDiagram
 
 ## Access
 
-Building an agent is *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
+Building an agent is *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 A shared agent is the platform's and a personal agent is its person's; making or owning an agent grants nothing ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)).
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every agent — its setup, Access Policies, what it may touch, named approvers, limits, voice, what it runs with, the model set and reported, Flow, who made it and versions | Every signed-in person — Operator, Modeller, Admin | — |
 | Create an agent — the platform's, made by its maker; copy a built-in agent — a personal agent of the copier | Modeller · Admin | *New agent* and *Copy* disabled, naming the role — *Needs the Modeller role — ask an Admin* |

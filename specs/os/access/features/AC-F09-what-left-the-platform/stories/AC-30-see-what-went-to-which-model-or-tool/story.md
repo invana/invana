@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AC-F09](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../AC-F02-access-policies/feature.md#the-role-table).
+Roles are [the permission catalogue](../../../AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every call — kinds, fields, record IDs and query, never a value; verify a value against a call; export | — |
-| Operator | Read the calls of runs they may read (AC-31); verify and export those; a Modeller the same | Other calls list with their time, agent, target, class, verdict and tokens; content reads *withheld — only {person behind}, or someone whose agent may read its sources, reads it* |
+| Operator | Read the calls of runs they may read (AC-31); verify and export those | Other calls list with their time, agent, target, class, verdict and tokens; content reads *withheld — only {person behind}, or someone whose agent may read its sources, reads it* |
 
 ## Flow
 
@@ -59,7 +59,7 @@ flowchart TD
 | AC-30.11 | A value the reader holds | they press *Verify* on a call and give it | it says whether the value matches what the call sent or received; nothing is stored |
 | AC-30.12 | A window | it reaches past 365 days | it is refused, reading *Calls are kept 365 days* |
 | AC-30.13 | The rows shown | the reader presses *Export* and picks CSV or JSON Lines | a file of exactly the rows they may read downloads, and the export is listed with who made it |
-| AC-30.14 | An Operator or a Modeller | they open a call of a run they may not read (AC-31) | its time, agent, target, class, verdict and tokens read; its content reads *withheld*; an Admin reads its kinds, fields, IDs and query, never a value |
+| AC-30.14 | A person without Read on `access/history` | they open a call of a run they may not read (AC-31) | its time, agent, target, class, verdict and tokens read; its content reads *withheld*; a reader of `access/history` reads its kinds, fields, IDs and query, never a value |
 | AC-30.15 | A call whose result has not come back | it is read | it reads *waiting on the result* and settles in place |
 | AC-30.16 | *What left* | it fails to load | it says what could not load, with *Try again* |
 

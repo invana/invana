@@ -186,11 +186,11 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 | 422 | A share or an owner change on a platform-owned or built-in resource | *{name} is the organisation's — nobody owns it alone.* | AC-24.13 · AC-25.2 |
 | 403 | Sharing a personal agent by anyone but its person | *Only {person} shares their own agent.* | AC-24.14 |
 | 409 | A copy named with a name its kind already uses | *{name} is taken.* | AC-25.7 |
-| 403 | Copying a built-in whose kind the caller's role may not make | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-25.6 |
+| 403 | Copying a built-in whose kind the caller may not Create | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-25.6 |
 | 403 | A share or a copy with a key | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-24.10 |
 | 409 | Adopting a personal agent already adopted | *{agent} is already {person}'s.* | AC-43.8 |
 | 403 | Adopting by anyone but the departed person's successor | *Only {person}'s successor adopts their agents.* | AC-43.10 |
-| 403 | Adopting by a successor whose role may not build agents | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-43.9 |
+| 403 | Adopting by a successor without Create on `agent/*` | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-43.9 |
 
 ### CLI
 
@@ -225,7 +225,7 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 | Owner is a modal | *Owner* opens from any resource's header as a modal, so the resource stays readable behind it |
 | A copied agent starts personal | A copy of a built-in agent is its maker's personal agent, to try before it is shared; any other copy is the organisation's from the start |
 | One successor takes it all | The successor takes every slot a fallback gives them and the leaver's chats, so the Admin decides once, while deactivating |
-| Adopting needs the role to build agents | A personal agent is an agent like any other; an Operator successor leaves it retired rather than hold an agent they could not build |
+| Adopting needs Create on agents | A personal agent is an agent like any other; a successor without Create on `agent/*` leaves it retired rather than hold an agent they could not build |
 | Sharing needs no second act | A shared agent is the platform's at once; it reaches others only when an Admin grants it, so sharing alone gives no one anything |
 
 ## Open questions

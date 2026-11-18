@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Versioning, retiring, moving a pin and copying are the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); a workflow is the platform's, so making one grants nothing over it.
+Versioning, retiring, moving a pin and copying are the Modeller's and the Admin's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); a workflow is the platform's, so making one grants nothing over it.
 
 | Access | Can | Otherwise sees |
 |---|---|---|

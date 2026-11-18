@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *Fork from here* on a settled reply of their own conversation; follow a fork to its parent and a parent to its forks | Another person's conversation: no *Fork from here* |
-| Operator | The same, on their own conversations; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *ask a question*) | Another person's conversation: no *Fork from here* |
+| Operator | The same, on their own conversations; a Modeller the same ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *ask a question*) | Another person's conversation: no *Fork from here* |
 
 ## Flow
 

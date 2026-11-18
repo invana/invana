@@ -46,7 +46,7 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a kind's and a property's meaning, and each property's level | Every signed-in person — Operator, Modeller, Admin | — |
 | Change a definition, synonym, unit, outside term or a property's level in a draft · accept a proposed one | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |

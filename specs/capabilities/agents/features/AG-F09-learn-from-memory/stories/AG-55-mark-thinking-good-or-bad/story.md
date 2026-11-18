@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Mark a run, plan, workflow or recalled item they may read good or bad; withdraw any mark | *Mark* disabled on a run they may not read, naming who may |
-| Operator | An Operator or a Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): mark from a run they are behind or, for a project's run, whose sources their default agent may see; withdraw their own mark | *Mark* disabled, naming who may — whoever may read the run's content; *Withdraw* absent on someone else's mark |
+| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): mark from a run they are behind or, for a project's run, whose sources their default agent may see; withdraw their own mark | *Mark* disabled, naming who may — whoever may read the run's content; *Withdraw* absent on someone else's mark |
 
 ## Flow
 

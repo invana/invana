@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every team's, user's, agent's and the deployment's spend against its limits; change a limit from its row (CP-11) | — |
-| Operator | Operator · Modeller: read the same spend against every limit ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Operator | Operator · Modeller: read the same spend against every limit ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
 
 ## Flow
 

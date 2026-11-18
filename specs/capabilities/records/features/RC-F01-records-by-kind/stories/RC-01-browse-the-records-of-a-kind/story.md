@@ -15,7 +15,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F01](../../feature.md)
 
 ## Who can
 
-Every role browses records ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Anyone with Read on `data/<graph database>/<kind>` browses records ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

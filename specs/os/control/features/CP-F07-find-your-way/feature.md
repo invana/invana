@@ -54,7 +54,7 @@ flowchart TD
 | Act | Role | Everyone else sees |
 |---|---|---|
 | Find with ⌘K or `invana search` | Operator · Modeller · Admin; hits are only what the person may open | A record they may not open is never a hit |
-| Run an act from ⌘K | The role the act's feature names ([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | The act listed disabled, naming the role |
+| Run an act from ⌘K | The role the act's feature names ([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | The act listed disabled, naming the role |
 | Ask the Assistant from ⌘K | A person who may use the Assistant | Absent |
 | Open the switcher; read, search, pin and unpin one's own recent items | Every signed-in person, for themselves | Another person's recent and pinned items are absent |
 | Read the deployment's name and version · pick one's own theme | Every signed-in person | — |
@@ -85,7 +85,7 @@ flowchart TD
 | Pinned is a star | Any recent item can be starred; pins are the person's own and never reorder Recent |
 | Before set-up | Until set-up starts, the switcher's modes and New are disabled, reading *Opens when set-up starts* ([CP-22](../CP-F05-graph-databases/stories/CP-22-start-a-fresh-deployment-from-a-question/story.md)) |
 | The records in Graph Data are found by asking | A customer or an order is reached through Explore and the Assistant, not ⌘K |
-| Leans on | The role table and who holds each role ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md)) · the person's own settings ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md)) |
+| Leans on | The permission catalogue and the policies each person holds ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md)) · the person's own settings ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md)) |
 
 ## Data touched
 
@@ -160,7 +160,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Ranking | Exact, then prefix, then contains on the name, case-insensitive; ties by name |
 | Not searched | Runs, schedules, findings and branches — a run is found through Runs, not by name |
 | ⌘K | Matches in the browser over the lists each mode already serves, read once per opening; it never calls the search route |
-| Who to ask | A disabled act names its role and who holds it from the role table and the Directory; a role nobody holds reads *Ask an Admin* |
+| Who to ask | A disabled act names its permission and who can grant it from the permission catalogue and the Directory; a permission nobody can grant reads *Ask an Admin* |
 | Recording a recent | An upsert on (`user_id`, `kind`, `target_id`) setting `opened_at`; past 100 a person and kind, the oldest row goes in the same transaction |
 | Access on read | Each recent and pin is checked against what the reader may open when listed — the owning feature's read check — and left out, not shown as withheld |
 | Continue | The newest conversation, board and project in `control_recents`; the snippet is the conversation's last answer's first line, the layout the board's saved positions for Studio to draw, the progress the project's done and total tasks as PJ-F01 counts them |

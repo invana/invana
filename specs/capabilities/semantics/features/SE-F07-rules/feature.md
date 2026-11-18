@@ -65,7 +65,7 @@ Permissions are [the permission catalogue](../../../../os/access/features/AC-F02
 | Act | Permission | Everyone else sees |
 |---|---|---|
 | Read every rule in force and its evidence | Read on `model/<model>` | The model absent |
-| Read every request — except one filed for what an Access Policy hides from its asker, which only a reader of policies reads | Read on `model/<model>`; a request for hidden data also needs Read on `access/policies` | A request for hidden data is absent, with no note, and the open count leaves it out |
+| Read every request | Read on `model/<model>` | The model absent |
 | Create, edit, stop offering or offer again a rule *Everywhere* or on *A project* · hold a kind or property to a standard | Edit on `model/<model>` | Acts disabled, the permission named — *Needs Edit on model/orders — ask Priya or Lee* |
 | Install a shipped pack's rules | Create on `setting/team-packs` | Disabled, the permission named |
 | Draft it from a request | Create on `model/*` | The rows read; the act disabled, the permission named |
@@ -98,7 +98,7 @@ Permissions are [the permission catalogue](../../../../os/access/features/AC-F02
 | When broken | *Block* refuses the act, naming the rule · *Warn* lets it through and says so · *Report* records it only. A check with no mode warns |
 | Every block in one refusal | An act reads every active rule in its scope before writing; a blocked act writes nothing, and the refusal names each blocking rule, its *because* and the reason. A load refuses record by record (RC-F02) |
 | A hold is a constraint | A kind or property holding a standard is a constraint naming its values, versioned with the model; a newer standard version never moves it (SE-19) |
-| A request for hidden data is filed, and only a reader of policies sees it | A run that needs a kind or property an Access Policy hides ends *cannot answer · not in Graph Data* and may file a request here; the request names what was asked, never that it is hidden. Only a person with Read on `access/policies` reads it, and with Edit on the model may decline it; no role grants it; the asker learns nothing more — no refusal, no ask to an approver ([AC-F02 › Property access](../../../../os/access/features/AC-F02-access-policies/feature.md#property-access)) |
+| A request for hidden data is stored like any other | A run that needs a kind or property an Access Policy hides ends *cannot answer · not in Graph Data* and may file a request here; it is stored and shown like any other, to those who read requests, with nothing marking that something was hidden; Invana never names a hidden kind or property to a person who may not read it, and the asker learns nothing more — no refusal, no ask to an approver ([AC-F02 › Property access](../../../../os/access/features/AC-F02-access-policies/feature.md#property-access)) |
 | Because | One optional line said to whoever the rule stops |
 | Versioned | Changing a rule publishes its next version; a past run, load and check name the version they read |
 | Stop offering, not delete | *Stop offering it* stops offering and checking; its versions and past citations stay, and *Offer it again* reverses it |
@@ -133,7 +133,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | `model_rules` | `kind` (`act` · `alert`) · `scope` (`install` · `project`) · `project_id?` · `order` · `active` · `current_version_id` | Never deleted — `active` stops offering and checking |
 | `model_rule_versions` | `rule_id` · `statement` · `check` · `params` · `mode` (`block` · `warn` · `report`) · `because` · `published_at` | A past run, load and check names the version it read |
-| `model_requests` | `graph_id` · `kind` (`unanswered` · `change`) · `title` · `detail` · `source` (`explorer` · `agent` · `schedule` · `api`) · `asked_by_id` · `agent_id` · `run_id` · `session_id` · `asks` · `last_asked_at` · `hidden_by_policy` (bool — what was asked is hidden from the asker by an Access Policy; read only with Read on `access/policies`) · `status` (`open` · `done`) · `resolution` (`declined` · `modelled`) · `resolution_note` · `model_id?` · `resolved_by_id` · `resolved_at` | The same open ask by the same person or agent adds to `asks` |
+| `model_requests` | `graph_id` · `kind` (`unanswered` · `change`) · `title` · `detail` · `source` (`explorer` · `agent` · `schedule` · `api`) · `asked_by_id` · `agent_id` · `run_id` · `session_id` · `asks` · `last_asked_at` · `status` (`open` · `done`) · `resolution` (`declined` · `modelled`) · `resolution_note` · `model_id?` · `resolved_by_id` · `resolved_at` | The same open ask by the same person or agent adds to `asks`. No column records that an Access Policy hides what was asked: a request about hidden data is stored and shown like any other, to those who may read requests; a kind or property is named only as the asker or the reader may read it |
 
 ### Reads
 
@@ -175,7 +175,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|---|
 | 403 | A rule or a resolve by someone without Edit on the model | *Needs Edit on {model} — ask {who can grant}.* | SE-12.16 · SE-13.14 |
 | 409 | An act a `block` rule refuses — on the act's route; every blocking rule in one refusal, nothing written | *{act} is blocked: {rule} — {because} ({reason}).* | SE-12.9 |
-| 404 | Reading or resolving a request with `hidden_by_policy` without Read on `access/policies` | The sentence of a request that does not exist | SE-13.16 |
 | 409 | Resolving a request already resolved | *Already resolved.* | SE-13.12 |
 
 ### CLI

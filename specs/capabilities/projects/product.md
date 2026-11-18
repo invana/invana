@@ -110,7 +110,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | Roles inside a project | Every person on the team may do everything inside it; the project's policies bound its runs |
 | Connectors on a project | Agents bring their work connections ([CP-F02](../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
 | Parameter sweeps · game theory | After 1.0 |
-| Per-place on the team | The role table governs every act ([AC-F02](../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) and a project grants nothing |
+| Per-place on the team | Permissions from the catalogue govern every act ([AC-F02](../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) and a project grants nothing |
 | Gantt charts, sprints, story points, time tracking | Groups and the Order answer "what is next"; the record holds what things cost |
 | Objectives and per-task criteria | A task's body says what done means; checks prove what can be proved; a person on the team accepts |
 | Editing a decision | A decision is superseded, never edited |

@@ -132,7 +132,7 @@ sequenceDiagram
 
 ## Access
 
-Delegation and outside agents are *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table).
+Delegation and outside agents are *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 Who an agent may hand work to is a rule on its Access Policies, which only an Admin changes.
 
 | Act | Role | Everyone else sees |
@@ -142,7 +142,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Approve or decline a hand-off that asks | The caller's named approvers, else the Admins with a *no approver* alert, never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, naming who it waits on |
 | Answer a helper's or an outside agent's question back | The person behind the run | The question reads, naming who it waits on |
 | Read a run's hand-off notes — what is done, what is next, what it read | The person behind the run; anyone else, an Admin included, only when the run belongs to a project and their default agent may read every source of the note ([AC-31](../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) · [GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#rules)) | The note's head — its sessions, when, its size and tokens — with its body *withheld*, naming the first source their agent may not read |
-| Fork a new run from a hand-off note | The person behind the run; an Admin who may read the note. Runs — re-run in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table): *Own* for Operator and Modeller, *Acts* for Admin | *Fork* disabled — *Only the person behind this run or an Admin*; on a note they may not read, *Fork* is not offered |
+| Fork a new run from a hand-off note | The person behind the run; an Admin who may read the note. Runs — re-run in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue): *Own* for Operator and Modeller, *Acts* for Admin | *Fork* disabled — *Only the person behind this run or an Admin*; on a note they may not read, *Fork* is not offered |
 | Set the session budget at which a run continues | Admin, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The session budget reads on the run; *Edit in Usage and limits* reads *Ask an Admin* |
 | Add an outside agent, turn it on or off, read its card again, set its credential and limits, remove it | Admin, in a session, with the password again for a credential | Outside agents read; each act disabled — *Needs the Admin role* |
 | Name an outside agent's approvers | Admin ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; *Change approvers* reads *Needs the Admin role* |

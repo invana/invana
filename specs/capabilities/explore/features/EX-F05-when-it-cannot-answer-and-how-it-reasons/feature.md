@@ -108,12 +108,12 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *how it reasons* is *Acts* for Operator, Modeller and Admin. Every act also runs through an agent, within what its
 Access Policies allow. A run's content — a refusal, a diagnosis, a prediction — is its run's: run privacy is
 [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md).
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a cannot answer, a plan gap, a refusal or a diagnosis, and follow its next step | The person behind the run; an Admin reads every one | Another person's run: that it ran, its status and its tokens |
 | Pick an approach with *Act as* · remove an assumption before the run · drop one and re-run · ask *what if* | Operator · Modeller · Admin, on their own runs | — |

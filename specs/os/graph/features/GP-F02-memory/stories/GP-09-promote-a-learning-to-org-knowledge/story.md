@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 
 ## Who can
 
-The role × feature table is [AC-F02 › The role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table);
+The role × feature table is [AC-F02 › The permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 promoting, declining and retiring org knowledge is a Modeller's and an Admin's ([GP-F02 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Switch an answer's template; author, copy, change, publish and delete projection templates | — |
-| Operator | Switch the template of an answer of theirs; read the projection templates. A Modeller also authors them, as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *skills*) | *+* and each authoring act disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | Switch the template of an answer of theirs; read the projection templates. A Modeller also authors them, as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *skills*) | *+* and each authoring act disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 

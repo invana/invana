@@ -79,13 +79,13 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every call — kinds, fields, record IDs, query, never a value | Admin | — |
-| Read the calls of runs the reader may read | Every signed-in person — Operator, Modeller | Calls of other runs: that they happened, their target, class, verdict and tokens — content withheld |
-| Read a run's content — its steps, queries, records, calls and answer | The person behind it; for a run that belongs to a project, anyone whose default agent may see its sources ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) — an Admin too, never by role alone | That it ran, its agent, its status and its tokens |
+| Read every call — kinds, fields, record IDs, query, never a value | Read on `access/history` | Calls of runs the reader may read only |
+| Read the calls of runs the reader may read | None — every signed-in person | Calls of other runs: that they happened, their target, class, verdict and tokens — content withheld |
+| Read a run's content — its steps, queries, records, calls and answer | The person behind it; for a run that belongs to a project, anyone whose default agent may see its sources ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) — no permission reads it on its own | That it ran, its agent, its status and its tokens |
 | Read which targets are external, and what the outbound check stopped or left out | Every signed-in person, over the calls they may read | — |
-| Mark an AI model local or external | Admin, in AI models ([CP-F01](../../../control/features/CP-F01-ai-models/feature.md)) | Reads here, linking to AI models |
+| Mark an AI model local or external | Edit on `setting/ai-models`, in AI models ([CP-F01](../../../control/features/CP-F01-ai-models/feature.md)) | Reads here, linking to AI models |
 | Export the calls the reader may read | Every signed-in person | — |
 
 ## States
@@ -113,7 +113,7 @@ sequenceDiagram
 | Refused or left out | A call — to an external AI model, an outside tool (its arguments too) or an outside agent — carrying a confidential or personal value is **refused** before it leaves, naming the property and its level. A result to an MCP client or an outside runtime, a channel message, an export, a published report or pull-request text carrying one **leaves without it**: those values are left out and what was left out is named in what leaves and in the row |
 | Outside runtimes reach data only through Invana's tools | An outside runtime on a worker reads data only by calling Invana's MCP tools; what each tool returns is redacted by lineage, passes the outbound check and is ledgered at the tool; the worker sandbox limits the runtime's network to what the agent's `net/` rules allow ([CP-F03](../../../control/features/CP-F03-workers-and-the-queue/feature.md)) |
 | Exports and published reports carry lineage | An export or a published report records the sources of everything in it; what the person exporting may not see is never in it, and what is confidential or personal is left out, named |
-| Run privacy | A run's content — its steps, queries, records, calls, what it sent and its answer — is a copy: the person behind the run reads it; for a run that belongs to a project, anyone whose default agent may see every source reads it ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)); a role never reads it by itself. Everyone else reads that it ran, its agent, its status and its tokens. Every surface that shows content holds to it: the run, *How it got here*, a ledger row, a History row's arguments, an ask, usage |
+| Run privacy | A run's content — its steps, queries, records, calls, what it sent and its answer — is a copy: the person behind the run reads it; for a run that belongs to a project, anyone whose default agent may see every source reads it ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)); no permission reads it by itself. Everyone else reads that it ran, its agent, its status and its tokens. Every surface that shows content holds to it: the run, *How it got here*, a ledger row, a History row's arguments, an ask, usage |
 | Edges in the system graph | Each row's run, target and record IDs follow into the system graph through the outbox, as IDs and hashes only; Postgres stays the truth |
 | Kept for a year | Rows are kept 365 days; a prune removes a whole window and is a History row |
 | Every number is the engine's | Counts and totals are counted over stored rows; tokens only |
@@ -202,7 +202,7 @@ exports and report publishing each pass their exit through it.
 | Locality | `model` from its mark ([CP-F01](../../../control/features/CP-F01-ai-models/feature.md#engine)); `tool` local only for a core plugin; `runtime` from its adapter's declared model place; `agent` · `mcp_client` · `channel` · `export` · `report` · `pull_request` always external; `graph_database` local |
 | Record IDs | Every ID sent to an AI model or a tool; for a graph database read the first 1,000, with `record_ids_total` |
 | Keyed hashes | HMAC-SHA-256 under the ledger key, so a value can be proved without being kept, and no one without the key can test guesses |
-| `may_read_run(person, run)` | True when the person is behind the run, or the run belongs to a project and `lineage.may_see(person, run.transcript)` is true ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)). A role adds nothing. Every route that returns a run's content — runs, *How it got here*, ledger calls, History arguments, asks, usage — calls it and withholds content when it is false; an Admin reads every ledger row's kinds, fields, IDs and query, which hold no value |
+| `may_read_run(person, run)` | True when the person is behind the run, or the run belongs to a project and `lineage.may_see(person, run.transcript)` is true ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)). No permission adds anything. Every route that returns a run's content — runs, *How it got here*, ledger calls, History arguments, asks, usage — calls it and withholds content when it is false; a reader of `access/history` reads every ledger row's kinds, fields, IDs and query, which hold no value |
 | What a withheld row carries | Its time, agent, person behind, target, class, verdict, status and tokens; never kinds, fields, IDs, a query or an answer |
 | The outbox | Each settled row writes an outbox row; the relay adds `(run)-[:CALLED]->(target)` and `(call)-[:CARRIED]->(record)` edges in the system graph, IDs and hashes only |
 | Retention | 365 days; a prune removes a whole window and writes its History row |
@@ -226,7 +226,7 @@ exports and report publishing each pass their exit through it.
 | Run privacy lives here | The Access Plane owns who may read a run's content; every surface that shows content calls the one check |
 | A call is refused, a document is trimmed | A prompt or a tool's arguments cannot be sent in part without changing what is asked, so the call is refused; a result, a message or a file still serves without the values, so they are left out and named |
 | Confidential and personal never leave | The two highest levels stay inside the deployment whatever the target; public and internal go where the agent's rules let them |
-| A role reads no content | The Admin role is platform acts; a run's content reads through lineage like any copy, and an Admin audits through the ledger, which holds no value |
+| A permission reads no content | Platform permissions are acts; a run's content reads through lineage like any copy, and a reader of `access/history` audits through the ledger, which holds no value |
 
 ## Open questions
 

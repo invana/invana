@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F06](../../feature.md)
 
 ## Who can
 
-*Alerts* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
+*Alerts* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see; writing the alert rule is a Modeller's or an Admin's
 ([SE-F07](../../../../../semantics/features/SE-F07-rules/feature.md)).
 

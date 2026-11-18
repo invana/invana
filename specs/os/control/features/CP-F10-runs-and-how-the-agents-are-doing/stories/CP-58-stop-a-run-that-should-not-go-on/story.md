@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Stop any run still going, a run with no person behind it included | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): stop a run they are behind | *Stop run* disabled: *Only {person} or an Admin can stop this run* — for a run with no person behind it, *Only an Admin can stop this run* |
+| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): stop a run they are behind | *Stop run* disabled: *Only {person} or an Admin can stop this run* — for a run with no person behind it, *Only an Admin can stop this run* |
 
 ## Flow
 

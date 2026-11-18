@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every ops alert; read every alert; act on what it is about; close one with a note | — |
-| Operator | Operator · Modeller: receive alerts about agents they are a named approver of, runs they are behind, their own limit, schedules they created and History alerts that name them or their team — alerts about tasks and connections are [CP-67](../CP-67-get-told-when-work-stops-or-a-connection-fails/story.md)'s ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
+| Operator | Operator · Modeller: receive alerts about agents they are a named approver of, runs they are behind, their own limit, schedules they created and History alerts that name them or their team — alerts about tasks and connections are [CP-67](../CP-67-get-told-when-work-stops-or-a-connection-fails/story.md)'s ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs the Admin role — ask {admins}*; a run's content withheld as AC-31 says |
 
 ## Flow
 

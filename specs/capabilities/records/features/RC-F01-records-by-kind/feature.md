@@ -47,10 +47,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read records, their provenance and history | Every signed-in person, as far as their Access Policies allow Read `data/<graph database>/<kind>` | A kind it may not Read is absent; a direct link to it reads *Not found*, as for a kind that does not exist |
-| Open a record on a board | Operator — every member | — |
+| Open a record on a board | Read on `data/<graph database>/<kind>` | — |
 
 ## States
 

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 ## Who can
 
-Building an agent in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Building an agent in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 Operator *Reads*, Modeller and Admin *Act*. Installing a runtime on a worker group is an Admin's, in the Control Plane.
 
 | Access | Can | Otherwise sees |

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every suggested change, its evidence and its difference; open the runs behind it; decide it (AG-52) | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): read every suggested change, its evidence and its difference; open the runs they may read | Deciding it needs what its target needs — the Modeller role for a skill, workflow, agent, answer template or the model, the Admin role for an index — read only, naming the role |
+| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): read every suggested change, its evidence and its difference; open the runs they may read | Deciding it needs what its target needs — the Modeller role for a skill, workflow, agent, answer template or the model, the Admin role for an index — read only, naming the role |
 
 ## Flow
 

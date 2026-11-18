@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Change a model in a draft, compare it, publish a change that only adds, request approval for a breaking one; approve or decline one as a named approver of the Modeller agent who did not ask | — |
-| Operator | Read the model, its draft, the comparison and its reviews; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*); anyone named an approver of the Modeller agent approves | *Change in a draft* disabled — *Needs the Modeller role — ask an Admin*; *Publish* hidden |
+| Operator | Read the model, its draft, the comparison and its reviews; with Edit on the model, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Model*); anyone named an approver of the Modeller agent approves | *Change in a draft* disabled — *Needs Edit on model/{model} — ask {who can grant}*; *Publish* hidden |
 
 ## Flow
 
@@ -45,7 +45,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| SE-05.1 | A published model and a Modeller or an Admin | they pick *Change in a draft* on the map or a kind | the model's draft opens full-bleed on its canvas with the header `Invana Model / Models › <model> vN · draft` and the draft bar `n staged · Discard · Publish vN` |
+| SE-05.1 | A published model and a person with Edit on it | they pick *Change in a draft* on the map or a kind | the model's draft opens full-bleed on its canvas with the header `Invana Model / Models › <model> vN · draft` and the draft bar `n staged · Discard · Publish vN` |
 | SE-05.2 | An open draft | the person adds a kind, adds a relationship between two kinds, adds or removes a property, or deletes | each joins the draft as a staged change, sorted first with a *staged* chip; nothing reaches the model yet |
 | SE-05.3 | A staged delete with dependents | the person confirms it | the confirm says it goes when published and names what depends on it |
 | SE-05.4 | Staged changes | the person discards one, or all | that change, or every change, leaves the draft; the model is as published |
@@ -66,11 +66,11 @@ flowchart LR
 | SE-05.19 | An approval | it is declined, or its deadline passes | *Not published* with the note or *expired*; the draft stays a draft |
 | SE-05.20 | A published version | the person opens *How it got here* on it | it shows who published it, why, the review and its approver, and the runs that previewed and published it |
 | SE-05.21 | A published version | anyone opens it | it reads; changing it opens the draft for the next version |
-| SE-05.22 | An Operator | they select a kind | *Change in a draft* is disabled with *Needs the Modeller role — ask an Admin*; *Publish* is not shown |
+| SE-05.22 | A person without Edit on the model | they select a kind | *Change in a draft* is disabled with *Needs Edit on model/{model} — ask {who can grant}*; *Publish* is not shown |
 | SE-05.23 | A model whose graph database is read-only | a version publishes | it publishes; the confirm and the version list each constraint and index as *not pushed — read-only*, and nothing is written to the graph database |
 | SE-05.24 | A model whose kinds use a property type its graph database's server version cannot hold | the model or its draft opens | A banner on its head names each type and the server version, and *Publish* is refused naming them |
 | SE-05.25 | An open draft | the person adds or removes an index, or a unique or exists constraint, on a kind's property | It is staged like any change and named in the comparison; adding an index only adds, and a unique or exists constraint breaks |
-| SE-05.26 | A draft and a Modeller or an Admin | they publish from the command line | The command says whether the draft adds or breaks; one that adds publishes, one that breaks opens the same review as Studio, and `--dry-run` writes nothing |
+| SE-05.26 | A draft and a person with Publish on the model | they publish from the command line | The command says whether the draft adds or breaks; one that adds publishes, one that breaks opens the same review as Studio, and `--dry-run` writes nothing |
 | SE-05.27 | An open draft | the person gives a property a type its graph database's server version cannot hold | It is refused where it was picked, naming the type and the server version; nothing is staged |
 | SE-05.28 | A draft with a kind whose label another model in the same graph database already holds | the person publishes | it is refused before anything is written, naming the label and the model that holds it — *{label} belongs to {model} — link the two with a same thing link instead.* |
 | SE-05.29 | A draft that changes a kind or a property *Hidden from agents* hides, published by an agent-started run | it is published | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is published; a publish a person starts through the Modeller is held to the person's own policies, not to the entry ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |

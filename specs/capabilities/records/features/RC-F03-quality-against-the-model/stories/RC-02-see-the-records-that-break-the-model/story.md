@@ -15,7 +15,7 @@ Tasks: [task.md](task.md) · Feature: [RC-F03](../../feature.md)
 
 ## Who can
 
-Every role runs a check and reads what breaks the model ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Anyone with Read on `data/<graph database>/<kind>` runs a check and reads what breaks the model ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

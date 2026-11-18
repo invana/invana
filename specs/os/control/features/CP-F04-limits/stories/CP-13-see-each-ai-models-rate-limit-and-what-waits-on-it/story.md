@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read each AI model's rate limit, use and what waits; set a model's rate limit | — |
-| Operator | Operator · Modeller: read each AI model's rate limit, use and what waits ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Operator | Operator · Modeller: read each AI model's rate limit, use and what waits ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
 
 ## Flow
 

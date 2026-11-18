@@ -99,7 +99,7 @@ terms and standards it follows, what must always hold and what may be derived �
 | A plan names a role, the agent names the model | A plan says *decide* or *extract*; the AI model pinned on the agent plays it, checked against the agent's Access Policies |
 | A refusal is an answer | A refused source is recorded and the run carries on without it; a run refused the AI model it thinks with, or the model version it is grounded on, ends *cannot answer* naming the rule — never an error |
 | A write is governed like a read | Loading into a model is checked against the same rules before it writes; one rule decides both, and a refused target writes nothing |
-| Who edits | Shaping a model is the Modeller's and the Admin's ([the role table](../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); a shipped pack and an index suggestion are the Admin's alone |
+| Who edits | Shaping a model is the Modeller's and the Admin's ([the permission catalogue](../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); a shipped pack and an index suggestion are the Admin's alone |
 | Outside formats are imported | Invana keeps its own contract and every import maps into it: SKOS, OWL/RDFS with schema.org, SHACL and CSV code lists, each by its own importer (SE-F05 · SE-15). Import only — source addresses kept on every kind and term make export cheap later |
 
 ## Depends on

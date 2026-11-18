@@ -109,11 +109,11 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *Branches, findings and decisions* is *Acts* for Operator, Modeller and Admin — on every project the person's default
 agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), reading records through the agents granted to them.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a project's branches, findings, decisions, proposals, lineage and the Decisions page | Anyone who may read `project/<key>` | The project's head; the rest reads *Withheld — join the team or ask {who can grant}* |
 | Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person who may read the project — Operator · Modeller · Admin | On an archived project, each act is disabled, saying it is archived |

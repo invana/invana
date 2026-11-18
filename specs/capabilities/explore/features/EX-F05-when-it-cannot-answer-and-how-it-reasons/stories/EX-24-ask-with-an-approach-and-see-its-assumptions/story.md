@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Pick an approach with *Act as*, remove an assumption before the run, drop one from an answer and re-run; author, copy and publish approaches in Agents › Skills | — |
-| Operator | Pick an approach, remove assumptions, drop one and re-run, on their own runs; read approaches in Agents › Skills. A Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *skills*) | *+* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | Pick an approach, remove assumptions, drop one and re-run, on their own runs; read approaches in Agents › Skills. A Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *skills*) | *+* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 

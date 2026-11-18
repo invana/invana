@@ -82,10 +82,10 @@ sequenceDiagram
 
 ## Access
 
-*Test an agent and a skill* is *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
+*Test an agent and a skill* is *Reads* for Operator and *Acts* for Modeller and Admin in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 a built-in agent or skill is never edited, and making or owning one grants nothing ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)).
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read an eval set — cases, checks, judge, rubric — its eval runs, test runs, drift alerts and the eval token budget | Every signed-in person — Operator, Modeller, Admin | — |
 | Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | Modeller · Admin. Never on a built-in agent or skill | Each act disabled — *Needs the Modeller role — ask an Admin*; a built-in reads its set, with *Copy* |

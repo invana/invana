@@ -24,8 +24,8 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  start([A published model on the map]) --> may{Modeller or Admin?}
-  may -->|no| ro["Read only — Change in a draft disabled · Needs the Modeller role"]
+  start([A published model on the map]) --> may{Edit on the model?}
+  may -->|no| ro["Read only — Change in a draft disabled · Needs Edit on the model"]
   may -->|yes| d["SE-05 · Change in a draft · kinds, relationships, properties"]
   d --> held{Someone else holds the draft?}
   held -->|yes| hro["Read only · who holds it"]
@@ -75,15 +75,15 @@ sequenceDiagram
 
 ## Access
 
-The role each act needs is the role table's *Ontology* row
-([AC-F02 › The role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); this
+The permission each act needs is the *Model* row of
+([AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this
 table names the acts.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read a model, its draft, its comparison and its reviews | Operator · Modeller · Admin | — |
-| Change in a draft · stage, discard · constrain a property | Modeller · Admin, through the Modeller agent | *Change in a draft* disabled — *Needs the Modeller role — ask an Admin* |
-| Publish a draft that only adds · request approval for a breaking one | Modeller · Admin, through the Modeller agent | *Publish* hidden; the draft reads |
+| Read a model, its draft, its comparison and its reviews | Read on `model/<model>` | — |
+| Change in a draft · stage, discard · constrain a property | Edit on `model/<model>`, through the Modeller agent | *Change in a draft* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Publish a draft that only adds · request approval for a breaking one | Publish on `model/<model>`, through the Modeller agent | *Publish* hidden; the draft reads |
 | Approve or decline a breaking publish | The Modeller agent's named approvers, never the requester ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | Not asked; the review reads *waiting on approval* |
 
 ## States
@@ -96,7 +96,7 @@ table names the acts.
 | Has data | The draft on its canvas, changed kinds chipped, the draft bar `n staged · Discard · Publish vN` |
 | Failed | A refused change says why where it was made; a failed preview says why and keeps the draft; a stale review says what moved |
 | Agent working or proposing | An agent's changes arrive staged on the same draft as a person's; the preview run scanning records |
-| No access | The model and its draft read; every change disabled with *Needs the Modeller role — ask an Admin* |
+| No access | The model and its draft read; every change disabled with *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## Rules
 
@@ -195,13 +195,13 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A change, constraint or publish by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-05.22 · SE-08.16 |
+| 403 | A change, constraint or publish by someone without Edit (a publish, Publish) on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-05.22 · SE-08.16 |
 | 409 | A change to a draft another person holds | *{person} holds this draft — it reads only.* | SE-05.6 |
 | 422 | A property type the connected server version cannot hold | *{type} is not available on {database} {version}.* | SE-05.27 |
 | 409 | Publishing a draft with nothing staged | *Nothing to publish.* | SE-05.10 |
 | 409 | Publishing a draft with a kind whose label another model in the same graph database holds | *{label} belongs to {model} — link the two with a same thing link instead.* | SE-05.28 |
 | 409 | Publishing a model whose kinds use a property type the server cannot hold | *{model} uses {types}, which {database} {version} cannot hold.* | SE-05.24 |
-| 409 | A breaking publish with no approver but the requester, or with a review already open on the model | *Nobody but you can approve this — ask an Admin to name an approver for the Modeller agent.* · *{model} already has a review open — {review}.* | SE-05.13 |
+| 409 | A breaking publish with no approver but the requester, or with a review already open on the model | *Nobody but you can approve this — ask someone with Manage on the Modeller agent to name an approver.* · *{model} already has a review open — {review}.* | SE-05.13 |
 | 422 | A publish an agent starts that writes a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | SE-05.29 |
 | 422 | A range on a text property, a minimum above the maximum, or a term with no values | *{property}: {why}.* | SE-08.7 |
 | 422 | A record a load or a board edit writes outside a published `reject` constraint — on the writing route | *`{Kind}.{property}` breaks its constraint {label}: {value}.* | SE-08.11 |

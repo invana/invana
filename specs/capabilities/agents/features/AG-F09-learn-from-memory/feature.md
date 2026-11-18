@@ -92,11 +92,11 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)
+The role × feature table is [AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
 (*thinking graph and memory*: Operator Acts · Modeller Acts · Admin Acts); this is what it means here. Who reads a
 run's content is [AC-31](../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s, never restated.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a recall step, a run's thinking and the nodes of its run | Whoever may read the run's content — the person behind it, and for a project's run anyone whose default agent may see its sources | That it ran, its status and its tokens; the plan or workflow it used, its outcome labels and the record IDs it cited — content *withheld*, naming who may read it |
 | Mark a run, plan, workflow or recalled item good or bad · withdraw one's own mark | Whoever may read the run's content | *Mark* disabled, naming who may |

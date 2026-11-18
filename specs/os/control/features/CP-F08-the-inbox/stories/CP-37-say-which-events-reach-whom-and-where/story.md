@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read, write, switch off and delete every rule; name any user, team, role, *the person behind the run*, *the agent's named approvers* or channel | — |
-| Operator | Operator · Modeller: read every rule and channel; write, switch and delete their own rules that reach only themselves ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | Other recipients, a team, a role, a channel, *Add channel* and another person's switch and *Edit* disabled — *Needs the Admin role — ask {admins}*, naming the rule's creator |
+| Operator | Operator · Modeller: read every rule and channel; write, switch and delete their own rules that reach only themselves ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Other recipients, a team, a role, a channel, *Add channel* and another person's switch and *Edit* disabled — *Needs the Admin role — ask {admins}*, naming the rule's creator |
 
 ## Flow
 

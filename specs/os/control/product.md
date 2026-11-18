@@ -86,12 +86,12 @@ can unblock; and an agent can only do what the models and tools offered to it al
 
 | Decision | Detail |
 |---|---|
-| The deployment's, set by an Admin | Graph databases, AI models, plugins, outside servers, the MCP server, channels, workers and limits are set by an Admin and read by everyone ([the role table](../access/features/AC-F02-access-policies/feature.md#the-role-table)) |
+| The deployment's, set by an Admin | Graph databases, AI models, plugins, outside servers, the MCP server, channels, workers and limits are set by an Admin and read by everyone ([the permission catalogue](../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) |
 | Two switches, new starts off | Graph databases and plugins have the deployment's switch and each person's own; anything new starts off until an Admin turns it on; off is refused before the work starts, naming who switched it off |
 | No credential in an environment variable | Graph database credentials, AI model keys, outside servers' secrets and accounts, and channel secrets are sealed under the install key, set with the password again, never read back |
 | Allow never passes a limit | Allow on a spend never passes a limit ([CP-F04](features/CP-F04-limits/feature.md)) |
 | One record of runs | Every run is one row of [CP-F10](features/CP-F10-runs-and-how-the-agents-are-doing/feature.md); the overview, Runs, the Inbox's Running and ops alerts all read it |
-| Those it costs can stop it | The person behind a run and the Admins stop it ([the role table](../access/features/AC-F02-access-policies/feature.md#the-role-table)); whoever acts on an ops alert closes it |
+| Those it costs can stop it | The person behind a run and the Admins stop it ([the permission catalogue](../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); whoever acts on an ops alert closes it |
 | Everything later happens on one clock | Schedules, deliveries, rules and ask deadlines run on one clock that repeats nothing after a restart |
 | Tokens, never currency | Every budget, limit, usage figure and alert is in tokens ([glossary › Token budget](../../glossary.md#what-may-happen)) |
 

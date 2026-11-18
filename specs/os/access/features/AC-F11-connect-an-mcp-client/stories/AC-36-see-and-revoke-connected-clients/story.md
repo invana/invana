@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F11](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and revoke their own connected clients; read every connected client in the deployment and revoke any. Each revoke asks for the password again | — |
-| Operator | Read and revoke their own connected clients, with the password again | *Access › Who › Connected clients* locked, naming the Admin role; another person's clients are absent |
+| Operator | Read and revoke their own connected clients, with the password again | *Access › Who › Connected clients* locked, naming Manage on Access; another person's clients are absent |
 
 ## Flow
 
@@ -47,7 +47,7 @@ flowchart TD
 | AC-36.3 | A connected client | its person revokes it, confirming and entering the password again | every token it holds ends at once; its next call is refused and it must connect again; History records who revoked it |
 | AC-36.4 | An Admin | they open *Access › Who › Connected clients* | every connected client in the deployment reads with its person, name, connected and last used; filtered by person |
 | AC-36.5 | An Admin | they revoke another person's connected client with the password again | it ends at once, and History records that the Admin revoked it |
-| AC-36.6 | An Operator or a Modeller | they open *Access › Who › Connected clients* | it is locked, naming the Admin role and the Admins; another person's client is absent from the API |
+| AC-36.6 | A person without Manage on Access | they open *Access › Who › Connected clients* | it is locked, naming Manage on Access and who can grant it; another person's client is absent from the API |
 | AC-36.7 | *Sign out everywhere* or a password change | it is done | connected clients keep working; only revoking ends them |
 | AC-36.8 | A revoke made with a key or a connected client's token | it is sent | it is refused — *This needs a person's session, not a key* |
 | AC-36.9 | The same client connected twice | the list is read | each connection reads as its own row and is revoked on its own |

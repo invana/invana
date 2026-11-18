@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [PJ-F01](../../feature.md)
 
 ## Who can
 
-*Projects and tasks* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table);
+*Projects and tasks* is *Acts* for every role in the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 pick-up is a setting of the project, its team's; a picked-up run reaches the project's policies ∩ the agent's ceiling — who set *Allow* or pressed *Start it* is recorded, never used for reach ([PJ-F01 › Access](../../feature.md#access)).
 
 | Access | Can | Otherwise sees |

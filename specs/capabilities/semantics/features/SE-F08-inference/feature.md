@@ -58,7 +58,7 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read derivations, their runs and every derived fact with its premises | Every signed-in person — Operator, Modeller, Admin — as far as their default agent reads the premises | A premise or a property their agent may not read is absent, with no count and no note |
 | Create, change, stop or run a derivation | Modeller · Admin | Absent; *Needs the Modeller role — ask an Admin* |

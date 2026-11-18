@@ -77,7 +77,7 @@ sequenceDiagram
 | AC-35.7 | *Deny* | it is pressed | the client is told access was denied; nothing is connected; History records it |
 | AC-35.8 | An authorize request with no code challenge, `plain`, a return address not registered, or a resource other than the deployment's MCP server | it arrives | an error page names what was wrong, and the client is never sent a code |
 | AC-35.9 | A code | it is traded with the wrong verifier, a second time, or after 60 seconds | it is refused, and a code used twice ends every token issued from it |
-| AC-35.10 | A connected client | it calls the MCP server | it acts as the person — their role and the agents they may use, read at each call — and *Access usage*, *What left the platform* and History name the person and the connected client |
+| AC-35.10 | A connected client | it calls the MCP server | it acts as the person — their policies and the agents they may use, read at each call — and *Access usage*, *What left the platform* and History name the person and the connected client |
 | AC-35.11 | A connected client's token | it is sent to any route but the MCP server | it is refused — the token is bound to the MCP server |
 | AC-35.12 | A connected client | it tries a session-only act — keys, access, credentials | it is refused — *This needs a person's session, not a key* |
 | AC-35.13 | A connected client's access token | it expires | the client renews it with its refresh token without the person; the refresh token rotates, and reusing a retired one revokes the client and is recorded |

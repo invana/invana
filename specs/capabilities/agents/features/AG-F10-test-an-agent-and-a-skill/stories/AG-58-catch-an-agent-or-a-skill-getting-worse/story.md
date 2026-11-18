@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 ## Who can
 
-Running drift now is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); an alert reaches the people [its kind names](../../../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds).
+Running drift now is the Modeller's and the Admin's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); an alert reaches the people [its kind names](../../../../../../os/control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

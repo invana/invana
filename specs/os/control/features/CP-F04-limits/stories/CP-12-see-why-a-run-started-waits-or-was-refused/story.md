@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every start and what decided it | — |
-| Operator | Operator · Modeller: read every start and what decided it ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | — |
+| Operator | Operator · Modeller: read every start and what decided it ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | — |
 
 ## Flow
 

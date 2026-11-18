@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every person's default agent; set it to an agent granted to that person, signing in again | An agent not granted to the person is not offered |
-| Operator | Read their own default agent in *You* and everyone's in *Users*; a Modeller reads the same | *Change default agent* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read their own default agent in *You* and everyone's in *Users* | *Change default agent* disabled — *Needs Manage on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -46,7 +46,7 @@ flowchart TD
 | AC-38.4 | A person whose default agent's grant is taken away | the take-away is saved | the preview named it first (AC-39); their default falls back to the built-in Assistant, and History records why |
 | AC-38.5 | A person | they open *You* | their default agent reads by name, linking to the Access Policies it runs under |
 | AC-38.6 | A read on any Studio screen | the default agent's rules refuse it | it is refused, naming the rule and its policy (AC-07), never shown and hidden |
-| AC-38.7 | An Operator or a Modeller | they open a person's page | the default agent reads; *Change default agent* is disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-38.7 | A person without Manage on Access | they open a person's page | the default agent reads; *Change default agent* is disabled, naming Manage on Access and who can grant it; the API refuses the write |
 | AC-38.8 | A change of default agent with a key | it is sent | it is refused — it needs a person's session |
 
 ## Screens

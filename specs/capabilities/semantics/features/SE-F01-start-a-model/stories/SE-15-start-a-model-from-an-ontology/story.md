@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read an ontology, pick its kinds, preview the mapping and open it as a draft | — |
-| Operator | See the models and their drafts; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *New model* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | See the models and their drafts; a Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* disabled — *Needs the Modeller role — ask an Admin* |
 
 ## Flow
 

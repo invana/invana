@@ -49,7 +49,7 @@ flowchart TD
 | AC-28.4 | An agent that read or wrote data | *By graph database* is read | each graph database it reached reads with its kinds, reads and writes |
 | AC-28.5 | A resource | the reader opens it | the calls behind it open in *What left the platform*, filtered to that agent and resource (AC-30) |
 | AC-28.6 | A filter by person, team or kind | it is applied | only matching usage counts; with no match, *Nothing matches*, naming the filter, with *Clear filters* |
-| AC-28.7 | An Operator or a Modeller | they open an agent | usage over runs they are behind and agents they own reads; the rest reads *N runs are not yours to read — counted, not shown* |
+| AC-28.7 | A person without Read on `access/policies` | they open an agent | usage over runs they are behind and agents they own reads; the rest reads *N runs are not yours to read — counted, not shown* |
 | AC-28.8 | A run the reader may not read | they open it from usage | it reads that it ran, its status and its tokens; its steps, queries, records and calls are withheld (AC-31) |
 | AC-28.9 | A window | it reaches past 365 days | it is refused, reading *Calls are kept 365 days* |
 | AC-28.10 | A run still going | usage is read | its calls count as they settle; the agent reads *running* beside its count |

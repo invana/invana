@@ -99,17 +99,17 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *Ask a question* is *Acts* for Operator, Modeller and Admin — within the agents the person may use
 ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)) and those agents' Access Policies
 ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)). A question reads only what the agent it
 runs through may read.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Ask in plain words · answer a question asked back | Anyone, through an agent they may use — the Assistant by default | No agent they may use: the composer disabled — *{person} may not use {agent} — ask an Admin* |
-| Type a Cypher or Gremlin query | Anyone who may use the Query console | The query kinds disabled — *{person} may not use Query console — ask an Admin* |
-| Write to a graph database from the composer | A typed write through the Query console asks first: its named approvers decide ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)); the person's role must hold *Edit on the board* (Modeller · Admin) and the graph database must be read + write | An Operator: refused — *Edit on the board needs the Modeller role.* A read-only graph database: *{name} is read-only — {why}.* |
+| Type a Cypher or Gremlin query | Run on `agent/query-console` | The query kinds disabled — *Needs Run on agent/query-console — ask {who can grant}* |
+| Write to a graph database from the composer | A typed write through the Query console asks first: its named approvers decide ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)); the person must hold Edit on `data/<graph database>` and the graph database must be read + write | Without it: refused — *Needs Edit on data/{graph database} — ask {who can grant}.* A read-only graph database: *{name} is read-only — {why}.* |
 | Open, search, reopen, start, rename, pin, archive and delete their own conversations · pick the conversation's agent | The person who started it | Another person's conversations are not listed; an Admin reads their runs in Agents › Runs ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Read a conversation's content | The person who started it, those an answer in it is shared with ([EX-15](../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and Admins — run privacy | That it ran, its status and its tokens; content withheld |
 | Set a conversation's token budget per run | The person who started it, up to the agent's own | Above the agent's: clamped, and the settings say so |

@@ -80,7 +80,7 @@ sequenceDiagram
 
 ## Access
 
-*Portable — bring in* is the Modeller's and the Admin's in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table).
+*Portable — bring in* is the Modeller's and the Admin's in [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
 | Act | Role | Everyone else sees |
 |---|---|---|

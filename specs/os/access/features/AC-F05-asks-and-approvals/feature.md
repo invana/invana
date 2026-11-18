@@ -81,12 +81,12 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read an ask's content — what it will do, its arguments, what it will send | The people it is routed to, the person behind its run and Admins | That an ask waits, its kind, its agent, who it waits on and its time left — content withheld |
-| Read an agent's named approvers | Every signed-in person | — |
-| Name or change an agent's approvers | Admin, in a session, signing in again | Disabled — *Needs the Admin role — ask Priya or Lee* |
-| Decide an ask — allow or decline, with a note | The people it is routed to, in a session; a role does not widen it — an Admin decides only once it is escalated to them | The ask reads; its acts are disabled, naming who it waits on |
+| Read an ask's content — what it will do, its arguments, what it will send | The people it is routed to, the person behind its run and anyone with Read on `run/<agent>`, with a logged reason | That an ask waits, its kind, its agent, who it waits on and its time left — content withheld |
+| Read an agent's named approvers | None — every signed-in person | — |
+| Name or change an agent's approvers | Manage on `agent/<name>`, in a session, signing in again | Disabled — *Needs Manage on agent/{name} — ask Priya or Lee* |
+| Decide an ask — allow or decline, with a note | The people it is routed to, in a session; no permission widens it — anyone else decides only once it is escalated to them | The ask reads; its acts are disabled, naming who it waits on |
 
 ## States
 
@@ -110,7 +110,7 @@ sequenceDiagram
 | No approver falls to the Admins | When an agent names no approvers, or none who can answer is left — every one inactive, or the person it benefits — the ask goes to the Admins and raises a *no approver* alert ([CP-F11](../../../control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) |
 | A single person warns | Naming one person as an agent's only approver is allowed, with a warning that one absence sends its asks to the Admins; a team or two people clear it |
 | A change to access waits for a second Admin | When a second Admin's yes is set ([AC-F02](../AC-F02-access-policies/feature.md#rules)), a saved change to an Access Policy, an attachment or a work connection is an ask routed to every other Admin; the Admin who made it is never in the route |
-| Only the people it is routed to decide | A role does not widen it — an Admin not routed to is refused like anyone else, until it is escalated to them. Any one of them decides; no quorum, no order. On a yes the engine checks the decider and every check again before the act goes |
+| Only the people it is routed to decide | No permission widens it — a person not routed to, whatever they hold, is refused like anyone else, until it is escalated to them. Any one of them decides; no quorum, no order. On a yes the engine checks the decider and every check again before the act goes |
 | Decided in a session | A decision is a person's signed-in act in Studio, the CLI or the API; a key or an agent never decides. A channel carries the ask and a link to it, never the decision |
 | Remind, escalate, expire | Each ask has a deadline. At half-time one reminder reaches those who have not decided; at three quarters it is escalated — the Admins join who it waits on, never the person it benefits; at the deadline it expires refused, never allowed |
 | Never decided by itself | Nothing set to Ask is ever decided by itself; expiry is a refusal, and tells the approvers and the person behind the run |
@@ -167,7 +167,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Route, after `/api/v1/access/approvals` | Does | Story |
 |---|---|---|
 | `GET /` | A page by the list contract: `?view=for_you · all · answered` (what the reader may decide · every pending ask they can see · decided and expired, newest first) · `?kind=` · `?status=` · `?agent=` · `?run_id=` · `?escalated=true` · `?q=` on the title; content withheld on rows the reader may not read; the tab counts are the engine's | AC-15 |
-| `POST /` | A person raises an ask for a role or an agent they lack — *Ask {name}* — `{grant, named_id?, act?}`; a repeat joins the open one | AC-07 |
+| `POST /` | A person raises an ask for a permission or an agent they lack — *Ask {name}* — `{grant, named_id?, act?}`; a repeat joins the open one | AC-07 |
 | `GET /{id}` | One ask with what it holds, who asked and on whose behalf, routed to and why, time left, reminder and escalation | AC-15 · AC-32 |
 | `POST /{id}/approve` | `{note? (2,000)}` — for this step of this run | AC-15 · AC-14 |
 | `POST /{id}/decline` | `{note, days? (≤ 90)}` — `days` declines the same item from that agent until then | AC-15 · AC-14 |
@@ -199,7 +199,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | On a yes, the decider may not decide it now, or a check the act needs now refuses — nothing runs | *{check} does not allow this now.* | AC-15.23 |
 | 409 | On a yes, a target of the act changed since the ask | *{target} changed since this was asked — {what}.* | AC-15.24 · AC-14.15 |
 | 422 | Naming an agent, the system user or a deactivated user as an approver | *Only active people answer asks.* | AC-26.3 |
-| 403 | Changing an agent's approvers by someone who is not an Admin, or with a key | *This needs the Admin role.* | AC-26.10 · AC-26.11 |
+| 403 | Changing an agent's approvers by someone without Manage on that agent, or with a key | *This needs Manage on agent/{name} — ask {who can grant}.* | AC-26.10 · AC-26.11 |
 | 403 | The Admin who made a change to access decides its ask | *Another Admin approves this change.* | AC-04.18 |
 | 422 | Declining for more than 90 days | *At most 90 days.* | AC-14.12 |
 | 404 | Reading an ask's content without the right to read its run | *Not found.* | AC-15.31 |

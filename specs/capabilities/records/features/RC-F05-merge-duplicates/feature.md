@@ -45,10 +45,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Compare two records | Every role — Operator, Modeller, Admin | — |
-| Merge them | Modeller · Admin, through an agent granted to them, on a connection that writes | Disabled — *Needs the Modeller role — ask an Admin*; a read-only connection gives its own reason |
+| Compare two records | Read on `data/<graph database>/<kind>` | — |
+| Merge them | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*; a read-only connection gives its own reason |
 
 ## States
 

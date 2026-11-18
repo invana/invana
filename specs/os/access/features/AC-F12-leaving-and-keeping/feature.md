@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J12 · A person leaves and the team keeps w
 flowchart TD
   start([Access › Keeping]) --> view["AC-44 · Each store: how long it is kept · holds"]
   view --> who{"Is the reader an Admin?"}
-  who -->|no| ro["Everything reads · each act disabled, naming the Admin role and the Admins"]
+  who -->|no| ro["Everything reads · each act disabled, naming Edit on setting/retention and who can grant it"]
   who -->|yes| ret["AC-44 · Set a store's retention · default Keep"]
   ret -->|shorter than today| prev["Preview: rows the next prune removes"]
   prev -->|confirm · sign in again| saved(["In force at the next prune · History"])
@@ -77,10 +77,10 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read each store's retention, the holds on and off, and the names setting | Every signed-in person — Operator, Modeller, Admin | — |
-| Set a store's retention · place or lift a legal hold · set the names setting | Admin, in a session, signing in again | Disabled — *Needs the Admin role — ask Priya or Lee* |
+| Read each store's retention, the holds on and off, and the names setting | None — every signed-in person | — |
+| Set a store's retention · place or lift a legal hold · set the names setting | Edit on `setting/retention`, in a session, signing in again | Disabled — *Needs Edit on setting/retention — ask Priya or Lee* |
 | Forget a subject · read the subjects forgotten | Admin, in a session, signing in again | Hidden — *Forget a subject* is not offered |
 | Export everything held about a person | Admin, in a session, signing in again | Hidden — *Export their data* is not offered on a person's row |
 
@@ -94,7 +94,7 @@ sequenceDiagram
 | Has data | Each store with its period, who set it and when, the date of its last prune; each hold with its reason, who placed it and when; the names setting; the subjects forgotten, newest first |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused act says why in place |
 | Agent working or proposing | — no agent sets retention, holds, the names setting, forgets or exports; an erasure waiting on a hold reads *Waiting for the hold on memory to lift* |
-| No access | An Operator or a Modeller reads each store, the holds and the names setting; each act is disabled, naming the Admin role and the Admins; *Forget a subject* and *Export their data* are not offered |
+| No access | A person without Edit on `setting/retention` reads each store, the holds and the names setting; each act is disabled, naming it and who can grant it; *Forget a subject* and *Export their data* are not offered |
 
 ## Rules
 
@@ -189,7 +189,7 @@ erasure is done by the feature that owns the store; this feature holds the setti
 | 409 | Forgetting a subject while memory is on hold | *Memory is on legal hold — lift the hold first.* | AC-46.6 |
 | 404 | Forgetting a record in a graph database the deployment does not have | *{database} is not connected.* | AC-46.8 |
 | 404 | A subject export for a user who is not a person | *{user} is not a person.* | AC-47.7 |
-| 403 | Any write here, or a forget or a subject export, by someone whose role is not Admin | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-44.10 · AC-45.8 · AC-46.10 · AC-47.8 |
+| 403 | Any write here, or a forget or a subject export, by someone without Edit on `setting/retention` | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-44.10 · AC-45.8 · AC-46.10 · AC-47.8 |
 | 403 | Any of these with a key or a connected client | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-44.11 · AC-46.11 · AC-47.9 |
 
 ### CLI
@@ -209,7 +209,7 @@ erasure is done by the feature that owns the store; this feature holds the setti
 | The pseudonym | `Former member · ` and four hex characters of the keyed hash of the user's id, unique among departures; every surface that names a person reads their display name from `access_users`, so the work names them by the code at once |
 | Forget | `record_hash = HMAC(ledger key, database ‖ kind ‖ record_id)`. Lineage walks from the `RecordRef` back along `CITES`, `FOUND`, `CAME_FROM` and `FROM` ([GP-F02 › Edge kinds](../../../graph/features/GP-F02-memory/feature.md#mechanisms)): the `RecordRef` and every `CITES` edge to it are removed; each `Evidence` node citing it holds its `record_hash` in place of the record ID; each copy built from that evidence has its content erased, keeping its kind, when, who made it and *Erased — a forgotten subject*. The ledger holds the hash in place of its record IDs for it, through [AC-F09](../AC-F09-what-left-the-platform/feature.md#engine); recall items citing it go through [AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md#engine). One transaction per owner; the counts are the engine's |
 | Forgotten stays forgotten | The outbox relay and a rebuild from History look up each `RecordRef`'s keyed hash in `access_forgotten_subjects` and skip it when the source row was written before the subject was forgotten |
-| Subject export | One JSON document, streamed: `profile` (username, name, email, role, teams, grants, default agent, created, signed in, deactivated) · `work` (History rows where the person is the actor or behind the run, their conversations with their turns, tasks they set or were assigned, asks they raised or answered) · `personal_connections` (each server, label, connected and last used — never a token — and the copies those connections returned). It passes the outbound check as the exit kind `subject_export` ([AC-F09](../AC-F09-what-left-the-platform/feature.md#engine)) and is one ledger row and one History row, naming its subject |
+| Subject export | One JSON document, streamed: `profile` (username, name, email, policies, teams, grants, default agent, created, signed in, deactivated) · `work` (History rows where the person is the actor or behind the run, their conversations with their turns, tasks they set or were assigned, asks they raised or answered) · `personal_connections` (each server, label, connected and last used — never a token — and the copies those connections returned). It passes the outbound check as the exit kind `subject_export` ([AC-F09](../AC-F09-what-left-the-platform/feature.md#engine)) and is one ledger row and one History row, naming its subject |
 
 ## System impact
 

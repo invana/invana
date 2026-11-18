@@ -44,12 +44,12 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every agent's usage — every resource, count and person behind | Admin | — |
-| Read an agent's usage over the runs the reader may read — runs they are behind and runs of a project their default agent may see | Every signed-in person — Operator, Modeller | The rest is counted, not shown — *N runs are not yours to read* |
-| Read access an agent never uses | Modeller · Admin | Hidden for an Operator; the agent's access reads in [AC-F04](../AC-F04-what-an-agent-may-touch/feature.md) |
-| Draft a narrower policy from unused access | Admin, in a session ([AC-06](../AC-F02-access-policies/stories/AC-06-draft-a-policy-and-see-who-it-changes/story.md)) | Disabled, naming the Admin role and the Admins |
+| Read every agent's usage — every resource, count and person behind | Read on `run/<agent>` and on `access/policies` | The usage over runs the reader may read — the rest counted, not shown |
+| Read an agent's usage over the runs the reader may read — runs they are behind and runs of a project their default agent may see | None — every signed-in person | The rest is counted, not shown — *N runs are not yours to read* |
+| Read access an agent never uses | Read on `access/policies` | Hidden; the agent's access reads in [AC-F04](../AC-F04-what-an-agent-may-touch/feature.md) |
+| Draft a narrower policy from unused access | Edit on Access, in a session ([AC-06](../AC-F02-access-policies/stories/AC-06-draft-a-policy-and-see-who-it-changes/story.md)) | Disabled, naming Edit on Access and who can grant it |
 
 ## States
 
@@ -61,7 +61,7 @@ flowchart TD
 | Has data | Each agent with its reads, writes and runs in the window and the people behind them; one agent's resources, each with its count and last use; access never used |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | Runs still going count as they settle; a running run reads *running* beside its count |
-| No access | An Operator or a Modeller reads usage over runs they may read; a line counts the rest |
+| No access | A person without Read on `access/policies` reads usage over runs they may read; a line counts the rest |
 
 ## Rules
 

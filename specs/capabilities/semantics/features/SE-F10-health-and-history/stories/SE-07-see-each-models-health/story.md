@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F10](../../feature.md)
 
 ## Who can
 
-Acting on what Health finds is the Modeller's and the Admin's; a suggested index is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Acting on what Health finds is the Modeller's and the Admin's; a suggested index is the Admin's alone ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

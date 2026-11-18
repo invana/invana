@@ -62,11 +62,11 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *Alerts* is *Acts* for Operator, Modeller and Admin — on every project the person can see
 ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)). Writing an alert rule is the Ontology's.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Write an alert rule and the project it opens leads in | Modeller · Admin ([SE-F07](../../../semantics/features/SE-F07-rules/feature.md)) | As SE-F07 |
 | Read a project's leads and the rule behind each | Anyone who may read the project | A project they may not read: its leads count, their content *Withheld — join the team or ask {who can grant}* |

@@ -56,7 +56,7 @@ sequenceDiagram
   participant E as Engine
   P->>S: works
   S->>E: a call with a short-lived access token
-  E->>E: who you are from the token · role and agents looked up now
+  E->>E: who you are from the token · permissions and agents looked up now
   E-->>S: allowed, or refused
   Note over S,E: the access token expires
   S->>E: renew with the refresh token
@@ -78,21 +78,21 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Sign in | Every person with an active account — Operator, Modeller, Admin. An agent and the system user never sign in | *Ask your admin for an account* — there is no sign-up form |
+| Sign in | Every person with an active account. An agent and the system user never sign in | *Ask your admin for an account* — there is no sign-up form |
 | Read and change one's own name, email, time zone and username | The person themselves, in a session | — |
 | Change one's own password | The person themselves, in a session, with the current password | — |
 | Sign out here · sign out everywhere | The person themselves, in a session | — |
-| Make an account · set a new password for one | Admin — from the command line, or signed in from Access › Who › *New person* or the API with the password again; never with a key ([AC-18](stories/AC-18-give-a-person-an-account/story.md)) | Refused, naming the Admin role |
-| Another person's profile, password or sessions | No one in Studio; an Admin deactivates a person ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)) | — |
-| Read who is signed in and when each last acted — coarse, from writes and runs only, never where or from which device ([AC-F06 › When one last acted](../AC-F06-history/feature.md#mechanisms)) | Admin, in the Access dropdown ([AC-48](../AC-F06-history/stories/AC-48-see-who-is-acting-and-what-was-blocked-from-the-header/story.md)) | Absent |
+| Make an account · set a new password for one | Create on Access, from the command line, or signed in from Access › Who › *New person* or the API with the password again; never with a key ([AC-18](stories/AC-18-give-a-person-an-account/story.md)) | Refused, naming Create on Access |
+| Another person's profile, password or sessions | No one in Studio; a person with Edit on Access deactivates a person ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)) | — |
+| Read who is signed in and when each last acted — coarse, from writes and runs only, never where or from which device ([AC-F06 › When one last acted](../AC-F06-history/feature.md#mechanisms)) | Read on `access/history`, in the Access dropdown ([AC-48](../AC-F06-history/stories/AC-48-see-who-is-acting-and-what-was-blocked-from-the-header/story.md)) | Absent |
 
 ## States
 
 | State | What the person sees |
 |---|---|
-| First use | The account as an Admin made it: name, email, username; one session — this one |
+| First use | The account as the person who made it entered it: name, email, username; one session — this one |
 | Empty after a filter | — no filter on this surface |
 | Loading | Sign in shows its card at once and the button says it is signing in; *Profile* opens at once, fields filling in place |
 | Has data | Profile, username and its rules, *Sign out here* and *Sign out everywhere* |
@@ -112,7 +112,7 @@ sequenceDiagram
 | A session is short-lived and renewable | A short-lived access token for every call, a refresh token that renews it; renewing retires the old one |
 | A session has an absolute lifetime | Every session ends 7 days after its sign-in, however often it renewed |
 | Reusing a retired refresh token ends every session | It is refused, every session of the account ends, and History records it |
-| Role and agents are read on every call | So a role change, a lost grant or a deactivation takes effect at the next call |
+| Permissions and agents are read on every call | So an attached or removed policy, a lost grant or a deactivation takes effect at the next call |
 | A password change ends every other session | Keys keep working — a script should not break because a person changed their password |
 | Risky acts sign in again | Changing access, keys or credentials asks for the password for that act, however recent the session; a key never does them |
 | Studio keeps the session in local storage, behind a strict policy | Both tokens sit in the browser's local storage; Studio is served with a Content Security Policy that runs scripts from its own origin only, so no injected script runs to read them |
@@ -149,7 +149,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | Keys — a `Bearer` value carrying the key prefix | [AC-F10](../AC-F10-keys/feature.md#engine) |
-| A person's kind, role, active or not, and the agents they may use | [AC-F03](../AC-F03-directory/feature.md#engine) |
+| A person's kind, active or not, the policies attached to them and the agents they may use | [AC-F03](../AC-F03-directory/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../AC-F06-history/feature.md#engine) |
 
 ### Routes
@@ -162,7 +162,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /refresh` | Rotate the pair — takes `{refresh_token}` in the body | AC-01 · AC-02 |
 | `POST /logout` | Retire this session's refresh row — takes `{refresh_token}` | AC-02 |
 | `POST /logout-everywhere` | Retire every refresh row of the account | AC-02 |
-| `GET /me` · `PATCH /me` | The account, its role and the agents it may use · change names, email, time zone, preferences and the username | AC-02 |
+| `GET /me` · `PATCH /me` | The account, its policies and the agents it may use · change names, email, time zone, preferences and the username | AC-02 |
 | `POST /me/password` | Change the password — `{current_password, new_password}`; every other session ends | AC-02 |
 
 ### Events
@@ -189,7 +189,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 401 | A refresh with an expired or unknown token, or past 7 days since sign-in | *This session has ended — sign in again.* | AC-02.14 · AC-02.20 |
 | 401 | A risky act without the password, or with a wrong one | *Enter your password again to do this.* | AC-02.21 |
 | 403 | Changing a password, making an account, or any risky act with a key | *This needs a person's session, not a key.* | AC-02.18 · AC-18.8 |
-| 403 | `POST /register` by someone whose role is not Admin | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-18.8 |
+| 403 | `POST /register` by someone without Create on Access | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-18.8 |
 | 401 | `POST /me/password` with a wrong current password | *Your current password is not right.* | AC-02.3 |
 | 422 | A password shorter than the deployment's minimum | *A password needs at least {n} characters.* | AC-02.3 · AC-18.5 |
 | 422 | A username outside the rules | *{username} cannot be a username — {rule}.* | AC-02.5 · AC-18.5 |
@@ -201,15 +201,15 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Command | Does |
 |---|---|
-| `invana users create --email --username --first-name [--last-name] [--role]` | Makes a person's account for whoever has shell access; prompts for the password, never a default; `--role` is Operator unless given |
+| `invana users create --email --username --first-name [--last-name]` | Makes a person's account for whoever has shell access; prompts for the password, never a default; the person holds the newcomers' policies — *Read only* out of the box — and nothing more |
 | `invana users update-password <email or username>` | Sets a new password; the account's other sessions end, its keys keep working, a lock on its email clears |
 
 ### Mechanisms
 
 | Mechanism | How |
 |---|---|
-| The access token carries identity only | A short-lived JWT (15 minutes): the subject and its session — never the role or the agents one may use, both of which change while a token lives |
-| Role and agents looked up per request | Every call reads the person's role, active state and grants now ([AC-F03](../AC-F03-directory/feature.md#engine)), so a change takes effect on the next call |
+| The access token carries identity only | A short-lived JWT (15 minutes): the subject and its session — never the policies or the agents one may use, both of which change while a token lives |
+| Policies and agents looked up per request | Every call reads the person's policies, active state and grants now ([AC-F03](../AC-F03-directory/feature.md#engine)), so a change takes effect on the next call |
 | The refresh token is a row | Opaque, hashed, one live row per session; retiring it is a database update, there is no denylist |
 | Rotation | One transaction retires the presented row and issues a new pair; `signed_in_at` carries over and `expires_at` never passes `signed_in_at` + 7 days, so rotating never freshens a sign-in or lengthens a session |
 | Reuse | A presented row already retired as `rotated` retires every live row of the account as `reuse` and writes `access.auth.reuse_detected` |

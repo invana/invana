@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 ## Who can
 
 A memory node inherits its sources' resources ([GP-06](../GP-06-see-where-any-excerpt-came-from-and-who-may-see-it/story.md)).
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table); the
+Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); the
 person's agent is their default agent ([AC-F02 › Rules › The default agent](../../../../../access/features/AC-F02-access-policies/feature.md#rules)).
 
 | Access | Can | Otherwise sees |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md) · Its evals: [
 
 ## Who can
 
-Publishing and rolling back is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Publishing and rolling back is the Modeller's and the Admin's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

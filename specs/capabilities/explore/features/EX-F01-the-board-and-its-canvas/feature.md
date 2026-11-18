@@ -82,13 +82,13 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *board* is *Acts* for Operator, Modeller and Admin — through an agent granted to the person, within that agent's
 Access Policies. A board is the organisation's, keeping who made it ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md));
 making it grants nothing. Board reads run as the built-in Assistant; saving edits is *Edit on the board*
 ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)).
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Open a board · look, pan, zoom, select | Every role — Operator, Modeller, Admin; what it draws reads through the person's default agent | *Not found* for a board that does not exist; a board or answer built on a source the default agent may not Read is *Not found* |
 | Expand a node · count the kinds | Every role, through the Assistant, within its Access Policies | A kind a rule denies: refused, naming the rule · no Assistant: *{person} may not use Assistant — ask an Admin* |

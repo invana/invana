@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Answering an ask is every role's, for an ask that names the person ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Answering an ask is every role's, for an ask that names the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

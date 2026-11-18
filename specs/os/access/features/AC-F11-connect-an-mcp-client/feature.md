@@ -77,12 +77,12 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Register a client · read the metadata | Anyone who can reach the deployment — no credential; rate-limited | — |
-| Connect a client as oneself — consent | Every person with an active account — Operator, Modeller, Admin — in a session, with the password again | An agent and the system user never sign in, so never consent; a client that is no one person uses a project key |
+| Connect a client as oneself — consent | Every person with an active account, in a session, with the password again | An agent and the system user never sign in, so never consent; a client that is no one person uses a project key |
 | Read and revoke one's own connected clients | Every signed-in person, in a session; revoking with the password again | — |
-| Read every connected client · revoke any | Admin, in a session; revoking with the password again | *Access › Who › Connected clients* locked — *Needs the Admin role — ask Priya or Lee*; another person's client is absent (`404`) |
+| Read every connected client · revoke any | Manage on Access, in a session; revoking with the password again | *Access › Who › Connected clients* locked — *Needs Manage on Access — ask Priya or Lee*; another person's client is absent (`404`) |
 | Call the MCP server | A connected client, as its person · a key, as key ∩ owner | `401` with where to find the metadata |
 
 ## States
@@ -95,7 +95,7 @@ sequenceDiagram
 | Has data | The consent card; one row per connected client: name · returns to · connected · last used |
 | Failed | A bad authorize request is an error page naming what was wrong; a list that could not load says so, with *Try again* |
 | Agent working or proposing | — no agent connects or revokes a client |
-| No access | An Operator or a Modeller reads *Access › Who › Connected clients* as locked, naming the Admin role |
+| No access | A person without Manage on Access reads *Access › Who › Connected clients* as locked, naming Manage on Access |
 
 ## Rules
 
@@ -107,7 +107,7 @@ sequenceDiagram
 | Clients register themselves | Dynamic client registration (RFC 7591); a name a client gives itself is shown as *Unverified*. Return addresses are `https` or loopback, matched exactly — a loopback's port may vary |
 | Consent is a person's yes | A signed-in person, with the password again; nothing is connected without it, and a code is sent only to a registered return address |
 | Tokens are bound to the MCP server | Every authorize and token request names the MCP server as its resource (RFC 8707); a token carries it as its audience and is refused anywhere else |
-| A connected client acts as its person | Their role and the agents they may use, read at each call; every call is ledgered naming the person and the client |
+| A connected client acts as its person | Their policies and the agents they may use, read at each call; every call is ledgered naming the person and the client |
 | Never session-only acts | A connected client never manages keys, access or credentials |
 | Revoking ends it at once | Every access and refresh token of the connection ends; the client connects again from the start |
 | Sign out and password changes leave clients alone | Only revoking or deactivating the person ends a connected client |
@@ -123,7 +123,7 @@ sequenceDiagram
 | Registered clients — name, return addresses | Write · read |
 | Connections — a person's yes to a client, with last use and revocation | Write · read |
 | Codes and tokens — hashed | Write · read |
-| The person's role, active state and agents (AC-F03) | Read |
+| The person's policies, active state and agents (AC-F03) | Read |
 | History rows of a registration, a consent, a denial, a revoke and a reuse (AC-F06) | Write |
 
 ## Engine
@@ -145,7 +145,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | The session, signing in again, the lock and the rate limit | [AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine) |
-| The person's role, active state and the agents they may use | [AC-F03](../AC-F03-directory/feature.md#engine) |
+| The person's policies, active state and the agents they may use | [AC-F03](../AC-F03-directory/feature.md#engine) |
 | The one evaluator | [AC-F02](../AC-F02-access-policies/feature.md#engine) |
 | A key on the MCP server | [AC-F10](../AC-F10-keys/feature.md#engine) |
 | The ledger row of each call | [AC-F09](../AC-F09-what-left-the-platform/feature.md#engine) |
@@ -209,7 +209,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | PKCE | The code stores the `S256` challenge; the token request's verifier must hash to it |
 | Consent is session-bound | `POST /oauth/consent` needs a person's session token and verifies `password` as [signing in again](../AC-F01-sign-in-account-and-sessions/feature.md#mechanisms) does; `state` is returned to the client unchanged |
 | Rotation and reuse | Each refresh retires the presented refresh token and issues a new pair; a retired one presented again revokes the connection with `revoked_why = reuse` |
-| Read at each call | The person's role, active state and agents are read at each MCP call; a deactivation revokes their connections with `revoked_why = deactivated` |
+| Read at each call | The person's policies, active state and agents are read at each MCP call; a deactivation revokes their connections with `revoked_why = deactivated` |
 | Who is behind the call | The person of the connection, and the connection's client name, are what the ledger and History record — never a name the client sends in a header |
 | Cleanup | Registrations with no connection after 24 hours, used and expired codes, and retired tokens past their expiry are removed by the deployment's housekeeping |
 | Revoking | Sets `revoked_at`, `revoked_by_id` and `revoked_why` and retires every token of the connection; in the same act stops every run with its `client_connection_id` that is queued or running, as [a stop](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#mechanisms) does, `stopped_by_id` the revoker — a History row for the revoke and one per run. When an Admin revokes another person's connection, an Update reaches that person in the Inbox ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md)), naming the client and the Admin |

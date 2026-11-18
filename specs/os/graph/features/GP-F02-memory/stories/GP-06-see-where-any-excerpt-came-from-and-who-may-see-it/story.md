@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 
 A copy shows to a person only when the person's **default agent** may Read every one of its sources
 ([AC-F02 › Rules › The default agent](../../../../../access/features/AC-F02-access-policies/feature.md#rules)).
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table); a run's
+Roles are [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a run's
 transcript has its own privacy rule on top ([AC-F09](../../../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)).
 
 | Access | Can | Otherwise sees |

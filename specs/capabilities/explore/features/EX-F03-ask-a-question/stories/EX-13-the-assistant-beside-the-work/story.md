@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open, close and reopen the assistant; attach or remove the selection; switch it off for themselves | — |
-| Operator | The same, through the agents they may use; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | No agent they may use: the assistant opens with its composer disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same, through the agents they may use; a Modeller the same ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ask a question*) | No agent they may use: the assistant opens with its composer disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 

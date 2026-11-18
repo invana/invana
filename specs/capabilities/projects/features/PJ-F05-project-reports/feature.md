@@ -50,11 +50,11 @@ flowchart TD
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *Reports* is *Acts* for Operator, Modeller and Admin — on every project the person can see
 ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read the draft and every version · export a version | Anyone who can see the project, as far as their default agent reads the report's sources | A project they may not read: the report lists, its content withheld; a report with a source their agent may not Read is absent, with no note |
 | Draft from the records · edit the draft · publish a version | Anyone who can see the project — Operator · Modeller · Admin; a publish and an export pass [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) | On an archived project, every version reads; *Draft from the records*, *Edit* and *Publish* are off |

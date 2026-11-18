@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
+The board is *Acts* for Operator, Modeller and Admin ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
 
 | Access | Can | Otherwise sees |
 |---|---|---|

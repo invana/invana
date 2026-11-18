@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 ## Who can
 
-Running a test is the Modeller's and the Admin's ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); a script step reads as the run's content does (AC-31), the role adding none.
+Running a test is the Modeller's and the Admin's ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); a script step reads as the run's content does (AC-31), the role adding none.
 
 | Access | Can | Otherwise sees |
 |---|---|---|

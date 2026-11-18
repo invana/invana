@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Re-run any ended question or typed query, as it was, on today's versions or retuned | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): re-run an ended question or typed query they are behind | *Re-run* on any other run is disabled: *Only {person} or an Admin can re-run this run.* |
+| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): re-run an ended question or typed query they are behind | *Re-run* on any other run is disabled: *Only {person} or an Admin can re-run this run.* |
 
 ## Flow
 

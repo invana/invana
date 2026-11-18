@@ -28,7 +28,7 @@ flowchart TD
   how -->|a file in the browser| up["RC-08 · Upload: a file, the model it goes into, its key, licence"]
   up --> prev["What it becomes — columns, the kinds and properties each maps to, examples"]
   prev -->|missing or repeated keys| upx["Refused — names the first five rows"]
-  prev -->|an Operator| una["Upload disabled — Needs the Modeller role"]
+  prev -->|without Create on the kind| una["Upload disabled — Needs Create on the kind"]
   prev -->|Load| run
   how -->|a pipeline · the command line or the API| cli["RC-09 · A load into a model"]
   cli -->|no such model · read-only connection| clx["Refused before anything is written"]
@@ -59,12 +59,12 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Load into a model — upload, command line, API, a bundle, records by hand | Modeller · Admin, through an agent granted to them | *Upload* and *Add records* disabled — *Needs the Modeller role — ask an Admin*; the command line and API refuse before anything is written |
-| Read the loads, what each rejected and what landed | Every role — Operator, Modeller, Admin | — |
-| Export a load with its provenance | Every role — Operator, Modeller, Admin | — |
-| Undo a load | Modeller · Admin | *Undo load* disabled — *Needs the Modeller role — ask an Admin* |
+| Load into a model — upload, command line, API, a bundle, records by hand | Create on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/loader`) | *Upload* and *Add records* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; the command line and API refuse before anything is written |
+| Read the loads, what each rejected and what landed | Read on `data/<graph database>` | — |
+| Export a load with its provenance | Read on `data/<graph database>` | — |
+| Undo a load | Edit on `data/<graph database>/<kind>` | *Undo load* disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
 | Cancel a load | Who started it, where they started it | Studio offers no cancel: a load is stopped where it was started |
 
 ## States
@@ -77,7 +77,7 @@ flowchart TD
 | Has data | A preview of what the file becomes; loads newest first with records written and rejected; a run's outcome, steps, what was rejected, its log and what landed |
 | Failed | A refused upload names the rows or the reason; a failed load shows its diagnosis and the next step where its counts are |
 | Agent working or proposing | — |
-| No access | Loading acts are disabled — *Needs the Modeller role — ask an Admin*; every load still reads |
+| No access | Loading acts are disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; every load still reads |
 
 ## Rules
 
@@ -168,7 +168,7 @@ flowchart TD
 | 404 | The load names no model, or one the deployment lacks | *No model `{name}` — the published models are {models}.* | RC-09.1 |
 | 409 | The graph database's connection is read-only | *This graph database's connection is read-only — loading needs a writable connection.* | RC-09.2 |
 | 403 | A rule refuses writing into the model | *Cannot answer — `{rule}` refuses writing into `{model}`.* | RC-09.3 |
-| 403 | The caller is an Operator | *Needs the Modeller role — ask an Admin.* | RC-08.9 |
+| 403 | The caller lacks Create on the kind | *Needs Create on data/{graph database}/{kind} — ask {who can grant}.* | RC-08.9 |
 | 415 | A file that is not rows with a header — a document, a paper, free text | *Only rows that fit a kind can be loaded — extract them first.* | RC-08.10 |
 | 422 | A load an agent starts that names a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | RC-08.11 |
 | 422 | Rows without a key, or two rows with one key, in an upload | *{n} rows have no key or repeat one — the first five: {rows}.* | RC-08.4 |
@@ -233,7 +233,7 @@ flowchart TD
 | The browser reads the file | Rows left out for having no key are listed in the load's report |
 | Records by hand are a load | The new records are one load, its source *by hand*, the person its author; a new record never overwrites a key; above 5,000 records the form points to the command |
 | A bulk load is listed when it names its graph database | The graph database supplies the connection and the load is listed; a connection typed on the command line runs direct and is not listed, because credentials never ride a run — the command says so |
-| Loading needs the Modeller role | Writing records into a model is the Modeller's and the Admin's, in the browser, the CLI and the API alike; which records a load reaches is the agent's Access Policies |
+| Loading needs Create on the kind | Writing records into a model needs Create on `data/<graph database>/<kind>`, in the browser, the CLI and the API alike; which records a load reaches is also the agent's Access Policies |
 | Experimental | Records by hand carry an *Experimental* badge on their act and page head |
 | A saved result is a load | Records saved from a run's result are one load, its source *run*, naming that run and the loads it was pinned to; its records read *derived*, and undoing an input flags it like any other citation |
 

@@ -52,11 +52,11 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and the fix queue | Every role — Operator, Modeller, Admin | — |
-| Run a check | Every role — Operator, Modeller, Admin | — |
-| Fix a problem from the queue | Every role — Operator, Modeller, Admin, through an agent granted to them, on a connection that writes | Disabled, naming the Access Policy of the agent that may not write the record |
+| Read records, their provenance and the fix queue | Read on `data/<graph database>/<kind>` | — |
+| Run a check | Read on `data/<graph database>/<kind>` | — |
+| Fix a problem from the queue | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled, naming the Access Policy of the agent that may not write the record |
 
 ## States
 

@@ -18,13 +18,13 @@ Tasks: [task.md](task.md) · Feature: [AC-F09](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../AC-F02-access-policies/feature.md#the-role-table). The check has no switch: no
-role turns it off.
+Permissions are [the permission catalogue](../../../AC-F02-access-policies/feature.md#the-permission-catalogue). The check has no switch: no
+permission turns it off.
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every target with its locality; mark an AI model local or external in AI models; read every refused and left-out exit in *What left* | — |
-| Operator | Read every target with its locality; read the refused and left-out exits of runs they may read (AC-31); see in their own run which step was stopped and why; a Modeller the same, and sets a property's level in Meaning (SE-20) | Marking a model is disabled, naming the Admins; exits of runs they may not read show their target, verdict and tokens, content withheld |
+| Operator | Read every target with its locality; read the refused and left-out exits of runs they may read (AC-31); see in their own run which step was stopped and why; with Edit on the model, the same, and sets a property's level in Meaning (SE-20) | Marking a model is disabled, naming Edit on `setting/ai-models` and who can grant it; exits of runs they may not read show their target, verdict and tokens, content withheld |
 
 ## Flow
 
@@ -40,7 +40,7 @@ flowchart TD
   kind -->|a result or a document: a client, a runtime, a channel, an export, a report, pull-request text| lo(["Leaves without those values · names what was left out"])
   rf --> led["A ledger row · Refused"]
   lo --> led2["A ledger row · Left out, with each property and level"]
-  rf -->|in the run| why(["The step reads what stopped it · Use a local model · Ask a Modeller about its level"])
+  rf -->|in the run| why(["The step reads what stopped it · Use a local model · Ask a person who may edit the model about its level"])
 ```
 
 ## Acceptance criteria
@@ -59,7 +59,7 @@ flowchart TD
 | AC-42.10 | A step stopped by the check | its person opens the run | the step reads the property, its level and the target, with *Use a local model* and who sets a level (SE-20) |
 | AC-42.11 | Every refused and left-out exit | *What left* is read | each is a row with verdict *Refused* or *Left out*, the property and level, never the value; the head counts both (AC-30) |
 | AC-42.12 | Any exit | it would leave without passing the check — a new caller, a missed path | it does not leave: every exit is recorded in *What left* before it leaves, and recording runs the check |
-| AC-42.13 | An Operator or a Modeller | they try to mark an AI model local | it is refused — *This needs an Admin* |
+| AC-42.13 | A person without Edit on `setting/ai-models` | they try to mark an AI model local | it is refused — *This needs Edit on setting/ai-models — ask {who can grant}.* |
 
 ## Screens
 

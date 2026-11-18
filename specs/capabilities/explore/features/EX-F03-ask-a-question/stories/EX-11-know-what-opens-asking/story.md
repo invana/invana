@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the lock and what is left; open the step that does it — *Connect a graph database* or *Open Model* to publish the model | — |
-| Operator | Read the lock and what is left. A Modeller also opens *Open Model* to publish the model | *Ask an Admin* in place of the step's act; a step only an Admin takes names the Admin role ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) |
+| Operator | Read the lock and what is left. A Modeller also opens *Open Model* to publish the model | *Ask an Admin* in place of the step's act; a step only an Admin takes names the Admin role ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) |
 
 ## Flow
 

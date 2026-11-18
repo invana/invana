@@ -92,8 +92,8 @@ sequenceDiagram
 
 ## Access
 
-The role each act needs is the one role table's row *Graph databases — connect, mode, switch, health*
-([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); this table
+The permission each act needs is the permission catalogue's row for `setting/graph-databases` — connect, mode, switch, health
+([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this table
 names the acts.
 
 | Act | Role | Everyone else sees |
@@ -173,7 +173,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Record | Owner |
 |---|---|
-| Who may act and the role table | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
+| Who may act and the permission catalogue | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | Signing in again for an act | [AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine) |
 | Rules, projects and workflows that name a graph database | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) · [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | The drafted model, and whether a model is published | [SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md#engine) · [SE-F02](../../../../capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
@@ -281,7 +281,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The model is shaped while connecting | The Modeller agent reads the schema and proposes a draft before anything is saved; publishing happens in Model |
 | The name is fixed | It is the resource segment every rule names; renaming would silently change what rules reach |
 | Read + write needs the password | It widens what agents can do to customer data — a change to access ([NFR-SEC-4](../../../../system-design.md#3-non-functional-requirements)) |
-| Reconnecting is an Admin's | It changes nothing the graph database holds, but the one role table gives Operators and Modellers reads only; an unreachable database raises an ops alert to the Admins |
+| Reconnecting needs Edit on `setting/graph-databases` | It changes nothing the graph database holds, but the permission catalogue gives a reader of the setting reads only; an unreachable database raises an ops alert to the Admins |
 | Demo data is a graph database | The developer setup connects one, marked demo; *Try it on demo data* opens Explore on it. An Admin switches it off or removes it like any other |
 | Home is the only place before set-up | Until a graph database is connected or someone picks *Try it on demo data*, mode switches are disabled and the leftNav holds no views; an Operator is offered *Ask {Admin}* where an Admin sees *Connect a graph database* |
 | Connecting starts in two places | Settings › Connections › Graph databases and Home before set-up — never the switcher's *New* |
@@ -293,7 +293,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| The one role table has no row for a person's own graph database switch; this feature lets every signed-in person narrow their own runs, as the glossary's *On · Off* says. Recommend: add *Graph databases — a person's own switch: Own · Own · Own* beside the plugins' row | Ravi |
+| The permission catalogue has no row for a person's own graph database switch; this feature lets every signed-in person narrow their own runs, as the glossary's *On · Off* says. Recommend: add *Graph databases — a person's own switch: Own · Own · Own* beside the plugins' row | Ravi |
 
 ## Not building
 

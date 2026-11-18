@@ -16,19 +16,19 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
-Loading records is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Loading records needs Create on `data/<graph database>/<kind>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Upload a file into any published model and load it | — |
-| Operator | Read the loads. A Modeller uploads as an Admin does | *Upload* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | Read the loads. With Create on the kind, uploads as an Admin does | *Upload* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([Model › Graph Data › Loads › Bring records in · Upload]) --> g{Modeller or Admin?}
-  g -->|no| na["Upload disabled — Needs the Modeller role"]
+  a([Model › Graph Data › Loads › Bring records in · Upload]) --> g{Create on the kind?}
+  g -->|no| na["Upload disabled — Needs Create on the kind"]
   g -->|yes| f["Drop a file"]
   f --> m["Pick the model · the key column · the licence"]
   m --> p["What it becomes: each column, the kind and property it maps to, an example"]
@@ -49,7 +49,7 @@ flowchart LR
 | RC-08.6 | A file whose content hash matches an earlier load into the same model | it is previewed | it reads *Unchanged — loading it updates nothing*, naming the earlier load |
 | RC-08.7 | Columns that map to no property of the model | the preview shows | they are listed as *not loaded*, never silently dropped |
 | RC-08.8 | A file the browser cannot read | it is dropped | it says why, with *Choose another* |
-| RC-08.9 | An Operator | they open Bring records in | *Upload* is disabled with *Needs the Modeller role — ask an Admin* |
+| RC-08.9 | A person without Create on the kind | they open Bring records in | *Upload* is disabled with *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
 | RC-08.10 | A document, a paper or any file that is not rows with a header | it is dropped | it is refused before anything is read: *Only rows that fit a kind can be loaded — extract them first*; nothing is written |
 | RC-08.11 | A load an agent starts whose rows name a kind or a property that *Hidden from agents* hides | it starts | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is written; a load a person starts through the Loader is held to the person's own policies, not to the entry ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 

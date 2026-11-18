@@ -76,7 +76,7 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read the map, a model, a kind, the links between models and their history | Every signed-in person — Operator, Modeller, Admin | — |
 | Link two models · commit or discard staged links · remove a link | Modeller · Admin | *Link models* disabled — *Needs the Modeller role — ask an Admin*; a drag between models does nothing and says why |

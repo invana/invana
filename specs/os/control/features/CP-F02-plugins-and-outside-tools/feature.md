@@ -104,7 +104,7 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every plugin, its functions and versions, what each needs, its switches and who set them | Every signed-in person — Operator, Modeller, Admin | — |
 | Turn a plugin on or off for the deployment | Admin | The deployment's switch reads, naming who set it — *Ask an Admin — Priya or Lee* |
@@ -222,7 +222,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Record | Owner |
 |---|---|
-| The role table, the evaluator, the built-in policies, the default agent and the second-Admin setting | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
+| The permission catalogue, the evaluator, the built-in policies, the default agent and the second-Admin setting | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | The gate — switches, declared needs and the caller chain at each step | [AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md#engine) |
 | The outbound check | [AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine) |
 | Lineage of what a call returns | [GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine) |

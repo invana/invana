@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F02](../../feature.md)
 
 ## Who can
 
-The catalogue is *Acts* for every role in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); granting and default agents are the Directory's.
+The catalogue is *Acts* for every role in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); granting and default agents are the Directory's.
 
 | Access | Can | Otherwise sees |
 |---|---|---|

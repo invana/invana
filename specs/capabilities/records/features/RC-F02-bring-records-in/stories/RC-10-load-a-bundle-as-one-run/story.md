@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
-Loading a bundle is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Loading a bundle needs Create on `data/<graph database>/<kind>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Check and load any bundle; read its run | — |
-| Operator | Check a bundle offline; read a bundle's run. A Modeller loads it as an Admin does | Loading refused before anything is written — *Needs the Modeller role — ask an Admin* |
+| Operator | Check a bundle offline; read a bundle's run. With Create on the kind, loads it as an Admin does | Loading refused before anything is written — *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
 
 ## Flow
 

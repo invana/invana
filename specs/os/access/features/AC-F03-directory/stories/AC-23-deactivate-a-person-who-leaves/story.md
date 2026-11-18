@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Deactivate a person, naming a successor; choose whether the leaver's tasks go to the successor or back to *Open*; reactivate them. Each asks them to sign in again | Their own row has no *Deactivate*; an Admin's row has none while only two Admins are active |
-| Operator | Read who is deactivated, by whom, when and who succeeded them; a Modeller reads the same | *Deactivate* and *Reactivate* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read who is deactivated, by whom, when and who succeeded them | *Deactivate* and *Reactivate* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -60,7 +60,7 @@ flowchart TD
 | AC-23.11 | The successor | the deactivation saves | their Inbox lists what they took over — chats, tasks, project team places — and the personal agents they may adopt (AC-43) |
 | AC-23.12 | A deactivated person | an Admin chooses *Reactivate* and signs in again | they may sign in again with their teams and policies; nothing handed on comes back, and erased data stays erased |
 | AC-23.13 | A deactivation or a reactivation | History is read | it shows who did it, to whom, when, the successor and what went where (AC-F06) |
-| AC-23.14 | An Operator or a Modeller | they open a deactivated person's row | it reads *Deactivated by Lee on 3 March · succeeded by Sam*; *Reactivate* is disabled, naming the Admin role and the Admins |
+| AC-23.14 | A person without Edit on Access | they open a deactivated person's row | it reads *Deactivated by Lee on 3 March · succeeded by Sam*; *Reactivate* is disabled, naming Edit on Access and who can grant it |
 | AC-23.15 | Deactivating could not save | it is sent | nothing changes — no hand-over, no fallback, no erasure — and the modal says why, with *Try again* |
 
 ## Screens

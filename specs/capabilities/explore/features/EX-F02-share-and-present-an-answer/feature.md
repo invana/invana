@@ -60,12 +60,12 @@ flowchart TD
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *share* is *Acts* for Operator, Modeller and Admin — through an agent granted to the person, within that agent's
 Access Policies. A board is the organisation's, made by a person ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)); sharing it
 tells the people and teams picked and gives them its link, and a link carries no access of its own.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Share a board's answer with users and teams — a live link or a frozen snapshot · stop sharing | Every role, with the Assistant | *Share* disabled — *{person} may not use Assistant — ask an Admin* |
 | Open a shared link | Every signed-in person; what it shows reads through their default agent | *Not found* for a board or snapshot that does not exist |

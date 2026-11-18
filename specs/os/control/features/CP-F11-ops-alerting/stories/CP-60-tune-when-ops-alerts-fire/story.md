@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and set each kind's threshold; read, write, switch off and remove History alerts | — |
-| Operator | Operator · Modeller: read each kind, its threshold and whom it reaches; read every History alert ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit*, *New History alert* and a History alert's switch disabled — *Needs the Admin role — ask {admins}* |
+| Operator | Operator · Modeller: read each kind, its threshold and whom it reaches; read every History alert ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit*, *New History alert* and a History alert's switch disabled — *Needs the Admin role — ask {admins}* |
 
 ## Flow
 

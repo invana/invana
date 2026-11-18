@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and set each store's period, or *Keep*; place and lift a legal hold on memory or History, with a reason. Each change asks them to sign in again | — |
-| Operator | Read each store's period, the holds and who set them; a Modeller reads the same | *Set*, *Place a hold* and *Lift* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read each store's period, the holds and who set them | *Set*, *Place a hold* and *Lift* disabled — *Needs Edit on setting/retention — ask Priya or Lee* |
 
 ## Flow
 
@@ -54,7 +54,7 @@ flowchart TD
 | AC-44.7 | A store on hold | its prune comes, or someone forgets a subject or a person leaves | no prune runs on it; forgetting is refused (AC-46.6); a departed person's erasure from memory waits, reading *Waiting for the hold on memory to lift* (AC-45.6) |
 | AC-44.8 | A store already on hold | an Admin places another hold on it | it is refused — *{store} is already on hold* |
 | AC-44.9 | A hold | an Admin lifts it and signs in again | the store's prunes resume and every erasure waiting on it runs, oldest first; History records who lifted it and when |
-| AC-44.10 | An Operator or a Modeller | they open *Leaving and keeping* | each store, hold and setting reads; *Set*, *Place a hold* and *Lift* are disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-44.10 | A person without Edit on `setting/retention` | they open *Leaving and keeping* | each store, hold and setting reads; *Set*, *Place a hold* and *Lift* are disabled, naming Edit on `setting/retention` and who can grant it; the API refuses the write |
 | AC-44.11 | A retention or hold change made with a key | it is sent | it is refused — it needs a person's session |
 | AC-44.12 | The settings could not load or save | the section opens or a change is sent | it reads what failed, with *Try again*; nothing changes |
 

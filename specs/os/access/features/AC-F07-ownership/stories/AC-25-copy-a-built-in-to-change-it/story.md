@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Copy any built-in; an agent copy is their personal agent, any other copy the organisation's, made by them | — |
-| Operator | Read every built-in, its owner *System* and its version; a Modeller copies a built-in agent, skill or workflow | *Copy* disabled, naming the role it needs — *Needs the Modeller role* for an agent, a skill or a workflow, *Needs the Admin role* for a policy — and who holds it |
+| Operator | Read every built-in, its owner *System* and its version; with Create on its kind, copies a built-in agent, skill, workflow or policy | *Copy* disabled, naming the permission it needs — *Needs Create on agents* for an agent, *Create on skills* for a skill, *Create on workflows* for a workflow, *Create on Access policies* for a policy — and who can grant it |
 
 ## Flow
 
@@ -28,7 +28,7 @@ flowchart TD
   b([A built-in · owner System]) --> e{"Edit?"}
   e --> ne["No Edit · Copy to change it"]
   ne --> c{"May the reader make one of its kind?"}
-  c -->|no| na(["Copy disabled · names the role and who holds it"])
+  c -->|no| na(["Copy disabled · names the permission and who can grant it"])
   c -->|yes| cp["Copy · a name for it"]
   cp -->|name taken| nt["Refused in place, naming it"]
   cp --> mine(["A custom one · copied from the built-in at its version · made by you · attached to nothing"])
@@ -44,10 +44,10 @@ flowchart TD
 |---|---|---|---|
 | AC-25.1 | A built-in agent, skill, workflow or Access Policy | it is read | its owner reads *System*, with the version Invana ships; it offers *Copy* and no *Edit*, *Delete* or owner acts |
 | AC-25.2 | A built-in | an edit, a delete or an owner change is sent through the API | it is refused — an edit or a delete: *{name} is built in — copy it to change it*; an owner change: *{name} is the organisation's — nobody owns it alone* |
-| AC-25.3 | A person whose role may make one of its kind | they *Copy* it with a free name | a custom one exists, reading *Copied from {built-in} at version {n}* and *Made by {person}* — an agent as their personal agent, anything else as the organisation's; History records it |
+| AC-25.3 | A person who may Create one of its kind | they *Copy* it with a free name | a custom one exists, reading *Copied from {built-in} at version {n}* and *Made by {person}* — an agent as their personal agent, anything else as the organisation's; History records it |
 | AC-25.4 | A copy of a built-in agent | it is made | it carries the built-in's instructions and skills, is its maker's personal agent granted to them alone, and has no policy attached until an Admin attaches one (AC-11); it reaches others only once shared (AC-24) and granted (AC-39) |
 | AC-25.5 | A copy | Invana ships a new version of its built-in | the copy stays as it is, at the version it came from |
-| AC-25.6 | A person whose role may not make one of its kind | they open the built-in | it reads in full; *Copy* is disabled, naming the role it needs and who holds it |
+| AC-25.6 | A person who may not Create one of its kind | they open the built-in | it reads in full; *Copy* is disabled, naming the permission it needs and who can grant it |
 | AC-25.7 | A name already used for one of its kind | a copy is made with it | it is refused in place, naming it |
 | AC-25.8 | A copy could not be made | *Copy* is sent | nothing is made; the reason reads in place, with *Try again* |
 
@@ -56,6 +56,6 @@ flowchart TD
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A built-in's owner and Copy | Admin | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | settings.me · Owners · Could not copy | — | — |
-| A built-in's owner and Copy | Operator | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | — | — | settings.me · Owners · Locked · Copy needs a role |
+| A built-in's owner and Copy | Operator | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | — | — | settings.me · Owners · Locked · Copy needs a permission |
 | The copy | Admin | — | — | — | settings.me · Owners · Copied | settings.me · Owners · Name taken | — | — |
-| The copy | Operator | — | — | — | — | — | — | settings.me · Owners · Locked · Copy needs a role |
+| The copy | Operator | — | — | — | — | — | — | settings.me · Owners · Locked · Copy needs a permission |

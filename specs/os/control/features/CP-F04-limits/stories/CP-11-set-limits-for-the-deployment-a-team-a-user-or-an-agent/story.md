@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every limit with what is used now; set, change or clear the deployment's, a team's, a user's or an agent's limits | — |
-| Operator | Operator · Modeller: read every limit, what is used now and its meter ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Operator | Operator · Modeller: read every limit, what is used now and its meter ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs the Admin role — ask {admins}* |
 
 ## Flow
 

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set *Keep* or *Pseudonymise* for departed people's names, signing in again; read before deactivating a person what will be erased (AC-23) | — |
-| Operator | Read the setting; read a departed person's work under their name or their code; a Modeller reads the same | *Change* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read the setting; read a departed person's work under their name or their code | *Change* disabled — *Needs Edit on setting/retention — ask Priya or Lee* |
 
 ## Flow
 
@@ -52,7 +52,7 @@ flowchart TD
 | AC-45.5 | A person deactivated under *Keep* | their work is read — tasks, findings, decisions, History | it names them as before, marked *Deactivated* |
 | AC-45.6 | Memory on hold | a person is deactivated | their personal connections are removed at once; the copies they returned wait, *Leaving and keeping* reading *Waiting for the hold on memory to lift*, and are erased when the hold lifts |
 | AC-45.7 | A person deactivated under *Pseudonymise* | their work, History rows and exports are read | their name and email are gone; they read as *Former member · 4F7A*, the same code everywhere; each History row still verifies |
-| AC-45.8 | An Operator or a Modeller | they reach *Change* | it is disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-45.8 | A person without Edit on `setting/retention` | they reach *Change* | it is disabled, naming Edit on `setting/retention` and who can grant it; the API refuses the write |
 | AC-45.9 | A pseudonymised person | an Admin reactivates them (AC-23) | the Admin gives a name and an email again; nothing erased comes back |
 | AC-45.10 | The setting could not save | it is sent | it stays as it was, saying why, with *Try again* |
 

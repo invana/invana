@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Export everything held about any person, active or deactivated, signing in again; read the exports made | — |
-| Operator | — ; a Modeller the same | *Export their data* is not offered on a person's row |
+| Operator | — | *Export their data* is not offered on a person's row |
 
 ## Flow
 
@@ -41,13 +41,13 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-47.1 | An Admin on a person's row | they choose *Export their data* | a modal lists what the file holds — profile, what they did, personal-connection data — with the engine's counts, and says it is the one place a person's personal-connection data reaches anyone but them |
-| AC-47.2 | The modal | the Admin signs in again | a JSON file downloads with `profile` (username, name, email, role, teams, agents granted, default agent, created, last signed in, deactivated), `work` (History rows they acted in or were behind, their conversations with their turns, tasks they set or were assigned, asks they raised or answered) and `personal_connections` (each server, account, connected and last used, and the copies they returned) |
+| AC-47.2 | The modal | the Admin signs in again | a JSON file downloads with `profile` (username, name, email, policies, teams, agents granted, default agent, created, last signed in, deactivated), `work` (History rows they acted in or were behind, their conversations with their turns, tasks they set or were assigned, asks they raised or answered) and `personal_connections` (each server, account, connected and last used, and the copies they returned) |
 | AC-47.3 | A personal connection | the file is read | it never holds a token or a secret |
 | AC-47.4 | A subject export | History and *What left the platform* are read | one History row and one call in *What left the platform* name who made it, for whom and its size |
 | AC-47.5 | A person deactivated | an Admin exports their data | their profile and what they did export; personal-connection data erased at their departure is absent, and the file says so |
 | AC-47.6 | An Admin deactivating a person (AC-23) | the modal opens | it offers *Export their data first*, before the erasure it lists |
 | AC-47.7 | An agent or the system user | an export is asked for them | it is refused — *{user} is not a person* |
-| AC-47.8 | An Operator or a Modeller | they open a person's row, or call the route | *Export their data* is not offered; the API refuses it |
+| AC-47.8 | A person without Edit on `setting/retention` | they open a person's row, or call the route | *Export their data* is not offered; the API refuses it |
 | AC-47.9 | An export asked with a key | it is sent | it is refused — it needs a person's session |
 | AC-47.10 | The export fails while streaming | it is made | no exports row is written; the modal says why, with *Try again* |
 

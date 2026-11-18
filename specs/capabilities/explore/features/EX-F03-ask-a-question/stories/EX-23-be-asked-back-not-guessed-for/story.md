@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Answer a question asked back on their own run, in the thread or in Inbox › Needs you, or type something else | — |
-| Operator | The same, on their own runs; a Modeller the same — only a person answers ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | A question asked back on another person's run is not shown to them |
+| Operator | The same, on their own runs; a Modeller the same — only a person answers ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ask a question*) | A question asked back on another person's run is not shown to them |
 
 ## Flow
 

@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 ## Who can
 
-Importing and restoring a model is the Modeller's and the Admin's; exporting is every signed-in person's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Importing and restoring a model is the Modeller's and the Admin's; exporting is every signed-in person's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F08](../../feature.md)
 
 ## Who can
 
-Running a derivation is the Modeller's and the Admin's; write-back is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Running a derivation is the Modeller's and the Admin's; write-back is the Admin's alone ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

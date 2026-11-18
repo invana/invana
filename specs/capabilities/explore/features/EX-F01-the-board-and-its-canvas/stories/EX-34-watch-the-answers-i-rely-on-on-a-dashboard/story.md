@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-A dashboard is *Acts* for Operator, Modeller and Admin, as a board is ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+A dashboard is *Acts* for Operator, Modeller and Admin, as a board is ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 It is the organisation's, made by a person; a tile refreshes through the agent that answered it, so it reads only what
 that agent may Read.
 

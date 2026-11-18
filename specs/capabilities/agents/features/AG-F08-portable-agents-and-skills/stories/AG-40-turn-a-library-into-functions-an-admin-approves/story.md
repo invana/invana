@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 ## Who can
 
-*Portable — bring in* in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); approving code is the Admin's, as approving a skill's script is (CP-F06).
+*Portable — bring in* in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); approving code is the Admin's, as approving a skill's script is (CP-F06).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

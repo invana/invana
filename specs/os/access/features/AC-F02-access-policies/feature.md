@@ -465,6 +465,8 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 | Removing an entry needs a second Admin | Whatever the second-yes setting, removal of an entry of *Hidden from agents* waits for another Admin and tells the others; adding is one step. Policy versions follow the setting |
 | Hiding fails open, on purpose | A new or personal-tagged property is read by agents until an Admin adds it; no count notice is shown; the outbound check is the guard |
 | A raw query is refused where anything is hidden | Only typed query plans run on a graph database where a caller's policies hide anything ([Property access](#property-access)); a raw query is never filtered after it returns |
+| A raw-query refusal tells the holder that something is hidden — accepted in v1 | *Raw queries are not available on {graph database}* tells the holder that a policy hides something in that graph database, though never what; this is accepted and deferred with the side channels |
+| *Hides anything* means a Deny Read | A raw query is refused only where a Deny Read on a kind or a property reaches the caller, an entry of *Hidden from agents* included; being allowed fewer kinds, with no Deny, is not a reason to refuse one |
 | Entries bind to the model's id | A rename or an alias keeps the entry in force |
 | *Can someone do this?* writes nothing | It runs the engine's own checks without running anything |
 | Policies as files | `invana policy apply · list · show · attach · detach` read and write custom policies as files, held to every check Studio is |

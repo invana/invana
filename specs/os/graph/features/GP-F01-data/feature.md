@@ -75,7 +75,7 @@ sequenceDiagram
 
 Every act here is an agent's, checked against its Access Policies on `data/<graph database>/<kind>` — for a property,
 `data/<graph database>/<kind>/<property>`
-([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); the person's
+([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); the person's
 role decides only whether they may start the act that asks for it.
 
 | Act | Role | Everyone else sees |

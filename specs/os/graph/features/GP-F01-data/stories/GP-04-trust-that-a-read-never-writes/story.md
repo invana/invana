@@ -22,7 +22,7 @@ Admin, which connectors passed the certification test.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read in any run's *How it got here* that a read step ran in a read-only session; read which connectors passed the certification test | — |
-| Operator | Read in *How it got here* that a read step ran in a read-only session; a Modeller reads the same ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | — |
+| Operator | Read in *How it got here* that a read step ran in a read-only session; a Modeller reads the same ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | — |
 
 ## Flow
 

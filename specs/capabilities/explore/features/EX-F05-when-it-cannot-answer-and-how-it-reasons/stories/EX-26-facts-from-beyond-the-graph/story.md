@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read third-party claims and nodes and their references; *Keep* a third-party node on a read + write graph database | — |
-| Operator | Read third-party claims and nodes and their references, on answers they may read. A Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Edit on the board*) | *Keep* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | Read third-party claims and nodes and their references, on answers they may read. A Modeller as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Edit on the board*) | *Keep* disabled — *Needs the Modeller role — ask an Admin* |
 
 Which outside tools an agent may run is its Access Policies' ([AC-F02](../../../../../../os/access/features/AC-F02-access-policies/feature.md)); setting up the web tool is an Admin's ([CP-F02](../../../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)).
 

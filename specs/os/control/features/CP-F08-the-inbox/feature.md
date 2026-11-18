@@ -63,7 +63,7 @@ flowchart TD
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)
+The role × feature table is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
 (*Inbox and notifications*: Operator Acts · Modeller Acts · Admin Acts); this is what it means here.
 
 | Act | Role | Everyone else sees |

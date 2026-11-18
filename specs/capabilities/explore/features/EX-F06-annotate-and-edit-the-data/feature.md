@@ -67,12 +67,12 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
 *Edit on the board* is *Reads* for Operator, *Acts* for Modeller and Admin. Staging an edit is the board's
 ([EX-F01](../EX-F01-the-board-and-its-canvas/feature.md)); saving runs as the built-in Record editor, within its
 Access Policies.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Role ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Stage edits on the board · revert one · discard them | Anyone who opens the board ([EX-F01](../EX-F01-the-board-and-its-canvas/feature.md)) | — |
 | Save the board's edits to a graph database | Modeller · Admin, on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/<kind>` | An Operator: Save disabled — *Needs the Modeller role — ask an Admin*. A read-only graph database: Save disabled, naming it and its mode. A rule: refused, naming the policy and rule |

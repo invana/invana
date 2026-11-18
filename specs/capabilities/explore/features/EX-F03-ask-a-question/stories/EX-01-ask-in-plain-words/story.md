@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask through any agent they may use, ask again from a recent question, open a kept board from the start, run a function a plan gap offers | — |
-| Operator | The same, through the agents they may use; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | No agent they may use: the composer disabled — *{person} may not use Assistant — ask an Admin*. A function the agent may not run: offered disabled, naming the rule |
+| Operator | The same, through the agents they may use; a Modeller the same ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ask a question*) | No agent they may use: the composer disabled — *{person} may not use Assistant — ask an Admin*. A function the agent may not run: offered disabled, naming the rule |
 
 ## Flow
 

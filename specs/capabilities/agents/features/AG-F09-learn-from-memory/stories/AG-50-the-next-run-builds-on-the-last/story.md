@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the recall step of a run they may read — its query, its items, each item's label and why it ranks, and the records it cites | On a run they may not read, the recall step is withheld, naming who may read it |
-| Operator | Read the recall step of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | On anyone else's run, the recall step is withheld, naming who may read it ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | Read the recall step of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | On anyone else's run, the recall step is withheld, naming who may read it ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 

@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Mark an endpoint local or external, with the password again to mark it local | — |
-| Operator | Read each endpoint's and version's *Local* or *External* mark ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Local · External* reads; changing it is disabled — *Needs the Admin role — ask {admins}* |
+| Operator | Read each endpoint's and version's *Local* or *External* mark ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Local · External* reads; changing it is disabled — *Needs the Admin role — ask {admins}* |
 
 ## Flow
 

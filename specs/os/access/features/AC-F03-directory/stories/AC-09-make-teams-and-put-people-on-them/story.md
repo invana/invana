@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Make, rename, describe and delete a team; put people on it and take them off; grant it an agent or take one away | A team an agent's approvers name has no *Delete* until they change |
-| Operator | Read every team, its people, the agents granted to it and the agents whose asks it answers; a Modeller reads the same | *New team*, *Add people*, *Grant an agent* and *Delete* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read every team, its people, the agents granted to it and the agents whose asks it answers | *New team*, *Add people*, *Grant an agent* and *Delete* disabled — *Needs Create or Edit on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -53,8 +53,8 @@ flowchart TD
 | AC-09.7 | An Admin | they grant an agent to a team, after its preview (AC-39) and signing in again | every person on the team may use it from their next step; taking it away ends that for whoever has no other grant |
 | AC-09.8 | A team | an owner is chosen for anything | a team is never offered as an owner; a policy is never attached to a team and no rule names one (AC-11.9) |
 | AC-09.9 | A team named by an agent's approvers | it is deleted | it is refused, naming each agent, so no ask loses its approvers silently |
-| AC-09.10 | A team no approvers name | it is deleted, confirming by name | it is gone; its people keep their role and their other teams |
-| AC-09.11 | An Operator or a Modeller | they open *Teams* | everything reads; each write is disabled, naming the Admin role and the Admins |
+| AC-09.10 | A team no approvers name | it is deleted, confirming by name | it is gone; its people keep their policies and their other teams |
+| AC-09.11 | A person without Create or Edit on Access | they open *Teams* | everything reads; each write is disabled, naming the permission and who can grant it |
 | AC-09.12 | A filter that matches no team | it is applied | *Nothing matches* reads with *Clear filters* |
 | AC-09.13 | The teams could not load | *Teams* is opened | *Could not load teams* reads, with *Try again* |
 

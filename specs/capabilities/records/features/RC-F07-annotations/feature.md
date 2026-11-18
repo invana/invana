@@ -60,11 +60,11 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every annotation | Every role — Operator, Modeller, Admin | — |
-| Edit or delete one's own annotation | Every role — an *Own* act on what the person wrote | Off on another person's — *Only Priya Nair can change it* |
-| Delete any annotation, with a reason | Admin | Off — *Only its author or an Admin can change it* |
+| Read every annotation | Read on `data/<graph database>/<kind>` | — |
+| Edit or delete one's own annotation | Edit on the kind — an *Own* act on what the person wrote | Off on another person's — *Only Priya Nair can change it* |
+| Delete any annotation, with a reason | Edit on `data/<graph database>`, every kind | Off — *Only its author or a holder of Edit on the graph database can change it* |
 
 ## States
 
@@ -98,14 +98,14 @@ flowchart TD
 | Decision | Detail |
 |---|---|
 | The built-in Annotation kind is not a model a person shapes | It is Invana's; it never appears on the model map |
-| Only the author changes it | Others read it; an Admin may delete any, with a reason kept in History |
+| Only the author changes it | Others read it; a holder of Edit on the graph database may delete any, with a reason kept in History |
 
 ## Open questions
 
 | Question | Who answers |
 |---|---|
 | Is the Annotation kind shown in Semantics, read-only? Recommend: no — it is Invana's, shown only here | Ravi |
-| EX-F06 › Access gives changing or deleting an annotation to its author alone; here an Admin may delete any, with a reason. Which holds? Recommend: an Admin may delete any with a reason, written into EX-F06 too, so nothing anyone wrote is beyond an Admin | Ravi |
+| EX-F06 › Access gives changing or deleting an annotation to its author alone; here a holder of Edit on the graph database may delete any, with a reason. Which holds? Recommend: a holder of Edit on the graph database may delete any with a reason, written into EX-F06 too, so nothing anyone wrote is beyond them | Ravi |
 
 ## Not building
 
