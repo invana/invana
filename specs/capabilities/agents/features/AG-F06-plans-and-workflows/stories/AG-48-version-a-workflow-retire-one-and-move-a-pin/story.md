@@ -23,7 +23,7 @@ Versioning, retiring and moving a pin need Edit on `workflow/<name>`; copying, C
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any workflow: propose its next version, retire a version, move a pin, copy it | A built-in: *Retire* and *Propose a version* absent — *Copy* to change it |
-| Operator | Read every version. With Edit on the workflow, does what an Admin does | *Copy*, *Retire*, *Propose a version* and *Move the pin* disabled — *Needs Edit on workflow/{workflow} — ask {who can grant}* |
+| Operator | Read every version. With Edit on the workflow, does what an Admin does | *Copy*, *Retire*, *Propose a version* and *Move the pin* disabled — *Needs Edit on the {workflow} workflow — ask {who can grant}* |
 
 ## Flow
 
@@ -57,8 +57,8 @@ flowchart TD
 | AG-48.6 | A composing workflow whose pinned workflow has published a newer version | its page is read | the composite reads *vN exists*; nothing moves by itself |
 | AG-48.7 | *Move the pin* | a person with Edit on the workflow chooses the newer version | it proposes the composing workflow's next version with that one pin moved, showing what changed in the pinned workflow, and waits on the named approvers |
 | AG-48.8 | A built-in workflow | a person with Create on `workflow/*` presses *Copy* | a workflow under a new key, v1 with the built-in's steps, the platform's and made by the copier, *copied from* `key@n`; no approval, and no agent may run it until a policy allows Run on its key |
-| AG-48.9 | A person without Edit on workflow/{workflow} | they reach *Retire*, *Propose a version* or *Move the pin* | each is disabled: *Needs Edit on workflow/{workflow} — ask {who can grant}*; the route answers 403 with the same sentence |
-| AG-48.10 | An Operator | they reach *Copy* | it is disabled: *Needs Create on workflow/* — ask {who can grant}* |
+| AG-48.9 | A person without Edit on workflow/{workflow} | they reach *Retire*, *Propose a version* or *Move the pin* | each is disabled: *Needs Edit on the {workflow} workflow — ask {who can grant}*; the route answers 403 with the same sentence |
+| AG-48.10 | An Operator | they reach *Copy* | it is disabled: *Needs Create on Skills* — ask {who can grant}* |
 | AG-48.11 | A built-in workflow | anyone proposes a version of it, retires it or moves a pin in it | it is refused: *{key} is built in — copy it to change it.* |
 | AG-48.12 | A workflow | anyone reads who owns it | it reads *Platform*, with who made it; no person owns it alone, and making it grants nothing over it (AC-F07) |
 | AG-48.13 | Any of these acts | it lands | History holds a row naming who, what and the versions |

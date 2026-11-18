@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Stop any run still going, a run with no person behind it included | — |
-| Operator | stop a run they are behind | *Stop run* disabled: *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Needs Manage on run/{agent} — ask {who can grant}* |
+| Operator | stop a run they are behind | *Stop run* disabled: *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Needs Manage on Runs — ask {who can grant}* |
 
 ## Flow
 
@@ -46,7 +46,7 @@ flowchart TD
 | CP-58.3 | The confirm | *Stop* is chosen | dispatch ends; calls already sent finish and are recorded; the run reads *stopped*, naming who stopped it, and each helper *stopped with its parent* |
 | CP-58.4 | A stopped run | its asks are read | each pending ask closed as expired and left *Needs you* |
 | CP-58.5 | A run stopped by someone other than the person behind it | the stop lands | the person behind it gets an Inbox item naming the run, who stopped it and when |
-| CP-58.6 | Anyone else | they read the run | *Stop run* is disabled: *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Needs Manage on run/{agent} — ask {who can grant}*; the route answers 403 with the same sentence |
+| CP-58.6 | Anyone else | they read the run | *Stop run* is disabled: *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Needs Manage on Runs — ask {who can grant}*; the route answers 403 with the same sentence |
 | CP-58.7 | A run that ended before the stop landed | *Stop* is chosen | *This run already ended — {reason}*; nothing changes |
 | CP-58.8 | A stop that cannot reach the workers yet | it is chosen | the run reads *stopping*, says what it finished so far, and stops when the workers answer |
 | CP-58.9 | A stop | it lands | History holds a row for the stop and one per helper, naming who stopped it and on whose run |

@@ -22,7 +22,7 @@ Running drift now needs Edit on `agent/<name>` or `skill/<name>` ([the permissio
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every drift run; get the alert as its kind names the Admins; run drift now on any agent or skill not built in | — |
-| Operator | Read every drift run and its result. With Edit on the agent or skill, runs drift now as an Admin does | *Run drift now* disabled, naming the permission — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}* |
+| Operator | Read every drift run and its result. With Edit on the agent or skill, runs drift now as an Admin does | *Run drift now* disabled, naming the permission — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}* |
 
 ## Flow
 

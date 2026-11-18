@@ -115,11 +115,11 @@ making it grants nothing over it.
 | Run a workflow by name · dry run | Run on `workflow/<key>`, through an agent the person may Run whose Access Policies allow it | *Run* disabled, naming the rule that denies it and *ask an Admin* |
 | Propose a plan that served as a workflow | The person behind the run | *Propose as a workflow* hidden |
 | Approve or decline a plan into a workflow | The agent's named approvers — else the other approvers, else the Admins — never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads; *Approve* and *Decline* absent — *Not yours to answer* |
-| Propose a workflow's next version · retire a version · move a pin | Edit on `workflow/<name>` | Disabled — *Needs Edit on workflow/{workflow} — ask {who can grant}* |
-| Copy a built-in workflow | Create on `workflow/*` ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | *Copy* disabled — *Needs Create on workflow/* — ask {who can grant}* |
+| Propose a workflow's next version · retire a version · move a pin | Edit on `workflow/<name>` | Disabled — *Needs Edit on the {workflow} workflow — ask {who can grant}* |
+| Copy a built-in workflow | Create on `workflow/*` ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | *Copy* disabled — *Needs Create on Skills* — ask {who can grant}* |
 | Switch a plugin on or off | Manage on `plugin/<name>` ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) | The plugin reads; its switch disabled, naming the permission |
 | Approve a library's functions | Publish · Approve on `skill/<name>` ([AG-F08](../AG-F08-portable-agents-and-skills/feature.md)) | Proposals read *Waiting for an Admin* |
-| Decide a suggested change to a workflow | Edit on `workflow/<name>` ([AG-52](../AG-F09-learn-from-memory/stories/AG-52-decide-on-a-suggested-change/story.md)) | Read only — *Needs Edit on workflow/{workflow} — ask {who can grant}* |
+| Decide a suggested change to a workflow | Edit on `workflow/<name>` ([AG-52](../AG-F09-learn-from-memory/stories/AG-52-decide-on-a-suggested-change/story.md)) | Read only — *Needs Edit on the {workflow} workflow — ask {who can grant}* |
 
 ## States
 

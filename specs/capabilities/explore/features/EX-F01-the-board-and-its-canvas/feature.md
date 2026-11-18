@@ -98,7 +98,7 @@ making it grants nothing. Board reads run as the built-in Assistant; saving edit
 | Read who made a board | None — every signed-in person | — |
 | Read the console · re-run a query step | Whoever may read the conversation's runs — the person behind them ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules), [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | Steps of runs they may not read: that they ran, status and tokens |
 | Open the Element panel · stage an edit in Edit mode | Anyone who opens the board | — |
-| Save staged edits to a graph database | Edit on `data/<graph database>/<kind>`, on a read + write graph database, through the Record editor ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)) | Save disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| Save staged edits to a graph database | Edit on `data/<graph database>/<kind>`, on a read + write graph database, through the Record editor ([EX-F06](../EX-F06-annotate-and-edit-the-data/feature.md)) | Save disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 | Schedule the question | Anyone, through an agent they may use ([AG-F07](../../../agents/features/AG-F07-schedules/feature.md)) | — |
 
 ## States

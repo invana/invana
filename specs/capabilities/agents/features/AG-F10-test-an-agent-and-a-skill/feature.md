@@ -90,9 +90,9 @@ a built-in agent or skill is never edited, and making or owning one grants nothi
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read an eval set — cases, checks, judge, rubric — its eval runs, test runs, drift alerts and the eval token budget | Read on `agent/<name>` · `skill/<name>` | — |
-| Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | Edit on `agent/<name>` or `skill/<name>`. Never on a built-in agent or skill | Each act disabled — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}*; a built-in reads its set, with *Copy* |
+| Write, accept or retire a case · set the judge and rubric · ask for proposed cases · run a test · run the evals · run drift now — in Studio or on the command line | Edit on `agent/<name>` or `skill/<name>`. Never on a built-in agent or skill | Each act disabled — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}*; a built-in reads its set, with *Copy* |
 | Promote a run's answer to a case | Edit on `agent/<name>` or `skill/<name>`, and who may read the run's content ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) | *Promote to eval* disabled on the run, naming the permission |
-| Set the deployment's eval token budget | Edit on `setting/deployment` | The budget and what is spent read; editing disabled — *Needs Edit on setting/deployment — ask {who can grant}* |
+| Set the deployment's eval token budget | Edit on `setting/deployment` | The budget and what is spent read; editing disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
 | Name the practice graph database | Edit on `setting/graph-databases` ([CP-41](../../../../os/control/features/CP-F05-graph-databases/stories/CP-41-name-a-practice-graph-database/story.md)) | Evals read *No practice graph database — reading in read mode* |
 
 ## States

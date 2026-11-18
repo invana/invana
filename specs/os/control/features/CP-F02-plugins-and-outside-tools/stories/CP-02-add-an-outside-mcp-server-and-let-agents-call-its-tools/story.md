@@ -22,7 +22,7 @@ The permission each act needs is in [the permission catalogue](../../../../../ac
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Create on `plugin/<name>`: add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
-| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; with Create on `plugin/<name>`, the same as Admin | *Add a server* and *Read its tools again* are disabled — *Needs Create on plugin/{name} — ask {who can grant}* |
+| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; with Create on `plugin/<name>`, the same as Admin | *Add a server* and *Read its tools again* are disabled — *Needs Create on Plugins — ask {who can grant}* |
 
 ## Flow
 

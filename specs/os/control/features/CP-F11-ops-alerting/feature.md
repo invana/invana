@@ -97,10 +97,10 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Read the ops alerts list and an alert | None — every signed-in person; a run's content inside it as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | Content withheld, naming who may read it |
 | Act on what an alert is about — stop a run, make a fix task, answer a question, renew a connection, change a limit, switch off | As [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#access) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#access) · [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#access) · [CP-F04](../CP-F04-limits/feature.md#access) · [CP-F05](../CP-F05-graph-databases/feature.md#access) | As there |
 | *Acknowledge* an alert — *{person} is on it* | None — the people it was sent to · Edit on `worker/<group>` for any other | Not offered on an alert not sent to them |
-| Close an alert with a note | Edit on `worker/<group>` | *Close* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
-| Set each kind's threshold | Edit on `worker/<group>` | Thresholds read; *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| Close an alert with a note | Edit on `worker/<group>` | *Close* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
+| Set each kind's threshold | Edit on `worker/<group>` | Thresholds read; *Edit* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
 | Read History alerts | None — every signed-in person | — |
-| Write, change, switch off or remove a History alert | Edit on `worker/<group>` | *New History alert*, its switch and *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| Write, change, switch off or remove a History alert | Edit on `worker/<group>` | *New History alert*, its switch and *Edit* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
 
 ## States
 

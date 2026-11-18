@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Write `fs/` · `cmd/` · `net/` rules on a custom policy; read what each agent may touch on a worker | — |
-| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads every `fs/` · `cmd/` · `net/` rule and what each agent may touch on a worker | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Edit* disabled — *Needs Edit on Access — ask Priya or Lee* |
+| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads every `fs/` · `cmd/` · `net/` rule and what each agent may touch on a worker | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *Edit* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 

@@ -21,7 +21,7 @@ Writing and publishing a standard needs Edit on `model/<model>`; applying a ship
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every standard; write one; publish the next version of any; apply a shipped pack | — |
-| Operator | Read every standard. With Edit on the model, writes and publishes a standard as an Admin does | *Write a standard*, *Import* and *New version* absent — *Needs Edit on model/{model} — ask {who can grant}*; a pack refused — *Needs Create on setting/team-packs — ask {who can grant}* |
+| Operator | Read every standard. With Edit on the model, writes and publishes a standard as an Admin does | *Write a standard*, *Import* and *New version* absent — *Needs Edit on the {model} model — ask {who can grant}*; a pack refused — *Needs Create on Settings — ask {who can grant}* |
 
 ## Flow
 
@@ -49,11 +49,11 @@ flowchart LR
 | SE-17.4 | Terms identical to the current version | the person publishes | it is refused as *unchanged* and no version is minted |
 | SE-17.5 | A changed standard | a person with Edit on the model publishes | the next version is minted; every kind and property that holds it stays on the version it holds |
 | SE-17.6 | A standard | the person opens *Used by* | it lists each kind and property that holds it, with its model, version and mode; ones the person cannot read are absent, with no count and no note |
-| SE-17.7 | An Operator | they open a standard | *New version* is absent and a line reads *Needs Edit on model/{model} — ask {who can grant}* |
+| SE-17.7 | An Operator | they open a standard | *New version* is absent and a line reads *Needs Edit on the {model} model — ask {who can grant}* |
 | SE-17.8 | The library cannot be read | Standards opens | it says it could not load, with *Try again* |
 | SE-17.9 | An Admin with a shipped pack's file | they apply it from the command line | it is published as a standard marked *pack*, or as its next version when the terms changed; identical terms read *unchanged* |
 | SE-17.10 | An Operator, with a pack's file, | they apply it | it is refused: only Create on `setting/team-packs` adds a shipped pack |
-| SE-17.11 | A person with Edit on the model, with a standard file | they apply it from the command line | its next version is published as if written here; an Operator is refused, naming *Needs Edit on model/{model} — ask {who can grant}* |
+| SE-17.11 | A person with Edit on the model, with a standard file | they apply it from the command line | its next version is published as if written here; an Operator is refused, naming *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Screens
 

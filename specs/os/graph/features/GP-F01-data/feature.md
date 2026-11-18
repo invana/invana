@@ -81,7 +81,7 @@ permission decides only whether they may start the act that asks for it.
 | Act | Permission | Everyone else sees |
 |---|---|---|
 | Read or search a graph database | An agent the person may use, as its Access Policies allow, within the graph database's mode and switches ([CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) | Refused before it starts, naming the rule, the mode or who switched it off |
-| Write to a graph database | An agent, as its Access Policies allow Write, on a read + write graph database; a person with Edit on `data/<graph database>` starts it | Refused before the wire, naming the rule or the mode, or *Needs Edit on data/{graph database} — ask {who can grant}* |
+| Write to a graph database | An agent, as its Access Policies allow Write, on a read + write graph database; a person with Edit on `data/<graph database>` starts it | Refused before the wire, naming the rule or the mode, or *Needs Edit on {graph database} data — ask {who can grant}* |
 | Run a raw query | Run on `agent/query-console`; a write also needs Edit on `data/<graph database>` | Cypher and Gremlin disabled, naming the permission and who can grant; a refusal naming the rule |
 | Read which connectors passed the certification test | Read on `setting/graph-databases` | — |
 

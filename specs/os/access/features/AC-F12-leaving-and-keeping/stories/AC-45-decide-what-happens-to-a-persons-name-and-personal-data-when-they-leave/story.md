@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set *Keep* or *Pseudonymise* for departed people's names, signing in again; read before deactivating a person what will be erased (AC-23) | — |
-| Operator | Read the setting; read a departed person's work under their name or their code | *Change* disabled — *Needs Edit on setting/retention — ask Priya or Lee* |
+| Operator | Read the setting; read a departed person's work under their name or their code | *Change* disabled — *Needs Edit on Retention settings — ask Priya or Lee* |
 
 ## Flow
 

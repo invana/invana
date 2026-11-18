@@ -95,7 +95,7 @@ The permission catalogue is [AC-F02 › The permission catalogue](../../../acces
 | Read a cited record | An agent the person may use, as its Access Policies allow | Left out, uncounted; never shown |
 | Open a project's map | None — when their default agent may Read `memory/project/<key>` | The project's head only — *Withheld — your agent may not read `memory/project/{key}`* |
 | Read org knowledge and its proposals | None — when their default agent may Read `memory/org` and every source | Org knowledge or a proposal whose place the reader's agent may not Read: its head only, content withheld; one whose sources it may not Read is absent |
-| Promote, decline or retire org knowledge | Edit on `memory/org` | Each act disabled — *Needs Edit on memory/org — ask {who can grant}* |
+| Promote, decline or retire org knowledge | Edit on `memory/org` | Each act disabled — *Needs Edit on Memory — ask {who can grant}* |
 
 ## States
 

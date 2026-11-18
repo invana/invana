@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read an ontology, pick its kinds, preview the mapping and open it as a draft | — |
-| Operator | See the models and their drafts; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* disabled — *Needs Create on model/{model} — ask {who can grant}* |
+| Operator | See the models and their drafts; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* disabled — *Needs Create on Models — ask {who can grant}* |
 
 ## Flow
 
@@ -54,7 +54,7 @@ flowchart LR
 | SE-15.11 | The name is used by a model in the deployment | the person opens the draft | the name is asked again beside the name field; nothing is made |
 | SE-15.12 | Property types the model's graph database cannot hold | the draft opens | they are named, and the draft still lands, unable to publish until changed |
 | SE-15.13 | The preview | the person picks *Back* | the picks are kept; a reload starts the dialog again |
-| SE-15.14 | An Operator | they reach *New model* | it is disabled with *Needs Create on model/{model} — ask {who can grant}* |
+| SE-15.14 | An Operator | they reach *New model* | it is disabled with *Needs Create on Models — ask {who can grant}* |
 | SE-15.15 | An ontology whose labels carry several languages | it is previewed | Each kind and property takes its label in the chosen language, else an untagged one, else any; names that clash are suffixed `_2`, and the preview says so |
 
 ## Screens

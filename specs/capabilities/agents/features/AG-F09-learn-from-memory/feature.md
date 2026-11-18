@@ -105,7 +105,7 @@ run's content is [AC-31](../../../../os/access/features/AC-F09-what-left-the-pla
 | Read Evidence and every suggested change | None — every signed-in person | — (the runs a count opens follow run privacy) |
 | Decide a suggested change to a skill, a workflow, an agent's skills or an answer template | Edit on its target — `skill/<name>` · `workflow/<name>` · `agent/<name>` | Read only — *Needs Edit on {target} — ask {who can grant}* |
 | Decide a suggested change to a model rule or meaning | Edit on `model/<model>`, through the model's own review ([SE-F02](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md)) | Read only — *Needs Edit on {target} — ask {who can grant}* |
-| Decide an index suggestion | Edit on `setting/graph-databases` | Read only — *Needs Edit on setting/graph-databases to add an index — ask {who can grant}* |
+| Decide an index suggestion | Edit on `setting/graph-databases` | Read only — *Needs Edit on Graph database settings to add an index — ask {who can grant}* |
 | Approve a plan into a workflow that a suggested change proposes | The agent's named approvers ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, with who it waits on |
 
 ## States

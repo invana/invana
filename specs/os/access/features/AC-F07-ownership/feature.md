@@ -225,7 +225,7 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 | Owner is a modal | *Owner* opens from any resource's header as a modal, so the resource stays readable behind it |
 | A copied agent starts personal | A copy of a built-in agent is its maker's personal agent, to try before it is shared; any other copy is the organisation's from the start |
 | One successor takes it all | The successor takes every slot a fallback gives them and the leaver's chats, so the Admin decides once, while deactivating |
-| Adopting needs Create on agents | A personal agent is an agent like any other; a successor without Create on `agent/*` leaves it retired rather than hold an agent they could not build |
+| Adopting Needs Create on Agents | A personal agent is an agent like any other; a successor without Create on `agent/*` leaves it retired rather than hold an agent they could not build |
 | Sharing needs no second act | A shared agent is the platform's at once; it reaches others only when an Admin grants it, so sharing alone gives no one anything |
 
 ## Open questions

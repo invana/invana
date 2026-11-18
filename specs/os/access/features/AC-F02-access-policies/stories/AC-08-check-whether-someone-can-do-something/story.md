@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Check any person through any agent | — |
-| Operator | Nothing here without Read on `access/policies`: the check names rules and policies. A person who holds it checks any person through any agent | *No access* — *Needs Read on access/policies — ask Priya or Lee* |
+| Operator | Nothing here without Read on `access/policies`: the check names rules and policies. A person who holds it checks any person through any agent | *No access* — *Needs Read on Access — ask Priya or Lee* |
 
 ## Flow
 

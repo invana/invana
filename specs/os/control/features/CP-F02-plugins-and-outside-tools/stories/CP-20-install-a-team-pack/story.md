@@ -23,7 +23,7 @@ Installing a Team pack needs Create on `setting/team-packs` ([the permission cat
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every pack and what it adds; install a pack (Create on `setting/team-packs`) or remove one (Edit on `setting/team-packs`); switch it as any plugin (CP-04); apply its Access Policy files (Edit on `access/policies`) after *Who it changes* (AC-04); grant its agents (AC-22) | — |
-| Operator | Read every pack, what it adds, whether it is installed, both switches and its policy files waiting to apply; with the permission an act needs, the same as Admin | *Install*, *Remove* and *Apply* are disabled — *Needs Create on setting/team-packs — ask {who can grant}* (*Apply*: Edit on access/policies) |
+| Operator | Read every pack, what it adds, whether it is installed, both switches and its policy files waiting to apply; with the permission an act needs, the same as Admin | *Install*, *Remove* and *Apply* are disabled — *Needs Create on Settings — ask {who can grant}* (*Apply*: Edit on access/policies) |
 
 ## Flow
 

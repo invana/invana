@@ -32,7 +32,7 @@ flowchart TD
   db -->|Add it in a draft| draft(["The draft — SE-05"])
   h -->|hot and slow · failed questions| perf["Performance: per kind — failed questions, slow query shapes, suggested indexes"]
   perf -->|Add index to draft| may{"Holds Edit on setting/graph-databases?"}
-  may -->|no| na["Needs Edit on setting/graph-databases — ask {who can grant}"]
+  may -->|no| na["Needs Edit on Graph database settings — ask {who can grant}"]
   may -->|yes| draft
   h -->|Save report| rep(["A saved report · frozen · Back to live"])
   h -->|History| hist["SE-09 · Who changed what, why, the effect after"]
@@ -56,9 +56,9 @@ flowchart TD
 |---|---|---|
 | Read health — Overview, Database, Usage, Performance, Growth — and history | Read on `model/<model>` | — |
 | Save a report · open saved reports | Read on `model/<model>` | — |
-| Read the database · *Add it in a draft* | Edit on `model/<model>` | Absent; the reading stays — *Needs Edit on model/{model} — ask {who can grant}* on the drift rows |
-| *Add index to draft* — apply a suggested index | Edit on `setting/graph-databases` | Absent; the suggestion reads — *Needs Edit on setting/graph-databases — ask {who can grant}* |
-| Archive, restore or delete a model | Edit on `model/<model>` | Absent from the model's `⋯`; *Needs Edit on model/{model} — ask {who can grant}* |
+| Read the database · *Add it in a draft* | Edit on `model/<model>` | Absent; the reading stays — *Needs Edit on the {model} model — ask {who can grant}* on the drift rows |
+| *Add index to draft* — apply a suggested index | Edit on `setting/graph-databases` | Absent; the suggestion reads — *Needs Edit on Graph database settings — ask {who can grant}* |
+| Archive, restore or delete a model | Edit on `model/<model>` | Absent from the model's `⋯`; *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## States
 

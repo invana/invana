@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and set each store's period, or *Keep*; place and lift a legal hold on memory or History, with a reason. Each change asks them to sign in again | — |
-| Operator | Read each store's period, the holds and who set them | *Set*, *Place a hold* and *Lift* disabled — *Needs Edit on setting/retention — ask Priya or Lee* |
+| Operator | Read each store's period, the holds and who set them | *Set*, *Place a hold* and *Lift* disabled — *Needs Edit on Retention settings — ask Priya or Lee* |
 
 ## Flow
 

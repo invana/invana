@@ -22,7 +22,7 @@ Loading needs Create, and undoing a load Edit, on `data/<graph database>/<kind>`
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Load into any model; read and export every load; undo any load | — |
-| Operator | Read and export every load in the deployment — its outcome, what was rejected, its log and what landed. With Create on the kind, also loads from the command line or the API; with Edit, undoes loads | Loading refused before anything is written — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; *Undo load* disabled, naming Edit on the kind |
+| Operator | Read and export every load in the deployment — its outcome, what was rejected, its log and what landed. With Create on the kind, also loads from the command line or the API; with Edit, undoes loads | Loading refused before anything is written — *Needs Create on {kind} in {graph database} — ask {who can grant}*; *Undo load* disabled, naming Edit on the kind |
 
 ## Flow
 
@@ -68,7 +68,7 @@ flowchart LR
 | RC-09.18 | A finished load | the person opens *How it got here* | the run's steps show what each one checked, wrote and rejected |
 | RC-09.19 | A finished load | the person picks *Export* | the load's records download with their provenance — the load's id, content hash, licence, file and run on each |
 | RC-09.20 | A person with Edit on the kind, and a load | they pick *Undo load* and confirm | the records it created are removed, values it wrote that nothing changed since are reverted, and every finding, report and simulation that cites it carries a *load undone* notice; a bulk load or one already undone is refused, saying why |
-| RC-09.21 | A person without Edit on the kind | they open a load | *Undo load* is disabled with *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| RC-09.21 | A person without Edit on the kind | they open a load | *Undo load* is disabled with *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 
 ## Screens
 

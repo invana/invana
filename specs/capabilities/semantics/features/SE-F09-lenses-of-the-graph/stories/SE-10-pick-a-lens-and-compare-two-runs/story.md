@@ -25,7 +25,7 @@ Reading, picking and comparing are every signed-in person's; naming and authorin
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every lens; pick one for a question; compare two runs; retune from their own run; name, create, edit, duplicate and delete lenses | — |
-| Operator | Read every lens; pick one for a question; compare two runs; retune from their own run into a lens private to that run. With Edit on the model, also names and authors lenses, as Admin | Authoring acts absent; under the list *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Read every lens; pick one for a question; compare two runs; retune from their own run into a lens private to that run. With Edit on the model, also names and authors lenses, as Admin | Authoring acts absent; under the list *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Flow
 
@@ -35,7 +35,7 @@ flowchart TD
   l -->|none yet| e["Everything — inside the rules on properties"]
   l -->|a lens| pg["Its page: the model read through it · layers · runs"]
   l -->|New lens · Edit| r{"Holds Edit on model/<model>?"}
-  r -->|no| na["Absent — Needs Edit on model/{model} — ask {who can grant}"]
+  r -->|no| na["Absent — Needs Edit on the {model} model — ask {who can grant}"]
   r -->|yes| ed["Pick models · slices · what is hidden · AI model per role · what may leave"]
   ed --> v{Checked at save}
   v -->|widens a rule · undeclared axis · matches nothing · cast denied| rf["Refused, naming why"]
@@ -67,7 +67,7 @@ flowchart TD
 | SE-10.13 | A lens a schedule or an agent uses | a person with Edit on the model deletes it | it is refused — *{lens} is used by {schedules and agents}.* |
 | SE-10.14 | A lens naming a model version that is not published | it is listed, then picked | it lists with a warning naming the version; picking it is refused before a run opens — *{lens} names {model} v{n}, which is not published.* |
 | SE-10.15 | A lens created, edited, named or deleted | History is read | each is an event with its before and after |
-| SE-10.16 | An Operator without Edit on the model | they reach Lenses | *New lens*, *Edit*, *Duplicate*, *Delete* and naming are absent and a line reads *Needs Edit on model/{model} — ask {who can grant}*; the engine refuses the same with 403 |
+| SE-10.16 | An Operator without Edit on the model | they reach Lenses | *New lens*, *Edit*, *Duplicate*, *Delete* and naming are absent and a line reads *Needs Edit on the {model} model — ask {who can grant}*; the engine refuses the same with 403 |
 | SE-10.17 | No outside service configured | a person picks what may leave | it reads *No third-party endpoints are configured* where the matches would be |
 | SE-10.18 | A run under a lens | the person opens *How it got here* | it shows its steps and sources, and names the lens and the rules it ran under |
 | SE-10.19 | A lens whose cast names an AI model its rules deny for a role | a run opens in it | the run reads *Cannot answer: {rule} in {denied_in} denies {address} for {role}.*, with *Use the lens's cast* · *Pick another lens* |

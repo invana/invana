@@ -35,10 +35,10 @@ flowchart TD
   sk -->|not readable| skx["Says why — download it and choose File"]
   sk -->|Import as a standard| own{"Holds Edit on model/<model>?"}
   ot --> own
-  own -->|no| ox["Needs Edit on model/{model} — ask {who can grant}"]
+  own -->|no| ox["Needs Edit on the {model} model — ask {who can grant}"]
   own -->|yes| sv
   cli([The command line · a pack's file]) -->|Admin| sv
-  cli -->|no| px["Refused — Needs Create on setting/team-packs — ask {who can grant}"]
+  cli -->|no| px["Refused — Needs Create on Settings — ask {who can grant}"]
   sv --> held(["Held by kinds and properties — SE-19"])
   sv -->|a newer version| pin["Each holder stays on its version · reads v2 is newer"]
 ```
@@ -55,8 +55,8 @@ flowchart TD
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every standard, its versions and who holds it | Read on `model/<model>` | — |
-| Write a standard or import one · publish the next version of a standard | Edit on `model/<model>` | *Write a standard*, *Import* and *New version* absent; *Needs Edit on model/{model} — ask {who can grant}* |
-| Apply a pack | Create on `setting/team-packs` | Refused — *Needs Create on setting/team-packs — ask {who can grant}* |
+| Write a standard or import one · publish the next version of a standard | Edit on `model/<model>` | *Write a standard*, *Import* and *New version* absent; *Needs Edit on the {model} model — ask {who can grant}* |
+| Apply a pack | Create on `setting/team-packs` | Refused — *Needs Create on Settings — ask {who can grant}* |
 
 ## States
 

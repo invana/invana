@@ -55,7 +55,7 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every endpoint, model version, local or external, status, the default and who pins it | Read on `setting/ai-models` and `llm/<endpoint>/<version>` | — |
-| Add, edit, rename or remove an endpoint · mark it local or external · ping it · offer or stop offering a version · choose the default | Create on `setting/ai-models` to add; Edit on `setting/ai-models` to edit, rename, remove, mark, ping, offer, stop offering or choose the default — with the password again for a key or a change to local | *Add an endpoint* and each act disabled — *Needs Edit on setting/ai-models — ask {who can grant}*; the key is never shown |
+| Add, edit, rename or remove an endpoint · mark it local or external · ping it · offer or stop offering a version · choose the default | Create on `setting/ai-models` to add; Edit on `setting/ai-models` to edit, rename, remove, mark, ping, offer, stop offering or choose the default — with the password again for a key or a change to local | *Add an endpoint* and each act disabled — *Needs Edit on AI model settings — ask {who can grant}*; the key is never shown |
 | Pin a version on an agent | As AG-29 | As AG-29 |
 
 ## States

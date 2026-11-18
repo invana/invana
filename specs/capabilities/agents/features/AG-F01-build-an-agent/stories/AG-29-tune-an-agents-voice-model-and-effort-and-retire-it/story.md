@@ -22,7 +22,7 @@ Tuning and retiring an agent needs Edit on `agent/<name>`; publishing a version,
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Settings › Connections › AI models | A built-in agent's settings read; *Copy* in place of every edit |
-| Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle. With Edit on the agent, every act an Admin has here, except offering model versions (Edit on `setting/ai-models`), which reads *Ask an Admin* | Every edit and lifecycle act disabled, naming the permission — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle. With Edit on the agent, every act an Admin has here, except offering model versions (Edit on `setting/ai-models`), which reads *Ask an Admin* | Every edit and lifecycle act disabled, naming the permission — *Needs Edit on the {agent} agent — ask {who can grant}* |
 
 ## Flow
 
@@ -67,11 +67,11 @@ flowchart TD
 | AG-29.18 | A helper an agent created | the work it was made for closes | it retires itself |
 | AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its page is disabled |
 | AG-29.20 | An ask to a paused or retired agent | it is sent | it is refused, naming the state, and *How it got here* shows the refused step and why |
-| AG-29.21 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume* and *Retire* are disabled, naming the permission — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| AG-29.21 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume* and *Retire* are disabled, naming the permission — *Needs Edit on the {agent} agent — ask {who can grant}* |
 | AG-29.22 | A paused agent with a run already queued | the run's turn comes | it starts and finishes; only work that arrives after the pause is refused |
 | AG-29.23 | A step that calls a model | the run opens | the version is the person's pick for that one question, else the skill version's pin, else the agent's pin, else the deployment's default; one that is not offered refuses the run, naming it — nothing falls back |
 | AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's evals run first, as AG-29.9; someone without Edit on agent/{agent} is refused, naming it |
-| AG-29.25 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every act is disabled — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| AG-29.25 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every act is disabled — *Needs Edit on the {agent} agent — ask {who can grant}* |
 
 ## Screens
 

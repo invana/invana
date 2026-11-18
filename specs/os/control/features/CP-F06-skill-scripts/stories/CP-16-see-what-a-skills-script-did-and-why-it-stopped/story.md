@@ -21,7 +21,7 @@ Running a test needs Run on `skill/<name>` ([the permission catalogue](../../../
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the script steps of a run whose content they may read; run a test of a draft that calls a script | A run whose content they may not read: a script step shows only that it ran, its status and its time |
-| Operator | Read the script steps of a run whose content they may read — one they are behind, or a project's run whose sources their default agent may read (AC-31) | *Run a test* disabled — *Needs Run on skill/{name} — ask {who can grant}*; with Run on the skill, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
+| Operator | Read the script steps of a run whose content they may read — one they are behind, or a project's run whose sources their default agent may read (AC-31) | *Run a test* disabled — *Needs Run on the {name} skill — ask {who can grant}*; with Run on the skill, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
 
 ## Flow
 

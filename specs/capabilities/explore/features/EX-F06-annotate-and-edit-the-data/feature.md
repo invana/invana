@@ -27,7 +27,7 @@ flowchart TD
   ed --> ch["EX-20 · Changes: added · edited · deleted, marked on the board"]
   ch -->|revert a row · Discard all · ⌘Z| start
   ch -->|Save n changes| gate{"Holds Edit on data/<graph database>/<kind>?"}
-  gate -->|no| sd["Save disabled — Needs Edit on data/{graph database}/{kind} · changes kept"]
+  gate -->|no| sd["Save disabled — Needs Edit on {kind} in {graph database} · changes kept"]
   gate -->|yes| mode{The graph database read + write and switched on?}
   mode -->|read-only| ro["Save disabled — the graph database and its mode named · changes kept"]
   mode -->|switched off| off["Refused — who switched it off, and when · changes kept"]
@@ -75,7 +75,7 @@ Access Policies.
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Stage edits on the board · revert one · discard them | Anyone who opens the board ([EX-F01](../EX-F01-the-board-and-its-canvas/feature.md)) | — |
-| Save the board's edits to a graph database | Edit on `data/<graph database>/<kind>`, on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/<kind>` | An Operator: Save disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*. A read-only graph database: Save disabled, naming it and its mode. A rule: refused, naming the policy and rule |
+| Save the board's edits to a graph database | Edit on `data/<graph database>/<kind>`, on a read + write graph database, through the Record editor, whose Access Policies allow Write on `data/<graph database>/<kind>` | An Operator: Save disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}*. A read-only graph database: Save disabled, naming it and its mode. A rule: refused, naming the policy and rule |
 | Read the save's run | The person behind it · anyone with Read on `run/<agent>` ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) | That it ran, its status and its tokens |
 
 ## States
@@ -146,7 +146,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 `permission_required` | The person does not hold Edit on `data/<graph database>/<kind>` | *Needs Edit on data/{graph database}/{kind} — ask {who can grant}.* | EX-20.11 |
+| 403 `permission_required` | The person does not hold Edit on `data/<graph database>/<kind>` | *Needs Edit on {kind} in {graph database} — ask {who can grant}.* | EX-20.11 |
 | 409 `read_only` | A graph database the edits name is read-only; before the run opens | *{graph database} is read-only — nothing can be written to it.* | EX-20.9 |
 | 409 `switched_off` | A graph database the edits name is switched off | *{graph database} is off — switched off by {person} {when}.* | EX-20.16 |
 | 403 `policy` | No rule allows the Record editor Write on `data/<graph database>/<kind>`, or a Deny reaches it | *{policy} › {rule} does not allow writing {kind}.* | EX-20.15 |

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every policy; *New policy* | — |
-| Operator | Nothing here: without Read on `access/policies` they never see what a policy holds or hides. A person who holds Read without Edit reads every policy, its rules and the agents it is attached to | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *New policy* disabled — *Needs Edit on Access — ask Priya or Lee* |
+| Operator | Nothing here: without Read on `access/policies` they never see what a policy holds or hides. A person who holds Read without Edit reads every policy, its rules and the agents it is attached to | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *New policy* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 

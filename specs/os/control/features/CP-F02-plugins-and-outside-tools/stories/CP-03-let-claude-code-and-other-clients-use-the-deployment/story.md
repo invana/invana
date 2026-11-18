@@ -23,7 +23,7 @@ The permission each act needs is in [the permission catalogue](../../../../../ac
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Manage on `plugin/<name>`: serve or stop serving an agent or a record tool; read the address, how to connect and every call | — |
-| Operator | Read the address, what is served and how to connect; call the server through their default agent with a connected client (AC-F11) or a key (AC-F10); read their own calls | The served switches read, naming the permission — *Needs Manage on plugin/{name} — ask {who can grant}*; another person's calls are absent |
+| Operator | Read the address, what is served and how to connect; call the server through their default agent with a connected client (AC-F11) or a key (AC-F10); read their own calls | The served switches read, naming the permission — *Needs Manage on the {name} plugin — ask {who can grant}*; another person's calls are absent |
 
 ## Flow
 

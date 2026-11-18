@@ -22,7 +22,7 @@ Linking models needs Edit on `model/<model>` ([the permission catalogue](../../.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Link two published models, commit or discard staged links, and remove a link | — |
-| Operator | Read every link, its rule, its counts and its history. With Edit on the model, links, commits and removes as an Admin does | *Link models* disabled and a drag between models refused — *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Read every link, its rule, its counts and its history. With Edit on the model, links, commits and removes as an Admin does | *Link models* disabled and a drag between models refused — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Flow
 
@@ -65,7 +65,7 @@ flowchart LR
 | SE-03.15 | An active link | the person picks *Remove link* and confirms | a run withdraws exactly the relationships it wrote, then the link goes and is listed under *Removed* with who removed it, when and what was withdrawn |
 | SE-03.16 | A relationship the link wrote | the person opens *How it got here* on it | it names the link, its rule and when it was written |
 | SE-03.17 | A model republished | its links show | they carry onto the new version; links on the version it replaced stay as history and are not counted twice |
-| SE-03.18 | An Operator | they drag between models or reach *Link models* | it is refused with *Needs Edit on model/{model} — ask {who can grant}*; every link still reads |
+| SE-03.18 | An Operator | they drag between models or reach *Link models* | it is refused with *Needs Edit on the {model} model — ask {who can grant}*; every link still reads |
 | SE-03.19 | Both keys named while no worker is free to count | the card counts | It reads that the count is waiting for a worker, with *Try again*; nothing is staged |
 | SE-03.20 | Two published models bound to different graph databases | the person drags a kind of one onto a kind of the other, or picks the other as *Target* | nothing is staged: the drag draws nothing and the footer says why, and in the card the model is disabled — *In {database} — a link joins two models in one graph database*; the API refuses it, naming both graph databases |
 

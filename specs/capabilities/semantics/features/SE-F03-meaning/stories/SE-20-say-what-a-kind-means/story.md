@@ -22,7 +22,7 @@ Changing meaning needs Edit on `model/<model>` ([the permission catalogue](../..
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read meaning and every property's level; change them in a draft; accept or dismiss a proposed synonym | — |
-| Operator | Read meaning and levels. With Edit on the model, changes them as an Admin does | *Change in a draft*, *Set level* and *Accept into the draft* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Read meaning and levels. With Edit on the model, changes them as an Admin does | *Change in a draft*, *Set level* and *Accept into the draft* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Flow
 
@@ -33,7 +33,7 @@ flowchart LR
   m -->|yes| r["Definition · synonyms · unit and level per property · outside terms"]
   r -->|Change in a draft| c{"Holds Edit on model/<model>?"}
   e --> c
-  c -->|no| na["Needs Edit on model/{model} — ask {who can grant}"]
+  c -->|no| na["Needs Edit on the {model} model — ask {who can grant}"]
   c -->|yes| s["Staged in the draft"]
   s -->|synonym taken · not an address · not a level| x["Refused, naming the field"]
   s -->|a level lowered| w["Shown as a widening · History records it"]
@@ -53,7 +53,7 @@ flowchart LR
 | SE-20.5 | An outside term that is not an address | it is staged | it is refused, naming the field |
 | SE-20.6 | A published synonym | someone asks a question in that word | the answer resolves to the kind, and *How it got here* names the synonym that matched |
 | SE-20.7 | A synonym proposed by Explore's memory | the kind's Meaning opens | it waits with *Accept into the draft* · *Dismiss*, naming where it came from; accepting stages it |
-| SE-20.8 | An Operator | they open Meaning | it reads; the acts are disabled, and a line reads *Needs Edit on model/{model} — ask {who can grant}*; the API refuses the write |
+| SE-20.8 | An Operator | they open Meaning | it reads; the acts are disabled, and a line reads *Needs Edit on the {model} model — ask {who can grant}*; the API refuses the write |
 | SE-20.9 | Meaning that cannot be read | the tab opens | it says it could not load, with *Try again* |
 | SE-20.10 | A person with Edit on the model on a property | they set its level to public, internal, confidential or personal | the level is staged on the draft and in force when the model publishes; a property nobody set reads *internal* |
 | SE-20.11 | A level that is not one of the four, or a level on a property its kind does not carry | it is staged | it is refused, naming the level or the property |

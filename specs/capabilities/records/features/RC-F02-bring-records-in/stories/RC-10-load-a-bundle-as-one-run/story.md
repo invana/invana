@@ -22,7 +22,7 @@ Loading a bundle needs Create on `data/<graph database>/<kind>` ([the permission
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Check and load any bundle; read its run | — |
-| Operator | Check a bundle offline; read a bundle's run. With Create on the kind, loads it as an Admin does | Loading refused before anything is written — *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
+| Operator | Check a bundle offline; read a bundle's run. With Create on the kind, loads it as an Admin does | Loading refused before anything is written — *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 
 ## Flow
 

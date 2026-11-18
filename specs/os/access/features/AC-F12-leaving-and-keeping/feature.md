@@ -80,7 +80,7 @@ sequenceDiagram
 | Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read each store's retention, the holds on and off, and the names setting | None — every signed-in person | — |
-| Set a store's retention · place or lift a legal hold · set the names setting | Edit on `setting/retention`, in a session, signing in again | Disabled — *Needs Edit on setting/retention — ask Priya or Lee* |
+| Set a store's retention · place or lift a legal hold · set the names setting | Edit on `setting/retention`, in a session, signing in again | Disabled — *Needs Edit on Retention settings — ask Priya or Lee* |
 | Forget a subject · read the subjects forgotten | Admin, in a session, signing in again | Hidden — *Forget a subject* is not offered |
 | Export everything held about a person | Admin, in a session, signing in again | Hidden — *Export their data* is not offered on a person's row |
 

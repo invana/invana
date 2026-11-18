@@ -21,7 +21,7 @@ The board needs no permission of its own ([the permission catalogue](../../../..
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every mode, every tool, every menu item on any board | — |
-| Operator | Look, pick a mode, open every menu on any board; with Edit on the graph database, the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*. A link to a board that does not exist: *Not found* |
+| Operator | Look, pick a mode, open every menu on any board; with Edit on the graph database, the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}*. A link to a board that does not exist: *Not found* |
 
 ## Flow
 

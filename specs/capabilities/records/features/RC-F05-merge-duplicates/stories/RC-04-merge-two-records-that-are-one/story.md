@@ -20,7 +20,7 @@ Merging needs Edit on `data/<graph database>/<kind>` ([the permission catalogue]
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Compare and merge two records of one kind | — |
-| Operator | Compare two records. With Edit on the kind, merges as an Admin does | *Merge* disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| Operator | Compare two records. With Edit on the kind, merges as an Admin does | *Merge* disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 
 ## Flow
 
@@ -40,7 +40,7 @@ flowchart LR
 | RC-04.2 | A merge the model allows | it runs | one record remains with the picked values and every relationship of both |
 | RC-04.3 | A merged record | its History opens | it names the merge, who ran it and the other record's key |
 | RC-04.4 | Two records of different kinds | a merge is asked for | it is refused before anything is written |
-| RC-04.5 | A person without Edit on the kind | they reach *Merge* | it is disabled with *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| RC-04.5 | A person without Edit on the kind | they reach *Merge* | it is disabled with *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 
 ## Screens
 

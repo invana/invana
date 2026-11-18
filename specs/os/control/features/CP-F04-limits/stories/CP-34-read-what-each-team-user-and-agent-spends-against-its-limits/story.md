@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every team's, user's, agent's and the deployment's spend against its limits; change a limit from its row (CP-11) | — |
-| Operator | read the same spend against every limit ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| Operator | read the same spend against every limit ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Edit* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
 
 ## Flow
 
@@ -45,7 +45,7 @@ flowchart TD
 | CP-34.3 | A deployment with no runs yet | the usage is read | each meter reads zero against its limit and each list says nothing has run |
 | CP-34.4 | Spend near a limit | the usage is read | the meter says so, and that only an Admin raises a limit |
 | CP-34.5 | A subject at its tokens a month | an agent would run | the run is held, naming the limit and whose (CP-11.9); a question a person asks still answers |
-| CP-34.6 | An Operator | they open *Usage and limits* | everything reads; *Edit* is disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| CP-34.6 | An Operator | they open *Usage and limits* | everything reads; *Edit* is disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
 | CP-34.7 | An Admin | they open *Usage and limits* | each row offers *Edit*, which opens its limits (CP-11) |
 | CP-34.8 | The usage cannot load | the page opens | it says it could not load and offers to try again |
 | CP-34.9 | A figure — a team's, user's or agent's runs or tokens | it is pressed | Runs opens filtered to the runs it counts (CP-50) |

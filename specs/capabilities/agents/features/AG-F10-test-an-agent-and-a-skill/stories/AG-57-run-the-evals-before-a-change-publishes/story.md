@@ -23,7 +23,7 @@ Running tests and evals needs Edit on `agent/<name>` or `skill/<name>` ([the per
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent or skill not built in: run a test, run the evals | A built-in's eval runs read, with *Copy* |
-| Operator | Read every test run, eval run, its tiles and its verdict. With Edit on the agent or skill, does what an Admin does | *Run a test* and *Run the evals* disabled, naming the permission — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}* |
+| Operator | Read every test run, eval run, its tiles and its verdict. With Edit on the agent or skill, does what an Admin does | *Run a test* and *Run the evals* disabled, naming the permission — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}* |
 
 ## Flow
 

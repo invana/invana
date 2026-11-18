@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Manage on the agent: name and change any agent's approvers, a built-in agent's included, signing in again | Naming one person alone warns, and is still allowed |
-| Operator | Read every agent's approvers | *Change approvers* disabled — *Needs Manage on agent/{name} — ask Priya or Lee* |
+| Operator | Read every agent's approvers | *Change approvers* disabled — *Needs Manage on the {name} agent — ask Priya or Lee* |
 
 ## Flow
 

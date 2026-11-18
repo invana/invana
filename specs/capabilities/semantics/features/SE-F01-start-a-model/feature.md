@@ -26,7 +26,7 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 ```mermaid
 flowchart TD
   start([A deployment with no model, or a new model wanted]) --> may{"Holds Create on model/<model>?"}
-  may -->|no| na["New model disabled — Needs Create on model/{model} · the map still reads"]
+  may -->|no| na["New model disabled — Needs Create on Models · the map still reads"]
   may -->|yes| from{Start from}
   from -->|what a graph database holds| r["SE-04 · Read a graph database"]
   r -->|empty| e["Nothing there yet — start from a description, a file or a starter"] --> from
@@ -79,8 +79,8 @@ table names the acts.
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | See the models, the drafts and what each graph database holds | Read on `model/<model>` | — |
-| Read a graph database · start a model from it | Create on `model/<model>`, through the Modeller agent | *Read the database* disabled — *Needs Create on model/{model} — ask {who can grant}* |
-| New model — describe it, a file, a starter, an ontology | Create on `model/<model>`, through the Modeller agent | *New model* disabled — *Needs Create on model/{model} — ask {who can grant}* |
+| Read a graph database · start a model from it | Create on `model/<model>`, through the Modeller agent | *Read the database* disabled — *Needs Create on Models — ask {who can grant}* |
+| New model — describe it, a file, a starter, an ontology | Create on `model/<model>`, through the Modeller agent | *New model* disabled — *Needs Create on Models — ask {who can grant}* |
 | Connect a graph database | Create on `setting/graph-databases`, in Graph databases ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)) | — |
 
 ## States
@@ -93,7 +93,7 @@ table names the acts.
 | Has data | The new draft open on its canvas, its kinds staged, the draft bar counting them |
 | Failed | The graph database unreachable or switched off, an unreadable file or ontology, a name taken — said in a sentence where it happened, with the next act; nothing half-made |
 | Agent working or proposing | The assistant drafting kinds from a description, docked beside the draft, each kind arriving staged |
-| No access | Every start disabled with *Needs Create on model/{model} — ask {who can grant}*; the map and drafts still read |
+| No access | Every start disabled with *Needs Create on Models — ask {who can grant}*; the map and drafts still read |
 
 ## Rules
 

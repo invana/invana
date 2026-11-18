@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Change a model in a draft, compare it, publish a change that only adds, request approval for a breaking one; approve or decline one as a named approver of the Modeller agent who did not ask | — |
-| Operator | Read the model, its draft, the comparison and its reviews; with Edit on the model, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Model*); anyone named an approver of the Modeller agent approves | *Change in a draft* disabled — *Needs Edit on model/{model} — ask {who can grant}*; *Publish* hidden |
+| Operator | Read the model, its draft, the comparison and its reviews; with Edit on the model, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Model*); anyone named an approver of the Modeller agent approves | *Change in a draft* disabled — *Needs Edit on the {model} model — ask {who can grant}*; *Publish* hidden |
 
 ## Flow
 
@@ -66,7 +66,7 @@ flowchart LR
 | SE-05.19 | An approval | it is declined, or its deadline passes | *Not published* with the note or *expired*; the draft stays a draft |
 | SE-05.20 | A published version | the person opens *How it got here* on it | it shows who published it, why, the review and its approver, and the runs that previewed and published it |
 | SE-05.21 | A published version | anyone opens it | it reads; changing it opens the draft for the next version |
-| SE-05.22 | A person without Edit on the model | they select a kind | *Change in a draft* is disabled with *Needs Edit on model/{model} — ask {who can grant}*; *Publish* is not shown |
+| SE-05.22 | A person without Edit on the model | they select a kind | *Change in a draft* is disabled with *Needs Edit on the {model} model — ask {who can grant}*; *Publish* is not shown |
 | SE-05.23 | A model whose graph database is read-only | a version publishes | it publishes; the confirm and the version list each constraint and index as *not pushed — read-only*, and nothing is written to the graph database |
 | SE-05.24 | A model whose kinds use a property type its graph database's server version cannot hold | the model or its draft opens | A banner on its head names each type and the server version, and *Publish* is refused naming them |
 | SE-05.25 | An open draft | the person adds or removes an index, or a unique or exists constraint, on a kind's property | It is staged like any change and named in the comparison; adding an index only adds, and a unique or exists constraint breaks |

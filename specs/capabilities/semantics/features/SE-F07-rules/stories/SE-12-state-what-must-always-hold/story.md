@@ -22,7 +22,7 @@ Writing a rule, *Everywhere* or on a project, is Edit on the model, from [the pe
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every rule and its evidence; create, edit, stop offering and offer again rules at both scopes | — |
-| Operator | Read every rule in force and its evidence; write both scopes when their policies hold Edit on the model | *New rule*, *Save rule* and *Stop offering it* disabled — *Needs Edit on model/orders — ask Priya or Lee* |
+| Operator | Read every rule in force and its evidence; write both scopes when their policies hold Edit on the model | *New rule*, *Save rule* and *Stop offering it* disabled — *Needs Edit on the Orders model — ask Priya or Lee* |
 
 ## Flow
 
@@ -61,7 +61,7 @@ flowchart LR
 | SE-12.13 | A step in the rule's scope | it runs | *How it got here* lists the rules it was offered, each as its statement, with the ones it cited marked |
 | SE-12.14 | A statement in *How it got here* | the person clicks it | it closes and the rule's evidence opens: offered · cited · never cited, each version with its own cited count, and where each was cited |
 | SE-12.15 | A person with Edit on the model | they set the scope | *Everywhere* and *A project* are both offered, and the rule saves at either |
-| SE-12.16 | A person without Edit on the model | they open a rule | it reads; *Save rule* and *Stop offering it* are disabled with *Needs Edit on model/orders — ask Priya or Lee* |
+| SE-12.16 | A person without Edit on the model | they open a rule | it reads; *Save rule* and *Stop offering it* are disabled with *Needs Edit on the Orders model — ask Priya or Lee* |
 | SE-12.17 | A person with Edit on the model | they list, show or apply rules from a file on the command line | The same scopes, checks and modes as the dialog, and a refusal names the field |
 | SE-12.18 | A person with Edit on the model | they pick *New rule* | it asks what the rule holds — *A statement* · *A standard* (SE-19) · *An alert* — and opens that rule's dialog |
 

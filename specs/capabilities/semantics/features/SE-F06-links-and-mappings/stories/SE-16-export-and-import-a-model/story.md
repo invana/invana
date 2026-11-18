@@ -21,7 +21,7 @@ Importing a model file as a new model needs Create on `model/*`; restoring needs
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Export a model with or without its records, import a model file as a new model, and restore an earlier version | — |
-| Operator | Export a model with or without its records, the records being those their default agent may read. With Create on `model/*`, imports as an Admin does; with Edit on the model, restores as an Admin does | *Import a model file* disabled — *Needs Create on models — ask {who can grant}*; *Restore* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Export a model with or without its records, the records being those their default agent may read. With Create on `model/*`, imports as an Admin does; with Edit on the model, restores as an Admin does | *Import a model file* disabled — *Needs Create on Models — ask {who can grant}*; *Restore* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Flow
 
@@ -54,7 +54,7 @@ flowchart LR
 | SE-16.9 | A property type this database cannot hold | the file is imported | it lands as a draft that cannot publish, naming each such type and why |
 | SE-16.10 | A file that cannot be read | it is imported | the dialog says why; nothing is made |
 | SE-16.11 | Any import or export | the dialog shows | it prints the matching `invana models` command |
-| SE-16.12 | An Operator | they open *New model* | *Export a model* works; *Import a model file* is disabled with *Needs Create on models — ask {who can grant}*, and *Restore* with *Needs Edit on model/{model} — ask {who can grant}* |
+| SE-16.12 | An Operator | they open *New model* | *Export a model* works; *Import a model file* is disabled with *Needs Create on Models — ask {who can grant}*, and *Restore* with *Needs Edit on the {model} model — ask {who can grant}* |
 | SE-16.13 | A model file declaring an axis on a property the model lacks | it is imported | The import is refused naming the model, the axis and the property; nothing is made |
 | SE-16.14 | A person with Create on `model/*` (Edit on the model to restore or upgrade) | they list, export, import or upgrade models, or list the starters, from the command line | The command does what the dialog does, under the same access; a refusal is a sentence naming the next command |
 | SE-16.15 | *The model and its records* where a property's level is confidential or personal | it exports | those values are left out of the records files; the dialog and the file name each property and level left out ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |

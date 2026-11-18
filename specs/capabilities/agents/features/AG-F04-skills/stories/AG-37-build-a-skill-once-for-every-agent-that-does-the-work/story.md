@@ -46,7 +46,7 @@ flowchart LR
   gi -->|names something its needs lack| gx["Publish refused, naming it"]
   i -->|no when to use| wx["Publish refused, naming the field"]
   i --> p(["Published version 1 — offered to the agents it is added to"])
-  s -->|without Create on skill/*| ro["Reads; New skill disabled — Needs Create on skill/*"]
+  s -->|without Create on skill/*| ro["Reads; New skill disabled — Needs Create on Skills*"]
   sh -->|without Edit on the skill| no["Reads; acts disabled — needs Create or Edit on skill/{skill}, ask {who can grant}"]
   sh -->|Delete| dl{"Ever published, or built in?"}
   dl -->|no| gone(["Deleted — taken off its agents, in History"])

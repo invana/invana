@@ -4,7 +4,7 @@ title: Start a project of its type
 feature: PJ-F01
 status: idea
 personas: [decision-maker, researcher, investigator, builder]
-boards: [projects.projects]
+boards: [projects.projects, shell.switcher, start.home]
 ---
 
 # PJ-02 · Start a project of its type
@@ -97,5 +97,9 @@ flowchart TD
 | New project · Team | Operator | projects.projects · New · Team · Only you | — | projects.projects · New · Team · Loading people and agents | projects.projects · New · Team | projects.projects · New · Team · No person | — | projects.projects · New · Team · Agent may not work here |
 | New project · Review | Admin | — | — | — | projects.projects · New · Review | projects.projects · New · Refused | — | — |
 | New project · Review | Operator | — | — | — | projects.projects · New · Review | projects.projects · New · Refused | — | — |
+| *New project*, refused — Create on Projects | Admin | — | — | — | — | — | — | — |
+| *New project*, refused — Create on Projects | Operator | — | — | — | — | — | — | shell.switcher · Act disabled |
+| *New project* on Home, refused — Create on Projects | Admin | — | — | — | — | — | — | — |
+| *New project* on Home, refused — Create on Projects | Operator | — | — | — | — | — | — | start.home · Act disabled |
 | A new project's page | Admin | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | — |
 | A new project's page | Operator | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | projects.projects · Detail · Withheld |

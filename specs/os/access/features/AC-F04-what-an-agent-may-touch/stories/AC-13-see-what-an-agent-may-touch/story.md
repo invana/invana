@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every resource and every declared need; *Change* opens the policy at that rule to edit (AC-04) | — |
-| Operator | Read every resource and every declared need when they hold Read on `access/policies`; without it nothing here | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Change* opens the policy read-only; editing is disabled, naming Edit on Access and who can grant it |
+| Operator | Read every resource and every declared need when they hold Read on `access/policies`; without it nothing here | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *Change* opens the policy read-only; editing is disabled, naming Edit on Access and who can grant it |
 
 ## Flow
 

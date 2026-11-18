@@ -75,8 +75,8 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Decide an ask | As AC-F05 | As AC-F05 |
 | Read rules and channels | None — every signed-in person | — |
 | Write, change or remove a notification rule that reaches only oneself | None — one's own rules | Another person's rule reads; its switch and *Edit* are disabled, naming its creator and the Admins |
-| Write a notification rule that reaches other people, a team or a channel | Edit on `setting/deployment` | Those recipients disabled — *Needs Edit on setting/deployment — ask {who can grant}* |
-| Add, test or remove a channel | Create on `setting/connections` to add · Edit to test or remove, in a session, with the password again | *Add channel*, *Test* and *Remove* disabled — *Needs Edit on setting/connections — ask {who can grant}* |
+| Write a notification rule that reaches other people, a team or a channel | Edit on `setting/deployment` | Those recipients disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
+| Add, test or remove a channel | Create on `setting/connections` to add · Edit to test or remove, in a session, with the password again | *Add channel*, *Test* and *Remove* disabled — *Needs Edit on Connection settings — ask {who can grant}* |
 | Choose where one's own asks and alerts reach one | None — one's own | Another person's choices are absent |
 | Answer project work in Needs you — accept or send back a task in review, start a task an agent asks to pick up, accept or reject an agent's proposal, read a new lead | None — on a project they can see ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) · [PJ-F03](../../../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md) · [PJ-F06](../../../../capabilities/projects/features/PJ-F06-alerts/feature.md)) | Work on a project their default agent may not Read lists its line, its content *Withheld*; *Accept* and *Send back* are its people on the team', a proposal's *Accept* its members' |
 

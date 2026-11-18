@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Switch an answer's template; author, copy, change, publish and delete projection templates | — |
-| Operator | Switch the template of an answer of theirs; read the projection templates. With Edit on skills, also authors them, as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *skills*) | *+* and each authoring act disabled — *Needs Edit on skill/{name} — ask {who can grant}* |
+| Operator | Switch the template of an answer of theirs; read the projection templates. With Edit on skills, also authors them, as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *skills*) | *+* and each authoring act disabled — *Needs Edit on the {name} skill — ask {who can grant}* |
 
 ## Flow
 
@@ -61,7 +61,7 @@ flowchart LR
 | EX-03.9 | A deployment with no custom templates | the person opens Agents › Skills › Projection templates | the five built-in ones are listed — records table · single value · category bars · graph · nothing held — each *built-in* |
 | EX-03.10 | A person with Edit on skills | they author a template and *Publish* | it is saved and published, and picked next time the rows match |
 | EX-03.11 | A template whose definition names a field the shape lacks | it is saved | it is refused, naming the field |
-| EX-03.12 | An Operator | they open the projection templates | they read them; *+* and every authoring act are disabled — *Needs Edit on skill/{name} — ask {who can grant}*; the engine refuses an authoring call — *Needs Edit on skill/{name} — ask {who can grant}.* |
+| EX-03.12 | An Operator | they open the projection templates | they read them; *+* and every authoring act are disabled — *Needs Edit on the {name} skill — ask {who can grant}*; the engine refuses an authoring call — *Needs Edit on the {name} skill — ask {who can grant}.* |
 | EX-03.13 | An HTML template | it draws | it runs no script, reaches no network and loads no outside asset |
 | EX-03.14 | A published template, or a built-in one | a person with Edit on skills changes it | a published custom template's change is a new draft version and answers keep reading the published one; a built-in one is not changed — *{template} is built in — copy it to change it*, and *Copy* makes a custom draft made by them |
 | EX-03.15 | A template | a person with Edit on skills deletes it | a draft that never published is deleted; a published or built-in one is refused, saying answers read it |

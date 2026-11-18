@@ -23,7 +23,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | All an Operator with Create can; apply the Access Policy files the folder brought (AC-04); grant the imported agents (AC-22) | — |
-| Operator | Read the imported agents and skills once they are saved. With Create on `agent/*` and `skill/*` (usually *Build agents*): drop a project's folder or a zip of it, read what Invana found in each agent tool's folder, confirm or leave out each file, import | *Import* is disabled — *Needs Create on agents and skills — ask {who can grant}*; Policy files read *Waiting for an Admin to apply*; *Apply* and *Grant* are disabled, naming Edit on Access and Manage on Access |
+| Operator | Read the imported agents and skills once they are saved. With Create on `agent/*` and `skill/*` (usually *Build agents*): drop a project's folder or a zip of it, read what Invana found in each agent tool's folder, confirm or leave out each file, import | *Import* is disabled — *Needs Create on Agents and Skills — ask {who can grant}*; Policy files read *Waiting for an Admin to apply*; *Apply* and *Grant* are disabled, naming Edit on Access and Manage on Access |
 
 ## Flow
 
@@ -45,7 +45,7 @@ flowchart TD
   cf -->|Import n| s(["Drafts, the platform's, made by the Modeller · granted to nobody"])
   cf -->|leave a file out| g
   s --> t(["Tested and published like any agent — AG-36 · an Admin grants it — AG-35"])
-  a -->|without Create on agents| no(["Import disabled · names Create on agents"])
+  a -->|without Create on Agents| no(["Import disabled · names Create on Agents"])
 ```
 
 ## Acceptance criteria
@@ -61,7 +61,7 @@ flowchart TD
 | AG-63.7 | An Access Policy file — `policies/*.yaml` — in the folder | *Import n* saves it | it lands as a draft reading *Waiting for an Admin to apply* and decides nothing; every Admin finds it in *Needs you*; only an Admin's *Apply*, after *Who it changes*, puts it in force (AC-04.17) |
 | AG-63.8 | A folder imported before | it is dropped again | each agent or skill that changed is offered as a new version, each unchanged one reads *Unchanged* and is skipped, and one gone from the folder is named and left as it is |
 | AG-63.9 | A dropped folder with no agent tool's folder, plugin, agent file or skill folder | it is read | it reads *No agents or skills found*, naming what Invana looks for; nothing is saved |
-| AG-63.10 | A person without Create on `agent/*` and `skill/*` | they open Agents › Skills | *Import* is disabled — *Needs Create on agents and skills — ask {who can grant}*; the engine refuses the same from the API |
+| AG-63.10 | A person without Create on `agent/*` and `skill/*` | they open Agents › Skills | *Import* is disabled — *Needs Create on Agents and Skills — ask {who can grant}*; the engine refuses the same from the API |
 | AG-63.11 | The files being read | the dry run is in progress | it reads *Reading the files…*; each folder's group and each row fill in as they are mapped |
 | AG-63.12 | Nothing refused | the Modeller presses *Import n* | every agent and skill is saved as a draft, owned by the platform and made by the Modeller, granted to nobody until an Admin grants it; History records the import with the folders it read |
 | AG-63.13 | An agent the import made | its page opens | it reads *Imported*, naming the folder and file it came from; *How it got here* on the import shows each mapped field beside its source and each file left out with why |

@@ -22,7 +22,7 @@ The permission each act needs is in [the permission catalogue](../../../../../ac
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Manage on `plugin/<name>`: make, renew and remove a work connection, with the password again; approve another Admin's change when a second Admin's yes is on; with Edit on `agent/<name>`, attach and take off a work connection on any agent | The Admin who made a change cannot approve it |
-| Operator | Read every work connection — its server, label, state, who made it and the agents it is attached to — on the server and on each agent. With Edit on `agent/<name>`, also attach and take off a work connection on that agent | *Make a work connection*, *Renew* and *Remove* are disabled — *Needs Manage on plugin/{name} — ask {who can grant}*; *Attach* is disabled — *Needs Edit on agent/{name} — ask {who can grant}* |
+| Operator | Read every work connection — its server, label, state, who made it and the agents it is attached to — on the server and on each agent. With Edit on `agent/<name>`, also attach and take off a work connection on that agent | *Make a work connection*, *Renew* and *Remove* are disabled — *Needs Manage on the {name} plugin — ask {who can grant}*; *Attach* is disabled — *Needs Edit on the {name} agent — ask {who can grant}* |
 
 ## Flow
 
@@ -60,8 +60,8 @@ flowchart TD
 | CP-62.6 | An agent that already has a work connection on a server | a second one on that server is attached | it is refused, naming the one it has |
 | CP-62.7 | A schedule, a picked-up task or a project key's run whose agent has no work connection on a server | a step calls the server | it is refused before the call, naming the agent and the server and saying someone with Edit on the agent attaches one |
 | CP-62.8 | A work connection the server stops renewing | a renewal is refused | it reads *Expired*; the Admins get a connection health alert; calls that need it are refused until an Admin renews it |
-| CP-62.9 | An Operator without Manage on the plugin | they make, renew or remove a work connection by any path | it is refused — *Needs Manage on plugin/{name} — ask {who can grant}* — and the acts read disabled, naming the permission |
-| CP-62.10 | An Operator without Edit on the agent | they attach or take off a work connection | it is refused — *Needs Edit on agent/{name} — ask {who can grant}* |
+| CP-62.9 | An Operator without Manage on the plugin | they make, renew or remove a work connection by any path | it is refused — *Needs Manage on the {name} plugin — ask {who can grant}* — and the acts read disabled, naming the permission |
+| CP-62.10 | An Operator without Edit on the agent | they attach or take off a work connection | it is refused — *Needs Edit on the {name} agent — ask {who can grant}* |
 | CP-62.11 | Making, renewing, removing or approving a work connection | it is done without the password, with a wrong one, or with a key | it is refused — *Enter your password again to do this* |
 | CP-62.12 | An Admin removing a work connection | they confirm | the agents it is attached to are listed first; it is taken off each and removed; History records it |
 | CP-62.13 | A call made with a work connection | it is recorded | *What left the platform* names the work connection, never its credential (AC-F09) |

@@ -21,7 +21,7 @@ Adding records needs Create on `data/<graph database>/<kind>` ([the permission c
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add records to any kind of a published model | — |
-| Operator | With Create on the kind, adds records as an Admin does | *Add records* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
+| Operator | With Create on the kind, adds records as an Admin does | *Add records* disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 
 ## Flow
 
@@ -45,7 +45,7 @@ flowchart LR
 | RC-11.3 | Records saved | the load runs | they are one load, its source *by hand*, the person its author, each record checked against the kind's constraints like any load |
 | RC-11.4 | A new record whose key already exists | it is saved | it is refused naming the key; a new record never overwrites one |
 | RC-11.5 | More than 5,000 records | the form opens | it points to the load command instead |
-| RC-11.6 | A person without Create on the kind | they open Bring records in | *Add records by hand* is disabled with *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
+| RC-11.6 | A person without Create on the kind | they open Bring records in | *Add records by hand* is disabled with *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 
 ## Screens
 

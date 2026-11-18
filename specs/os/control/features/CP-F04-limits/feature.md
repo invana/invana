@@ -63,7 +63,7 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every limit and what each team, user and agent spends against it | Read on `worker/<group>` | — |
-| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit; the slots of *AI model calls*, *graph database calls* and *heavy steps* | Edit on `worker/<group>` | *Edit* disabled — *Needs Edit on worker/{group} — ask {who can grant}* |
+| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit; the slots of *AI model calls*, *graph database calls* and *heavy steps* | Edit on `worker/<group>` | *Edit* disabled — *Needs Edit on the {group} worker group — ask {who can grant}* |
 | Ask for a higher limit from a held run | The person behind the run | *Ask for more* absent; why it is held reads |
 | Allow that ask | Edit on `worker/<group>`, in Needs you (AC-15) | As AC-F05 |
 | Set a project's *Runs at once* and *Tokens a month* | Manage on Projects for it, in the project's Access — the policy form's *Fleet / Workers* tab ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#the-policy-form)); its creator in New project's Access step, a raise beyond what they may grant asked of those with Manage on Projects | The tab reads; its limits disabled, naming the permission and who can grant it |

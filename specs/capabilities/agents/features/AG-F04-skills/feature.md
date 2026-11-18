@@ -134,11 +134,11 @@ A skill is the platform's ([AC-F07](../../../../os/access/features/AC-F07-owners
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read every skill — instructions, Flow, what it needs, who made it, agents, usage, exceptions, evals, tests, history | Read on `skill/<name>` | — |
-| Create a skill; copy a built-in skill — the platform's, made by the copier | Create on `skill/*` | *New skill* and *Copy* are disabled, naming the permission — *Needs Create on skill/* — ask {who can grant}*; the command line refuses, naming it |
-| Edit a draft, set its model version, choose guided or planned, answer the drawing's questions, discard the draft, publish, roll back, delete a skill that never published — in Studio or on the command line | Edit on `skill/<name>` (Publish on it to publish or roll back). Never on a built-in skill | The editor reads; each act is disabled — *Needs Edit on skill/{skill} — ask {who can grant}*; a built-in skill offers *Copy* instead |
-| Adopt a handler | Edit on `skill/<name>` | Exceptions read; *Adopt* is disabled — *Needs Edit on skill/{skill} — ask {who can grant}* |
+| Create a skill; copy a built-in skill — the platform's, made by the copier | Create on `skill/*` | *New skill* and *Copy* are disabled, naming the permission — *Needs Create on Skills* — ask {who can grant}*; the command line refuses, naming it |
+| Edit a draft, set its model version, choose guided or planned, answer the drawing's questions, discard the draft, publish, roll back, delete a skill that never published — in Studio or on the command line | Edit on `skill/<name>` (Publish on it to publish or roll back). Never on a built-in skill | The editor reads; each act is disabled — *Needs Edit on the {skill} skill — ask {who can grant}*; a built-in skill offers *Copy* instead |
+| Adopt a handler | Edit on `skill/<name>` | Exceptions read; *Adopt* is disabled — *Needs Edit on the {skill} skill — ask {who can grant}* |
 | Keep its evals, run a test, run the evals | As [AG-F10](../AG-F10-test-an-agent-and-a-skill/feature.md#access) | As AG-F10 |
-| Add a skill to an agent, remove it | Edit on `agent/<name>` | The agents read; *Add to an agent* and *Remove* are disabled — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| Add a skill to an agent, remove it | Edit on `agent/<name>` | The agents read; *Add to an agent* and *Remove* are disabled — *Needs Edit on the {agent} agent — ask {who can grant}* |
 | Approve a function a skill needs from a library | Publish · Approve on `skill/<name>` (AG-40) | The need reads *Waiting for an Admin* |
 | Approve a script in a skill's `scripts/` | Publish · Approve on `skill/<name>` ([CP-F06](../../../../os/control/features/CP-F06-skill-scripts/feature.md)) | The script reads *Waiting for an Admin* |
 | Allow what a skill needs — a rule on an Access Policy attached to the agent | Edit on `access/policies` ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The need reads, naming the resource and verb a rule would have to allow |

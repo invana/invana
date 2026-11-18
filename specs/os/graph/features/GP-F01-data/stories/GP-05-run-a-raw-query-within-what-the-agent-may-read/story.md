@@ -23,7 +23,7 @@ is the person's side of it); its four layers are this story's. The permission ea
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run a raw query as the Query console, within what its policies allow Read; a write waits on its approvers and runs only on a read + write graph database | A refusal naming the rule, its policy and who set it, for a write or an unlabelled pattern; what a policy hides is simply not there |
-| Operator | The same for a read, when they may use the Query console; with Edit on `data/<graph database>` they may also send a write, as Admin | A write: *Needs Edit on data/{graph database} — ask {who can grant}*. Not granted the Query console: disabled, naming the Admins |
+| Operator | The same for a read, when they may use the Query console; with Edit on `data/<graph database>` they may also send a write, as Admin | A write: *Needs Edit on {graph database} data — ask {who can grant}*. Not granted the Query console: disabled, naming the Admins |
 
 ## Flow
 

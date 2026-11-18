@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the slots and where steps wait; *Add workers* on a short group; *Drain* idle workers the advice names | — |
-| Operator | Read the slots, where steps wait and the advice | *Add workers* disabled — *Needs Create on worker/{group}*, and *Drain* — *Needs Manage on worker/{group}* — ask {who can grant} |
+| Operator | Read the slots, where steps wait and the advice | *Add workers* disabled — *Needs Create on Workers*, and *Drain* — *Needs Manage on the {group} worker group* — ask {who can grant} |
 
 ## Flow
 
@@ -47,7 +47,7 @@ flowchart TD
 | CP-08.4 | A group with no worker | it is read | it says *no workers — start one*, and a run waiting on it names the group |
 | CP-08.5 | A step whose labels no live group covers | it waits | it is named, with the missing label, and fails when its wait runs out |
 | CP-08.6 | Any group | Invana suggests workers | nothing starts a machine; a person adds them |
-| CP-08.7 | An Operator | they open Where steps wait | everything reads; *Add workers* are disabled — *Needs Create on worker/{group}*, and *Drain* — *Needs Manage on worker/{group}* — ask {who can grant} |
+| CP-08.7 | An Operator | they open Where steps wait | everything reads; *Add workers* are disabled — *Needs Create on Workers*, and *Drain* — *Needs Manage on the {group} worker group* — ask {who can grant} |
 | CP-08.8 | Workers in any group | Settings › Workers › Groups opens | its head reads the slots every worker together has now — *48 slots · 31 busy · 17 free* — and each group reads its own; a slot is one agent step a worker can take at once, and every number is the engine's, stored every 30 s |
 | CP-08.9 | A group whose suggested count is above its workers | it is read | its advice reads *Add {n} workers*, the number the engine suggested |
 | CP-08.10 | A group with workers idle over the last ten minutes and a suggested count below its workers, above its minimum | it is read | its advice reads *{n} idle — drain {n}*, never below the group's minimum; an Admin's *Drain* drains that many idle workers (CP-09) |

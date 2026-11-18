@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a policy's rules and versions; write a new or a copied policy; edit and delete a custom policy; *Copy* any policy; apply a policy file an import or a Team pack brought in; approve another Admin's change when a second Admin's yes is set. Saving asks them to sign in again | A built-in policy has no *Edit*, *Rename* or *Delete* — *Copy to change*; their own waiting change has no *Approve* |
-| Operator | Nothing here without Read on `access/policies`; a person who may import brings in an import whose policy files wait for a person with Edit on Access. A person who holds Read but not Edit on Access reads a policy's rules and versions | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *New policy*, *Edit*, *Copy*, *Apply* and *Delete* disabled — *Needs Edit on Access — ask Priya or Lee* |
+| Operator | Nothing here without Read on `access/policies`; a person who may import brings in an import whose policy files wait for a person with Edit on Access. A person who holds Read but not Edit on Access reads a policy's rules and versions | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *New policy*, *Edit*, *Copy*, *Apply* and *Delete* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 

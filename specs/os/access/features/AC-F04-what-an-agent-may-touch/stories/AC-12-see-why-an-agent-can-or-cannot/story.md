@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every agent's access; attach a policy to it (AC-11) | — |
-| Operator | Read every agent's access, its policies and its refusals when they hold Read on `access/policies`; without it nothing here | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Attach a policy* disabled — *Needs Manage on Access — ask Priya or Lee* |
+| Operator | Read every agent's access, its policies and its refusals when they hold Read on `access/policies`; without it nothing here | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *Attach a policy* disabled — *Needs Manage on Access — ask Priya or Lee* |
 
 ## Flow
 

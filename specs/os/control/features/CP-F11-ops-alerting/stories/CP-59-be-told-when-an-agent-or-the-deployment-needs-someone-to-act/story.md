@@ -21,7 +21,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F11](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every ops alert; read every alert; act on what it is about; with Edit on `worker/<group>`, close one with a note | — |
-| Operator | receive alerts about agents they are a named approver of, runs they are behind, their own limit, schedules they created and History alerts that name them or their team — alerts about tasks and connections are [CP-67](../CP-67-get-told-when-work-stops-or-a-connection-fails/story.md)'s ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs Edit on worker/{group} — ask {who can grant}*; a run's content withheld as AC-31 says |
+| Operator | receive alerts about agents they are a named approver of, runs they are behind, their own limit, schedules they created and History alerts that name them or their team — alerts about tasks and connections are [CP-67](../CP-67-get-told-when-work-stops-or-a-connection-fails/story.md)'s ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); read every alert; act on what it is about as that act allows | *Close* disabled — *Needs Edit on the {group} worker group — ask {who can grant}*; a run's content withheld as AC-31 says |
 
 ## Flow
 
@@ -59,7 +59,7 @@ flowchart TD
 | CP-59.6 | A run of a workflow approved as schema-only that makes a data-bearing call | the call is recorded | an alert *data from a schema-only workflow* opens naming the run, the target and the class, sent to the agent's named approvers, then the Admins |
 | CP-59.7 | An alert already open on the same thing | the kind fires again | the open alert counts one more and moves to the top; no second alert opens |
 | CP-59.8 | An alert | it reaches a person | it waits in their *Needs you* and goes to each channel they turned on, as one line and a link — never a run's content, a record or a query |
-| CP-59.9 | An Operator | they read an alert | *Close* is disabled — *Needs Edit on worker/{group} — ask {who can grant}*; the route answers 403 with the same sentence |
+| CP-59.9 | An Operator | they read an alert | *Close* is disabled — *Needs Edit on the {group} worker group — ask {who can grant}*; the route answers 403 with the same sentence |
 | CP-59.10 | An Admin closing an alert already closed | they choose *Close* | *Already closed — {by}*; nothing changes |
 | CP-59.11 | An alert about a run | the run is stopped, or moves again | the alert closes naming the stop and who, or *cleared*; each recipient's Inbox row reads closed |
 | CP-59.12 | An alert about a limit or a graph database | the limit is changed, or the database is switched off or answers again | the alert closes naming the act and who, or *cleared* |

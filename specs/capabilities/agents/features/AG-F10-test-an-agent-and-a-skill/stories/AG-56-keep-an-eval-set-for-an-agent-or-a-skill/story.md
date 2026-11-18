@@ -23,7 +23,7 @@ Keeping an eval set needs Edit on `agent/<name>` or `skill/<name>` ([the permiss
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent or skill not built in: write, accept and retire cases, set the judge and rubric, ask for proposed cases, promote a run's answer to a case | A built-in's set reads, with *Copy* — *Built in — copy it to change it* |
-| Operator | Read every eval set, its cases, checks, judge and rubric. With Edit on the agent or skill, does what an Admin does; promote only from a run they may read | *Write a case*, *Propose from the instructions*, *Promote to eval* disabled, naming the permission — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}* |
+| Operator | Read every eval set, its cases, checks, judge and rubric. With Edit on the agent or skill, does what an Admin does; promote only from a run they may read | *Write a case*, *Propose from the instructions*, *Promote to eval* disabled, naming the permission — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}* |
 
 ## Flow
 
@@ -57,7 +57,7 @@ flowchart LR
 | AG-56.8 | A run's answer | a person with Edit on the agent or skill who may read the run presses *Promote to eval*, *passing* or *failing* | it becomes a case of that set with the question and checks, keeping its run; an agent never promotes |
 | AG-56.9 | A run whose content the person may not read | they look for *Promote to eval* | it is disabled, naming who reads it — the person behind the run and, for a project's run, anyone whose default agent may see its sources |
 | AG-56.10 | A case whose run is gone, or a retired case | it is read | it keeps its question and checks, and a retired case the results it judged; a gone run's link reads *source gone* |
-| AG-56.11 | An Operator | they open Evals | everything reads; every act is disabled, naming the permission — *Needs Edit on agent/{agent} or skill/{skill} — ask {who can grant}* |
+| AG-56.11 | An Operator | they open Evals | everything reads; every act is disabled, naming the permission — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}* |
 | AG-56.12 | A built-in agent or skill | Evals opens | its set reads, with *Copy* in place of every act; the copy keeps the set's cases, owned by the copier |
 | AG-56.13 | A judged check | it is shown | it is labelled *judged* and kept apart from the hard checks |
 

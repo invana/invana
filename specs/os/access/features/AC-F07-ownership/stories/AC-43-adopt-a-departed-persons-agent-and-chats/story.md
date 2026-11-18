@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | As a successor: read the departed person's chats, which are theirs now; adopt a retired personal agent of the person they succeeded | Another successor's chats and agents are not offered |
-| Operator | As a successor: read the departed person's chats, which are theirs now; with Create on `agent/*`, also adopts a retired personal agent of the person they succeeded | *Adopt* disabled — *Needs Create on agents — ask Priya or Lee*; the agent stays retired |
+| Operator | As a successor: read the departed person's chats, which are theirs now; with Create on `agent/*`, also adopts a retired personal agent of the person they succeeded | *Adopt* disabled — *Needs Create on Agents — ask Priya or Lee*; the agent stays retired |
 
 ## Flow
 
@@ -34,7 +34,7 @@ flowchart TD
   ch -->|personal data erased| er(["Erased — personal data of a person who left"])
   inbox --> ag["Their personal agents · Retired"]
   ag --> can{"Can I Create agents?"}
-  can -->|no| dis(["Adopt disabled · needs Create on agents · stays retired"])
+  can -->|no| dis(["Adopt disabled · Needs Create on Agents · stays retired"])
   can -->|yes| ad["Adopt"]
   ad --> pw{"Confirm"}
   pw --> mine(["My personal agent · granted to me alone · made by them · History"])

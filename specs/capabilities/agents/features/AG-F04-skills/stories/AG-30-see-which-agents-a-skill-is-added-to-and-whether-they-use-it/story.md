@@ -23,7 +23,7 @@ Adding a skill to an agent needs Edit on `agent/<name>` ([the permission catalog
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add any skill to any agent, remove it, read every count | — |
-| Operator | Read which agents it is added to, which are refused and why, what it needs, and every count. With Edit on the agent, does what an Admin does | *Add to an agent* and *Remove* disabled, naming the permission — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| Operator | Read which agents it is added to, which are refused and why, what it needs, and every count. With Edit on the agent, does what an Admin does | *Add to an agent* and *Remove* disabled, naming the permission — *Needs Edit on the {agent} agent — ask {who can grant}* |
 
 ## Flow
 
@@ -65,13 +65,13 @@ flowchart LR
 | AG-30.17 | Usage | it is read | the four readings are drawn, each naming its move — the wrong agents: remove it · the wrong trigger: rewrite *when to use* · the wrong content: rewrite the instructions · it fits: leave it |
 | AG-30.18 | Any count's row | the person opens it | it opens the runs behind it, each to the step that was offered the skill — one row per step, so two steps of one run read as two rows; a run whose detail is purged says so, its counts stay, and a step whose run is gone carries no action |
 | AG-30.19 | A new version published | Usage opens | its counts start at zero; earlier versions keep theirs, and counts are never summed across versions |
-| AG-30.20 | An Operator | they open Agents or Usage | everything reads; *Add to an agent* and *Remove* are disabled, naming the permission — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| AG-30.20 | An Operator | they open Agents or Usage | everything reads; *Add to an agent* and *Remove* are disabled, naming the permission — *Needs Edit on the {agent} agent — ask {who can grant}* |
 | AG-30.21 | A guided skill | it is added to an agent | it is refused only when a need in its `metadata:` list is outside what the agent's Access Policies allow, naming it; each call a run makes is checked as it is made |
 | AG-30.22 | A skill with only a draft | Usage opens | the version reads `draft`, never `v0`, and the per-version band reads *nothing is published yet — there is no text for these counts to belong to* |
 | AG-30.23 | Usage, with an older version picked on the version bar | by agent and by outcome are read | they say *only the current version has a breakdown*, never the current version's counts under the older label |
 | AG-30.24 | A skill that needs to write `data/<graph database>/<kind>` on a read-only graph database | it is added | it is refused under that agent's row — *{database} is read-only — {skill} needs to write* |
 | AG-30.25 | A need a rule allows only under Ask | it is added | it is added; the need reads *asks first*, and each run checks it again for the person behind it |
-| AG-30.26 | An Operator | they open the skill's Agents tab or the agent's skills | everything reads; *Add to an agent* and *Remove* are disabled — *Needs Edit on agent/{agent} — ask {who can grant}* |
+| AG-30.26 | An Operator | they open the skill's Agents tab or the agent's skills | everything reads; *Add to an agent* and *Remove* are disabled — *Needs Edit on the {agent} agent — ask {who can grant}* |
 
 ## Screens
 

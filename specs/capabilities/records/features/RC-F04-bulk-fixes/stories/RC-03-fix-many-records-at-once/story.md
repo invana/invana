@@ -20,7 +20,7 @@ Running a fix needs Edit on `data/<graph database>/<kind>` ([the permission cata
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Preview and run a fix | — |
-| Operator | Preview a fix. With Edit on the kind, runs it as an Admin does | *Run* disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| Operator | Preview a fix. With Edit on the kind, runs it as an Admin does | *Run* disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 
 ## Flow
 
@@ -42,7 +42,7 @@ flowchart LR
 | RC-03.2 | A preview the model fully allows | the person runs it | it writes as one run and each record's History names it |
 | RC-03.3 | A change the model refuses | the person runs it | nothing is written and the refusal names the constraint |
 | RC-03.4 | A Gremlin database refusing part way | the fix runs | it says what was written and what was not, with *Try the rest* |
-| RC-03.5 | A person without Edit on the kind | they reach *Run* | it is disabled with *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| RC-03.5 | A person without Edit on the kind | they reach *Run* | it is disabled with *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 
 ## Screens
 

@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read, write, switch off and delete every rule; with Edit on `setting/deployment`, name any user, team, *the person behind the run*, *the agent's named approvers* or channel | — |
-| Operator | read every rule and channel; write, switch and delete their own rules that reach only themselves ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Other recipients, a team, a channel, *Add channel* and another person's switch and *Edit* disabled — *Needs Edit on setting/deployment — ask {who can grant}*, naming the rule's creator |
+| Operator | read every rule and channel; write, switch and delete their own rules that reach only themselves ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Other recipients, a team, a channel, *Add channel* and another person's switch and *Edit* disabled — *Needs Edit on Deployment settings — ask {who can grant}*, naming the rule's creator |
 
 ## Flow
 
@@ -31,7 +31,7 @@ flowchart LR
   r -->|New rule| n["When: events or alert kinds · Tell: users, teams, the person behind the run, the agent's named approvers · On: In app and channels"]
   n --> who{"Edit on setting/deployment, or only me?"}
   who -->|only me| v
-  who -->|anyone else, a team or a channel, without the permission| nr(["Refused · Needs Edit on setting/deployment, naming who can grant"])
+  who -->|anyone else, a team or a channel, without the permission| nr(["Refused · Needs Edit on Deployment settings, naming who can grant"])
   who -->|with the permission| v{"Valid?"}
   v -->|no recipient · unknown channel · it would feed itself| x["Refused, naming the field"] --> n
   v -->|yes| ok(["Saved · on"])
@@ -57,7 +57,7 @@ flowchart LR
 | CP-37.15 | A rule or channel change | it is saved | it is a History row (AC-F06) |
 | CP-37.16 | An Operator | they open Settings › Notifications | rules and channels read; they may write rules that reach only themselves; other recipients, teams, channels, *Add channel* and another person's switch and *Edit* are disabled, naming the permission |
 | CP-37.17 | An Admin at the command line | they apply a rules file — one rule or a list | each rule is created, or replaces the rule of its name, with the same checks as *New rule*; a refused rule names its field and nothing in the file is half-applied |
-| CP-37.18 | Anyone without Edit on `setting/deployment` | they save a rule that reaches anyone but themselves, or names a team or a channel, or change another person's rule | it is refused — *Needs Edit on setting/deployment — ask {who can grant}* — and nothing is saved |
+| CP-37.18 | Anyone without Edit on `setting/deployment` | they save a rule that reaches anyone but themselves, or names a team or a channel, or change another person's rule | it is refused — *Needs Edit on Deployment settings — ask {who can grant}* — and nothing is saved |
 | CP-37.19 | An alert (CP-59) | an Admin writes a rule matching its kind and naming a channel | each alert of that kind is delivered to that place as a line and a link, beside the Inbox rows CP-59 writes |
 | CP-37.20 | A rule an Operator wrote for themselves | it matches | it reaches them in the Inbox and on the channels they turned on (CP-46) |
 

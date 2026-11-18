@@ -92,7 +92,7 @@ is its run's: run privacy is [CP-F10](../../../../os/control/features/CP-F10-run
 | Open *Why?* and *How it got here* — prompts, plan, compiled queries, records | Whoever may read the answer | Content withheld |
 | Keep board · Share | The person behind the run ([EX-F02](../EX-F02-share-and-present-an-answer/feature.md)) | — |
 | Schedule this · Add to a project | The person behind the run — *Schedules* and *Projects* need no permission of their own ([AG-F07](../../../agents/features/AG-F07-schedules/feature.md) · [PJ-F03](../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) | — |
-| Author, change, publish and delete projection templates | Edit on `skill/<name>` | The templates read; *+* disabled — *Needs Edit on skill/{name} — ask {who can grant}* |
+| Author, change, publish and delete projection templates | Edit on `skill/<name>` | The templates read; *+* disabled — *Needs Edit on the {name} skill — ask {who can grant}* |
 
 ## States
 

@@ -24,7 +24,7 @@ promoting, declining and retiring org knowledge needs Edit on `memory/org` ([GP-
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every proposal and every piece of org knowledge their default agent may Read; promote, decline and retire | A proposal whose sources their default agent may not Read is absent |
-| Operator | Read proposals and org knowledge as far as their default agent may Read `memory/org` and the sources; with Edit on `memory/org` they may promote, decline and retire, as an Admin | *Promote*, *Decline* and *Retire* disabled — *Needs Edit on memory/org — ask {who can grant}* |
+| Operator | Read proposals and org knowledge as far as their default agent may Read `memory/org` and the sources; with Edit on `memory/org` they may promote, decline and retire, as an Admin | *Promote*, *Decline* and *Retire* disabled — *Needs Edit on Memory — ask {who can grant}* |
 
 ## Flow
 
@@ -38,7 +38,7 @@ flowchart TD
   l --> d{"Does the reader hold Edit on memory/org?"}
   d -->|Promote| pr["Promoted · read by every agent allowed memory/org · History records who"]
   d -->|Decline, with a note| dc(["Declined · kept with why"])
-  d -->|an Operator| no["Promote and Decline disabled: Needs Edit on memory/org"]
+  d -->|an Operator| no["Promote and Decline disabled: Needs Edit on Memory"]
   pr -->|Retire, with a note| rt(["Retired · not recalled · kept"])
   l -->|sources the reader's agent may not Read| wh["Absent · no note"]
 ```
@@ -65,7 +65,7 @@ sequenceDiagram
 | GP-09.3 | A proposal | a person with Edit on `memory/org` presses *Promote* | it reads *Promoted*, by whom and when, History records it, and from the next run every agent whose Access Policies allow Read on `memory/org` and on its sources may recall it ([AG-F09](../../../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)) |
 | GP-09.4 | A proposal | a person with Edit on `memory/org` declines it with a note | it reads *Declined*, by whom and why, and is never recalled |
 | GP-09.5 | Promoted org knowledge | a person with Edit on `memory/org` retires it with a note | it reads *Retired*, is not recalled by any run that starts after, and stays listed with who retired it and why |
-| GP-09.6 | An Operator | they open a proposal | it reads; *Promote*, *Decline* and *Retire* are disabled — *Needs Edit on memory/org — ask {who can grant}*; a call is refused the same way |
+| GP-09.6 | An Operator | they open a proposal | it reads; *Promote*, *Decline* and *Retire* are disabled — *Needs Edit on Memory — ask {who can grant}*; a call is refused the same way |
 | GP-09.7 | A proposal or org knowledge whose sources the reader's default agent may not Read | it is listed | it is absent from the list, with no count and no note |
 | GP-09.8 | A proposal | a person who may read its run opens *How it got here* | it shows the run's steps and the learning behind it; anyone else reads that it ran, its status and its tokens |
 | GP-09.9 | An agent | it tries to promote, decline or retire | it cannot: only a person decides org knowledge; no function offers an agent the act |

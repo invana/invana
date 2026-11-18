@@ -22,14 +22,14 @@ Running a derivation needs Run on `model/<model>`; write-back needs Edit on `dat
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read derivations and derived facts; create, change, stop or run a derivation; turn on write-back | — |
-| Operator | Read derivations and the derived facts whose premises their default agent may read. With Run on the model, also creates, changes, stops and runs a derivation; write-back needs Edit on the graph database | *New derivation*, *Run again* and *Stop* disabled — *Needs Run on model/{model} — ask {who can grant}*; *Write back* disabled — *Needs Edit on data/{graph database} — ask {who can grant}* |
+| Operator | Read derivations and the derived facts whose premises their default agent may read. With Run on the model, also creates, changes, stops and runs a derivation; write-back needs Edit on the graph database | *New derivation*, *Run again* and *Stop* disabled — *Needs Run on the {model} model — ask {who can grant}*; *Write back* disabled — *Needs Edit on {graph database} data — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   a([Model › Inference · New derivation]) --> c{"Holds Run on model/<model>?"}
-  c -->|no| na["Needs Run on model/{model} — ask {who can grant}"]
+  c -->|no| na["Needs Run on the {model} model — ask {who can grant}"]
   c -->|yes| d["When … then … · scope · write back"]
   d -->|not a supported form| x["Refused, naming what is not supported"]
   d -->|Preview| p["Would derive n facts now"]
@@ -53,9 +53,9 @@ flowchart LR
 | SE-22.7 | A load or a change that removes a premise | the next run ends | the facts that rested on it are withdrawn |
 | SE-22.8 | A derivation with write-back off | it runs | nothing is written to the graph database |
 | SE-22.9 | An Admin | they turn on write-back for a derivation | its facts are also written to the graph database, marked derived, and removed when withdrawn |
-| SE-22.10 | Someone without Edit on the graph database | they open a derivation | write-back reads; turning it on is disabled with *Needs Edit on data/{graph database} — ask {who can grant}*, and the API refuses it |
+| SE-22.10 | Someone without Edit on the graph database | they open a derivation | write-back reads; turning it on is disabled with *Needs Edit on {graph database} data — ask {who can grant}*, and the API refuses it |
 | SE-22.11 | A run that fails or passes the deployment's limit | it stops | the derivation names the reason, with *Run again* |
-| SE-22.12 | An Operator | they open Derivations | the list and derived facts read; the acts are disabled with *Needs Run on model/{model} — ask {who can grant}*, and the API refuses them |
+| SE-22.12 | An Operator | they open Derivations | the list and derived facts read; the acts are disabled with *Needs Run on the {model} model — ask {who can grant}*, and the API refuses them |
 | SE-22.13 | A derivation whose premises hold properties of different levels | it derives a fact | each derived property takes the highest level of the properties it was derived from, and shows it; a derivation cannot give a derived property a lower level |
 | SE-22.14 | A premise property whose level is changed in a later published version | the next run ends | the derived property's level follows it |
 | SE-22.15 | A derived fact whose premise property the reader's default agent may not read | the fact opens | the premise is absent from the fact's premises, with no note, and the derived property reads only as far as that agent's Access Policies reach its level |

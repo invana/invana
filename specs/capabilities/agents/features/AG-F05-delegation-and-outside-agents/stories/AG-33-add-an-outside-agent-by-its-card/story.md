@@ -22,7 +22,7 @@ Adding an outside agent needs Create on `plugin/*`; the rest, Manage on `plugin/
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add an outside agent, choose its credential, turn it on or off, read its card again, set its limits, remove one no run reached | — |
-| Operator | Read every outside agent, its skills, who added it and limits, never its secret | *Add an outside agent* and every act disabled — *Needs Create on plugin/* or Manage on plugin/{plugin} — ask {who can grant}* |
+| Operator | Read every outside agent, its skills, who added it and limits, never its secret | *Add an outside agent* and every act disabled — *Needs Create on Plugins* or Manage on plugin/{plugin} — ask {who can grant}* |
 
 ## Flow
 
@@ -55,7 +55,7 @@ flowchart LR
 | AG-33.5 | A card changed on the other side | nothing is done | nothing changes until an Admin presses *Read the card again*; a skill the card has dropped refuses, naming the card's date |
 | AG-33.6 | An outside agent | it is read | it shows its protocol, endpoint or server, skills, credential choice (never a secret's value), workers it calls from, limits — time, attempts, tasks at once — who added it, and on or off with who switched it |
 | AG-33.7 | An outside agent | it is listed in Agents | it reads *Outside*, is granted to nobody, is never given a task by a person, and holds no limits of Invana's own |
-| AG-33.8 | An Operator | they open Outside agents | everything reads; *Add an outside agent*, *Turn on*, *Read the card again* and *Remove* are disabled — *Needs Create on plugin/* or Manage on plugin/{plugin} — ask {who can grant}* |
+| AG-33.8 | An Operator | they open Outside agents | everything reads; *Add an outside agent*, *Turn on*, *Read the card again* and *Remove* are disabled — *Needs Create on Plugins* or Manage on plugin/{plugin} — ask {who can grant}* |
 | AG-33.9 | A document that is not an A2A agent card, or one whose interfaces offer no A2A version Invana speaks | they add it | it is refused, naming the version it found and the one Invana speaks; nothing is added |
 | AG-33.10 | An MCP outside agent naming a server not added in the Control Plane | they add it | it is refused, naming the server |
 | AG-33.11 | An outside agent a run has reached | an Admin removes it | it is refused — *turn it off instead* — so every run that reached it still resolves |

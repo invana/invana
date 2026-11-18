@@ -33,7 +33,7 @@ flowchart TD
   rows -->|Draft a narrower policy| who{"An Admin?"}
   who -->|yes| dr(["AC-06 · a draft without those rules · who it changes"])
   who -->|no| ro(["Disabled · names the Admins"])
-  a -->|without Create on agents| no(["Unused is not offered"])
+  a -->|without Create on Agents| no(["Unused is not offered"])
 ```
 
 ## Acceptance criteria

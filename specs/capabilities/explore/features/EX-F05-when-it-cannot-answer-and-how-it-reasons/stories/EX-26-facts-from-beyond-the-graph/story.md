@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read third-party claims and nodes and their references; *Keep* a third-party node on a read + write graph database | — |
-| Operator | Read third-party claims and nodes and their references, on answers they may read. With Edit on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Edit on the board*) | *Keep* disabled — *Needs Edit on data/{graph database}/Source — ask {who can grant}* |
+| Operator | Read third-party claims and nodes and their references, on answers they may read. With Edit on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Edit on the board*) | *Keep* disabled — *Needs Edit on Source in {graph database} — ask {who can grant}* |
 
 Which outside tools an agent may run is its Access Policies' ([AC-F02](../../../../../../os/access/features/AC-F02-access-policies/feature.md)); setting up the web tool needs Edit on `plugin/<name>` ([CP-F02](../../../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)).
 
@@ -50,7 +50,7 @@ flowchart TD
   ans --> n["Third-party nodes drawn on the board, marked"]
   n --> k{Keep?}
   k -->|"Holds Edit on data/<graph database>/Source · read + write"| kp(["Written as a Source, still marked after reload"])
-  k -->|an Operator| na["Keep disabled — Needs Edit on data/{graph database}/Source"]
+  k -->|an Operator| na["Keep disabled — Needs Edit on Source in {graph database}"]
   k -->|read-only graph database · no Write rule| kr["Refused · the database and its mode, or the rule, named"]
   k -->|not kept| gone([Gone when the board closes])
 ```
@@ -76,7 +76,7 @@ flowchart TD
 | EX-26.15 | A link that has since died | the person opens the reference | it keeps the link and says *as fetched on* its date |
 | EX-26.16 | The web tool switched off — at install by an Admin, or by the person's own switch | a question needs the web | the search is refused, naming who switched it off and when, and the answer is from Graph Data |
 | EX-26.17 | The web tool with no search address set | an allowed question needs the web | the step says *Web search is not set up — an Admin sets it in Plugins*, and the answer is from Graph Data |
-| EX-26.18 | An Operator | they select third-party nodes | *Keep* is disabled — *Needs Edit on data/{graph database}/Source — ask {who can grant}* |
+| EX-26.18 | An Operator | they select third-party nodes | *Keep* is disabled — *Needs Edit on Source in {graph database} — ask {who can grant}* |
 | EX-26.19 | An answer with third-party claims | the person opens *How it got here* | it shows the search, each fetch with its reference, which claims came from where, and that each call is in *What left the platform* |
 | EX-26.20 | A kept third-party node | anyone opens it in the Element panel | it shows its reference, the run it came from, who kept it and when, and what it is about |
 

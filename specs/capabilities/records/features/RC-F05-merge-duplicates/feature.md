@@ -48,7 +48,7 @@ flowchart TD
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Compare two records | Read on `data/<graph database>/<kind>` | — |
-| Merge them | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}*; a read-only connection gives its own reason |
+| Merge them | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}*; a read-only connection gives its own reason |
 
 ## States
 

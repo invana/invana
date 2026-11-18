@@ -61,10 +61,10 @@ flowchart TD
 
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Load into a model — upload, command line, API, a bundle, records by hand | Create on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/loader`) | *Upload* and *Add records* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; the command line and API refuse before anything is written |
+| Load into a model — upload, command line, API, a bundle, records by hand | Create on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/loader`) | *Upload* and *Add records* disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}*; the command line and API refuse before anything is written |
 | Read the loads, what each rejected and what landed | Read on `data/<graph database>` | — |
 | Export a load with its provenance | Read on `data/<graph database>` | — |
-| Undo a load | Edit on `data/<graph database>/<kind>` | *Undo load* disabled — *Needs Edit on data/{graph database}/{kind} — ask {who can grant}* |
+| Undo a load | Edit on `data/<graph database>/<kind>` | *Undo load* disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 | Cancel a load | Who started it, where they started it | Studio offers no cancel: a load is stopped where it was started |
 
 ## States
@@ -77,7 +77,7 @@ flowchart TD
 | Has data | A preview of what the file becomes; loads newest first with records written and rejected; a run's outcome, steps, what was rejected, its log and what landed |
 | Failed | A refused upload names the rows or the reason; a failed load shows its diagnosis and the next step where its counts are |
 | Agent working or proposing | — |
-| No access | Loading acts are disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*; every load still reads |
+| No access | Loading acts are disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}*; every load still reads |
 
 ## Rules
 

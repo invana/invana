@@ -21,7 +21,7 @@ Placing kinds and values needs Edit on `model/<model>` ([the permission catalogu
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the trees; set a broader kind; add or change a value hierarchy, in a draft | — |
-| Operator | Read the trees. With Edit on the model, places kinds and values as an Admin does | *Set a broader kind* and *Add a value hierarchy* absent — *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Read the trees. With Edit on the model, places kinds and values as an Admin does | *Set a broader kind* and *Add a value hierarchy* absent — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Flow
 
@@ -32,7 +32,7 @@ flowchart LR
   t -->|yes| r["Kinds under broader kinds · value hierarchies"]
   r -->|Set a broader kind · Add a value hierarchy| c{"Holds Edit on model/<model>?"}
   e --> c
-  c -->|no| na["Needs Edit on model/{model} — ask {who can grant}"]
+  c -->|no| na["Needs Edit on the {model} model — ask {who can grant}"]
   c -->|yes| s["Staged in the draft"]
   s -->|a cycle| x["Refused, naming the loop"]
   s -->|Publish| p(["Questions about the broader one reach the narrower ones"])
@@ -49,7 +49,7 @@ flowchart LR
 | SE-21.5 | A published value hierarchy | someone asks for a broader value | records with any narrower value are included, and *How it got here* names the value it widened through |
 | SE-21.6 | A kind or value placed under itself, directly or not | it is staged | it is refused, naming the loop |
 | SE-21.7 | A published broader kind removed in a draft | the draft publishes | it is a breaking change, reviewed as SE-05 says |
-| SE-21.8 | An Operator | they open Taxonomies | the trees read; the acts are absent with *Needs Edit on model/{model} — ask {who can grant}* |
+| SE-21.8 | An Operator | they open Taxonomies | the trees read; the acts are absent with *Needs Edit on the {model} model — ask {who can grant}* |
 | SE-21.9 | Taxonomies that cannot be read | it opens | it says it could not load, with *Try again* |
 
 ## Screens

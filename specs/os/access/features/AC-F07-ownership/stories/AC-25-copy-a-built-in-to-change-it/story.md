@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Copy any built-in; an agent copy is their personal agent, any other copy the organisation's, made by them | — |
-| Operator | Read every built-in, its owner *System* and its version; with Create on its kind, copies a built-in agent, skill, workflow or policy | *Copy* disabled, naming the permission it needs — *Needs Create on agents* for an agent, *Create on skills* for a skill, *Create on workflows* for a workflow, *Create on Access policies* for a policy — and who can grant it |
+| Operator | Read every built-in, its owner *System* and its version; with Create on its kind, copies a built-in agent, skill, workflow or policy | *Copy* disabled, naming the permission it needs — *Needs Create on Agents* for an agent, *Create on skills* for a skill, *Create on workflows* for a workflow, *Create on Access policies* for a policy — and who can grant it |
 
 ## Flow
 

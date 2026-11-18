@@ -22,7 +22,7 @@ Editing a skill needs Edit on `skill/<name>`; publishing, Publish ([the permissi
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any skill not built in: edit the draft, add functions, answer the planner's questions, choose for a flagged line, set the model version, discard the draft, publish, roll back — in Studio or on the command line | A built-in skill reads; *Copy* in place of *Edit instructions* |
-| Operator | Read the instructions, Plan preview, What it needs, Flow and History. With Edit on the skill, does what an Admin does | The editor is read-only; *Add functions*, *Discard draft*, *Publish*, *Edit instructions* and *Roll back* are disabled, naming the permission — *Needs Edit on skill/{skill} — ask {who can grant}* |
+| Operator | Read the instructions, Plan preview, What it needs, Flow and History. With Edit on the skill, does what an Admin does | The editor is read-only; *Add functions*, *Discard draft*, *Publish*, *Edit instructions* and *Roll back* are disabled, naming the permission — *Needs Edit on the {skill} skill — ask {who can grant}* |
 
 ## Flow
 
@@ -82,7 +82,7 @@ flowchart LR
 | AG-19.25 | A draft | its editor picks the model version the skill thinks with, or clears it | it is kept on the draft and publishes with the version, through the evals like any edit; a cleared one hands the choice to the agent; a step on this skill's plan calls it as AG-29.23 says, and one the deployment does not offer refuses the run, naming it |
 | AG-19.26 | The command line | `invana skills list · history · push · publish · rollback` | they do what Studio does: *push* writes the draft from a file and draws it, and a draw that asks a question prints it and stops — the question is answered in Studio; *publish* and *rollback* pass the same evals gate; someone without Edit on skill/{skill} is refused, naming the permission |
 | AG-19.27 | A drawn plan with two steps under one key, a function the deployment lacks, or a named workflow that is retired, is given a value of the wrong type, or would nest past the depth limit or into a cycle (AG-F06) | it is drawn | nothing is written; it says why where the flow would be, naming the step, the function or the workflow and what is wrong, and the plan that was there is untouched |
-| AG-19.28 | An Operator | they open a skill's Instructions or History | everything reads; the editor is read-only and each act is disabled — *Needs Edit on skill/{skill} — ask {who can grant}* |
+| AG-19.28 | An Operator | they open a skill's Instructions or History | everything reads; the editor is read-only and each act is disabled — *Needs Edit on the {skill} skill — ask {who can grant}* |
 
 ## Screens
 

@@ -23,7 +23,7 @@ The permission each act needs is in [the permission catalogue](../../../../../ac
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Edit on `plugin/<name>`: choose how Invana signs in to each outside server and whether people may connect their own; set or clear a shipped tool's secrets — each with the password again | — |
-| Operator | Read how each server signs in, whether people may connect their own, and whether each secret is set | Every credential act is disabled — *Needs Edit on plugin/{name} — ask {who can grant}*. A secret's value is never shown to anyone |
+| Operator | Read how each server signs in, whether people may connect their own, and whether each secret is set | Every credential act is disabled — *Needs Edit on the {name} plugin — ask {who can grant}*. A secret's value is never shown to anyone |
 
 ## Flow
 

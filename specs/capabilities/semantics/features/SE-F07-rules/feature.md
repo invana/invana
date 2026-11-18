@@ -66,7 +66,7 @@ Permissions are [the permission catalogue](../../../../os/access/features/AC-F02
 |---|---|---|
 | Read every rule in force and its evidence | Read on `model/<model>` | The model absent |
 | Read every request | Read on `model/<model>` | The model absent |
-| Create, edit, stop offering or offer again a rule *Everywhere* or on *A project* · hold a kind or property to a standard | Edit on `model/<model>` | Acts disabled, the permission named — *Needs Edit on model/orders — ask Priya or Lee* |
+| Create, edit, stop offering or offer again a rule *Everywhere* or on *A project* · hold a kind or property to a standard | Edit on `model/<model>` | Acts disabled, the permission named — *Needs Edit on the Orders model — ask Priya or Lee* |
 | Install a shipped pack's rules | Create on `setting/team-packs` | Disabled, the permission named |
 | Draft it from a request | Create on `model/*` | The rows read; the act disabled, the permission named |
 | Decline a request | Edit on `model/<model>` | The rows read; the act disabled, the permission named |

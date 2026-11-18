@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every step; open each one where its fact is made; skip or bring back an offer | — |
-| Operator | Read every step, its idea and its command | Each step's act reads the permission it needs — *Ask an Admin* for graph databases and AI models, *Needs Edit on model/{model} — ask {who can grant}* for the model and records |
+| Operator | Read every step, its idea and its command | Each step's act reads the permission it needs — *Ask an Admin* for graph databases and AI models, *Needs Edit on the {model} model — ask {who can grant}* for the model and records |
 
 ## Flow
 

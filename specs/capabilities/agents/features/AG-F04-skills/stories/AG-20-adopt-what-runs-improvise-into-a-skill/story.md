@@ -23,7 +23,7 @@ Adopting a handler needs Edit on `skill/<name>` ([the permission catalogue](../.
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every skill's exceptions; adopt a handler into any skill not built in | A built-in skill's exceptions read, with *Copy* in place of *Adopt* |
-| Operator | Read every skill's exceptions and usage. With Edit on the skill, adopts a handler as an Admin does | *Adopt* disabled, naming the permission — *Needs Edit on skill/{skill} — ask {who can grant}* |
+| Operator | Read every skill's exceptions and usage. With Edit on the skill, adopts a handler as an Admin does | *Adopt* disabled, naming the permission — *Needs Edit on the {skill} skill — ask {who can grant}* |
 
 ## Flow
 
@@ -43,7 +43,7 @@ flowchart LR
 | AG-20.19 | Exceptions | it opens | runs · replanned · replans a run p95 · hit the limit over 30 days, then each exception with where it happened, how it was handled, where the handler came from, seen and served after; with none recorded it reads *No exceptions recorded yet* |
 | AG-20.20 | The same improvised handler in 3 runs | Exceptions reads it | it proposes it as a *When* line; *Adopt* writes it into the draft and opens Instructions, and the evals gate its publish like any edit (AG-57) |
 | AG-20.22 | A skill never run | Usage or Exceptions opens | each reads *Not run yet* with the act that fills it |
-| AG-20.23 | An Operator | they open Exceptions | everything reads; *Adopt* is disabled, naming the permission — *Needs Edit on skill/{skill} — ask {who can grant}* |
+| AG-20.23 | An Operator | they open Exceptions | everything reads; *Adopt* is disabled, naming the permission — *Needs Edit on the {skill} skill — ask {who can grant}* |
 
 ## Screens
 

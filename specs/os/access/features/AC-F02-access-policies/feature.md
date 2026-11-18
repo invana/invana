@@ -208,6 +208,7 @@ rules; nothing else decides what a person or an agent may see. A property's acce
 The one source of what may be granted. A permission is an action on a resource — `data:edit` on
 `data/sales/Order`. Every feature's acts name the permission they need from here; no feature restates who may.
 `—` is an action the resource does not take. *Takes effect for* names the holders a rule on it reaches.
+A refusal on screen names the resource by its *Resource* name, never its *Pattern* — [the rule](../../../../design-language.md#7-naming-boards).
 
 | Resource | Pattern | Read | Create | Edit | Publish · Approve | Run | Manage | Takes effect for |
 |---|---|---|---|---|---|---|---|---|

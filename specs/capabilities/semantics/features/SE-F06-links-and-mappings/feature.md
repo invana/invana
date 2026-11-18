@@ -25,10 +25,10 @@ flowchart TD
   map -->|a model with nothing published| empty["An empty frame that says so"]
   map -->|a kind| k["SE-02 · The kind: its properties, records, key · Open it"]
   k -->|Mappings · Map to a standard| mp{"Holds Edit on model/<model>?"}
-  mp -->|no| na2["Reads · Needs Edit on model/{model} — ask {who can grant}"]
+  mp -->|no| na2["Reads · Needs Edit on the {model} model — ask {who can grant}"]
   mp -->|yes| ms(["SE-02 · Staged in the draft: this property is that standard's term"])
   map -->|drag from one model to another · Link models| may{"Holds Edit on model/<model>?"}
-  may -->|no| na["Disabled — Needs Edit on model/{model} — ask {who can grant}"]
+  may -->|no| na["Disabled — Needs Edit on the {model} model — ask {who can grant}"]
   may -->|yes| dec["SE-03 · Link two models: same thing, or a relationship · a key on each side"]
   dec --> cnt{Records joined?}
   cnt -->|none match| fix["Matches nothing — Try another key"] --> dec
@@ -79,11 +79,11 @@ sequenceDiagram
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read the map, a model, a kind, the links between models and their history | Read on `model/<model>` | — |
-| Link two models · commit or discard staged links · remove a link | Edit on `model/<model>` | *Link models* disabled — *Needs Edit on model/{model} — ask {who can grant}*; a drag between models does nothing and says why |
-| Rename a model · change its description | Edit on `model/<model>` | *Rename* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Link two models · commit or discard staged links · remove a link | Edit on `model/<model>` | *Link models* disabled — *Needs Edit on the {model} model — ask {who can grant}*; a drag between models does nothing and says why |
+| Rename a model · change its description | Edit on `model/<model>` | *Rename* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 | Export a model, with or without its records | Read on `model/<model>`; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
-| Import a model file as a new model | Create on `model/*` | *Import a model file* disabled — *Needs Create on models — ask {who can grant}* |
-| Restore an earlier version, or a model file onto a model of the same name | Edit on `model/<model>` | *Restore* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Import a model file as a new model | Create on `model/*` | *Import a model file* disabled — *Needs Create on Models — ask {who can grant}* |
+| Restore an earlier version, or a model file onto a model of the same name | Edit on `model/<model>` | *Restore* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## States
 
@@ -95,7 +95,7 @@ sequenceDiagram
 | Has data | Frames per model in their own hue, links dashed, the left section listing models, kinds and links |
 | Failed | A refused link names the side, kind or key, or the two graph databases when its models are in different ones; a commit or removal refused by a rule or a missing connection keeps the link as it was; an unreadable file says why |
 | Agent working or proposing | A run counting, writing or withdrawing a link's relationships; an ontology's equivalences offered as links to confirm |
-| No access | The map, kinds and links read; linking, committing, removing and restoring are disabled with *Needs Edit on model/{model} — ask {who can grant}*; importing is disabled with *Needs Create on models — ask {who can grant}* |
+| No access | The map, kinds and links read; linking, committing, removing and restoring are disabled with *Needs Edit on the {model} model — ask {who can grant}*; importing is disabled with *Needs Create on Models — ask {who can grant}* |
 
 ## Rules
 

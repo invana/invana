@@ -85,7 +85,7 @@ sequenceDiagram
 |---|---|---|
 | Read an ask's content — what it will do, its arguments, what it will send | The people it is routed to, the person behind its run and anyone with Read on `run/<agent>`, with a logged reason | That an ask waits, its kind, its agent, who it waits on and its time left — content withheld |
 | Read an agent's named approvers | None — every signed-in person | — |
-| Name or change an agent's approvers | Manage on `agent/<name>`, in a session, signing in again | Disabled — *Needs Manage on agent/{name} — ask Priya or Lee* |
+| Name or change an agent's approvers | Manage on `agent/<name>`, in a session, signing in again | Disabled — *Needs Manage on the {name} agent — ask Priya or Lee* |
 | Decide an ask — allow or decline, with a note | The people it is routed to, in a session; no permission widens it — anyone else decides only once it is escalated to them | The ask reads; its acts are disabled, naming who it waits on |
 
 ## States

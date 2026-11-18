@@ -22,7 +22,7 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | With Create (install) or Manage (remove) on `plugin/<name>`: install and remove a runtime plugin; switch it on or off; pick the worker groups that carry it (CP-10) | — |
-| Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it | *Install* and *Remove* disabled — *Needs Create on plugin/{name} — ask {who can grant}* |
+| Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it | *Install* and *Remove* disabled — *Needs Create on Plugins — ask {who can grant}* |
 
 ## Flow
 

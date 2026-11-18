@@ -82,7 +82,7 @@ table names the acts.
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a model, its draft, its comparison and its reviews | Read on `model/<model>` | — |
-| Change in a draft · stage, discard · constrain a property | Edit on `model/<model>`, through the Modeller agent | *Change in a draft* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Change in a draft · stage, discard · constrain a property | Edit on `model/<model>`, through the Modeller agent | *Change in a draft* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 | Publish a draft that only adds · request approval for a breaking one | Publish on `model/<model>`, through the Modeller agent | *Publish* hidden; the draft reads |
 | Approve or decline a breaking publish | The Modeller agent's named approvers, never the requester ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | Not asked; the review reads *waiting on approval* |
 
@@ -96,7 +96,7 @@ table names the acts.
 | Has data | The draft on its canvas, changed kinds chipped, the draft bar `n staged · Discard · Publish vN` |
 | Failed | A refused change says why where it was made; a failed preview says why and keeps the draft; a stale review says what moved |
 | Agent working or proposing | An agent's changes arrive staged on the same draft as a person's; the preview run scanning records |
-| No access | The model and its draft read; every change disabled with *Needs Edit on model/{model} — ask {who can grant}* |
+| No access | The model and its draft read; every change disabled with *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Rules
 

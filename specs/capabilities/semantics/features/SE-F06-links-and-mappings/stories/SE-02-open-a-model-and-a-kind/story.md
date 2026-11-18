@@ -21,7 +21,7 @@ Changing a model or a kind needs Edit on `model/<model>` ([the permission catalo
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open a model and a kind, and from a kind change it in a draft; rename a model and change its description | — |
-| Operator | Open a model and a kind and read them. With Edit on the model, changes a model or a kind as an Admin does | *Change in a draft* and *Rename* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Open a model and a kind and read them. With Edit on the model, changes a model or a kind as an Admin does | *Change in a draft* and *Rename* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Flow
 
@@ -34,7 +34,7 @@ flowchart LR
   a -->|a model| m["The model · its kinds, relationships, links"]
   m -->|breadcrumb| a
   k -->|Mappings · Map to a standard| ms(["Staged in the draft — SE-05"])
-  k -->|not a person with Edit on the model| na["Reads · Needs Edit on model/{model} — ask {who can grant}"]
+  k -->|not a person with Edit on the model| na["Reads · Needs Edit on the {model} model — ask {who can grant}"]
 ```
 
 ## Acceptance criteria
@@ -47,7 +47,7 @@ flowchart LR
 | SE-02.4 | A kind's peek with constraints that records break | it shows | it names how many records break each, and whether new ones are rejected |
 | SE-02.5 | A kind | the person presses Esc or picks the breadcrumb | they are back on the map as they left it |
 | SE-02.6 | A model with a draft | its kind opens | the page shows the draft's chip and, for a person with Edit on the model, *Add property* |
-| SE-02.7 | An Operator | they open a kind | it reads; *Change in a draft* is disabled with *Needs Edit on model/{model} — ask {who can grant}* |
+| SE-02.7 | An Operator | they open a kind | it reads; *Change in a draft* is disabled with *Needs Edit on the {model} model — ask {who can grant}* |
 | SE-02.8 | A model's head and a person with Edit on the model | they rename it or change its description | It saves at once, outside the draft — a name and a description are not part of a version — and History names who changed it |
 | SE-02.9 | A kind's Mappings and a person with Edit on the model | they pick *Map to a standard* and a property, a standard and a term or value | the mapping — same as · broader · narrower — is staged on the model's draft and publishes with it |
 | SE-02.10 | A kind's Mappings | it opens | each mapping lists its property, the standard's term or value and version, and who declared it; an Operator reads them with *Map to a standard* absent |

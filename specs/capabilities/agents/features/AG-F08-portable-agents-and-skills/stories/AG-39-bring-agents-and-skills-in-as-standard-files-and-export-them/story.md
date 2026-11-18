@@ -23,7 +23,7 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | All an Operator with Create can, and with Edit on Access apply the Access Policy files an import brought (AC-04) | — |
-| Operator | Read imported agents and skills once they are saved. With Create on `agent/*` and `skill/*` (usually *Build agents*): import a zip, a folder or a Claude plugin, confirm what each file becomes, import; export one agent, one skill or all | *Import* and *Export* are disabled — *Needs Create on agents and skills — ask {who can grant}*; A policy file reads *Waiting for an Admin to apply*; *Apply* is disabled, naming Edit on Access |
+| Operator | Read imported agents and skills once they are saved. With Create on `agent/*` and `skill/*` (usually *Build agents*): import a zip, a folder or a Claude plugin, confirm what each file becomes, import; export one agent, one skill or all | *Import* and *Export* are disabled — *Needs Create on Agents and Skills — ask {who can grant}*; A policy file reads *Waiting for an Admin to apply*; *Apply* is disabled, naming Edit on Access |
 
 ## Flow
 
@@ -43,7 +43,7 @@ flowchart LR
   m -->|a name already in the catalogue| nv["A new version of it, or a rename"]
   m --> cf["Confirm split descriptions and model versions"]
   cf -->|Import n| s(["Saved as drafts, the platform's — tested and published like any agent"])
-  a -->|without Create on agents| no(["Import disabled · names Create on agents"])
+  a -->|without Create on Agents| no(["Import disabled · names Create on Agents"])
   e([An agent's or skill's page · Agents › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields under metadata"])
 ```
 
@@ -63,7 +63,7 @@ flowchart LR
 | AG-39.10 | Nothing refused | the Modeller presses *Import n* | every agent and skill is saved as a draft, owned by the platform and made by the Modeller, granted to nobody; a skill with no tests imports and waits for them before it publishes |
 | AG-39.11 | An agent, a skill or the whole catalogue | a Modeller presses *Export* | agent `.md` files and `SKILL.md` folders are written, Invana's fields under `metadata:`; the plan is not exported, and no `AGENTS.md`, TOML or Claude plugin is ever written |
 | AG-39.12 | Files being read | the dry run is in progress | it reads *Reading the files…* and each row fills in as it is mapped |
-| AG-39.13 | A person without Create on `agent/*` and `skill/*` | they open Agents › Skills or an agent's or skill's page | *Import* and *Export* are disabled — *Needs Create on agents and skills — ask {who can grant}*; the engine refuses the same from the API |
+| AG-39.13 | A person without Create on `agent/*` and `skill/*` | they open Agents › Skills or an agent's or skill's page | *Import* and *Export* are disabled — *Needs Create on Agents and Skills — ask {who can grant}*; the engine refuses the same from the API |
 | AG-39.14 | An `AGENTS.md` | it is read | it becomes one draft agent whose instructions are its body, named after the folder it sat in, for the importer to confirm |
 | AG-39.15 | A Codex TOML agent file | it is read | it is converted to the agent `.md` shape, each field it maps shown beside its source, and a field with no place named as left out |
 | AG-39.16 | A Claude plugin — a folder with `.claude-plugin/plugin.json` | it is read | its agents and skills come in as AG-39.3 and AG-39.4; each MCP server its `.mcp.json` names is listed for an Admin to add in Settings (CP-02), never added by the import; a server started as a local process is refused, naming that Invana reaches servers by address |

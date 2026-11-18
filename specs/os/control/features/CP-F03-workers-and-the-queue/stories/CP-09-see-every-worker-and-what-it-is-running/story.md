@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every group and worker; with Manage on `worker/<group>`, drain a worker; revoke a join key | — |
-| Operator | Read every group and worker and what each runs | *Drain* and *Revoke* disabled — *Needs Manage on worker/{group} — ask {who can grant}* |
+| Operator | Read every group and worker and what each runs | *Drain* and *Revoke* disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |
 
 ## Flow
 
@@ -50,7 +50,7 @@ flowchart TD
 | CP-09.7 | An Admin | they drain a worker | it takes no new work, finishes what it holds, then stops |
 | CP-09.8 | An Admin | they revoke a join key | no new worker joins with it; joined workers keep running |
 | CP-09.9 | Every number on Workers | it is read | it is the engine's, stored every 30 s; a change against last week reads `—` when nothing was measured |
-| CP-09.10 | An Operator | they open Workers | everything reads; *Drain* and *Revoke* are disabled — *Needs Manage on worker/{group} — ask {who can grant}* |
+| CP-09.10 | An Operator | they open Workers | everything reads; *Drain* and *Revoke* are disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |
 | CP-09.11 | An Admin | they drain a worker group | every worker in it takes no new work, finishes what it holds, then stops; History records who and when (AC-F06) |
 | CP-09.12 | An Operator | they read a group's changes | every join, loss, drain, revoke and change to the group reads newest first, with who or what caused it and why |
 | CP-09.13 | A lost worker | it heartbeats again | it reads busy or idle again; the steps already handed on are not run a second time |

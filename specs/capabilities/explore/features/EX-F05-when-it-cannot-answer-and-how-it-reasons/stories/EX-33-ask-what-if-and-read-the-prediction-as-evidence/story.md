@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask *what if* or pick *What-if*, read the predicted part and its run, add it to a project, save it as derived records on a read + write graph database | — |
-| Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; with Create on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}*. Another person's run: that it ran, its status and its tokens |
+| Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; with Create on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}*. Another person's run: that it ran, its status and its tokens |
 
 ## Flow
 
@@ -38,7 +38,7 @@ flowchart LR
   pr -->|Add to a project| fd(["A finding, still Predicted"])
   pr -->|Save as derived records| sv{"Holds Edit on data/<graph database>/<kind> · read + write?"}
   sv -->|yes| dr(["Derived records · labelled derived · lineage kept"])
-  sv -->|an Operator| od["Disabled — Needs Create on data/{graph database}/{kind}"]
+  sv -->|an Operator| od["Disabled — Needs Create on {kind} in {graph database}"]
   sv -->|read-only · no rule · a kind that does not fit| rr["Refused · named, in the dialog"]
 ```
 
@@ -61,7 +61,7 @@ flowchart LR
 | EX-33.13 | A read-only graph database picked | the person saves | it is refused in the dialog, naming the graph database and that it is read-only; nothing is written |
 | EX-33.14 | No rule allowing the Loader Write on the kind in that graph database | the person saves | it is refused in the dialog, naming the policy and the rule |
 | EX-33.15 | A kind the rows do not fit | the person saves | it is refused in the dialog, naming the field that does not fit |
-| EX-33.16 | An Operator | they read a predicted part | *Save as derived records* is disabled — *Needs Create on data/{graph database}/{kind} — ask {who can grant}* |
+| EX-33.16 | An Operator | they read a predicted part | *Save as derived records* is disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 | EX-33.17 | A predicted part | the person opens *How it got here* | it shows the steps, the change, the simulator and its version, the seed, the pinned loads and the tokens |
 | EX-33.18 | A predicted part | the person chooses *Add to a project* | it becomes a finding still marked *Predicted*, citing the run ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) |
 | EX-33.19 | A simulator removed since a what-if ran | the conversation is opened | the predicted part still reads, naming the simulator version it ran |

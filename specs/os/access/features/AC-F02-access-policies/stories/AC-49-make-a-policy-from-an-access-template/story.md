@@ -24,7 +24,7 @@ Projects for it — [AC-F02 › Access](../../feature.md#access).
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *New policy*: name it, start from an Access template or Blank, set each tab of *What it allows* or *Edit as policy*, pick who holds it — people, teams and projects in one picker — read the whole policy back in Review and *Create policy* after a confirm, signing in again | — |
-| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads every template and every policy, tab by tab and as the matrix | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *New policy* disabled — *Needs Edit on Access — ask Priya or Lee*; with Edit on Access but not Manage on Access, people and teams in *Who holds it* are disabled, naming the permission; a project without Manage on Projects for it, likewise; the policy is created unattached |
+| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads every template and every policy, tab by tab and as the matrix | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *New policy* disabled — *Needs Edit on Access — ask Priya or Lee*; with Edit on Access but not Manage on Access, people and teams in *Who holds it* are disabled, naming the permission; a project without Manage on Projects for it, likewise; the policy is created unattached |
 
 ## Flow
 

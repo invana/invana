@@ -28,7 +28,7 @@ flowchart TD
   m -->|failed| fl["Could not load · Try again"]
   m -->|nothing yet| e["No meaning yet — Add a definition"]
   m -->|Change in a draft| may{"Holds Edit on model/<model>?"}
-  may -->|no| na["Reads · Needs Edit on model/{model} — ask {who can grant}"]
+  may -->|no| na["Reads · Needs Edit on the {model} model — ask {who can grant}"]
   may -->|yes| d["Staged in the draft"]
   d -->|a property's level| lv["public · internal · confidential · personal"]
   lv -->|lowered| wd["Shown as a widening · History records it"]
@@ -49,7 +49,7 @@ flowchart TD
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read a kind's and a property's meaning, and each property's level | Read on `model/<model>` | — |
-| Change a definition, synonym, unit, outside term or a property's level in a draft · accept a proposed one | Edit on `model/<model>` | Absent; *Needs Edit on model/{model} — ask {who can grant}* |
+| Change a definition, synonym, unit, outside term or a property's level in a draft · accept a proposed one | Edit on `model/<model>` | Absent; *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## States
 

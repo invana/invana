@@ -22,7 +22,7 @@ depends_on: [RC-F06, CP-F03]
 ```mermaid
 flowchart TD
   start([Model › Inference · New derivation]) --> may{"Holds Run on model/<model>?"}
-  may -->|no| na["Reads · Needs Run on model/{model} — ask {who can grant}"]
+  may -->|no| na["Reads · Needs Run on the {model} model — ask {who can grant}"]
   may -->|yes| d["SE-22 · When … then … · scope · write back to the database or not"]
   d -->|a form outside the supported rules| bad["Refused, naming what is not supported"]
   d -->|Preview| pv["What it would derive now, counted by the engine"]
@@ -61,8 +61,8 @@ sequenceDiagram
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read derivations, their runs and every derived fact with its premises | Read on `model/<model>` — as far as their default agent reads the premises | A premise or a property their agent may not read is absent, with no count and no note |
-| Create, change, stop or run a derivation | Run on `model/<model>` | Absent; *Needs Run on model/{model} — ask {who can grant}* |
-| Turn on write-back to the graph database for a derivation | Edit on `data/<graph database>` | Absent; *Needs Edit on data/{graph database} — ask {who can grant}* |
+| Create, change, stop or run a derivation | Run on `model/<model>` | Absent; *Needs Run on the {model} model — ask {who can grant}* |
+| Turn on write-back to the graph database for a derivation | Edit on `data/<graph database>` | Absent; *Needs Edit on {graph database} data — ask {who can grant}* |
 
 ## States
 

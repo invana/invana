@@ -22,7 +22,7 @@ Publishing and rolling back needs Publish on `agent/<name>` ([the permission cat
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Publish a version of any agent not built in, roll back to an earlier one | A built-in agent has no *Publish* — *Built in — copy it to change it* |
-| Operator | Read every version, its reason and its eval result. With Publish on the agent, does what an Admin does | *Publish* and *Roll back* disabled, naming the permission — *Needs Publish on agent/{agent} — ask {who can grant}* |
+| Operator | Read every version, its reason and its eval result. With Publish on the agent, does what an Admin does | *Publish* and *Roll back* disabled, naming the permission — *Needs Publish on the {agent} agent — ask {who can grant}* |
 
 ## Flow
 
@@ -52,11 +52,11 @@ flowchart LR
 | AG-36.9 | Versions | the tab opens | every version with its date, who published it, its reason and its eval result; a voice change, a model move and an instructions publish each read as their own row |
 | AG-36.10 | An earlier version | the builder presses *Roll back* | it becomes a draft of the next version and passes the evals before it publishes, like any other |
 | AG-36.11 | A draft | anyone asks it, gives it a task, schedules it, delegates to it or makes it the default | it is refused, naming that it is a draft |
-| AG-36.14 | An Operator | they open a draft or Versions | the results and every version read; *Publish* and *Roll back* are disabled, naming the permission — *Needs Publish on agent/{agent} — ask {who can grant}* |
+| AG-36.14 | An Operator | they open a draft or Versions | the results and every version read; *Publish* and *Roll back* are disabled, naming the permission — *Needs Publish on the {agent} agent — ask {who can grant}* |
 | AG-36.17 | The command line | `invana agents push` writes a draft's instructions from a file and `invana agents publish` publishes it | each passes the same gate as Studio and needs the same permission, refused naming it |
 | AG-36.18 | A draft with active eval cases and no settled eval run over its exact text and model version, or one still running | the builder presses *Create*, *Publish* or *Roll back* | it is refused where the act was, naming the case count, with *Run the evals*; Studio never predicts the gate |
 | AG-36.19 | A draft with no Access Policy attached | the builder presses *Create* or *Publish* | it is refused — *may touch nothing — ask an Admin to attach an Access Policy* — and nothing goes live |
-| AG-36.20 | An Operator | they open Versions | every version reads; *Publish* and *Roll back* are disabled — *Needs Publish on agent/{agent} — ask {who can grant}* |
+| AG-36.20 | An Operator | they open Versions | every version reads; *Publish* and *Roll back* are disabled — *Needs Publish on the {agent} agent — ask {who can grant}* |
 
 ## Screens
 

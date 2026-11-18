@@ -24,7 +24,7 @@ again. Removing an entry waits for a second Admin whatever the second-yes settin
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read *Hidden from agents*; add an entry — a kind or a property of a graph database, with a reason; ask to remove one, which another Admin approves; read *Who it changes* first | Their own removal waits — no *Approve* on it |
-| Operator | Nothing here: without Read on `access/policies` they never see what is hidden | *No access* — *Needs Read on access/policies — ask Priya or Lee* |
+| Operator | Nothing here: without Read on `access/policies` they never see what is hidden | *No access* — *Needs Read on Access — ask Priya or Lee* |
 
 ## Flow
 

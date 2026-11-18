@@ -19,7 +19,7 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open *New model*, start from a description, a file or a starter, and land on the new draft | — |
-| Operator | See the models and their drafts; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* and *Import* disabled — *Needs Create on model/{model} — ask {who can grant}* |
+| Operator | See the models and their drafts; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* and *Import* disabled — *Needs Create on Models — ask {who can grant}* |
 
 ## Flow
 
@@ -55,7 +55,7 @@ flowchart LR
 | SE-06.10 | A starter already in the deployment | a newer starter version ships | it is offered as a new version with what changes; it is never applied by itself |
 | SE-06.11 | A draft from a starter | the person deletes the kinds they do not need | the rest stays a draft until they publish it |
 | SE-06.12 | A model the assistant drafted | the person opens *How it got here* on the draft | it shows the conversation, the description it started from, and each kind it staged |
-| SE-06.13 | An Operator | they reach *New model* | it is disabled with *Needs Create on model/{model} — ask {who can grant}* |
+| SE-06.13 | An Operator | they reach *New model* | it is disabled with *Needs Create on Models — ask {who can grant}* |
 | SE-06.14 | A model drafted from a description, a file or a starter | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
 
 ## Screens

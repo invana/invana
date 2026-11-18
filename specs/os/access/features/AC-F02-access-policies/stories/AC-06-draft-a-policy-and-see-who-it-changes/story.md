@@ -20,7 +20,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Save, save anyway, cancel or discard a draft | — |
-| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads a draft | *No access* — *Needs Read on access/policies — ask Priya or Lee*; with Read, *Save* disabled — *Needs Edit on Access — ask Priya or Lee* |
+| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads a draft | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *Save* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 

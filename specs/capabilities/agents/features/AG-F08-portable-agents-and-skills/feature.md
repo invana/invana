@@ -86,7 +86,7 @@ The permission each act needs is the *Agents* and *Skills* rows of [the permissi
 
 | Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Import agents and skills — dropped files, a Claude plugin, an agent tool's folder · export them | Create on `agent/*` and `skill/*` | *Import* and *Export* are disabled — *Needs Create on agent/* or skill/* — ask {who can grant}* |
+| Import agents and skills — dropped files, a Claude plugin, an agent tool's folder · export them | Create on `agent/*` and `skill/*` | *Import* and *Export* are disabled — *Needs Create on Agents and Skills — ask {who can grant}* |
 | Apply an Access Policy file an import brought | Edit on `access/policies`, as [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#access) | The file reads *Waiting for an Admin to apply* |
 | Add a library | Create on `plugin/*` | *Add a library* is disabled, naming the permission |
 | Approve the functions a library proposes | Publish · Approve on `skill/<name>` | Proposed functions read *Waiting for an Admin* |
@@ -222,7 +222,7 @@ The code change is [migrations.md](../../../../migrations.md) M37.
 
 | Decision | Detail |
 |---|---|
-| Bringing agents in is building agents | Importing is building agents, so it needs Create on agents and skills; what an import may reach is still applied only with Edit on Access |
+| Bringing agents in is building agents | Importing is building agents, so it Needs Create on Agents and Skills; what an import may reach is still applied only with Edit on Access |
 | Model aliases on import | `sonnet` · `opus` · `inherit` resolve to an exact offered version, shown for the importer to confirm |
 | A name already in the catalogue | Offered as a new version of it, or a rename |
 | `AGENTS.md` · `CLAUDE.md` | One draft agent, its body the instructions, named after its folder for the importer to confirm |
