@@ -22,9 +22,8 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | All a Modeller can; apply the Access Policy files the folder brought (AC-04); grant the imported agents (AC-22) | — |
-| Modeller (usually *Build agents*) | With Create on `agent/*` and `skill/*`: drop a project's folder or a zip of it, read what Invana found in each agent tool's folder, confirm or leave out each file, import | Policy files read *Waiting for an Admin to apply*; *Apply* and *Grant* are disabled, naming Edit on Access and Manage on Access |
-| Operator | Read the imported agents and skills once they are saved | *Import* is disabled — *Needs Create on agents and skills — ask {who can grant}* |
+| Admin | All an Operator with Create can; apply the Access Policy files the folder brought (AC-04); grant the imported agents (AC-22) | — |
+| Operator | Read the imported agents and skills once they are saved. With Create on `agent/*` and `skill/*` (usually *Build agents*): drop a project's folder or a zip of it, read what Invana found in each agent tool's folder, confirm or leave out each file, import | *Import* is disabled — *Needs Create on agents and skills — ask {who can grant}*; Policy files read *Waiting for an Admin to apply*; *Apply* and *Grant* are disabled, naming Edit on Access and Manage on Access |
 
 ## Flow
 

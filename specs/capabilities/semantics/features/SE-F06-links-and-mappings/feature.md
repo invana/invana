@@ -82,7 +82,8 @@ sequenceDiagram
 | Link two models · commit or discard staged links · remove a link | Edit on `model/<model>` | *Link models* disabled — *Needs Edit on model/{model} — ask {who can grant}*; a drag between models does nothing and says why |
 | Rename a model · change its description | Edit on `model/<model>` | *Rename* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
 | Export a model, with or without its records | Read on `model/<model>`; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
-| Import a model · restore an earlier version | Edit on `model/<model>` | *Import a model file* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Import a model file as a new model | Create on `model/*` | *Import a model file* disabled — *Needs Create on models — ask {who can grant}* |
+| Restore an earlier version, or a model file onto a model of the same name | Edit on `model/<model>` | *Restore* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## States
 
@@ -94,7 +95,7 @@ sequenceDiagram
 | Has data | Frames per model in their own hue, links dashed, the left section listing models, kinds and links |
 | Failed | A refused link names the side, kind or key, or the two graph databases when its models are in different ones; a commit or removal refused by a rule or a missing connection keeps the link as it was; an unreadable file says why |
 | Agent working or proposing | A run counting, writing or withdrawing a link's relationships; an ontology's equivalences offered as links to confirm |
-| No access | The map, kinds and links read; linking, committing, removing and importing are disabled with *Needs Edit on model/{model} — ask {who can grant}* |
+| No access | The map, kinds and links read; linking, committing, removing and restoring are disabled with *Needs Edit on model/{model} — ask {who can grant}*; importing is disabled with *Needs Create on models — ask {who can grant}* |
 
 ## Rules
 
@@ -182,7 +183,8 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A link, commit, removal or import by someone without Edit on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-03.18 · SE-16.12 |
+| 403 | A link, commit, removal or restore by someone without Edit on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-03.18 · SE-16.12 |
+| 403 | An import by someone without Create on `model/*` | *Needs Create on models — ask {who can grant}.* | SE-16.12 |
 | 422 | A side's kind its published version does not declare (`type_not_in_version`) | *{model} v{n} has no kind {kind}.* | API only — the card offers only declared kinds |
 | 422 | A side that is a draft, the same model on both sides, or a model with nothing published (`version_is_draft`) | *A link joins two published models — {why}.* | SE-03.8 |
 | 422 | Two models bound to different graph databases (`link_across_graph_databases`) | *{source} is in {database} and {target} in {database} — a link joins two models in one graph database.* | SE-03.20 |

@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F06](../../feature.md)
 
 ## Who can
 
-Importing and restoring a model needs Edit on `model/<model>`; exporting is every signed-in person's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
+Importing a model file as a new model needs Create on `model/*`; restoring needs Edit on `model/<model>`; exporting is every signed-in person's ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
 | Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Export a model with or without its records, import a model file as a new model, and restore an earlier version | — |
-| Operator | Export a model with or without its records, the records being those their default agent may read. With Edit on the model, imports and restores as an Admin does | *Import a model file* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
+| Operator | Export a model with or without its records, the records being those their default agent may read. With Create on `model/*`, imports as an Admin does; with Edit on the model, restores as an Admin does | *Import a model file* disabled — *Needs Create on models — ask {who can grant}*; *Restore* disabled — *Needs Edit on model/{model} — ask {who can grant}* |
 
 ## Flow
 
@@ -46,17 +46,17 @@ flowchart LR
 | SE-16.1 | A published model | the person picks *Export a model* | they choose *The model* or *The model and its records* and get one file |
 | SE-16.2 | *The model and its records* | it exports | the file holds the model, one records file per kind and where they came from, with their hashes |
 | SE-16.3 | Several models exported together | a link joins two of them | the link travels; a link whose other model is not in the file is left out, naming that model |
-| SE-16.4 | A model file and a person with Edit on the model | they pick *Import a model file* | it opens as a new draft under the name typed |
+| SE-16.4 | A model file and a person with Create on `model/*` | they pick *Import a model file* | it opens as a new draft under the name typed |
 | SE-16.5 | A file with records | the imported model is published | its records load as an ordinary load |
-| SE-16.6 | A file whose model shares a name with one in this deployment | it is imported | the dialog offers *Restore* or another name; *Restore* makes a new draft with the exported version's kinds and lists what returns and what goes; a breaking removal is reviewed when published (SE-05) |
+| SE-16.6 | A file whose model shares a name with one in this deployment | it is imported | the dialog offers *Restore* (for a person with Edit on that model) or another name; *Restore* makes a new draft with the exported version's kinds and lists what returns and what goes; a breaking removal is reviewed when published (SE-05) |
 | SE-16.7 | A restore | it lands | records are not loaded unless the person asks — the database already holds them |
 | SE-16.8 | A file of the same package with new content | it is imported | it is recognised as a new version of that model, with what changes; the local draft is never overwritten silently |
 | SE-16.9 | A property type this database cannot hold | the file is imported | it lands as a draft that cannot publish, naming each such type and why |
 | SE-16.10 | A file that cannot be read | it is imported | the dialog says why; nothing is made |
 | SE-16.11 | Any import or export | the dialog shows | it prints the matching `invana models` command |
-| SE-16.12 | An Operator | they open *New model* | *Export a model* works; *Import a model file* is disabled with *Needs Edit on model/{model} — ask {who can grant}* |
+| SE-16.12 | An Operator | they open *New model* | *Export a model* works; *Import a model file* is disabled with *Needs Create on models — ask {who can grant}*, and *Restore* with *Needs Edit on model/{model} — ask {who can grant}* |
 | SE-16.13 | A model file declaring an axis on a property the model lacks | it is imported | The import is refused naming the model, the axis and the property; nothing is made |
-| SE-16.14 | A person with Edit on the model | they list, export, import or upgrade models, or list the starters, from the command line | The command does what the dialog does, under the same access; a refusal is a sentence naming the next command |
+| SE-16.14 | A person with Create on `model/*` (Edit on the model to restore or upgrade) | they list, export, import or upgrade models, or list the starters, from the command line | The command does what the dialog does, under the same access; a refusal is a sentence naming the next command |
 | SE-16.15 | *The model and its records* where a property's level is confidential or personal | it exports | those values are left out of the records files; the dialog and the file name each property and level left out ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
 | SE-16.16 | An export | it is made | it passes the outbound check with lineage, and a person whose default agent may not Read a property's level gets the records without that property |
 

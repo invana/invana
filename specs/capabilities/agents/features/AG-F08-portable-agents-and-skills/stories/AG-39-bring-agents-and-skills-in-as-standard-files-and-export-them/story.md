@@ -22,9 +22,8 @@ Tasks: [task.md](task.md) · Feature: [AG-F08](../../feature.md)
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | All a Modeller can, and with Edit on Access apply the Access Policy files an import brought (AC-04) | — |
-| Modeller (usually *Build agents*) | With Create on `agent/*` and `skill/*`: import a zip, a folder or a Claude plugin, confirm what each file becomes, import; export one agent, one skill or all | A policy file reads *Waiting for an Admin to apply*; *Apply* is disabled, naming Edit on Access |
-| Operator | Read imported agents and skills once they are saved | *Import* and *Export* are disabled — *Needs Create on agents and skills — ask {who can grant}* |
+| Admin | All an Operator with Create can, and with Edit on Access apply the Access Policy files an import brought (AC-04) | — |
+| Operator | Read imported agents and skills once they are saved. With Create on `agent/*` and `skill/*` (usually *Build agents*): import a zip, a folder or a Claude plugin, confirm what each file becomes, import; export one agent, one skill or all | *Import* and *Export* are disabled — *Needs Create on agents and skills — ask {who can grant}*; A policy file reads *Waiting for an Admin to apply*; *Apply* is disabled, naming Edit on Access |
 
 ## Flow
 
