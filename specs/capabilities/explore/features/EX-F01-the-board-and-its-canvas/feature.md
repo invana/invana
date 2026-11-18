@@ -30,7 +30,7 @@ flowchart TD
   d -->|look| look["Pan · zoom · hover"]
   d -->|widen| ex["EX-09 · Expand a node — counted first, in its own graph database"]
   ex -->|too many| cap["The count, and a cap or a kind to filter by"] --> ex
-  ex -->|a rule denies the kind| rf["Refused · names the rule, its policy and who set it"]
+  ex -->|a rule denies the kind| rf["Refused · Needs {Action} on {Resource name}"]
   ex -->|a graph database off or down| off["Refused · names the database and why"]
   d -->|arrange| lay["EX-16 · Layout: Network · Tree · Flow · Radial"]
   lay -->|over 3,000 nodes| big["Tree · Flow · Radial disabled with the cap"]

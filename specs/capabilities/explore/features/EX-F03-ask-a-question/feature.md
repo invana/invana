@@ -127,7 +127,7 @@ runs through may read.
 | Has data | The conversation docked right, its turns in order, each naming the graph databases its plan read |
 | Failed | The reply says why in a sentence and the next act; a failed query opens the console on Log; the board is untouched |
 | Agent working or proposing | The agent working through its steps, asking back with options to tap, or a typed write waiting on its approvers |
-| No access | No agent the person may use: the composer disabled, naming the agent and *ask an Admin*; a question a rule refuses says which rule; the lock without the right to finish set-up offers *Ask an Admin* |
+| No access | No agent the person may use: the composer disabled, naming the agent and *ask an Admin*; a question a rule refuses reads *Needs {Action} on {Resource name}*, naming no rule; the lock without the right to finish set-up offers *Ask an Admin* |
 
 ## Rules
 

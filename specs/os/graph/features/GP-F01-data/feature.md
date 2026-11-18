@@ -26,7 +26,7 @@ Connecting a graph database, its mode, switches and health come first, in [CP-F0
 ```mermaid
 flowchart TD
   q([A question, a board or an agent step]) --> p["A typed plan · checked against the model and the agent's Access Policies"]
-  p -->|refused| r0(["Refused · names the rule"])
+  p -->|refused| r0(["Refused · Needs {Action} on {Resource name}"])
   p --> rw["GP-01 · One step per graph database, in its own language"]
   rw -->|off, or read-only for a write| cf(["Refused before the wire — CP-F05"])
   rw --> ro["GP-04 · Every read in a read-only session the database enforces"]

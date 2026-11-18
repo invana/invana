@@ -135,7 +135,7 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 | Has data | An answer whose assumptions, third-party claims, predicted parts and fork lineage are each one click away |
 | Failed | What broke, on the step it broke on, with its evidence folded under it and one next step |
 | Agent working or proposing | The approach's assumptions above the composer before the run; the assistant's third-party nodes on the board, marked, waiting for *Keep*; a predicted part waiting for *Save as derived records* |
-| No access | A refusal names the policy and rule, the switch and who set it, or the property; *Keep* and *Save as derived records* disabled for an Operator, naming the permission; another person's run shows only that it ran, its status and its tokens |
+| No access | A refusal names the resource and action it needs, the switch and who set it, or the property — never a policy or rule; *Keep* and *Save as derived records* disabled for an Operator, naming the permission; another person's run shows only that it ran, its status and its tokens |
 
 ## Rules
 
@@ -146,7 +146,7 @@ Access Policies allow. A run's content — a refusal, a diagnosis, a prediction 
 | Nothing partial is an answer | A run that did not settle shows what it reached as steps, never as an answer |
 | Cannot answer names what is missing | Which kind, which model, or that nothing is loaded — and whether the kind is modelled but empty |
 | The plan gap says what the plan lacks | A question a typed plan cannot express is said so, naming what the plan lacks, offering a function that does it — never a raw query run silently. The typed plan and the gap are [EX-F03](../EX-F03-ask-a-question/feature.md#engine)'s |
-| A refusal names what refused | An Access Policy's Deny names the policy and the rule; an Ask refused or expired names who answered; a switched-off graph database or plugin names who switched it off and when; a sensitive property bound for an external AI model names the property |
+| A refusal names what refused | An Access Policy's Deny reads *Needs {Action} on {Resource name}*, never the policy or rule; an Ask refused or expired names who answered; a switched-off graph database or plugin names who switched it off and when; a sensitive property bound for an external AI model names the property |
 | A question asked back is not an ask | Asked back ([EX-23](../EX-F03-ask-a-question/stories/EX-23-be-asked-back-not-guessed-for/story.md)) is *I do not know*, answered by the asker; an Ask is *I may not proceed*, answered by the agent's named approvers ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)). Neither is the other |
 | A diagnosis is built from evidence | The step, the error and the query — never an invented cause — and its one action is its next step |
 | Repair once | A plan that fails the check against the model goes back once with the error; a second failure stops |

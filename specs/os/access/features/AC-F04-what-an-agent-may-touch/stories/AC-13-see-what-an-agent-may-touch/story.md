@@ -46,7 +46,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-13.1 | An agent | *What it may touch* opens | every resource reads, grouped — data by graph database and kind · memory · projects · skills · workflows · agents · plugins · tools · files, programs and hosts on a worker — each with Read, Write or Run and its effect, the same for everyone who may use the agent |
-| AC-13.2 | A resource's effect | it is read | it names the rule that sets it, its policy and version, and who saved it |
+| AC-13.2 | A resource's effect | it is read | it shows the resource, access and allow or deny; the rule that sets it, its policy and version, and who saved it show only to a person with Read on Access Policies — others see no policy or rule column |
 | AC-13.3 | Rules that disagree | the effect is read | it is the strictest — Deny over Ask over Allow — and the rule that set it is marked |
 | AC-13.4 | A resource no rule reaches | it is read | it reads *No rule — denied* |
 | AC-13.5 | A kind with a sensitive property | it is read | the property reads *Never to an external model*, linking to Meaning |

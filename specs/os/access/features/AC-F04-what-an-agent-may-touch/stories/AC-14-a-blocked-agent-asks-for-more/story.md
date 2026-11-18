@@ -27,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F04](../../feature.md)
 ```mermaid
 flowchart LR
   s([An agent's step]) --> b{"The strictest rule"}
-  b -->|Deny · no rule| r["Refused before it runs · names the rule, its policy and who saved it"]
+  b -->|Deny · no rule| r["Refused before it runs · Needs {Action} on {Resource name}"]
   r --> c{"Asked already · past the cap · declined until a date?"}
   c -->|yes| stop(["Refused · names why it does not ask"])
   c -->|no| a["The agent asks for more · the step holds, the run carries on"]
@@ -49,7 +49,7 @@ flowchart LR
 |---|---|---|---|
 | AC-14.1 | An agent's step whose strictest rule is Deny, or that no rule reaches | it is about to run | it is refused before it runs, naming the check — and, to a person with Read on `access/policies`, the rule, its policy and who saved it — or *No rule*; nothing is spent |
 | AC-14.2 | A refused step | the agent asks for more | one ask appears in Needs you; the step holds and the rest of the run carries on |
-| AC-14.3 | An ask for more | it is read | it shows exactly the act the step would take; the rule that denies it, its policy and who saved it; who asked and on whose behalf; and the agent in the chain that was denied |
+| AC-14.3 | An ask for more | it is read | it shows exactly the act the step would take; the rule that denies it, its policy and who saved it, only to a person with Read on Access Policies (others read *Needs {Action} on {Resource name}*); who asked and on whose behalf; and the agent in the chain that was denied |
 | AC-14.4 | An ask for more | it is raised | it is routed to the agent's named approvers, then Admins when none can answer (AC-26), never the person behind the run nor anyone it benefits, and says which |
 | AC-14.5 | An ask for more, routed to the reader | they press *Allow for this run* | that step runs for that agent, in this run only — never another step, its children or another run; no rule changes |
 | AC-14.6 | An ask for more, read by an Admin | they press *Draft a rule* | a draft of the agent's policy opens with the rule proposed and *Who it changes* (AC-06); the ask is still decided on its own |

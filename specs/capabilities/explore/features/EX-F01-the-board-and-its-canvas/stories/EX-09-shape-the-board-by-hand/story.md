@@ -28,7 +28,7 @@ The board needs no permission of its own ([the permission catalogue](../../../..
 ```mermaid
 flowchart LR
   a([A drawn board]) -->|right-click a node · Expand neighbours| ck{"The Assistant's Access Policies · each graph database on"}
-  ck -->|a rule denies the kind| r["Refused — names the rule, its policy and who set it"]
+  ck -->|a rule denies the kind| r["Refused — Needs {Action} on {Resource name}"]
   ck -->|a graph database off| off["Refused — names it and who switched it off"]
   ck -->|allowed| c{The count, in the node's graph database}
   c -->|within the cap| d["Neighbours added · nothing replaced"]

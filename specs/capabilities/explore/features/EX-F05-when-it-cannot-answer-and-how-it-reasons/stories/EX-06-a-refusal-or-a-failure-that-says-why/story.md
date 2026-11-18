@@ -50,7 +50,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| EX-06.1 | A question a Deny rule on the agent's Access Policies reaches | it is asked | it is refused before anything runs; the reply names the policy and the rule, in the agent's voice |
+| EX-06.1 | A question a Deny rule on the agent's Access Policies reaches | it is asked | it is refused before anything runs; the reply reads *Needs {Action} on {Resource name}*, naming no policy or rule, in the agent's voice |
 | EX-06.2 | A skill or function whose declared needs the agent's Access Policies, or the graph database's mode, do not give | the plan is checked | it is refused before anything runs, naming what is missing |
 | EX-06.3 | An Ask rule reaches a step | the run reaches it | the step reads *Waiting for* the agent's approvers; allowed, the run goes on; refused or expired, it is refused naming who refused, or that nobody answered in time |
 | EX-06.4 | A plugin the plan needs is switched off — at install by an Admin, or by the person's own switch | the question is asked | it is refused before it starts, naming the plugin, who switched it off and when; a switched-off graph database reads the same ([EX-F03](../../../EX-F03-ask-a-question/feature.md)) |
@@ -62,7 +62,7 @@ flowchart TD
 | EX-06.10 | An AI provider's rate limit | retries run out | the diagnosis names the provider and the limit |
 | EX-06.11 | The same failure across runs | it recurs | the diagnosis reads the same each time |
 | EX-06.12 | An Operator, and a next step that needs Edit on access/policies | they reach it | it is disabled — *Needs Edit on Access — ask {who can grant}*; an Admin's *Open the policy* opens the policy at the rule |
-| EX-06.13 | A refusal or a diagnosis | the person opens *How it got here* | the run shows the policy and rule, the switch, the property, or the step with its error and its query |
+| EX-06.13 | A refusal or a diagnosis | the person opens *How it got here* | the run shows the resource and action needed (the policy and rule only to a person with Read on Access Policies), the switch, the property, or the step with its error and its query |
 
 ## Screens
 

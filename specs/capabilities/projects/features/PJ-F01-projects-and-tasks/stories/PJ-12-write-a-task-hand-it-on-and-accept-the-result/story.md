@@ -45,7 +45,7 @@ flowchart TD
   out -->|asked a question| ni["Needs input · the question is on the task"]
   ni -->|a person answers| ip
   out -->|waits on another task, a paused agent, an open sub-task| bl["Blocked · names what it waits on · reassign offered"]
-  out -->|the agent's policies refuse| rf["Failed · names the rule that refused"]
+  out -->|the agent's policies refuse| rf["Failed · Needs {Action} on {Resource name}"]
   out -->|result posted| ck{"Checks? (PJ-25)"}
   ck -->|none, or each passed| rv["In review · in the project's people' Needs you · the result with How it got here"]
   ck -->|one failed| cf["Checks failed · Accept off"]

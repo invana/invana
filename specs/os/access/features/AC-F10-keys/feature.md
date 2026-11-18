@@ -43,7 +43,7 @@ flowchart TD
   use([A script calls]) --> chk{"Live · a personal key's person active?"}
   chk -->|no| r1(["Refused · revoked, expired or deactivated"])
   chk -->|yes| reach{"The owner's policies ∩ the agent's ceiling ∩ the key's rules allow it?"}
-  reach -->|no| r2(["Refused · names the rule"])
+  reach -->|no| r2(["Refused · Needs {Action} on {Resource name}"])
   reach -->|ask| ask(["An ask to the agent's named approvers (AC-F05)"])
   reach -->|yes| ok(["Done for the owner, through the agent · History names the key"])
 ```

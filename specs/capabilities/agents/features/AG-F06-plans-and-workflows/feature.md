@@ -112,7 +112,7 @@ making it grants nothing over it.
 |---|---|---|
 | Read workflows, a workflow's page, its versions and arguments, and functions | Read on `workflow/<name>` | — |
 | Read a run's plan — its rung, why, the check's result | Whoever may read the run's content — the person behind it, and for a project's run anyone whose default agent may see its sources (run privacy, [AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) | That it ran, its status and its tokens; the plan reads *Content withheld* |
-| Run a workflow by name · dry run | Run on `workflow/<key>`, through an agent the person may Run whose Access Policies allow it | *Run* disabled, naming the rule that denies it and *ask an Admin* |
+| Run a workflow by name · dry run | Run on `workflow/<key>`, through an agent the person may Run whose Access Policies allow it | *Run* disabled, reading *Needs Run on {Resource name}* and *ask an Admin*, naming no rule |
 | Propose a plan that served as a workflow | The person behind the run | *Propose as a workflow* hidden |
 | Approve or decline a plan into a workflow | The agent's named approvers — else the other approvers, else the Admins — never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads; *Approve* and *Decline* absent — *Not yours to answer* |
 | Propose a workflow's next version · retire a version · move a pin | Edit on `workflow/<name>` | Disabled — *Needs Edit on the {workflow} workflow — ask {who can grant}* |

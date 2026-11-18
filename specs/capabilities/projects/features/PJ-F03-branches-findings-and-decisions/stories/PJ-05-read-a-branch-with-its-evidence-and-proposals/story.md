@@ -59,7 +59,7 @@ flowchart LR
 | PJ-05.7 | A waiting proposal | a person who may read its run opens *How it got here* | it shows the agent's steps and sources behind the rationale; anyone else reads that the run ran, its status and its tokens |
 | PJ-05.8 | A waiting fork proposal | a person on the team accepts it | the children are made (PJ-04) and the proposal reads accepted, by whom |
 | PJ-05.9 | A waiting decision proposal | a person on the team accepts it | the decision is recorded in that person's name, with every rule in force checked (PJ-07); the proposal reads accepted |
-| PJ-05.10 | A decision proposal a rule blocks | it is accepted | the refusal names the rule and the evidence, nothing is recorded, and the proposal stays open |
+| PJ-05.10 | A decision proposal a rule blocks | it is accepted | the refusal reads *Needs {Action} on {Resource name}*, naming no rule, and shows the evidence, nothing is recorded, and the proposal stays open |
 | PJ-05.11 | A waiting proposal | a person on the team rejects it | it reads rejected, by whom and when, and stays listed |
 | PJ-05.12 | A proposal already accepted or rejected | someone acts on it again | it is refused, saying it is already resolved |
 | PJ-05.13 | Any agent | it tries to record a verdict or a decision | it cannot: verdicts and decisions are a person's, and an agent can only propose |
