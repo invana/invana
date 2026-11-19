@@ -62,7 +62,7 @@ The path is [J11 · Ideate and run a project with its assistant](../journeys/J11
 
 | Agent | Does | Runs with | Skills | On a project |
 |---|---|---|---|---|
-| `researcher` · **Researcher** | Reads the web and documents the project names, proposes nodes and Claims each citing a Source, and tags what looks duplicated | Invana | `map-the-landscape` · `recommend` | Picks up tasks tagged *research* |
+| `researcher` · **Researcher** | Reads the web and documents the project names, proposes nodes and Claims each citing a Source, and tags what looks duplicated | Invana | `map-the-landscape` · `recommend` | Works the tasks tagged *research* |
 | `analyst` · **Analyst** | Sketches the market's nodes with the team, finds the gaps between a competitor and us, proposes milestones and writes the brief | Invana | `find-gaps` · `write-a-brief` · `recommend` | The project assistant: every proposal is a member's to accept |
 | `fact-checker` · **Fact-checker** | Judges each Claim against its Source and its age, in a run of its own | Invana | `fact-check` · `recommend` | Its judgement is a check on a task ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
 
@@ -94,16 +94,26 @@ The path is [J11 · Ideate and run a project with its assistant](../journeys/J11
 | `labels` | `project` Project · `task` Task · `milestone` Milestone |
 | `fields` | none beyond the name and description |
 | `subject_model` | `ontology/research.yaml` — **Competitor** · **Offering** · **Capability** · **Price** · **Segment** · **Claim** · **Source**. A Competitor *offers* an Offering; an Offering *has* Capabilities, a Price and a Segment; a Claim *states* a fact about a node and *cites* a Source. A Capability may `match` or `gap` a Capability or Feature of another model — ours, from a Software project ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)) |
-| `sources` | `web` and `documents` · connector `invana-web` ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md): the Web adapter, read only) · parses to Competitor, Offering, Capability, Price, Segment, Claim, Source — `tracker` when the team keeps its research there |
+| `sources` | `web` · connector `invana-web` ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md): the Web adapter, pages, read only) · parses to Competitor, Offering, Capability, Price, Segment, Claim, Source · required — `documents` · connector `invana-files` (a folder of documents, bundled, read only) · the same kinds · not required — `tracker` · connector kind `tracker` · not required, for a team that keeps its research there |
 | `milestones` | *Landscape* → *Gaps* → *Brief*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
-| `tags` | research · review · duplicate · waiting-deletion · gap |
+| `tags` | research · review · duplicate · waiting-deletion · gap — each a label ([PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) |
 | `task_kinds` | none beyond **Task** and **Recommendation**, which every project has ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
 | `checks` | A task tagged *research*: workflow `claims-cite-a-source` (every Claim cites a Source), workflow `sources-under-6-months` (every Source is under 6 months old), then `person` · a task tagged *gap*: `person` reviews every gap |
 | `reviewers` | `creator` by default, at least one person ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
 | `agents` | The three agents above, `analyst` as the `assistant`, each with its skills |
 | `pick_up` | `ask` for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
 | `report_template` | *Brief*: the competitors, offerings and capabilities, the gaps with their evidence, and what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
-| `requires` | `invana-web` |
+| `access_template` | none until a person settles it ([the paper test](#the-paper-test)) |
+| `requires` | `invana-web`; until it is installed the type is listed as unavailable, naming it |
+
+### The checks
+
+Each check workflow is a run of its own, started through the project assistant ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)); its step is the Fact-checker's `fact-check`, so both `checks` keys have one doer.
+
+| Workflow | Its step | Doer |
+|---|---|---|
+| `claims-cite-a-source` | Judges that every Claim cites a Source and that the Source says it | Fact-checker · `fact-check` |
+| `sources-under-6-months` | Judges that every Source is under 6 months old | Fact-checker · `fact-check` |
 
 ## The Access Policy files
 
@@ -112,7 +122,7 @@ draft for a person with Create on `setting/team-packs` to apply. Anything a rule
 
 | Area | Researcher | Analyst | Fact-checker |
 |---|---|---|---|
-| The web | Read `net/` the hosts the project's sources name, narrowed to the hosts an Admin allows on the Web connection ([CP-73.19](../os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md)) | Read only what the project already holds | Read `net/` the hosts a Claim cites, narrowed the same way |
+| The web | Read `net/` the hosts the project's sources name, narrowed to the hosts an Admin allows on the Web connection ([CP-73.19](../os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md)); Read `fs/` the folder of a `documents` source | Read only what the project already holds | Read `net/` the hosts a Claim cites, narrowed the same way; Read `fs/` the folder of a `documents` source |
 | Projects and memory | Read and Write `project/*` and Read `memory/project/*`, narrowed at run time to the run's project ([AC-F04](../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) | The same | Read `project/*` and `memory/project/*` |
 | The project graph | Propose nodes and links; never write one | Propose nodes, links and milestones | Read |
 | Files | `fs/reports/<agent>/**` Write, its own | `fs/reports/<agent>/**` Write, its own | `fs/reports/<agent>/**` Write, its own |
@@ -125,6 +135,17 @@ draft for a person with Create on `setting/team-packs` to apply. Anything a rule
 | Data | None. A team that wants its agents to read Graph Data writes that rule itself |
 | Outside text | A page or an issue the Researcher reads is data: a run that read one asks before any write at a tracker ([CP-73.17](../os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md)) |
 | Deletes | No agent deletes an outside item; it tags *waiting-deletion* ([CP-74](../os/control/features/CP-F12-issue-trackers/stories/CP-74-delete-an-outside-issue-only-by-hand/story.md)) |
+
+## The paper test
+
+Walked end to end against [the manifest](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#the-project-type-manifest) and the drawn boards: every field above has a home in the manifest, every parser is a connector, every check key a workflow with a doer. What the walk changed is in the tables above; what it left open:
+
+| Open | Why it is Ravi's |
+|---|---|
+| `access_template` — which Access template this type starts a person or team from (recommended *Read and analyse*, as the *Team* step is drawn) | A choice of access |
+| `reviewers` — the manifest field has no home in PJ-22 | Who accepts a task is not yet specified anywhere in Projects |
+
+A pack agent's policy is a draft until an Admin applies it, so on the *Team* step a Research agent reads *Chooses nothing yet — pick a policy* until then ([PJ-02.39](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); an Operator who may not apply it reads *Will ask {who can grant}*. A default policy is never applied.
 
 ## What it relies on
 

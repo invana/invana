@@ -64,8 +64,8 @@ new piece of work.
 | Agent | Does | Runs with | Skills | On a project |
 |---|---|---|---|---|
 | `product-manager` · **Product manager** | Turns ideas, bugs and recommendations into stories — who can, flow, criteria, screens — and the system design; proposes tasks and their order; takes up recommendations | Invana | `product-spec` · `system-design` · `recommend` | The project assistant ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)): every proposal is a member's to accept |
-| `designer` · **Designer** | Draws exactly the boards a story names, every state and access level, from the team's design kit | Invana | `design-story` · `recommend` | Picks up the tasks of the *Design* group |
-| `coder` · **Coder** | Builds the story — code, every test and a changeset — in the task's workspace, and opens a pull request | Claude Code or Codex ([AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md)), set by a Modeller | `build-feature` · `build-ui` · `recommend` | Picks up the tasks of the *Build* milestone and tasks tagged *bug* |
+| `designer` · **Designer** | Draws exactly the boards a story names, every state and access level, from the team's design kit | Invana | `design-story` · `recommend` | Works the tasks of the *Design* milestone |
+| `coder` · **Coder** | Builds the story — code, every test and a changeset — in the task's workspace, and opens a pull request | Claude Code or Codex ([AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md)), set by a Modeller | `build-feature` · `build-ui` · `recommend` | Works the tasks of the *Build* milestone and the tasks tagged *bug* |
 | `qa` · **QA** | Runs the tests and reviews the code against the criteria; compares what was built against its boards; writes PASS or FAIL | Invana | `code-review` · `design-qa` · `recommend` | Its reviews are checks on a task ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
 | `security` · **Security** | Threat-models a story that touches access, data, agents or an outside system; audits a change before it is accepted | Invana | `security-audit` · `recommend` | Its audit is a check on a task |
 
@@ -102,16 +102,29 @@ new piece of work.
 | `labels` | `project` Project · `task` Story · `milestone` Milestone |
 | `fields` | `repository` (url, required) — the code host's address · `default_branch` (text, default `main`) · `product_owner` (person, required) — the person on the team who accepts specs and boards |
 | `subject_model` | `ontology/software.yaml` — **Feature** · **Requirement** · **Story** · **Module** · **Persona** · **Journey** · **Decision**, parsed from the repository's `specs/` folder and its code ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)); the spec files stay the source of truth, a canvas edit is a draft, and approving it writes the story file |
-| `sources` | `specs` · connector `invana-files` · parses to Feature, Requirement, Story, Persona, Journey, Decision · read only — `code` · connector `invana-files` · parses to Module, an import graph per language · read only — `tracker` · the code host connector the team keeps its work in ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md)) |
+| `sources` | `specs` · connector `invana-files` · parses to Feature, Requirement, Story, Persona, Journey, Decision · read only · required — `code` · connector `invana-files` · parses to Module, an import graph per language · read only · not required — `tracker` · connector kind `code_host`, any installed code host connector (`invana-github` or `invana-gitea`) the team keeps its work in ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md)) · required |
 | `milestones` | *Spec* → *Design* → *Build* → *Verify*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
-| `tags` | story · bug · test · review · audit · duplicate · waiting-deletion — each a label on a connected tracker ([PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) |
+| `tags` | story · bug · test · review · audit · screen · duplicate · waiting-deletion — *screen* marks a story that changes a screen; each a label on a connected tracker ([PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) |
 | `task_kinds` | none beyond **Task** and **Recommendation**, which every project has ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
-| `checks` | A task tagged *story*: workflow `spec-check`, then `person` · a task tagged *bug*, and a Task of the *Build* milestone: workflows `tests` and `code-review`, and `design-review` when a screen changed · a story touching access, data, agents or an outside system: workflow `security-audit` — each a run of its own |
+| `checks` | A task tagged *story*: workflow `spec-check`, then `person` · a task tagged *bug*, and a Task of the *Build* milestone: workflows `tests` and `code-review`, and `design-review` for a task tagged *screen* · a story touching access, data, agents or an outside system: workflow `security-audit` — each a run of its own |
 | `reviewers` | `product_owner` by default, at least one person ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
 | `agents` | The five agents above, `product-manager` as the `assistant`, each with its skills |
 | `pick_up` | `ask` for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
 | `report_template` | *Release notes*: the stories done, their criteria and checks, the bugs fixed, what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
-| `requires` | `invana-files` and a code host connector — `invana-github` or `invana-gitea` |
+| `access_template` | none until a person settles it ([the paper test](#the-paper-test)) |
+| `requires` | `invana-files` and a connector of kind `code_host` — `invana-github` or `invana-gitea`; until one is installed the type is listed as unavailable, naming both |
+
+### The checks
+
+Each check workflow is a run of its own, started through the project assistant ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)); its step uses the skill or program below, so every `checks` key has one doer.
+
+| Workflow | Its step | Doer |
+|---|---|---|
+| `spec-check` | Runs the repository's spec check program over the task's story | QA, through a program an Admin names |
+| `tests` | Runs the repository's tests | QA, through a program an Admin names |
+| `code-review` | Reviews the change against the story's criteria | QA · `code-review` |
+| `design-review` | Compares each built screen with its board | QA · `design-qa` |
+| `security-audit` | Threat-models or audits the change | Security · `security-audit` |
 
 ## The Access Policy files
 
@@ -133,13 +146,24 @@ an Admin edits the paths to the repository's own before applying them. Anything 
 
 | Rule | Detail |
 |---|---|
-| Programs | The Coder and QA: Run `cmd/git` and the repository's build and test programs, named by an Admin; Security: Run its scanners. No other `cmd/` |
+| Programs | The Coder and QA: Run `cmd/git` and the repository's build, test and spec check programs, named by an Admin; Security: Run its scanners. No other `cmd/` |
 | Hosts | Read `net/` the package registries the repository uses; no Write to any host but through a tool |
 | The code host | Run `tool/<code host>/*` on Ask for the Coder — opening a pull request is an outbound act, with its text through the outbound check ([AC-F09](../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)); through a work connection an Admin made ([CP-F02](../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)) |
 | Projects and memory | Read and Write `project/*` and Read `memory/project/*` — narrowed at run time to the run's project and the ones related to it ([AC-F04](../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
 | Data | None. A team that wants its agents to read Graph Data writes that rule itself |
 | Rows within a file | Each role adds only its own rows of a story's tasks; the sandbox guards files, so a row is the spec check's to guard, not a rule's |
 | Never | No agent may Write `fs/.claude/**`, `fs/CLAUDE.md` or `fs/AGENTS.md`: the team's rules are a person's to change |
+
+## The paper test
+
+Walked end to end against [the manifest](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#the-project-type-manifest) and the drawn boards: every field above has a home in the manifest, every parser is a connector, every check key a workflow with a doer. What the walk changed is in the tables above; what it left open:
+
+| Open | Why it is Ravi's |
+|---|---|
+| `access_template` — which Access template this type starts a person or team from (recommended *Full project*) | A choice of access; *Full project* carries `net/*` and `worker/*` |
+| `reviewers` — the manifest field has no home in PJ-22 | Who accepts a task is not yet specified anywhere in Projects |
+
+A pack agent's policy is a draft until an Admin applies it, so on the *Team* step a Software agent reads *Chooses nothing yet — pick a policy* until then ([PJ-02.39](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); an Operator who may not apply it reads *Will ask {who can grant}*. A default policy is never applied.
 
 ## What it relies on
 

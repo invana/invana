@@ -39,7 +39,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| PJ-27.1 | A project of a type | a task is written or opened | it offers the tags the type ships as defaults — the software type: story · bug · test · review · audit · duplicate · waiting-deletion; the research type: research · review · duplicate · waiting-deletion — and the project's own tags |
+| PJ-27.1 | A project of a type | a task is written or opened | it offers the tags the type ships as defaults — the software type: story · bug · test · review · audit · screen · duplicate · waiting-deletion; the research type: research · review · duplicate · waiting-deletion · gap — and the project's own tags |
 | PJ-27.2 | A person on the team | they add or remove a tag | it is saved, History records who and which tag, and a task may carry any number of tags |
 | PJ-27.3 | A tag that is empty, longer than 32 characters or has a space | it is saved | it is refused naming why; nothing is saved |
 | PJ-27.4 | A task kind that only labelled the work — *Story*, *Bug* | a project of a type is read | it is a tag; a kind remains only where it asks for fields of its own (*Task*, *Recommendation*, PJ-20) |

@@ -122,7 +122,7 @@ type *chooses*; the engine's generic core holds everything else, so no type adds
 | `labels` | The type's words for the core nouns — `project` · `task` · `milestone` · `check` · `review` · and the name of each node kind in the plural — used inside a project only | `project` and `task` | PJ-02.19 |
 | `fields` | The fields About asks for beside the name — each `key` · `label` · `type` (`text` · `choice` · `person` · `url`) · `required` · `default` | No | PJ-02 About |
 | `subject_model` | The `ontology` file declaring the node kinds, their fields and the links between them; none for General | No — absent means *No subject model* | PJ-28.1 · PJ-28.2 |
-| `sources` | Each source the type can read: `kind` (`specs` · `code` · `web` · `documents` · `tracker`) · `connector` (the id of the `source` or tracker connector that reads it) · `parses_to` (the node kinds it may produce) · `required` | No | PJ-28.3 · PJ-28.13 |
+| `sources` | Each source the type can read: `kind` (`specs` · `code` · `web` · `documents` · `tracker`) · `connector` (the id of the `source` or tracker connector that reads it, or a connector kind such as `code_host` that any installed connector of that kind satisfies) · `parses_to` (the node kinds it may produce) · `required` | No | PJ-28.3 · PJ-28.13 |
 | `milestones` | The ordered starting milestones — each a `name`, with the previous one as what it waits on | No | PJ-18 · PJ-26 |
 | `tags` | The default tags, each a label ([PJ-27](../PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) | No | PJ-27 |
 | `task_kinds` | Kinds beyond *Task* and *Recommendation*, each with its fields and its default checks | No | PJ-20 |
@@ -138,7 +138,7 @@ type *chooses*; the engine's generic core holds everything else, so no type adds
 |---|---|---|---|---|---|
 | **General** | none | none; a tracker may be linked ([CP-F12](../../../../os/control/features/CP-F12-issue-trackers/feature.md)) | *Project* · *Task* | none | Built in |
 | **Software** | `ontology/software.yaml` — Feature · Requirement · Story · Module · Persona · Journey · Decision | `specs` and `code` by `invana-files`; `tracker` by a code host | *Project* · *Story* | *Spec* → *Design* → *Build* → *Verify* | [`software-delivery`](../../../../packs/software-delivery.md#the-project-type) |
-| **Research** | `ontology/research.yaml` — Competitor · Offering · Capability · Price · Segment · Claim · Source | `web` and `documents` by `invana-web`; `tracker` | *Project* · *Task* | *Landscape* → *Gaps* → *Brief* | [`market-research`](../../../../packs/market-research.md#the-project-type) |
+| **Research** | `ontology/research.yaml` — Competitor · Offering · Capability · Price · Segment · Claim · Source | `web` by `invana-web`; `documents` by `invana-files`; `tracker` | *Project* · *Task* | *Landscape* → *Gaps* → *Brief* | [`market-research`](../../../../packs/market-research.md#the-project-type) |
 
 | Rule | Detail |
 |---|---|
@@ -146,7 +146,9 @@ type *chooses*; the engine's generic core holds everything else, so no type adds
 | A parser is a connector | A type ships no parser code. A source names the connector that reads it — `invana-files` for specs folders and code (an import parser per language), `invana-web` for pages and documents — and that connector's `connector.yaml` lists the node kinds it can produce; a `parses_to` kind a connector does not list fails the manifest |
 | Checks are workflows | Each check step is the key of a workflow or a person; a key no workflow answers to fails the manifest. A check is applied to a new task by its `when`, and is a run of its own ([PJ-25](../PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
 | A manifest is valid or not offered | Every field is checked when the pack is installed: a field the schema does not know, a required field missing, a node kind used and not declared, a link with an undeclared end, a milestone naming itself, a duplicate `id`. A pack whose manifest fails installs nothing and names the file, the field and why |
-| A type with a missing connector is held | An installed type whose `requires` connector is not installed is listed in *New project* as unavailable, naming the connector — never hidden |
+| A type with a missing connector is held | An installed type whose `requires` connector is not installed — for a connector kind, none of its kind — is listed in *New project* as unavailable, naming the connector or those that satisfy the kind — never hidden. Only a `required` source holds a type |
+| A pack agent's policy is a draft until applied | The Team step offers a pack agent's policy only once an Admin has applied it; until then the agent's row reads *Chooses nothing yet* ([PJ-02.39](../PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); a default policy is never applied |
+| Every check key has one doer | A pack lists, for each workflow its `checks` name, the skill or program its step uses and the agent that runs it |
 | General is one with no model | General has no `subject_model`, no sources and no milestones; the same flow, the same work graph, only the work shows |
 
 ## Data touched
