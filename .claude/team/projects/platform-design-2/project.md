@@ -407,6 +407,10 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 
 | Date | Phase | Question | Options | Recommend | Answer |
 |---|---|---|---|---|---|
+| 2026-11-19 | P01b | Datasets (audit Q2) | keep retired · bring back · cherry-pick | keep retired | answered — keep retired; P01b checks provenance, versions and standards for gaps only |
+| 2026-11-19 | P01b | projects.simulate (audit Q3) | leave out · specify and draw | leave out | answered — **specify and draw it**: P04 writes the story, P10 draws it on projects.branches |
+| 2026-11-19 | P05 | Airy density on Explorer chrome | forms, flows and pages only · chrome too | forms, flows and pages only | answered — forms, flows and pages only; Explorer chrome stays compact |
+| 2026-11-19 | P01b | Explorer visual comparison scope | answer and board families first · all 105 · name only | families first | answered — answer, board, layout and presenting first; the rest by state name |
 | 2026-11-19 | P01 | Audit Q1: the specs have no Graph above a graph database, Invana Products draws one — skip the 21 Graph boards, or restore Graphs | (a) keep the specs, skip the Graph boards · (b) restore Graphs | (a) | Answered: yes — the Graph stays retired and the project takes its place; `graph.settings.*` and `settings.graph_limits` become project settings (P04 · P10 · P11) |
 | 2026-11-19 | P01 | Audit Q2 (Datasets retired) · Q3 (`projects.simulate`) · Q4 (accept the 334 `skip` rows) | see the audit §7 | Q4 no — verdicts are redone | Q4: not accepted, re-audited in P01b. Q2 and Q3 stay open until P01b reissues the verdicts |
 | 2026-11-19 | P02 | Part 1's design-review changes: none were handed over. What did the part-1 review change? | (a) paste or dictate them before P02 starts · (b) none — P02 only confirms the MVP journeys | (a) | |
