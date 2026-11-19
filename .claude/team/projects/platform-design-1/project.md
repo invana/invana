@@ -281,7 +281,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P06 | Boards open from the URL, and the undrawn boards | P01 | done | 2026-11-19 | gates green · reviews passed |
 | P07 | Full fidelity — Shell, Start and Explore | P06 | done | 2026-11-19 | gates green · reviews passed |
 | P08 | Full fidelity — Model and Graph Data | P07, P04 | done | 2026-11-19 | gates green · reviews passed |
-| P09 | Full fidelity — Projects | P08, P05 | pending |  |  |
+| P09 | Full fidelity — Projects | P08, P05 | in progress | 2026-11-19 |  |
 | P10 | Full fidelity — Agents and Inbox | P09 | pending |  |  |
 | P11 | Full fidelity — Access | P10 | pending |  |  |
 | P12 | Full fidelity — Settings | P11, P03, P04 | pending |  |  |

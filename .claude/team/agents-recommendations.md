@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**534 recommendations** · 333 open · 121 taken · 23 declined · 57 done
+**536 recommendations** · 335 open · 121 taken · 23 declined · 57 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -577,3 +577,5 @@ flowchart LR
 | R563 | open | 2026-11-19 | designer | phase platform-design-1/P08 | docs | low | RC-08 and RC-11 cells name Needs the model grant; criteria and boards say Needs Create on Graph Data | RC-08 and RC-11 Screens (No access column) cite data.loads Upload and Add by hand Needs the model grant; their criteria RC-08.9 and RC-11.6 say Needs Create on the kind. P08 drew both names (the old name as an alias state). Rename the cells to Needs Create on Graph Data, then the alias states can go. |  |  |
 | R564 | open | 2026-11-19 | designer | phase platform-design-1/P08 | docs | low | SE-13 Request refused cell is undefined; the board draws Already resolved | SE-13 Screens cite model.rules Request refused (Admin, Failed) but no criterion says what is refused. P08 drew SE-13.12 Already resolved as that state. Name the refusal in a criterion, or rename the cell to the drawn state. |  |  |
 | R565 | open | 2026-11-19 | designer | phase platform-design-1/P08 | docs | medium | Record P08 hand-off note in platform-design-1 project file | Designer cannot edit the project file. The P08 note is in .agent-reports/designer/platform-design-1-P08.md; copy it into Hand-off notes. Publishing the mirror stays with R560. |  |  |
+| R566 | open | 2026-11-19 | designer | phase platform-design-1/P09 | idea | medium | P09: staging canvas boards could not be ported (no artifact reader) | Phase platform-design-1/P09 step 1: staging canvas 8u9qeDPktzNyMwH82aQjSg was unreadable (Docs read not granted; no Artifact tool), so its project-graph and code-host boards were not ported; projects.graph already draws every cited cell. Run a session with an artifact reader to compare and port, and publish the mirror (R560). |  |  |
+| R567 | open | 2026-11-19 | designer | phase platform-design-1/P09 | docs | low | Record P09's hand-off note in platform-design-1 project.md | The designer cannot edit the project file. Note for P09: 36 cells drawn (projects.projects Milestones/Tracker tabs, New About types; projects.tasks Tags/Pull request/Tracker tabs, Tag filter); boards render tabs from one generic xt spec; staging canvas unread (R566); not published; PJ-26 and PJ-27 still idea status. See .agent-reports/designer/platform-design-1-P09.md. |  |  |
