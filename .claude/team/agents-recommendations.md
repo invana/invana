@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**546 recommendations** · 333 open · 126 taken · 23 declined · 64 done
+**547 recommendations** · 334 open · 126 taken · 23 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -589,3 +589,4 @@ flowchart LR
 | R575 | taken | 2026-11-19 | product-manager | phase platform-design-2/P03 | docs | medium | Draw the states P03's spec edits name that no board draws yet | settings.packs · Install · Manifest refused (CP-20.17) · agents.skills · Import · a refused address (AG-64.2, mapped to Refused file for now) · agents.skills · Detail · Export · Writing, Refused and Disabled (AG-64) · inbox.dropdown · Agent waiting, Refused, Not mine (CP-76). Draw each in the phase that owns its board (P12 builder and packs, P13 inbox). | P2 | phase platform-design-2/P12 |
 | R576 | open | 2026-11-19 | designer | phase platform-design-2/P06 | docs | low | Add P06's hand-off row to platform-design-2 and publish the density pass | A designer cannot edit the project file. Add P06's hand-off note (text in .agent-reports/designer/platform-design-2-P06-boards.md) to its Hand-off notes. The density pass is built in the mirror but not published: this session had no Artifact tool (R560/R566). A session with it publishes ds/density.css and every changed board to PgtkC6KygGZz2u8fYq1LWX. |  |  |
 | R577 | open | 2026-11-19 | designer | phase platform-design-2/P07 | debt | medium | Publish to the v2027 canvas needs the Artifact tool | P07 ran in a session with no Artifact tool, so settings.workers.dc.html and canvas.json are not published to PgtkC6KygGZz2u8fYq1LWX. Same cause as R560 and R566. |  |  |
+| R578 | open | 2026-11-19 | designer | phase platform-design-2/P08 | docs | low | P08 hand-off note: the designer may not edit the project file | The edit_rights hook refuses designer writes to .claude/team/projects/platform-design-2/project.md, so the P08 hand-off note is in .agent-reports/designer/platform-design-2-P08.md (Hand-off note section). Copy it into the project's Hand-off notes. The Artifact tool was missing again (R577): settings.policies, settings.agent_access and canvas.json are not published. |  |  |
