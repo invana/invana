@@ -9,7 +9,7 @@ boards: [settings.plugins, projects.projects]
 
 # CP-73 · Connect an issue tracker and link a project to it
 
-**As** an Admin **I want** to connect a tracker — GitHub, Jira, Forgejo, local files or the web — and a person on a project to link the project to it **so that** the tracker stays the record of truth, each issue has an Invana twin that carries its runs, checks and context, and agents work the tracker as their policies allow.
+**As** an Admin **I want** to connect a code host — GitHub or Gitea — or a read only source — local files or the web — and a person on a project to link the project to it **so that** the tracker stays the record of truth, each issue has an Invana twin that carries its runs, checks and context, and agents work the tracker as their policies allow.
 
 Tasks: [task.md](task.md) · Feature: [CP-F12](../../feature.md)
 
@@ -24,7 +24,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F12](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Settings › Connections › Trackers]) --> ad["Add a tracker: GitHub · Jira · Forgejo · Local files · Web"]
+  s([Settings › Connections › Trackers]) --> ad["Add a code host: GitHub · Gitea — or a read only source: Local files · Web"]
   ad --> wc["Signs in with a work connection · CP-62"]
   wc -->|fails| af["Names the address and what failed · nothing stored"]
   wc --> ok["Connected · its adapter · read only or read and write"]
@@ -46,7 +46,7 @@ flowchart TD
 | # | Given | When | Then |
 |---|---|---|---|
 | CP-73.1 | An Admin with Manage on the tracker's plugin | they add a tracker with its address, a work connection (CP-62) and the repositories or project keys it may serve | it is tested, sealed and reads *Connected* with its adapter, whether it is read only or read and write and what it may serve (none until named); History records who, never the credential |
-| CP-73.2 | The adapters | they are listed | GitHub, Jira and Forgejo read and write; Local files and Web read only — a write to either is refused, naming that it is read only |
+| CP-73.2 | The adapters | they are listed | GitHub and Gitea read and write — issues, branches, pull requests, checks and reviews, through the adapter's seventeen methods; Local files and Web read only — a write to either is refused, naming that it is read only; no other host is offered — another is a connector added later |
 | CP-73.3 | A tracker that cannot be reached or signs in badly | it is added | it fails naming the address and what failed; nothing is stored |
 | CP-73.4 | A person on a project's team | they link the project to a project or repository a connected tracker may serve (CP-73.16) | every issue read in becomes a twin task, and each twin shows its issue's address; a task made later in Invana creates its issue only when a person chooses *Create the issue* |
 | CP-73.5 | A twin and its issue | they are read | the tracker is the record of truth: title, body, state (open or closed, with a state label), tags and labels, milestone and assignee map one to one, an agent being a bot user of the tracker; a tag added in Invana adds the label of the same name, and a label the project has no tag for becomes one |

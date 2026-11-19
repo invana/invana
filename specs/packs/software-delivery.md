@@ -7,7 +7,7 @@
 > *is this change specified, drawn, built and proven well enough for a person to accept it?*
 
 It runs the one flow of [the project graph](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#rules), beside [the Market research pack](market-research.md); a deployment may install both and link their models. It is a Team pack like any other ([CP-F02](../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)):
-a Claude plugin with Invana's fields under `metadata`, installed and turned on by an Admin
+a Claude plugin with Invana's fields under `metadata.invana`, installed and turned on by an Admin
 ([CP-20](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-20-install-a-team-pack/story.md)). Installing
 it widens nobody's reach: its agents are granted to nobody and its policy files decide nothing until an Admin grants
 and applies them.
@@ -16,11 +16,13 @@ and applies them.
 
 ```text
 software-delivery/
-├── .claude-plugin/plugin.json      name · version · description · metadata: kind = pack, title, engine, the ordered agents and skills
+├── .claude-plugin/plugin.json      name · version · description · metadata.invana: kind = pack, title, engine, requires [a code_host connector: invana-github or invana-gitea], project_types, the ordered agents and skills
 ├── agents/                         product-manager.md · designer.md · coder.md · qa.md · security.md
 ├── skills/                         one Agent Skills folder each — the skills below
 ├── policies/                       product-manager.yaml · designer.yaml · coder.yaml · qa.yaml · security.yaml
-└── project_types/software/         subject model · sources · default tags · default checks · labels · suggested agents and skills · report template
+├── project_types/software.yaml         sources · default tags · default checks · labels · suggested agents and skills · report template
+├── ontology/software.yaml              the subject model
+└── lenses/                         none until a story names one
 ```
 
 | Piece | Offered in | Owned by |

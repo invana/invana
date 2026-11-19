@@ -2,7 +2,7 @@
 id: J13
 title: Plan and run work from the project graph
 personas: [decision-maker, builder, researcher]
-stories: [PJ-02, PJ-28, PJ-30, PJ-29, PJ-26, PJ-27, PJ-31, PJ-12, PJ-25, CP-73, CP-74, CP-76]
+stories: [PJ-02, PJ-28, PJ-30, PJ-29, PJ-26, PJ-27, PJ-31, PJ-12, PJ-25, CP-73, CP-78, CP-74, CP-76]
 boards: [projects.projects, projects.tasks, projects.graph, settings.plugins, inbox]
 ---
 
@@ -26,6 +26,8 @@ flowchart TD
   TR -->|yes| TW["CP-73 · The tracker is the record · each issue a twin · agents act through its MCP"]
   TR -->|no| PK["PJ-12 · Agents pick up tasks"]
   TW --> PK
+  TW -->|a Software task with an issue| BP["CP-78 · The agent branches, fixes, pushes to its branch only (a force push only after a person approves) and opens a pull request · checks and reviews flow back"]
+  BP -->|a person merges at the host| BM["CP-78 · The task moves to Needs you as Merged · a person accepts in one click, never by the merge"] --> CK
   PK --> CK["PJ-25 · Checks, each in a run of its own"]
   CK -->|failed twice| WT["CP-76 · Needs you: the run holds"]
   WT --> PK
@@ -47,6 +49,7 @@ flowchart TD
 | 5 | Make a milestone of the selection | Projects · a project › Map · Milestones | [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md) | `projects.graph · Make a milestone` |
 | 6 | Tag the tasks | Projects · a task | [PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md) | `projects.tasks · Detail · Tags` |
 | 7 | Connect a tracker and link the project | Settings › Connections · a project | [CP-73](../os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md) | `settings.plugins · Trackers` |
+| 7a | A Software task's issue goes to a branch, a pull request, checks and reviews; a person merges at the host | Projects · a task · Inbox | [CP-78](../os/control/features/CP-F12-issue-trackers/stories/CP-78-fix-an-issue-through-a-branch-and-a-pull-request/story.md) | `projects.tasks · Detail · Pull request` |
 | 8 | Agents work the tasks; checks run in runs of their own | Projects · a task | [PJ-12](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-12-write-a-task-hand-it-on-and-accept-the-result/story.md) · [PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md) | `projects.tasks · Detail` |
 | 9 | See the work beside the nodes | Projects · a project › Map | [PJ-31](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-31-see-the-work-in-the-same-graph/story.md) | `projects.graph · Map · Work` |
 | 10 | Accept the milestone | Inbox › Needs you | [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md) | `projects.projects · Detail · Milestones · Ready to accept` |
@@ -61,6 +64,7 @@ flowchart TD
 | The tracker changed a field Mira changed | The tracker's value stays and the thread says what changed | CP-73.6 | `projects.tasks · Detail · Tracker changed it` |
 | An agent would create more than 5 issues | The run holds; a card names each | CP-73.9 · CP-76.3 | `inbox · Needs you · Agent waiting` |
 | A check fails twice | The run holds; a card in Needs you | CP-76.4 | `inbox · Needs you · Agent waiting` |
+| An agent pushes to the default branch, a workflow file, or tries to merge | Refused, naming the ref or that a merge is never granted; a person merges at the host | CP-78.4 · CP-78.11 | `projects.tasks · Detail · Pull request` |
 | An agent asks to delete an issue | Refused — it tags waiting-deletion; a person deletes it at the tracker | CP-74.1 · CP-74.3 | `settings.plugins · Waiting deletion` |
 | An Operator not on the team | Acts disabled — *Join the team to change it* | PJ-26.11 | `projects.projects · Detail · Milestones · Not on the team` |
 | The project has no read + write graph database | The map draws subject nodes only and says the work graph is off | PJ-31.5 | `projects.graph · Map · Work graph off` |
@@ -68,4 +72,5 @@ flowchart TD
 ## Done when
 
 - A milestone of each project reads *Done*, accepted by a person on the team after every covered task's checks passed in a run of its own.
+- No pull request was merged, and no branch or issue deleted, by an agent or by Invana.
 - No outside issue was deleted by an agent or by Invana; every deletion waiting reads in Needs you until a person acts at the tracker.

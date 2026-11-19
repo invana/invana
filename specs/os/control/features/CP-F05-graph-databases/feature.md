@@ -130,6 +130,7 @@ names the acts.
 | A graph database is one connection | One connector, one address, one database, one credential. Graph Data is what every graph database the deployment has on holds |
 | Its name is a resource segment | Lowercase letters, digits and `_`, unique, fixed once saved — it is the `<graph database>` of `data/<graph database>/<kind>` in every rule |
 | A test gates every save | Nothing is saved until the details passed a test — on the first save and on every change to address, user, password, database |
+| A connector declares itself | Every connector carries a `connector.yaml` manifest — its `config` schema, secret names, capabilities and scopes — read at start ([CP-F02 › Mechanisms](../CP-F02-plugins-and-outside-tools/feature.md#mechanisms)); the connect form is drawn from it |
 | The connector is fixed once saved | Address, user, password and database stay editable; a different connector is a different graph database |
 | The credential is write-only | Sealed like every secret; the user reads back, the password field is blank — *Stored encrypted. Leave blank to keep it* |
 | Read-only by default | A new graph database is read-only. Read + write is a second, deliberate act by an Admin who signs in again; both directions are History rows. A write to a read-only graph database is refused before the wire, naming it; every read is a read whatever the mode ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) |

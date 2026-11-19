@@ -7,7 +7,7 @@
 > each competitor, and what does the evidence say we should do about it?*
 
 It is a Team pack like any other ([CP-F02](../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)):
-a Claude plugin with Invana's fields under `metadata`, installed and turned on by an Admin
+a Claude plugin with Invana's fields under `metadata.invana`, installed and turned on by an Admin
 ([CP-20](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-20-install-a-team-pack/story.md)). It sits
 beside [the Software delivery pack](software-delivery.md): both run the one flow of
 [the project graph](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#rules), and a deployment may
@@ -18,11 +18,13 @@ files decide nothing until an Admin grants and applies them.
 
 ```text
 market-research/
-├── .claude-plugin/plugin.json      name · version · description · metadata: kind = pack, title, engine, the ordered agents and skills
+├── .claude-plugin/plugin.json      name · version · description · metadata.invana: kind = pack, title, engine, requires [invana-web], project_types, the ordered agents and skills
 ├── agents/                         researcher.md · analyst.md · fact-checker.md
 ├── skills/                         one Agent Skills folder each — the skills below
 ├── policies/                       researcher.yaml · analyst.yaml · fact-checker.yaml
-└── project_types/research/         subject model · sources · default tags · default checks · labels · suggested agents and skills · report template
+├── project_types/research.yaml         sources · default tags · default checks · labels · suggested agents and skills · report template
+├── ontology/research.yaml              the subject model
+└── lenses/                         none until a story names one
 ```
 
 | Piece | Offered in | Owned by |
@@ -109,7 +111,7 @@ draft for a person with Create on `setting/team-packs` to apply. Anything a rule
 | Projects and memory | Read and Write `project/*` and Read `memory/project/*`, narrowed at run time to the run's project ([AC-F04](../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) | The same | Read `project/*` and `memory/project/*` |
 | The project graph | Propose nodes and links; never write one | Propose nodes, links and milestones | Read |
 | Files | `fs/reports/<agent>/**` Write, its own | `fs/reports/<agent>/**` Write, its own | `fs/reports/<agent>/**` Write, its own |
-| An issue tracker | Run `tool/<tracker>/*` read tools; a wildcard matches only the adapter's eight methods, never another tool of the server ([CP-74.1](../os/control/features/CP-F12-issue-trackers/stories/CP-74-delete-an-outside-issue-only-by-hand/story.md)) | Run create, update and comment on Ask | Read |
+| An issue tracker | Run `tool/<tracker>/*` read tools; a wildcard matches only the adapter's seventeen methods, never another tool of the server ([CP-74.1](../os/control/features/CP-F12-issue-trackers/stories/CP-74-delete-an-outside-issue-only-by-hand/story.md)) | Run create, update and comment on Ask | Read |
 | Never | Delete anything at a source; no `cmd/` | No `cmd/`; delete at a tracker is never granted | No Write to a node |
 
 | Rule | Detail |

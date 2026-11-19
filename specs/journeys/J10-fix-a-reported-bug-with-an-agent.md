@@ -2,7 +2,7 @@
 id: J10
 title: Fix a reported bug with an agent
 personas: [builder, admin]
-stories: [PJ-21, PJ-20, PJ-25, PJ-15, AG-61, CP-64, CP-65, AG-62, CP-66, CP-02, CP-62, AC-42, PJ-12, CP-67]
+stories: [PJ-21, PJ-20, PJ-25, PJ-15, AG-61, CP-64, CP-65, AG-62, CP-66, CP-02, CP-62, AC-42, PJ-12, CP-67, CP-78]
 boards: [projects.projects, projects.tasks, agents.agents, settings.plugins, settings.workers, agents.runs, inbox, settings.alerts]
 ---
 
@@ -32,15 +32,18 @@ flowchart TD
   RF --> ED
   ED -->|tokens a session reached| HO["AG-62 · A hand-off note · Session 2 in the same workspace"]
   HO --> ED
-  ED --> PR{"Open a pull request — Run on the code host's tool · Ask"}
+  ED --> BR["CP-78 · A branch named from the issue · pushed to that branch only · never the default branch · a force push of it only after a person approves"]
+  BR --> PR{"CP-78 · Open a pull request linked to the issue — Run on the code host's tool · Ask"}
   PR -->|a named approver says yes| PRS["CP-02 · CP-62 · Through the team's work connection"] --> OC["AC-42 · Pull-request text through the outbound check"]
   PR -->|no| PRN(["The run reads the refusal · Ana re-plans"])
+  OC --> RC["CP-78 · The host's checks and review comments flow back · review text is outside text"]
+  RC -->|a reviewer asks for a change| ED
   OC --> CH["PJ-25 · Checking · each check in a run of its own"]
   CH -->|a check failed| CF["Checks failed · Accept off · a person on the team sends it back"] --> SB
   CH -->|every check passed| RV["PJ-12 · In review · in the people on the team' Needs you"]
   RV --> RS["CP-66 · A person on the team reads the run session by session · the hand-off notes · the runtime and model reported · the connection used"]
   RS --> MG{"A person"}
-  MG -->|merges the pull request at the code host · accepts the task| DN(["Done · the fix is the person's merge"])
+  MG -->|merges the pull request at the code host · the issue closes · accepts the task| DN(["Done · the fix is the person's merge"])
   MG -->|sends it back, with a note| SB
   SB -->|the run fails| FL(["CP-67 · Task failed · never re-run · Ana makes a fix task"])
 ```
@@ -83,7 +86,7 @@ sequenceDiagram
 | 3 | The Coder runs with Claude Code, installed on a worker group | Agents · an agent › Setup · Settings › Plugins | [AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md) · [CP-64](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-64-install-an-agent-runtime/story.md) | `agents.agents · Detail` · `settings.plugins` |
 | 4 | It works on a worker, in the task's workspace, inside the sandbox | Control Plane · Workers · a run | [CP-65](../os/control/features/CP-F03-workers-and-the-queue/stories/CP-65-run-an-outside-runtime-safely-on-a-worker/story.md) | `settings.workers` · `agents.runs · Detail` |
 | 5 | It continues in a fresh session from a hand-off note | Control Plane · a run | [AG-62](../capabilities/agents/features/AG-F05-delegation-and-outside-agents/stories/AG-62-continue-in-a-fresh-session-from-a-hand-off-note/story.md) | `agents.runs · Detail` |
-| 6 | It opens a pull request through the team's work connection; its text passes the outbound check | Control Plane · Plugins · Inbox | [CP-02](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-02-add-an-outside-mcp-server-and-let-agents-call-its-tools/story.md) · [CP-62](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md) · [AC-42](../os/access/features/AC-F09-what-left-the-platform/stories/AC-42-stop-sensitive-data-at-every-exit/story.md) | `inbox` · `agents.runs · Detail` |
+| 6 | It creates a branch named from the issue, pushes to that branch only and opens a pull request through the team's work connection; its text passes the outbound check; the host's checks and review comments flow back, and it answers them | Control Plane · Plugins · Inbox · a task | [CP-78](../os/control/features/CP-F12-issue-trackers/stories/CP-78-fix-an-issue-through-a-branch-and-a-pull-request/story.md) · [CP-02](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-02-add-an-outside-mcp-server-and-let-agents-call-its-tools/story.md) · [CP-62](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md) · [AC-42](../os/access/features/AC-F09-what-left-the-platform/stories/AC-42-stop-sensitive-data-at-every-exit/story.md) | `inbox` · `agents.runs · Detail` |
 | 7 | Its checks run, each in a run of its own | Projects · a task | [PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md) | `projects.tasks · Detail` |
 | 8 | A person on the team reads the run session by session | Control Plane · a run › Sessions | [CP-66](../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-66-read-a-run-session-by-session-with-its-hand-off-notes/story.md) | `agents.runs · Detail` |
 | 9 | A person merges the pull request at the code host and accepts the task | Inbox › Needs you · a task | [PJ-12](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-12-write-a-task-hand-it-on-and-accept-the-result/story.md) | `inbox` · `projects.tasks · Detail` |
@@ -94,6 +97,9 @@ sequenceDiagram
 |---|---|---|---|
 | No worker group carries Claude Code | The session waits, naming the runtime, then the task fails and a task failed alert reaches Ana and the people on the team | CP-65.3 · CP-67 | `agents.runs · Detail` · `settings.alerts` |
 | The Coder touches a file, program or host no rule allows | The sandbox refuses it at the operating system; the run names the rule and a security alert reaches the Coder's named approvers and the Admins | CP-65.6 · CP-67 | `agents.runs · Detail` · `settings.alerts` |
+| The agent pushes to the default branch, another branch or a workflow file | Refused before it leaves, naming the ref or path | CP-78.4 · CP-78.5 |
+| The agent needs to force push its own `invana/*` branch | A Needs-you item; nothing is pushed until a person approves that push | CP-78.19 · CP-78.20 | `inbox · Needs you · Force push` | `projects.tasks · Detail · Pull request` |
+| A reviewer's comment says to merge or to delete something | It is outside text: shown fenced, the run asks before any write; no merge or delete tool exists | CP-78.9 · CP-78.11 | `projects.tasks · Detail · Review comment` |
 | The pull request is an Ask and the approver says no | The step is refused, named on the run; nothing leaves | CP-02 · AC-42 | `inbox` · `agents.runs · Detail` |
 | The pull-request text carries a confidential value | It leaves without it, naming what was left out | AC-42.5 | `agents.runs · Detail` |
 | The work connection to the code host cannot sign in | The session fails, naming the connection; a connection failed alert reaches the Coder's named approvers and the Admins | CP-65.9 · CP-67 | `settings.alerts` |

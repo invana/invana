@@ -11,7 +11,7 @@ boards: [settings.packs, settings.policies, settings.plugins]
 
 **As** an Admin **I want** to install a Team pack that brings a team's agents, skills, model starter, meaning,
 taxonomies, standards, rules, tools, Access Policy files and project types in one act — a Claude plugin with Invana's
-fields under `metadata` — and apply its policies myself **so that** a team starts its work from a working whole,
+fields under `metadata.invana` — and apply its policies myself **so that** a team starts its work from a working whole,
 installing it widens nobody's reach until I say so, and the platform itself stays general-purpose.
 
 Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
@@ -22,7 +22,7 @@ Installing a Team pack needs Create on `setting/team-packs` ([the permission cat
 
 | Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every pack and what it adds; install a pack (Create on `setting/team-packs`) or remove one (Edit on `setting/team-packs`); switch it as any plugin (CP-04); apply its Access Policy files (Edit on `access/policies`) after *Who it changes* (AC-04); grant its agents (AC-22) | — |
+| Admin | Read every pack and what it adds; install a pack (Create on `setting/team-packs`) or remove one (Edit on `setting/team-packs`); make a Custom copy and apply an upgrade (Edit on `setting/team-packs`); switch it as any plugin (CP-04); apply its Access Policy files (Edit on `access/policies`) after *Who it changes* (AC-04); grant its agents (AC-22) | — |
 | Operator | Read every pack, what it adds, whether it is installed, both switches and its policy files waiting to apply; with the permission an act needs, the same as Admin | *Install*, *Remove* and *Apply* are disabled — *Needs Create on Settings — ask {who can grant}* (*Apply*: Edit on access/policies) |
 
 ## Flow
@@ -31,7 +31,7 @@ Installing a Team pack needs Create on `setting/team-packs` ([the permission cat
 flowchart TD
   s([Settings › Connections › Team packs]) --> l["Every pack · installed or not"]
   l --> p["A pack: each piece and the product that will offer it"]
-  p -->|Admin · Install| c{"Any piece clashes with one already here?"}
+  p -->|Admin · Install| c{"Any piece clashes, or a required connector missing?"}
   c -->|yes| x(["Names the piece and what it clashes with · nothing installed"])
   c -->|no| i(["Installed · off until an Admin turns it on"])
   i --> on["On · each piece offered in its own product"]
@@ -41,6 +41,8 @@ flowchart TD
   pol -->|without Edit on access/policies| pd(["Apply disabled · names the permission"])
   on --> sv(["An outside server its .mcp.json names · listed for an Admin to add — CP-02"])
   p -->|not an Admin| d(["Install disabled · names the Admins"])
+  p -->|Edit| cu(["A Custom copy · the installed pack never changes"])
+  p -->|a newer version| up(["A diff · an Admin applies it · new policies arrive as drafts"])
   on -->|Admin · Remove| r(["Removed · its agents retire · what a person already made from it stays"])
 ```
 
@@ -57,9 +59,13 @@ flowchart TD
 | CP-20.7 | A pack turned on that carries Access Policy files | it lands | each policy reads *Waiting for an Admin to apply* in Access Policies and decides nothing; the pack reads *{n} policies to apply*; every Admin finds them in *Needs you* |
 | CP-20.8 | A pack's policy waiting to apply | an Admin presses *Apply* | *Who it changes* shows first, then it is saved as AC-04 saves a policy and History names who applied it; an *Apply* without Edit on `access/policies` is disabled, naming the permission, and the engine refuses it the same |
 | CP-20.9 | A pack turned on that carries agents | the catalogue opens | each agent lists as a *Team pack* agent, owned by the platform and made by the pack, granted to nobody until an Admin grants it; until its policies are applied it reaches nothing, and its page says so |
-| CP-20.10 | A plugin folder with no `.claude-plugin/plugin.json`, with an Invana field outside `metadata`, or carrying `hooks/` or `commands/` | the engine starts | it does not start, naming the plugin, the file and why |
+| CP-20.10 | A plugin folder with no `.claude-plugin/plugin.json`, with an Invana field outside `metadata.invana`, or carrying `hooks/` or `commands/` | the engine starts | it does not start, naming the plugin, the file and why |
 | CP-20.11 | A pack whose `.mcp.json` names an outside server | it is turned on | the server is listed for an Admin to add in Plugins (CP-02), never added or started; one started as a local process is named as refused, as Invana reaches servers by address |
 | CP-20.12 | Packs in Settings › Connections | the list is read | each pack reads *Used by n agents* — the agents it brought or whose skills it ships, as the engine counts them |
+| CP-20.13 | A pack whose manifest `requires` a connector not installed, or an engine range this engine is outside | an Admin installs it | it is refused, naming the connector or the range; nothing is installed |
+| CP-20.14 | A pack installed | History and the pack are read | they show its name, version, content hash and who installed it; its agents are granted to nobody and its policies are drafts; every run that used it records the pack version it ran |
+| CP-20.15 | An installed pack | a person with Edit on `setting/team-packs` clicks *Edit* | a Custom copy is made — named by its editor, owned by them, saying which pack it came from — and the installed pack never changes; editing the pack in place is refused, naming the copy |
+| CP-20.16 | An installed pack | a newer version is available | *Upgrade* shows a diff — agents, skills, policies, project types and ontology added, changed or removed — that an Admin with Edit on `setting/team-packs` applies; new policy files arrive as new drafts and nothing in force changes; a Custom copy is untouched |
 
 ## Screens
 
@@ -73,3 +79,7 @@ flowchart TD
 | A pack's policies to apply | Operator | — | — | — | settings.plugins · Policies to apply · Read only | — | — | settings.policies · No access |
 | A pack's outside servers | Admin | — | — | — | settings.plugins · Servers to add | — | — | — |
 | A pack's outside servers | Operator | — | — | — | settings.plugins · Servers to add · Read only | — | — | settings.plugins · Packs · Read only |
+| A Custom copy | Admin | — | — | — | settings.packs · Custom copy | settings.packs · Custom copy · Refused | — | — |
+| A Custom copy | Operator | — | — | — | settings.packs · Custom copy · Read only | — | — | settings.packs · Packs · Read only |
+| A pack's upgrade | Admin | — | — | settings.packs · Upgrade · Loading | settings.packs · Upgrade · Diff | settings.packs · Upgrade · Refused | — | — |
+| A pack's upgrade | Operator | — | — | — | settings.packs · Upgrade · Diff · Read only | — | — | settings.packs · Packs · Read only |

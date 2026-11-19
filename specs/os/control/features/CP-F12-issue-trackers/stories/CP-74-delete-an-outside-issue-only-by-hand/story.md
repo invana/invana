@@ -30,14 +30,14 @@ flowchart TD
   d -->|opens it at the tracker and deletes it| gone["The next sync finds it gone · the twin reads Gone at the tracker · leaves the queue"]
   d -->|closes it at the tracker| cl["The twin reads closed · the tag is removed"]
   d -->|keeps it| kp["The tag is removed · the issue stays"]
-  ag([An agent calls a tool of the tracker's MCP that is not one of the eight]) --> rf["Refused and recorded · Deny whatever a wildcard says"]
+  ag([An agent calls a tool of the tracker's MCP that is not one of the seventeen — a merge, a delete, or a force push of anything but an agent's own `invana/*` branch]) --> rf["Refused and recorded · Deny whatever a wildcard says"]
 ```
 
 ## Acceptance criteria
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-74.1 | A tracker's MCP server | its tools are offered or called | only the adapter's eight methods — list, get, create, update, comment, close, labels and milestones — are offered or callable; every other tool of that server is Deny whatever a rule or a wildcard says, a renamed or new tool included; a rule that names one is refused when saved, saying a delete at a tracker is never granted; a call by name outside the eight is refused the same way and recorded |
+| CP-74.1 | A tracker's MCP server | its tools are offered or called | only the adapter's seventeen methods — list, get, create, update, comment and close an issue, labels, milestones, create a branch, push a branch, force push an agent's own `invana/*` branch (guarded: only after a person approves, CP-78.19), open, update and comment on a pull request, read a pull request, its checks and its reviews — are offered or callable; no merge and no delete of an issue, a branch or a pull request is among them; every other tool of that server is Deny whatever a rule or a wildcard says, a renamed or new tool included; a rule that names one is refused when saved, saying a merge or a delete at a code host is never granted; a call by name outside the seventeen is refused the same way and recorded |
 | CP-74.2 | Invana | any of its acts runs | none deletes an issue; unlinking a project or removing a tracker leaves every issue as it is |
 | CP-74.3 | A twin | an agent or a person tags it *waiting-deletion* | it is listed in *Waiting deletion* under Settings › Connections, with its tracker, who tagged it and their note, and waits in Needs you of the project's people |
 | CP-74.4 | An item in the queue | a person chooses *Open at the tracker* | the issue opens in the tracker; Invana changes nothing |

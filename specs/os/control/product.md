@@ -50,7 +50,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 |---|---|---|---|
 | CP-F09 | [Overview — workloads by user, agent and team](features/CP-F09-overview/feature.md) | CP-47 | idea |
 | CP-F10 | [Runs and how the agents are doing](features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) | CP-48 · CP-49 · CP-53 · CP-50 · CP-58 · CP-51 · CP-52 · CP-54 · CP-55 · CP-56 · CP-57 | idea |
-| CP-F12 | [Issue trackers](features/CP-F12-issue-trackers/feature.md) | CP-73 · CP-74 | idea |
+| CP-F12 | [Code hosts and issue trackers](features/CP-F12-issue-trackers/feature.md) | CP-73 · CP-74 · CP-78 | idea |
 | CP-F11 | [Ops alerting](features/CP-F11-ops-alerting/feature.md) | CP-59 · CP-60 | idea |
 | CP-F01 | [AI models](features/CP-F01-ai-models/feature.md) | CP-01 · CP-61 | idea |
 | CP-F02 | [Plugins and MCP](features/CP-F02-plugins-and-outside-tools/feature.md) | CP-04 · CP-44 · CP-02 · CP-42 · CP-43 · CP-03 · CP-75 · CP-20 | idea |

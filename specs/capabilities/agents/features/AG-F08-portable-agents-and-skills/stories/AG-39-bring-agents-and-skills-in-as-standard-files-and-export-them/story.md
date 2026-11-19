@@ -44,7 +44,7 @@ flowchart LR
   m --> cf["Confirm split descriptions and model versions"]
   cf -->|Import n| s(["Saved as drafts, the platform's — tested and published like any agent"])
   a -->|without Create on Agents| no(["Import disabled · names Create on Agents"])
-  e([An agent's or skill's page · Agents › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields under metadata"])
+  e([An agent's or skill's page · Agents › Skills]) -->|Export| f(["Agent .md and SKILL.md folders, Invana's fields in the extension block"])
 ```
 
 ## Acceptance criteria
@@ -53,15 +53,15 @@ flowchart LR
 |---|---|---|---|
 | AG-39.1 | Agents › Skills | a Modeller presses *Import* | a drop target takes a zip or a folder holding agent files, skill folders, an `AGENTS.md`, Codex TOML agent files or a Claude plugin; nothing is saved until *Import* |
 | AG-39.2 | Dropped files | they are read | *What came in* lists every file — its kind, what it becomes and its state: *ready*, *needs approval*, *left out* or *refused* |
-| AG-39.3 | An agent file — Markdown with YAML front matter | it is read | its front matter `name` · `description` · `model` · `tools` · `skills` and its body become the agent and its instructions; Invana's own fields — voice, voice dials, effort, its tests — are read from `metadata:` when present |
-| AG-39.4 | A skill folder | it is read | `SKILL.md` and its folder become a draft version; Invana's own fields — when to use, how it runs, model version — are read from `metadata:`; without them the `description` is split into what it does and when to use it, shown for the importer to confirm |
+| AG-39.3 | An agent file — Markdown with YAML front matter | it is read | its front matter `name` · `description` · `model` · `tools` · `skills` and its body become the agent and its instructions; Invana's own fields — voice, voice dials, effort, its tests — are read from the agent's `invana:` front-matter key when present |
+| AG-39.4 | A skill folder | it is read | `SKILL.md` and its folder become a draft version; Invana's own fields — when to use, how it runs, model version — are read from `metadata`; without them the `description` is split into what it does and when to use it, shown for the importer to confirm |
 | AG-39.5 | A planned skill's instructions | the import is dry run | its plan is compiled; a line that maps to no function is refused under that line, naming what would make it map — a library, a plugin or a rewrite — with *Import as guided* beside it |
 | AG-39.6 | A file in a skill's `scripts/` | it is read | it reads *needs approval*; the skill imports, and publishes only once an Admin approved the script (CP-F06) |
 | AG-39.7 | A model alias — `sonnet`, `opus`, `inherit` | it is read | it resolves to an exact version offered in Settings › AI and connections, shown for the importer to confirm; one no provider serves imports with no model to think with until a version is picked |
 | AG-39.8 | A name already in the catalogue | it is read | it is offered as a new version of that agent or skill, or a rename |
 | AG-39.9 | A `references/` file over the size limit | it is read | it is refused, naming the limit in characters |
 | AG-39.10 | Nothing refused | the Modeller presses *Import n* | every agent and skill is saved as a draft, owned by the platform and made by the Modeller, granted to nobody; a skill with no tests imports and waits for them before it publishes |
-| AG-39.11 | An agent, a skill or the whole catalogue | a Modeller presses *Export* | agent `.md` files and `SKILL.md` folders are written, Invana's fields under `metadata:`; the plan is not exported, and no `AGENTS.md`, TOML or Claude plugin is ever written |
+| AG-39.11 | An agent, a skill or the whole catalogue | a Modeller presses *Export* | agent `.md` files and `SKILL.md` folders are written, Invana's fields in the extension block (`invana:` · `metadata`); the plan is not exported, and no `AGENTS.md` or Codex TOML is ever written; a Claude plugin is exported by AG-64 |
 | AG-39.12 | Files being read | the dry run is in progress | it reads *Reading the files…* and each row fills in as it is mapped |
 | AG-39.13 | A person without Create on `agent/*` and `skill/*` | they open Agents › Skills or an agent's or skill's page | *Import* and *Export* are disabled — *Needs Create on Agents and Skills — ask {who can grant}*; the engine refuses the same from the API |
 | AG-39.14 | An `AGENTS.md` | it is read | it becomes one draft agent whose instructions are its body, named after the folder it sat in, for the importer to confirm |
