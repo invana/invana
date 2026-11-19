@@ -352,7 +352,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Audit — Invana Products against v2027, by content |  | pending |  |  |
+| P01 | Audit — Invana Products against v2027, by content |  | in progress | 2026-11-19 |  |
 | P02 | Part 1's review changes and the MVP badges |  | pending |  |  |
 | P03 | Take up the open part-1 recommendations that are spec edits |  | pending |  |  |
 | P04 | Spec the gaps | P01, P02, P03 | pending |  |  |
