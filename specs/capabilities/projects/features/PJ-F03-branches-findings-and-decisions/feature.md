@@ -4,9 +4,9 @@ title: Branches, findings and decisions
 product: PJ
 status: idea
 personas: [decision-maker, analyst]
-stories: [PJ-03, PJ-04, PJ-05, PJ-06, PJ-07, PJ-08, PJ-10, PJ-11, PJ-13]
+stories: [PJ-03, PJ-04, PJ-05, PJ-06, PJ-07, PJ-08, PJ-10, PJ-11, PJ-13, PJ-32]
 journeys: [J03]
-boards: [projects.projects, projects.branches, projects.tasks]
+boards: [projects.projects, projects.graph, projects.branches, projects.tasks]
 nfrs: [NFR-PERF-5]
 depends_on: [PJ-F01, RC-F02, EX-F01, EX-F02, EX-F05, CP-F10, SE-F07, AG-F09]
 ---
@@ -38,6 +38,7 @@ flowchart TD
   add -->|a cite does not resolve| rc["Names the cite · nothing added"]
   explore([Explore › Add to a project — EX-12]) --> add
   whatif([A what-if answer — EX-33]) -->|predicted evidence| add
+  sim([PJ-32 · Simulate options against targets]) -->|predicted evidence| add
   add --> fd["PJ-06 · A finding: records · origin · reviewed by · How it got here"]
   fd -->|an agent added it| rev["Unreviewed until a person reviews it"] --> fd
   fd -->|a load it cites is undone| rt["Marked: a load undone"]
@@ -106,6 +107,7 @@ sequenceDiagram
 | PJ-10 | [See what a decision reaches](stories/PJ-10-see-what-a-decision-reaches/story.md) | idea |
 | PJ-11 | [Follow a decision back to the original authors](stories/PJ-11-follow-a-decision-back-to-the-original-authors/story.md) | idea |
 | PJ-13 | [Audit every decision in one place](stories/PJ-13-audit-every-decision-in-one-place/story.md) | idea |
+| PJ-32 | [Simulate options against targets on a branch](stories/PJ-32-simulate-options-against-targets-on-a-branch/story.md) | idea |
 
 ## Access
 
@@ -242,6 +244,8 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | `GET /{key}/branches/{n}/impact/{run_id}` | `ImpactRead` — the hops landed so far, while the run goes on | PJ-10 |
 | `GET /{key}/findings/{n}` · `POST /{key}/findings/{n}/review` | A finding · a person reviews it | PJ-06 |
 | `GET /{key}/proposals` · `POST /{key}/proposals/{n}/accept` · `POST /{key}/proposals/{n}/reject` | Proposals · accept · reject | PJ-05 |
+| `POST /{key}/branches/{n}/simulate` | `{options[], targets[{measure, op, value}], seed?}` → `202` `{run_id}` — opens the simulation as a what-if run of the Assistant ([EX-33](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)), the caller behind it | PJ-32 |
+| `GET /{key}/branches/{n}/simulate/{run_id}` | `SimulationRead` — the options ranked by the share of predicted outcomes meeting every target, each measure as mean and spread, the simulator and its version, the seed and the pinned loads | PJ-32 |
 | `GET /{key}/decisions` · `GET /decisions` | A project's decisions · every decision the reader may see, across projects | PJ-11 · PJ-13 |
 | `GET /{key}/decisions/{n}/lineage` | The decision's lineage: its findings, their steps, runs, evidence, records and loads, and each load's authors | PJ-11 |
 
@@ -263,12 +267,17 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | `projects.findings.add` · `projects.findings.review` | A finding added · reviewed |
 | `projects.decisions.record` | A decision recorded, a merge included |
 | `projects.proposals.submit` · `accept` · `reject` | A proposal's three acts |
+| — | A simulation writes its run's events (CP-F10) and none of its own; a finding added from it is `projects.findings.add` |
 | — | An impact reach writes its run's events ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) and none of its own |
 
 ### Refusals
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
+| 422 | A simulation with fewer than two options, or a target with no value | *Pick at least two options.* · *{measure} needs a value.* | PJ-32.2 · PJ-32.3 |
+| 409 | A simulation with no simulator installed | *Simulation needs a simulator, and none is installed.* | PJ-32.4 |
+| 403 | A simulation whose plugin is off, or no rule allows Run on it | *{plugin} is switched off by {person}.* · *{rule} on {policy} does not allow it.* | PJ-32.5 |
+| 422 | A simulation behind more than 20 loads, or a load undone | *A simulation reads at most 20 loads.* · *{load} was undone.* | PJ-32.6 |
 | 403 | A project the caller's default agent may not Read | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-03.9 · PJ-11.8 · PJ-13.6 |
 | 403 | Accepting or rejecting a proposal by someone not on the team | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-05.17 |
 | 403 | An agent records a verdict or a decision | *An agent proposes — a person decides.* | PJ-05.13 · PJ-07.15 |
@@ -343,6 +352,7 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | Who decided | Decisions names the decider for every reader who may read the project; *Export for audit* is a CSV of the rows shown |
 | Current is counted by the engine | *2 current · 5 recorded*; it reads *5* alone when they match |
 | Add from Explore | A settled answer reaches *Add a finding* through *Add to a project* (EX-12); a what-if answer arrives the same way, its evidence *predicted* |
+| A simulation is a what-if from a branch | *Simulate* on a branch opens the what-if run of Explore with the branch's options and targets; the result is predicted evidence, ranked, and reaches the branch only as a finding the person adds, still *Predicted*. The simulator is a plugin the deployment installs; the project names no domain |
 | Impact is a tab of the project | The branch and the hops are picked on it and kept on reload; it is read each time, never saved as a record |
 | One branch at a time | Impact shows one branch's reach; switching the branch replaces it |
 | Words for every reader | The impact rings are also listed in words, every group and link, for a reader who cannot see them |
@@ -367,7 +377,6 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | A *Loads* tab, and a branch's *Runs* and *Schedules* tabs | Not yet: the Overview lists the loads cited; runs and schedules are listed elsewhere |
 | A *stays parked* choice on merge | A merge always marks the source merged |
 | Lineage and impact from the command line | Not yet; Studio draws them from the same records |
-| Simulating on a branch | A what-if is a question in Explore whose answer is *predicted* evidence ([EX-33](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)); it reaches a branch as a finding |
 | What-if values per node in impact | Impact reads reach only |
 | Comparing two branches' impact side by side | One branch at a time |
 | Impact saved as a record | A decision cites findings, not a reach |

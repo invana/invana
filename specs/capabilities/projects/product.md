@@ -41,10 +41,11 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | ID | Feature | Stories | Status |
 |---|---|---|---|
 | PJ-F01 | [Projects and tasks](features/PJ-F01-projects-and-tasks/feature.md) | PJ-01 · PJ-02 · PJ-12 · PJ-15 · PJ-18 · PJ-20 · PJ-21 · PJ-22 · PJ-23 · PJ-24 · PJ-25 · PJ-26 · PJ-27 | idea |
-| PJ-F03 | [Branches, findings and decisions](features/PJ-F03-branches-findings-and-decisions/feature.md) | PJ-03 · PJ-04 · PJ-05 · PJ-06 · PJ-07 · PJ-08 · PJ-10 · PJ-11 · PJ-13 | idea |
+| PJ-F03 | [Branches, findings and decisions](features/PJ-F03-branches-findings-and-decisions/feature.md) | PJ-03 · PJ-04 · PJ-05 · PJ-06 · PJ-07 · PJ-08 · PJ-10 · PJ-11 · PJ-13 · PJ-32 | idea |
 | PJ-F05 | [Project reports](features/PJ-F05-project-reports/feature.md) | PJ-14 | idea |
 | PJ-F07 | [The project graph](features/PJ-F07-the-project-graph/feature.md) | PJ-28 · PJ-29 · PJ-30 · PJ-31 | idea |
 | PJ-F06 | [Alerts](features/PJ-F06-alerts/feature.md) | PJ-19 | idea |
+| PJ-F08 | [Project settings and the agents in a project](features/PJ-F08-project-settings/feature.md) | PJ-33 · PJ-34 · PJ-35 · PJ-36 · PJ-37 | idea |
 
 ## Surfaces
 
