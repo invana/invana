@@ -386,7 +386,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P16 | Paper-test the two project types | P15 | done | 2026-11-20 | gates green · reviews passed |
 | P17 | System design and NFR lock | P16 | done | 2026-11-20 | gates green · reviews passed |
 | P18 | Threat model | P17 | done | 2026-11-20 | gates green · reviews passed |
-| P19 | Build plan | P18 | pending |  |  |
+| P19 | Build plan | P18 | in progress | 2026-11-20 |  |
 
 ## Hand-off notes
 
