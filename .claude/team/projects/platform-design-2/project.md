@@ -374,7 +374,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P04 | Spec the gaps | P01, P01b, P02, P03 | done | 2026-11-19 | gates green · reviews passed |
 | P05 | Density rule in the design language | P01, P01b | done | 2026-11-19 | gates green · reviews passed |
 | P06 | Density pass — one pass over every board | P05 | done | 2026-11-19 | gates green · reviews passed |
-| P07 | Fleet and workers | P06, P04 | in progress | 2026-11-19 | drawn; not published — no Artifact tool (R577) |
+| P07 | Fleet and workers | P06, P04 | done | 2026-11-19 | gates green · reviews passed |
 | P08 | Access (IAM) | P07 | pending |  |  |
 | P09 | Modeller — the global model (stitch) and overview | P08 | pending |  |  |
 | P10 | Projects — the map-led views and project settings | P09 | pending |  |  |
