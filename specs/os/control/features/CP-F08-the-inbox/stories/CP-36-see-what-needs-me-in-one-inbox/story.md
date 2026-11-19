@@ -3,6 +3,7 @@ id: CP-36
 title: See what needs me in one inbox
 feature: CP-F08
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker, builder, admin]
 boards: [inbox.dropdown, inbox]
 ---

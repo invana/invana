@@ -3,6 +3,7 @@ id: AC-08
 title: Check whether someone can do something
 feature: AC-F02
 status: idea
+milestone: MVP
 personas: [admin, builder, analyst]
 boards: [settings.policies]
 ---

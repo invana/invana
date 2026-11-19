@@ -3,6 +3,7 @@ id: CP-09
 title: See every worker and what it is running
 feature: CP-F03
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.workers]
 ---

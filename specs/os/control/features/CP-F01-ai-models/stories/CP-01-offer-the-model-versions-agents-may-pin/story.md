@@ -3,6 +3,7 @@ id: CP-01
 title: Offer the model versions agents may pin
 feature: CP-F01
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.ai]
 ---

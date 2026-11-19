@@ -3,6 +3,7 @@ id: SE-04
 title: Draft a model from the database
 feature: SE-F01
 status: idea
+milestone: MVP
 personas: [modeller]
 boards: [settings.databases, model.models, model.health]
 ---

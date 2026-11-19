@@ -3,6 +3,7 @@ id: CP-17
 title: Install a graph connector and see it offered
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.databases, settings.connectors]
 ---

@@ -3,6 +3,7 @@ id: CP-04
 title: See every plugin and switch it on or off
 feature: CP-F02
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.plugins]
 ---

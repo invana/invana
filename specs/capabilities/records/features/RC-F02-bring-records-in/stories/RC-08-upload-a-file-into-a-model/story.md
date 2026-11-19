@@ -3,6 +3,7 @@ id: RC-08
 title: Upload a file into a model
 feature: RC-F02
 status: idea
+milestone: MVP
 personas: [curator]
 boards: [data.loads]
 ---

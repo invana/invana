@@ -3,6 +3,7 @@ id: EX-12
 title: Add an answer to a project
 feature: EX-F02
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker]
 boards: [explore.board, projects.branches]
 ---

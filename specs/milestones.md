@@ -14,7 +14,7 @@ Invana's roadmap is **milestones**. There is no *release*: the word is not a ter
 
 | ID | Name | Waits on | Done when | Journeys |
 |---|---|---|---|---|
-| MVP | MVP | — | Every journey listed passes end to end | *Proposed — Ravi confirms in his review:* [J07](journeys/J07-ready-a-deployment.md) · [J01](journeys/J01-from-a-fresh-deployment-to-a-first-answer.md) · [J02](journeys/J02-ask-and-trust-the-answer.md) · [J03](journeys/J03-give-an-agent-work-and-decide-on-the-result.md) · [J06](journeys/J06-set-what-an-agent-may-touch.md). Open: J01 lists CP-27, a parked story |
+| MVP | MVP | — | Every journey listed passes end to end | *Confirmed:* [J07](journeys/J07-ready-a-deployment.md) · [J01](journeys/J01-from-a-fresh-deployment-to-a-first-answer.md) · [J02](journeys/J02-ask-and-trust-the-answer.md) · [J03](journeys/J03-give-an-agent-work-and-decide-on-the-result.md) · [J06](journeys/J06-set-what-an-agent-may-touch.md). J01 does not include CP-27 (drop files), a parked story (`later`) that carries no milestone |
 
 ## How a story and a journey join a milestone
 
@@ -24,4 +24,4 @@ Invana's roadmap is **milestones**. There is no *release*: the word is not a ter
 | A journey's milestone | Derived, never typed: a journey is in a milestone when every story it touches is in it |
 | A parked story | A story whose `status` is `later` carries no milestone |
 | A listed journey | Every story of a journey the milestone lists is in that milestone |
-| Boards | A board, flow board and frame shows a milestone badge derived from the stories it cites ([design-language §7](design-language.md#7-naming-boards)); *MVP?* while the milestone is proposed and unconfirmed |
+| Boards | A board, flow board and frame shows a milestone badge derived from the stories it cites ([design-language §7](design-language.md#7-naming-boards)); the MVP is confirmed, so its badge reads *MVP* |

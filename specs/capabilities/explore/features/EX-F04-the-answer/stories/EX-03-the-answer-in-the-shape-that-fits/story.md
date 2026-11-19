@@ -3,6 +3,7 @@ id: EX-03
 title: The answer in the shape that fits
 feature: EX-F04
 status: idea
+milestone: MVP
 personas: [analyst, builder]
 boards: [explore.board, agents.skills]
 ---

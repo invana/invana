@@ -3,6 +3,7 @@ id: PJ-12
 title: Write a task, hand it on and accept the result
 feature: PJ-F01
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker]
 boards: [projects.tasks, projects.reviews, inbox]
 ---

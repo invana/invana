@@ -3,6 +3,7 @@ id: PJ-01
 title: See every project and open one
 feature: PJ-F01
 status: idea
+milestone: MVP
 personas: [decision-maker, analyst]
 boards: [projects.projects]
 ---

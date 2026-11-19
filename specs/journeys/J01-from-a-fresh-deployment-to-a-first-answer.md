@@ -2,7 +2,7 @@
 id: J01
 title: From a fresh deployment to a first answer
 personas: [admin, modeller]
-stories: [AC-01, CP-22, CP-25, CP-17, CP-26, CP-27, SE-04, SE-06, SE-15, CP-39, CP-38, CP-24, SE-05, RC-08, RC-09, CP-01, AG-35, EX-01, EX-02, EX-04]
+stories: [AC-01, CP-22, CP-25, CP-17, CP-26, SE-04, SE-06, SE-15, CP-39, CP-38, CP-24, SE-05, RC-08, RC-09, CP-01, AG-35, EX-01, EX-02, EX-04]
 boards: [access.signin, start.home, settings.databases, model.models, data.loads, settings.ai, explore.board]
 ---
 
@@ -24,9 +24,6 @@ flowchart TD
   E -->|the test fails| E1["The database's own words"] --> E
   E -->|it holds records| H["SE-04 · The agent drafts the model from the database's schema, never its records"]
   E -->|it is empty| H2["SE-06 · SE-15 · A description, a starter or an ontology"]
-  E -->|it is empty, Priya has files| G["CP-27 · Drop files · each says what it becomes"]
-  G -->|a column is unclear| G1["Asked, not guessed"] --> G
-  G --> H
   H --> I{"Priya decides"}
   H2 --> I
   I -->|change| H
@@ -56,14 +53,13 @@ flowchart TD
 | 1 | Sign in | Access Plane · Sign in, account and sessions | AC-01 | `access.signin` |
 | 2 | Say what she is deciding; pick *Connect a graph database* | Control Plane · Graph databases — Home, first run | CP-22 | `start.home` |
 | 3 | Name and connect the graph database — offered only if its connector is installed; the test says what is there | Control Plane · Graph databases | CP-25 · CP-26 · CP-17 | `settings.databases · Connect` |
-| 4 | Or, with an empty database: drop files; each says what it becomes | Control Plane · Graph databases | CP-27 | `settings.databases · Connect · Files` |
-| 5 | The agent drafts the model; Priya accepts or changes it | Ontology · Start a model | SE-04 · SE-06 · SE-15 | `settings.databases · Connect · Shape` |
-| 6 | Connect it — saved read-only and off — and turn it on | Control Plane · Graph databases | CP-25 · CP-39 | `settings.databases · Connect · Ready` · `settings.databases` |
-| 7 | See what is left before the first answer | Control Plane · Graph databases › Set-up | CP-24 | `start.home · Set-up` |
-| 8 | Review and publish the model | Ontology · Change and publish | SE-05 | `model.models · Publish` |
-| 9 | Load records, when the database had none | Intelligence · Bring records in | RC-08 · RC-09 | `data.loads · Upload` |
-| 10 | Ask the first question, through the Assistant | Evidence · Ask a question | EX-01 | `explore.board · Ask` |
-| 11 | Read the answer and how it got here | Evidence · The answer | EX-02 · EX-04 | `explore.board` · `explore.board · Why` |
+| 4 | The agent drafts the model; Priya accepts or changes it | Ontology · Start a model | SE-04 · SE-06 · SE-15 | `settings.databases · Connect · Shape` |
+| 5 | Connect it — saved read-only and off — and turn it on | Control Plane · Graph databases | CP-25 · CP-39 | `settings.databases · Connect · Ready` · `settings.databases` |
+| 6 | See what is left before the first answer | Control Plane · Graph databases › Set-up | CP-24 | `start.home · Set-up` |
+| 7 | Review and publish the model | Ontology · Change and publish | SE-05 | `model.models · Publish` |
+| 8 | Load records, when the database had none | Intelligence · Bring records in | RC-08 · RC-09 | `data.loads · Upload` |
+| 9 | Ask the first question, through the Assistant | Evidence · Ask a question | EX-01 | `explore.board · Ask` |
+| 10 | Read the answer and how it got here | Evidence · The answer | EX-02 · EX-04 | `explore.board` · `explore.board · Why` |
 
 ## Branches
 

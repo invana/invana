@@ -3,6 +3,7 @@ id: PJ-18
 title: Order tasks by what they wait on
 feature: PJ-F01
 status: idea
+milestone: MVP
 personas: [decision-maker, analyst]
 boards: [projects.projects, projects.tasks]
 ---

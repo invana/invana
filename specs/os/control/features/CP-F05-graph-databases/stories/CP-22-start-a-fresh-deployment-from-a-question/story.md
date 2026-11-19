@@ -3,6 +3,7 @@ id: CP-22
 title: Start a fresh deployment from a question
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [start.home]
 ---

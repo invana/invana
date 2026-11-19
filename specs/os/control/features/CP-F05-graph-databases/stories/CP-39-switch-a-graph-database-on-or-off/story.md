@@ -3,6 +3,7 @@ id: CP-39
 title: Switch a graph database on or off
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.databases]
 ---

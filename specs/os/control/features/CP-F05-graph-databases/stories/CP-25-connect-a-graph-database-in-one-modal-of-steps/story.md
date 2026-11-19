@@ -3,6 +3,7 @@ id: CP-25
 title: Connect a graph database in one modal
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.databases]
 ---

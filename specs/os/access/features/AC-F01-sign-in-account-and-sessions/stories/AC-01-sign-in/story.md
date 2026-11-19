@@ -3,6 +3,7 @@ id: AC-01
 title: Sign in
 feature: AC-F01
 status: idea
+milestone: MVP
 personas: [analyst, admin]
 boards: [access.signin]
 ---

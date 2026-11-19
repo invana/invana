@@ -3,6 +3,7 @@ id: SE-15
 title: Start a model from an ontology
 feature: SE-F01
 status: idea
+milestone: MVP
 personas: [modeller]
 boards: [model.models]
 ---

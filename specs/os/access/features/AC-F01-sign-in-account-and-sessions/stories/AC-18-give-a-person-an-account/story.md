@@ -3,6 +3,7 @@ id: AC-18
 title: Give a person an account
 feature: AC-F01
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.people, access.signin]
 ---

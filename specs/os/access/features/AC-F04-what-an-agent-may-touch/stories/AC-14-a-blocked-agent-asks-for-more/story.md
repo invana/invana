@@ -3,6 +3,7 @@ id: AC-14
 title: A denied agent asks for more
 feature: AC-F04
 status: idea
+milestone: MVP
 personas: [admin, builder, analyst]
 boards: [inbox, agents.runs]
 ---

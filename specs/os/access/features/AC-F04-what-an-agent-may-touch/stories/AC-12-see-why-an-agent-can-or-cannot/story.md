@@ -3,6 +3,7 @@ id: AC-12
 title: See why an agent can or cannot
 feature: AC-F04
 status: idea
+milestone: MVP
 personas: [admin, builder]
 boards: [settings.agent_access, agents.runs]
 ---

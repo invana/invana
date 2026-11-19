@@ -3,6 +3,7 @@ id: AC-15
 title: Decide what an agent asks before it acts
 feature: AC-F05
 status: idea
+milestone: MVP
 personas: [admin, builder, analyst]
 boards: [inbox]
 ---

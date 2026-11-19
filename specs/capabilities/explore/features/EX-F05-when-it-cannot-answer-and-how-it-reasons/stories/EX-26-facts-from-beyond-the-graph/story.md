@@ -3,6 +3,7 @@ id: EX-26
 title: Facts from outside Graph Data, marked as such
 feature: EX-F05
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---

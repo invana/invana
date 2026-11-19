@@ -3,6 +3,7 @@ id: CP-41
 title: Name a practice graph database
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, builder]
 boards: [settings.databases]
 ---

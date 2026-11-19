@@ -3,6 +3,7 @@ id: CP-40
 title: See every graph database and its health
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, modeller, analyst]
 boards: [settings.databases]
 ---

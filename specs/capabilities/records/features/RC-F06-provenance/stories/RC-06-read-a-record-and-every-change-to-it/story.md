@@ -3,6 +3,7 @@ id: RC-06
 title: Read a record and every change to it
 feature: RC-F06
 status: idea
+milestone: MVP
 personas: [curator, analyst]
 boards: [data.records]
 ---

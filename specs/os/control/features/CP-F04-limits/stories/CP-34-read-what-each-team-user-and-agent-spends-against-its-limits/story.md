@@ -3,6 +3,7 @@ id: CP-34
 title: Read what each team, user and agent spends against its limits
 feature: CP-F04
 status: idea
+milestone: MVP
 personas: [admin, builder, analyst]
 boards: [settings.limits]
 ---

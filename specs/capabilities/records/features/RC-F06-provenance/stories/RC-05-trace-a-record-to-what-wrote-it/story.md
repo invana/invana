@@ -3,6 +3,7 @@ id: RC-05
 title: Trace a record to what wrote it
 feature: RC-F06
 status: idea
+milestone: MVP
 personas: [analyst, curator]
 boards: [data.records]
 ---

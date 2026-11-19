@@ -3,6 +3,7 @@ id: AG-35
 title: See every agent and who may use it
 feature: AG-F02
 status: idea
+milestone: MVP
 personas: [analyst, admin]
 boards: [agents.agents, settings.people]
 ---

@@ -3,6 +3,7 @@ id: RC-09
 title: See every load and what it rejected
 feature: RC-F02
 status: idea
+milestone: MVP
 personas: [curator, modeller]
 boards: [data.loads, agents.runs, explore.board]
 ---

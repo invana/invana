@@ -3,6 +3,7 @@ id: CP-24
 title: See what is left before the first answer
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [start.home]
 ---

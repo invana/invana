@@ -3,6 +3,7 @@ id: PJ-06
 title: Weigh a finding and the records behind it
 feature: PJ-F03
 status: idea
+milestone: MVP
 personas: [decision-maker, analyst]
 boards: [projects.branches, projects.projects, projects.tasks]
 ---

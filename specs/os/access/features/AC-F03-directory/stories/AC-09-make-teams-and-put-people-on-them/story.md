@@ -3,6 +3,7 @@ id: AC-09
 title: Make teams and put people on them
 feature: AC-F03
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.people]
 ---

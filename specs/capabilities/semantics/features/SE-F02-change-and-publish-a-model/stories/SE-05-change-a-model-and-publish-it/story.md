@@ -3,6 +3,7 @@ id: SE-05
 title: Change a model and publish it
 feature: SE-F02
 status: idea
+milestone: MVP
 personas: [modeller]
 boards: [model.models, model.kinds, inbox]
 ---

@@ -3,6 +3,7 @@ id: CP-26
 title: Connect a graph database that already holds data
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, modeller]
 boards: [settings.databases]
 ---

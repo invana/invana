@@ -3,6 +3,7 @@ id: SE-06
 title: Start a model from a description, a file or a starter
 feature: SE-F01
 status: idea
+milestone: MVP
 personas: [modeller]
 boards: [model.models, settings.databases]
 ---

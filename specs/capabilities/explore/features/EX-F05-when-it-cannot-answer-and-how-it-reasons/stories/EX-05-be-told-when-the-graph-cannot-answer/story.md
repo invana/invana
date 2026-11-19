@@ -3,6 +3,7 @@ id: EX-05
 title: Be told when Graph Data does not hold it
 feature: EX-F05
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---

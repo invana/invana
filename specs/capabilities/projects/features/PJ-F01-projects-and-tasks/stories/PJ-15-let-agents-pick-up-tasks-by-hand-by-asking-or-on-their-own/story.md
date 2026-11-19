@@ -3,6 +3,7 @@ id: PJ-15
 title: Let agents pick up tasks by hand, by asking or on their own
 feature: PJ-F01
 status: idea
+milestone: MVP
 personas: [decision-maker, builder]
 boards: [projects.projects, projects.tasks, inbox]
 ---

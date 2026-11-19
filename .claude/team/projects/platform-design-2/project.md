@@ -1,6 +1,6 @@
 ---
 name: platform-design-2
-status: paused
+status: running
 branch: feat/platform-design-2
 scope: platform-design-2
 artifact_publish: auto approve
@@ -369,7 +369,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 |---|---|---|---|---|---|
 | P01 | Audit — Invana Products against v2027, by content |  | done | 2026-11-19 | gates green · reviews passed |
 | P01b | Visual re-audit — Invana Products against v2027, side by side | P01 | done | 2026-11-19 | gates green · reviews passed |
-| P02 | Part 1's review changes and the MVP badges |  | pending |  |  |
+| P02 | Part 1's review changes and the MVP badges |  | in progress | 2026-11-19 |  |
 | P03 | Take up the open part-1 recommendations that are spec edits |  | pending |  |  |
 | P04 | Spec the gaps | P01, P01b, P02, P03 | pending |  |  |
 | P05 | Density rule in the design language | P01, P01b | pending |  |  |
@@ -407,6 +407,9 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 
 | Date | Phase | Question | Options | Recommend | Answer |
 |---|---|---|---|---|---|
+| 2026-11-19 | P01b | Re-audit Q1: the 275 tier B `skip` rows were scored, not compared by eye | (a) accept as provisional; P06 and each designer phase flag a pair that differs and raise a recommendation · (b) re-run by eye first | (a) | approved — (a); no story or designer phase relies on a tier B skip until confirmed |
+| 2026-11-19 | P01b | Re-audit Q2: fleet worker CPU bar and 30-minute CPU chart | (a) no, stays out · (b) add to CP-09 and draw | (a) | approved — (a) |
+| 2026-11-19 | P01b | Re-audit Q3: fleet pools and capacity — the over-time chart and worker events (who scaled, why) | (a) yes, P04 writes them in CP-08 / CP-12 · (b) no | (a) | approved — (a) |
 | 2026-11-19 | P01b | Datasets (audit Q2) | keep retired · bring back · cherry-pick | keep retired | answered — keep retired; P01b checks provenance, versions and standards for gaps only |
 | 2026-11-19 | P01b | projects.simulate (audit Q3) | leave out · specify and draw | leave out | answered — **specify and draw it**: P04 writes the story, P10 draws it on projects.branches |
 | 2026-11-19 | P05 | Airy density on Explorer chrome | forms, flows and pages only · chrome too | forms, flows and pages only | answered — forms, flows and pages only; Explorer chrome stays compact |

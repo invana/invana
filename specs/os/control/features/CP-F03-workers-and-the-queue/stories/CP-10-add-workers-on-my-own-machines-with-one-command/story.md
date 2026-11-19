@@ -3,6 +3,7 @@ id: CP-10
 title: Add workers on my own machines with one command
 feature: CP-F03
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.workers]
 ---

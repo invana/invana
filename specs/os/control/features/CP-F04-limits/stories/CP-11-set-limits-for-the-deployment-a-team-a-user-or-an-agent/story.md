@@ -3,6 +3,7 @@ id: CP-11
 title: Set limits for the deployment, a team, a user or an agent
 feature: CP-F04
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.limits]
 ---

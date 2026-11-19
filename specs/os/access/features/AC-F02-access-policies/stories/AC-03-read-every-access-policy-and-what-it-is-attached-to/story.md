@@ -3,6 +3,7 @@ id: AC-03
 title: Read every Access Policy and what it is attached to
 feature: AC-F02
 status: idea
+milestone: MVP
 personas: [admin, builder, analyst]
 boards: [settings.policies]
 ---

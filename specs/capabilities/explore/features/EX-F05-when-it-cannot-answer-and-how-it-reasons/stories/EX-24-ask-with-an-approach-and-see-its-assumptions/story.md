@@ -3,6 +3,7 @@ id: EX-24
 title: Ask with an approach, with the assumptions shown
 feature: EX-F05
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker, builder]
 boards: [explore.board, agents.skills, agents.runs]
 ---

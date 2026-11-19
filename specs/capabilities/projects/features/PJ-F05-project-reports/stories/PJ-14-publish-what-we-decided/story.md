@@ -3,6 +3,7 @@ id: PJ-14
 title: Publish what we decided
 feature: PJ-F05
 status: idea
+milestone: MVP
 personas: [decision-maker]
 boards: [projects.report]
 ---

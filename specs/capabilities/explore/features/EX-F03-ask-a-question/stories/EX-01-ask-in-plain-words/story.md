@@ -3,6 +3,7 @@ id: EX-01
 title: Ask in plain words
 feature: EX-F03
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---

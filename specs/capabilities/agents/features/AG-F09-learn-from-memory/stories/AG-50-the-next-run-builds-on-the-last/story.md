@@ -3,6 +3,7 @@ id: AG-50
 title: The next run builds on the last
 feature: AG-F09
 status: idea
+milestone: MVP
 personas: [analyst, builder]
 boards: [explore.board, agents.runs]
 ---

@@ -3,6 +3,7 @@ id: AG-24
 title: See who made whom, and hand work to a helper within bounds
 feature: AG-F05
 status: idea
+milestone: MVP
 personas: [builder, analyst]
 boards: [agents.runs, agents.agents, inbox]
 ---

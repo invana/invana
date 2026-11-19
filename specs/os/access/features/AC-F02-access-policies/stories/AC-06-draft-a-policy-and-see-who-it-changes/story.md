@@ -3,6 +3,7 @@ id: AC-06
 title: Draft a policy and see who it changes
 feature: AC-F02
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.policies]
 ---

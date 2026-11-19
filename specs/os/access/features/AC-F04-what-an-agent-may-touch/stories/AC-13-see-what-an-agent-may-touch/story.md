@@ -3,6 +3,7 @@ id: AC-13
 title: See what an agent may touch
 feature: AC-F04
 status: idea
+milestone: MVP
 personas: [admin, builder]
 boards: [settings.agent_access]
 ---

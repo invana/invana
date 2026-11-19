@@ -3,6 +3,7 @@ id: EX-02
 title: Watch the answer arrive on the board
 feature: EX-F04
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---

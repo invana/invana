@@ -3,6 +3,7 @@ id: PJ-07
 title: Record a verdict and a decision the rules check
 feature: PJ-F03
 status: idea
+milestone: MVP
 personas: [decision-maker]
 boards: [projects.branches, projects.projects]
 ---

@@ -3,6 +3,7 @@ id: EX-25
 title: The answer in words
 feature: EX-F04
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker]
 boards: [explore.board]
 ---

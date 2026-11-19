@@ -3,6 +3,7 @@ id: EX-06
 title: A refusal or a failure that says why and what next
 feature: EX-F05
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board, agents.runs]
 ---

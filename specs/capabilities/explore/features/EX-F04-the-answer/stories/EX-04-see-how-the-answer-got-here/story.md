@@ -3,6 +3,7 @@ id: EX-04
 title: See how the answer got here
 feature: EX-F04
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker]
 boards: [explore.board, agents.runs, projects.tasks]
 ---

@@ -3,6 +3,7 @@ id: EX-15
 title: Share an answer
 feature: EX-F02
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---

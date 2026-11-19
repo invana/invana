@@ -3,6 +3,7 @@ id: CP-38
 title: Set a graph database read-only or read + write
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.databases, access.signin]
 ---

@@ -3,6 +3,7 @@ id: AC-04
 title: Write the rules of an Access Policy
 feature: AC-F02
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.policies]
 ---

@@ -3,6 +3,7 @@ id: EX-23
 title: Be asked back, not guessed for
 feature: EX-F03
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---

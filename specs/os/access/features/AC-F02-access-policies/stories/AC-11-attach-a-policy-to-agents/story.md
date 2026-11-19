@@ -3,6 +3,7 @@ id: AC-11
 title: Attach a policy to agents
 feature: AC-F02
 status: idea
+milestone: MVP
 personas: [admin, builder]
 boards: [settings.policies]
 ---
