@@ -198,6 +198,72 @@ class JourneyDiagram(Tree):
         self.assertTrue(any('draws AC-03, missing from `stories`' in e for e in errors), errors)
         self.assertEqual(len(errors), 3, errors)
 
+MILESTONES_MD = ('# Milestones\n\n## Milestones\n\n| ID | Name | Waits on | Done when | Journeys |\n|---|---|---|---|---|\n'
+                 '| MVP | MVP | — | x | {cell} |\n\n## How\n')
+
+
+class Milestones(Tree):
+    """``milestone:`` values, parked stories and confirmed milestone journeys are held to milestones.md."""
+
+    def setUp(self):
+        super().setUp()
+        patch = mock.patch.object(check, 'MILESTONES', self.specs / 'milestones.md')
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def docs(self, story_milestones, status='idea', journey_stories='GR-01, GR-02'):
+        docs = {}
+        for sid, m in story_milestones.items():
+            path = self.write(f'specs/os/graph/features/GR-F01-x/stories/{sid}-x/story.md')
+            fm = {'id': sid, 'status': status, **({'milestone': m} if m else {})}
+            docs[path] = ('story', fm, '')
+        path = self.write('specs/journeys/J01-x.md')
+        docs[path] = ('journey', {'id': 'J01', 'stories': [s.strip() for s in journey_stories.split(',')]}, '')
+        return docs
+
+    def run_check(self, cell, **kw):
+        self.write('specs/milestones.md', MILESTONES_MD.format(cell=cell))
+        check.check_milestones(self.docs(**kw))
+        return check.errors
+
+    def test_a_listed_journey_with_all_its_stories_in_the_milestone_passes(self):
+        self.assertEqual(self.run_check('[J01](journeys/J01-x.md)', story_milestones={'GR-01': 'MVP', 'GR-02': 'MVP'}), [])
+
+    def test_an_unknown_milestone_and_a_parked_story_with_one_fail(self):
+        errors = self.run_check('—', story_milestones={'GR-01': 'V9'})
+        self.assertTrue(any('`V9` is not a row of milestones.md' in e for e in errors), errors)
+        check.errors.clear()
+        errors = self.run_check('—', story_milestones={'GR-01': 'MVP'}, status='later')
+        self.assertTrue(any('a `later` story carries no milestone' in e for e in errors), errors)
+
+    def test_a_confirmed_journey_with_a_story_outside_fails_but_a_proposed_one_does_not(self):
+        stories = {'GR-01': 'MVP', 'GR-02': None}
+        errors = self.run_check('[J01](journeys/J01-x.md)', story_milestones=stories)
+        self.assertTrue(any('lists J01, but GR-02 are not in it' in e for e in errors), errors)
+        check.errors.clear()
+        self.assertEqual(self.run_check('*Proposed:* [J01](journeys/J01-x.md)', story_milestones=stories), [])
+
+
+class BoardIds(Tree):
+    """Flow and journey board ids follow design-language §7."""
+
+    def test_valid_ids_pass(self):
+        check.check_board_ids({'flow.create_agent', 'journey.j01', 'agents.runs'}, {'J01'})
+        self.assertEqual(check.errors, [])
+
+    def test_bad_flow_and_journey_ids_fail(self):
+        check.check_board_ids({'flow.Create-Agent', 'journey.1', 'journey.j99'}, {'J01'})
+        self.assertEqual(len(check.errors), 3, check.errors)
+        self.assertTrue(any('journey J99, which no journey defines' in e for e in check.errors))
+
+
+class IndexLink(Tree):
+    def test_the_index_header_links_milestones(self):
+        self.write('specs/milestones.md')
+        with mock.patch.object(check, 'MILESTONES', self.specs / 'milestones.md'):
+            check.index({}, {})
+        self.assertIn('[milestones](milestones.md)', (self.specs / 'README.md').read_text())
+
 
 if __name__ == '__main__':
     unittest.main()

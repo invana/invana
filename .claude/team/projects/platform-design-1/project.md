@@ -274,7 +274,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
 | P01 | Gap report — every board, flow and journey against the specs |  | done | 2026-11-19 | gates green · reviews passed |
-| P02 | `check.py` validates milestones, flows and journeys |  | pending |  |  |
+| P02 | `check.py` validates milestones, flows and journeys |  | in progress | 2026-11-19 |  |
 | P03 | Specs — connectors, credentials, plugins and packs | P01 | pending |  |  |
 | P04 | Specs — data stores | P03 | pending |  |  |
 | P05 | Specs — the project type manifest | P04 | pending |  |  |
@@ -299,3 +299,10 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | Date | Phase | Question | Options | Recommend | Answer |
 |---|---|---|---|---|---|
+| 2026-11-19 | P01 | MVP journeys (gaps §7 Q1) | (a) J07·J01·J02·J03·J06 · (b) + J05 · (c) J07·J01·J02 | (a) | approved — (a) |
+| 2026-11-19 | P01 | J01 lists parked CP-27 (Q2) | (a) drop CP-27 from J01 · (b) un-park · (c) leave J01 out | (a) | approved — (a) |
+| 2026-11-19 | P01 | Install a connector, CP-17.9 (Q3, breaking) | (a) command line · (b) in Studio · (c) curated list | (a) | approved — (a) |
+| 2026-11-19 | P01 | model.kinds · model.relationships (Q4) | (a) repoint · (b) draw | (a) | approved — (a) |
+| 2026-11-19 | P01 | projects.graph (Q5) | (a) draw · (b) fold | (a) | approved — (a) |
+| 2026-11-19 | P01 | AG-64 state names (Q6) | (a) align story · (b) redraw | (a) | approved — (a) |
+| 2026-11-19 | P01 | Badges (Q7) | (a) derived *MVP?* · (b) on every board | (a) | approved — (a) |
