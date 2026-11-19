@@ -1,6 +1,6 @@
 ---
 name: platform-design-1
-status: running
+status: paused
 branch: design-v2027-redraw/P19-health-visuals-and-publish-check
 scope: platform-design-1
 artifact_publish: auto approve
