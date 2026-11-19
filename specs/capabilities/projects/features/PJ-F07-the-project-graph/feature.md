@@ -130,7 +130,7 @@ type *chooses*; the engine's generic core holds everything else, so no type adds
 | `reviewers` | The default reviewer — `creator` or the field holding a person | No | PJ-22 |
 | `agents` | The suggested agents, the `assistant` among them, and the skills each carries | No | PJ-02.14 |
 | `pick_up` | The default pick-up mode, `ask` unless a pack asks narrower | No | PJ-15 |
-| `access_template` | The Access template chosen first in the Access step | No | PJ-02.21 |
+| `access_template` | The Access template chosen first for a person or team on the Team step | No | PJ-02.38 |
 | `report_template` | The report's starting point | No | [PJ-F05](../PJ-F05-project-reports/feature.md) |
 | `requires` | The connectors the type needs installed — every `connector` named in `sources`, and the code host when the type opens pull requests | Derived | PJ-02 About |
 

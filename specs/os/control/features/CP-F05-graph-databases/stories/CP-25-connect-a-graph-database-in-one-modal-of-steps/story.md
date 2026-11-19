@@ -37,7 +37,10 @@ flowchart TD
   s3f --> s4
   s4 --> cn{"Connect"}
   cn -->|refused| rf["Says why · every answer kept"] --> m
-  cn -->|saved| rd(["Ready · read-only · off · Turn it on · set-up's next step"])
+  cn -->|saved| rd["Ready · read-only · off · Turn it on · set-up's next step"]
+  rd --> md{"Mode"}
+  md -->|keep| ro(["Read-only · CP-38"])
+  md -->|Read + write| rw["Sign in again · CP-38"] --> ro
   o -->|Esc before Connect| x(["Nothing saved · nothing kept"])
 ```
 
@@ -56,6 +59,8 @@ flowchart TD
 | CP-25.9 | *Connect* | the engine refuses — the test fails again, the name was taken meanwhile | it says why and keeps every answer |
 | CP-25.10 | Ready | the Admin opens *How it got here* on the draft | it shows the agent's run that drafted it, the schema it read and what it left out |
 | CP-25.11 | An Operator | they reach *Connect a graph database* | it reads *Ask an Admin*, naming the Admins |
+| CP-25.12 | Ready | the Admin reads the mode | it reads *Read-only* with *Allow writes*, which asks the Admin to sign in again and then sets *Read + write* as CP-38 does; nothing is turned on until *Turn it on* (CP-39) |
+| CP-25.13 | The sections of the modal | the Admin moves through them | each section reads its own state as it happens — the type picked, the credential saved sealed, *Testing*, *Connected*, the shape read, Ready — and the same states are the frames of the connect flow's journey |
 
 ## Screens
 
@@ -67,3 +72,5 @@ flowchart TD
 | 4 · Shape | Operator | — | — | — | — | — | — | — |
 | Ready | Admin | settings.databases · Connect · Ready | — | — | settings.databases · Connect · Ready | settings.databases · Connect · Ready · Could not connect | settings.databases · Connect · Ready · Drafting below | — |
 | Ready | Operator | — | — | — | — | — | — | — |
+| Ready · mode | Admin | settings.databases · Connect · Ready · Mode | — | — | settings.databases · Connect · Ready · Mode | settings.databases · Connect · Ready · Could not connect | — | — |
+| Ready · mode | Operator | — | — | — | — | — | — | — |

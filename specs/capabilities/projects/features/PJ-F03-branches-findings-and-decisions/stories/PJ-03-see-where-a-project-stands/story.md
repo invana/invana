@@ -4,7 +4,7 @@ title: See where a project stands
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.projects]
+boards: [projects.projects, projects.graph]
 ---
 
 # PJ-03 · See where a project stands
@@ -34,6 +34,8 @@ flowchart LR
   load -->|fails| f["Could not load · the reason · Try again"] --> load
   load --> o["Overview: question · type · branches with status and balance · loads cited · predicted findings · open work · decisions so far"]
   o -->|only the first branch, nothing cited| j["Just started: the question as asked, open"]
+  o --> mp["The map leads · a one-line where it stands · detail through peeks"]
+  mp -->|a node| pk["Peek · branch · finding · task · decision · Open for the full page"]
   o --> b["A branch → PJ-05"]
   o --> t["The tree → PJ-04"]
   o --> d["Every decision of this project → PJ-13"]
@@ -57,6 +59,11 @@ flowchart LR
 | PJ-03.10 | The engine cannot return the project | the page loads | it says *Could not load* with the reason and *Try again*; nothing partial is drawn as complete |
 | PJ-03.11 | An archived project | the overview opens | it reads in full; every act is disabled, saying the project is archived |
 | PJ-03.12 | An Operator who can see the project | they open its overview | it reads in full and every act on it is theirs, as for an Admin |
+| PJ-03.13 | A project the person can read | its page opens | the map of the project (PJ-31) leads the page, with one line above it — *where it stands* — reading the number of branches and which are open, the open tasks, the decisions waiting on a person and when the last decision was made, every number the engine's |
+| PJ-03.14 | A project's page | it is read | it answers one question at a time — *Where does it stand?* is the map; *What is open?*, *Who is on it?*, *What did we decide?* and *What did we publish?* are each their own tab, never stacked on the map's page |
+| PJ-03.15 | A node on the map — a branch, finding, task or decision | the person selects it | a peek opens beside the map with its head, status and balance and *Open*; selecting another replaces it; no new page opens until *Open* |
+| PJ-03.16 | A project's page | it is read | whatever can be drawn is drawn on the canvas — the branch tree (PJ-04), the reach of a decision (PJ-10), a lineage (PJ-11) — and the lists beside it read the same records |
+| PJ-03.17 | A project just created | the page opens | the map shows the question as its one node, open, with *Fork* and *Add a task*; the line above it reads *Just started* |
 
 ## Screens
 
@@ -64,5 +71,9 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Overview | Admin | projects.projects · Detail · Just started | — | projects.projects · Detail · Loading | projects.projects · Detail | projects.projects · Detail · Could not load | projects.projects · Detail · Proposals waiting | projects.projects · Detail · Withheld |
 | Overview | Operator | projects.projects · Detail · Just started | — | projects.projects · Detail · Loading | projects.projects · Detail | projects.projects · Detail · Could not load | projects.projects · Detail · Proposals waiting | projects.projects · Detail · Withheld |
+| The map and where it stands | Admin | projects.projects · Detail · Just started | — | projects.projects · Detail · Loading | projects.projects · Detail · Map | projects.projects · Detail · Could not load | projects.projects · Detail · Proposals waiting | projects.projects · Detail · Withheld |
+| The map and where it stands | Operator | projects.projects · Detail · Just started | — | projects.projects · Detail · Loading | projects.projects · Detail · Map | projects.projects · Detail · Could not load | projects.projects · Detail · Proposals waiting | projects.projects · Detail · Withheld |
+| A peek on the map | Admin | — | — | — | projects.projects · Detail · Map · Peek | — | — | — |
+| A peek on the map | Operator | — | — | — | projects.projects · Detail · Map · Peek | — | — | projects.projects · Detail · Withheld |
 | An archived project | Admin | — | — | — | projects.projects · Detail · Archived | — | — | — |
 | An archived project | Operator | — | — | — | projects.projects · Detail · Archived | — | — | — |

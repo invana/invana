@@ -4,7 +4,7 @@ title: Set the project team and its Lead agent
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.projects]
+boards: [projects.settings]
 ---
 
 # PJ-22 · Set the project team and its Lead agent
@@ -29,8 +29,12 @@ a project, and joining grants nothing outside it ([PJ-F01 › Access](../../feat
 
 ```mermaid
 flowchart TD
-  s([A project › Team]) --> p["People and agents side by side · one agent tagged Lead agent"]
+  s([A project › Settings › Team]) --> p["People and agents side by side · one agent tagged Lead agent"]
   p -->|not on the team| na["Reads · acts disabled: join the team or ask who can grant it"]
+  p --> pol["Each row: the access policy it holds here · chosen from Access · its effect shown"]
+  pol -->|an agent with none| nopol["Chooses nothing yet · pick a policy"]
+  p --> pause["Pause · Resume a row · it keeps its place and policy, holds nothing meanwhile"]
+  p --> inv["Invite an agent from the catalogue"] --> add
   p --> add["Add a user, team or agent"]
   add -->|an agent the project's policies do not allow| ng["Disabled: may not work here"]
   add -->|a person, and Adding people needs approval| apr["Asked · waits for Manage on Projects · History"]
@@ -66,14 +70,26 @@ flowchart TD
 | PJ-22.14 | A project with a Lead agent | someone tags a second agent | it is refused — *{project} already has {agent} as its Lead agent.*; nothing changes |
 | PJ-22.15 | The Lead agent | it assigns an open task to another agent on the team | the task is assigned and a run opens, reaching the project's policies ∩ that agent's ceiling; the assignment is in History |
 | PJ-22.16 | The project is set to *Adding people needs approval* | a person on the team adds a person | the join waits as an ask in the Inbox of those with Manage on Projects; approved, they join; declined, the reason is kept; History records both |
+| PJ-22.17 | A person, team or agent on the team | its row is read | it reads the access policy it holds in this project, chosen from the one list of Access Policies (AC-03); changing it is saved, History records who and when, and it holds from the next check |
+| PJ-22.18 | An agent added to the team | no policy is chosen for it | its row reads *Chooses nothing yet — pick a policy*; it holds nothing here and no task or run starts for it until one is chosen; no default is applied |
+| PJ-22.19 | A row | the person opens its effect | a person's reads what their policy lets them do in this project (AC-08); an agent's reads the effective matrix *In* this project ([AC-12.18](../../../../../../os/access/features/AC-F04-what-an-agent-may-touch/stories/AC-12-see-why-an-agent-can-or-cannot/story.md)); without Read on `access/policies` it reads *No access*, naming it and who can grant it |
+| PJ-22.20 | A row | the person presses *Pause* | it keeps its place and its policy but holds nothing here — no task is assigned to it, no run starts for it, and its open claims run out; *Resume* restores it; History records both; pausing the last active person is refused as PJ-22.6 says; *Remove* takes it off as before |
+| PJ-22.21 | *Invite an agent* | it opens | it lists the agents of the catalogue the project's policies let work here (AG-35), each with its version and what it is for; one the policies do not allow is disabled — *May not work here*; a picked agent is added with no policy until one is chosen |
+| PJ-22.22 | The create-project Team step (PJ-02.5 · PJ-02.38) | it is read beside this tab | it is this tab's first form — the same rows, picker, policies, effect and refusals — and the tab edits afterwards what that step made |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Team | Admin | projects.projects · Detail · Team · Only the creator | — | projects.projects · Detail · Team · Loading | projects.projects · Detail · Team | projects.projects · Detail · Team · Last person refused | projects.projects · Detail · Team · Lead agent proposing | — |
-| Team | Operator | projects.projects · Detail · Team · Only the creator | — | projects.projects · Detail · Team · Loading | projects.projects · Detail · Team | projects.projects · Detail · Team · Last person refused | projects.projects · Detail · Team · Lead agent proposing | projects.projects · Detail · Team · Not on the team |
-| Add to the team | Admin | projects.projects · Detail · Team · Add | — | projects.projects · Detail · Team · Loading people and agents | projects.projects · Detail · Team · Added | projects.projects · Detail · Team · Agent may not work here | — | — |
-| Add to the team | Operator | projects.projects · Detail · Team · Add | — | projects.projects · Detail · Team · Loading people and agents | projects.projects · Detail · Team · Added | projects.projects · Detail · Team · Agent may not work here | — | projects.projects · Detail · Team · Join asked |
-| Lead agent | Admin | — | — | — | projects.projects · Detail · Team · Lead agent | projects.projects · Detail · Team · One person warning | — | — |
-| Lead agent | Operator | — | — | — | projects.projects · Detail · Team · Lead agent | projects.projects · Detail · Team · One person warning | — | projects.projects · Detail · Team · Not on the team |
+| Team | Admin | projects.settings · Team · Only the creator | — | projects.settings · Team · Loading | projects.settings · Team | projects.settings · Team · Last person refused | projects.settings · Team · Lead agent proposing | — |
+| Team | Operator | projects.settings · Team · Only the creator | — | projects.settings · Team · Loading | projects.settings · Team | projects.settings · Team · Last person refused | projects.settings · Team · Lead agent proposing | projects.settings · Team · Not on the team |
+| Add to the team | Admin | projects.settings · Team · Add | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Added | projects.settings · Team · Agent may not work here | — | — |
+| Add to the team | Operator | projects.settings · Team · Add | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Added | projects.settings · Team · Agent may not work here | — | projects.settings · Team · Join asked |
+| Access policy and effect | Admin | — | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Access policy | projects.settings · Team · Agent without a policy | — | — |
+| Access policy and effect | Operator | — | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Access policy | projects.settings · Team · Agent without a policy | — | projects.settings · Team · Not on the team |
+| Pause a row | Admin | — | — | — | projects.settings · Team · Paused | projects.settings · Team · Last person refused | — | — |
+| Pause a row | Operator | — | — | — | projects.settings · Team · Paused | projects.settings · Team · Last person refused | — | projects.settings · Team · Not on the team |
+| Invite an agent | Admin | projects.settings · Team · Invite an agent | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Invite an agent | projects.settings · Team · Agent may not work here | — | — |
+| Invite an agent | Operator | projects.settings · Team · Invite an agent | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Invite an agent | projects.settings · Team · Agent may not work here | — | projects.settings · Team · Not on the team |
+| Lead agent | Admin | — | — | — | projects.settings · Team · Lead agent | projects.settings · Team · One person warning | — | — |
+| Lead agent | Operator | — | — | — | projects.settings · Team · Lead agent | projects.settings · Team · One person warning | — | projects.settings · Team · Not on the team |
