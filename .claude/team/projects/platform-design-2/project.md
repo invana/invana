@@ -381,7 +381,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P11 | Create a project | P10, P08 | done | 2026-11-20 | gates green · reviews passed |
 | P12 | Datasets, activity and builder | P11 | done | 2026-11-20 | gates green · reviews passed |
 | P13 | Shell, notifications and explorer | P12 | done | 2026-11-20 | gates green · reviews passed |
-| P14 | Redo the flow and journey boards that changed | P13 | in progress | 2026-11-20 |  |
+| P14 | Redo the flow and journey boards that changed | P13 | done | 2026-11-20 | gates green · reviews passed |
 | P15 | Final design review and the reference-only marks | P14 | pending |  |  |
 | P16 | Paper-test the two project types | P15 | pending |  |  |
 | P17 | System design and NFR lock | P16 | pending |  |  |
