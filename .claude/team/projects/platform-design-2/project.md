@@ -1,6 +1,6 @@
 ---
 name: platform-design-2
-status: running
+status: paused
 branch: feat/platform-design-2
 scope: platform-design-2
 artifact_publish: auto approve
@@ -75,6 +75,21 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Budget | |
 | Steps | 1. List and group the 353 boards by product. 2. Compare by content against the mirror, group by group. 3. Verdict and backing story per board. 4. Gaps without a story. 5. Questions |
 
+### P01b · Visual re-audit — Invana Products against v2027, side by side
+
+| | |
+|---|---|
+| Agent | product-manager |
+| Read | P01's report (`.agent-reports/product-manager/platform-design-2-audit.md`) · `.design/canvas-products/project/` and the mirror `.design/canvas-invana/project/` · `specs/design-language.md` · the render harness (`.design/canvas-nav-proposals/harness`, `shot.mjs`) · Ravi's decisions in *Hand-off notes* |
+| Stories | — |
+| Done when | A report at `.agent-reports/product-manager/platform-design-2-reaudit.md` that **replaces the verdict column** of P01's report for every board P01 marked `skip · landed`. Each such board is rendered (both lenses) next to its v2027 board and compared on fidelity (the states, fields, actions and detail it shows) and layout (spacing against the airy-for-forms, dense-for-tables rule), and gets one verdict — port · redraw to the kit and tokens · skip (equal detail, with the evidence: the two renders and what matched) — and its backing story or *none — P04 writes it*. Order: 1. `fleet.*` and `settings.workers` — add-workers and fleet detail are reported missing, so *redraw* unless the comparison shows equal detail · 2. `iam.*` and the policy boards (draft, test, impact, limits, denied, `iam.agent.effective`) · 3. `graph.settings.*` and `settings.graph_limits` (their content becomes *project settings*, see Hand-off notes) · 4. builder agent, skill and function boards — verified visually, never assumed `skip` · 5. every other board P01 marked `skip · landed`. A name match alone is never a verdict. Anything that conflicts with the specs is a questions batch for Ravi, recommendation first |
+| Lands | The re-audit report |
+| Boards | — |
+| Review | |
+| Approve | Ravi — the re-audit report decides P04 and every designer phase |
+| Budget | |
+| Steps | 1. Render the two boards of each pair, both lenses. 2. Compare in the order above: fleet and workers, IAM and policy, graph settings, builder, the rest. 3. Verdict, evidence and backing story per board. 4. Gaps without a story. 5. Questions |
+
 ### P02 · Part 1's review changes and the MVP badges
 
 | | |
@@ -110,22 +125,22 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | | |
 |---|---|
 | Agent | product-manager |
-| Read | P01's report and Ravi's answers · P02 and P03's notes · `/product-spec` · `/system-design` · PJ-F01 · PJ-F07 · CP-F02 · CP-F05 · CP-F13 · IAM · `graph.settings.members` and `graph.settings.agent.access` |
+| Read | P01's report, **P01b's re-audit (its verdicts win)** and Ravi's answers · P02 and P03's notes · `/product-spec` · `/system-design` · PJ-F01 · PJ-F07 · CP-F02 · CP-F05 · CP-F13 · IAM · `graph.settings.*` (the source of the project settings) · `builder.agents` |
 | Stories | — |
-| Done when | Every audited board with verdict *port* or *redraw* has a story with Flow, criteria and `## Screens`. Written at least: **project access at create** — the create-project flow follows the create-graph flow (`shell.graph.new.*`): *start* (choose a type, or start from an existing project, PJ-23) · *about* (name, question, objective, slug with a taken state) · *data* (subject model and sources; General has none) · *team* (people, teams and agents who get access, each with an access policy, drawn from IAM policies, groups, people and `iam.agent.effective`, so a person sees the effect of access before creating) · *review* (type, data, who gets what, what its agents may do, then create); PJ-02 stays *start a project of its type* — the old question, objective and first branch fold into *about*, people and rules into *team*; **connect a graph database** (connector picked, credential, test, connected, shape, ready, mode) and **add workers** (where picked, new or existing group, run command per docker, k8s and python, token, joined, region tag from CP-F13) in detail; the inquiry tree (forks, merges, parked, dropped — PJ-F03) with `projects.graph` on the branch tree; the map-led project page and its peeks; anything else the audit found without a story. `check.py` 0 errors |
+| Done when | Every audited board with verdict *port* or *redraw* has a story with Flow, criteria and `## Screens`. Written at least: **project access at create** — the create-project flow follows the create-graph flow (`shell.graph.new.*`): *start* (choose a type, or start from an existing project, PJ-23) · *about* (name, question, objective, slug with a taken state) · *data* (subject model and sources; General has none) · *team* (people, teams and agents who get access, each with an access policy, drawn from IAM policies, groups, people and `iam.agent.effective`, so a person sees the effect of access before creating) · *review* (type, data, who gets what, what its agents may do, then create); PJ-02 stays *start a project of its type* — the old question, objective and first branch fold into *about*, people and rules into *team*; **connect a graph database** (connector picked, credential, test, connected, shape, ready, mode) and **add workers** (where picked, new or existing group, run command per docker, k8s and python, token, joined, region tag from CP-F13) in detail; the inquiry tree (forks, merges, parked, dropped — PJ-F03) with `projects.graph` on the branch tree; the map-led project page and its peeks; **project settings** — a place with five tabs, drawn from `graph.settings.*`: *General* (name, description, question, objective), *Data* (the connections the project uses, test, read-only), *Team* (people, teams and agents in one list, access per row, pause and remove, invite from the agent catalogue — the create-project *team* step is its first form and the same tab edits it afterwards), *An agent in this project* (version, what it may touch, its runs as a filter on `agents.runs`), *Usage* (the project's share of the deployment, team, user and agent limits, read-only — limits are never set per project, CP-11); PJ-22 (set the project team and its lead agent) is extended, not duplicated; **Agents in this project** — a view on the project page, drawn from `builder.agents`; anything else the audits found without a story. `check.py` 0 errors |
 | Lands | The features and stories the gaps belong to · `specs/README.md` index |
 | Boards | — |
 | Review | |
 | Approve | Ravi — the spec review (journey, Access, boards to draw, open questions) before any designer phase |
 | Budget | |
-| Steps | 1. Group the story-less boards by feature. 2. Create-project, connect and workers. 3. Projects (map-led, inquiry tree). 4. Fleet, graph settings, modeller, IAM. 5. Datasets, activity, builder, notifications, explorer. 6. Check; the spec review |
+| Steps | 1. Group the story-less boards by feature. 2. Create-project, connect and workers. 3. Projects (map-led, inquiry tree). 4. Fleet, project settings, modeller, IAM. 5. Datasets, activity, builder, notifications, explorer. 6. Check; the spec review |
 
 ### P05 · Density rule in the design language
 
 | | |
 |---|---|
 | Agent | product-manager |
-| Read | `specs/design-language.md` (the density token) · P01's notes on spacing · Ravi's decision: airy for forms and flows, dense for tables and inspectors |
+| Read | `specs/design-language.md` (the density token) · P01's and P01b's notes on spacing · Ravi's decision: airy for forms and flows, dense for tables and inspectors |
 | Stories | — |
 | Done when | `specs/design-language.md` states the rule once through the density token: which surfaces are airy (forms, flows, create and connect steps, the map-led project page) and which dense (tables, inspectors, lists); no other file restates it. `check.py` 0 errors |
 | Lands | `specs/design-language.md` |
@@ -155,7 +170,7 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's report (the fleet rows) · P04's stories · P06's notes · `design-story` · the stories citing each board · `fleet.*` in *Invana Products* |
+| Read | P01's report and P01b's re-audit (the fleet rows) · P04's stories · P06's notes · `design-story` · the stories citing each board · `fleet.*` in *Invana Products* |
 | Stories | — |
 | Done when | The 13 `fleet.*` ports exist on the fleet and workers boards: add with docker, k8s and python run steps, token, pool, joined, capacity, pools, tokens, worker; both lenses, MVP rows first; every `## Screens` cell citing them drawn |
 | Lands | The mirror: these boards and `canvas.json` |
@@ -165,16 +180,16 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Budget | |
 | Steps | 1. MVP cells. 2. The rest. 3. Render check; gates; publish |
 
-### P08 · Graph settings and access (IAM)
+### P08 · Access (IAM)
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's report · P04's stories · P07's notes · `design-story` · the stories citing each board · `graph.settings.*` and `iam.*` in *Invana Products* |
+| Read | P01's report and P01b's re-audit · P04's stories · P07's notes · `design-story` · the stories citing each board · `iam.*` in *Invana Products* |
 | Stories | — |
-| Done when | Drawn: `graph.settings.*` (general, connection, members with invite and update, agent, agent.access, agent.runs, usage) and `settings.graph_limits`; `iam.*` (policies, groups, people, `iam.agent.effective`); every cell citing them, both lenses, MVP rows first |
+| Done when | Drawn: `iam.*` (policies, groups, people, `iam.agent.effective`) and the policy boards P01b names (draft, test, impact, limits, denied); every cell citing them, both lenses, MVP rows first. The Graph is retired: `graph.settings.*` and `settings.graph_limits` are drawn as project settings in P10, not here |
 | Lands | The mirror: these boards and `canvas.json` |
-| Boards | graph.settings.* · settings.graph_limits · iam.* · settings.policies · settings.people · settings.agent_access |
+| Boards | iam.* · settings.policies · settings.people · settings.agent_access |
 | Review | |
 | Approve | |
 | Budget | |
@@ -195,29 +210,29 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Budget | |
 | Steps | 1. The stitch. 2. Diff and dark. 3. Overview and empty. 4. Render check; gates; publish |
 
-### P10 · Projects — the map-led views
+### P10 · Projects — the map-led views and project settings
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's report · P04's stories · P09's notes · `design-story` · the 18 `projects.*` boards in *Invana Products* · the staging canvas's project-graph boards |
+| Read | P01's report and P01b's re-audit · P04's stories (project settings, Agents in this project) · P09's notes · `design-story` · the 18 `projects.*` boards and `graph.settings.*` in *Invana Products* · `builder.agents` · the staging canvas's project-graph boards |
 | Stories | — |
-| Done when | All 18 `projects.*` ports drawn on the v2027 project boards: list and list.empty · project · branches · branch with decide, fork and merge · finding · decisions · impact · lineage · simulate and its result · todo · todos · report; the inquiry tree (forks, merges, parked, dropped — PJ-F03) with `projects.graph` on the branch tree; the map leads each project page, a one-line "where it stands" header, detail through peeks; both lenses, MVP rows first |
+| Done when | All 18 `projects.*` ports drawn on the v2027 project boards: list and list.empty · project · branches · branch with decide, fork and merge · finding · decisions · impact · lineage · simulate and its result · todo · todos · report; the inquiry tree (forks, merges, parked, dropped — PJ-F03) with `projects.graph` on the branch tree; the map leads each project page, a one-line "where it stands" header, detail through peeks; the **project settings place** with its five tabs — General · Data · Team · An agent in this project (its runs a filter on `agents.runs`) · Usage (read-only) — in the airy form density; the **Agents in this project** view on the project page, drawn from `builder.agents`; both lenses, MVP rows first |
 | Lands | The mirror: these boards and `canvas.json` |
-| Boards | projects.projects · projects.graph · projects.branches · projects.* |
+| Boards | projects.projects · projects.graph · projects.branches · projects.* · project settings (from graph.settings.* and settings.graph_limits) |
 | Review | |
 | Approve | |
 | Budget | |
-| Steps | 1. The map-led project page. 2. MVP cells. 3. Branches and the inquiry tree. 4. The rest. 5. Render check; gates; publish |
+| Steps | 1. The map-led project page. 2. MVP cells. 3. Branches and the inquiry tree. 4. Project settings and Agents in this project. 5. The rest. 6. Render check; gates; publish |
 
 ### P11 · Create a project
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | P04's create-project stories · P08's notes (IAM boards) · P10's notes · `design-story` · `shell.graph.new.*` in the mirror · `projects.new` in *Invana Products* |
+| Read | P04's create-project stories · P08's notes (IAM boards) · P10's notes (the project settings *Team* tab) · `design-story` · `shell.graph.new.*` in the mirror · `projects.new` in *Invana Products* |
 | Stories | — |
-| Done when | The create-project boards follow `shell.graph.new.*`: start (choose type or start from an existing project) · about (name, question, objective, slug, slug taken) · data (subject model and sources; General has none) · team (people, teams and agents, each with an access policy, showing the effect of access from IAM, `graph.settings.members` and `graph.settings.agent.access`) · review (type, data, who gets what, what its agents may do, create); both lenses, every state |
+| Done when | The create-project boards follow `shell.graph.new.*`: start (choose type or start from an existing project) · about (name, question, objective, slug, slug taken) · data (subject model and sources; General has none) · team (the first form of P10's project settings *Team* tab, reused not redrawn: people, teams and agents, each with an access policy, showing the effect of access from IAM) · review (type, data, who gets what, what its agents may do, create); both lenses, every state |
 | Lands | The mirror: these boards and `canvas.json` |
 | Boards | projects.new (start · about · data · team · review) |
 | Review | |
@@ -230,9 +245,9 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's report · P04's stories · P11's notes · `design-story` · the datasets, activity and builder boards of *Invana Products* |
+| Read | P01's report and P01b's re-audit · P04's stories · P11's notes · `design-story` · the datasets, activity and builder boards of *Invana Products* |
 | Stories | — |
-| Done when | Every audited port drawn: datasets (provenance, versions, standards) · activity (run step, compare) · builder (agent soul, flow); every cell citing them, both lenses, MVP rows first |
+| Done when | Every audited port drawn: datasets (provenance, versions, standards) · activity (run step, compare) · builder (agent soul, flow, and the agent, skill and function boards P01b verified); every cell citing them, both lenses, MVP rows first |
 | Lands | The mirror: these boards and `canvas.json` |
 | Boards | the boards P01 names for datasets, activity and builder |
 | Review | |
@@ -245,7 +260,7 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | | |
 |---|---|
 | Agent | designer |
-| Read | P01's report · P04's stories · P12's notes · `design-story` · the shell, notification and explorer boards of *Invana Products* |
+| Read | P01's report and P01b's re-audit · P04's stories · P12's notes · `design-story` · the shell, notification and explorer boards of *Invana Products* |
 | Stories | — |
 | Done when | Every audited port drawn: notifications · explorer (answer, board, layout, presenting, tools) · the shell pieces P01 names; every cell citing them, both lenses, MVP rows first |
 | Lands | The mirror: these boards and `canvas.json` |
@@ -275,9 +290,9 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | | |
 |---|---|
 | Agent | designer |
-| Read | P14's notes · `specs/journeys/` · `specs/milestones.md` · P01's report |
+| Read | P14's notes · `specs/journeys/` · `specs/milestones.md` · P01's report and P01b's re-audit (its verdicts replace P01's) |
 | Stories | — |
-| Done when | The Index lists every page and board; the audit's every *port* and *redraw* board is in v2027 and every *skip* has its reason; *Invana Products* and the proposal canvases carry a visible reference-only mark (never deleted); every board renders and every link resolves; the package for Ravi is assembled (canvas, each journey, open questions) |
+| Done when | The Index lists every page and board; the audits' every *port* and *redraw* board (P01b's verdicts win) is in v2027 and every *skip* has its reason; *Invana Products* and the proposal canvases carry a visible reference-only mark (never deleted); every board renders and every link resolves; the package for Ravi is assembled (canvas, each journey, open questions) |
 | Lands | The mirror: `Main.dc.html`, `canvas.json` · the reference marks in the reference canvases' own `canvas.json` notes |
 | Boards | every board · the Index |
 | Review | |
@@ -353,15 +368,16 @@ only `partial` (it handed off) or `blocked` (with the question).
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
 | P01 | Audit — Invana Products against v2027, by content |  | done | 2026-11-19 | gates green · reviews passed |
+| P01b | Visual re-audit — Invana Products against v2027, side by side | P01 | pending |  |  |
 | P02 | Part 1's review changes and the MVP badges |  | pending |  |  |
 | P03 | Take up the open part-1 recommendations that are spec edits |  | pending |  |  |
-| P04 | Spec the gaps | P01, P02, P03 | pending |  |  |
-| P05 | Density rule in the design language | P01 | pending |  |  |
+| P04 | Spec the gaps | P01, P01b, P02, P03 | pending |  |  |
+| P05 | Density rule in the design language | P01, P01b | pending |  |  |
 | P06 | Density pass — one pass over every board | P05 | pending |  |  |
 | P07 | Fleet and workers | P06, P04 | pending |  |  |
-| P08 | Graph settings and access (IAM) | P07 | pending |  |  |
+| P08 | Access (IAM) | P07 | pending |  |  |
 | P09 | Modeller — the global model (stitch) and overview | P08 | pending |  |  |
-| P10 | Projects — the map-led views | P09 | pending |  |  |
+| P10 | Projects — the map-led views and project settings | P09 | pending |  |  |
 | P11 | Create a project | P10, P08 | pending |  |  |
 | P12 | Datasets, activity and builder | P11 | pending |  |  |
 | P13 | Shell, notifications and explorer | P12 | pending |  |  |
@@ -382,6 +398,8 @@ What a later phase must know that the code does not say. One row per note, newes
 | — | PJ-02 was rewritten in part 1 P05 as *start a project of its type* (type manifest, General with no subject model); *Invana Products*' `projects.new` (question, objective, first branch, people, rules) predates it — its people and rules steps survive under the type-first flow as the *team* step |
 | — | `model.kinds` and `model.relationships` are states of `model.models` (part 1 Q4) |
 | — | Connector install stays on the command line, not offered in Studio (part 1 Q3) |
+| — | Ravi has not approved P01's report: it marked 334 of 352 boards `skip · landed` by state-name match, without comparing fidelity or layout. P01b's re-audit replaces its verdicts for those boards; until Ravi approves P01b, no later phase relies on a P01 `skip · landed` |
+| — | The Graph stays retired and the project takes its place: `graph.settings.*` and `settings.graph_limits` are not out of spec — their content becomes project settings (General · Data · Team · An agent in this project · Usage). Limits are never set per project (CP-11): the Usage tab only shows the project's share. The create-project *team* step is the first form of the Team tab. P04 writes the stories, P10 draws the place, P11 reuses the Team tab |
 
 ## Questions for Ravi
 
@@ -389,6 +407,8 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 
 | Date | Phase | Question | Options | Recommend | Answer |
 |---|---|---|---|---|---|
+| 2026-11-19 | P01 | Audit Q1: the specs have no Graph above a graph database, Invana Products draws one — skip the 21 Graph boards, or restore Graphs | (a) keep the specs, skip the Graph boards · (b) restore Graphs | (a) | Answered: yes — the Graph stays retired and the project takes its place; `graph.settings.*` and `settings.graph_limits` become project settings (P04 · P10 · P11) |
+| 2026-11-19 | P01 | Audit Q2 (Datasets retired) · Q3 (`projects.simulate`) · Q4 (accept the 334 `skip` rows) | see the audit §7 | Q4 no — verdicts are redone | Q4: not accepted, re-audited in P01b. Q2 and Q3 stay open until P01b reissues the verdicts |
 | 2026-11-19 | P02 | Part 1's design-review changes: none were handed over. What did the part-1 review change? | (a) paste or dictate them before P02 starts · (b) none — P02 only confirms the MVP journeys | (a) | |
 | 2026-11-19 | Start | Project branch: part 1's header names a stale phase branch (`design-v2027-redraw/P19-…`); the run-project rule is `feat/<name>` made by Ravi off an up-to-date `main`. Part 2 must start from part 1's drawn boards, which are on `platform-design-1/P14-journey-boards-and-the-design-review` and not on `main` | (a) `feat/platform-design-2` off the tip of `platform-design-1/P14-…` · (b) merge part 1 to `main` first, then `feat/platform-design-2` off `main` | (b) | |
 | 2026-11-19 | P06 | Density pass before the ports (P06) or after all of them | (a) first, so every later phase draws on the final density · (b) last, one pass over everything at once | (a) — a token set once, ports drawn on it, no rework | |
