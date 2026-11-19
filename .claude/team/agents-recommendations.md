@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**548 recommendations** · 335 open · 126 taken · 23 declined · 64 done
+**549 recommendations** · 336 open · 126 taken · 23 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -591,3 +591,4 @@ flowchart LR
 | R577 | open | 2026-11-19 | designer | phase platform-design-2/P07 | debt | medium | Publish to the v2027 canvas needs the Artifact tool | P07 ran in a session with no Artifact tool, so settings.workers.dc.html and canvas.json are not published to PgtkC6KygGZz2u8fYq1LWX. Same cause as R560 and R566. |  |  |
 | R578 | open | 2026-11-19 | designer | phase platform-design-2/P08 | docs | low | P08 hand-off note: the designer may not edit the project file | The edit_rights hook refuses designer writes to .claude/team/projects/platform-design-2/project.md, so the P08 hand-off note is in .agent-reports/designer/platform-design-2-P08.md (Hand-off note section). Copy it into the project's Hand-off notes. The Artifact tool was missing again (R577): settings.policies, settings.agent_access and canvas.json are not published. |  |  |
 | R579 | open | 2026-11-19 | designer | phase platform-design-2/P09 | idea | low | Designer phases cannot write their own hand-off note in project.md | The edit_rights hook refuses the designer on .claude/team/projects/platform-design-2/project.md, yet the run brief asks each phase for a hand-off note row. P09's note is in .agent-reports/designer/SE-01-boards.md under Hand-off note; the lead or product-manager should copy it into the project file. Also: no Artifact tool again, so P09's model.models board is not published (R577). |  |  |
+| R580 | open | 2026-11-19 | designer | phase platform-design-2/P10 | debt | low | Render harness shot.mjs loads only the first ds/ stylesheet, so density.css never loads | .design/canvas-nav-proposals/harness/shot.mjs replaces only the first ds/ link: density tokens are missing in every render, so spacing collapses. Make it a replace-all. P10 used patched copies in pd2p10/settings_proj and pd2p10/projects_shot.mjs |  |  |
