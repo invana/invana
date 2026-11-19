@@ -274,7 +274,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
 | P01 | Gap report — every board, flow and journey against the specs |  | done | 2026-11-19 | gates green · reviews passed |
-| P02 | `check.py` validates milestones, flows and journeys |  | in progress | 2026-11-19 |  |
+| P02 | `check.py` validates milestones, flows and journeys |  | done | 2026-11-19 | gates green · reviews passed |
 | P03 | Specs — connectors, credentials, plugins and packs | P01 | pending |  |  |
 | P04 | Specs — data stores | P03 | pending |  |  |
 | P05 | Specs — the project type manifest | P04 | pending |  |  |
