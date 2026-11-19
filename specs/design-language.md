@@ -174,9 +174,32 @@ one never changes another.
 | Rule | Detail |
 |---|---|
 | Two themes | Light and dark, each a set of the kit's tokens; a person picks one ([CP-F07](os/control/features/CP-F07-find-your-way/feature.md)). More palettes are later |
-| Density is a token | Dense inspectors and airy forms are the same components at different sizes, never a second component |
 | A switch mid-render redraws nothing | A canvas picks the new colours up on its next frame |
 | A missing token falls back | A theme without a token takes the default theme's, never renders unstyled |
+
+### Density
+
+Two densities, **airy** and **dense**, set through the kit's density token. They are the same components at different
+sizes, never a second component. A board, story or component never sets spacing of its own; it takes the density its
+surface kind names below.
+
+| Density | Surfaces | Why |
+|---|---|---|
+| **Airy** | Forms and preference rows · flows and their steps — create, connect and add-workers steps, the large modal's detail forms · task modals · the map-led project page and project settings (its five tabs) · empty states | A person reads, chooses and types here; room lowers mistakes |
+| **Dense** | Tables · inspectors and element panels · lists and trees, leftNav and leftSection · the header dropdowns' rows · the console · Explorer chrome — toolbar, minimap, layout and tool panels | A person scans many rows or works the canvas; the work stays in view |
+
+| Rule | Detail |
+|---|---|
+| The surface sets it, not the page | A page that holds both takes each region's own density: a table inside an airy form page stays dense, a form in an inspector stays airy |
+| Explorer chrome stays compact | The Explorer's chrome is dense even where it holds a form; the airy density is for forms, flows and pages |
+| Set once, never per board | Spacing comes from the token on the shared shell components; a board that needs a different spacing is a gap in the token, raised, never overridden |
+| Both lenses and every state | Admin and Operator, and every state of a surface, draw at the surface's density |
+
+### Breadcrumbs
+
+| Rule | Detail |
+|---|---|
+| A deep trail folds | When the crumb is wider than its room, the middle levels fold into one *…* control; it opens a menu of the levels it hides, each linking to its level. The first level and the last two always show |
 
 ### Canvases
 
