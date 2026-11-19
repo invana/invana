@@ -60,6 +60,9 @@ flowchart TD
 | AC-12.13 | An Admin | they attach a policy from here or from the agent's page in Agents | it is one attachment (AC-11); it holds from the agent's next step |
 | AC-12.14 | A person with Read on `access/policies` but not Manage on Access | they open an agent | everything reads; *Attach a policy* is disabled, naming Manage on Access and who can grant it |
 | AC-12.17 | A person without Read on `access/policies` | they open an agent's access, its effective view or its refusals, or ask the API or `invana access effective` | it reads *No access*, naming Read on `access/policies` and who can grant it; no rule, policy, setter or *Hidden from agents* entry shows (AC-27.26) |
+| AC-12.18 | *What it can do* | it is read | it is a matrix of action × resource, and each row reads, in columns: what the skill needs · its policies · the person who started it · the project it runs in · the boundary · *Effective* · *Why not* — the first column that refuses is marked and the others read what they would have allowed |
+| AC-12.19 | *What it can do* | the reader picks *Started by* and *In a project* | the matrix is worked out again for that person and that project — the agent's ceiling when neither is picked (AC-12.5) — and the picks are in the address, so the view can be shared |
+| AC-12.20 | *Who it may hand work to* | it is read | it lists each agent the reader's agent may run (AC-12.11) inside the same view, below the matrix, with the rule that allows it |
 | AC-12.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it, the rule, its policy and version, any ceiling that narrowed it and who saved the rule, as they were when the step ran |
 | AC-12.16 | The list of agents | it fails to load | it says what could not load, with *Try again* |
 

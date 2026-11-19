@@ -212,6 +212,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | `POST /pools/{name}/drain` · `POST /{id}/drain` | Drain a group · a worker | CP-09 |
 | `GET /{id}` | One worker — what it runs now, steps this hour, failures, recent log | CP-09 |
 | `GET /capacity` | Per group and overall: `slots` · `slots_busy` · `slots_free` · steps waiting · the oldest · workers · `idle` · `suggested` · `advice` (`add` · `drain` · `keep`) with `advice_count`, as last stored | CP-08 |
+| `GET /capacity/history` | Per group and overall over `window` (`1h` · `24h` · `7d`): the stored points of `control_worker_stats` — workers, `slots_busy`, steps waiting — and the `control_worker_events` inside the window, each with `why` and who | CP-08 |
 | `GET /work` | Runs by stage — started · admitted · running · waiting — each count as stored, each waiting run with its reason and how long; the order work is taken in and each person's share | CP-05 · CP-06 |
 | `GET /coordinators` | Each coordinator, its state, the runs it holds, when it last renewed | CP-07 |
 | `GET /join-keys` · `POST /pools/{name}/join-keys` · `POST /join-keys/{id}/revoke` | List keys (prefix, expiry, joined of cap, revoked) · mint one `{expires_at, cap}` → its secret once and the commands · revoke | CP-10 |

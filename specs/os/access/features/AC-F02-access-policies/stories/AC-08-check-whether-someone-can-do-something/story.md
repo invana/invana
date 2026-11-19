@@ -54,6 +54,8 @@ flowchart LR
 | AC-08.9 | An Operator with Read on `access/policies` | they check anyone | it works as for an Admin; an Operator without it reads *No access* (AC-08.1) |
 | AC-08.10 | A check that could not run | it is read | it says why, with *Try again* |
 | AC-08.11 | A filled check | its link is copied | the address carries `dialog=check` with `user`, `agent`, `verb` and `resource` |
+| AC-08.12 | A check | it is run | the answer lists every layer the engine's own check passed through, in order — the permission the person holds · the policies they hold · the agent's policies · the person who started it and the project it runs in · the boundary — each reading *allows* or *refuses*, the first that refuses marked; the answer above them is the same *Yes* · *No* · *Asks first* of AC-08.2 to AC-08.4 |
+| AC-08.13 | The check is opened from a policy, a person or an agent | it opens | it opens as a modal over the page it came from, filled with what that page knows; closing it returns there |
 
 ## Screens
 

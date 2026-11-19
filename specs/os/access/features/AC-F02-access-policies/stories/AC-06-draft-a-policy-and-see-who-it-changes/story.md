@@ -55,6 +55,8 @@ flowchart TD
 | AC-06.11 | A draft attached to agents before it is saved | *Who it changes* is read | it is drawn against those agents; the attachment takes effect when it is saved |
 | AC-06.12 | A saved change | History is read | it shows who saved it, when and why (AC-F06) |
 | AC-06.14 | A person with Read on `access/policies` but not Edit on Access | they open a draft or the section | the draft reads; *Save* is disabled, naming Edit on Access and who can grant it; without Read it reads *No access* |
+| AC-06.15 | *Who it changes* | it is read | it is a per-agent table — the agent, what it gains or loses, the resource, its uses in the last 30 days — and, below it, each skill or workflow that would be refused, with its version and the need it loses, each with *Add {need} to this policy, then save*; an agent that loses nothing is not listed, and a change that loses nobody reads *Nobody loses access* |
+| AC-06.16 | A loss the table names | the Admin presses *Add {need} to this policy, then save* | the need is added to the draft, *Who it changes* is worked out again and the row leaves the table when nothing is lost; nothing is saved until *Save* |
 
 ## Screens
 
@@ -62,7 +64,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A draft policy | Admin | settings.policies · New | — | settings.policies · Loading | settings.policies · Draft | settings.policies · Rule refused | — | — |
 | A draft policy | Operator | — | — | — | — | — | — | settings.policies · No access |
-| Who it changes | Admin | — | — | settings.policies · Working out who it changes | settings.policies · Nobody loses | settings.policies · What would break | — | — |
+| Who it changes | Admin | — | — | settings.policies · Working out who it changes | settings.policies · Nobody loses | settings.policies · What would break · Per agent | — | — |
 | Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |
 | New policy · 4 Who it changes | Admin | — | — | settings.policies · New · Working out who it changes | settings.policies · New · Nobody loses | settings.policies · New · What would break | — | — |
 | New policy · 4 Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |

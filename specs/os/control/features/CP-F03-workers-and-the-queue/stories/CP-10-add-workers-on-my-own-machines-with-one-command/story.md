@@ -34,7 +34,13 @@ flowchart TD
   ge --> k["Join key: expiry · cap · shown once"]
   gn --> k
   k --> run["Run it: the command or the manifest"]
-  run --> chk{"Joining checks"}
+  run --> rr{"Where"}
+  rr -->|Docker| rd["One docker run line · its env · Copy · Download .env"]
+  rr -->|Python| rp["Install · invana worker · service install · Copy"]
+  rr -->|Kubernetes| rk["Three kubectl lines · manifest · Copy · Download"]
+  rd --> chk
+  rp --> chk
+  rk --> chk{"Joining checks"}
   chk -->|key expired or used up| k
   chk -->|engine not reached| net["Check outbound 443 to the engine"]
   chk -->|plugins, runtimes or labels do not fit| ge
@@ -61,6 +67,11 @@ flowchart TD
 | CP-10.13 | An Operator | they open *Join keys* | every key reads its group, prefix, expiry, how many joined of its cap, and whether it is revoked — never its secret |
 | CP-10.14 | A group's runtimes | an Admin picks them | only runtimes installed as runtime plugins are offered; one not installed reads disabled, naming *Install it in Plugins* (CP-64); a group that carries an outside runtime needs the `code` label, or the change is refused, naming it |
 | CP-10.15 | A worker joining a group that carries a runtime | the joining checks run | *runtimes loaded* passes only when the worker loaded each runtime the group carries, at a version its plugin allows; else the join is refused, naming the runtime |
+| CP-10.16 | *Run it* on Docker | it is read | one `docker run` line carries the engine address, the join key, the group, labels and slots as `INVANA_ENGINE_URL` · `INVANA_JOIN_TOKEN` · `INVANA_POOL` · `INVANA_LABELS` · `INVANA_SLOTS`, with *Copy* and *Download .env*; the key's secret shows once, on this step |
+| CP-10.17 | *Run it* on Python | it is read | it reads the install, the one `invana worker` command with the same values and, below it, `invana worker install-service` for a service on the machine, each with *Copy* |
+| CP-10.18 | *Run it* on Kubernetes | it is read | three `kubectl` lines and a manifest with *Copy* and *Download*; Invana starts nothing — the replicas are declared by the Admin (CP-08.6) |
+| CP-10.19 | A worker group whose machine sits in a region | *Run it* is read | an optional *Region* field, a short tag from the data stores' regions ([CP-F13](../../../CP-F13-data-stores/feature.md#rules)), is part of the command as `INVANA_REGION`; untagged reads *anywhere*; the worker carries the tag it joined with, and *Joined* reads it |
+| CP-10.20 | *Group* | it opens | it offers *Existing group* — the groups with their labels, slots, plugins, runtimes and secret names — or *New group*; choosing one shows what the worker will be held to |
 
 ## Screens
 
@@ -72,5 +83,11 @@ flowchart TD
 | Add workers · 2 Group | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | Add workers · 3 Join key · 4 Run it | Admin | — | — | — | settings.workers · Add workers · Run it | settings.workers · Add workers · Key expired | — | — |
 | Add workers · 3 Join key · 4 Run it | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 4 Run it · Docker | Admin | — | — | — | settings.workers · Add workers · Run it · Docker | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 4 Run it · Docker | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 4 Run it · Python | Admin | — | — | — | settings.workers · Add workers · Run it · Python | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 4 Run it · Python | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 4 Run it · Kubernetes | Admin | — | — | — | settings.workers · Add workers · Run it | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 4 Run it · Kubernetes | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | Add workers · 5 Joined | Admin | — | — | settings.workers · Add workers · Waiting to join | settings.workers · Add workers · Joined | settings.workers · Add workers · Join failed | — | — |
 | Add workers · 5 Joined | Operator | — | — | — | — | — | — | settings.workers · Read only |
