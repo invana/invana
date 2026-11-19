@@ -1,6 +1,6 @@
 ---
 name: design-v2027-redraw
-status: paused
+status: done
 branch: design-redesign/P17-audit-every-board-drawn-every-link-resol
 scope: design-v2027-redraw
 artifact_publish: auto approve
