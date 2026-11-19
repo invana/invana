@@ -276,7 +276,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01 | Gap report — every board, flow and journey against the specs |  | done | 2026-11-19 | gates green · reviews passed |
 | P02 | `check.py` validates milestones, flows and journeys |  | done | 2026-11-19 | gates green · reviews passed |
 | P03 | Specs — connectors, credentials, plugins and packs | P01 | done | 2026-11-19 | gates green · reviews passed |
-| P04 | Specs — data stores | P03 | in progress | 2026-11-19 |  |
+| P04 | Specs — data stores | P03 | done | 2026-11-19 | gates green · reviews passed |
 | P05 | Specs — the project type manifest | P04 | pending |  |  |
 | P06 | Boards open from the URL, and the undrawn boards | P01 | pending |  |  |
 | P07 | Full fidelity — Shell, Start and Explore | P06 | pending |  |  |
