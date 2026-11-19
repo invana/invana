@@ -1,6 +1,6 @@
 ---
 name: platform-design-2
-status: running
+status: paused
 branch: feat/platform-design-2
 scope: platform-design-2
 artifact_publish: auto approve
@@ -413,7 +413,7 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 | 2026-11-19 | P01b | Explorer visual comparison scope | answer and board families first · all 105 · name only | families first | answered — answer, board, layout and presenting first; the rest by state name |
 | 2026-11-19 | P01 | Audit Q1: the specs have no Graph above a graph database, Invana Products draws one — skip the 21 Graph boards, or restore Graphs | (a) keep the specs, skip the Graph boards · (b) restore Graphs | (a) | Answered: yes — the Graph stays retired and the project takes its place; `graph.settings.*` and `settings.graph_limits` become project settings (P04 · P10 · P11) |
 | 2026-11-19 | P01 | Audit Q2 (Datasets retired) · Q3 (`projects.simulate`) · Q4 (accept the 334 `skip` rows) | see the audit §7 | Q4 no — verdicts are redone | Q4: not accepted, re-audited in P01b. Q2 and Q3 stay open until P01b reissues the verdicts |
-| 2026-11-19 | P02 | Part 1's design-review changes: none were handed over. What did the part-1 review change? | (a) paste or dictate them before P02 starts · (b) none — P02 only confirms the MVP journeys | (a) | |
-| 2026-11-19 | Start | Project branch: part 1's header names a stale phase branch (`design-v2027-redraw/P19-…`); the run-project rule is `feat/<name>` made by Ravi off an up-to-date `main`. Part 2 must start from part 1's drawn boards, which are on `platform-design-1/P14-journey-boards-and-the-design-review` and not on `main` | (a) `feat/platform-design-2` off the tip of `platform-design-1/P14-…` · (b) merge part 1 to `main` first, then `feat/platform-design-2` off `main` | (b) | |
-| 2026-11-19 | P06 | Density pass before the ports (P06) or after all of them | (a) first, so every later phase draws on the final density · (b) last, one pass over everything at once | (a) — a token set once, ports drawn on it, no rework | |
-| 2026-11-19 | P11 | Create-project: the project-lead's own *team* step grants access before the project exists. Does an agent in the team step get an access policy by default? | (a) no — an agent gets nothing until a policy is chosen · (b) a default read-only policy | (a) | |
+| 2026-11-19 | P02 | Part 1's design-review changes: none were handed over. What did the part-1 review change? | (a) paste or dictate them before P02 starts · (b) none — P02 only confirms the MVP journeys | (a) | answered — none; P02 only confirms the MVP journeys |
+| 2026-11-19 | Start | Project branch: part 1's header names a stale phase branch (`design-v2027-redraw/P19-…`); the run-project rule is `feat/<name>` made by Ravi off an up-to-date `main`. Part 2 must start from part 1's drawn boards, which are on `platform-design-1/P14-journey-boards-and-the-design-review` and not on `main` | (a) `feat/platform-design-2` off the tip of `platform-design-1/P14-…` · (b) merge part 1 to `main` first, then `feat/platform-design-2` off `main` | (b) | answered — (a) `feat/platform-design-2` off the tip of platform-design-1/P14 |
+| 2026-11-19 | P06 | Density pass before the ports (P06) or after all of them | (a) first, so every later phase draws on the final density · (b) last, one pass over everything at once | (a) — a token set once, ports drawn on it, no rework | answered — first |
+| 2026-11-19 | P11 | Create-project: the project-lead's own *team* step grants access before the project exists. Does an agent in the team step get an access policy by default? | (a) no — an agent gets nothing until a policy is chosen · (b) a default read-only policy | (a) | answered — no; an agent gets nothing until a policy is chosen |
