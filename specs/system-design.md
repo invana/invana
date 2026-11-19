@@ -8,6 +8,8 @@ status: idea
 > How Invana's technology delivers its stories, and how well. What a person can do is the stories in
 > [capabilities](capabilities/) and [os](os/); this file is the high-level design and the non-functional requirements.
 > Each feature's low-level design is its `feature.md` › `## Engine`; a fact stated there is linked here, never restated.
+> The data stores (§ 6), residency (the region tag, § 6) and code structure (§ 7) are final for the build: a change to a
+> store, a service, a route family, a module band or an NFR target is a breaking change, asked of Ravi first.
 
 | § | Section | Answers |
 |---|---|---|
@@ -331,7 +333,7 @@ How the new code is laid out. The repository paths are § 13; this section is th
 |---|---|---|
 | One name across layers | A module's name is the same in its engine module, tables (`<module>_<records>`), routes, resources, events (`<module>.<records>.<verb>`), spans, Studio package (`@invana-studio/<module>`), Studio routes and boards (`<module>.<surface>`); a spec folder keeps its product name, and *Code structure* maps one to the other. Modules: `core` · `access` · `graph` · `ontology` · `projects` · `agents` · `conversations` · `inbox` · `context` · `sources` · `workers`; edge: `api` · `cli` · `mcp` | [migrations.md](migrations.md) M41 for the code |
 | Records are plural nouns, said once | `access_policies`, `runs`; a record named as its package is said once | Each feature's *Records* |
-| One route shape | `/api/v1/<package>/<records>` — no graph, user or tenant segment; a route sits under the package that owns its records, never under the screen that calls it; Studio's routes follow without a graph segment | Each feature's *Routes* |
+| One route shape | `/api/v1/<family>/<records>` — no graph, user or tenant segment; a route sits under the family that owns its records, never under the screen that calls it; the families and their modules are *Route families* below; Studio's routes follow without a graph segment | Each feature's *Routes* |
 | A read without access | `404` — what the person's agents may not Read is absent, not forbidden; an act they may see but not do is `403`, naming the rule | [AC-F02](os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Errors map once | Not found `404` · conflict `409` · unauthenticated `401` · denied `403` · a shape the model forbids `422` · rate-limited `429`; every error names the field, step, bound or rule, never a bare code | Each feature's *Refusals* |
 | A write answers `{ message, data }` | The engine writes the sentence; Studio shows it and composes none; one gesture reports once | Each feature's *Routes* |
@@ -347,6 +349,29 @@ How the new code is laid out. The repository paths are § 13; this section is th
 | CLI shape | `invana <noun> <verb>`; `--database <name>` where a command targets one graph database; `--user` names who it acts as and is checked like the route it stands for; `--json` on every command; `--dry-run` on every write; prompts, or `--non-interactive` with every value a flag | Each feature's *CLI* |
 | A CLI refusal names the next command | A route answers a refusal as a code and its facts; the CLI turns the code into what happened, what was written and the command that does what was meant; distinct exit codes for a validation failure | Each feature's *CLI* |
 | A name on the wire is public | A module path stored in a row or imported by a connector package changes only through a migration that rewrites the stored values | [migrations.md](migrations.md) |
+
+### Route families
+
+A feature's `## Engine` › *Routes* names the route a person or the coder uses, under its product's family prefix. The
+prefix is the URL's name and stays as written; the family's code lands in the module below, so a route is never
+re-homed by guesswork. No route carries a graph, user or tenant segment.
+
+| Route prefix `/api/v1/…` | Records of | Lands in |
+|---|---|---|
+| `access` | Sign-in, Access Policies, the Directory, keys, asks, ownership, History, the ledger, leaving and keeping | `access/` |
+| `control` | Runs, workers and the queue, limits, ops alerting, the Inbox and its channels, overview | `workers/` · `inbox/` |
+| `control` | AI models, plugins and MCP, skill scripts, settings, data stores | `core/` |
+| `control` | Graph database connections | `graph/` |
+| `graph` | Memory and lineage | `context/` |
+| `model` | Models, kinds, links, rules, derivations, health | `ontology/` |
+| `records` | Loads, checks, provenance, annotations | `sources/` · `graph/` |
+| `explore` | Boards, questions, answers, edits | `conversations/` |
+| `agents` · `catalogue` | Agents, skills, plans, workflows, schedules, portable agents | `agents/` |
+| `projects` | Projects, tasks, branches, findings, decisions, the project graph, settings, alerts | `projects/` |
+
+| Decision | Choice | Trade-off |
+|---|---|---|
+| The prefix is the family's, the module is the code's | The URL keeps the product family's name; the module is named by *Code structure*; this table is the only map between them | A prefix and a module name differ for `control`, `model`, `records` and `explore`; a rename of a prefix is a migration, never a drive-by |
 
 ### Who calls, and how they prove it
 

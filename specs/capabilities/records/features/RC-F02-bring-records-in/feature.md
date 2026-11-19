@@ -119,7 +119,7 @@ flowchart TD
 
 | Table | Columns | Notes |
 |---|---|---|
-| `record_loads` | `id` · `graph_id` · `model_id` · `model_version` · `file_name` · `file_hash` · `licence` · `source` (`upload` · `cli` · `api` · `bundle` · `by_hand` · `bulk` · `run`) · `run_id` · `bundle_run_id?` · `from_run_id?` · `status` (`running` · `succeeded` · `partly_rejected` · `failed` · `cancelled` · `undone`) · `written` · `created` · `updated` · `rejected` · `created_by` · `created_at` · `undone_at` · `undone_by` | `id` is stable and citable; `file_hash` is SHA-256 of the file's bytes, or of the records' canonical JSON when there is no file (`by_hand` · `run`); counts are written when the run settles; a bulk load is `source = bulk` and is never citable. `run_id` is the load's own run; `bundle_run_id` the bundle run it is a lane of; `from_run_id` the run whose result a `source = run` load saves |
+| `record_loads` | `id` · `database_id` · `model_id` · `model_version` · `file_name` · `file_hash` · `licence` · `source` (`upload` · `cli` · `api` · `bundle` · `by_hand` · `bulk` · `run`) · `run_id` · `bundle_run_id?` · `from_run_id?` · `status` (`running` · `succeeded` · `partly_rejected` · `failed` · `cancelled` · `undone`) · `written` · `created` · `updated` · `rejected` · `created_by` · `created_at` · `undone_at` · `undone_by` | `id` is stable and citable; `file_hash` is SHA-256 of the file's bytes, or of the records' canonical JSON when there is no file (`by_hand` · `run`); counts are written when the run settles; a bulk load is `source = bulk` and is never citable. `run_id` is the load's own run; `bundle_run_id` the bundle run it is a lane of; `from_run_id` the run whose result a `source = run` load saves |
 | `record_load_inputs` | `load_id` · `input_load_id` | A `source = run` load only: one row per load the run it saves was pinned to. Its records are *derived*; their provenance is `from_run_id` and these loads |
 | `record_load_rejections` | `load_id` · `record_ref` · `field` · `reason` · `sample` | One row per rejected record; grouped by `reason` when read |
 
@@ -140,7 +140,7 @@ flowchart TD
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
+| Route, after `/api/v1/records` | Does | Story |
 |---|---|---|
 | `POST /loads` | Start a load into a model — a file, a stream of records, or `{from_run_id, kind}` to save a run's result as derived records | RC-08 · RC-09 · RC-11 · EX-33 |
 | `POST /loads/preview` | What a file becomes against a model, before anything is written | RC-08 |

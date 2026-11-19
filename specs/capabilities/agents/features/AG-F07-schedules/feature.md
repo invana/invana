@@ -145,8 +145,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `agents_schedules` | `graph_id` · `name` · `agent_id` · `instructions` · `trigger` (`time` · `event`) · `cron` · `timezone` · `event_pattern?` · `event_scope?` · `status` (`active` · `paused`) · `missed` (`catch_up` · `run_all` · `skip`) · `overlap` (`skip` · `allow`) · `deliver_in_app` · `recipient_ids[]` · `channel_ids[]` · `approve_outward` · `allow_set_by?` · `allow_set_at?` · `approval_deadline_s` (a day) · `next_fire_at` · `made_by` · `updated_by` · `created_at` · `updated_at` | `name` unique in the deployment. Owned by the platform ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); `made_by` is who set it and never changes; `updated_by` who last edited it. Neither is an identity the run takes |
-| `agents_schedule_firings` | `schedule_id` · `graph_id` · `due_at` · `fired_at` · `outcome` (`queued` · `opened` · `skipped` · `failed`) · `catch_up` · `manual` · `run_id?` · `reason` · `delivered_at?` · `actor_id?` | Unique (`schedule_id`, `due_at`), so two engine processes never fire one occurrence twice |
+| `agents_schedules` | `name` · `agent_id` · `instructions` · `trigger` (`time` · `event`) · `cron` · `timezone` · `event_pattern?` · `event_scope?` · `status` (`active` · `paused`) · `missed` (`catch_up` · `run_all` · `skip`) · `overlap` (`skip` · `allow`) · `deliver_in_app` · `recipient_ids[]` · `channel_ids[]` · `approve_outward` · `allow_set_by?` · `allow_set_at?` · `approval_deadline_s` (a day) · `next_fire_at` · `made_by` · `updated_by` · `created_at` · `updated_at` | `name` unique in the deployment. Owned by the platform ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); `made_by` is who set it and never changes; `updated_by` who last edited it. Neither is an identity the run takes |
+| `agents_schedule_firings` | `schedule_id` · `due_at` · `fired_at` · `outcome` (`queued` · `opened` · `skipped` · `failed`) · `catch_up` · `manual` · `run_id?` · `reason` · `delivered_at?` · `actor_id?` | Unique (`schedule_id`, `due_at`), so two engine processes never fire one occurrence twice |
 
 ### Reads
 
@@ -161,7 +161,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/agents/schedules` | Does | Story |
+| Route, after `/api/v1/agents/schedules` | Does | Story |
 |---|---|---|
 | `GET /` · `POST /` | List (with the paused count and *Coming up* over seven days) · create | AG-42 |
 | `GET /{id}` · `PATCH /{id}` · `DELETE /{id}` | Read · change · delete | AG-42 |

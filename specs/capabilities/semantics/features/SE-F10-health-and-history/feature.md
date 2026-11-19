@@ -111,8 +111,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `model_type_counts` | `graph_id` · `at` · `source` (`introspect` · `load` · `link_commit`) · `source_id` (the run) · `kind` · `count` · `max_degree` · `median_degree` | A snapshot per kind each time something writes. Degree only at a read of the database and the end of a load |
-| `model_query_log` | `graph_id` · `at` · `shape_hash` · `shape_text` · `language` · `caller_kind` (`agent` · `plan` · `explorer` · `api`) · `caller_id` · `run_id` · `duration_ms` · `rows` · `ok` · `types_touched` · `properties_touched` (filtered · returned · ordered · scanned) · `touched_from` (`plan` · `results`) | One row per graph query that answered or failed. Rows older than 90 days are pruned by its writer |
+| `model_type_counts` | `database_id` · `at` · `source` (`introspect` · `load` · `link_commit`) · `source_id` (the run) · `kind` · `count` · `max_degree` · `median_degree` | A snapshot per kind each time something writes. Degree only at a read of the database and the end of a load |
+| `model_query_log` | `database_id` · `at` · `shape_hash` · `shape_text` · `language` · `caller_kind` (`agent` · `plan` · `explorer` · `api`) · `caller_id` · `run_id` · `duration_ms` · `rows` · `ok` · `types_touched` · `properties_touched` (filtered · returned · ordered · scanned) · `touched_from` (`plan` · `results`) | One row per graph query that answered or failed. Rows older than 90 days are pruned by its writer |
 
 ### Reads
 
@@ -127,7 +127,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/model` | Does | Story |
+| Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
 | `GET /models/insights?model=&window=` | Overview · usage · performance · growth · `catalog` — every number the page shows | SE-07 |
 | `GET /models/insights/shapes/{hash}` | One shape: `plan[]` · `slowest[]` · `advice[]` · `explains` | SE-07 |

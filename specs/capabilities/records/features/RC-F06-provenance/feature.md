@@ -108,7 +108,7 @@ flowchart TD
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
+| Route, after `/api/v1/records` | Does | Story |
 |---|---|---|
 | `GET /{kind}/{key}/provenance` | Per value: what wrote it (`load` · `run` · `derived` · `database`), its `grade` (`observed` · `derived` · `predicted` · `claimed`), the load or run, the person or agent, when, and `load_undone` | RC-05 |
 | `GET /{kind}/{key}/history` | History filtered to the record, newest first: when · who · run · property, before → after · why; also for an address deleted since | RC-06 |

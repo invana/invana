@@ -84,7 +84,7 @@ flowchart TD
 
 | Table | Columns | Notes |
 |---|---|---|
-| `record_checks` | `id` · `graph_id` · `model_id` · `model_version` · `run_id` · `status` (`running` · `succeeded` · `stopped` · `failed`) · `checked` · `conforming` · `problems` · `started_by` · `started_at` · `settled_at` | One row per check; counts are written when the run settles, and kept as they stood when it was stopped (`stopped` is partial) |
+| `record_checks` | `id` · `database_id` · `model_id` · `model_version` · `run_id` · `status` (`running` · `succeeded` · `stopped` · `failed`) · `checked` · `conforming` · `problems` · `started_by` · `started_at` · `settled_at` | One row per check; counts are written when the run settles, and kept as they stood when it was stopped (`stopped` is partial) |
 | `record_check_scores` | `check_id` · `kind` · `records` · `conforming` · `score` | One row per kind checked; `score` is `conforming / records`, stored by the engine |
 | `record_check_problems` | `id` · `check_id` · `kind` · `record_ref` · `property` · `rule_ref` · `problem` (`missing` · `not_allowed` · `wrong_type` · `out_of_range` · `pattern` · `relationship`) · `value` · `fixed_at?` · `fixed_run_id?` | One row per record and rule it breaks; `rule_ref` names the validation rule, or the standard `publisher/name@v` and its term |
 
@@ -101,7 +101,7 @@ flowchart TD
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
+| Route, after `/api/v1/records` | Does | Story |
 |---|---|---|
 | `POST /checks` | Start a check of a model's records against its published version | RC-02 |
 | `GET /checks/latest?model=` | The last settled check: counts by kind and by rule, scores, when, and kinds left out | RC-02 |

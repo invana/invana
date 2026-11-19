@@ -189,7 +189,7 @@ Subject nodes, work nodes and links between models are records of the project's 
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/projects` | Does | Story |
+| Route, after `/api/v1/projects` | Does | Story |
 |---|---|---|
 | `GET /{key}/sources` · `POST /{key}/sources` · `DELETE /{key}/sources/{id}` · `POST /{key}/sources/{id}/read` | Sources and their last read · add · remove · read again | PJ-28 |
 | `GET /{key}/graph` | The map: `?view=` `subject` · `work` · `both`, `?kind=`, `?q=`; nodes and links by the list contract, counts by kind, `withheld` | PJ-28 · PJ-31 |

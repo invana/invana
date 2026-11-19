@@ -159,7 +159,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/model` | Does | Story |
+| Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
 | `GET /links` · `POST /links` | The links with `edges`, no history · stage one | SE-01 · SE-03 |
 | `GET /links/{id}` | One link whole: `declared_by` · `declared_at` · `history[]` (its declare and commit events) and each end's latest counted `records` | SE-03 |

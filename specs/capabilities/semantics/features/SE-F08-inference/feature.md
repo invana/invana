@@ -110,9 +110,9 @@ record, never a row of [SE-F07](../SE-F07-rules/feature.md#engine)'s `model_rule
 
 | Table | Columns | Notes |
 |---|---|---|
-| `model_derivations` | `graph_id` · `scope` (`install` · `project`) · `project_id?` · `active` · `write_back` (bool) · `current_version_id` | Never deleted — `active` stops running it |
+| `model_derivations` | `database_id` · `scope` (`install` · `project`) · `project_id?` · `active` · `write_back` (bool) · `current_version_id` | Never deleted — `active` stops running it |
 | `model_derivation_versions` | `derivation_id` · `form` (`owl_rl` · `shacl` · `when_then`) · `statement` · `params` · `published_at` | A fact names the version that derived it |
-| `derived_facts` | `graph_id` · `fact_id` · `derivation_version_id` · `premises` · `run_id` · `written_back` · `levels` (property → level) · `created_at` · `withdrawn_at` | One row per derived fact; `premises` are record ids; `levels` holds each derived property's inherited level; a withdrawn fact keeps its row for provenance |
+| `derived_facts` | `database_id` · `fact_id` · `derivation_version_id` · `premises` · `run_id` · `written_back` · `levels` (property → level) · `created_at` · `withdrawn_at` | One row per derived fact; `premises` are record ids; `levels` holds each derived property's inherited level; a withdrawn fact keeps its row for provenance |
 
 ### Reads
 
