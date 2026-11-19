@@ -374,7 +374,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P04 | Spec the gaps | P01, P01b, P02, P03 | done | 2026-11-19 | gates green · reviews passed |
 | P05 | Density rule in the design language | P01, P01b | done | 2026-11-19 | gates green · reviews passed |
 | P06 | Density pass — one pass over every board | P05 | done | 2026-11-19 | gates green · reviews passed |
-| P07 | Fleet and workers | P06, P04 | pending |  |  |
+| P07 | Fleet and workers | P06, P04 | in progress | 2026-11-19 | drawn; not published — no Artifact tool (R577) |
 | P08 | Access (IAM) | P07 | pending |  |  |
 | P09 | Modeller — the global model (stitch) and overview | P08 | pending |  |  |
 | P10 | Projects — the map-led views and project settings | P09 | pending |  |  |
@@ -401,6 +401,7 @@ What a later phase must know that the code does not say. One row per note, newes
 | — | Ravi has not approved P01's report: it marked 334 of 352 boards `skip · landed` by state-name match, without comparing fidelity or layout. P01b's re-audit replaces its verdicts for those boards; until Ravi approves P01b, no later phase relies on a P01 `skip · landed` |
 | — | The Graph stays retired and the project takes its place: `graph.settings.*` and `settings.graph_limits` are not out of spec — their content becomes project settings (General · Data · Team · An agent in this project · Usage). Limits are never set per project (CP-11): the Usage tab only shows the project's share. The create-project *team* step is the first form of the Team tab. P04 writes the stories, P10 draws the place, P11 reuses the Team tab |
 | — | Ravi pre-approved P04, P15, P17, P18 and P19 (2026-11-19): the run does not pause for them; he reviews the results afterwards and changes go through the product-manager |
+| P07 | The 13 `fleet.*` ports all land as states of `settings.workers` (generator `.design/canvas-invana/pd2p07/workers.py`, idempotent). New: Run it · Docker and · Python (with Region), Workers over time (KPI strip, chart, worker events) and No history yet, Join keys and No join keys. Join keys left the All workers view for their own tab. The chart is the board's `bars` block (no kit chart component drawn). The CPU bar and chart stay out (Q2). Revoke's refusal reads *Needs Manage on the {group} worker group*. **Not published**: this session had no Artifact tool (R577) — publish `project/settings.workers.dc.html` and `project/canvas.json` to the canvas. P14 redraws `flow.add_workers` from these states |
 
 ## Questions for Ravi
 
