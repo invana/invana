@@ -54,6 +54,7 @@ flowchart TD
 | PJ-20.6 | A task of a kind | it is listed or opened | its kind reads as a badge beside its title, in the type's words; shared places — My tasks, Needs you, search — show the same badge |
 | PJ-20.7 | An Operator not on the team | they open *Task kinds* | the kinds read; the switches are disabled — *Join the team to change it*; a call is refused the same way |
 | PJ-20.8 | A type installed by a Team pack | a project of it is created | its kinds are offered as the built-in ones are; no kind is written in Studio |
+| PJ-20.9 | A type | its kinds are declared | a kind exists only where it asks for fields of its own; work that only needs a label — *Story*, *Bug*, *Test*, *Review*, *Audit* — is a tag ([PJ-27](../PJ-27-tag-a-task/story.md)) |
 
 ## Screens
 

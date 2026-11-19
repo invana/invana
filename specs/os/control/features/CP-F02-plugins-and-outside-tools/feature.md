@@ -4,10 +4,10 @@ title: Plugins and MCP
 product: CP
 status: idea
 personas: [admin, builder, analyst, curator]
-stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-20, CP-64]
+stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-75, CP-20, CP-64]
 journeys: [J07, J10]
 boards: [settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers]
-nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-PERF-3]
+nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-SEC-9, NFR-SEC-15, NFR-PERF-3]
 depends_on: [AC-F02, AC-F04, AC-F05, AC-F09, AC-F10, AC-F11, CP-F03, AG-F06, RC-F02]
 ---
 
@@ -32,6 +32,8 @@ flowchart TD
   pl -->|core| always(["Always on · no switch"])
   pl -->|Admin turns a plugin on| on(["On for the deployment · from the next step"])
   pl -->|without Manage on the plugin| ro["The deployment's switch reads · Ask an Admin"]
+  pl -->|Admin · MCP server| gt["CP-75 · Serve the graph and task tools: context · impact · find · query · tasks · milestones · proposals · needs_you"]
+  gt --> gc(["A client with an expiring key acts as its person or agent, under their policies"])
   pl -->|anyone · off for me| mine(["CP-63 · Off only for the runs I start"])
   pl --> nd["CP-44 · What it needs · which agents may use it"]
   nd -->|a need no policy allows · no connection| miss(["Missing · names the rule, mode or connection · AC-13"])
@@ -99,6 +101,7 @@ sequenceDiagram
 | CP-43 | [Connect my own account to an outside server](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md) | idea |
 | CP-63 | [Connect my own accounts for my own runs](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md) | idea |
 | CP-03 | [Let Claude Code and other clients use the deployment](stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md) | idea |
+| CP-75 | [Let a client read the graph and work the tasks](stories/CP-75-let-a-client-read-the-graph-and-work-the-tasks/story.md) | idea |
 | CP-20 | [Install a Team pack](stories/CP-20-install-a-team-pack/story.md) | idea |
 | CP-64 | [Install an agent runtime](stories/CP-64-install-an-agent-runtime/story.md) | idea |
 
@@ -374,6 +377,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The MCP server — a call | The credential is checked on every call as AC-F10 or AC-F11 says; `tools/list` returns what is served, granted to the person and within reach of the person's default agent; `tools/call` opens a run for the person whose chain is the default agent, then the agent the tool runs as — `ask_<agent>` that agent, *Check records* and *Load records* the Loader — so `decide()` runs for both and the strictest wins ([AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md#engine)); run inline in the request and admitted like any run (CP-F04). The run records `triggered_by = mcp` and `params.mcp` `{tool, credential_kind, credential_id, client, result}`; `client` is the connected client's name or the key's name, never a name the caller sends |
 | The MCP server — what returns | The result is passed to `outbound.check(result, target = mcp_client)` before it is sent: confidential and personal values are left out and named in the result's `withheld` ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
 | Served tools | `check_records` (*Check records*) — `database`, `kind`, `records` → `valid` · `rejected[{record, key, reason}]` · `warnings[]`, writing nothing · `load_records` (*Load records*) — `database`, `kind`, `records`, `source?` → the load's `load_id` · `content_hash` · `landed` · `rejected` ([RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md#engine)) · `ask_<agent>` — `question` → the answer's text, `run`, `outcome`, `summary`; the name is `ask_` and the agent's snake-case name, at most 64 characters, two of one name told apart by the id's first six characters |
+| Graph and task tools | The server also serves `context` · `impact` · `find` · `query` (read only) · `tasks.list` · `tasks.create` · `tasks.update` · `tasks.comment` · `tasks.tag` · `milestones.read` · `proposals.create` · `needs_you.ask`, each switched by an Admin. Every call acts as a person or agent under the strictest of their policies; a key used with them expires; a bundle never passes its token budget, never holds a node the caller may not read and fences outside text as data; `query` takes an agent's raw-query path, with caps ([CP-75](stories/CP-75-let-a-client-read-the-graph-and-work-the-tasks/story.md)). No tool deletes |
 | A caller reads its run | Every call returns its run id; the caller reads it with the same credential at `GET /api/v1/control/runs/{id}` |
 | Recent calls and calls today | Read from the runs the server opened: each carries the one-line `result` stored when it settled; *calls today* counts `triggered_by = mcp` runs since 00:00 UTC |
 | How to connect | Built from the deployment's public address: `claude mcp add --transport http invana https://<deployment>/mcp` — the client signs in through AC-F11; for a script, the same with `--header "Authorization: Bearer $INVANA_KEY"` |
@@ -425,6 +429,7 @@ The code changes are [migrations.md](../../../../migrations.md) M15 (work and pe
 | Question | Who answers |
 |---|---|
 | May an Admin remove an outside server? Recommend: no — turning it off stops every call, and removing would orphan the versions old runs recorded | Ravi |
+| Security's medium row R554 is scheduled with CP-75 and is should-fix before it is `built`: a connection or key reaching these tools expires or idles out (365 days or 30 idle days) and a never key is refused for them; revoking a key, deactivating its owner or removing a project member ends the next call, one in flight included; narrowing and policies are read on every call; `needs_you.ask` and `proposals.create` show the caller's name and key from the engine, a plain-text body of at most 500 characters, never an act, and are limited per key. The coder adds a task for it at the story's `designed` gate | Coder, at build |
 
 ## Not building
 

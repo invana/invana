@@ -136,6 +136,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | What it may touch is its Access Policies | Every Read · Write · Run comes from a rule on an Access Policy an Admin attaches to it ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)); the agent holds no rule, list of functions or mode of its own. Default deny: an agent with no policy attached may touch nothing |
 | Checked before it runs | A step whose function, workflow or data no rule allows is refused before anything is dispatched — nothing is spent ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
 | What binds a run | The agent's Access Policies ∩ every caller's on a delegated run; its limits ∩ the deployment's, and for a personal run the person's and their teams' ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#rules)). A refusal names the bound and whose it was |
+| A confidence bar is the agent's | A whole number on the agent's effort, none by default; each step of a run reports a confidence, and a step below the bar holds the run as a card in Needs you ([CP-76](../../../../os/control/features/CP-F08-the-inbox/stories/CP-76-see-why-an-agent-is-waiting-for-me/story.md)); no bar, no hold |
 | Limits live in one place | Tokens a run and a month, runs at once, helpers and depth are the agent's limits in [CP-F04](../../../../os/control/features/CP-F04-limits/feature.md), set by an Admin; the page reads them. Effort — steps, replans, questions — is the agent's own |
 | Tighten, never loosen | An agent may propose a tighter Access Policy or a lower limit; widening either is a person's act ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) |
 | The platform owns the work | A built-in or shared agent is owned by the platform and keeps who made it; what an agent makes in a run is the platform's, made by the person behind the run through the agent ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#rules)). Making an agent grants nothing over it |
@@ -194,7 +195,7 @@ A shared agent is the platform's and a personal agent is its person's; making or
 | JSON column | Keys |
 |---|---|
 | `soul_traits` | `humour` (`off` · `light` · `playful`, default `light`) · `formality` (`casual` · `neutral` · `formal`, default `neutral`) · `emoji` (`off` · `on`, default `off`) · `greeting` (`off` · `on`, default `off`) |
-| `effort` | `max_steps` (24) · `max_replans` (1) · `max_clarifications` (3) |
+| `effort` | `max_steps` (24) · `max_replans` (1) · `max_clarifications` (3) · `confidence_bar?` (1–100; none by default, so the agent never holds for confidence) |
 | `triggers` | `can_be_assigned` · `unattended` · `mcp_callable` |
 | `model_pin` | An exact address `llm/<endpoint>/<model version>` |
 

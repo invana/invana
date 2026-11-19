@@ -4,9 +4,9 @@ title: Projects and tasks
 product: PJ
 status: idea
 personas: [decision-maker, analyst, researcher, investigator, builder]
-stories: [PJ-01, PJ-02, PJ-12, PJ-15, PJ-18, PJ-20, PJ-21, PJ-22, PJ-23, PJ-24, PJ-25]
+stories: [PJ-01, PJ-02, PJ-12, PJ-15, PJ-18, PJ-20, PJ-21, PJ-22, PJ-23, PJ-24, PJ-25, PJ-26, PJ-27]
 journeys: [J03, J11]
-boards: [projects.projects, projects.tasks, projects.reviews, inbox]
+boards: [projects.projects, projects.tasks, projects.reviews, projects.graph, inbox]
 nfrs: [NFR-PERF-3]
 depends_on: [AG-F01, AG-F06, CP-F10, AG-F07, AC-F02, AC-F03, AC-F04, AC-F07, CP-F08, GP-F02]
 ---
@@ -56,6 +56,10 @@ flowchart TD
   pick -->|Allow| claim["PJ-15 · Claimed for 30 minutes · acts for who set Allow"]
   claim -->|lease lapses| open
   page --> ord["PJ-18 · Order: groups and tasks in waves"]
+  ord --> mst["PJ-26 · A group with a goal, a done-when and a person's accept: a milestone, made from a selection on the map (PJ-29)"]
+  mst -->|every covered task done and checked| mac["PJ-26 · Ready to accept · Needs you"]
+  mac -->|a person accepts| mdn(["Milestone done"])
+  newt --> tg["PJ-27 · Tag it: story · bug · test · review · audit · research · duplicate · waiting-deletion"]
   ord --> dep["PJ-18 · A dependency: on success · on failure · any outcome · a group on a group, in any project"]
   dep -->|makes a loop| loop["Refused, naming the loop"]
   dep --> wait["PJ-18 · A task waits, or reads why it will not run, or never triggered"]
@@ -126,6 +130,8 @@ sequenceDiagram
 | PJ-23 | [Relate a project to another or start one from it](stories/PJ-23-relate-a-project-to-another-or-start-one-from-it/story.md) | idea |
 | PJ-24 | [Ask another project for help](stories/PJ-24-ask-another-project-for-help/story.md) | idea |
 | PJ-25 | [Gate a task on its checks](stories/PJ-25-gate-a-task-on-its-checks/story.md) | idea |
+| PJ-26 | [Make a milestone from a selection](stories/PJ-26-make-a-milestone-from-a-selection/story.md) | idea |
+| PJ-27 | [Tag a task](stories/PJ-27-tag-a-task/story.md) | idea |
 
 ## Access
 
@@ -168,6 +174,9 @@ grant it.
 | Flat projects | A project holds tasks, groups and branches; it has no sub-projects |
 | A task is one piece of work | It has a kind, the kind's fields, a title, a body, a project or none, a group or none, an assignee, a due date, checks and an outcome. Its body says what done means |
 | Task kinds | A type declares its kinds — each with its fields and default checks; every project has *Task* and *Recommendation*. Its people turn the type's other kinds on or off for the project; a kind in use is never turned off. New task asks the kind first, and its fields follow (PJ-20) |
+| Tags | A task carries any number of tags: story · bug · test · review · audit · research · duplicate · waiting-deletion, a type's own defaults, or the project's own. A kind remains only where it asks for fields of its own — *Task* and *Recommendation*; what only labelled the work is a tag. A tag maps to a label on a connected tracker ([CP-F12](../../../../os/control/features/CP-F12-issue-trackers/feature.md)) (PJ-27) |
+| Milestones | A milestone is a group extended: a goal, a *done when*, optional start and end dates (order alone is enough), what it **covers** — any subject node, picked by lassoing nodes on the map — what it waits on, and a person's accept at its end. Its progress is stored by the engine from the tasks about or changing what it covers. It is neither a parent task nor a project of its own (PJ-26) |
+| A task's links | A task is `about` any node, `changes` a node and is `linked to` an outside issue ([CP-F12](../../../../os/control/features/CP-F12-issue-trackers/feature.md)); a milestone `covers` nodes and `waits on` a milestone. The links are projected into the project's graph ([PJ-F07](../PJ-F07-the-project-graph/feature.md)) |
 | A Recommendation is a task kind | A recommendation — from a person, an agent's run or another feature — lands as a proposal for the project assistant; a person on the team who accepts it makes a task of kind *Recommendation*, worked like any task (PJ-21) |
 | The team | People, teams and agents on the project. Every person on it — directly or through a team — may do everything inside the project; there are no project roles for people. Being on the team fills the assignee picker and lets an agent pick up the project's tasks; it grants nothing over data, memory or tools. At least one active person; a project left with none alerts the Admins (PJ-22) |
 | The Lead agent | At most one agent on the team is tagged **Lead agent** — the project assistant. It coordinates the project's agents: ideates in the project's thread, plans the work, splits a task into sub-tasks within its own run and assigns open tasks to the team's other agents. Every decision a person must give — a new task, group, check or relation, a plan, a goal, a change to the team or the policy, accepting or sending back a result — reaches the project's people as a proposal. It never accepts its own proposal (PJ-21 · PJ-22) |
@@ -180,7 +189,7 @@ grant it.
 | Relations | *Started from* — a project made from another project, task or finding · *Waits on* — a group of this project waits on a group of the other · *Related* — two projects that share context. A run's scope reaches the projects related to its own by any of the three ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) (PJ-23) |
 | Asks across projects | A person or a run in one project asks another for help; the ask lands as a proposal for the other project's assistant, carrying its sources' lineage ([GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#rules)). Accepted, it is a task in the other project and the two projects become *Related*; the asking task lists it under *Asked of other projects* with its state, and its result is posted to the asking task's thread (PJ-24) |
 | Checks gate a task | A check names a workflow ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)). When a result is posted, the engine runs each check in a run of its own through the project assistant, never in the run that did the work; the task reads *Checking*, then *In review* when every check passed, or *Checks failed*, naming each. *Accept* is off until every check passed; a failed check is never re-run on its own — a person on the team sends the task back. What an agent says about its own work is never a check's result (PJ-25) |
-| Groups | A group is a named set of a project's tasks done in order. A group waits on another group — of this project or of another — on success: when every task in it is done. A task in a group whose group waits reads *Blocked*, naming the group (PJ-18) |
+| Groups | A group is a named set of a project's tasks done in order. A group waits on another group — of this project or of another — on success: when every task in it is done. A task in a group whose group waits reads *Blocked*, naming the group (PJ-18). A group with a goal, a done-when and a person's accept is a **milestone** (PJ-26) |
 | The Order is not a plan | Tasks, groups and their dependencies are work people accept; a plan and a workflow are an agent's ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)). A task's run has a plan; a project's Order is never one |
 | Sub-tasks | A task may have sub-tasks, to any depth for people. An agent may make sub-tasks for its own parts, bounded by its run's limits ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) — depth, count and tokens. Cancelling a task cancels every sub-task at every level. A parent reads *Blocked* while any sub-task is open. The engine counts each level and a rolled-up total |
 | Dependencies are between siblings | A task dependency joins two tasks that share a parent (or two top-level tasks of one project); one across levels or projects is refused, naming both — work across projects waits through groups |
@@ -237,7 +246,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `projects_team` | `project_id` · `principal_kind` (`user` · `team` · `agent`) · `principal_id` · `lead_agent` (bool, an agent row only) · `added_by_id` · `added_at` | Unique (`project_id`, `principal_kind`, `principal_id`). The creator is written first. At least one row that is a user or a team with an active person; at most one `lead_agent` row — the project assistant |
 | `projects_task_kinds` | `project_id` · `kind` · `enabled` | A kind its type declares; *task* and *recommendation* always enabled. No row is enabled |
 | `projects_relations` | `project_id` · `other_project_id` · `kind` (`started_from` · `waits_on` · `related`) · `from_kind?` (`task` · `finding`) · `from_id?` · `created_by_id` · `created_at` | Unique (`project_id`, `other_project_id`, `kind`). `waits_on` is written and removed with the cross-project group dependencies that carry it |
-| `projects_groups` | `project_id` · `name` · `created_by_id` | Unique (`project_id`, `name`) |
+| `projects_groups` | `project_id` · `name` · `goal?` · `done_when?` · `starts_on?` · `ends_on?` · `state` (`open` · `ready` · `done`) · `accepted_by_id?` · `accepted_at?` · `tasks_done` · `tasks_total` · `created_by_id` | Unique (`project_id`, `name`). A group with a `goal` is a milestone; the two counts are written when a task settles |
+| `projects_group_covers` | `group_id` · `database_id` · `node_key` · `kind` | What a milestone covers — a node of the project's graph database ([PJ-F07](../PJ-F07-the-project-graph/feature.md#engine)) |
+| `projects_task_nodes` | `task_id` · `database_id` · `node_key` · `link` (`about` · `changes`) | Unique (`task_id`, `database_id`, `node_key`, `link`) |
+| `projects_task_tags` | `task_id` · `tag` (1–32, no space) · `added_by_kind` (`user` · `run`) · `added_by_id` · `note?` | Unique (`task_id`, `tag`) |
 | `projects_group_dependencies` | `group_id` · `depends_on_group_id` (any project) · `created_by_id` | On success only: the group's tasks all done |
 | `projects_tasks` | `project_id?` · `parent_id?` (*part of*) · `group_id?` · `branch_id?` · `kind` · `fields` (JSON, checked against the kind's fields) · `title` · `body` (the intent an agent plans from, and what done means) · `assignee_kind?` (`user` · `agent`) · `assignee_id?` · `created_by_kind` (`user` · `run` · `rule` · `proposal`) · `created_by_id` · `due_at?` · `result?` · `closed_at?` · `outcome?` (`done` · `failed` · `cancelled`) | No `status` column — the state is derived (Mechanisms). A null `project_id` is the *No project* bucket |
 | `projects_task_dependencies` | `task_id` · `depends_on_id` · `on` (`success` · `failure` · `any_outcome`) · `created_by_id` | *After* — distinct from `parent_id` |
@@ -288,6 +300,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /{key}/pickup` · `PUT /{key}/pickup` | The project's mode and each team agent's · set one; `allow` carries `confirmed` | PJ-15 |
 | `GET /{key}/pickup/preview` | Which team agents would start which open tasks now, and the project's *Tokens a month* — used and left — they would run within ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#engine)) | PJ-15 |
 | `GET /{key}/order` | The derived order, groups included | PJ-18 |
+| `POST /{key}/milestones` · `PATCH /groups/{id}` · `POST /groups/{id}/accept` · `POST /groups/{id}/reject` | Make a milestone from `covers[]`, `goal`, `done_when`, dates · edit it · accept it · send it back with a note | PJ-26 |
+| `PUT /tasks/{id}/tags/{tag}` · `DELETE /tasks/{id}/tags/{tag}` · `GET /tasks?tag=` | Add a tag, with an optional note · remove it · filter by it | PJ-27 |
 | `GET /{key}/summary` | The project's counts | PJ-01 · PJ-03 |
 | `GET /types` | Every project type — built in, and each a Team pack installs — with its fields, task kinds (each with fields and default checks), labels, default rules, suggested agents and skills, and report template | PJ-02 · PJ-20 |
 | `GET /tasks` · `POST /tasks` | List tasks (`?project=`; none open is every task the reader may read, the reader's first) · create one | PJ-12 |
@@ -312,6 +326,8 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | `projects.access.save` · `projects.access.asked` | A project's policy saved, attached or taken off, from and to · a widening asked for, and its answer |
 | `projects.kinds.set` | A task kind turned on or off |
 | `projects.relations.add` · `projects.relations.remove` | A relation made · removed |
+| `projects.milestones.create` · `projects.milestones.accepted` · `projects.milestones.rejected` | A milestone made · accepted · sent back |
+| `projects.tags.add` · `projects.tags.remove` | A tag added · removed, with who and the note |
 | `projects.groups.create` · `projects.groups.dependencies.add` · `projects.groups.dependencies.remove` | A group made · a group's wait drawn · removed |
 | `projects.recommendations.raised` · `projects.asks.raised` | A recommendation · an ask from another project, each a proposal |
 | `projects.pickup.set` | A project's or an agent's mode changes — from and to, who set it |
@@ -346,6 +362,10 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | 422 | An edit that names the key | *A project's key is fixed once saved.* | PJ-02.18 |
 | 409 | Any write to an archived project or its tasks | *{project} is archived — unarchive it first.* | PJ-01.9 · PJ-12.19 · PJ-18.15 |
 | 409 | Accept or send back a task not in review or checks failed; start, cancel or post a result on a closed task | *{task} is {state} — {act} needs it {wanted}.* | API only — Studio offers each act only in its state |
+| 422 | A milestone with no name, goal or done-when, or an end before its start | *{field}: {why}.* | PJ-26.3 |
+| 403 | A milestone that covers a node the caller may not read | *Withheld — join the team or ask {who can grant}.* | PJ-26.5 |
+| 422 | A tag that is empty, over 32 characters or has a space | *{tag}: {why}.* | PJ-27.3 |
+| 403 | Accepting a milestone by an agent, or by a person not on the team | *Join the team to change it.* | PJ-26.8 · PJ-26.11 |
 | 422 | A dependency or a group's wait that makes a loop | *That makes a loop: {a} → {b} → {a}.* | PJ-18.4 · PJ-18.19 |
 | 422 | A task dependency between tasks that do not share a parent | *{a} and {b} do not share a parent — a dependency joins tasks with the same parent.* | PJ-18.12 |
 | 422 | Relating a project to itself, or one already related that way | *{project} is already {relation}.* | PJ-23.6 |
@@ -384,6 +404,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | Recommendations and asks | `POST /{key}/recommendations` and `POST /{key}/asks` — and the agent function `projects.asks.create`, from inside a run — write a proposal of kind `recommendation` · `ask` with its sources' lineage ([GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#engine)), and open a run of the assistant to triage it — it proposes a task, or proposes declining with a reason. A person on the team accepting it writes a task of kind *Recommendation*, or for an ask a task in this project, a `projects_task_asks` row and a `related` relation |
 | An answered ask | When the task an ask made closes, its result is posted to the asking task's thread, through `lineage.may_see` for each reader |
 | Checks | On `result_posted`, for each `projects_task_checks` row the engine opens a run of the project's assistant running the check's workflow, `role = evaluate`, linked to the task; the run writes one `projects_check_results` row. A task with no assistant runs its checks through the built-in Assistant. A send-back and a new result start every check again; a failed check is never re-run on its own |
+| Milestone progress | When a task about or changing a covered node settles, the engine writes the milestone's `tasks_done` and `tasks_total`; when every one is `done` with every check passed, `state` is `ready` and the milestone waits in the Needs you of the project's people. Only a person's `accept` sets `done`; a send-back with a note sets `open` |
 | Groups | A group's tasks are those with its `group_id`. A group is met when every task in it is closed `done`. A task in a group with an unmet `projects_group_dependencies` row reads `blocked`, naming the group. A cross-project wait writes a `waits_on` relation; removing the last one removes it |
 | `projects.tasks.create` | The agent function that raises a task from inside a run, `created_by_kind = run`: in the run's project, a sub-task of the run's own task, or else a `task` proposal for the project's people; outside a project, a task with no project. Handing work to another agent is the same function |
 | `projects.tasks.assign` | The agent function by which the project assistant assigns an open task to another agent on the team; refused for any other caller or assignee |
@@ -401,7 +422,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | Fourteen tables in Invana's own store; no new store | — |
+| § 6 Data and storage | Seventeen tables in Invana's own store; no new store | — |
 | § 8 APIs and events | The routes and events above, under `projects` | NFR-PERF-3 |
 | § 10 AI and agents | Agent functions `projects.tasks.create`, `projects.tasks.claim`, `projects.proposals.create` and `projects.asks.create`; the project assistant runs on the project's thread and triages recommendations and asks; checks run each in an evaluator run of their own; every run in a project reaches the project's policies ∩ the agent's ceiling, the person recorded; the Lead agent coordinates and only proposes; only a person closes a task | — |
 | § 12 Qualities | Privacy: a project's content reads to its team and to Read on Projects; copies inside it through lineage; a task's run content follows run privacy | — |

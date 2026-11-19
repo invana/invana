@@ -6,7 +6,7 @@
 > approve the spec, approve the boards, merge the pull request and accept the result. The decision it helps make:
 > *is this change specified, drawn, built and proven well enough for a person to accept it?*
 
-It is a Team pack like any other ([CP-F02](../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)):
+It runs the one flow of [the project graph](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#rules), beside [the Market research pack](market-research.md); a deployment may install both and link their models. It is a Team pack like any other ([CP-F02](../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)):
 a Claude plugin with Invana's fields under `metadata`, installed and turned on by an Admin
 ([CP-20](../os/control/features/CP-F02-plugins-and-outside-tools/stories/CP-20-install-a-team-pack/story.md)). Installing
 it widens nobody's reach: its agents are granted to nobody and its policy files decide nothing until an Admin grants
@@ -20,7 +20,7 @@ software-delivery/
 ├── agents/                         product-manager.md · designer.md · coder.md · qa.md · security.md
 ├── skills/                         one Agent Skills folder each — the skills below
 ├── policies/                       product-manager.yaml · designer.yaml · coder.yaml · qa.yaml · security.yaml
-└── project_types/software/         fields · task kinds · default checks · labels · suggested agents and skills · report template
+└── project_types/software/         subject model · sources · default tags · default checks · labels · suggested agents and skills · report template
 ```
 
 | Piece | Offered in | Owned by |
@@ -28,7 +28,7 @@ software-delivery/
 | Five agents | The agents catalogue, as *Team pack* agents | [AG-F02](../capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md#rules) |
 | Their skills | Skills, `origin = builtin` with the pack named | [AG-F04](../capabilities/agents/features/AG-F04-skills/feature.md#rules) |
 | Five Access Policy files | Access Policies, as drafts *Waiting for an Admin to apply* | [AC-F02](../os/access/features/AC-F02-access-policies/feature.md#rules) |
-| The `software` project type | *New project* | [PJ-F01](../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules) |
+| The `software` project type | *New project* | [PJ-F07](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#rules) |
 
 ## How work moves
 
@@ -62,7 +62,7 @@ new piece of work.
 |---|---|---|---|---|
 | `product-manager` · **Product manager** | Turns ideas, bugs and recommendations into stories — who can, flow, criteria, screens — and the system design; proposes tasks and their order; takes up recommendations | Invana | `product-spec` · `system-design` · `recommend` | The project assistant ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)): every proposal is a member's to accept |
 | `designer` · **Designer** | Draws exactly the boards a story names, every state and access level, from the team's design kit | Invana | `design-story` · `recommend` | Picks up the tasks of the *Design* group |
-| `coder` · **Coder** | Builds the story — code, every test and a changeset — in the task's workspace, and opens a pull request | Claude Code or Codex ([AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md)), set by a Modeller | `build-feature` · `build-ui` · `recommend` | Picks up the tasks of the *Build* group and *Bug* tasks |
+| `coder` · **Coder** | Builds the story — code, every test and a changeset — in the task's workspace, and opens a pull request | Claude Code or Codex ([AG-61](../capabilities/agents/features/AG-F01-build-an-agent/stories/AG-61-choose-what-an-agent-runs-with/story.md)), set by a Modeller | `build-feature` · `build-ui` · `recommend` | Picks up the tasks of the *Build* milestone and tasks tagged *bug* |
 | `qa` · **QA** | Runs the tests and reviews the code against the criteria; compares what was built against its boards; writes PASS or FAIL | Invana | `code-review` · `design-qa` · `recommend` | Its reviews are checks on a task ([PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
 | `security` · **Security** | Threat-models a story that touches access, data, agents or an outside system; audits a change before it is accepted | Invana | `security-audit` · `recommend` | Its audit is a check on a task |
 
@@ -91,14 +91,17 @@ new piece of work.
 
 ## The project type
 
-`software` — the words inside a project of this type: **Project** · **Story**.
+`software` — the words inside a project of this type: **Project** · **Story**; a milestone is a **Milestone**.
 
 | Part | Holds |
 |---|---|
+| Subject model | **Feature** · **Requirement** · **Story** · **Module** · **Persona** · **Journey** · **Decision**, parsed from the repository's `specs/` folder and its code ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)); the spec files stay the source of truth, a canvas edit is a draft, and approving it writes the story file |
 | Fields | `repository` — the code host's address · `default_branch` · `product_owner` — the person on the team who accepts specs and boards |
-| Task kinds | **Story** — a person's need with its criteria · **Bug** — a fault against criteria that exist · **Task** — one piece of work · **Recommendation** — every project has it ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
-| Groups | *Spec* → *Design* → *Build* → *Verify*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md)) |
-| Default checks | Story: the spec check, then a person on the team · a Bug, and a Task of the *Build* group: the tests, QA's code review, and QA's design review when a screen changed · a story touching access, data, agents or an outside system: security's audit |
+| Sources | The repository's spec folder and code (Local files, read only); the issue tracker the team keeps its work in ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md)) |
+| Default tags | story · bug · test · review · audit · duplicate · waiting-deletion — each a label on a connected tracker ([PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) |
+| Task kinds | **Task** · **Recommendation** — every project has them ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
+| Milestones | *Spec* → *Design* → *Build* → *Verify*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
+| Default checks | A task tagged *story*: the spec check, then a person on the team · a task tagged *bug*, and a Task of the *Build* milestone: the tests, QA's code review, and QA's design review when a screen changed · a story touching access, data, agents or an outside system: security's audit |
 | Reviewers | At least one person; the product owner by default ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
 | Suggested agents and skills | The five agents above, the product manager as the project assistant |
 | Pick-up | Ask by default for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
@@ -141,9 +144,12 @@ an Admin edits the paths to the repository's own before applying them. Anything 
 | The catalogue and grants | [AG-F02](../capabilities/agents/features/AG-F02-the-agents-catalogue/feature.md) · [AC-F03](../os/access/features/AC-F03-directory/feature.md) |
 | Access Policies, `fs/` · `cmd/` · `net/` and the sandbox | [AC-F02](../os/access/features/AC-F02-access-policies/feature.md) · [CP-F03](../os/control/features/CP-F03-workers-and-the-queue/feature.md) |
 | Runtimes and continuation | [AG-F01](../capabilities/agents/features/AG-F01-build-an-agent/feature.md) · [AG-F05](../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md) · [CP-F10](../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
-| Projects, task kinds, the assistant, reviewers and checks | [PJ-F01](../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) |
+| Projects, tags, milestones, the assistant, reviewers and checks | [PJ-F01](../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md) |
+| The subject model, the map and asking it | [PJ-F07](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md) |
+| The issue tracker | [CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md) |
 | Asks and the outbound check | [AC-F05](../os/access/features/AC-F05-asks-and-approvals/feature.md) · [AC-F09](../os/access/features/AC-F09-what-left-the-platform/feature.md) |
 | Alerts when work stops | [CP-F11](../os/control/features/CP-F11-ops-alerting/feature.md) |
+| An agent waiting for a person | [CP-76](../os/control/features/CP-F08-the-inbox/stories/CP-76-see-why-an-agent-is-waiting-for-me/story.md) |
 
 ## Not building
 

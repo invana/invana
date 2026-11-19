@@ -4,11 +4,11 @@ title: The Inbox — what needs me, and notifications
 product: CP
 status: idea
 personas: [admin, builder, analyst, decision-maker]
-stories: [CP-36, CP-37, CP-45, CP-46, CP-69]
+stories: [CP-36, CP-37, CP-45, CP-46, CP-69, CP-76]
 journeys: [J03, J04, J06, J08]
 boards: [inbox.dropdown, inbox, settings.notifications, access.signin, settings.me]
 nfrs: [NFR-SEC-2, NFR-PERF-3, NFR-PERF-7, NFR-UX-2]
-depends_on: [AC-F05, CP-F11, PJ-F01, PJ-F03, PJ-F06]
+depends_on: [AC-F05, AG-F01, CP-F11, PJ-F01, PJ-F03, PJ-F06]
 ---
 
 # The Inbox — what needs me, and notifications
@@ -43,6 +43,7 @@ flowchart TD
   inbox -->|nothing waits| calm(["Nothing needs you"])
   inbox --> ask(["AC-15 · Decide the ask"])
   inbox --> upd["CP-36 · An update opens what it is about · marked read"]
+  inbox -->|an agent is waiting| aw["CP-76 · Outside policy · below its bar · an outside act · a check failed twice · 90% of a budget · waiting-deletion · the run holds"]
   inbox -->|project work| pj(["PJ-12 · PJ-15 · PJ-05 · PJ-19 · tasks in review, tasks to start, proposals, new leads"])
   set([Settings › Notifications]) --> r5["CP-37 · Rules"]
   r5 -->|a rule for others, a team or a place · without Edit on setting/deployment| r5ro["Only rules that reach me · the rest disabled, naming the Admins"]
@@ -60,6 +61,7 @@ flowchart TD
 | CP-45 | [Set up where asks and alerts can go](stories/CP-45-set-up-where-asks-and-alerts-can-go/story.md) | idea |
 | CP-46 | [Choose where my asks and alerts reach me](stories/CP-46-choose-where-my-asks-and-alerts-reach-me/story.md) | idea |
 | CP-69 | [Decide what needs me from the header](stories/CP-69-decide-what-needs-me-from-the-header/story.md) | idea |
+| CP-76 | [See why an agent is waiting for me](stories/CP-76-see-why-an-agent-is-waiting-for-me/story.md) | idea |
 
 ## Access
 
@@ -104,6 +106,7 @@ The permission each act needs is in [AC-F02 › The permission catalogue](../../
 | Low-risk acts in place, writes confirm | *Acknowledge*, *Send back* and *Allow tokens* answer on the card; an *Accept* that writes Graph Data or the model opens a confirm modal listing what changes |
 | One counts source | Every count Studio shows — the badge, *n running*, the footer, the dropdowns, the browser title *(n) Invana* — is one engine read and one live stream; Studio never counts ([design-language › Counts](../../../../design-language.md#counts)) |
 | Questions lead Needs you | A question asked back of the person sits first: it holds a run until it is answered. Then every other ask and each open ops alert, oldest first |
+| An agent waits, never acts on silence | An agent stops and asks when it would act outside its policy, falls below the confidence bar set on it, makes an outside act (a push, a pull request, more than 5 issues at once), has a check fail twice, reaches 90% of a token budget, or something is tagged *waiting-deletion*. Each is one card in Needs you with what it wants and why; the run holds, and at a deadline the act is not done and the task says why ([CP-76](stories/CP-76-see-why-an-agent-is-waiting-for-me/story.md)) |
 | Only asks toast | A new ask or question for the reader shows a toast with *Review*; updates never toast |
 | Rules read what happened | A rule matches events after they are written, never slowing or failing a write. A rule never matches its own notifications, deliveries or reminders, so it cannot feed itself |
 | In the Inbox, and out | *In app* is not a channel: every ask, rule and schedule writes to the Inbox. Channels — email · Slack · Microsoft Teams · webhook — are what leaves Invana, set up by an Admin |
@@ -261,7 +264,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Question | Who answers |
 |---|---|
-| — | — |
+| Security's medium rows R549 and R553 follow with CP-76 and are should-fix before it is `built`: CP-76.3 follows the per-link write caps once CP-73 holds them; more than 5 *waiting-deletion* tags in one run or one label sync are one grouped card, and a card shows the tagger and their note as plain text. The coder adds a task for each at the story's `designed` gate | Coder, at build |
 
 ## Not building
 

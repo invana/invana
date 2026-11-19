@@ -72,6 +72,7 @@ flowchart TD
 | AG-29.23 | A step that calls a model | the run opens | the version is the person's pick for that one question, else the skill version's pin, else the agent's pin, else the deployment's default; one that is not offered refuses the run, naming it — nothing falls back |
 | AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's evals run first, as AG-29.9; someone without Edit on agent/{agent} is refused, naming it |
 | AG-29.25 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every act is disabled — *Needs Edit on the {agent} agent — ask {who can grant}* |
+| AG-29.26 | Effort | it opens | a *Confidence bar* sits beside steps, replans and questions — a whole number from 1 to 100, empty by default; the run reports a confidence for each step, and a step ending below the bar holds the run in Needs you ([CP-76.2](../../../../../../os/control/features/CP-F08-the-inbox/stories/CP-76-see-why-an-agent-is-waiting-for-me/story.md)); with no bar set the agent never holds for confidence |
 
 ## Screens
 

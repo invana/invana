@@ -40,9 +40,10 @@ result was accepted, whether its checks ran, or pick the work up when the person
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| PJ-F01 | [Projects and tasks](features/PJ-F01-projects-and-tasks/feature.md) | PJ-01 · PJ-02 · PJ-12 · PJ-15 · PJ-18 · PJ-20 · PJ-21 · PJ-22 · PJ-23 · PJ-24 · PJ-25 | idea |
+| PJ-F01 | [Projects and tasks](features/PJ-F01-projects-and-tasks/feature.md) | PJ-01 · PJ-02 · PJ-12 · PJ-15 · PJ-18 · PJ-20 · PJ-21 · PJ-22 · PJ-23 · PJ-24 · PJ-25 · PJ-26 · PJ-27 | idea |
 | PJ-F03 | [Branches, findings and decisions](features/PJ-F03-branches-findings-and-decisions/feature.md) | PJ-03 · PJ-04 · PJ-05 · PJ-06 · PJ-07 · PJ-08 · PJ-10 · PJ-11 · PJ-13 | idea |
 | PJ-F05 | [Project reports](features/PJ-F05-project-reports/feature.md) | PJ-14 | idea |
+| PJ-F07 | [The project graph](features/PJ-F07-the-project-graph/feature.md) | PJ-28 · PJ-29 · PJ-30 · PJ-31 | idea |
 | PJ-F06 | [Alerts](features/PJ-F06-alerts/feature.md) | PJ-19 | idea |
 
 ## Surfaces
@@ -59,6 +60,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | A finding | peek | `projects.branches · Finding` |
 | A report | modal | `projects.report` |
 | A project's alerts | mode | `projects.alerts` |
+| The project graph — sources, the map, ask, sketch | mode | `projects.graph` |
 | A project as a map | mode | `graph.memory · Project map` ([GP-08](../../os/graph/features/GP-F02-memory/stories/GP-08-see-a-project-as-a-map-and-what-is-moving-on-it/story.md)) |
 
 ## Decisions
@@ -67,7 +69,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 |---|---|
 | Experimental | Projects is shown and labelled *Experimental*, not launched, until workers, agents, Explore and Model are strong; nothing is hidden behind a setting |
 | Any kind of work | A project is any work a team of people and agents runs — a question to decide, a case, a document, a fix. Its type decides its fields, its task kinds and its words (PJ-F01) |
-| Of one type | Its type — Research · Investigation · Policy · General, or one a Team pack adds — declares the fields *New project* asks for, the task kinds it offers, and relabels Project, Task, Branch, Finding and Decision inside the project only; it carries default rules, suggested agents and skills, default checks and a report template. The engine, the API and every shared place say the generic words; changing the type later only relabels |
+| Of one type | A project's type is a manifest — a **subject model** (what the work is about: its node kinds and links), the sources it reads, suggested agents and skills, default tags, default checks and its words. Two ship — **Software** (Feature · Requirement · Story · Module · Persona · Journey · Decision) and **Research** (Competitor · Offering · Capability · Price · Segment · Claim · Source) — and **General** has no subject model. A type relabels Project, Task, Branch, Finding and Decision inside the project only; the engine, the API and every shared place say the generic words, and changing the type later only relabels. Every type runs the same flow ([PJ-F07](features/PJ-F07-the-project-graph/feature.md#rules)) |
 | Flat projects | A project has no sub-projects; branches live inside it and are never sub-projects. Tasks nest: sub-tasks to any depth for people, bounded by the run's limits for agents (PJ-F01) |
 | A project is a repository | Tasks are issues: people ask, agents answer, and @ an agent gives it work |
 | A project owns its access | A project is its context, instructions, files, tasks, team, Lead agent and relations, and its **Access Policies** — attached like a person's, the first made from a template through a plain form. Every run inside it reaches the project's policies ∩ the agent's ceiling, whoever asked; joining or leaving never changes it. It grants a person nothing outside the project ([PJ-F01 › Rules](features/PJ-F01-projects-and-tasks/feature.md#rules) · [AC-F02 › Rules](../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
@@ -88,7 +90,10 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | Decisions are never edited | A decision cites the thinking-graph steps it rests on; it is immutable and owned by nobody — a new decision supersedes it, linking back (PJ-F03) |
 | Loads used are cited ones | A project's loads are the ones its findings cite, by stable id and content hash; derived records it saves are written to a read + write graph database, labelled *derived* |
 | What-if is a way of reasoning | Simulating before committing is asked in a conversation and comes back as evidence marked *Predicted* ([EX-F05](../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md)); what a decision reaches is PJ-10 |
-| Generic by design | No project type, task kind, story or word is domain-specific; a team's own types and kinds arrive in its Team pack (CP-F02) |
+| Generic by design | The core is Project · Milestone · Task (with sub-tasks) · Run · Check · Review · Subject model, joined by `covers`, `waits on`, `about`, `changes` and `linked to`. No project type, tag, story or word is domain-specific in the core, a screen or the engine; a team's own types arrive in its Team pack (CP-F02) |
+| Two models, one graph | A project's subject model is parsed from its sources and its work is projected from the engine's tables into the same graph database; a person reads and asks both together ([PJ-F07](features/PJ-F07-the-project-graph/feature.md#rules)) |
+| Milestones are groups extended | A group with a goal, a done-when, optional dates, what it covers and a person's accept; not a parent task, not a project (PJ-26) |
+| The tracker is the record | When a project is linked to an issue tracker, the tracker holds the truth and Invana's task is its twin; deletes are always a person's, at the tracker ([CP-F12](../../os/control/features/CP-F12-issue-trackers/feature.md)) |
 
 ## Depends on
 
@@ -99,7 +104,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | Intelligence | The loads findings cite, and the derived records a project saves |
 | Ontology | The rules that check a decision, and the alert rules that open leads (SE-F07) |
 | Graph Plane | Memory — the project map, project memory and org knowledge ([GP-F02](../../os/graph/features/GP-F02-memory/feature.md)) |
-| Control Plane | The Inbox, where project work waits on a person (CP-F08); ops alerts, which are never a project's (CP-F11) |
+| Control Plane | The Inbox, where project work waits on a person (CP-F08); ops alerts, which are never a project's (CP-F11); issue trackers (CP-F12) |
 | Access Plane | The project's Access Policies and the permission catalogue (AC-F02); people and teams (AC-F03); slots and fallbacks (AC-F07); the run scope (AC-F04) |
 
 ## Not building
@@ -108,7 +113,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 |---|---|
 | Sub-projects | Branches carry the forks; groups and relations carry the rest |
 | Roles inside a project | Every person on the team may do everything inside it; the project's policies bound its runs |
-| Connectors on a project | Agents bring their work connections ([CP-F02](../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) |
+| Credentials on a project | Agents bring their work connections ([CP-F02](../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)); a project only names the connected tracker it is linked to ([CP-F12](../../os/control/features/CP-F12-issue-trackers/feature.md)) |
 | Parameter sweeps · game theory | After 1.0 |
 | Per-place on the team | Permissions from the catalogue govern every act ([AC-F02](../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) and a project grants nothing |
 | Gantt charts, sprints, story points, time tracking | Groups and the Order answer "what is next"; the record holds what things cost |
