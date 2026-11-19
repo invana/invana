@@ -278,7 +278,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P03 | Specs — connectors, credentials, plugins and packs | P01 | done | 2026-11-19 | gates green · reviews passed |
 | P04 | Specs — data stores | P03 | done | 2026-11-19 | gates green · reviews passed |
 | P05 | Specs — the project type manifest | P04 | done | 2026-11-19 | gates green · reviews passed |
-| P06 | Boards open from the URL, and the undrawn boards | P01 | pending |  |  |
+| P06 | Boards open from the URL, and the undrawn boards | P01 | in progress | 2026-11-19 |  |
 | P07 | Full fidelity — Shell, Start and Explore | P06 | pending |  |  |
 | P08 | Full fidelity — Model and Graph Data | P07, P04 | pending |  |  |
 | P09 | Full fidelity — Projects | P08, P05 | pending |  |  |
