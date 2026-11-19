@@ -59,6 +59,6 @@ flowchart LR
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Upload | Admin | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | — |
-| Upload | Operator | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | data.loads · Upload · Needs the model grant |
+| Upload | Operator | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | data.loads · Upload · Needs Create on Graph Data |
 | What it becomes | Admin | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | — |
-| What it becomes | Operator | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | data.loads · Upload · Needs the model grant |
+| What it becomes | Operator | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | data.loads · Upload · Needs Create on Graph Data |

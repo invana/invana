@@ -310,14 +310,14 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 
 ## 7. Naming boards
 
-`area.feature`, lower snake — `agents.runs`, `model.kinds`. The areas are
+`area.feature`, lower snake — `agents.runs`, `model.models`. The areas are
 `start · explore · model · data · agents · inbox · settings · projects · shell`. One canvas page per area, one row per name prefix.
 
 | Rule | Detail |
 |---|---|
-| One board per place | A board is one place a feature lives: a canvas page, a mode's view, a section of the large modal, a header dropdown or a page outside the shell. It is named for that place's feature — `model.kinds`, `agents.runs`, `settings.people` |
+| One board per place | A board is one place a feature lives: a canvas page, a mode's view, a section of the large modal, a header dropdown or a page outside the shell. It is named for that place's feature — `model.models`, `agents.runs`, `settings.people` |
 | The board shows the whole feature | It opens on the list; a **View** switch moves List · Detail; a modal it opens — a create, an edit, a confirm, Sign in again — is a state of the board, drawn over it; a peek, a menu, a panel, the console and a collapsed region are states too. **State** and **Access** switches carry the rest |
-| A cell names board and state | A story's `## Screens` cell reads `<board> · <view or overlay> · <state>` — `model.kinds · Detail · Edit`, `agents.runs · Detail · Content withheld`. A cell with no view is the List |
+| A cell names board and state | A story's `## Screens` cell reads `<board> · <view or overlay> · <state>` — `model.models · Kind · Edit`, `agents.runs · Detail · Content withheld`. A cell with no view is the List |
 | The Operator access is the board's | The read-only access is the same board, each act a person lacks disabled with *Ask {who can grant}* — `<board> · Locked` names that state; there is no separate locked board. The exception is a board whose reading needs a permission the Operator lacks — Access Policies (`settings.policies`, `settings.agent_access`): the Operator state is `<board> · No access`, with no policy content shown |
 | A refusal names the resource, not its address | Copy reads *Needs {Action} on {Resource name} — ask {who can grant}*. The resource name is the *Resource* column of [the permission catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) — Graph Data, Models, Projects, Agents, Skills, Memory, Access, Settings — or, when the refusal is about one item, the item's name: *Needs Edit on the Airways model*, *Needs Create on Models*. It never shows the address (`model/*`, `project/<project>`, `data/<graph database>/…`); addresses appear only on policy, API and History surfaces — the policy editor, the permission catalogue, History rows, API errors. *{who can grant}* is the people who can grant it, by name — *ask Priya or Lee* — written the same way everywhere. A refusal never names a policy or a rule, for anyone |
 | A modal many boards share is drawn once | *Sign in again* is `access.signin · Sign in again`; every story that asks for the password again cites it there |

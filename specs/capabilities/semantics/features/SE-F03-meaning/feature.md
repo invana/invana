@@ -6,7 +6,7 @@ status: idea
 personas: [modeller, analyst, researcher]
 stories: [SE-20]
 journeys: []
-boards: [model.kinds, model.models]
+boards: [model.models]
 nfrs: [NFR-SEC-5, NFR-SEC-8, NFR-SEC-11]
 depends_on: [SE-F02, SE-F05]
 ---

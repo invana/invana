@@ -79,15 +79,15 @@ flowchart TD
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Choose a source | Admin | agents.skills · Import · Source | — | agents.skills · Import · Fetching | agents.skills · Import · Source | agents.skills · Import · Address refused | — | — |
-| Choose a source | Operator | agents.skills · Import · Source | — | agents.skills · Import · Fetching | agents.skills · Import · Source | agents.skills · Import · Address refused | — | agents.skills · Import disabled |
-| The preview | Admin | — | agents.skills · Import · No agents found | agents.skills · Import · Reading the files | agents.skills · Import · Preview | agents.skills · Import · Preview · Can't map | agents.skills · Import · Mapping | — |
-| The preview | Operator | — | agents.skills · Import · No agents found | agents.skills · Import · Reading the files | agents.skills · Import · Preview | agents.skills · Import · Preview · Can't map | agents.skills · Import · Mapping | agents.skills · Import disabled |
-| The choices | Admin | — | — | — | agents.skills · Import · Choices | agents.skills · Import · Choices · Skill not found | agents.skills · Import · Choices · Proposed | — |
-| The choices | Operator | — | — | — | agents.skills · Import · Choices | agents.skills · Import · Choices · Skill not found | agents.skills · Import · Choices · Proposed | agents.skills · Import disabled |
+| Choose a source | Admin | agents.skills · Import | — | agents.skills · Import · Reading the files | agents.skills · Import · Tool folders found | agents.skills · Import · Refused file | — | — |
+| Choose a source | Operator | agents.skills · Import | — | agents.skills · Import · Reading the files | agents.skills · Import · Tool folders found | agents.skills · Import · Refused file | — | agents.skills · Import disabled |
+| The preview | Admin | — | agents.skills · Import · No agents found | agents.skills · Import · Reading the files | agents.skills · Import · What came in | agents.skills · Import · Refused line | agents.skills · Import · Mapping | — |
+| The preview | Operator | — | agents.skills · Import · No agents found | agents.skills · Import · Reading the files | agents.skills · Import · What came in | agents.skills · Import · Refused line | agents.skills · Import · Mapping | agents.skills · Import disabled |
+| The choices | Admin | — | — | — | agents.skills · Import · Confirm | agents.skills · Import · Skill not found | agents.skills · Import · Converted | — |
+| The choices | Operator | — | — | — | agents.skills · Import · Confirm | agents.skills · Import · Skill not found | agents.skills · Import · Converted | agents.skills · Import disabled |
 | A Custom pack | Admin | — | — | — | settings.packs · Custom pack | settings.packs · Custom pack · Refused | — | — |
 | A Custom pack | Operator | — | — | — | settings.packs · Custom pack · Read only | — | — | settings.packs · Packs · Read only |
 | Draft policies and servers it brought | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
 | Draft policies and servers it brought | Operator | — | — | — | settings.plugins · Servers to add · Read only | — | — | settings.policies · No access |
-| Export | Admin | — | — | agents.skills · Export · Writing | agents.skills · Export | agents.skills · Export · Refused | — | — |
-| Export | Operator | — | — | agents.skills · Export · Writing | agents.skills · Export | agents.skills · Export · Refused | — | agents.skills · Export disabled |
+| Export | Admin | — | — | agents.skills · Detail · Export · Writing | agents.skills · Detail · Export | agents.skills · Detail · Export · Refused | — | — |
+| Export | Operator | — | — | agents.skills · Detail · Export · Writing | agents.skills · Detail · Export | agents.skills · Detail · Export · Refused | — | agents.skills · Detail · Export · Disabled |

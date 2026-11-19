@@ -31,8 +31,8 @@ Installing a Team pack needs Create on `setting/team-packs` ([the permission cat
 flowchart TD
   s([Settings › Connections › Team packs]) --> l["Every pack · installed or not"]
   l --> p["A pack: each piece and the product that will offer it"]
-  p -->|Admin · Install| c{"Any piece clashes, or a required connector missing?"}
-  c -->|yes| x(["Names the piece and what it clashes with · nothing installed"])
+  p -->|Admin · Install| c{"Any piece clashes, a required connector missing, or a type manifest invalid?"}
+  c -->|yes| x(["Names the piece and what it clashes with, or the file, field and why · nothing installed"])
   c -->|no| i(["Installed · off until an Admin turns it on"])
   i --> on["On · each piece offered in its own product"]
   on --> ag(["Its agents in the catalogue as Team pack agents · granted to nobody"])
@@ -66,6 +66,7 @@ flowchart TD
 | CP-20.14 | A pack installed | History and the pack are read | they show its name, version, content hash and who installed it; its agents are granted to nobody and its policies are drafts; every run that used it records the pack version it ran |
 | CP-20.15 | An installed pack | a person with Edit on `setting/team-packs` clicks *Edit* | a Custom copy is made — named by its editor, owned by them, saying which pack it came from — and the installed pack never changes; editing the pack in place is refused, naming the copy |
 | CP-20.16 | An installed pack | a newer version is available | *Upgrade* shows a diff — agents, skills, policies, project types and ontology added, changed or removed — that an Admin with Edit on `setting/team-packs` applies; new policy files arrive as new drafts and nothing in force changes; a Custom copy is untouched |
+| CP-20.17 | A pack whose `project_types/<id>.yaml` fails the [type manifest](../../../../../../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#the-project-type-manifest) schema ([PJ-28.15](../../../../../../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)) | an Admin installs it | it is refused whole, reading *{file}: {field} — {why}. Nothing was installed.*; no type of it is offered in *New project* |
 
 ## Screens
 
@@ -75,6 +76,8 @@ flowchart TD
 | Team packs | Operator | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs · Read only | settings.packs · Could not load | — | settings.packs · Packs · Read only |
 | Install a pack | Admin | settings.packs · Install | — | — | settings.packs · Install · What it brings | settings.packs · Install · Pack clashes | — | — |
 | Install a pack | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
+| A pack's type manifest | Admin | — | — | — | — | settings.packs · Install · Manifest refused | — | — |
+| A pack's type manifest | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
 | A pack's policies to apply | Admin | — | — | settings.policies · Loading | settings.plugins · Policies to apply | settings.policies · Rule refused | — | — |
 | A pack's policies to apply | Operator | — | — | — | settings.plugins · Policies to apply · Read only | — | — | settings.policies · No access |
 | A pack's outside servers | Admin | — | — | — | settings.plugins · Servers to add | — | — | — |

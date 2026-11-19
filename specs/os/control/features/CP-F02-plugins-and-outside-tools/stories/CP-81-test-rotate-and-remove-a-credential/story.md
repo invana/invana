@@ -3,6 +3,7 @@ id: CP-81
 title: Test, rotate and remove a credential
 feature: CP-F02
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.plugins, settings.me, settings.connectors]
 ---

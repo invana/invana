@@ -59,7 +59,7 @@ flowchart TD
   cn -->|manifest invalid · engine range outside · fails to load| cnf(["Listed failed · names the package and why · not offered"])
   cn -->|Admin · Connect| cnc(["A form drawn from its config schema · secrets by name · scopes that warn named"])
   pl -->|a Team pack| pk["CP-20 · Install: each piece offered in its own product"]
-  pk -->|a piece clashes · a required connector is missing| pkc(["Names the piece or the connector · nothing installed"])
+  pk -->|a piece clashes · a required connector is missing · a type manifest is invalid| pkc(["Names the piece, the connector, or the manifest file and field · nothing installed"])
   pk -->|Admin · Install · Update · Remove| pkx["CP-83 · What it brings or changes first · then the act"]
   pk -->|Edit| cu(["A Custom copy · the installed pack never changes"])
   pk -->|a newer version| up(["A diff · an Admin applies it · new policies arrive as drafts"])
@@ -359,6 +359,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 404 | An unknown plugin, server or account | *Not found.* | API only — Studio lists only what exists |
 | 409 | A pack piece whose name is taken in its product | *{piece} clashes with {existing} in {product}.* | CP-20.4 |
 | 409 | Installing a pack that `requires` a connector not installed, or an engine range the engine is outside | *{pack} needs the {connector} connector — install it first.* · *{pack} needs engine {range}.* | CP-20.13 |
+| 422 | A pack whose `project_types/<id>.yaml` fails the [type manifest](../../../../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#the-project-type-manifest) schema — nothing is installed | *{file}: {field} — {why}. Nothing was installed.* | CP-20.17 · PJ-28.15 |
 | 409 | Editing an installed pack in place | *{pack} is installed — make a Custom copy to change it.* | CP-20.15 |
 | not offered (listed `failed`) | A connector whose `connector.yaml` is missing or invalid, whose engine range excludes this engine, or that fails to load | *{package}: {why}.* | CP-77.5 |
 | start refused | A plugin folder with no `.claude-plugin/plugin.json`, with Invana's fields outside `metadata.invana`, or carrying `hooks/` or `commands/` — the process does not start | *{plugin}: {file} — {why}.* | CP-20.10 |

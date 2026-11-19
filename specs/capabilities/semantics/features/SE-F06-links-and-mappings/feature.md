@@ -6,7 +6,7 @@ status: idea
 personas: [modeller]
 stories: [SE-01, SE-02, SE-03, SE-16]
 journeys: []
-boards: [model.models, model.kinds, model.relationships]
+boards: [model.models]
 nfrs: [NFR-PERF-4, NFR-SEC-11]
 depends_on: [SE-F01, SE-F02]
 ---
@@ -231,7 +231,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | Decision | Detail |
 |---|---|
 | The map is Model's landing | Every published model on one full-bleed canvas, each a frame in its own hue with its kinds inside; a link is the only line that crosses a frame, and every link is dashed. *Show* draws all models or one; *Detail* is circles · cards · property cards. Map · Health · History are its tabs |
-| The left section is the Models tree | Models are grouped by graph database: each graph database is a folder holding the models bound to it, and a link never crosses folders. Under each model, a tree of its Kinds and Relationships; then Links between models, each with its count; Kinds and Relationships are not views of their own — the tree and its states are `model.models`; `model.kinds` and `model.relationships` are the kind and relationship pages only. A model is opened from the tree, the map or a breadcrumb |
+| The left section is the Models tree | Models are grouped by graph database: each graph database is a folder holding the models bound to it, and a link never crosses folders. Under each model, a tree of its Kinds and Relationships; then Links between models, each with its count; Kinds and Relationships are not boards of their own — the tree, a kind (`model.models · Kind`) and a relationship (`model.models · Relationship`) and every state of them are `model.models`. A model is opened from the tree, the map or a breadcrumb |
 | A kind opens in a peek | Its properties with type and *Must be*, its records, its key, *Change in a draft* and *Open <kind>*; open, it is a page of its model with Properties · Indexes · Constraints · Mappings |
 | Link from the map or the list | Dragging a kind onto a kind in another model, or *Link models*, opens one card with both sides filled: *Same thing* or *Relationship*, *Source* and *Target*, a key on each side; a relationship adds its name and where its ends come from — *These keys* or *Its own rows* |
 | The count fires itself | Naming both keys counts what they join — *1,284 of 1,310 join* — before anything is made; a zero disables *Stage this link* and offers *Try another key*, listing the keys that matched nothing |

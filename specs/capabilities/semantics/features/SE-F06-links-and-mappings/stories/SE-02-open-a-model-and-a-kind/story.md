@@ -4,7 +4,7 @@ title: Open a model and a kind
 feature: SE-F06
 status: idea
 personas: [modeller]
-boards: [model.kinds, model.models, model.relationships]
+boards: [model.models]
 ---
 
 # SE-02 · Open a model and a kind
@@ -61,17 +61,17 @@ flowchart LR
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A kind | Admin | model.kinds · Detail · No properties | — | model.kinds · Detail · Loading | model.kinds · Detail | model.kinds · Detail · Could not load | — | — |
-| A kind | Operator | model.kinds · Detail · No properties | — | model.kinds · Detail · Loading | model.kinds · Detail · Read only | model.kinds · Detail · Could not load | — | model.kinds · Detail · Read only |
+| A kind | Admin | model.models · Kind · No properties | — | model.models · Kind · Loading | model.models · Kind | model.models · Kind · Could not load | — | — |
+| A kind | Operator | model.models · Kind · No properties | — | model.models · Kind · Loading | model.models · Kind · Read only | model.models · Kind · Could not load | — | model.models · Kind · Read only |
 | A model | Admin | model.models · Model with nothing yet | — | model.models · Loading | model.models · Detail | model.models · Could not load | — | — |
 | A model | Operator | model.models · Model with nothing yet | — | model.models · Loading | model.models · Detail | model.models · Could not load | — | model.models · Read only |
-| A kind · Change in a draft | Admin | — | — | — | model.kinds · Detail · Edit | — | — | — |
-| A kind · Change in a draft | Operator | — | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Edit disabled |
-| A relationship | Admin | — | — | model.relationships · Detail · Loading | model.relationships · Detail | model.relationships · Detail · Could not load | — | — |
-| A relationship | Operator | — | — | model.relationships · Detail · Loading | model.relationships · Detail | model.relationships · Detail · Could not load | — | model.relationships · Detail · Read only |
+| A kind · Change in a draft | Admin | — | — | — | model.models · Kind · Edit | — | — | — |
+| A kind · Change in a draft | Operator | — | — | — | model.models · Kind · Read only | — | — | model.models · Kind · Edit disabled |
+| A relationship | Admin | — | — | model.models · Relationship · Loading | model.models · Relationship | model.models · Relationship · Could not load | — | — |
+| A relationship | Operator | — | — | model.models · Relationship · Loading | model.models · Relationship | model.models · Relationship · Could not load | — | model.models · Relationship · Read only |
 | Kinds in the Models tree | Admin | model.models · Tree · No kinds yet | model.models · Tree · No kind matches | model.models · Tree · Loading | model.models · Tree | model.models · Tree · Could not load | — | — |
 | Kinds in the Models tree | Operator | model.models · Tree · No kinds yet | model.models · Tree · No kind matches | model.models · Tree · Loading | model.models · Tree | model.models · Tree · Could not load | — | model.models · Tree · Read only |
 | Relationships in the Models tree | Admin | model.models · Tree · No relationships yet | model.models · Tree · No relationship matches | model.models · Tree · Relationships loading | model.models · Tree · Relationships | model.models · Tree · Relationships could not load | — | — |
 | Relationships in the Models tree | Operator | model.models · Tree · No relationships yet | model.models · Tree · No relationship matches | model.models · Tree · Relationships loading | model.models · Tree · Relationships | model.models · Tree · Relationships could not load | — | model.models · Tree · Read only |
-| A kind · Indexes | Admin | model.kinds · Detail · No indexes | — | model.kinds · Detail · Loading | model.kinds · Detail · Indexes | model.kinds · Detail · Could not load | — | — |
-| A kind · Indexes | Operator | model.kinds · Detail · No indexes | — | model.kinds · Detail · Loading | model.kinds · Detail · Indexes · Read only | model.kinds · Detail · Could not load | — | model.kinds · Detail · Indexes · Read only |
+| A kind · Indexes | Admin | model.models · Kind · No indexes | — | model.models · Kind · Loading | model.models · Kind · Indexes | model.models · Kind · Could not load | — | — |
+| A kind · Indexes | Operator | model.models · Kind · No indexes | — | model.models · Kind · Loading | model.models · Kind · Indexes · Read only | model.models · Kind · Could not load | — | model.models · Kind · Indexes · Read only |

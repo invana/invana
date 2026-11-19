@@ -2,8 +2,8 @@
 id: J07
 title: Ready a deployment
 personas: [admin]
-stories: [AC-18, CP-17, CP-25, CP-38, CP-39, CP-40, CP-41, CP-01, CP-04, AC-09, AG-35, AC-04, CP-10, CP-09, CP-11, CP-34]
-boards: [settings.databases, settings.ai, settings.policies, settings.workers, settings.limits]
+stories: [AC-18, CP-17, CP-25, CP-38, CP-39, CP-40, CP-41, CP-01, CP-79, CP-82, CP-80, CP-81, CP-04, AC-09, AG-35, AC-04, CP-10, CP-09, CP-11, CP-34]
+boards: [settings.databases, settings.connectors, settings.plugins, settings.ai, settings.policies, settings.workers, settings.limits]
 ---
 
 # Ready a deployment
@@ -27,8 +27,11 @@ flowchart TD
   D --> E["CP-01 · Add AI models · mark each local or external · ping it"]
   E -->|the ping fails| E1["The provider's message, word for word"] --> E
   E --> F{"Should agents reach outside?"}
-  F -->|yes| F2["CP-04 · Switch a plugin on, deliberately"]
+  F -->|yes| F1["CP-79 · CP-82 · Install the connector or plugin, shown the command to run"]
   F -->|not yet| T
+  F1 --> F4["CP-80 · CP-81 · Add a credential and connect it · test, rotate or remove it later"]
+  F4 -->|the credential is refused| F5["The outside tool's own words"] --> F4
+  F4 --> F2["CP-04 · Switch a plugin on, deliberately"]
   F2 -->|its extra is not installed| F3["Says so, naming the extra · cannot be switched on"] --> T
   F2 --> T["AC-09 · Make teams and put people on them"]
   T --> G["AG-35 · Grant agents to teams and people — the Assistant among them"]
@@ -51,14 +54,16 @@ flowchart TD
 | 2 | Install the connector package for each kind of graph database; read it in `invana version` | Control Plane · Graph databases · the engine's machine | CP-17 | — |
 | 3 | Connect each graph database, set its mode, switch it on and name a practice one | Control Plane · Graph databases | CP-25 · CP-38 · CP-39 · CP-41 | `settings.databases · Connect` · `settings.databases · Detail` |
 | 4 | Add AI models, each marked local or external | Control Plane · AI models | CP-01 | `settings.ai` |
-| 5 | Switch on the plugins agents may use | Control Plane · Plugins and MCP | CP-04 | — |
-| 6 | Make teams and put people on them | Access Plane · Directory | AC-09 | `settings.people` |
-| 7 | Grant agents to teams and people | Agents · The agents catalogue | AG-35 | — |
-| 8 | Write the Access Policies and attach them to agents | Access Plane · Access Policies | AC-04 | `settings.policies` |
-| 9 | Add workers on Lee's own machines and watch them join | Control Plane · Workers and the queue | CP-10 | `settings.workers` |
-| 10 | See every worker and where steps wait | Control Plane · Workers and the queue | CP-09 | `settings.workers` |
-| 11 | Set limits per team, user and agent | Control Plane · Limits | CP-11 | `settings.limits · Usage` |
-| 12 | Read what each spends against its limits | Control Plane · Limits | CP-34 | `settings.limits · Usage` |
+| 5 | Install a connector or a plugin agents may use — shown the command, run on the engine's machine | Control Plane · Plugins and MCP | CP-79 · CP-82 | `settings.connectors` · `settings.plugins` |
+| 6 | Add a credential to a connector, connect it, and test, rotate or remove it later | Control Plane · Plugins and MCP | CP-80 · CP-81 | `settings.connectors · Connect` · `settings.plugins · Servers · Work connections` |
+| 7 | Switch on the plugins agents may use | Control Plane · Plugins and MCP | CP-04 | — |
+| 8 | Make teams and put people on them | Access Plane · Directory | AC-09 | `settings.people` |
+| 9 | Grant agents to teams and people | Agents · The agents catalogue | AG-35 | — |
+| 10 | Write the Access Policies and attach them to agents | Access Plane · Access Policies | AC-04 | `settings.policies` |
+| 11 | Add workers on Lee's own machines and watch them join | Control Plane · Workers and the queue | CP-10 | `settings.workers` |
+| 12 | See every worker and where steps wait | Control Plane · Workers and the queue | CP-09 | `settings.workers` |
+| 13 | Set limits per team, user and agent | Control Plane · Limits | CP-11 | `settings.limits · Usage` |
+| 14 | Read what each spends against its limits | Control Plane · Limits | CP-34 | `settings.limits · Usage` |
 
 ## Branches
 

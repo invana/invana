@@ -4,7 +4,7 @@ title: Say what a kind means
 feature: SE-F03
 status: idea
 personas: [modeller]
-boards: [model.kinds, model.models]
+boards: [model.models]
 ---
 
 # SE-20 · Say what a kind means
@@ -66,9 +66,9 @@ flowchart LR
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A kind · Meaning | Admin | model.kinds · Detail · Meaning · No meaning yet | — | model.kinds · Detail · Meaning · Loading | model.kinds · Detail · Meaning | model.kinds · Detail · Meaning · Could not load | model.kinds · Detail · Meaning · Proposed synonym | — |
-| A kind · Meaning | Operator | model.kinds · Detail · Meaning · No meaning yet | — | model.kinds · Detail · Meaning · Loading | model.kinds · Detail · Meaning · Read only | model.kinds · Detail · Meaning · Could not load | model.kinds · Detail · Meaning · Read only | model.kinds · Detail · Meaning · Read only |
-| A property · Level | Admin | model.kinds · Detail · Meaning · Levels | — | model.kinds · Detail · Meaning · Loading | model.kinds · Detail · Meaning · Levels | model.kinds · Detail · Meaning · Level refused | — | — |
-| A property · Level | Operator | model.kinds · Detail · Meaning · Levels | — | model.kinds · Detail · Meaning · Loading | model.kinds · Detail · Meaning · Levels · Read only | model.kinds · Detail · Meaning · Could not load | — | model.kinds · Detail · Meaning · Levels · Read only |
-| The draft · meaning staged | Admin | — | — | — | model.models · Draft · Widening | model.kinds · Detail · Meaning · Refused | — | — |
+| A kind · Meaning | Admin | model.models · Kind · Meaning · No meaning yet | — | model.models · Kind · Meaning · Loading | model.models · Kind · Meaning | model.models · Kind · Meaning · Could not load | model.models · Kind · Meaning · Proposed synonym | — |
+| A kind · Meaning | Operator | model.models · Kind · Meaning · No meaning yet | — | model.models · Kind · Meaning · Loading | model.models · Kind · Meaning · Read only | model.models · Kind · Meaning · Could not load | model.models · Kind · Meaning · Read only | model.models · Kind · Meaning · Read only |
+| A property · Level | Admin | model.models · Kind · Meaning · Levels | — | model.models · Kind · Meaning · Loading | model.models · Kind · Meaning · Levels | model.models · Kind · Meaning · Level refused | — | — |
+| A property · Level | Operator | model.models · Kind · Meaning · Levels | — | model.models · Kind · Meaning · Loading | model.models · Kind · Meaning · Levels · Read only | model.models · Kind · Meaning · Could not load | — | model.models · Kind · Meaning · Levels · Read only |
+| The draft · meaning staged | Admin | — | — | — | model.models · Draft · Widening | model.models · Kind · Meaning · Refused | — | — |
 | The draft · meaning staged | Operator | — | — | — | — | — | — | — |

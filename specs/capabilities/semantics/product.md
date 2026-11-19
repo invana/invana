@@ -61,8 +61,8 @@ terms and standards it follows, what must always hold and what may be derived �
 | Surface | Tier | Board |
 |---|---|---|
 | Models — the list and the map; one model · its links | mode | `model.models` · `model.models · Detail` |
-| Kinds — the list; a kind · Properties · Meaning · Standards | mode | `model.kinds` · `model.kinds · Detail` · `model.kinds · Detail · Meaning` |
-| Relationships — the list; a relationship on its model | mode | `model.relationships` · `model.relationships · Detail` |
+| Kinds — the list; a kind · Properties · Meaning · Standards | mode | `model.models · Tree` · `model.models · Kind` · `model.models · Kind · Meaning` |
+| Relationships — the list; a relationship on its model | mode | `model.models · Tree` · `model.models · Relationship` |
 | A draft and its publish | mode · modal | `model.models · Draft` · `model.models · Publish` |
 | Taxonomies — broader kinds and value hierarchies | mode | `model.taxonomies` |
 | Standards — the install's library; a standard; a new one | mode · modal | `model.standards` · `model.standards · Detail` · `model.standards · New` |

@@ -3,6 +3,7 @@ id: CP-79
 title: Install a connector
 feature: CP-F02
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.connectors]
 ---

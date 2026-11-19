@@ -3,6 +3,7 @@ id: CP-80
 title: Add a credential to a connector and connect it
 feature: CP-F02
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.connectors, settings.plugins, settings.me]
 ---

@@ -3,6 +3,7 @@ id: CP-82
 title: Install, update and remove a plugin
 feature: CP-F02
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.plugins, settings.connectors]
 ---

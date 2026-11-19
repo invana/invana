@@ -59,5 +59,5 @@ flowchart LR
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Requests | Admin | model.rules · No requests | — | model.rules · Requests loading | model.rules · Requests | model.rules · Request refused | — | — |
+| Requests | Admin | model.rules · No requests | — | model.rules · Requests loading | model.rules · Requests | model.rules · Already resolved | — | — |
 | Requests | Operator | model.rules · No requests | — | model.rules · Requests loading | model.rules · Requests | model.rules · Could not load | — | model.rules · Requests read only |

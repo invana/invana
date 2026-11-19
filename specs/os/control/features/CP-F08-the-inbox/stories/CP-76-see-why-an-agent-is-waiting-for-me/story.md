@@ -4,7 +4,7 @@ title: See why an agent is waiting for me
 feature: CP-F08
 status: idea
 personas: [decision-maker, builder, admin]
-boards: [inbox]
+boards: [inbox, inbox.dropdown]
 ---
 
 # CP-76 · See why an agent is waiting for me
@@ -62,5 +62,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | An agent waiting | Admin | inbox · Needs you · Nothing waiting | — | inbox · Needs you · Loading | inbox · Needs you · Agent waiting | inbox · Needs you · Could not load | inbox · Needs you · Agent waiting · Run held | — |
 | An agent waiting | Operator | inbox · Needs you · Nothing waiting | — | inbox · Needs you · Loading | inbox · Needs you · Agent waiting | inbox · Needs you · Could not load | inbox · Needs you · Agent waiting · Run held | inbox · Needs you · Not mine |
-| Decide in place | Admin | — | — | — | inbox · Dropdown · Agent waiting | inbox · Dropdown · Refused | — | — |
-| Decide in place | Operator | — | — | — | inbox · Dropdown · Agent waiting | inbox · Dropdown · Refused | — | inbox · Dropdown · Not mine |
+| Decide in place | Admin | — | — | — | inbox.dropdown · Agent waiting | inbox.dropdown · Refused | — | — |
+| Decide in place | Operator | — | — | — | inbox.dropdown · Agent waiting | inbox.dropdown · Refused | — | inbox.dropdown · Not mine |

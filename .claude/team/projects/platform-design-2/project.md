@@ -131,7 +131,7 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Lands | The features and stories the gaps belong to · `specs/README.md` index |
 | Boards | — |
 | Review | |
-| Approve | Ravi — the spec review (journey, Access, boards to draw, open questions) before any designer phase |
+| Approve | |
 | Budget | |
 | Steps | 1. Group the story-less boards by feature. 2. Create-project, connect and workers. 3. Projects (map-led, inquiry tree). 4. Fleet, project settings, modeller, IAM. 5. Datasets, activity, builder, notifications, explorer. 6. Check; the spec review |
 
@@ -292,11 +292,11 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Agent | designer |
 | Read | P14's notes · `specs/journeys/` · `specs/milestones.md` · P01's report and P01b's re-audit (its verdicts replace P01's) |
 | Stories | — |
-| Done when | The Index lists every page and board; the audits' every *port* and *redraw* board (P01b's verdicts win) is in v2027 and every *skip* has its reason; *Invana Products* and the proposal canvases carry a visible reference-only mark (never deleted); every board renders and every link resolves; the package for Ravi is assembled (canvas, each journey, open questions) |
+| Done when | The Index lists every page and board; the audits' every *port* and *redraw* board (P01b's verdicts win) is in v2027 and every *skip* has its reason; *Invana Products* and the proposal canvases carry a visible reference-only mark (never deleted); every board renders and every link resolves; the package for Ravi is assembled (canvas, each journey, open questions) and reported for review afterwards |
 | Lands | The mirror: `Main.dc.html`, `canvas.json` · the reference marks in the reference canvases' own `canvas.json` notes |
 | Boards | every board · the Index |
 | Review | |
-| Approve | Ravi — the full design review; his changes are routed to the phase that owns them before P16 |
+| Approve | |
 | Budget | |
 | Steps | 1. Index and completeness against P01. 2. Reference-only marks. 3. Render check on every board; gates; publish |
 
@@ -326,7 +326,7 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Lands | `specs/system-design.md` · the NFRs · the features' Engine and System impact |
 | Boards | — |
 | Review | |
-| Approve | Ravi |
+| Approve | |
 | Budget | |
 | Steps | 1. Data stores and residency. 2. Code structure. 3. Features agree. 4. Check |
 
@@ -341,7 +341,7 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Lands | The report · recommendations |
 | Boards | — |
 | Review | |
-| Approve | Ravi |
+| Approve | |
 | Budget | |
 | Steps | 1. Connector credentials, outside MCP servers, PR pushes. 2. The rest of access, data and agents. 3. Findings and fixes |
 
@@ -352,11 +352,11 @@ Run it: `python3 .claude/skills/run-project/run.py platform-design-2` (the proje
 | Agent | product-manager |
 | Read | The locked specs · P18's findings · `specs/milestones.md` · `.claude/skills/run-project/project-template.md` · `create-project` skill |
 | Stories | — |
-| Done when | A draft project (`status: draft`) for the engine and Studio build at `.claude/team/projects/<name>/project.md`: milestone phases in dependency order from the locked design, MVP journeys first, each phase's stories designed, gates and budgets set; P18's accepted fixes included. Presented to Ravi |
+| Done when | A draft project (`status: draft`) for the engine and Studio build at `.claude/team/projects/<name>/project.md`: milestone phases in dependency order from the locked design, MVP journeys first, each phase's stories designed, gates and budgets set; P18's accepted fixes included. Reported to Ravi for review afterwards |
 | Lands | The new project file |
 | Boards | — |
 | Review | |
-| Approve | Ravi — the project that lets building start |
+| Approve | |
 | Budget | |
 | Steps | 1. Dependency order from the system design. 2. Phases and gates. 3. Present |
 
@@ -370,7 +370,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01 | Audit — Invana Products against v2027, by content |  | done | 2026-11-19 | gates green · reviews passed |
 | P01b | Visual re-audit — Invana Products against v2027, side by side | P01 | done | 2026-11-19 | gates green · reviews passed |
 | P02 | Part 1's review changes and the MVP badges |  | done | 2026-11-19 | gates green · reviews passed |
-| P03 | Take up the open part-1 recommendations that are spec edits |  | pending |  |  |
+| P03 | Take up the open part-1 recommendations that are spec edits |  | in progress | 2026-11-19 |  |
 | P04 | Spec the gaps | P01, P01b, P02, P03 | pending |  |  |
 | P05 | Density rule in the design language | P01, P01b | pending |  |  |
 | P06 | Density pass — one pass over every board | P05 | pending |  |  |
@@ -400,6 +400,7 @@ What a later phase must know that the code does not say. One row per note, newes
 | — | Connector install stays on the command line, not offered in Studio (part 1 Q3) |
 | — | Ravi has not approved P01's report: it marked 334 of 352 boards `skip · landed` by state-name match, without comparing fidelity or layout. P01b's re-audit replaces its verdicts for those boards; until Ravi approves P01b, no later phase relies on a P01 `skip · landed` |
 | — | The Graph stays retired and the project takes its place: `graph.settings.*` and `settings.graph_limits` are not out of spec — their content becomes project settings (General · Data · Team · An agent in this project · Usage). Limits are never set per project (CP-11): the Usage tab only shows the project's share. The create-project *team* step is the first form of the Team tab. P04 writes the stories, P10 draws the place, P11 reuses the Team tab |
+| — | Ravi pre-approved P04, P15, P17, P18 and P19 (2026-11-19): the run does not pause for them; he reviews the results afterwards and changes go through the product-manager |
 
 ## Questions for Ravi
 

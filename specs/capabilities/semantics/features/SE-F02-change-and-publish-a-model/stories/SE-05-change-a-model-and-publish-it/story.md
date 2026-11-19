@@ -5,7 +5,7 @@ feature: SE-F02
 status: idea
 milestone: MVP
 personas: [modeller]
-boards: [model.models, model.kinds, inbox]
+boards: [model.models, inbox]
 ---
 
 # SE-05 · Change a model and publish it
@@ -82,8 +82,8 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The map · Comparing | Admin | model.models | — | model.models · Comparing loading | model.models · Comparing | — | — | — |
 | The map · Comparing | Operator | model.models | — | model.models · Comparing loading | model.models · Comparing | — | — | model.models · Read only |
-| A kind | Admin | — | — | — | model.kinds · Detail | — | — | — |
-| A kind | Operator | — | — | — | model.kinds · Detail · Read only | — | — | model.kinds · Detail · Read only |
+| A kind | Admin | — | — | — | model.models · Kind | — | — | — |
+| A kind | Operator | — | — | — | model.models · Kind · Read only | — | — | model.models · Kind · Read only |
 | The draft | Admin | model.models · Draft · Nothing staged | — | model.models · Draft · Saving | model.models · Draft | model.models · Draft · Change refused | model.models · Draft · Agent staging | model.models · Draft · Held by another |
 | The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
 | Publish | Admin | — | — | model.models · Publish · Checking | model.models · Publish | model.models · Publish · Refused | model.models · Publish · Previewing | — |

@@ -52,4 +52,4 @@ flowchart LR
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Add records by hand | Admin | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | — |
-| Add records by hand | Operator | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | data.loads · Add by hand · Needs the model grant |
+| Add records by hand | Operator | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | data.loads · Add by hand · Needs Create on Graph Data |
