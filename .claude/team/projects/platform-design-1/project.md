@@ -286,7 +286,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P11 | Full fidelity — Access | P10 | done | 2026-11-19 | gates green · reviews passed |
 | P12 | Full fidelity — Settings | P11, P03, P04 | done | 2026-11-19 | gates green · reviews passed |
 | P13 | Flow boards | P12, P02 | done | 2026-11-19 | gates green · reviews passed |
-| P14 | Journey boards and the design review | P13 | in progress | 2026-11-19 |  |
+| P14 | Journey boards and the design review | P13 | done | 2026-11-19 | gates green · reviews passed |
 
 ## Hand-off notes
 
