@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**527 recommendations** · 326 open · 121 taken · 23 declined · 57 done
+**528 recommendations** · 327 open · 121 taken · 23 declined · 57 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -570,3 +570,4 @@ flowchart LR
 | R556 | taken | 2026-11-19 | security | session | security | low | Tracker credential and bot hygiene, and repudiation notes (CP-73.1, CP-73.13) | Add: CP-73.1c a tracker's credential is never sent to another host on a redirect and its address is rechecked at each call (as CP-F02); the bot account's name is shown, and the Admin is told when a credential looks like a person's; each comment or label an agent posts carries its run id, so the tracker side can be tied back to the ledger; the expiry of the credential is shown and an alert reaches the Admins 14 days before. | P3 | session — scheduled with CP-73 (CP-F12 open questions) |
 | R557 | open | 2026-11-19 | product-manager | session | idea | medium | check.py: validate milestones, flow and journey board ids, and link milestones.md from the index | scripts/specs/check.py: (1) story front-matter milestone: must name a row of specs/milestones.md; (2) a story with status later carries none; (3) every journey a milestone lists has all its stories in that milestone; (4) flow and journey board ids follow design-language §7 (flow.<act>, journey.jNN); (5) the --index header emits a link to milestones.md (a hand-added line in specs/README.md is overwritten by --index). |  |  |
 | R558 | open | 2026-11-19 | product-manager | phase platform-design-1/P03 | docs | medium | Journeys J07 and J14 cite the new connector, credential, plugin and pack stories | specs/journeys/J07 and J14 and their flows: add CP-79 (install a connector), CP-80 and CP-81 (credentials), CP-82 (plugin) and CP-83 (pack) as steps; set their milestone once Ravi confirms the MVP. Journeys are outside P03's Lands (specs/os/control). |  |  |
+| R559 | open | 2026-11-19 | product-manager | phase platform-design-1/P05 | docs | low | CP-20 and CP-F02 cite the type manifest check on install | PJ-28.15 refuses a pack whose project_types manifest fails the schema; CP-20 (install a Team pack) and CP-F02 Rules should name that refusal, and its Screens may need a refused state on settings.packs · Install (P12). |  |  |
