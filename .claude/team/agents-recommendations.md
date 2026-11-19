@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**531 recommendations** · 330 open · 121 taken · 23 declined · 57 done
+**534 recommendations** · 333 open · 121 taken · 23 declined · 57 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -574,3 +574,6 @@ flowchart LR
 | R560 | open | 2026-11-19 | designer | phase platform-design-1/P06 | debt | high | Publish the P06 mirror to the Invana v2027 canvas | P06 session had no Artifact publish tool. Publish .design/canvas-invana/project (all place boards except the 7 shared components, plus canvas.json) to artifact PgtkC6KygGZz2u8fYq1LWX with root .design/canvas-invana: carries the URL reader on 62 boards and the new projects.graph board. |  |  |
 | R561 | open | 2026-11-19 | designer | phase platform-design-1/P06 | docs | medium | Repoint model.kinds and model.relationships cells to model.models states | Ravi chose repoint (Q4 a): 29 cells in SE-02, SE-05, SE-08, SE-19, SE-20 and two examples in specs/design-language.md section 7 become model.models · Kind[ · state] and Relationship[ · state]; the states exist; check.py still warns on both ids. |  |  |
 | R562 | open | 2026-11-19 | designer | phase platform-design-1/P06 | docs | medium | Record P06 hand-off notes in platform-design-1 project file | Designer cannot edit the project file. P06 notes are in .agent-reports/designer/platform-design-1-P06.md: URL reader contract (?view&st&lens, pd1p06/urlreader.py re-run after any board regeneration), checks (pd1p06/checkall.mjs), projects.graph drawn with a Graph tab only on itself and projects.alerts (P09 adds it to other project boards), publish pending. Copy into Hand-off notes. |  |  |
+| R563 | open | 2026-11-19 | designer | phase platform-design-1/P08 | docs | low | RC-08 and RC-11 cells name Needs the model grant; criteria and boards say Needs Create on Graph Data | RC-08 and RC-11 Screens (No access column) cite data.loads Upload and Add by hand Needs the model grant; their criteria RC-08.9 and RC-11.6 say Needs Create on the kind. P08 drew both names (the old name as an alias state). Rename the cells to Needs Create on Graph Data, then the alias states can go. |  |  |
+| R564 | open | 2026-11-19 | designer | phase platform-design-1/P08 | docs | low | SE-13 Request refused cell is undefined; the board draws Already resolved | SE-13 Screens cite model.rules Request refused (Admin, Failed) but no criterion says what is refused. P08 drew SE-13.12 Already resolved as that state. Name the refusal in a criterion, or rename the cell to the drawn state. |  |  |
+| R565 | open | 2026-11-19 | designer | phase platform-design-1/P08 | docs | medium | Record P08 hand-off note in platform-design-1 project file | Designer cannot edit the project file. The P08 note is in .agent-reports/designer/platform-design-1-P08.md; copy it into Hand-off notes. Publishing the mirror stays with R560. |  |  |
