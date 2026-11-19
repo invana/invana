@@ -376,7 +376,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P06 | Density pass — one pass over every board | P05 | done | 2026-11-19 | gates green · reviews passed |
 | P07 | Fleet and workers | P06, P04 | done | 2026-11-19 | gates green · reviews passed |
 | P08 | Access (IAM) | P07 | done | 2026-11-19 | gates green · reviews passed |
-| P09 | Modeller — the global model (stitch) and overview | P08 | in progress | 2026-11-19 |  |
+| P09 | Modeller — the global model (stitch) and overview | P08 | done | 2026-11-19 | gates green · reviews passed |
 | P10 | Projects — the map-led views and project settings | P09 | pending |  |  |
 | P11 | Create a project | P10, P08 | pending |  |  |
 | P12 | Datasets, activity and builder | P11 | pending |  |  |
