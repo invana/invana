@@ -5,6 +5,7 @@ feature: XX-F01
 status: idea
 personas: []
 boards: []
+# milestone: MVP   # optional, one ID of specs/milestones.md; omit = unplanned; never on a `later` story
 ---
 
 # XX-01 · Story title
