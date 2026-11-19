@@ -371,7 +371,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01b | Visual re-audit — Invana Products against v2027, side by side | P01 | done | 2026-11-19 | gates green · reviews passed |
 | P02 | Part 1's review changes and the MVP badges |  | done | 2026-11-19 | gates green · reviews passed |
 | P03 | Take up the open part-1 recommendations that are spec edits |  | done | 2026-11-19 | gates green · reviews passed |
-| P04 | Spec the gaps | P01, P01b, P02, P03 | in progress | 2026-11-19 |  |
+| P04 | Spec the gaps | P01, P01b, P02, P03 | done | 2026-11-19 | gates green · reviews passed |
 | P05 | Density rule in the design language | P01, P01b | pending |  |  |
 | P06 | Density pass — one pass over every board | P05 | pending |  |  |
 | P07 | Fleet and workers | P06, P04 | pending |  |  |
