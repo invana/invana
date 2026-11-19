@@ -48,6 +48,7 @@ flowchart LR
 | RC-05.8 | A value saved from a simulation's result | *Provenance* opens | it is labelled *derived*, naming the run it came from and the loads that run was pinned to |
 | RC-05.9 | A property whose level the person's default agent may not Read | *Provenance* opens | the value is absent — no row, no count, no note; what wrote the other values and when stay readable |
 | RC-05.10 | A copy of a record's values — an answer, a finding, a report, a snapshot, a note or an export | someone asks where it came from | its sources are the records and loads this provenance names, recorded as lineage ([GP-F02](../../../../../../os/graph/features/GP-F02-memory/feature.md#engine)); provenance is where a value came from, lineage what a copy was read from |
+| RC-05.11 | A value shown in *Provenance* | it is read | it carries one grade — *observed* (a load, a data store or the graph database's own record), *derived*, *predicted* or *claimed* (a person, an agent or a third party said it and no source backs it) — beside what wrote it, and *How it got here* names the grade's reason |
 
 ## Screens
 

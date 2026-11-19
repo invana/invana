@@ -57,6 +57,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | CP-F03 | [Workers and the queue](features/CP-F03-workers-and-the-queue/feature.md) | CP-05 · CP-06 · CP-07 · CP-08 · CP-09 · CP-10 | idea |
 | CP-F04 | [Limits](features/CP-F04-limits/feature.md) | CP-11 · CP-34 · CP-12 · CP-13 · CP-14 | idea |
 | CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 · CP-17 | idea |
+| CP-F13 | [Data stores](features/CP-F13-data-stores/feature.md) | CP-84 | idea |
 | CP-F06 | [Skill scripts](features/CP-F06-skill-scripts/feature.md) | CP-15 · CP-16 | idea |
 | CP-F07 | [Find your way — ⌘K and search](features/CP-F07-find-your-way/feature.md) | CP-30 · CP-68 · CP-71 | idea |
 | CP-F08 | [The Inbox — what needs me, and notifications](features/CP-F08-the-inbox/feature.md) | CP-36 · CP-37 · CP-45 · CP-46 | idea |

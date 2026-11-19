@@ -157,6 +157,8 @@ Roadmap: [milestones](milestones.md) — Invana's own milestones (MVP first).
 | | CP-73 | [Connect an issue tracker and link a project to it](os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md) | idea | [—](os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/task.md) |
 | | CP-74 | [Delete an outside issue only by hand](os/control/features/CP-F12-issue-trackers/stories/CP-74-delete-an-outside-issue-only-by-hand/story.md) | idea | [—](os/control/features/CP-F12-issue-trackers/stories/CP-74-delete-an-outside-issue-only-by-hand/task.md) |
 | | CP-78 | [Fix an issue through a branch and a pull request](os/control/features/CP-F12-issue-trackers/stories/CP-78-fix-an-issue-through-a-branch-and-a-pull-request/story.md) | idea | [—](os/control/features/CP-F12-issue-trackers/stories/CP-78-fix-an-issue-through-a-branch-and-a-pull-request/task.md) |
+| **CP-F13** | | [Data stores](os/control/features/CP-F13-data-stores/feature.md) | idea | |
+| | CP-84 | [Connect a data store](os/control/features/CP-F13-data-stores/stories/CP-84-connect-a-data-store/story.md) | idea | [—](os/control/features/CP-F13-data-stores/stories/CP-84-connect-a-data-store/task.md) |
 
 ### Graph Plane · `GP` · idea
 
@@ -341,6 +343,7 @@ Roadmap: [milestones](milestones.md) — Invana's own milestones (MVP first).
 | **SE-F02** | | [Change and publish a model](capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md) | idea | |
 | | SE-05 | [Change a model and publish it](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-05-change-a-model-and-publish-it/story.md) | idea | [—](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-05-change-a-model-and-publish-it/task.md) |
 | | SE-08 | [Constrain a property's values](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-08-constrain-a-propertys-values/story.md) | idea | [—](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-08-constrain-a-propertys-values/task.md) |
+| | SE-23 | [Store a kind's rows in a table](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-23-store-a-kinds-rows-in-a-table/story.md) | idea | [—](capabilities/semantics/features/SE-F02-change-and-publish-a-model/stories/SE-23-store-a-kinds-rows-in-a-table/task.md) |
 | **SE-F03** | | [Meaning](capabilities/semantics/features/SE-F03-meaning/feature.md) | idea | |
 | | SE-20 | [Say what a kind means](capabilities/semantics/features/SE-F03-meaning/stories/SE-20-say-what-a-kind-means/story.md) | idea | [—](capabilities/semantics/features/SE-F03-meaning/stories/SE-20-say-what-a-kind-means/task.md) |
 | **SE-F04** | | [Taxonomies](capabilities/semantics/features/SE-F04-taxonomies/feature.md) | idea | |

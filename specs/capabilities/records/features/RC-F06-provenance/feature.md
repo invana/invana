@@ -58,6 +58,7 @@ flowchart TD
 | The database's own records | A value Invana never wrote reads *Present in the graph database before Invana wrote to it* — never a guess |
 | Provenance is not lineage | Provenance is *where a value came from* — a load, an edit, a person, an agent. Lineage is *what a copy was read from* — an answer, a finding, a report, a snapshot, a note, an export. Provenance feeds lineage: a copy's sources are resources in [Access Policies' grammar](../../../../os/access/features/AC-F02-access-policies/feature.md#mechanisms), and a record's provenance is what tells which load or run a source was ([GP-F02 › Engine](../../../../os/graph/features/GP-F02-memory/feature.md#engine)) |
 | A value shows as far as the reader's agent reads | A value the person's default agent may not Read is absent from provenance and history — no row, no count, no note; what wrote the other values and when stay readable |
+| Every value has an evidence grade | A value shows one grade: *observed* when a load, a data store or the graph database's own record wrote it, *derived* when a rule or inference added it, *predicted* when it came from what-if reasoning, *claimed* when a person, an agent or a third party said it and no source backs it ([system-design.md](../../../../system-design.md) § 6). The grade is read from the origin stamp (`import` observed · `user`, `llm`, `third_party` claimed) and the derived and predicted labels, never typed |
 | An undone load says so | A value whose load was undone and that nothing changed since is gone; one kept because a later write changed it names both |
 
 ## Access
@@ -109,7 +110,7 @@ flowchart TD
 
 | Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
 |---|---|---|
-| `GET /{kind}/{key}/provenance` | Per value: what wrote it (`load` · `run` · `derived` · `database`), the load or run, the person or agent, when, and `load_undone` | RC-05 |
+| `GET /{kind}/{key}/provenance` | Per value: what wrote it (`load` · `run` · `derived` · `database`), its `grade` (`observed` · `derived` · `predicted` · `claimed`), the load or run, the person or agent, when, and `load_undone` | RC-05 |
 | `GET /{kind}/{key}/history` | History filtered to the record, newest first: when · who · run · property, before → after · why; also for an address deleted since | RC-06 |
 
 ### Events
@@ -136,6 +137,7 @@ flowchart TD
 |---|---|
 | What wrote a value | The newest History event that wrote the property; none, the element's load stamps; none, *Present in the graph database before Invana wrote to it* — never a guess |
 | Lineage to the file | A load-written value opens its load: id, file, content hash, licence and run |
+| The grade | `GET .../provenance` returns each value's `grade` beside what wrote it; a claimed value that a later load or a data store's row confirms reads *observed* from then, its History unchanged |
 | Derived | A value from a derived fact names its rule version and premises; a value from a `source = run` load names that run and the loads it was pinned to (`record_load_inputs`) |
 | An undone load | A value its undone load wrote that a later write kept names the later write and flags the load *load undone* |
 | What the reader may open | A run or a member the reader may not read is named, never opened — *a run by an agent you cannot see* · *a member you cannot see* |
@@ -153,6 +155,7 @@ flowchart TD
 | Decision | Detail |
 |---|---|
 | Written once | What wrote a value is stamped when it is written and never changes; later changes are its History |
+| The grade is read, not stored | A value's grade follows its origin and label, so no table holds it and a re-read never disagrees with the stamp |
 | The same rows as History | What a record's History shows and what History shows for it are the same rows |
 
 ## Open questions
