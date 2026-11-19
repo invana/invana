@@ -104,11 +104,50 @@ Permissions are [the permission catalogue](../../../../os/access/features/AC-F02
 | The subject model is parsed, never hand-kept | It is read from the project's sources — specs folders and code for Software, web pages and documents for Research — each node citing its source, place and content hash. The source is the truth; the sync is one way: source to graph. Only an approved draft ever writes a source |
 | The work model is projected | Milestones, tasks, runs and linked issues stay recorded in the engine's tables ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#engine)); the engine projects each into the graph database as it settles, labelled *derived*. The graph can be rebuilt from the tables, never the other way |
 | Core nodes are generic | A project's core nouns are Project · Milestone · Task (with sub-tasks) · Run · Check · Review · Subject model. A milestone `covers` any subject node and `waits on` a milestone; a task is `about` any node, `changes` a node and is `linked to` an outside issue. No software word is in the core, a screen or the engine: the type supplies its own labels |
-| A project type is a manifest | A type is a subject model (node kinds and links), sources it can read, suggested agents and skills, default tags, default checks and labels. It is built in or from a Team pack ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)); never authored in Studio. Two ship — **Software** ([the pack](../../../../packs/software-delivery.md#the-project-type)) and **Research** ([the pack](../../../../packs/market-research.md#the-project-type)) — and **General** has no subject model |
+| A project type is a manifest | A type is one file, `project_types/<id>.yaml`, with the fields of [the type manifest](#the-project-type-manifest): subject model, sources and the connectors that parse them, milestones, default tags, default checks as workflows, labels, suggested agents and skills. It is built in or from a Team pack ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)); never authored in Studio. Two ship — **Software** ([the pack](../../../../packs/software-delivery.md#the-project-type)) and **Research** ([the pack](../../../../packs/market-research.md#the-project-type)) — and **General** is built in with no subject model |
 | One flow for every type | Ideate with the assistant → it proposes nodes, dashed until accepted → save a version → explore, ask and query from a node or a group → plan milestones from a selection → agents pick up tasks → checks → a person reviews and accepts. A type changes the nodes and the words, never the flow |
 | The agent proposes, the person decides | A proposed node, link or milestone is a person's to accept; an approved draft asks first before it writes anything outside Invana |
 | A context bundle is bounded and narrowed | Every read answers to the caller's token budget and reach; what it cannot include it counts |
 | Backend owns every number | Node counts by kind, the hops reached, how many were cut and withheld, and a milestone's progress are the engine's |
+
+## The project type manifest
+
+A type is declared once, in a manifest the engine reads when its pack is installed and offers in *New project*
+([PJ-02](../PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)). The manifest holds what the
+type *chooses*; the engine's generic core holds everything else, so no type adds a screen, a route or a table.
+
+| Field | Holds | Required | Used by |
+|---|---|---|---|
+| `id` · `title` · `description` · `group` | The type's key (unique in the deployment), its card title and one line, and the group it sits under in the type grid (*Built in* or the pack's title) | Yes | PJ-02 About |
+| `labels` | The type's words for the core nouns — `project` · `task` · `milestone` · `check` · `review` · and the name of each node kind in the plural — used inside a project only | `project` and `task` | PJ-02.19 |
+| `fields` | The fields About asks for beside the name — each `key` · `label` · `type` (`text` · `choice` · `person` · `url`) · `required` · `default` | No | PJ-02 About |
+| `subject_model` | The `ontology` file declaring the node kinds, their fields and the links between them; none for General | No — absent means *No subject model* | PJ-28.1 · PJ-28.2 |
+| `sources` | Each source the type can read: `kind` (`specs` · `code` · `web` · `documents` · `tracker`) · `connector` (the id of the `source` or tracker connector that reads it) · `parses_to` (the node kinds it may produce) · `required` | No | PJ-28.3 · PJ-28.13 |
+| `milestones` | The ordered starting milestones — each a `name`, with the previous one as what it waits on | No | PJ-18 · PJ-26 |
+| `tags` | The default tags, each a label ([PJ-27](../PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) | No | PJ-27 |
+| `task_kinds` | Kinds beyond *Task* and *Recommendation*, each with its fields and its default checks | No | PJ-20 |
+| `checks` | The default checks: each a `when` (a tag, a kind, a milestone, or a story that touches access, data, agents or an outside system) and an ordered list of steps — a `workflow` key ([AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md)) run in an evaluator run of its own, or `person` (a person on the team) | No | PJ-25 |
+| `reviewers` | The default reviewer — `creator` or the field holding a person | No | PJ-22 |
+| `agents` | The suggested agents, the `assistant` among them, and the skills each carries | No | PJ-02.14 |
+| `pick_up` | The default pick-up mode, `ask` unless a pack asks narrower | No | PJ-15 |
+| `access_template` | The Access template chosen first in the Access step | No | PJ-02.21 |
+| `report_template` | The report's starting point | No | [PJ-F05](../PJ-F05-project-reports/feature.md) |
+| `requires` | The connectors the type needs installed — every `connector` named in `sources`, and the code host when the type opens pull requests | Derived | PJ-02 About |
+
+| Type | `subject_model` | `sources` · connectors | `labels` | `milestones` | Where it is declared |
+|---|---|---|---|---|---|
+| **General** | none | none; a tracker may be linked ([CP-F12](../../../../os/control/features/CP-F12-issue-trackers/feature.md)) | *Project* · *Task* | none | Built in |
+| **Software** | `ontology/software.yaml` — Feature · Requirement · Story · Module · Persona · Journey · Decision | `specs` and `code` by `invana-files`; `tracker` by a code host | *Project* · *Story* | *Spec* → *Design* → *Build* → *Verify* | [`software-delivery`](../../../../packs/software-delivery.md#the-project-type) |
+| **Research** | `ontology/research.yaml` — Competitor · Offering · Capability · Price · Segment · Claim · Source | `web` and `documents` by `invana-web`; `tracker` | *Project* · *Task* | *Landscape* → *Gaps* → *Brief* | [`market-research`](../../../../packs/market-research.md#the-project-type) |
+
+| Rule | Detail |
+|---|---|
+| The core is not in the manifest | Project · Milestone · Task · Run · Check · Review, the sub-task, the dependency and the `covers` · `about` · `changes` links are the engine's; a manifest cannot rename an id or remove one of them |
+| A parser is a connector | A type ships no parser code. A source names the connector that reads it — `invana-files` for specs folders and code (an import parser per language), `invana-web` for pages and documents — and that connector's `connector.yaml` lists the node kinds it can produce; a `parses_to` kind a connector does not list fails the manifest |
+| Checks are workflows | Each check step is the key of a workflow or a person; a key no workflow answers to fails the manifest. A check is applied to a new task by its `when`, and is a run of its own ([PJ-25](../PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
+| A manifest is valid or not offered | Every field is checked when the pack is installed: a field the schema does not know, a required field missing, a node kind used and not declared, a link with an undeclared end, a milestone naming itself, a duplicate `id`. A pack whose manifest fails installs nothing and names the file, the field and why |
+| A type with a missing connector is held | An installed type whose `requires` connector is not installed is listed in *New project* as unavailable, naming the connector — never hidden |
+| General is one with no model | General has no `subject_model`, no sources and no milestones; the same flow, the same work graph, only the work shows |
 
 ## Data touched
 
@@ -180,6 +219,8 @@ Subject nodes, work nodes and links between models are records of the project's 
 | 403 | A link with an end the caller may not read | *Withheld — join the team or ask {who can grant}.* | PJ-28.6 |
 | 409 | Editing a parsed or projected node | *Change it in {where}.* | PJ-31.6 |
 | 409 | Any write to an archived project | *{project} is archived — unarchive it first.* | PJ-28.12 |
+| 422 | A pack whose `project_types/<id>.yaml` fails the manifest schema | *{file}: {field} — {why}. Nothing was installed.* | PJ-28.15 |
+| 422 | A project created of a type whose required connector is not installed | *{type} needs {connector} — install it first.* | PJ-02.32 |
 
 ### CLI
 
@@ -195,6 +236,7 @@ Subject nodes, work nodes and links between models are records of the project's 
 | Projection | A settled fact — a milestone, task, run, check or issue link — writes an outbox row in its own transaction; one relay applies it to the project's graph database as a node or link marked `derived`, in order, retrying with a doubling delay, within 5 seconds p95 ([NFR-PERF-8](../../../../system-design.md#3-non-functional-requirements)). Each node carries its project and kind as policy attributes and holds ids, kind, state, title and dates only; every read surface filters it by the project's reach and it is Hidden from agents outside the project by default. With no read + write graph database `work_graph = off` and the reason is shown. The graph is rebuilt from the tables, never the reverse |
 | Context | `nodes[]` expand breadth first to `hops`; each node is checked against the caller's reach before it is added; nodes are ranked by link count and recency and added until `budget` tokens, counting what is cut and withheld. The budget is held like a model call's ([system-design.md](../../../../system-design.md) § 10) |
 | Impact | Follows `depends on`, `covers`, `about` and `changes` links outward from the node; groups what it reaches by kind with the open tasks and milestones among them |
+| Reading a manifest | When a pack is installed the engine validates each `project_types/<id>.yaml` against [the manifest schema](#the-project-type-manifest) and the pack's connectors, workflows and ontology, and stores nothing of a type that fails; `GET /types` ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#routes)) serves the valid ones, General first |
 | Approving a draft | In Software: renders the node into its spec file with the type's template and asks first — the file and its text — as an outside write ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)); after *Send it* it writes the file in the project's workspace and reads the source again, so the parsed node replaces the draft. In Research: writes the node with its source and approver, refusing one with no source |
 | A version | `projects_sketch_versions.snapshot` is the draft nodes and links as they stand; opening one reads it beside the live sketch with what was added and removed |
 
@@ -220,6 +262,8 @@ Subject nodes, work nodes and links between models are records of the project's 
 | Draft before node | The assistant's proposal is dashed, an accepted one is a *Draft*, an approved one is written to its source — three steps, each a person's yes where it matters |
 | Code is read as an import graph | Module nodes and their `depends on` links come from the imports of each file, per language — Python and TypeScript first — not from manifests alone; parsers keep the sandbox and caps above |
 | A work node answers to its project | A projected node carries its project's reach, is filtered on every read surface and Hidden from agents outside the project by default |
+| A type is data, never code | A type is a manifest of choices over the generic core; a parser is a connector it names, a check a workflow it names — so a new type is a pack, never a change to the engine or Studio |
+| An invalid manifest installs nothing | A pack with a manifest that fails the schema is refused whole, naming the file and field, so *New project* never offers a type that cannot run |
 | A context bundle is a budget | A bundle is cut to the caller's token budget and reports what it cut; it is never silently truncated |
 
 ## Open questions

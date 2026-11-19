@@ -57,6 +57,8 @@ flowchart TD
 | PJ-28.13 | A person on the team | they add a Web source or a Local files, specs or code source | a Web address must be in the Web connection's hosts and a folder under the Local files workspace root an Admin set (CP-73.19); one outside is refused, naming it, and the source reads *Failed*; the fetch follows CP-73.20 |
 | PJ-28.14 | A Software project's code source in Python or TypeScript | it is read | the files' imports become Module nodes and `depends on` links — an import graph per language, not manifests alone — each citing its file, place and hash; a file in a language with no parser is listed as skipped, naming it |
 
+| PJ-28.15 | A Team pack whose type manifest names a field the schema does not know, omits a required one, uses a node kind or link it does not declare, or names a connector's node kind or a workflow that does not exist | an Admin installs the pack | it is refused whole, naming the file, the field and why; no type of it is offered |
+
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
