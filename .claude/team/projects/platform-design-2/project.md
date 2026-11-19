@@ -373,7 +373,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P03 | Take up the open part-1 recommendations that are spec edits |  | done | 2026-11-19 | gates green · reviews passed |
 | P04 | Spec the gaps | P01, P01b, P02, P03 | done | 2026-11-19 | gates green · reviews passed |
 | P05 | Density rule in the design language | P01, P01b | done | 2026-11-19 | gates green · reviews passed |
-| P06 | Density pass — one pass over every board | P05 | pending |  |  |
+| P06 | Density pass — one pass over every board | P05 | in progress | 2026-11-19 |  |
 | P07 | Fleet and workers | P06, P04 | pending |  |  |
 | P08 | Access (IAM) | P07 | pending |  |  |
 | P09 | Modeller — the global model (stitch) and overview | P08 | pending |  |  |

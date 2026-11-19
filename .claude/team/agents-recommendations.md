@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**544 recommendations** · 331 open · 126 taken · 23 declined · 64 done
+**545 recommendations** · 332 open · 126 taken · 23 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -587,3 +587,4 @@ flowchart LR
 | R573 | open | 2026-11-19 | product-manager | phase platform-design-2/P01 | docs | medium | TEAM.md §7 names Graph-scope roles and a per-Graph Owner; the glossary says a Graph is never created, opened or listed | TEAM.md §7 (Operator, Can work on projects, Owner of 'the Graph's settings') and CLAUDE.md say Graph roles; specs/glossary.md Deployment and Graph Data say there is no unit inside the deployment and access is Access Policies. P01 found Invana Products still draws a Graph as a place (shell.graph.new.*, graph.settings.*). Recommend: once Ravi answers P01 Q1, align TEAM.md §7 with the glossary or restore Graphs in the specs. |  |  |
 | R574 | open | 2026-11-19 | product-manager | phase platform-design-2/P02 | docs | low | design-language §7 badge row still says MVP? while proposed | specs/design-language.md:327 says the badge reads MVP? while the milestone is proposed; the MVP is now confirmed, so it reads MVP. Fix in P05 with the density rule. |  |  |
 | R575 | taken | 2026-11-19 | product-manager | phase platform-design-2/P03 | docs | medium | Draw the states P03's spec edits name that no board draws yet | settings.packs · Install · Manifest refused (CP-20.17) · agents.skills · Import · a refused address (AG-64.2, mapped to Refused file for now) · agents.skills · Detail · Export · Writing, Refused and Disabled (AG-64) · inbox.dropdown · Agent waiting, Refused, Not mine (CP-76). Draw each in the phase that owns its board (P12 builder and packs, P13 inbox). | P2 | phase platform-design-2/P12 |
+| R576 | open | 2026-11-19 | designer | phase platform-design-2/P06 | docs | low | Add P06's hand-off row to platform-design-2 and publish the density pass | A designer cannot edit the project file. Add P06's hand-off note (text in .agent-reports/designer/platform-design-2-P06-boards.md) to its Hand-off notes. The density pass is built in the mirror but not published: this session had no Artifact tool (R560/R566). A session with it publishes ds/density.css and every changed board to PgtkC6KygGZz2u8fYq1LWX. |  |  |
