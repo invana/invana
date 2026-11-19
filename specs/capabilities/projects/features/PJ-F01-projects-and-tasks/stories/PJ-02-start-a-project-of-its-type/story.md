@@ -32,6 +32,10 @@ Projects — [PJ-F01 › Access](../../feature.md#access).
 flowchart TD
   s([Projects · the switcher's New]) -->|no Create on Projects| off(["New project disabled · names the permission and who can grant it"])
   s --> a["1 About · name · description · type and its fields · key · started from (PJ-23)"]
+  a --> tg["The type grid · General first · each type's title, words and what it reads"]
+  tg -->|General| gn["No subject model · only the work · no sources to add"]
+  tg -->|Software · Research · a pack's type| tf["The type's fields · its node kinds and sources shown"]
+  tg -->|a type whose connector is not installed| tu["Listed, unavailable · names the connector"]
   a -->|Next| g["2 Goals · the assistant drafts the decision it helps make and what success looks like"]
   g -->|drafting| gl["Drafting from the description · the fields stay editable"]
   g -->|draft failed| gf["Could not draft · write them yourself"]
@@ -69,7 +73,7 @@ flowchart TD
 | PJ-02.16 | A name typed | the key field is read | it holds a key generated from the name — lower case, URL-safe — unique in the deployment, and may be edited on About |
 | PJ-02.17 | A key already used, one that is not URL-safe, or a reserved word (`tasks`, `decisions`, `types`) | they press *Next* on About, or *Create* | it is refused, the key field naming which and why; nothing is saved |
 | PJ-02.18 | A project created | its Details are read | the key reads as a fact, never a field; no act edits it (PJ-01.7) |
-| PJ-02.19 | A project of a type | it is open | its heading, tabs, dialogs and report use the type's words — a Research project reads *Study* and *Task*, an Investigation *Case* and *Action* — while Projects, My tasks, Inbox › Needs you, Decisions, search and History use *Project* and *Task* with the type as a badge |
+| PJ-02.19 | A project of a type | it is open | its heading, tabs, dialogs and report use the `labels` of the type's manifest ([PJ-F07](../../../PJ-F07-the-project-graph/feature.md#the-project-type-manifest)) — a Software project reads *Story* where the generic words read *Task* — while Projects, My tasks, Inbox › Needs you, Decisions, search and History use *Project* and *Task* with the type as a badge |
 | PJ-02.20 | A project created | every person opens Projects | it is listed for each of them, its head readable; History records who made it |
 | PJ-02.21 | The Access step | it opens | it runs *New policy*'s form inline ([AC-49](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-49-make-a-policy-from-an-access-template/story.md)) — its Start, named for the project, from the one list of Access templates, the type's default first, then *What it allows* as [a tab per section](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-policy-form) — a horizontal tab strip above the content, each tab with its short status, the selected tab's content spanning the full width of the step: **Graph Data** — each graph database *None* · *Read* · *Read + write*, with overrides per kind of node and relationship and each property *Hidden* · *Read* · *Read + write* · **Models** · **AI models** · **Agents** that may work here · **Skills & plugins** · **Fleet / Workers** — the worker group, runs at once, tokens a month · **Projects** · **Access** · **Settings** · **Outside Invana** · *Adding people needs approval*; *Who holds it* is this project, fixed; the person adjusts it, and *Edit as policy* opens the same policy as the matrix |
 | PJ-02.22 | A graph database the deployment does not attach, sent by the API | they press *Create* | it is refused before saving — *There is no graph database {name}.*; nothing is saved |
@@ -82,6 +86,10 @@ flowchart TD
 | PJ-02.29 | A creator without Manage on Projects who sets access beyond the template's or widens it | they press *Create* | the project is created read-only on what they chose — Read on the graph databases, models and agents they picked — each part beyond it marked *Asked {who can grant}*; an ask lands in the Inbox of those with Manage on Projects; History records the ask and its answer |
 | PJ-02.30 | A project created | any run inside it starts — asked by anyone on its team, scheduled, picked up or by its Lead agent | it reaches the project's policies ∩ the agent's ceiling; the person who asked is recorded on the run; *How it got here* names the project's policies for each step |
 | PJ-02.31 | A project created | Access › Access Policies is read | its policy is listed like any other, attached to it, started from its template — the same object a person's or a team's policy is; another attached later adds to it, never replaces it |
+| PJ-02.32 | About | it opens | the type grid lists every type the deployment offers, grouped — *Built in* (General) first, then each pack's — each card with its title, one line and the node kinds and sources its manifest declares; a type whose required connector is not installed is listed and unavailable, naming the connector, and a call to create one is refused — *{type} needs {connector} — install it first.* |
+| PJ-02.33 | A type picked | About shows its fields | it asks the fields the manifest declares — each with its label, kind, default and whether it is required — and nothing the manifest does not declare; changing the type clears fields the new type does not have, after a confirm that names them |
+| PJ-02.34 | The General type picked | About, Review and the new project's Sources are read | About says *No subject model — only the work shows*; Review lists no sources or milestones; the project's Sources reads *No subject model* ([PJ-28.2](../../../PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)); tasks and milestones work as in any type |
+| PJ-02.35 | A Software or Research type picked | Review reads | it lists, under the type, its starting milestones, default tags, default checks (each as the workflow or person it names) and suggested agents — each a line with *Edit* back to the step that sets it; *Create* applies them as PJ-02.14 says |
 
 ## Screens
 
@@ -89,6 +97,8 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | New project · About | Admin | projects.projects · New · About | — | projects.projects · New · Loading types | projects.projects · New · About filled | projects.projects · New · Field refused | — | — |
 | New project · About | Operator | projects.projects · New · About | — | projects.projects · New · Loading types | projects.projects · New · About filled | projects.projects · New · Field refused | — | — |
+| New project · Type | Admin | projects.projects · New · About · Types | — | projects.projects · New · Loading types | projects.projects · New · About · General | projects.projects · New · About · Type needs a connector | — | — |
+| New project · Type | Operator | projects.projects · New · About · Types | — | projects.projects · New · Loading types | projects.projects · New · About · General | projects.projects · New · About · Type needs a connector | — | — |
 | New project · Goals | Admin | projects.projects · New · Goals · No description | — | projects.projects · New · Goals · Drafting | projects.projects · New · Goals | projects.projects · New · Goals · Could not draft | projects.projects · New · Goals · Drafting | — |
 | New project · Goals | Operator | projects.projects · New · Goals · No description | — | projects.projects · New · Goals · Drafting | projects.projects · New · Goals | projects.projects · New · Goals · Could not draft | projects.projects · New · Goals · Drafting | — |
 | New project · Access | Admin | projects.projects · New · Access · Template | — | projects.projects · New · Access · Loading | projects.projects · New · Access · Adjusted | projects.projects · New · Access · Could not load | — | — |
