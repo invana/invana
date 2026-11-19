@@ -47,7 +47,7 @@ flowchart TD
 | CP-17.6 | A saved graph database | it is stored | it names its connector by the registered name, never by a code path |
 | CP-17.7 | A graph database whose connector's package was removed | it is read or a run reaches it | it says the connector is not installed, naming the package; nothing runs against it |
 | CP-17.8 | Two packages that register the same name | the engine starts | neither is offered under that name; `invana version` names both packages |
-| CP-17.9 | An Operator | they open a graph database's details | they read its connector and language; installing one is not offered anywhere in Invana |
+| CP-17.9 | An Operator | they open a graph database's details | they read its connector and language; installing one is not an act of Invana — [CP-79](../../../CP-F02-plugins-and-outside-tools/stories/CP-79-install-a-connector/story.md) shows an Admin the command to run on the engine's machine |
 | CP-17.10 | Connectors in Settings › Connections | the list is read | each installed connector reads its graph databases and *Used by n agents*, as the engine counts them |
 | CP-17.11 | Installed graph connectors | a person opens Settings › Connections › Connectors | each lists with the graph database it connects, its version and *Used by n graph databases*; an Operator reads the same list, which has no acts of its own |
 

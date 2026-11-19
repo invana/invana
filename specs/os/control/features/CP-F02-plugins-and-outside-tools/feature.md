@@ -4,7 +4,7 @@ title: Plugins and MCP
 product: CP
 status: idea
 personas: [admin, builder, analyst, curator]
-stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-75, CP-20, CP-64, CP-77]
+stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-75, CP-20, CP-64, CP-77, CP-79, CP-80, CP-81, CP-82, CP-83]
 journeys: [J07, J10]
 boards: [settings.connectors, settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-SEC-9, NFR-SEC-15, NFR-PERF-3]
@@ -52,10 +52,15 @@ flowchart TD
   rti --> rtg(["Carried by the worker groups an Admin picks (CP-10) · offered in Runs with (AG-61)"])
   rti -->|agents still run with it · Remove| rtb(["Refused, naming the agents"])
   pl -->|a connector| cn["CP-77 · Installed connectors: kind · version · engine range · scopes · capabilities"]
+  cn -->|not installed| ci["CP-79 · Install a connector: the command to run on the engine's machine · restart"]
+  cn -->|Admin · a credential| cr2["CP-80 · A work connection, or my own account where allowed · tried before it is stored"]
+  cr2 --> cr3["CP-81 · Test · Rotate · Remove"]
+  pl -->|a plugin · update · remove| pu["CP-82 · Update or remove on the engine's machine · what depends on it first"]
   cn -->|manifest invalid · engine range outside · fails to load| cnf(["Listed failed · names the package and why · not offered"])
   cn -->|Admin · Connect| cnc(["A form drawn from its config schema · secrets by name · scopes that warn named"])
   pl -->|a Team pack| pk["CP-20 · Install: each piece offered in its own product"]
   pk -->|a piece clashes · a required connector is missing| pkc(["Names the piece or the connector · nothing installed"])
+  pk -->|Admin · Install · Update · Remove| pkx["CP-83 · What it brings or changes first · then the act"]
   pk -->|Edit| cu(["A Custom copy · the installed pack never changes"])
   pk -->|a newer version| up(["A diff · an Admin applies it · new policies arrive as drafts"])
   pk -->|without Create on setting/team-packs| pkr(["Reads · Install disabled, naming the permission"])
@@ -110,6 +115,11 @@ sequenceDiagram
 | CP-20 | [Install a Team pack](stories/CP-20-install-a-team-pack/story.md) | idea |
 | CP-64 | [Install an agent runtime](stories/CP-64-install-an-agent-runtime/story.md) | idea |
 | CP-77 | [See the connectors installed and connect one from its manifest](stories/CP-77-see-the-connectors-installed-and-connect-one-from-its-manifest/story.md) | idea |
+| CP-79 | [Install a connector](stories/CP-79-install-a-connector/story.md) | idea |
+| CP-80 | [Add a credential to a connector and connect it](stories/CP-80-add-a-credential-to-a-connector-and-connect-it/story.md) | idea |
+| CP-81 | [Test, rotate and remove a credential](stories/CP-81-test-rotate-and-remove-a-credential/story.md) | idea |
+| CP-82 | [Install, update and remove a plugin](stories/CP-82-install-update-and-remove-a-plugin/story.md) | idea |
+| CP-83 | [Install, update and remove a Team pack](stories/CP-83-install-update-and-remove-a-team-pack/story.md) | idea |
 
 ## Access
 
@@ -128,6 +138,12 @@ sequenceDiagram
 | Connect or disconnect one's own personal connection to an outside server | None — one's own; in a session, with the password again | An agent, the system user and a project key have no personal connection; shared work never uses one |
 | Read and disconnect any person's personal connection | Manage on `plugin/<name>`, in a session, with the password again | Another person's personal connection is absent |
 | Install or remove a Team pack · make a Custom copy · apply an upgrade | Create on `setting/team-packs` to install · Edit to remove, copy or upgrade | *Install* and *Remove* are disabled — *Needs Create on Settings — ask {who can grant}* |
+| Read the connectors Invana ships and the command that installs each | None — every signed-in person | — |
+| Install, update or remove a connector or a tool plugin | Not an act of Invana — done on the engine's machine, by whoever runs the deployment | Studio shows the command; *Install a connector* is disabled for an Operator — *This needs an Admin — ask {admins}* |
+| Make a work connection for a connector · rotate or remove it | Manage on `plugin/<id>`, in a session, with the password again; a second Admin's yes when the deployment asks | Disabled — *Needs Manage on the {name} plugin — ask {who can grant}* |
+| Connect, rotate or disconnect one's own account on a connector that allows it | None — one's own; in a session, with the password again | A connector that allows none shows no *My own account* |
+| Test a work connection | Manage on `plugin/<id>` | Disabled — *Needs Manage on the {name} plugin — ask {who can grant}* |
+| Test one's own personal connection | None — one's own | Another person's connection is absent |
 | Apply an Access Policy file a Team pack brought | Edit on `access/policies`, as [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#access) | The file reads *Waiting for an Admin to apply*; *Apply* is disabled — *Needs Edit on Access — ask {who can grant}* |
 | Install or remove a runtime plugin · read every runtime, what it declares and which groups carry it | Create on `plugin/<name>` installs · Manage removes · Read on `plugin/<name>` reads | *Install* and *Remove* are disabled — *Needs Create on Plugins — ask {who can grant}* |
 | Read the deployment's MCP server — address, what it serves, how to connect | None — every signed-in person | — |
@@ -227,9 +243,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `control_plugin_secrets` | `plugin` · `name` (a secret the manifest declares) · `value_sealed` · `set_by_id` · `set_at` | A shipped tool's setting. Unique (`plugin`, `name`) |
 | `control_mcp_servers` | `name` (`^[a-z][a-z0-9_]{0,31}$`, the key, unique across plugins) · `url` · `revision` (from 1) · `tools` (the frozen list, each `key` · `version` · `read_only_hint` · `needs` · input and output schema) · `skipped` (each tool left out, with why) · `server` (`name` · `version` · `protocol` from its `initialize`) · `auth` (`none` · `token` · `oauth`) · `personal` (people may connect their own; `oauth` only) · `oauth?` (`issuer` · `client_id` · `client_secret_sealed?` · `scopes[]`) · `frozen_at` · `added_by_id` | One outside server, one plugin of kind `mcp`. Previous revisions' tools stay readable for re-runs |
 | `control_connectors` | `id` (the entry-point name) · `kind` (`graph` · `code_host` · `source` · `runtime`) · `package` · `version` · `manifest_hash` · `state` (`loaded` · `failed`) · `error?` · `seen_at` | One per connector the engine found at start, from its `connector.yaml`; rewritten at every start. Never a credential |
-| `control_work_connections` | `name` (`[a-z0-9-]`, unique per server) · `server` · `label` (the service account's name) · `kind` (`token` · `oauth`) · `token_sealed?` · `access_token_sealed?` · `refresh_token_sealed?` · `expires_at?` · `state` (`awaiting` · `connected` · `expired`) · `made_by_id` · `made_at` · `approved_by_id?` · `last_used_at?` | A service identity on one server; `awaiting` while a second Admin's yes is pending. Never a person's account |
+| `control_work_connections` | `name` (`[a-z0-9-]`, unique per server) · `server` · `connector?` (the connector whose credential it is) · `label` (the service account's name) · `kind` (`token` · `oauth`) · `token_sealed?` · `access_token_sealed?` · `refresh_token_sealed?` · `expires_at?` · `state` (`awaiting` · `connected` · `expired`) · `made_by_id` · `made_at` · `approved_by_id?` · `last_used_at?` · `tested_at?` · `test_result?` (`works` · `failed`, with the server's answer) | A service identity on one server; `awaiting` while a second Admin's yes is pending. Never a person's account |
 | `control_work_connection_agents` | `connection_id` · `agent_id` · `server` · `attached_by_id` · `attached_at` | Unique (`agent_id`, `server`) — one work connection per agent per server |
-| `control_personal_connections` | `server` · `user_id` · `label` (the account's name as the server gives it) · `access_token_sealed` · `refresh_token_sealed?` · `expires_at?` · `state` (`connected` · `expired`) · `connected_at` · `last_used_at?` | A person's own account on a server with `personal` on. Unique (`server`, `user_id`); disconnecting removes the row |
+| `control_personal_connections` | `server` · `user_id` · `label` (the account's name as the server gives it) · `access_token_sealed` · `refresh_token_sealed?` · `expires_at?` · `state` (`connected` · `expired`) · `connected_at` · `last_used_at?` · `tested_at?` · `test_result?` | A person's own account on a server with `personal` on. Unique (`server`, `user_id`); disconnecting removes the row |
 | `control_runtimes` | `plugin` (a `runtime` plugin) · `runtime` (`claude_code` · `codex`, unique) · `versions` (the range it drives) · `model_runs` (`local` · `external`) · `needs` (`{verb, resource}` in `fs/` · `cmd/` · `net/`) · `installed_by_id` · `installed_at` | One per installed runtime plugin, read from its manifest; which groups carry it is [CP-F03](../CP-F03-workers-and-the-queue/feature.md#engine)'s |
 | `control_mcp_served` | `kind` (`agent` · `tool`) · `ref` · `served` · `changed_by_id` · `changed_at` | Unique (`kind`, `ref`); what the deployment's MCP server offers |
 | `control_mcp_sessions` | `session_id` (random) · `credential_kind` (`client` · `key`) · `credential_id` · `protocol` · `created_at` · `last_used_at` | One per `initialize`; a later call must carry a session its credential opened |
@@ -266,6 +282,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /plugins` | By the list contract — `?f.kind=` · `?f.enabled=` · `?q=` name or title. Each: `name` · `kind` · `version` · `title` · `extra` · `installed` · `enabled` · `switched_by` · `switched_at` · `my_switch` (`on` · `off`) · `switchable` · counts of functions, skills and workflows · `used_by_agents` — the agents that may use any of its functions | CP-04 · CP-20 |
 | `GET /plugins/{name}` | One plugin: the summary, each function's manifest with its `needs`, each workflow and skill, the secrets it declares (names, and whether each is set), and for a pack each piece with the product that offers it | CP-04 · CP-44 · CP-20 |
 | `GET /connectors` · `GET /connectors/{id}` | Every connector by the list contract — `?f.kind=` · `?f.state=`: `id` · `kind` · `version` · `state` · `engine_range` · `capabilities` · `scopes`; one with its `config` JSON Schema, its secret names and the `mcp` pin it drives. The connect form of CP-25 and CP-73 is drawn from `config` | CP-77 |
+| `GET /connectors/shipped` | The connectors Invana ships — `id` · `kind` · `package` · `installed` · `command` (the one line that installs it, run on the engine's machine) · read-only; no route installs a connector | CP-79 |
+| `GET /plugins/{name}/dependents` | What depends on a plugin before it is updated or removed — the agents that may use its functions, the workflows that need it and the schedules that run it | CP-82 |
 | `POST /plugins/{name}/copy` | Make a Custom copy of an installed pack for editing → `201`; the pack itself is unchanged | CP-20 |
 | `GET /plugins/{name}/upgrade` · `POST /plugins/{name}/upgrade` | Read the diff of a newer pack version against the installed one · apply it — an Admin's | CP-20 |
 | `GET /plugins/{name}/agents?person=` | Each agent and whether it may use each function for that person — missing needs named ([AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md#routes)) | CP-44 |
@@ -277,8 +295,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /mcp-servers` | Add `{name, url, auth, personal?, client_id?, client_secret?, password?}` — lists its tools with a work connection made in the same act, or with none, and freezes them → `201` | CP-02 · CP-42 |
 | `POST /mcp-servers/{name}/refresh` | Read its tools again — a new revision | CP-02 |
 | `PUT /mcp-servers/{name}/auth` | `{auth, personal, client_id?, client_secret?, password}` — change how Invana signs in; turning `personal` off disconnects every personal connection | CP-42 |
-| `GET /work-connections` · `POST /work-connections` | Every work connection — `name` · `server` · `label` · `kind` · `state` · `agents` · `made_by` · `last_used_at` · make one `{server, name, label, kind, token?, password}`; `oauth` returns the address to send the browser to | CP-62 |
-| `PUT /work-connections/{id}` · `DELETE /work-connections/{id}` | Renew its credential `{token?, password}` · remove it `{password}`, the agents it is attached to listed first | CP-62 |
+| `GET /work-connections` · `POST /work-connections` | Every work connection — `name` · `server` · `label` · `kind` · `state` · `agents` · `made_by` · `last_used_at` · make one `{server, connector?, name, label, kind, token?, password}`; the credential is tried once before it is stored; `oauth` returns the address to send the browser to | CP-62 · CP-80 |
+| `PUT /work-connections/{id}` · `DELETE /work-connections/{id}` | Renew or rotate its credential `{token?, password}` — the new credential is tried first and the old stays in force when it fails · remove it `{password}`, the agents it is attached to listed first | CP-62 · CP-81 |
+| `POST /work-connections/{id}/test` · `POST /personal-connections/{server}/test` | One read-only call with the credential → `works` or `failed` with the server's answer, and `tested_at`; ledgered, carries no record | CP-81 |
 | `POST /work-connections/{id}/approve` · `…/decline` | A second Admin's yes or no on an `awaiting` connection, with the password again | CP-62 |
 | `PUT /work-connections/{id}/agents/{agent}` · `DELETE /work-connections/{id}/agents/{agent}` | Attach to an agent · take off | CP-62 |
 | `GET /personal-connections` | The caller's personal connections — `server` · `label` · `state` · `connected_at` · `last_used_at` · `runs` (the last runs that used it); an Admin reads every person's with `?user=` | CP-43 · CP-63 |
@@ -306,6 +325,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `control.work_connections.attach` · `control.work_connections.detach` | A work connection is attached to an agent · taken off |
 | `control.personal_connections.connect` · `control.personal_connections.disconnect` · `control.personal_connections.expired` | A person connects · disconnects, or an Admin disconnects (`details.by`) · the server stops renewing it |
 | `control.connectors.loaded` · `control.connectors.failed` | A connector read at start · one that failed its manifest, its engine range or its load, naming the package and why |
+| `control.connectors.updated` | A connector read at start at a version other than the one stored — `{from, to}`, from the package metadata; History shows it as the plugin's update |
+| `control.connections.tested` | A work or personal connection tested — who, which connection and the result, never a credential |
 | `control.plugins.copy` · `control.plugins.upgrade` | A Custom copy made · a newer pack version applied, with the diff's counts |
 | `control.runtimes.install` · `control.runtimes.remove` | A runtime plugin is installed · removed, with its runtime and versions |
 | `control.connections.failed` · `control.connections.recovered` | A work or personal connection cannot sign in — expired, revoked, refused — naming which and why · it signs in again, is renewed or removed; CP-F11 opens and closes a connection failed alert from them |
@@ -320,6 +341,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 403 | Attaching or taking off a work connection without Edit on the agent | *Needs Edit on agent/{name} — ask {who can grant}.* | CP-62.10 |
 | 403 | The Admin who made a work connection approves it | *Another Admin approves this change.* | CP-62.4 |
 | 401 | A credential or secret change, a work connection made, renewed, removed or approved, or connecting or disconnecting a personal connection, without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-42.7 · CP-62.11 · CP-43.9 |
+| 422 | A credential the server refuses or cannot answer, when a connection is made or rotated — nothing is stored or replaced | *{server}: {what failed}.* | CP-80.4 · CP-81.6 |
+| 422 | A connector's `config` field that breaks its schema | *{field}: {why}.* | CP-80.5 |
+| 422 | A personal connection for a connector that allows none | *{connector} allows no personal connection.* | CP-80.7 |
 | 409 | Attaching a second work connection on one server to an agent | *{agent} already uses {connection} on {server} — take it off first.* | CP-62.6 |
 | 422 | `personal` on a server that does not sign in with OAuth | *People connect their own only over OAuth.* | CP-42.10 |
 | 409 | Switching a core plugin | *{name} is part of Invana and is always on.* | CP-04.3 |
@@ -434,6 +458,9 @@ The connector contract and the pack layout are [migrations.md](../../../../migra
 | A personal connection is its person's | It is used only in runs that person starts and their helpers, and what it returns shows only to them |
 | Attaching is building the agent | Which work connection an agent uses is part of the agent, so a person with Edit on the agent attaches it; making the service identity needs Manage on the plugin, as every credential does |
 | Credentials ask for the password again | Setting a secret, changing how a server signs in, making, renewing or removing a work connection, and connecting or disconnecting a personal connection change credentials ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#rules)) |
+| Installing code is the command line | A connector or a tool plugin is installed, updated and removed on the engine's machine with its package command; Invana shows the command and what depends on the plugin, runs nothing and offers no install act in Studio or the API. A pack is content, so Studio installs it ([CP-83](stories/CP-83-install-update-and-remove-a-team-pack/story.md)) |
+| A connector's credential is a connection | A connector's credential is a work connection or, where its outside server allows people their own and the connector is not a shipped tool, a personal connection — the same records, permissions, second Admin's yes and password rule as every outside server. A graph database's login is [CP-25](../CP-F05-graph-databases/feature.md)'s |
+| A credential is tried before it is kept | Making or rotating a credential makes one read-only, ledgered call first; a failure stores or replaces nothing, so the credential in force never lapses by a bad replacement |
 | A client acts through the default agent | A connected client or a key reaches no more than the person's default agent, narrowed further by the key; what it receives is outside the deployment, so it passes the outbound check |
 | A tool's read-only hint informs, never decides | The hint reads beside each tool to help an Admin write rules; whether a call waits is the agent's policies alone |
 | Streamable HTTP only | An outside server is reached by address; Invana starts no third-party process on its own machine. The tools it ships run on its workers and are reached the same way |
