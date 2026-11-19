@@ -59,3 +59,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Presenting | Admin | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |
 | Presenting | Operator | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |
+| Presenting · Your changes | Admin | — | — | — | explore.board · Present · Your changes | — | — | — |
+| Presenting · Your changes | Operator | — | — | — | explore.board · Present · Your changes | — | — | — |

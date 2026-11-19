@@ -297,6 +297,7 @@ Roadmap: [milestones](milestones.md) — Invana's own milestones (MVP first).
 | | PJ-10 | [See what a decision reaches](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-10-see-what-a-decision-reaches/story.md) | idea | [—](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-10-see-what-a-decision-reaches/task.md) |
 | | PJ-11 | [Follow a decision back to the original authors](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-11-follow-a-decision-back-to-the-original-authors/story.md) | idea | [—](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-11-follow-a-decision-back-to-the-original-authors/task.md) |
 | | PJ-13 | [Audit every decision in one place](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-13-audit-every-decision-in-one-place/story.md) | idea | [—](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-13-audit-every-decision-in-one-place/task.md) |
+| | PJ-32 | [Simulate options against targets on a branch](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-32-simulate-options-against-targets-on-a-branch/story.md) | idea | [—](capabilities/projects/features/PJ-F03-branches-findings-and-decisions/stories/PJ-32-simulate-options-against-targets-on-a-branch/task.md) |
 | **PJ-F05** | | [Project reports](capabilities/projects/features/PJ-F05-project-reports/feature.md) | idea | |
 | | PJ-14 | [Publish what we decided](capabilities/projects/features/PJ-F05-project-reports/stories/PJ-14-publish-what-we-decided/story.md) | idea | [—](capabilities/projects/features/PJ-F05-project-reports/stories/PJ-14-publish-what-we-decided/task.md) |
 | **PJ-F06** | | [Alerts](capabilities/projects/features/PJ-F06-alerts/feature.md) | idea | |
@@ -306,6 +307,12 @@ Roadmap: [milestones](milestones.md) — Invana's own milestones (MVP first).
 | | PJ-29 | [Ask the graph from a node or a group](capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-29-ask-the-graph-from-a-node-or-a-group/story.md) | idea | [—](capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-29-ask-the-graph-from-a-node-or-a-group/task.md) |
 | | PJ-30 | [Sketch nodes with the assistant and save a version](capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-30-sketch-nodes-with-the-assistant/story.md) | idea | [—](capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-30-sketch-nodes-with-the-assistant/task.md) |
 | | PJ-31 | [See the work in the same graph](capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-31-see-the-work-in-the-same-graph/story.md) | idea | [—](capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-31-see-the-work-in-the-same-graph/task.md) |
+| **PJ-F08** | | [Project settings and the agents in a project](capabilities/projects/features/PJ-F08-project-settings/feature.md) | idea | |
+| | PJ-33 | [Say what a project is about](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-33-say-what-a-project-is-about/story.md) | idea | [—](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-33-say-what-a-project-is-about/task.md) |
+| | PJ-34 | [See the data a project reads](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-34-see-the-data-a-project-reads/story.md) | idea | [—](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-34-see-the-data-a-project-reads/task.md) |
+| | PJ-35 | [See an agent in a project](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-35-see-an-agent-in-a-project/story.md) | idea | [—](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-35-see-an-agent-in-a-project/task.md) |
+| | PJ-36 | [See how much of the limits a project uses](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-36-see-how-much-of-the-limits-a-project-uses/story.md) | idea | [—](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-36-see-how-much-of-the-limits-a-project-uses/task.md) |
+| | PJ-37 | [See the agents in a project](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-37-see-the-agents-in-a-project/story.md) | idea | [—](capabilities/projects/features/PJ-F08-project-settings/stories/PJ-37-see-the-agents-in-a-project/task.md) |
 
 ### Records · `RC` · idea
 
@@ -372,17 +379,17 @@ Roadmap: [milestones](milestones.md) — Invana's own milestones (MVP first).
 
 | ID | Journey | Stories |
 |---|---|---|
-| J01 | [From a fresh deployment to a first answer](journeys/J01-from-a-fresh-deployment-to-a-first-answer.md) | AC-01 · CP-22 · CP-25 · CP-17 · CP-26 · CP-27 · SE-04 · SE-06 · SE-15 · CP-39 · CP-38 · CP-24 · SE-05 · RC-08 · RC-09 · CP-01 · AG-35 · EX-01 · EX-02 · EX-04 |
+| J01 | [From a fresh deployment to a first answer](journeys/J01-from-a-fresh-deployment-to-a-first-answer.md) | AC-01 · CP-22 · CP-25 · CP-17 · CP-26 · SE-04 · SE-06 · SE-15 · CP-39 · CP-38 · CP-24 · SE-05 · RC-08 · RC-09 · CP-01 · AG-35 · EX-01 · EX-02 · EX-04 |
 | J02 | [Ask and trust the answer](journeys/J02-ask-and-trust-the-answer.md) | EX-01 · EX-23 · EX-02 · EX-03 · EX-25 · EX-04 · RC-05 · RC-06 · EX-26 · EX-05 · EX-06 · EX-24 · EX-15 · EX-12 · AG-50 |
 | J03 | [Give an agent work and decide on the result](journeys/J03-give-an-agent-work-and-decide-on-the-result.md) | PJ-01 · PJ-12 · PJ-15 · PJ-18 · CP-36 · AC-15 · AG-24 · PJ-06 · PJ-07 · PJ-14 |
 | J04 | [Build an agent and improve it from what runs teach](journeys/J04-build-an-agent-and-improve-it-from-what-runs-teach.md) | AG-19 · AG-20 · AG-26 · AG-21 · AG-36 · AG-31 · AG-44 · AG-42 · CP-36 · AC-15 · CP-49 · AG-49 · AG-51 · AG-52 · CP-56 |
 | J05 | [Join a team](journeys/J05-join-a-team.md) | AC-18 · AC-09 · AC-01 · EX-11 · EX-01 · CP-30 · AC-07 · AC-15 · CP-36 |
 | J06 | [Set what an agent may touch](journeys/J06-set-what-an-agent-may-touch.md) | AC-03 · AC-04 · AC-06 · AC-11 · AC-08 · AC-13 · AC-15 · CP-36 · AC-14 · AC-12 |
-| J07 | [Ready a deployment](journeys/J07-ready-a-deployment.md) | AC-18 · CP-17 · CP-25 · CP-38 · CP-39 · CP-40 · CP-41 · CP-01 · CP-04 · AC-09 · AG-35 · AC-04 · CP-10 · CP-09 · CP-11 · CP-34 |
+| J07 | [Ready a deployment](journeys/J07-ready-a-deployment.md) | AC-18 · CP-17 · CP-25 · CP-38 · CP-39 · CP-40 · CP-41 · CP-01 · CP-79 · CP-82 · CP-80 · CP-81 · CP-04 · AC-09 · AG-35 · AC-04 · CP-10 · CP-09 · CP-11 · CP-34 |
 | J08 | [Watch agent workloads and act on an alert](journeys/J08-watch-agent-workloads-and-act-on-an-alert.md) | CP-47 · CP-60 · CP-37 · CP-59 · CP-67 · CP-36 · CP-57 · CP-50 · CP-66 · CP-58 · CP-12 · CP-05 · CP-34 · CP-11 · CP-40 · CP-39 · CP-62 · CP-49 · CP-53 |
 | J09 | [Audit what an agent touched and what left the platform](journeys/J09-audit-what-an-agent-touched-and-what-left-the-platform.md) | AC-13 · CP-50 · RC-06 · AC-12 · AC-06 · AC-16 · AC-17 |
 | J10 | [Fix a reported bug with an agent](journeys/J10-fix-a-reported-bug-with-an-agent.md) | PJ-21 · PJ-20 · PJ-25 · PJ-15 · AG-61 · CP-64 · CP-65 · AG-62 · CP-66 · CP-02 · CP-62 · AC-42 · PJ-12 · CP-67 · CP-78 |
 | J11 | [Ideate and run a project with its assistant](journeys/J11-ideate-and-run-a-project-with-its-assistant.md) | PJ-02 · PJ-22 · PJ-21 · PJ-20 · PJ-18 · PJ-15 · PJ-12 · PJ-25 · PJ-24 · PJ-23 · GP-08 · GP-09 |
 | J12 | [A person leaves and the team keeps working](journeys/J12-a-person-leaves-and-the-team-keeps-working.md) | AC-47 · AC-23 · AC-45 · AC-43 · AC-22 · AC-44 · AC-46 |
 | J13 | [Plan and run work from the project graph](journeys/J13-plan-and-run-work-from-the-project-graph.md) | PJ-02 · PJ-28 · PJ-30 · PJ-29 · PJ-26 · PJ-27 · PJ-31 · PJ-12 · PJ-25 · CP-73 · CP-78 · CP-74 · CP-76 |
-| J14 | [Bring my agents over](journeys/J14-bring-my-agents-over.md) | AG-64 · AG-63 · CP-20 · CP-02 · AC-04 · AG-35 · AG-36 |
+| J14 | [Bring my agents over](journeys/J14-bring-my-agents-over.md) | AG-64 · AG-63 · CP-20 · CP-83 · CP-04 · CP-02 · CP-80 · AC-04 · AG-35 · AG-36 |

@@ -73,3 +73,5 @@ flowchart LR
 | Right-click · Expand | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |
 | Legend · Styling · History | Admin | — | explore.board · Empty after a filter | — | explore.board | — | — | — |
 | Legend · Styling · History | Operator | — | explore.board · Empty after a filter | — | explore.board | — | — | — |
+| History | Admin | explore.board · History · One version | — | explore.board · History · Loading | explore.board · History | explore.board · History · Could not restore | — | — |
+| History | Operator | explore.board · History · One version | — | explore.board · History · Loading | explore.board · History | explore.board · History · Could not restore | — | explore.board · History · Restore disabled |

@@ -54,6 +54,7 @@ flowchart LR
 | EX-16.12 | Tree, Flow or Radial laying out | the footer's message line reads | it says *Laying out 2,159 nodes · Flow →* with no step count, because the layered and radial layouts report no progress; Network counts its steps (EX-F01 › States) |
 | EX-16.13 | A drawn cycle | Tree or Flow lays it out | one relationship of the cycle is drawn reversed so the layers can be ranked; the relationship itself is unchanged |
 | EX-16.14 | A board whose preset another person switched | someone opens it | it opens on that preset; History lists the change, naming who made it |
+| EX-16.15 | The Flow layout | it is drawn | every edge runs at right angles, leaving a node on its right and entering the next on its left, and edges that meet share a trunk; Network, Tree and Radial draw their edges as before |
 
 ## Screens
 
@@ -61,3 +62,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | The Layout card | Admin | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Too large | — | — |
 | The Layout card | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Too large | — | — |
+| Flow · orthogonal edges | Admin | — | — | — | explore.board · Menu · Flow orthogonal | — | — | — |
+| Flow · orthogonal edges | Operator | — | — | — | explore.board · Menu · Flow orthogonal | — | — | — |

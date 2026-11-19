@@ -72,6 +72,7 @@ flowchart TD
 | CP-10.18 | *Run it* on Kubernetes | it is read | three `kubectl` lines and a manifest with *Copy* and *Download*; Invana starts nothing — the replicas are declared by the Admin (CP-08.6) |
 | CP-10.19 | A worker group whose machine sits in a region | *Run it* is read | an optional *Region* field, a short tag from the data stores' regions ([CP-F13](../../../CP-F13-data-stores/feature.md#rules)), is part of the command as `INVANA_REGION`; untagged reads *anywhere*; the worker carries the tag it joined with, and *Joined* reads it |
 | CP-10.20 | *Group* | it opens | it offers *Existing group* — the groups with their labels, slots, plugins, runtimes and secret names — or *New group*; choosing one shows what the worker will be held to |
+| CP-10.21 | The *Join keys* list | it is read | each key reads its group, who minted it and when, its prefix, expiry, how many joined of its cap and whether it is revoked — never its secret; an Admin's *Revoke* ends it for new workers (CP-09.8), and an Operator reads the list with *Revoke* disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |
 
 ## Screens
 
@@ -91,3 +92,5 @@ flowchart TD
 | Add workers · 4 Run it · Kubernetes | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | Add workers · 5 Joined | Admin | — | — | settings.workers · Add workers · Waiting to join | settings.workers · Add workers · Joined | settings.workers · Add workers · Join failed | — | — |
 | Add workers · 5 Joined | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Join keys | Admin | settings.workers · No join keys | — | settings.workers · Loading | settings.workers · Join keys | settings.workers · Could not load | — | — |
+| Join keys | Operator | settings.workers · No join keys | — | settings.workers · Loading | settings.workers · Join keys | settings.workers · Could not load | — | settings.workers · Read only |

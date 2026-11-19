@@ -64,3 +64,5 @@ flowchart LR
 | Console · Data | Operator | explore.board · Console · Nothing drawn | — | explore.board · Console · Loading | explore.board · Console | — | explore.board · Console · Running | — |
 | Console · Queries | Admin | explore.board · Console · Nothing ran | — | explore.board · Console · Loading | explore.board · Console · Queries | explore.board · Console · Query failed | explore.board · Console · Running | — |
 | Console · Queries | Operator | explore.board · Console · Nothing ran | — | explore.board · Console · Loading | explore.board · Console · Queries | explore.board · Console · Query failed | explore.board · Console · Running | explore.board · Console · Content withheld |
+| Console · Data · JSON | Admin | — | — | explore.board · Console · Loading | explore.board · Console · JSON | — | — | — |
+| Console · Data · JSON | Operator | — | — | explore.board · Console · Loading | explore.board · Console · JSON | — | — | — |

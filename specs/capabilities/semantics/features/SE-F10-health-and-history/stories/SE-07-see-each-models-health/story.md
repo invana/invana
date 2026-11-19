@@ -69,6 +69,8 @@ flowchart LR
 | SE-07.23 | A person with Edit on the model, without Edit on `setting/graph-databases` | they open a suggested index | *Add index to draft* is absent and the row reads *Needs Edit on Graph database settings — ask {who can grant}* |
 | SE-07.24 | Questions that failed in the window — *cannot answer*, refused, or erroring | Performance opens for a model | each kind shows its failed questions with their reason, counted by the engine, each linking to its run |
 | SE-07.25 | A slow query shape whose plan the database can explain | its row opens | its advice names a faster way to reach the same records, each in one line with the step it would change — *add an index on Order.placed_at*, *start from the kind, not every node*, *bound this hop to 3*, *filter by relationship kind before expanding the supernode Airport*, *these two patterns multiply — join them on a key* — and only an index offers an act (*Add index to draft*); the rest is read by whoever writes the plan, the function or the query |
+| SE-07.28 | The models of a graph database | *Overview* is opened | one row per model reads its health, usage and speed, and what needs attention, each number the engine's; a row opens that model's health |
+| SE-07.29 | A graph database with no model yet | *Overview* is opened | it says *No models yet* with the way to make one (SE-06) |
 
 ## Screens
 
@@ -90,3 +92,5 @@ flowchart LR
 | The draft · index or drift added | Operator | — | — | — | — | — | — | — |
 | Health · Usage · slow signal | Admin | — | — | model.health · Loading | model.health · Usage · Not available | — | — | — |
 | Health · Usage · slow signal | Operator | — | — | model.health · Loading | model.health · Usage · Not available | — | — | model.health · Read only |
+| Models overview | Admin | model.models · Overview · No models yet | model.models · Overview · Nothing matches | model.models · Overview · Loading | model.models · Overview | model.models · Overview · Could not load | — | — |
+| Models overview | Operator | model.models · Overview · No models yet | model.models · Overview · Nothing matches | model.models · Overview · Loading | model.models · Overview | model.models · Overview · Could not load | — | model.models · Read only |

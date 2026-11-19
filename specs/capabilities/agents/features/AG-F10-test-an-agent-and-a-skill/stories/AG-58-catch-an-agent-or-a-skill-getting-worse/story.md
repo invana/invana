@@ -4,7 +4,7 @@ title: Catch an agent or a skill getting worse
 feature: AG-F10
 status: idea
 personas: [builder, admin]
-boards: [agents.skills, agents.agents, inbox]
+boards: [agents.skills, agents.agents, inbox, settings.ai]
 ---
 
 # AG-58 · Catch an agent or a skill getting worse
@@ -49,6 +49,7 @@ flowchart LR
 | AG-58.6 | No active case | a trigger fires | nothing runs, and Evals reads *No eval set — nothing checked* |
 | AG-58.7 | An Operator | they open Evals | every drift run reads; *Run drift now* is disabled, naming the permission |
 | AG-58.8 | A built-in agent or skill | a trigger fires | its drift runs like any other, and the alert reaches the Admins |
+| AG-58.9 | A model version an endpoint serves | its *Performance* is read | it reads the version's runs, success, time and tokens against its own baseline, each number the engine's; a version worse than its baseline is marked and opens the runs behind it |
 
 ## Screens
 
@@ -60,3 +61,5 @@ flowchart LR
 | Drift on an agent's Evals | Operator | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Drift | agents.agents · Detail · Could not load | agents.agents · Detail · Eval running | agents.agents · Detail · Drift |
 | The alert that it got worse | Admin | — | — | inbox · Loading | inbox · Got worse | — | — | — |
 | The alert that it got worse | Operator | — | — | inbox · Loading | inbox · Got worse | — | — | inbox · Got worse |
+| A model version · performance | Admin | settings.ai · Endpoint · No runs yet | — | settings.ai · Endpoint · Loading | settings.ai · Endpoint · Performance | settings.ai · Endpoint · Could not load | — | — |
+| A model version · performance | Operator | settings.ai · Endpoint · No runs yet | — | settings.ai · Endpoint · Loading | settings.ai · Endpoint · Performance | settings.ai · Endpoint · Could not load | — | settings.ai · Endpoint · Read only |

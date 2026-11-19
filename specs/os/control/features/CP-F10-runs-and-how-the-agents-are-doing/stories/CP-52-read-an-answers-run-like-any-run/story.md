@@ -46,6 +46,7 @@ flowchart LR
 | CP-52.6 | Someone else's conversation, not shared | a person with Read on `run/*` opens its run | the run, its steps and history rows read; *Open the conversation* is absent |
 | CP-52.7 | History rows of an answer's run | they read | the actor reads *person ▸ Assistant* |
 | CP-52.8 | Someone else's answer's run | an Operator opens it | it reads that it ran, by the Assistant, on behalf of whom, its status and its tokens; its question, steps and answer read *withheld* |
+| CP-52.9 | A run | its *Assets* are read | they list what it produced — files, emissions, branches and tasks — each with who or which agent made it and when; a person who may not read the run reads that it ran, its status and its tokens |
 
 ## Screens
 
@@ -55,3 +56,5 @@ flowchart LR
 | An answer's run | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |
 | Runs from Ask | Admin | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | — |
 | Runs from Ask | Operator | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |
+| A run · assets | Admin | agents.runs · Detail · Nothing produced | — | agents.runs · Detail · Loading | agents.runs · Detail · Assets | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
+| A run · assets | Operator | agents.runs · Detail · Nothing produced | — | agents.runs · Detail · Loading | agents.runs · Detail · Assets | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
