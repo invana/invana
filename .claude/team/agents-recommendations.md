@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**547 recommendations** · 334 open · 126 taken · 23 declined · 64 done
+**548 recommendations** · 335 open · 126 taken · 23 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -590,3 +590,4 @@ flowchart LR
 | R576 | open | 2026-11-19 | designer | phase platform-design-2/P06 | docs | low | Add P06's hand-off row to platform-design-2 and publish the density pass | A designer cannot edit the project file. Add P06's hand-off note (text in .agent-reports/designer/platform-design-2-P06-boards.md) to its Hand-off notes. The density pass is built in the mirror but not published: this session had no Artifact tool (R560/R566). A session with it publishes ds/density.css and every changed board to PgtkC6KygGZz2u8fYq1LWX. |  |  |
 | R577 | open | 2026-11-19 | designer | phase platform-design-2/P07 | debt | medium | Publish to the v2027 canvas needs the Artifact tool | P07 ran in a session with no Artifact tool, so settings.workers.dc.html and canvas.json are not published to PgtkC6KygGZz2u8fYq1LWX. Same cause as R560 and R566. |  |  |
 | R578 | open | 2026-11-19 | designer | phase platform-design-2/P08 | docs | low | P08 hand-off note: the designer may not edit the project file | The edit_rights hook refuses designer writes to .claude/team/projects/platform-design-2/project.md, so the P08 hand-off note is in .agent-reports/designer/platform-design-2-P08.md (Hand-off note section). Copy it into the project's Hand-off notes. The Artifact tool was missing again (R577): settings.policies, settings.agent_access and canvas.json are not published. |  |  |
+| R579 | open | 2026-11-19 | designer | phase platform-design-2/P09 | idea | low | Designer phases cannot write their own hand-off note in project.md | The edit_rights hook refuses the designer on .claude/team/projects/platform-design-2/project.md, yet the run brief asks each phase for a hand-off note row. P09's note is in .agent-reports/designer/SE-01-boards.md under Hand-off note; the lead or product-manager should copy it into the project file. Also: no Artifact tool again, so P09's model.models board is not published (R577). |  |  |
