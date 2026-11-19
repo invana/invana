@@ -14,7 +14,7 @@ Invana's roadmap is **milestones**. There is no *release*: the word is not a ter
 
 | ID | Name | Waits on | Done when | Journeys |
 |---|---|---|---|---|
-| MVP | MVP | — | Every journey listed passes end to end | *Proposed — Ravi confirms in his review.* Open: no journey is picked yet |
+| MVP | MVP | — | Every journey listed passes end to end | *Proposed — Ravi confirms in his review:* [J07](journeys/J07-ready-a-deployment.md) · [J01](journeys/J01-from-a-fresh-deployment-to-a-first-answer.md) · [J02](journeys/J02-ask-and-trust-the-answer.md) · [J03](journeys/J03-give-an-agent-work-and-decide-on-the-result.md) · [J06](journeys/J06-set-what-an-agent-may-touch.md). Open: J01 lists CP-27, a parked story |
 
 ## How a story and a journey join a milestone
 

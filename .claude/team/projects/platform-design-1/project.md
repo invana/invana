@@ -1,6 +1,6 @@
 ---
 name: platform-design-1
-status: ready
+status: running
 branch: design-v2027-redraw/P19-health-visuals-and-publish-check
 scope: platform-design-1
 artifact_publish: auto approve
@@ -273,7 +273,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Gap report — every board, flow and journey against the specs |  | pending |  |  |
+| P01 | Gap report — every board, flow and journey against the specs |  | in progress | 2026-11-19 |  |
 | P02 | `check.py` validates milestones, flows and journeys |  | pending |  |  |
 | P03 | Specs — connectors, credentials, plugins and packs | P01 | pending |  |  |
 | P04 | Specs — data stores | P03 | pending |  |  |
