@@ -20,8 +20,9 @@ software-delivery/
 ├── agents/                         product-manager.md · designer.md · coder.md · qa.md · security.md
 ├── skills/                         one Agent Skills folder each — the skills below
 ├── policies/                       product-manager.yaml · designer.yaml · coder.yaml · qa.yaml · security.yaml
-├── project_types/software.yaml         sources · default tags · default checks · labels · suggested agents and skills · report template
-├── ontology/software.yaml              the subject model
+├── project_types/software.yaml         the type manifest — the fields of the table under *The project type*
+├── ontology/software.yaml              the subject model the manifest names
+├── workflows/                          the check workflows the manifest names: spec-check · tests · code-review · design-review · security-audit
 └── lenses/                         none until a story names one
 ```
 
@@ -93,21 +94,24 @@ new piece of work.
 
 ## The project type
 
-`software` — the words inside a project of this type: **Project** · **Story**; a milestone is a **Milestone**.
+`software` — a manifest of [the type manifest's](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#the-project-type-manifest) fields, one row each. Inside a project of this type the words are **Project** · **Story**; a milestone is a **Milestone**.
 
-| Part | Holds |
+| Manifest field | Holds |
 |---|---|
-| Subject model | **Feature** · **Requirement** · **Story** · **Module** · **Persona** · **Journey** · **Decision**, parsed from the repository's `specs/` folder and its code ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)); the spec files stay the source of truth, a canvas edit is a draft, and approving it writes the story file |
-| Fields | `repository` — the code host's address · `default_branch` · `product_owner` — the person on the team who accepts specs and boards |
-| Sources | The repository's spec folder and code (Local files, read only); the issue tracker the team keeps its work in ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md)) |
-| Default tags | story · bug · test · review · audit · duplicate · waiting-deletion — each a label on a connected tracker ([PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) |
-| Task kinds | **Task** · **Recommendation** — every project has them ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
-| Milestones | *Spec* → *Design* → *Build* → *Verify*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
-| Default checks | A task tagged *story*: the spec check, then a person on the team · a task tagged *bug*, and a Task of the *Build* milestone: the tests, QA's code review, and QA's design review when a screen changed · a story touching access, data, agents or an outside system: security's audit |
-| Reviewers | At least one person; the product owner by default ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
-| Suggested agents and skills | The five agents above, the product manager as the project assistant |
-| Pick-up | Ask by default for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
-| Report template | *Release notes*: the stories done, their criteria and checks, the bugs fixed, what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
+| `id` · `title` · `group` | `software` · *Software* · the pack's title |
+| `labels` | `project` Project · `task` Story · `milestone` Milestone |
+| `fields` | `repository` (url, required) — the code host's address · `default_branch` (text, default `main`) · `product_owner` (person, required) — the person on the team who accepts specs and boards |
+| `subject_model` | `ontology/software.yaml` — **Feature** · **Requirement** · **Story** · **Module** · **Persona** · **Journey** · **Decision**, parsed from the repository's `specs/` folder and its code ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)); the spec files stay the source of truth, a canvas edit is a draft, and approving it writes the story file |
+| `sources` | `specs` · connector `invana-files` · parses to Feature, Requirement, Story, Persona, Journey, Decision · read only — `code` · connector `invana-files` · parses to Module, an import graph per language · read only — `tracker` · the code host connector the team keeps its work in ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md)) |
+| `milestones` | *Spec* → *Design* → *Build* → *Verify*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
+| `tags` | story · bug · test · review · audit · duplicate · waiting-deletion — each a label on a connected tracker ([PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md)) |
+| `task_kinds` | none beyond **Task** and **Recommendation**, which every project has ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
+| `checks` | A task tagged *story*: workflow `spec-check`, then `person` · a task tagged *bug*, and a Task of the *Build* milestone: workflows `tests` and `code-review`, and `design-review` when a screen changed · a story touching access, data, agents or an outside system: workflow `security-audit` — each a run of its own |
+| `reviewers` | `product_owner` by default, at least one person ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
+| `agents` | The five agents above, `product-manager` as the `assistant`, each with its skills |
+| `pick_up` | `ask` for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
+| `report_template` | *Release notes*: the stories done, their criteria and checks, the bugs fixed, what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
+| `requires` | `invana-files` and a code host connector — `invana-github` or `invana-gitea` |
 
 ## The Access Policy files
 

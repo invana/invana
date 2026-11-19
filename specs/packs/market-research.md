@@ -22,8 +22,9 @@ market-research/
 ├── agents/                         researcher.md · analyst.md · fact-checker.md
 ├── skills/                         one Agent Skills folder each — the skills below
 ├── policies/                       researcher.yaml · analyst.yaml · fact-checker.yaml
-├── project_types/research.yaml         sources · default tags · default checks · labels · suggested agents and skills · report template
-├── ontology/research.yaml              the subject model
+├── project_types/research.yaml         the type manifest — the fields of the table under *The project type*
+├── ontology/research.yaml              the subject model the manifest names
+├── workflows/                          the check workflows the manifest names: claims-cite-a-source · sources-under-6-months
 └── lenses/                         none until a story names one
 ```
 
@@ -85,20 +86,24 @@ The path is [J11 · Ideate and run a project with its assistant](../journeys/J11
 
 ## The project type
 
-`research` — the words inside a project of this type: **Project** · **Task**; a milestone is a **Milestone**.
+`research` — a manifest of [the type manifest's](../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#the-project-type-manifest) fields, one row each. Inside a project of this type the words are **Project** · **Task**; a milestone is a **Milestone**.
 
-| Part | Holds |
+| Manifest field | Holds |
 |---|---|
-| Subject model | **Competitor** · **Offering** · **Capability** · **Price** · **Segment** · **Claim** · **Source**. A Competitor *offers* an Offering; an Offering *has* Capabilities, a Price and a Segment; a Claim *states* a fact about a node and *cites* a Source. A Capability may `match` or `gap` a Capability or Feature of another model — ours, from a Software project ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)) |
-| Sources | Web pages and documents ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md): the Web adapter, read only); a tracker when the team keeps its research there |
-| Default tags | research · review · duplicate · waiting-deletion · gap |
-| Task kinds | **Task** · **Recommendation** — every project has them ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
-| Milestones | *Landscape* → *Gaps* → *Brief*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
-| Default checks | A task tagged *research*: every Claim cites a Source · every Source is under 6 months old · then a person on the team. A task tagged *gap*: a person on the team reviews every gap |
-| Reviewers | At least one person; the project's creator by default ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
-| Suggested agents and skills | The three agents above, the analyst as the project assistant |
-| Pick-up | Ask by default for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
-| Report template | *Brief*: the competitors, offerings and capabilities, the gaps with their evidence, and what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
+| `id` · `title` · `group` | `research` · *Research* · the pack's title |
+| `labels` | `project` Project · `task` Task · `milestone` Milestone |
+| `fields` | none beyond the name and description |
+| `subject_model` | `ontology/research.yaml` — **Competitor** · **Offering** · **Capability** · **Price** · **Segment** · **Claim** · **Source**. A Competitor *offers* an Offering; an Offering *has* Capabilities, a Price and a Segment; a Claim *states* a fact about a node and *cites* a Source. A Capability may `match` or `gap` a Capability or Feature of another model — ours, from a Software project ([PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md)) |
+| `sources` | `web` and `documents` · connector `invana-web` ([CP-F12](../os/control/features/CP-F12-issue-trackers/feature.md): the Web adapter, read only) · parses to Competitor, Offering, Capability, Price, Segment, Claim, Source — `tracker` when the team keeps its research there |
+| `milestones` | *Landscape* → *Gaps* → *Brief*, each waiting on the one before ([PJ-18](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-18-order-tasks-by-what-they-wait-on/story.md) · [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md)) |
+| `tags` | research · review · duplicate · waiting-deletion · gap |
+| `task_kinds` | none beyond **Task** and **Recommendation**, which every project has ([PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md)) |
+| `checks` | A task tagged *research*: workflow `claims-cite-a-source` (every Claim cites a Source), workflow `sources-under-6-months` (every Source is under 6 months old), then `person` · a task tagged *gap*: `person` reviews every gap |
+| `reviewers` | `creator` by default, at least one person ([PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)) |
+| `agents` | The three agents above, `analyst` as the `assistant`, each with its skills |
+| `pick_up` | `ask` for every agent; a person on the team may set Allow ([PJ-15](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-15-let-agents-pick-up-tasks-by-hand-by-asking-or-on-their-own/story.md)) |
+| `report_template` | *Brief*: the competitors, offerings and capabilities, the gaps with their evidence, and what was left out and why ([PJ-F05](../capabilities/projects/features/PJ-F05-project-reports/feature.md)) |
+| `requires` | `invana-web` |
 
 ## The Access Policy files
 
