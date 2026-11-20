@@ -45,7 +45,7 @@ session these rules, so a project never repeats them; its *Rules for every sessi
 | Recommend the rest | Anything outside the phase or the role goes through the `recommend` skill, `--raised-in "phase <name>/<ID>"` |
 | Commit each step | Ravi's start of the run is the yes for these commits (`TEAM.md` §6 *Git*). The lead commits each finished step as `wip(<scope>): <ID> · step N — <what>` with `git add -A` and `--no-verify` — safe only because the phase starts from a clean tree on its own branch; the closing commit runs the hooks. Never amends, rebases, resets, pushes or opens a PR |
 | Stay on the phase branch | Never switch, create or merge branches (*Branches* below) |
-| Hand off | A hand-off note when done; past the context limit, row `partial` and a note saying where to resume |
+| Hand off | A hand-off note when done; stopping early or past the context limit, the resume note goes to `.claude/team/.live/projects/<name>/<ID>.handoff.md` — the runner sets `partial` and files it; a report starting `RESULT: PARTIAL` or `BLOCKED`, or a *Deliverable* missing or unchanged since `<ID>-start`, never closes the phase |
 
 ## Branches
 
@@ -75,6 +75,7 @@ session these rules, so a project never repeats them; its *Rules for every sessi
 | `INVANA_CONTEXT_LIMIT` · `INVANA_RUNNER_HANDOFF_GRACE` | `300000` · `50000` — hand-off, then hard stop. A phase's `Budget` row overrides the limit for that phase |
 | `INVANA_RUNNER_LEAD_MODEL` · `INVANA_RUNNER_CHEAP_MODEL` | the agent's model · `sonnet` (fixes, QA, sub-agents) |
 | `INVANA_RUNNER_GATE_TIMEOUT` | `1800` s |
+| `INVANA_RUNNER_IDLE_AFTER_TURN` | `900` s — once the lead's turn ends, this long with no event ends the session |
 | `INVANA_RUNNER_SHOT_THRESHOLD` | `0.005` — the share of a board's pixels that may change before QA looks at it |
 | `INVANA_RUNNER_SANDBOX=1` | skip permission prompts — only inside a disposable container |
 

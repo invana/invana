@@ -43,11 +43,13 @@ import contextlib
 import datetime as dt
 import json
 import os
+import queue
 import re
 import shutil
 import signal
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -61,6 +63,7 @@ GRACE = int(os.environ.get("INVANA_RUNNER_HANDOFF_GRACE", "50000"))
 LEAD_MODEL = os.environ.get("INVANA_RUNNER_LEAD_MODEL", "")
 CHEAP_MODEL = os.environ.get("INVANA_RUNNER_CHEAP_MODEL", "sonnet")
 GATE_TIMEOUT = float(os.environ.get("INVANA_RUNNER_GATE_TIMEOUT", "1800"))
+IDLE_AFTER_TURN = float(os.environ.get("INVANA_RUNNER_IDLE_AFTER_TURN", "900"))  # silence after a turn ends
 SHOOT = ROOT / ".claude" / "skills" / "design-qa" / "shoot.mjs"
 SCREEN_MAP = SHOOT.with_name("screen-map.json")
 SHOT_THRESHOLD = float(os.environ.get("INVANA_RUNNER_SHOT_THRESHOLD", "0.005"))  # share of pixels a board may change
@@ -89,8 +92,9 @@ COMMIT = ("Keep your plan in the todo list (TodoWrite) — the project dashboard
           "and never set your own row to `done`.")
 HANDOFF = ("Context budget reached: this session has used more than {limit:,} tokens of context. Stop at the next "
            "clean point — finish or revert the file you are editing so the tree compiles; start nothing new. "
-           "Set {id}'s log row to `partial`, add a hand-off note saying exactly where the next session resumes "
-           "(files done, files left, the next step), commit, and stop. A fresh session continues from your note.")
+           "Write your hand-off note — exactly where the next session resumes: files done, files left, the next step "
+           "— to `{note}`, never to the project file; the runner sets {id}'s row `partial` and files the note. Commit, "
+           "and stop. A fresh session continues from your note.")
 PART_HANDOFF = ("Sub-agent '{name}' has passed {limit:,} tokens of context. Stop it with TaskStop (its edits stay on "
                 "disk), write its hand-off yourself — the files it owns, what `git diff` shows it changed, what its "
                 "brief still lists — and launch one fresh sub-agent with the brief plus that hand-off, or finish it "
@@ -196,6 +200,17 @@ class Project:
                 lines[i] = "| " + " | ".join(row[h] for h in head) + " |"
         self.file.write_text(text[:start] + "\n".join(lines) + text[end:])
 
+    def add_note(self, pid: str, note: str) -> None:
+        """Append a row to *Hand-off notes*, after its last table row."""
+        text = self.text
+        start = text.index("## Hand-off notes")
+        end = text.find("\n## ", start + 1)
+        end = len(text) if end < 0 else end
+        last = text.rfind("\n|", start, end)
+        at = text.index("\n", last + 1) if last >= 0 else end
+        row = "\n| " + pid + " | " + " ".join(note.split()).replace("|", "\\|") + " |"
+        self.file.write_text(text[:at] + row + text[at:])
+
     def entry(self, pid: str) -> dict[str, str]:
         m = re.search(rf"^### {re.escape(pid)} · (.+?)\n(.*?)(?=^### |^## |\Z)", self.text, re.S | re.M)
         if not m:
@@ -223,6 +238,7 @@ class Project:
         own = self.dir / "prompts" / f"{name}.md"
         text = (own if own.exists() else HERE / "prompts" / f"{name}.md").read_text()
         values = {"PROJECT": self.name, "FILE": str(self.file.relative_to(ROOT)),
+                  "HANDOFF": str(handoff_file(self, values.get("ID", "")).relative_to(ROOT)),
                   "COMMIT": COMMIT.format(scope=self.get("scope", self.name), id=values.get("ID", "")), **values}
         for k, v in values.items():
             text = text.replace("{{" + k + "}}", v)
@@ -311,6 +327,73 @@ def enter_phase(p: Project, pid: str) -> None:
     switch(p, branch)
 
 
+# ── hand-offs and deliverables ─────────────────────────────────────────────
+def handoff_file(p: Project, pid: str) -> Path:
+    """Where a session leaves its resume note: any role may write it, unlike the project file."""
+    return LIVE / p.name / f"{pid}.handoff.md"
+
+
+def agent_report(p: Project, pid: str, agent: str) -> Path:
+    return ROOT / ".agent-reports" / agent / f"{p.name}-{pid}.md"
+
+
+def report_state(report: Path) -> str:
+    """The upper-case word that opens the report (``RESULT: PARTIAL`` or ``PARTIAL — …``); ``""`` when none does."""
+    first = (report.read_text().lstrip().splitlines() or [""])[0] if report.exists() else ""
+    m = re.match(r"(?:RESULT:\s*)?([A-Z]{4,})\b", first.strip())
+    return m.group(1) if m else ""
+
+
+def take_handoff(p: Project, pid: str, agent: str, since: float) -> None:
+    """After a session: a note in ``handoff_file`` sets the row ``partial`` and is filed under *Hand-off notes*.
+
+    The backstop is the agent's report: rewritten during the session with line 1 ``RESULT: PARTIAL`` it hands off,
+    ``RESULT: BLOCKED`` blocks — whatever the session could or could not write to the project file.
+    """
+    note = handoff_file(p, pid)
+    if note.exists():
+        text = note.read_text().strip()
+        p.set_status(pid, "partial", "handed off — see Hand-off notes")
+        p.add_note(pid, text or "Handed off with an empty note — resume from `git log` and the report.")
+        note.unlink()
+        return
+    report = agent_report(p, pid, agent)
+    state = report_state(report)
+    if not report.exists() or report.stat().st_mtime < since or p.status_of(pid) in ("partial", "blocked"):
+        return
+    rel = report.relative_to(ROOT)
+    if state == "BLOCKED":
+        p.set_status(pid, "blocked", f"the report says BLOCKED — {rel}")
+    elif state == "PARTIAL":
+        p.set_status(pid, "partial", "handed off — the report says PARTIAL")
+        p.add_note(pid, f"Resume from the hand-off note in [{report.name}]({os.path.relpath(report, p.dir)}).")
+
+
+def undelivered(p: Project, pid: str) -> list[str]:
+    """Each *Deliverable* glob with no file, or whose files did not change since the phase's start tag.
+
+    A tracked file counts as changed when ``git diff`` against the tag names it; an untracked or ignored one (a
+    report) when it was written after the tag.
+    """
+    pats = re.findall(r"`([^`]+)`", p.entry(pid).get("deliverable", ""))
+    if not pats:
+        return []
+    tag = start_tag(p, pid)
+    since = float(sh(["git", "log", "-1", "--format=%ct", tag]).stdout.strip() or 0)
+    diff = set(sh(["git", "diff", "--name-only", tag]).stdout.split()) if since else set()
+    missing = []
+    for pat in pats:
+        files = [f for f in ROOT.glob(pat) if f.is_file()]
+        if not files:
+            missing.append(f"`{pat}` — nothing there")
+            continue
+        rels = [str(f.relative_to(ROOT)) for f in files]
+        tracked = set(sh(["git", "ls-files", "--", *rels]).stdout.split())
+        if not any((r in diff) if r in tracked else f.stat().st_mtime > since for r, f in zip(rels, files)):
+            missing.append(f"`{pat}` — unchanged since `{tag}`")
+    return missing
+
+
 # ── one headless session ───────────────────────────────────────────────────
 def ledger(p: Project, record: dict) -> None:
     LIVE.mkdir(parents=True, exist_ok=True)
@@ -343,7 +426,9 @@ def session(p: Project, text: str, pid: str, step: str, part: int, agent: str,
 
     The context in use is input + cache-read + cache-written tokens of each assistant message. A message with a
     ``parent_tool_use_id`` is a sub-agent's. Past the phase's ``budget`` the lead is asked to hand off, or to hand off
-    the sub-agent; anyone past the budget plus ``GRACE`` ends the session and the row is set ``partial``.
+    the sub-agent; anyone past the budget plus ``GRACE`` ends the session and the row is set ``partial``. Once the
+    lead's turn has ended, ``IDLE_AFTER_TURN`` seconds with no event end the session too: a background task the
+    stream never reports finished must not hold the run.
     """
     cmd = ["claude", "-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose"]
     if agent:
@@ -370,7 +455,25 @@ def session(p: Project, text: str, pid: str, step: str, part: int, agent: str,
     running: set[str] = set()
     parts: dict[str, str] = {}
     stopped: set[str] = set()
-    for line in proc.stdout:
+    lines: queue.Queue[str | None] = queue.Queue()
+
+    def pump() -> None:
+        for ln in proc.stdout:
+            lines.put(ln)
+        lines.put(None)
+
+    threading.Thread(target=pump, daemon=True).start()
+    turn_ended = idle = False
+    while True:
+        try:
+            line = lines.get(timeout=IDLE_AFTER_TURN if turn_ended else None)
+        except queue.Empty:
+            print(f"  {pid} {step}: turn ended and {IDLE_AFTER_TURN / 60:.0f} min passed with no event — "
+                  f"{len(running)} background task(s) never reported finished; ending the session", flush=True)
+            idle = True
+            break
+        if line is None:
+            break
         try:
             e = json.loads(line)
         except json.JSONDecodeError:
@@ -394,7 +497,7 @@ def session(p: Project, text: str, pid: str, step: str, part: int, agent: str,
                 peak = max(peak, ctx)
                 if ctx > limit and not warned:
                     print(f"  {pid} {step}: context {ctx:,} — asking for a hand-off", flush=True)
-                    send(HANDOFF.format(limit=limit, id=pid))
+                    send(HANDOFF.format(limit=limit, id=pid, note=handoff_file(p, pid).relative_to(ROOT)))
                     warned = True
         elif kind == "rate_limit_event":
             info = e.get("rate_limit_info") or {}
@@ -411,9 +514,12 @@ def session(p: Project, text: str, pid: str, step: str, part: int, agent: str,
             running.discard(e.get("task_id"))
         elif kind == "result":
             result = e.get("result", "") or ""
+            turn_ended = True
             if not running:  # a lead's turn also ends while it waits on background sub-agents
                 break
     proc.stdin.close()
+    if idle:
+        proc.terminate()
     if killed:
         print(f"  {pid} {step}: {killed} passed {hard_stop:,} tokens — ending the session", flush=True)
         proc.terminate()
@@ -433,23 +539,23 @@ def session(p: Project, text: str, pid: str, step: str, part: int, agent: str,
 def until_handoffs_end(p: Project, pid: str, first: str, step: str, agent: str, model: str, max_handoffs: int) -> None:
     """Run a step; while it ends `partial` (a hand-off), continue in a fresh session from the note.
 
-    A continuing session that commits nothing and leaves the tree clean found nothing left to do; it cannot always
-    clear `partial` itself (a headless session may not edit the project file), so the runner counts the step built.
+    The runner sets the row back to `in progress` before each continuing session, so only a new hand-off
+    (``take_handoff``) makes it `partial` again.
     """
+    since = time.time()
     claude(p, first, pid, step, 1, agent, model)
+    take_handoff(p, pid, agent, since)
     reclaim(p, pid)
     checkpoint(p, pid, f"{step} session 1")
     for n in range(2, max_handoffs + 2):
         if p.status_of(pid) != "partial":
             return
         print(f"  {pid} handed off — part {n}", flush=True)
-        before = sh(["git", "rev-parse", "HEAD"]).stdout.strip()
+        p.set_status(pid, "in progress")
+        since = time.time()
         claude(p, p.prompt("continue", ID=pid), pid, step, n, agent, model)
+        take_handoff(p, pid, agent, since)
         reclaim(p, pid)
-        if p.status_of(pid) == "partial" and git_clean() and sh(["git", "rev-parse", "HEAD"]).stdout.strip() == before:
-            print(f"  {pid} part {n} changed nothing — {step} counted as built", flush=True)
-            p.set_status(pid, "in progress")
-            return
         checkpoint(p, pid, f"{step} session {n}")
     if p.status_of(pid) == "partial":
         raise RuntimeError(f"still partial after {max_handoffs} hand-offs")
@@ -693,8 +799,17 @@ def run_phase(p: Project, row: dict, max_fix: int, max_handoffs: int) -> bool:
                     findings = [f"QA failed ({review(p, pid, 'qa').relative_to(ROOT)}) — the coder's blockers:\n"
                                 + (table if coder else text[:8000])]
             if not findings:
+                report = agent_report(p, pid, agent)
+                if (state := report_state(report)) in ("PARTIAL", "BLOCKED"):
+                    return block(p, pid, f"its report says {state} — {report.relative_to(ROOT)}")
+                if missing := undelivered(p, pid):
+                    findings = ["Deliverables missing or unchanged: " + " · ".join(missing)]
+                    seen = {findings[0]}
+            if not findings:
                 return close(p, pid, row["phase"])
             if seen == last:
+                if findings[0].startswith("Deliverables"):
+                    return block(p, pid, findings[0])
                 return block(p, pid, f"same findings two rounds running — see {reports}")
             last = seen
             if attempt == rounds:
@@ -702,6 +817,9 @@ def run_phase(p: Project, row: dict, max_fix: int, max_handoffs: int) -> bool:
             p.set_status(pid, f"fixing {attempt + 1}")
             fix = p.prompt("fix", ID=pid, ATTEMPT=str(attempt + 1), FINDINGS="\n\n".join(findings))
             until_handoffs_end(p, pid, fix, f"fix {attempt + 1}", agent, CHEAP_MODEL, max_handoffs)
+            if p.status_of(pid) == "blocked":
+                p.set_meta("status", "blocked")
+                return False
             if moved := criteria_moved(p, pid, agent):
                 return block(p, pid, f"criteria changed during the phase — Ravi decides: {moved}")
     except RuntimeError as exc:
