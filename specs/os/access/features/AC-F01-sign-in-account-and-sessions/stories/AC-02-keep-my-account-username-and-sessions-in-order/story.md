@@ -50,10 +50,10 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-02.1 | A signed-in person | they open *Settings › You › Profile* | their name, email, time zone and username read, with *Sign out here* and *Sign out everywhere*; *Keys* and *Connected clients* are tabs beside it |
+| AC-02.1 | A signed-in person | they open *Settings › You › Profile* | their name, email, time zone and username read, with *Sign out here* and *Sign out everywhere*; *Keys* is a tab beside it |
 | AC-02.2 | The profile | the person changes their first or last name | it saves; a first name is required, a last name is not |
 | AC-02.3 | A password change | the current password is wrong, or the new one is shorter than the deployment's minimum | it is refused, naming which — the current password, or the minimum length |
-| AC-02.4 | A password change | it saves | every other session ends on its next call; the person's keys and connected clients keep working |
+| AC-02.4 | A password change | it saves | every other session ends on its next call; the person's keys keep working |
 | AC-02.5 | A new username | it breaks a rule — not 2–64 characters, not lowercase letters, digits and single hyphens, a hyphen at either end | it is refused, naming the rule |
 | AC-02.6 | A new username typed with capitals | it is read | the field shows it folded to lowercase, as it will be saved |
 | AC-02.7 | A username already taken in the deployment | it is saved | it is refused, saying it is taken |

@@ -26,7 +26,7 @@ Journeys this feature is a step of: [J12 · A person leaves and the team keeps w
 
 ```mermaid
 flowchart TD
-  start([Access › Keeping]) --> view["AC-44 · Each store: how long it is kept · holds"]
+  start([Access › Keeping — later]) -.-> view["AC-44 · Each store: how long it is kept · holds"]
   view --> who{"Is the reader an Admin?"}
   who -->|no| ro["Everything reads · each act disabled, naming Edit on setting/retention and who can grant it"]
   who -->|yes| ret["AC-44 · Set a store's retention · default Keep"]
@@ -39,10 +39,12 @@ flowchart TD
   who -->|yes| names["AC-45 · A departed person's name: Keep · Pseudonymise"]
   names --> nsaved(["Applies to each person deactivated from now · History"])
   dir([Directory › a person]) --> exp["AC-47 · Export everything held about them"]
-  exp --> json(["JSON: profile · what they did · personal-connection data"])
-  dir -->|Deactivate · AC-23| leave["Personal connections removed · their data erased · name kept or pseudonymised"]
-  leave -->|memory on hold| wait(["Erasure waits for the hold to lift"])
-  rec([A record's subject asks to be forgotten]) --> fg["AC-46 · Forget a subject: graph database · kind · record ID"]
+  exp --> json(["JSON: profile · what they did"])
+  dir -->|Deactivate · AC-23| leave["Everything kept · their name stays on their work"]
+  leave -->|Export first| exp
+  leave -.->|later| er["Personal connections removed · their data erased · name kept or pseudonymised"]
+  er -->|memory on hold| wait(["Erasure waits for the hold to lift"])
+  rec([A record's subject asks to be forgotten — later]) -.-> fg["AC-46 · Forget a subject: graph database · kind · record ID"]
   fg --> fprev["Preview: memory nodes and copies that cite it"]
   fprev -->|memory on hold| fr["Refused · lift the hold first"]
   fprev -->|confirm · sign in again| fdone(["Erased from memory · the record stays the customer's · History"])
@@ -223,7 +225,8 @@ erasure is done by the feature that owns the store; this feature holds the setti
 
 | Decision | Detail |
 |---|---|
-| One section | *Access › Keeping* holds retention, holds, the names setting and the subjects forgotten; *Forget a subject* opens a modal from it, *Export their data* a modal from a person's row in the Directory |
+| Keeping is parked | AC-44 · AC-45 · AC-46 are `later`: everything is kept, the default; Access has no *Keeping* tab. *Export their data* (AC-47) stays on a person's row in `settings.people` and in the deactivate modal. Risk: a request to erase a person or a subject has no Studio act until they return. `settings.keeping` stays as drawn, unwired |
+| One section, when it returns | *Access › Keeping* holds retention, holds, the names setting and the subjects forgotten; *Forget a subject* opens a modal from it, *Export their data* a modal from a person's row in the Directory |
 | Keep is the default | Nothing is removed until an Admin chooses to; a shorter period shows what the next prune removes before it is saved |
 | Holds are per store | A hold covers all of memory or all of History, never a person or a project — light, and enough for an on-prem deployment that answers one matter at a time |
 | Erasure at deactivation | A departed person's personal-connection data and, under *Pseudonymise*, their name go when they are deactivated; the modal says so before the Admin confirms |

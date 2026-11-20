@@ -261,7 +261,7 @@ sections never closes it.
 | Section | Nav | Rule |
 |---|---|---|
 | Agents | — (one glance) | Three bands: **Waits on you** — each agent's ask of the reader, answered in place · **Running** — each agent at work, what it is doing now and its next ask, with *Pause* and *Stop* in place · **Workers** — keeping up or not, runs at once free, scale advice. *Assign* gives an agent a task from here. Every deeper act — build, test, read a run, — is *Open in Agents*; adding or draining workers and changing a limit is *Open in Settings*, at Settings › Workers ([CP-72](os/control/features/CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)) |
-| Access | Now · Who · What they may do · Record · Keeping | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, keys, connected clients · *What they may do* — Access Policies · Agents · *Record* — History · Usage · What left · *Keeping* — retention, holds, forgetting ([Access Plane](os/access/product.md)) |
+| Access | Now · Who · What they may do · Record | *Now* — who acts, what was blocked today, delegations in force · *Who* — users, teams, keys · *What they may do* — Access Policies · Agents · *Record* — History ([Access Plane](os/access/product.md)) |
 | Settings | General · Appearance · You · Connections · Plugins · Fleet · Workers · Notifications | *Connections* — Graph databases · AI models · MCP server · Connectors · Team packs. Preference rows and tables · *Plugins* — Core · Tool · Outside servers · Runtimes, each reading on or off and *Used by n agents*; an outside server lists its work connections; a plugin opens as its detail page ([CP-F02](os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) · *Fleet* — Map · Workloads: the map of agents, skills, functions and worker groups, and runs and tokens by user, agent and team ([CP-F09](os/control/features/CP-F09-overview/feature.md)) · *Workers* — Groups · All workers · Queue · Limits · Alerts: runs at once free, scale advice on Groups and Queue; a worker group or a worker opens as its detail page ([CP-F03](os/control/features/CP-F03-workers-and-the-queue/feature.md) · [CP-F04](os/control/features/CP-F04-limits/feature.md) · [CP-F11](os/control/features/CP-F11-ops-alerting/feature.md)) |
 | About | — | The version, what's new and Help |
 
@@ -323,7 +323,7 @@ sections never closes it.
 | World · view of the graph | An **Access Policy** rule — what may be seen is never a named view; a lens is parked |
 | Guardrail · invariant | A rule (*must always hold*) |
 | Envelope · bound | *What it may do* |
-| Ledger | *What left the platform* · *Access usage* · History (*what people and agents did*) |
+| Ledger | History (*what people and agents did*) |
 | Pool · lane · worker-seconds | Workers · *runs at once* |
 | Stitch | Link between models |
 | Task plan · frontier · step envelope | Its steps |
@@ -398,7 +398,7 @@ A state that exists is not enough: a person clicks from where an act starts to w
 | Fleet dashboard · Overview | **Operations** — the header's *● n running* and the footer's; the depth is Agents › Runs and Settings › Workers | dropdown |
 | Activity · Notifications | **Inbox** — the header's dropdown (Needs you · Running · Updates), then the large modal (Needs you · Running · Updates · Done) | dropdown · modal |
 | Fleet workers · limits · ops alerts | **Settings › Workers** — Groups · All workers · Queue · Limits · Alerts; whether workers keep up shows in the Agents glance and *● n running* | modal |
-| IAM · IAM activity | **Access** — Now · Who · What they may do · Record · Keeping; the header's lock is its glance, for everyone | modal · dropdown |
-| Graph settings · Settings · Connectors · Profile | **Settings** — General · Appearance · You · Connections · Plugins · Fleet · Workers · Notifications | modal |
+| IAM · IAM activity | **Access** — Now · Who · What they may do · Record; *Record* is History; the header's lock is its glance, for everyone. No *Keeping* tab, no Usage, no What left — their stories are `later` (AC-F08 · AC-30 · AC-F12) | modal · dropdown |
+| Graph settings · Settings · Connectors · Profile | **Settings** — General · Appearance · You · Connections · Plugins · Fleet · Workers · Notifications. *You* — profile, username, password, sessions, default agent, where asks reach you, keys; no Connections, Connected clients or Owners — their stories are `later` (CP-43 · CP-63 · AC-F11 · AC-24 · AC-43) | modal |
 | Help | The avatar menu and ⌘K | menu |
 | Projects | **Projects** mode — Projects · My tasks · Reviews · Schedules; a project is a repository, tasks are issues | mode |

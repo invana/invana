@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, analyst]
 stories: [AC-24, AC-25, AC-43]
 journeys: [J04, J12]
-boards: [settings.me]
+boards: [settings.me, agents.agents, agents.skills, settings.policies]
 nfrs: [NFR-SEC-1]
 depends_on: [AC-F02, AC-F03, AC-F06, AC-F12]
 ---
@@ -27,22 +27,22 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([A resource › Owner]) --> list["AC-24 · Its owner — the platform, with who made it · or a person for a personal agent"]
+  start([A resource's own detail · Owner]) --> list["Its owner — the platform, with who made it · or a person for a personal agent"]
   list --> kind{"What is it?"}
   kind -->|built in| bi["System · Copy to change it"]
-  bi --> copy["AC-25 · Copy — a personal agent of the person who copied it · or the organisation's skill, workflow or policy, made by them"]
+  bi --> copy["AC-25 · Copy to change it, on the built-in's own detail — a personal agent of the person who copied it · or the organisation's skill, workflow or policy, made by them"]
   kind -->|shared| sh["The platform · made by · nobody's alone"]
   kind -->|a personal agent| pa{"Is the reader its owner, or holds Manage on Agents?"}
-  pa -->|yes| share["AC-24 · Share it — it becomes the platform's, made by them"]
+  pa -.->|later| share["AC-24 · Share it — it becomes the platform's, made by them"]
   pa -->|no| ro["Reads · acts disabled"]
   share --> ok(["The platform's · used by whoever may Run it · History"])
-  me([Settings › You › What I own and made]) --> mine["AC-24 · My personal agents · what I made · the slots I sit in"]
+  me([Settings › You › Owners]) -.->|later| mine["AC-24 · My personal agents · what I made · the slots I sit in"]
   run([An agent's run makes something]) --> org(["The organisation's · made by the person behind the run, through the agent"])
   agent([An agent the work does not need]) --> ret(["Retired, never deleted · its runs and History stay"])
   leave([AC-23 · A person is deactivated]) --> succ["The successor takes every slot · their chats outside projects"]
   leave --> pr["Their personal agents retire"]
-  pr --> adopt{"AC-43 · The successor adopts?"}
-  adopt -->|Create on Agents| mine(["The successor's personal agent · made by kept"])
+  pr -.->|later| adopt{"AC-43 · The successor adopts?"}
+  adopt -->|Create on Agents| mine2(["The successor's personal agent · made by kept"])
   adopt -->|without it| stay(["Stays retired · Adopt disabled, naming the permission"])
 ```
 
@@ -93,7 +93,7 @@ Permissions are [the permission catalogue](../AC-F02-access-policies/feature.md#
 | Every seat is a slot | A place a person sits on work is a slot with a fallback — the work never waits on that person ([Slots and fallbacks](#slots-and-fallbacks)) |
 | A leaver has a successor | Deactivating a person names one active person as successor ([AC-23](../AC-F03-directory/stories/AC-23-deactivate-a-person-who-leaves/story.md)), who takes every slot a fallback gives them and the chats they started outside projects |
 | Chats are the organisation's | A chat outside a project sits in its person's space and is the organisation's; when its person leaves it goes to their successor, who reads each answer as far as their own default agent may read its sources ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#rules)). A chat inside a project stays with its project |
-| A departed person's personal agent retires | It is offered to no one and runs nothing new; the successor may adopt it as their own personal agent ([AC-43](stories/AC-43-adopt-a-departed-persons-agent-and-chats/story.md)) |
+| A departed person's personal agent retires | It is offered to no one and runs nothing new; it is kept so a successor may adopt it when [AC-43](stories/AC-43-adopt-a-departed-persons-agent-and-chats/story.md) returns |
 | Leans on | The Directory — people, the system user, deactivating (AC-F03) · Access Policies and the permission catalogue (AC-F02) · History (AC-F06) · the features that own each resource ([Reads](#reads)) |
 
 ### Slots and fallbacks
@@ -107,7 +107,7 @@ Permissions are [the permission catalogue](../AC-F02-access-policies/feature.md#
 | A personal key's owner | The person who minted it ([AC-F10](../AC-F10-keys/feature.md)) | The key is revoked; automation uses a project key, which no one's leaving stops |
 | A work connection | A service identity, no person ([CP-F02](../../../control/features/CP-F02-plugins-and-outside-tools/feature.md)) | Nothing — no person holds it |
 | A chat outside a project | Its person ([EX-F03](../../../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)) | The successor |
-| A personal agent | Its person ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)) | Retired; the successor may adopt it |
+| A personal agent | Its person ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md)) | Retired, kept, granted to no one |
 | A holder of Super user | The active people who hold it ([AC-F03](../AC-F03-directory/feature.md)) | A deactivation or take-off that leaves none is refused |
 
 ### Where memory goes when a person leaves
@@ -222,6 +222,7 @@ Each owned resource keeps `made_by_id` (a person) and `made_via_agent_id?` on it
 
 | Decision | Detail |
 |---|---|
+| The Owners tab is parked | AC-24 and AC-43 are `later`: `settings.me` has no *Owners* tab; a resource's owner and maker read on its own detail, and *Copy to change it* sits on a built-in's own detail — `agents.agents` · `agents.skills` · `settings.policies` (AC-25). The rule stays: the platform owns shared work, every slot has a fallback, a successor takes a leaver's slots |
 | Owner is a modal | *Owner* opens from any resource's header as a modal, so the resource stays readable behind it |
 | A copied agent starts personal | A copy of a built-in agent is its maker's personal agent, to try before it is shared; any other copy is the organisation's from the start |
 | One successor takes it all | The successor takes every slot a fallback gives them and the leaver's chats, so the Admin decides once, while deactivating |

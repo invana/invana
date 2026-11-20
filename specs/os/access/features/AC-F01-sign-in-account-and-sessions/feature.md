@@ -237,7 +237,7 @@ The code change is [migrations.md](../../../../migrations.md) M13.
 
 | Decision | Detail |
 |---|---|
-| You is a part of Settings | *Settings › You* holds *Profile* (name, email, time zone, username, password, sessions), *Keys* ([AC-F10](../AC-F10-keys/feature.md)) and *Connected clients* ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md)); there is no profile page of its own |
+| You is a part of Settings | *Settings › You* holds *Profile* (name, email, time zone, username, password, sessions), *Keys* ([AC-F10](../AC-F10-keys/feature.md)); *Connected clients* ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) is `later`; there is no profile page of its own |
 | Sessions are two acts, not a list | *Sign out here* and *Sign out everywhere*; there is no list of devices — the engine keeps no device names |
 | Password rules are configuration | Minimum length and hashing cost are the deployment's, with sane defaults |
 | No sign-up form | Accounts are made by an Admin; the sign-in card says whom to ask |

@@ -50,10 +50,10 @@ afterwards what it did. Without that, a deployment is either open to every agent
 | AC-F05 | [Asks and approvals](features/AC-F05-asks-and-approvals/feature.md) | AC-15 · AC-26 · AC-32 | idea |
 | AC-F06 | [History — what people and agents did, and every change](features/AC-F06-history/feature.md) | AC-16 · AC-17 | idea |
 | AC-F07 | [Ownership](features/AC-F07-ownership/feature.md) | AC-24 · AC-25 · AC-43 | idea |
-| AC-F08 | [Access usage and reviews](features/AC-F08-access-usage/feature.md) | AC-28 · AC-29 · AC-41 | idea |
+| AC-F08 | [Access usage and reviews](features/AC-F08-access-usage/feature.md) | AC-28 · AC-29 · AC-41 | later |
 | AC-F09 | [What left the platform](features/AC-F09-what-left-the-platform/feature.md) | AC-30 · AC-31 | idea |
 | AC-F10 | [Keys](features/AC-F10-keys/feature.md) | AC-10 | idea |
-| AC-F11 | [Connect an MCP client](features/AC-F11-connect-an-mcp-client/feature.md) | AC-35 · AC-36 | idea |
+| AC-F11 | [Connect an MCP client](features/AC-F11-connect-an-mcp-client/feature.md) | AC-35 · AC-36 | later |
 | AC-F12 | [Leaving and keeping](features/AC-F12-leaving-and-keeping/feature.md) | AC-44 · AC-45 · AC-46 · AC-47 | idea |
 
 ## Surfaces
@@ -62,17 +62,14 @@ afterwards what it did. Without that, a deployment is either open to every agent
 |---|---|---|
 | Sign in — a password, or the company's SSO, then a second factor | page | `access.signin` |
 | Sign in again — the password or the SSO for a risky act | modal | `access.signin · Sign in again` |
-| Connect an MCP client — consent | page | `access.consent` |
+| Connect an MCP client — consent (`later`) | page | `access.consent` |
 | Access Policies | modal | `settings.policies` |
-| Directory — users, teams, the policies attached to each, every key and connected client | modal | `settings.people` |
-| Owners of what a person owns | modal | `settings.me · Owners` |
-| You — profile, default agent, sessions, keys, connected clients | modal | `settings.me` |
+| Directory — users, teams, the policies attached to each, every key | modal | `settings.people` |
+| Copy a built-in to change it — on the built-in's own detail | modal | `agents.agents` · `agents.skills` · `settings.policies` |
+| You — profile, username, password, sessions, default agent, where asks reach you, keys | modal | `settings.me` |
 | An ask in Needs you | modal | `inbox` |
-| Access usage — what each agent touched, access never used, the quarterly access review | modal | `access.usage` |
-| What left the platform — the ledger | modal | `access.ledger` |
-| History | modal | `settings.history` |
-| Leaving and keeping — retention per store, legal holds, a departed person's name, subjects forgotten | modal | `settings.keeping` |
-| Forget a subject | modal | `settings.keeping · Forget` |
+| History — *Access › Record*, every act, call and refusal | modal | `settings.history` |
+| Access usage · What left the platform · Leaving and keeping · Owners — `later`, drawn, unwired | modal | `access.usage` · `access.ledger` · `settings.keeping` |
 | Export everything held about a person | modal | `settings.people · Export their data` |
 | No access | every surface | The Operator access of each board, `<board> · Locked` — the act names the check that refused it: the permission it needs and who can grant it, the rule and its policy, or the approver who decides |
 

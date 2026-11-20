@@ -25,8 +25,10 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  start([Access › Record › What left]) -->|nothing called yet| none["No calls yet"]
-  start --> list["AC-30 · Every call: when · agent · person behind · target · local or external · schema-only or data-bearing · records · tokens"]
+  hist([Access › Record › History]) -->|Refused · Left out| hr["AC-42 · A refused or left-out exit · the property and level, never the value"]
+  hr -->|Open the run| may
+  start([Access › Record › What left — later]) -.->|nothing called yet| none["No calls yet"]
+  start -.-> list["AC-30 · Every call: when · agent · person behind · target · local or external · schema-only or data-bearing · records · tokens"]
   list -->|Data-bearing to external targets · Refused · Left out · a target · an agent · a window| f{"Matches?"}
   f -->|no| nm["Nothing matches · Clear filters"]
   list --> row["AC-30 · A call: the kinds, fields and every record ID it carried · response schema · keyed hashes"]
@@ -220,7 +222,8 @@ exports and report publishing each pass their exit through it.
 
 | Decision | Detail |
 |---|---|
-| What left sits in Access › Record | *What left* sits beside *History* and *Usage* in *Access › Record*; a call opens beside the list |
+| The What left page is parked | AC-30 is `later`: *Access › Record* is History alone. The ledger, the outbound check and run privacy (AC-31 · AC-42) are built — a refused or left-out exit reads as a History row and on the run's step; the page over the ledger returns with no change to them. `access.ledger` stays as drawn, unwired |
+| What left sits in Access › Record when it returns | *What left* sits beside *History* in *Access › Record*; a call opens beside the list |
 | The preset an auditor asks for first | *Data-bearing to external targets* is the first preset, with its count for the window; *Refused* and *Left out* follow |
 | Withheld, not hidden | A call of a run the reader may not read still lists, so nothing seems missing; only its content is withheld |
 | Run privacy lives here | The Access Plane owns who may read a run's content; every surface that shows content calls the one check |

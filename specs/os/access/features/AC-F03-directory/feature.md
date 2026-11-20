@@ -46,8 +46,9 @@ flowchart TD
   users -->|a person leaves| deact["AC-23 · Deactivate"]
   deact --> succ["Name a successor · tasks to them or back to Open"]
   succ --> off(["Deactivated · sessions end · keys revoked · every slot falls back · AC-F07"])
-  off --> keep(["Personal-connection data erased · name kept or pseudonymised · AC-F12"])
-  off --> adopt(["The successor may adopt their personal agents · AC-43"])
+  off --> keep(["Their work keeps their name · marked Deactivated"])
+  off --> ret(["AC-23 · Their personal agents retire · kept, granted to no one"])
+  off -.->|later| adopt(["Pseudonymise · erase · adopt a retired agent · AC-F12 · AC-43"])
   deact -->|the last Super user · themselves| refd["Refused · names why"]
 ```
 
@@ -216,6 +217,7 @@ Attaching a policy is `invana policy attach` ([AC-F02 › CLI](../AC-F02-access-
 | The Directory is Access › Who | *Users* and *Teams*, beside *What they may do* (*Access Policies* · *Permissions*); a user or a team drills in and the crumb grows; each reads *What can they do?* |
 | Deactivate, never delete | A person who leaves is deactivated, so their work, authorship and History keep a name |
 | The successor is part of deactivating | The person deactivating names the successor in the same act; one person takes every place the leaver held, so nothing is left to chase afterwards |
+| A leaver's personal agents retire | They are kept as they were and granted to no one; adopting one (AC-43), the names setting and erasure (AC-F12) are `later`, so deactivating erases nothing and every name stays. The departure count lists no personal connections until CP-43 returns |
 | Two holders of Super user, never one | A holder who is away or leaves never locks the deployment; a deployment with one is told to name a second |
 | Agents appear as users | One list answers "who acts here"; an agent's row opens its page, where its ceiling is |
 | The default agent only routes asks | A person reads their default agent in *You*; it is where their asks go, never what they may reach |
