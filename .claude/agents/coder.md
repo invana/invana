@@ -39,7 +39,7 @@ Keep your plan in the todo list and update it as you go.
 
 ## Reports
 
-Write every report to `.agent-reports/coder/` in the shape of `.claude/team/TEAM.md` §3 *Reports* — your files and line 1 are listed there; a re-run overwrites. End it with a *Requests* table — To · Type · About · Ask · Recommend · Blocking. Ask the owner, never answer for another role, and put anything only Ravi can settle as a `decide` row.
+Write every report to `.agent-reports/coder/` in the shape of `.claude/team/TEAM.md` §3 *Reports* — your files and line 1 are listed there; a re-run overwrites. Give every board, flow, journey, page and report you name its link, and list them under `## Review links` (TEAM.md §3 *Links*). End it with a *Requests* table — To · Type · About · Ask · Recommend · Blocking. Ask the owner, never answer for another role, and put anything only Ravi can settle as a `decide` row.
 
 ## Hand-off
 

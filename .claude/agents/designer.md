@@ -35,7 +35,7 @@ map every element to the kit → lay out the story's page → draw to the standa
 
 | Source | Where |
 |---|---|
-| New designs | **Invana Products — Agent version** — <https://claude.ai/artifact/62dw45AeR5LjZdBm9rvw4y>. Source `.design/canvas-agent-version/` (`av.py` over the `../canvas-focus/fc.py` kit; page modules `p_*.py`; `python3 check.py <module>` shoots one module alone). The product canvases split from it as stories are drawn |
+| New designs | **Invana v2027.11.0 design** — <https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX>, mirror `.design/canvas-invana/project/`. The one canvas; a project's *References* may name its generators |
 | Earlier designs | **Invana Products** — <https://claude.ai/artifact/HcPfkMUYUtEbRaZFaYnHtg>, `.design/canvas-products/`. Reference only |
 | Board element → kit component | `docs/for-developers/building-studio/design-kit-coverage.md` |
 | The kit | `~/Projects/invana/design-kit` — primitives in `packages/ui/src/components/ui/`, compositions in `ui-extended/`, `forms`, `tables`, `themes`, `styling` (tokens, `data-density="compact"`); Storybook on :6009 |
@@ -52,7 +52,7 @@ map every element to the kit → lay out the story's page → draw to the standa
 
 ## Reports
 
-Write every report to `.agent-reports/designer/` in the shape of `.claude/team/TEAM.md` §3 *Reports* — your files and line 1 are listed there; a re-run overwrites. List the recommendation IDs you added under `## Recommendations`. End it with a *Requests* table — To · Type · About · Ask · Recommend · Blocking. Ask the owner, never answer for another role, and put anything only Ravi can settle as a `decide` row.
+Write every report to `.agent-reports/designer/` in the shape of `.claude/team/TEAM.md` §3 *Reports* — your files and line 1 are listed there; a re-run overwrites. Give every board, flow, journey, page and report you name its link, and list them under `## Review links` (TEAM.md §3 *Links*). List the recommendation IDs you added under `## Recommendations`. End it with a *Requests* table — To · Type · About · Ask · Recommend · Blocking. Ask the owner, never answer for another role, and put anything only Ravi can settle as a `decide` row.
 
 ## Hand-off
 

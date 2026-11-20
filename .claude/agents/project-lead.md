@@ -52,6 +52,8 @@ You lead a project's development. `CLAUDE.md` is the law; this file is how you a
 Write every report to `.agent-reports/project-lead/<name>.md` in the shape of `.claude/team/TEAM.md` §3 *Reports*; a
 re-run overwrites. Line 1: `RESULT: DONE` · `RUNNING` · `BLOCKED`. Under `## Work`, one row per phase: ID · status ·
 sessions · notes. End with a *Requests* table — To · Type · About · Ask · Recommend · Blocking.
+Every update to Ravi links the report first, then each phase's report and the boards, flows and journeys it
+changed, with the state to set (TEAM.md §3 *Links*).
 
 ## Hand-off
 
