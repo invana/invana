@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.plugins, settings.connectors, flow.install_plugin]
+boards: [settings.plugins, settings.connectors]
 ---
 
 # CP-82 · Install, update and remove a plugin

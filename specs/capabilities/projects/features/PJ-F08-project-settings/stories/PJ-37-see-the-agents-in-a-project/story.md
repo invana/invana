@@ -4,7 +4,7 @@ title: See the agents in a project
 feature: PJ-F08
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.projects, projects.settings, flow.project_settings]
+boards: [projects.projects, projects.settings]
 ---
 
 # PJ-37 · See the agents in a project

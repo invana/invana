@@ -5,7 +5,7 @@ feature: AC-F01
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.people, access.signin, flow.create_account]
+boards: [settings.people, access.signin]
 ---
 
 # AC-18 · Give a person an account

@@ -4,7 +4,7 @@ title: Connect an issue tracker and link a project to it
 feature: CP-F12
 status: idea
 personas: [admin, builder, decision-maker]
-boards: [settings.connectors, projects.projects, flow.connect_tracker]
+boards: [settings.connectors, projects.projects]
 ---
 
 # CP-73 · Connect an issue tracker and link a project to it

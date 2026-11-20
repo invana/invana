@@ -6,7 +6,7 @@ status: idea
 personas: [decision-maker, analyst, researcher, investigator, builder]
 stories: [PJ-01, PJ-02, PJ-12, PJ-15, PJ-18, PJ-20, PJ-21, PJ-22, PJ-23, PJ-24, PJ-25, PJ-26, PJ-27]
 journeys: [J03, J11]
-boards: [projects.projects, projects.new, projects.settings, projects.tasks, projects.reviews, projects.graph, inbox, flow.project_settings, shell.switcher, start.home]
+boards: [projects.projects, projects.new, projects.settings, projects.tasks, projects.reviews, projects.graph, inbox, shell.switcher, start.home]
 nfrs: [NFR-PERF-3]
 depends_on: [AG-F01, AG-F06, CP-F10, AG-F07, AC-F02, AC-F03, AC-F04, AC-F07, CP-F08, GP-F02]
 ---

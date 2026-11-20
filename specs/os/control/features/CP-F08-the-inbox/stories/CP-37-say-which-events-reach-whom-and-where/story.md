@@ -4,7 +4,7 @@ title: Say which events reach whom, and where
 feature: CP-F08
 status: idea
 personas: [admin, builder]
-boards: [settings.notifications, flow.write_rule]
+boards: [settings.notifications]
 ---
 
 # CP-37 · Say which events reach whom, and where

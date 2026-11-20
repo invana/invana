@@ -4,7 +4,7 @@ title: Install an agent runtime
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.plugins, settings.workers, flow.install_runtime]
+boards: [settings.plugins, settings.workers]
 ---
 
 # CP-64 · Install an agent runtime

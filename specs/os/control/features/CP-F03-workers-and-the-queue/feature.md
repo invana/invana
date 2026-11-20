@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-05, CP-06, CP-07, CP-08, CP-09, CP-10, CP-65]
 journeys: [J07, J10]
-boards: [settings.workers, agents.runs, flow.add_workers, flow.drain_worker]
+boards: [settings.workers, agents.runs]
 nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14, NFR-SEC-15, NFR-SEC-17, NFR-SEC-18]
 depends_on: [CP-F02, CP-F04, CP-F10, AC-F02]
 ---

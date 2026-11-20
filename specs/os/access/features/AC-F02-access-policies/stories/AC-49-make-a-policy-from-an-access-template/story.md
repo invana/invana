@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin, investigator]
-boards: [settings.policies, access.signin, flow.write_policy]
+boards: [settings.policies, access.signin]
 ---
 
 # AC-49 · Make a policy from an Access template

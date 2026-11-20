@@ -4,7 +4,7 @@ title: Mint a key that acts as its owner, narrowed
 feature: AC-F10
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.me, access.signin, settings.people, projects.projects, flow.mint_key]
+boards: [settings.me, access.signin, settings.people, projects.projects]
 ---
 
 # AC-10 · Mint a key that acts as its owner, narrowed

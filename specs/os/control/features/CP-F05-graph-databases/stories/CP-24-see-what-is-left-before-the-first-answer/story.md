@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [start.home, flow.start_first_run]
+boards: [start.home]
 ---
 
 # CP-24 · See what is left before the first answer

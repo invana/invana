@@ -4,7 +4,7 @@ title: Set the project team and its Lead agent
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.settings, flow.project_settings]
+boards: [projects.settings]
 ---
 
 # PJ-22 · Set the project team and its Lead agent

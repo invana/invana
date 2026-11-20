@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.connectors, settings.databases, flow.install_connector]
+boards: [settings.connectors, settings.databases]
 ---
 
 # CP-79 · Install a connector

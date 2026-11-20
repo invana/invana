@@ -4,7 +4,7 @@ title: Install, update and remove a Team pack
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.packs, settings.policies, settings.plugins, flow.manage_pack]
+boards: [settings.packs, settings.policies, settings.plugins]
 ---
 
 # CP-83 · Install, update and remove a Team pack

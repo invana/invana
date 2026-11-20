@@ -4,7 +4,7 @@ title: Grant agents to a team and see who gains them
 feature: AC-F03
 status: idea
 personas: [admin]
-boards: [settings.people, access.signin, flow.grant_agent]
+boards: [settings.people, access.signin]
 ---
 
 # AC-39 · Grant agents to a team and see who gains them

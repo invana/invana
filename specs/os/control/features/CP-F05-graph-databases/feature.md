@@ -6,7 +6,7 @@ status: idea
 personas: [admin, modeller, builder, analyst]
 stories: [CP-22, CP-25, CP-26, CP-27, CP-24, CP-38, CP-39, CP-40, CP-35, CP-41]
 journeys: [J01, J07]
-boards: [start.home, settings.databases, access.signin, settings.connectors, flow.connect_graph_database, flow.set_database_mode, flow.make_practice]
+boards: [start.home, settings.databases, access.signin, settings.connectors]
 nfrs: [NFR-REL-3, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-9, NFR-PERF-3]
 depends_on: [AC-F01, AC-F02, AC-F06, SE-F01, RC-F02, CP-F01, GP-F01]
 ---

@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.policies, access.signin, flow.write_policy]
+boards: [settings.policies, access.signin]
 ---
 
 # AC-04 · Write the rules of an Access Policy

@@ -4,7 +4,7 @@ title: Tune when ops alerts fire
 feature: CP-F11
 status: idea
 personas: [admin]
-boards: [settings.alerts, flow.tune_alert]
+boards: [settings.alerts]
 ---
 
 # CP-60 · Tune when ops alerts fire

@@ -4,7 +4,7 @@ title: Read what people and agents did, and prove it
 feature: AC-F06
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.history, agents.runs, flow.read_ledger]
+boards: [settings.history, agents.runs]
 ---
 
 # AC-16 · Read what people and agents did, and prove it

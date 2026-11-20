@@ -4,7 +4,7 @@ title: Connect a data store
 feature: CP-F13
 status: idea
 personas: [admin]
-boards: [settings.databases, settings.connectors, access.signin, flow.connect_data_store]
+boards: [settings.databases, settings.connectors, access.signin]
 ---
 
 # CP-84 · Connect a data store

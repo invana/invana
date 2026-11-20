@@ -5,7 +5,7 @@ feature: CP-F04
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.limits, flow.set_limits]
+boards: [settings.limits]
 ---
 
 # CP-11 · Set limits for the deployment, a team, a user or an agent

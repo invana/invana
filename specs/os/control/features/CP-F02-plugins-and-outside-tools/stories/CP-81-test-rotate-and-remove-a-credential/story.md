@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.connectors, access.signin, flow.manage_credential]
+boards: [settings.connectors, access.signin]
 ---
 
 # CP-81 · Test, rotate and remove a credential

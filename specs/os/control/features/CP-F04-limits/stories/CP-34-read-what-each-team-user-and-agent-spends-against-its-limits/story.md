@@ -5,7 +5,7 @@ feature: CP-F04
 status: idea
 milestone: MVP
 personas: [admin, builder, analyst]
-boards: [settings.limits, flow.set_limits]
+boards: [settings.limits]
 ---
 
 # CP-34 · Read what each team, user and agent spends against its limits

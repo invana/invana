@@ -4,7 +4,7 @@ title: Install a Team pack
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.packs, settings.policies, settings.plugins, flow.manage_pack]
+boards: [settings.packs, settings.policies, settings.plugins]
 ---
 
 # CP-20 · Install a Team pack

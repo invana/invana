@@ -5,7 +5,7 @@ feature: AC-F03
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.people, access.signin, flow.create_team, flow.grant_agent]
+boards: [settings.people, access.signin]
 ---
 
 # AC-09 · Make teams and put people on them

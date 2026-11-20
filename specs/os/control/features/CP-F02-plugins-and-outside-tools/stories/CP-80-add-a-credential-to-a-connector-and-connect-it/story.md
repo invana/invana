@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.connectors, agents.agents, settings.plugins, access.signin, flow.add_credential]
+boards: [settings.connectors, agents.agents, settings.plugins, access.signin]
 ---
 
 # CP-80 · Add a credential to a connector and connect it

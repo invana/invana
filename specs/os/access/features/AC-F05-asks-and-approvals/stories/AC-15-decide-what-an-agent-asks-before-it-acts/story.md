@@ -5,7 +5,7 @@ feature: AC-F05
 status: idea
 milestone: MVP
 personas: [admin, builder, analyst]
-boards: [inbox, flow.decide_ask]
+boards: [inbox]
 ---
 
 # AC-15 · Decide what an agent asks before it acts

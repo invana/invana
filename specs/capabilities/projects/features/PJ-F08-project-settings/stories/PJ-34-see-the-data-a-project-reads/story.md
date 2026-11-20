@@ -4,7 +4,7 @@ title: See the data a project reads
 feature: PJ-F08
 status: idea
 personas: [decision-maker, analyst, researcher]
-boards: [projects.settings, flow.project_settings]
+boards: [projects.settings]
 ---
 
 # PJ-34 · See the data a project reads

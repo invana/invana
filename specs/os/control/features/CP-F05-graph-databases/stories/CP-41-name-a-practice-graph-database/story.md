@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, builder]
-boards: [settings.databases, flow.make_practice]
+boards: [settings.databases]
 ---
 
 # CP-41 · Name a practice graph database

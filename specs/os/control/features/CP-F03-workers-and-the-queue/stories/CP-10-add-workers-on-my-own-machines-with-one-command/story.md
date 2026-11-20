@@ -5,7 +5,7 @@ feature: CP-F03
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.workers, flow.add_workers]
+boards: [settings.workers]
 ---
 
 # CP-10 · Add workers on my own machines with one command

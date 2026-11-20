@@ -5,7 +5,7 @@ feature: CP-F01
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.ai, flow.add_ai_model]
+boards: [settings.ai]
 ---
 
 # CP-01 · Offer the model versions agents may pin

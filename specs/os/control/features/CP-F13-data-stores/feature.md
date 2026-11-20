@@ -6,7 +6,7 @@ status: idea
 personas: [admin, modeller, analyst]
 stories: [CP-84]
 journeys: [J07]
-boards: [settings.databases, settings.connectors, access.signin, flow.connect_data_store]
+boards: [settings.databases, settings.connectors, access.signin]
 nfrs: [NFR-SEC-2, NFR-SEC-7, NFR-SEC-9, NFR-PERF-3]
 depends_on: [AC-F01, AC-F02, AC-F09, CP-F02, CP-F03, CP-F05, SE-F02]
 ---

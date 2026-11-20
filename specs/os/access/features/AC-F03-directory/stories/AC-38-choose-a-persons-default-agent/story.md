@@ -4,7 +4,7 @@ title: Choose a person's default agent
 feature: AC-F03
 status: idea
 personas: [admin, analyst]
-boards: [settings.people, settings.me, access.signin, flow.grant_agent]
+boards: [settings.people, settings.me, access.signin]
 ---
 
 # AC-38 · Choose a person's default agent

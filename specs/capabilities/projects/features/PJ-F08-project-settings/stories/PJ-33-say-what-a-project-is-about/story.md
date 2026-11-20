@@ -4,7 +4,7 @@ title: Say what a project is about
 feature: PJ-F08
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.settings, flow.project_settings]
+boards: [projects.settings]
 ---
 
 # PJ-33 · Say what a project is about

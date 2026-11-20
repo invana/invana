@@ -6,7 +6,7 @@ status: idea
 personas: [decision-maker, analyst, builder]
 stories: [PJ-33, PJ-34, PJ-36, PJ-37]
 journeys: [J03]
-boards: [projects.settings, projects.projects, flow.project_settings]
+boards: [projects.settings, projects.projects]
 nfrs: []
 depends_on: [PJ-F01, PJ-F07, AG-F01, CP-F04, CP-F05, AC-F04]
 ---

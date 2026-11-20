@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.databases, access.signin, flow.connect_graph_database]
+boards: [settings.databases, access.signin]
 ---
 
 # CP-25 · Connect a graph database in one modal

@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.databases, flow.set_database_mode]
+boards: [settings.databases]
 ---
 
 # CP-39 · Switch a graph database on or off

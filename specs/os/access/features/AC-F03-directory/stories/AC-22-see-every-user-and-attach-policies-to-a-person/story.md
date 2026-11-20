@@ -4,7 +4,7 @@ title: See every user and the agents each may use
 feature: AC-F03
 status: idea
 personas: [admin, analyst]
-boards: [settings.people, access.signin, flow.grant_agent]
+boards: [settings.people, access.signin]
 ---
 
 # AC-22 · See every user and the agents each may use

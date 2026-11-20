@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, modeller]
-boards: [settings.databases, flow.connect_graph_database]
+boards: [settings.databases]
 ---
 
 # CP-26 · Connect a graph database that already holds data

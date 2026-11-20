@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin, builder]
-boards: [settings.policies, access.signin, flow.attach_policy]
+boards: [settings.policies, access.signin]
 ---
 
 # AC-11 · Attach a policy to agents

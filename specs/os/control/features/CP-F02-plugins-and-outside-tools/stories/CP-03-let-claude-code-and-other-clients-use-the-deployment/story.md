@@ -4,7 +4,7 @@ title: Let Claude Code and other clients use the deployment
 feature: CP-F02
 status: idea
 personas: [builder, curator, analyst, admin]
-boards: [settings.mcp, settings.me, flow.connect_client_with_key]
+boards: [settings.mcp, settings.me]
 ---
 
 # CP-03 · Let Claude Code and other clients use the deployment

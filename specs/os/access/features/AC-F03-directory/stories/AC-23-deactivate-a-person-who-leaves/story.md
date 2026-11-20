@@ -4,7 +4,7 @@ title: Deactivate a person who leaves
 feature: AC-F03
 status: idea
 personas: [admin]
-boards: [settings.people, access.signin, settings.me, flow.deactivate_person]
+boards: [settings.people, access.signin, settings.me]
 ---
 
 # AC-23 · Deactivate a person who leaves

@@ -5,7 +5,7 @@ feature: CP-F01
 status: idea
 milestone: MVP
 personas: [admin, builder]
-boards: [settings.ai, access.signin, flow.add_ai_model]
+boards: [settings.ai, access.signin]
 ---
 
 # CP-61 · Mark an AI model local or external

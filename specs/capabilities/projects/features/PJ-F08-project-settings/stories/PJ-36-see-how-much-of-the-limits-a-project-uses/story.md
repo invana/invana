@@ -4,7 +4,7 @@ title: See how much of the limits a project uses
 feature: PJ-F08
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.settings, flow.project_settings]
+boards: [projects.settings]
 ---
 
 # PJ-36 · See how much of the limits a project uses

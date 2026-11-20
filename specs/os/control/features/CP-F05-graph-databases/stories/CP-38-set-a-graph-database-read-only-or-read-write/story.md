@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.databases, access.signin, flow.set_database_mode]
+boards: [settings.databases, access.signin]
 ---
 
 # CP-38 · Set a graph database read-only or read + write
