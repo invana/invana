@@ -46,8 +46,9 @@ Run it: `INVANA_RUNNER_LEAD_MODEL=opus python3 .claude/skills/run-project/run.py
 | Board ids stay | Keep the ids the specs cite; a renamed state is renamed in the spec in the same phase only by the product-manager — a designer phase raises it |
 | MVP first | J07 · J01 · J02 · J03 · J06 rows first inside every phase |
 | Kit only, tokens only | `InvanaUI` from the mirror's bundle; tokens only; density by its token; graph rendering is `@invana/canvas` |
-| Four stops for Ravi | The run pauses only after P01b (the CRUD matrix: scope), P03 (the board engine every board rests on), P08b (the MVP places drawn) and P11b. Elsewhere a question only Ravi can answer goes to *Questions for Ravi* with the recommendation, and the session applies the recommendation and goes on; every change Ravi asks for afterwards goes through the product-manager |
+| Four stops for Ravi | The run pauses only after P01c (the CRUD matrix and the slimmed Settings: scope), P03 (the board engine every board rests on), P08b (the MVP places drawn) and P11b. Elsewhere a question only Ravi can answer goes to *Questions for Ravi* with the recommendation, and the session applies the recommendation and goes on; every change Ravi asks for afterwards goes through the product-manager |
 | What changed, with links | Every phase ends its report (`.agent-reports/<agent>/platform-design-3-<ID>.md`) with `## Review links` by `.claude/team/TEAM.md` §3 *Links*: each board, flow and journey it added or changed, its deep link, and the View · State · Lens to set for each new or wired state; spec phases link each story and row they changed. The project-lead's update links each phase report first |
+| Settings merges | A board P01c merged away moves its states into the board that keeps it, in the place phase that owns the keeper; its file is removed, every link and flow frame repointed, and the canvas publish sends `null` for it |
 | CRUD matrix rows | A place phase also closes the P01b matrix rows Ravi kept for the boards it owns — the create, edit and delete/archive acts with their confirm, result and failure states — and records them in `flows.json` |
 | Re-check before writing | `git status` on `specs/` and `.design/canvas-invana/` before writing — a peer session may hold them |
 | Render and click-through check | Before a designer phase is done: every board it touched renders with no page error in both lenses (`node .design/canvas-nav-proposals/harness/shot.mjs <abs path to .design/canvas-invana/project> <out> <board>.dc.html`, then with `--props '{"lens":"Operator"}'`), and `node .design/canvas-invana/clickthrough/run.mjs --through <its ID>` exits 0 |
@@ -121,22 +122,37 @@ None — the canvas and the harness need no stack.
 | Agent | product-manager |
 | Read | P01's hand-off note · `specs/glossary.md` (the nouns) · every feature's `## Engine` tables and routes · every story's Flow and `## Screens` · the gap report · `specs/milestones.md` |
 | Stories | — |
-| Done when | A report at `.agent-reports/product-manager/platform-design-3-crud.md`: one row per entity a person or an agent creates (project · milestone · task · branch · finding · agent · skill · workflow · schedule · model · kind · rule · standard · graph database · data store · connector · credential · plugin · pack · AI model · tracker · outside server · outside agent · person · team · policy · key · worker group · join key · alert · notification rule · dashboard · saved query · annotation · record …) × **Create · Read · Update · Delete or archive**, each cell the story and criterion, the place board · state and the `flow.<act>` that carry it, or *missing*. Each missing cell has a recommendation — add (the story it joins), defer (`later`), or not needed (why) — with the MVP rows first, as a questions batch in *Questions for Ravi*. `## Review links` links each board and flow named |
+| Done when | A report at `.agent-reports/product-manager/platform-design-3-crud.md`: one row per entity a person or an agent creates (project · milestone · task · branch · finding · agent · skill · workflow · schedule · model · kind · rule · standard · graph database · data store · connector · credential · plugin · pack · AI model · tracker · outside server · outside agent · person · team · policy · key · worker group · join key · alert · notification rule · dashboard · saved query · annotation · record …) × **Create · Read · Update · Delete or archive**, each cell the story and criterion, the place board · state and the `flow.<act>` that carry it, or *missing*; and per entity and per feature two more columns — **Needed for MVP?** (which MVP journey needs it, or no) and **Verdict** (keep · merge into … · cut · defer), flagging any feature whose screens, tabs or options go beyond what its stories need. Each missing cell has a recommendation — add (the story it joins), defer (`later`), or not needed (why) — with the MVP rows first, as a questions batch in *Questions for Ravi*. `## Review links` links each board and flow named |
 | Lands | The report · *Questions for Ravi* |
 | Boards | — |
 | Review | |
-| Approve | Ravi — what the matrix adds is scope |
+| Approve | — (Ravi decides it with P01c's, at P01c's stop) |
 | Budget | |
 | Steps | 1. Entities from the glossary and the engine tables. 2. Each cell from stories, Screens and flows. 3. A recommendation per gap. 4. Questions |
+
+### P01c · Settings, slimmed
+
+| | |
+|---|---|
+| Agent | product-manager |
+| Read | P01's hand-off note · the P01b matrix · `.agent-reports/product-manager/platform-design-3-settings-review.md` · `specs/design-language.md` §3 and §8 · every story citing a `settings.*`, `access.*` or `shell.access` board · the mirror's Settings boards (their tabs and sections) |
+| Stories | — |
+| Done when | A report at `.agent-reports/product-manager/platform-design-3-settings-slim.md`: every Settings board, tab, section and field — keep · merge into … · cut · defer, with the MVP journey (J07 · J01 · J02 · J03 · J06) that needs it or none. It weighs at least: `settings.fleet` with `settings.workers`; `settings.alerts` with `settings.notifications`; `settings.policies` · `settings.agent_access` · `settings.access_now`; `settings.general` · `settings.appearance` · `settings.about`; `settings.connectors` · `settings.plugins` · `settings.packs` · `settings.mcp`; `settings.limits`. It ends with the proposed Settings — its nav, its boards, each board's tabs — as one table, and the stories each merge or cut moves or sets `later`. Questions for Ravi, recommendation first, with P01b's. `## Review links` links every board weighed |
+| Lands | The report · *Questions for Ravi* |
+| Boards | — |
+| Review | |
+| Approve | Ravi — the matrix (P01b) and the slimmed Settings, together |
+| Budget | |
+| Steps | 1. Inventory every Settings board, tab and section. 2. Each against the MVP journeys and its stories. 3. Merges and cuts. 4. The proposed Settings. 5. Questions |
 
 ### P02 · Spec gaps
 
 | | |
 |---|---|
 | Agent | product-manager |
-| Read | The gap report §2 *Story* and *Spec change* columns and §4 · P01's hand-off note · the P01b matrix and Ravi's answers · `/product-spec` · `/system-design` · `specs/design-language.md` §7 · *Invana Products* boards in the report's *Invana Products* column |
+| Read | The gap report §2 *Story* and *Spec change* columns and §4 · P01's hand-off note · the P01b matrix, the P01c report and Ravi's answers · `/product-spec` · `/system-design` · `specs/design-language.md` §7 · *Invana Products* boards in the report's *Invana Products* column |
 | Stories | CP-10 · CP-84 · CP-82 · CP-83 · CP-25 · CP-64 · CP-20 · AC-04 · AC-06 · PJ-02 · AG-42 · AG-64 · AG-38 · SE-13 · RC-13 · and every story an E2E row cites |
-| Done when | §4 is in the specs: CP-10 splits *3 Join key* (Set · Expired · Used up) from one *4 Run it* row per platform and lists the five join failures under *5 Joined*; CP-84 names the form per connector and its failures, *Ready · Read + write* and *A data store*; CP-82 and CP-83 name Updated · Still old version · Removed · Applying · Upgraded and the plugin Install states; CP-25 · CP-64 · CP-20 name *Ready · Mode*, *Only Invana's runtime*, *Manifest refused*; AC-04 says Sign in again names the act it confirms and the state it returns to; PJ-02 renames *Start · Loading types*, adds *Data · found · ok · Could not connect* and *Team · Add*, and retires the legacy New modal on `projects.projects`; AG-42 names the inbox state of a schedule's result; AG-64 its Export states; SE-13 *Already resolved*; AC-06 *What would break · Per agent*; AG-38 a function's calls ×3; RC-13 *Someone else's* (E2E-007: each of the 13 states drawn, renamed or retired). Then every E2E row of a non-`later` story is swept: each state the row adds is a `Step · Substate` node in its story's `## Screens`, every result state (Saved · Attached · Revoked · Removed …) included, and each act with no flow board (CP-84 · CP-81 · CP-82 · CP-41 · CP-83 · PJ-22 · CP-03) names its `flow.<act>` board in `boards:`; wherever *Invana Products* draws a fuller flow, the spec takes it. Every P01b gap Ravi kept is written: its create, edit or delete/archive act in its story (or a new story with `/product-spec`), with its confirm, result and failure states in `## Screens` and its `flow.<act>` board in `boards:`; the gaps he deferred are `later`. `check.py` 0 errors |
+| Done when | §4 is in the specs: CP-10 splits *3 Join key* (Set · Expired · Used up) from one *4 Run it* row per platform and lists the five join failures under *5 Joined*; CP-84 names the form per connector and its failures, *Ready · Read + write* and *A data store*; CP-82 and CP-83 name Updated · Still old version · Removed · Applying · Upgraded and the plugin Install states; CP-25 · CP-64 · CP-20 name *Ready · Mode*, *Only Invana's runtime*, *Manifest refused*; AC-04 says Sign in again names the act it confirms and the state it returns to; PJ-02 renames *Start · Loading types*, adds *Data · found · ok · Could not connect* and *Team · Add*, and retires the legacy New modal on `projects.projects`; AG-42 names the inbox state of a schedule's result; AG-64 its Export states; SE-13 *Already resolved*; AC-06 *What would break · Per agent*; AG-38 a function's calls ×3; RC-13 *Someone else's* (E2E-007: each of the 13 states drawn, renamed or retired). Then every E2E row of a non-`later` story is swept: each state the row adds is a `Step · Substate` node in its story's `## Screens`, every result state (Saved · Attached · Revoked · Removed …) included, and each act with no flow board (CP-84 · CP-81 · CP-82 · CP-41 · CP-83 · PJ-22 · CP-03) names its `flow.<act>` board in `boards:`; wherever *Invana Products* draws a fuller flow, the spec takes it. Every P01b gap Ravi kept is written: its create, edit or delete/archive act in its story (or a new story with `/product-spec`), with its confirm, result and failure states in `## Screens` and its `flow.<act>` board in `boards:`; the gaps he deferred are `later`. Every P01c merge, cut and deferral Ravi kept is written: the stories move their `## Screens` to the board that keeps them or go `later`, and `specs/design-language.md` §8 shows the slimmed Settings. `check.py` 0 errors |
 | Lands | The stories and features above · `specs/README.md` index |
 | Boards | — |
 | Review | |
@@ -467,8 +483,9 @@ only `partial` (it handed off) or `blocked` (with the question).
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
 | P01 | Settings decisions |  | done | 2026-11-20 | gates green · reviews passed |
-| P01b | CRUD matrix | P01 | pending |  |  |
-| P02 | Spec gaps | P01b | pending |  | E2E-007 · §4 |
+| P01b | CRUD matrix | P01 | in progress | 2026-11-20 |  |
+| P01c | Settings, slimmed | P01b | pending |  |  |
+| P02 | Spec gaps | P01c | pending |  | E2E-007 · §4 |
 | P03 | Board engine | P02 | pending |  | E2E-001 · 002 · 003 · 004 · 021 |
 | P03b | Click-through harness | P03 | pending |  |  |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | pending |  |  |
