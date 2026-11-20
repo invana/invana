@@ -38,7 +38,7 @@ flowchart TD
   f --> gd["Graph Data · per graph database None · Read · Read + write"]
   gd --> kd["A kind of node or relationship · override"]
   kd --> pr["A property · Hidden · Read · Read + write"]
-  f --> tabs["Models · AI models · Agents · Skills & plugins · Fleet / Workers · Projects · Access · Settings · Outside Invana"]
+  f --> tabs["Data stores · Models · AI models · Agents · Skills & plugins · Fleet / Workers · Projects · Access · Settings · Outside Invana"]
   f -->|Edit as policy| mx["The matrix · AC-04"] -->|rules the form can show| f
   mx -->|rules the form cannot show| ea["Edited as policy · the matrix only"]
   f --> w["3 Who holds it · people, teams and projects in one picker"]
@@ -62,12 +62,12 @@ flowchart TD
 |---|---|---|---|
 | AC-49.1 | A person with Edit on Access in Access Policies | they press *New policy* | one modal opens with a step strip — *1 Start · 2 What it allows · 3 Who holds it · 4 Review* — on Start: a name, and one list of *Read only* · *Explore* · *Shape the model* · *Build agents* · *Run the deployment* · *Read and analyse* · *Fix data quality* · *Full project* and *Blank*, each with one line of what it allows; there is no choice of who the policy is for |
 | AC-49.2 | Start | the name is already used | it is refused in place — *{name} is taken.* — and *Next* stays off |
-| AC-49.3 | A template picked | *What it allows* opens | a horizontal tab strip sits above the content, one tab per section — **Graph Data** · **Models** · **AI models** · **Agents** · **Skills & plugins** · **Fleet / Workers** · **Projects** · **Access** · **Settings** · **Outside Invana** — every one present whatever the template, filled from it, each tab with its short status — *Read on 2 of 3 graph databases* · *Not set* — and the selected tab's content spans the full width of *What it allows*, with no column beside it ([AC-F02 › The policy form](../../feature.md#the-policy-form)) |
+| AC-49.3 | A template picked | *What it allows* opens | a horizontal tab strip sits above the content, one tab per section — **Graph Data** · **Data stores** · **Models** · **AI models** · **Agents** · **Skills & plugins** · **Fleet / Workers** · **Projects** · **Access** · **Settings** · **Outside Invana** — every one present whatever the template, filled from it, each tab with its short status — *Read on 2 of 3 graph databases* · *Not set* — and the selected tab's content spans the full width of *What it allows*, with no column beside it ([AC-F02 › The policy form](../../feature.md#the-policy-form)) |
 | AC-49.4 | The Graph Data tab | it is read | each graph database reads *None* · *Read* · *Read + write*; opening one lists its kinds of node and of relationship, each inheriting the graph database's setting with an override *None* · *Read* · *Read + write*; opening a kind lists its properties, each *Hidden* · *Read* · *Read + write* |
 | AC-49.5 | A graph database at *Read + write*, a kind set *None*, one property *Hidden* and another *Read* | the policy is created and a holder reads and edits that graph database | the kind is absent from every picker and a query naming it fails as an unknown kind; the hidden property is absent from every record of its kind, with no column, no count and no note, and a query naming it fails as an unknown property; the *Read* property shows and its edit is refused, naming Edit on that property and who can grant it; the other kinds and properties read and change |
 | AC-49.6 | A relationship kind that reads, one of whose end kinds is *None* | a holder reads it | the relationship does not exist for them, never drawn to a missing end |
 | AC-49.8 | The AI models tab | it is read | *Every offered version* · *Local only* · chosen versions, each named exactly and marked *Local* or *External*; *Local only* writes one rule per local endpoint, so one added later is reached once the policy is saved again; a version not chosen is absent from the agent's model picker for the holder and refused in a run |
-| AC-49.9 | A tab or a rule naming a graph database, kind, property, model, AI model version, agent, skill, plugin, tool or project that does not exist | they press *Create policy* | it is refused, Review opening the tab that holds it and naming it |
+| AC-49.9 | A tab or a rule naming a graph database, kind, property, data store, model, AI model version, agent, skill, plugin, tool or project that does not exist | they press *Create policy* | it is refused, Review opening the tab that holds it and naming it |
 | AC-49.10 | A policy whose *Outside Invana* or *Settings* is set | it is held by a project and by a person | nothing is refused: each section takes effect for the holders its resources reach, and Review reads, per holder, what does not apply — *Outside Invana does not apply to people* · *Settings does not apply to projects* |
 | AC-49.11 | *Edit as policy* | it is pressed | the same policy opens as the matrix (AC-04); back in the tabs, every change shows; a rule the form cannot show turns the tabs into *Edited as policy*, the matrix the only editor |
 | AC-49.12 | The Fleet / Workers tab | it is set | worker groups are rules; *Runs at once* and *Tokens a month* show as limits beside them and are saved, on *Create policy*, as each holder's limits — a user's, a team's or a project's (CP-F04) — never as rules |
@@ -80,6 +80,7 @@ flowchart TD
 | AC-49.19 | A person with Read on `access/policies` but not Edit on Access | they open Access Policies | *New policy* is disabled — *Needs Edit on Access — ask Priya or Lee*; every template and policy reads tab by tab and as the matrix; without Read it reads *No access* (AC-03.12) |
 | AC-49.20 | Answers on any step | the person presses Esc or Close | a confirm asks *Discard this policy?* — *Keep editing* · *Discard*; nothing is saved |
 | AC-49.21 | A property one holder's policies set *Hidden*, and a project run that person asked | the run answers them | the property is absent from the answer, the records and the counts the run shows them, though the project's own policies may reach it; another person on the team, whose policies do not hide it, reads it in the same run |
+| AC-49.22 | The Data stores tab | it is read | each data store the deployment connects reads *None* · *Read* · *Read + write*, with its connector and mode; *Read + write* on a read-only data store is saved and still refused at the store, the row saying *The store is read-only* |
 
 ## Screens
 
@@ -88,6 +89,8 @@ flowchart TD
 | New policy · Start | Admin | settings.policies · New · Start | — | settings.policies · New · Start · Loading templates | settings.policies · New · Start · Template picked | settings.policies · New · Start · Name taken | — | — |
 | New policy · Start | Operator | — | — | — | — | — | — | settings.policies · No access |
 | What it allows · tabs | Admin | settings.policies · New · What it allows · From template | settings.policies · New · What it allows · No kind matches | settings.policies · New · What it allows · Loading kinds | settings.policies · New · What it allows · Kinds and properties | settings.policies · New · What it allows · Could not load | — | — |
+| What it allows · Data stores tab | Admin | — | — | — | settings.policies · New · What it allows · Data stores | — | — | — |
+| What it allows · Data stores tab | Operator | — | — | — | — | — | — | settings.policies · No access |
 | What it allows · Models tab | Admin | — | — | — | settings.policies · New · What it allows · Models | — | — | — |
 | What it allows · Models tab | Operator | — | — | — | — | — | — | settings.policies · No access |
 | What it allows · AI models tab | Admin | — | — | — | settings.policies · New · What it allows · AI models | — | — | — |

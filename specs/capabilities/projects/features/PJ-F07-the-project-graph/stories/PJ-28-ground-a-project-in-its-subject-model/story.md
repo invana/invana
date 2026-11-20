@@ -9,7 +9,7 @@ boards: [projects.graph]
 
 # PJ-28 · Ground a project in its subject model
 
-**As** a person starting a project **I want** its type's subject model — what the work is about — parsed from its sources and never typed by hand, and linked to the models of other types **so that** every task, milestone and question rests on nodes that cite where they came from.
+**As** a person starting a project **I want** its type's subject model — what the work is about — held in the graph database the project is granted, parsed from its sources and never typed by hand, and linked to the models of other types **so that** every task, milestone and question rests on nodes that cite where they came from.
 
 Tasks: [task.md](task.md) · Feature: [PJ-F07](../../feature.md)
 
@@ -26,7 +26,9 @@ Tasks: [task.md](task.md) · Feature: [PJ-F07](../../feature.md)
 flowchart TD
   s([A project's Sources]) --> ty{"Its type has a subject model?"}
   ty -->|General · none| nm["Only the work shows · tasks are about any node"]
-  ty -->|Software · Research| src["Add a source: specs folder · code · web page · documents"]
+  ty -->|Software · Research| db{"Granted a graph database at Read + write?"}
+  db -->|none| nodb["No graph database to hold the subject model · Add a source disabled · names who can grant"]
+  db -->|yes · the one Access named| src["Add a source: specs folder · code · web page · documents"]
   src --> pr["Parsed into the type's node kinds · each cites its source and hash"]
   pr -->|fails| pf["Names the source and why · earlier nodes kept"]
   pr --> mp["The map: nodes · links · counts by kind"]
@@ -57,6 +59,7 @@ flowchart TD
 | PJ-28.13 | A person on the team | they add a Web source or a Local files, specs or code source | a Web address must be in the Web connection's hosts and a folder under the Local files workspace root an Admin set (CP-73.19); one outside is refused, naming it, and the source reads *Failed*; the fetch follows CP-73.20 |
 | PJ-28.14 | A Software project's code source in Python or TypeScript | it is read | the files' imports become Module nodes and `depends on` links — an import graph per language, not manifests alone — each citing its file, place and hash; a file in a language with no parser is listed as skipped, naming it |
 
+| PJ-28.16 | A project of a type with a subject model | its subject model is read | it lives in the graph database the project is granted at *Read + write* — the one New project's Access step named ([PJ-02.37](../../../PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)) — and no step picks it apart from that grant; a later change to the project's access that leaves no such graph database turns the subject model and the work graph off, saying why; granted none, Sources reads *No graph database to hold the subject model* naming who can grant, and *Add a source* is disabled |
 | PJ-28.15 | A Team pack whose type manifest names a field the schema does not know, omits a required one, uses a node kind or link it does not declare, or names a connector's node kind or a workflow that does not exist | an Admin installs the pack | it is refused whole, naming the file, the field and why; no type of it is offered |
 
 ## Screens

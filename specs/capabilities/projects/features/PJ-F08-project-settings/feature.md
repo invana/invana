@@ -19,7 +19,7 @@ depends_on: [PJ-F01, PJ-F07, AG-F01, CP-F04, CP-F05, AC-F04]
 
 A project's settings are a place with five tabs: **General** (PJ-33) · **Data** (PJ-34) · **Team** (people, teams and
 agents in one list — [PJ-22](../PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md);
-the create-project Team step is its first form) · **An agent in this project** (PJ-37) · **Usage** (PJ-36). *Agents in
+the create-project Access step's *Adjust* is its first form) · **An agent in this project** (PJ-37) · **Usage** (PJ-36). *Agents in
 this project* (PJ-37) is a section of the project page.
 
 ## User journey
@@ -85,7 +85,7 @@ and anyone with Manage on Projects, may do everything inside it; settings add no
 | The question and the objective | *The question* is the decision the project helps make (`goal`); *the objective* is what success looks like (`success`). Every agent plans from them |
 | Settings read; Databases change | A project reads the graph databases its policies reach; it never connects, switches or sets the mode of one |
 | Limits are shown here, set elsewhere | Usage reads the project's limits and its share of every limit that binds it; each is set where CP-F04 says — the project's own in its policy's *Fleet / Workers* tab |
-| One list for the team | People, teams and agents sit in one list with a policy per row ([PJ-22](../PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)); the create-project Team step and this tab are one form |
+| One list for the team | People, teams and agents sit in one list with a policy per row ([PJ-22](../PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md)); the create-project Access step's *Adjust* and this tab are one form |
 | Numbers are the engine's | Every count, limit and share is stored when the fact settles; Studio formats and never derives |
 
 ## Data touched
@@ -176,7 +176,7 @@ The low-level design: what this feature serves and refuses. Conventions — nami
 
 | Decision | Detail |
 |---|---|
-| Settings is a place with five tabs | General · Data · Team · An agent in this project · Usage, in the airy form density; Team is the create-project Team step's form, edited afterwards |
+| Settings is a place with five tabs | General · Data · Team · An agent in this project · Usage, in the airy form density; Team is the form of the create-project Access step's *Adjust*, edited afterwards |
 | Settings replace the Graph's settings | A project reads what a Graph's settings used to hold; nothing sits above a graph database |
 | Limits are read here, set where CP-F04 says | Usage never sets a limit — the project's own are set in its policy's *Fleet / Workers* tab. A request to remove per-project limits is Ravi's |
 | Agents in this project is a section of the page | It reads the team's agents with the rows of the Agents list; detail is a peek, then the agent's tab in settings |

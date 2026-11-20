@@ -142,10 +142,10 @@ Walked end to end against [the manifest](../capabilities/projects/features/PJ-F0
 
 | Open | Why it is Ravi's |
 |---|---|
-| `access_template` — which Access template this type starts a person or team from (recommended *Read and analyse*, as the *Team* step is drawn) | A choice of access |
+| `access_template` — which project access template the Access step picks first for this type (recommended *Read and analyse*) | A choice of access |
 | `reviewers` — the manifest field has no home in PJ-22 | Who accepts a task is not yet specified anywhere in Projects |
 
-A pack agent's policy is a draft until an Admin applies it, so on the *Team* step a Research agent reads *Chooses nothing yet — pick a policy* until then ([PJ-02.39](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); an Operator who may not apply it reads *Will ask {who can grant}*. A default policy is never applied.
+A pack agent's policy is a draft until an Admin applies it, so on the *Access* step a Research agent reads *Chooses nothing yet — pick a policy* until then ([PJ-02.39](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); an Operator who may not apply it reads *Will ask {who can grant}*. A default policy is never applied.
 
 ## What it relies on
 

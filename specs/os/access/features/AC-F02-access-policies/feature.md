@@ -16,7 +16,8 @@ depends_on: [AC-F01, AC-F03, AC-F05, AC-F06, AG-F01, AG-F04, SE-F03]
 > What each person, team, project and agent may do — one kind of permission: named Access Policies of rules, each rule
 > an effect, an action and a resource, read from one permission catalogue, reaching down to the kinds, relationships and
 > properties of each graph database — attached to users, teams and projects as grants and to agents as ceilings; the
-> locked Super user policy and the Access templates to start from; the order every act is checked in.
+> locked Super user policy, the Access templates to start from and the project access templates a new project picks;
+> the order every act is checked in.
 > The decision it helps make: *who may do this — and what breaks if I change it?*
 
 ## User journey
@@ -38,7 +39,7 @@ flowchart TD
   open -->|Super user| lock["Locked · reads only"]
   open -->|built in · an Access template| copy["Copy, or edit the template in place"] --> open
   list --> np["AC-49 · New policy · 1 Start · a name and an Access template, or Blank"]
-  np --> form["AC-49 · 2 What it allows · a tab strip above full-width content, each tab with its status · Graph Data down to kinds, relationships and properties · Models · AI models · Agents · Skills & plugins · Fleet / Workers · Projects · Access · Settings · Outside Invana"]
+  np --> form["AC-49 · 2 What it allows · a tab strip above full-width content, each tab with its status · Graph Data down to kinds, relationships and properties · Data stores · Models · AI models · Agents · Skills & plugins · Fleet / Workers · Projects · Access · Settings · Outside Invana"]
   form -->|Edit as policy| open
   form --> hold["AC-49 · 3 Who holds it · people, teams and projects in one picker"]
   hold --> rv["AC-49 · 4 Review · every section read back · who holds it · who it changes"]
@@ -119,7 +120,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 |---|---|
 | Read every Access Policy, its rules, versions and holders · the built-in agents and their ceilings · every agent's rules, ceilings and effective view, on the page, in a check and at the command line ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md)) · the rule, policy and setter behind a refusal, in a run and in History ([AC-F06](../AC-F06-history/feature.md)) · *Hidden from agents* · *What can {person} do?* · *Can someone do this?* | Read on `access/policies` — Super user and *Run the deployment* hold it; a key reads under its owner. Without it every one of these reads *No access* |
 | Read the permission catalogue — the Permissions tab, also on *No access* | None — every signed-in person |
-| New policy · Copy · Edit · Delete · Save · apply a policy file from an import or a Team pack · edit an Access template | Edit on Access, in a session, signing in again on Save |
+| New policy · Copy · Edit · Delete · Save · apply a policy file from an import or a Team pack · edit an Access template · make, edit, delete or apply a project access template | Edit on Access, in a session, signing in again on Save |
 | Attach a policy to a user, a team or an agent · take it off | Manage on Access, in a session, signing in again |
 | Attach a policy to a project · widen a project's policies | Manage on Projects (`project/<project>`). Making a new project's first policy is part of starting it ([PJ-F01 › Access](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#access)); a person on its team narrows it |
 | Approve another person's change to access, when a second person's yes is set | Approve on Access — not the person who saved it |
@@ -158,6 +159,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Outside a project | A run reaches the person behind it ∩ the agent's ceiling ∩ every caller's ∩ the run's other ceilings ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md#rules)). The person behind it is who asked, a key's owner, the person who consented a connected client, or a schedule's or a pick-up's setter — so a schedule or a pick-up outside any project reaches its setter's policies ∩ the agent's ceiling. A run whose person cannot act — deactivated, with no successor yet — waits, naming them, until the slot falls back ([AC-F07](../AC-F07-ownership/feature.md#slots-and-fallbacks)) |
 | A project's policies | Access Policies like any other, attached to the project — one or more. New project makes its first through [the policy form](#the-policy-form), from any Access template — the type's default first; *Edit as policy* opens the matrix. A policy may be held by many projects: a change to it reaches each, named in *Who it changes*, and *Copy for this project* splits one off. They grant a person nothing outside the project |
 | Access templates | Access Policies shipped as data to start from ([below](#access-templates)) — one list of suggested starting points: *Read only* · *Explore* · *Shape the model* · *Build agents* · *Run the deployment* · *Read and analyse* · *Fix data quality* · *Full project*. Any may be attached to any holder. Owned by the system user; attached as they are, copied, or edited in place by Edit on Access. A project's type may name its default. Nothing in the engine depends on their names |
+| Project access templates | What one choice on New project's Access step grants a project — its people and teams, its agents and, through one Access Policy, its graph databases, data stores and AI models ([below](#project-access-templates)) |
 | An agent holds only a ceiling | The policies attached to an agent are the most it may ever do — *may edit Graph Data: no*, *may send outside: no*. Adding it to a project's team grants it nothing. Using an agent is Run on `agent/<name>`, a person's permission |
 | Super user | One built-in policy: every action on every resource. The first account, made from the CLI, holds it. It is locked — never edited, renamed, copied over or deleted — and never taken off its last active holder |
 | Newcomers | A new person holds the policies the deployment names for newcomers — the setting `access.newcomer_policies`, *Read only* out of the box — set by Manage on Access. *Read only* is data: it is never named or special-cased in code. Any further policy is attached only by a holder of Manage on Access — *Super user*, or *Run the deployment* |
@@ -165,6 +167,7 @@ act shows, disabled, naming the permission and who can grant it — *Needs Edit 
 | Who can grant | The active people who hold Manage on Access — on screen *Admins* ([Decisions](#decisions)) |
 | Every act is checked in one order | [The order of checks](#the-order-of-checks); a refusal names the first check that refused. The rule, its policy and who set it show only to a person with Read on `access/policies`; anyone else reads the check and who can grant |
 | Declare, never grant | A skill, a workflow, a plugin, a Team pack or a runtime declares what it needs; a declaration grants nothing. *Who it changes* names each declared need a change leaves unmet |
+| Data stores, each reached by rule | A data store's rows and files are reached only where a rule on `store/<data store>` allows it — for a run, where the person or the project and the agent each allow it — within the store's own mode and switch ([CP-F13](../../../control/features/CP-F13-data-stores/feature.md)) |
 | Many graph databases, each reached by rule | A deployment attaches many graph databases. A person reaches one only where a rule on `data/<graph database>/…` allows it; a run, only where the person, the project and the agent each allow it |
 | Run content needs a reason | A run's content — what it read, sent and answered — reads to the person behind it; anyone else reads that it ran, its status and its tokens. Read on `run/*` opens another's content only with a reason, which History keeps ([AC-F09](../AC-F09-what-left-the-platform/feature.md)) |
 | Built-in ceilings | Each built-in agent ships with one built-in policy — its ceiling — owned by the system user and attached to it. It is never edited, renamed, deleted or taken off its agent, and *Hidden from agents* is never taken off any agent; *Copy* makes a custom policy. A built-in agent is narrowed by attaching a custom policy with a Deny |
@@ -213,6 +216,7 @@ A refusal on screen names the resource by its *Resource* name, never its *Patter
 | Resource | Pattern | Read | Create | Edit | Publish · Approve | Run | Manage | Takes effect for |
 |---|---|---|---|---|---|---|---|---|
 | Graph Data | `data/<graph database>[/<kind>[/<property>]]` — a kind of node or of relationship ([Property access](#property-access)) | Read its records, or the property | Add records — load, add on the board | Change records, or the property — fix (*Fix from the queue*), merge, annotate, delete any annotation or record | — | — | — | users · teams · projects · agents |
+| Data stores | `store/<data store>` — a connection of [CP-F13](../../../control/features/CP-F13-data-stores/feature.md) | Read its rows, time series and files | — | Write them — only on a read + write store | — | — | — | users · teams · projects · agents |
 | Model | `model/<model>` | Read it — kinds, meaning, rules, history | Start a model | Change its draft — kinds, meaning, taxonomies, standards, rules, links between models | Publish a version | Run inference and health checks | — | users · teams · projects · agents |
 | AI models | `llm/<endpoint>/<version>` — the address [CP-F01](../../../control/features/CP-F01-ai-models/feature.md) gives each model version | Read it | — | — | — | Use it — pin it on an agent, and every call a run makes to it | — | users · teams · projects · agents |
 | Projects | `project/<project>` | Read a project the reader is not on | Start a project | Change its tasks, files and context — what a person on its team always may | — | — | Attach a policy to it, or widen the one it holds · archive or delete it, without being on its team | users · teams · projects · agents |
@@ -243,20 +247,50 @@ any may be attached to any holder. The last three are written for a project's ru
 | Template | Allows |
 |---|---|
 | **Super user** — built in, locked, not a template | Every action on every resource |
-| **Read only** — every newcomer's | Read `data/*` · `model/*` · `llm/*` · `project/*` · `agent/*` · `skill/*` · `workflow/*` · `plugin/*` · `worker/*` · `setting/*` — Read on every resource that takes it, except `run/*` and `access/*`, whose Read opens another's run content and every History row. No Create, Edit, Publish, Run or Manage |
-| **Explore** | Read `data/*` · `model/*` · `llm/*` · `agent/*` · `skill/*` · `plugin/*` · `worker/*` · `setting/*` · Create `project/*` · Run `agent/assistant` · `agent/query-console` · `skill/*` · `plugin/*` · `llm/*` |
+| **Read only** — every newcomer's | Read `data/*` · `store/*` · `model/*` · `llm/*` · `project/*` · `agent/*` · `skill/*` · `workflow/*` · `plugin/*` · `worker/*` · `setting/*` — Read on every resource that takes it, except `run/*` and `access/*`, whose Read opens another's run content and every History row. No Create, Edit, Publish, Run or Manage |
+| **Explore** | Read `data/*` · `store/*` · `model/*` · `llm/*` · `agent/*` · `skill/*` · `plugin/*` · `worker/*` · `setting/*` · Create `project/*` · Run `agent/assistant` · `agent/query-console` · `skill/*` · `plugin/*` · `llm/*` |
 | **Shape the model** | Read `data/*` · Create · Edit · Publish · Run `model/*` · Create · Edit `data/*` · Run `agent/modeller` · `agent/loader` · `agent/record-editor` · `llm/*` |
 | **Build agents** | Read `run/*` · Create · Edit · Publish · Run `agent/*` · `skill/*` · Create · Edit `plugin/*` · Run `llm/*` · `worker/*` |
 | **Run the deployment** | Every action on `worker/*` · `setting/*` · `run/*` · `access/*` · Manage `plugin/*` |
-| **Read and analyse** | Read `data/*` · `model/*` · `memory/project/*` · Run `llm/*` · `skill/*` · `workflow/*` · the project's team agents · Ask Run `tool/*/*` · nothing leaves |
-| **Fix data quality** | *Read and analyse*, and Create · Edit `data/<the graph databases picked>` · Run `agent/record-editor` · `agent/loader` |
+| **Read and analyse** | Read `data/*` · `store/*` · `model/*` · `memory/project/*` · Run `llm/*` · `skill/*` · `workflow/*` · the project's team agents · Ask Run `tool/*/*` · nothing leaves |
+| **Fix data quality** | *Read and analyse*, and Create · Edit `data/<the graph databases picked>` · Edit `store/<the data stores picked>` · Run `agent/record-editor` · `agent/loader` |
 | **Full project** | *Fix data quality*, and Edit `model/*` · Run `worker/*` · `plugin/*` · Ask Run `tool/*/*` · `net/*` |
+
+## Project access templates
+
+What New project's Access step picks ([PJ-02](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)): one choice that grants a new project
+everything it works with. Each is data — shipped, carried by a Team pack, or written through the API or the CLI by a
+holder of Edit on Access — and *Adjust* edits it for one project without changing the template.
+
+| Kind | What the template holds | Written on create as |
+|---|---|---|
+| **People and teams** | Each team — and any person it names — put on the project's team, with the Access Policy each holds in the project; *Adjust* adds people beside teams the same way, starting at the template's policy for people and teams | A `projects_team` row per person or team, its `policy_id` ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)) |
+| **Agents** | Each agent put on the team, with the Access Policy it holds in the project; at most one marked Lead agent. The type's suggested agents are added beside them, the type's assistant the Lead agent when the template names none | A `projects_team` row per agent; an agent with no policy holds nothing until one is chosen |
+| **Graph databases** | Through the template's project policy: per graph database *None* · *Read* · *Read + write* | The policy's Graph Data tab, attached to the project; the one at *Read + write* holds the subject model ([PJ-F07](../../../../capabilities/projects/features/PJ-F07-the-project-graph/feature.md#rules)) |
+| **Data stores** | Through the template's project policy: per data store *None* · *Read* · *Read + write* | The policy's Data stores tab |
+| **AI models** | Through the template's project policy: *Every offered version* · *Local only* · chosen versions | The policy's AI models tab |
+
+| Template — shipped | Project policy | People and teams · Agents |
+|---|---|---|
+| **Read and analyse** | The Access template *Read and analyse* | None — the type's suggested agents |
+| **Fix data quality** | The Access template *Fix data quality* | None — the type's suggested agents |
+| **Full project** | The Access template *Full project* | None — the type's suggested agents |
+
+| Rule | Detail |
+|---|---|
+| One choice, five kinds | The Access step shows a template's effect one line per kind — *People and teams · 2 teams, 1 person* · *Agents · Analyst, Forecaster* · *Graph databases · airways (read + write)* · *Data stores · …* · *AI models · …* |
+| The project's policy is attached as it is | Picked unchanged, the template's project policy is attached to the project as it is, like any held policy. Adjusting the graph databases, data stores, AI models or agents makes a policy for the project — a copy of it, named for the project — attached instead |
+| Agents must be allowed | Every agent a template names is one its project policy allows Run on; a template whose agent it does not allow is refused when written. Adding an agent in *Adjust* adds Run on it to the project's copy |
+| Granting asks, as everywhere | A template grants a project only what its creator may grant; beyond that, each line reads *Will ask {who can grant}* and waits in the Inbox of those with Manage on Projects ([PJ-F01 › Rules](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) |
+| A type names its first | A project type's manifest `access_template` names the template picked first; with none, the Access step asks for one |
+| A Team pack's template waits | A project access template in a Team pack lands as a draft, offered nowhere until a holder of Edit on Access applies it |
+| Nothing in the engine names one | The shipped three are data; the engine reads a type's `access_template` key, never a template's name |
 
 ## The policy form
 
 The plain way to say what a policy allows — *What it allows*, one tab per section: a horizontal tab strip above the
 content, each tab with its short status, the selected tab's content spanning the full width of *What it allows*. The
-same form is *New policy*'s, New project's Access step and a project's Access tab
+same form is *New policy*'s, New project's Access step under *Adjust*, and a project's Access tab
 ([AC-49](stories/AC-49-make-a-policy-from-an-access-template/story.md)). Every section is part of every policy, whoever
 holds it; a section that takes no effect for a holder says so in Review. Each section writes rules; *Edit as policy* opens the same policy as the matrix. A policy whose rules the form cannot
 show reads *Edited as policy* and opens in the matrix.
@@ -264,6 +298,7 @@ show reads *Edited as policy* and opens in the matrix.
 | Section · tab | Sets | Status on its tab | Rules it writes |
 |---|---|---|---|
 | **Graph Data** | Per graph database: *None* · *Read* · *Read + write* — the quick level. Under it, per kind of node and of relationship, an override: *None* · *Read* · *Read + write*. Under each kind, each property *Hidden* · *Read* · *Read + write*, its kind shown — *Crew member · Email* | *Read + write on 1 of 3 · 2 kinds narrowed · 4 properties hidden* | Allow Read — and Create · Edit for *Read + write* — on `data/<db>`; an override narrows with a Deny on `data/<db>/<kind>`, or widens with an Allow; a property narrower than its kind is a Deny on `data/<db>/<kind>/<property>`, as [Property access](#property-access) writes each setting |
+| **Data stores** | Per data store: *None* · *Read* · *Read + write* | *Read on 2 of 3 · Read + write on 1* | Read — and Edit for *Read + write* — on `store/<data store>` |
 | **Models** | Per model: *None* · *Read* · *Edit* · *Publish* | *Read on every model* · *Publish on 1* | Read · Edit · Publish on `model/<model>` |
 | **AI models** | *Every offered version* · *Local only* · chosen versions, each marked *Local* or *External* | *Every offered version* · *Local only* · *3 versions* | Run on `llm/<endpoint>/<version>`, or `llm/<endpoint>/*` for each local endpoint |
 | **Agents** | Which agents may be used — held by a project, which may work here and be on its team | *4 agents* · *Builds agents* | Run on `agent/<name>`; *build agents* adds Create · Edit · Publish `agent/*` |
@@ -283,7 +318,7 @@ ends it, and its refusal names that check.
 |---|---|---|---|
 | 1 | Active | The person — or the person behind the run — is active; a key is live ([AC-F03](../AC-F03-directory/feature.md) · [AC-F10](../AC-F10-keys/feature.md)) | The person or the key |
 | 2 | The person | The person's permissions allow the action on the resource — for a run outside a project, the person behind it, Run on the agent included. A run inside a project skips it; the person is recorded | The permission and who can grant it |
-| 3 | Switches | The graph database and the plugin the step uses are on — the install's switch, then the person's own switch for runs they start ([CP-F02](../../../control/features/CP-F02-plugins-and-outside-tools/feature.md) · [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) | The switch |
+| 3 | Switches | The graph database, the data store and the plugin the step uses are on — the install's switch, then the person's own switch for runs they start ([CP-F02](../../../control/features/CP-F02-plugins-and-outside-tools/feature.md) · [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) | The switch |
 | 4 | The run's reach | `decide()` allows it for the project's policies and for every agent in the caller chain — each one's ceiling: the strictest wins, no match is Deny. Ask waits for a named approver; a yes covers this step of this run ([AC-F05](../AC-F05-asks-and-approvals/feature.md)) | The check; to a reader of policies also the rule, its policy and who set it |
 | 5 | Ceilings | The key ∩ the run scope ∩ the graph database's mode allows it ([AC-F04](../AC-F04-what-an-agent-may-touch/feature.md)) | The ceiling |
 | 6 | Limits | The step fits the limits, at admission ([CP-F04](../../../control/features/CP-F04-limits/feature.md)) | The limit |
@@ -297,6 +332,7 @@ ends it, and its refusal names that check.
 | Access Policies — name, origin, rules, version, status, who drafted it | Write · read |
 | Versions of a policy — its rules, who saved it, who approved it, when, why | Write · read |
 | Attachments — which users, teams, projects and agents hold a policy, who attached it, when | Write · read |
+| Project access templates — their people, teams, agents and project policy | Write · read |
 | Users, teams and who is on each (AC-F03) | Read |
 | Owners of a policy (Ownership, AC-F07) | Read |
 | Refusals and uses in History (AC-F06) | Read |
@@ -312,6 +348,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|---|
 | `access_policies` | `name` (`[a-z0-9-]`) · `title` · `description` · `origin` (`builtin` · `template` · `custom` · `imported`) · `locked` (bool) · `imported_from?` (the import or Team pack) · `copied_from_id?` (the template or policy it started from) · `status` (`draft` · `awaiting` · `saved`) · `version` (a draft is 0) · `rules` · `drafted_by` (`person` · `file` · `form`) · `created_by_id` · `updated_by_id?` · `created_at` · `updated_at` | Unique `name`. A `builtin` policy — Super user and each built-in agent's ceiling — is written from code and owned by the system user; only Super user is `locked`. A `template` is written once, at the first start, from data, and edited like a custom one. There is no kind of policy: any one is attached to any holder. `awaiting` is a saved version waiting for a second yes; the version before it stays in force |
 | `access_policy_versions` | `policy_id` · `version` · `rules` · `description` · `saved_by_id` · `saved_at` · `approved_by_id?` · `approved_at?` · `why?` (500) | One row per save; never edited |
+| `access_project_templates` | `name` (`[a-z0-9-]`) · `title` · `description` · `origin` (`template` · `custom` · `imported`) · `status` (`draft` · `saved`) · `policy_id` (the project policy) · `people_policy_id?` (the policy a person or team added in *Adjust* starts at) · `members` (JSON — `[{kind: team · user, id, policy}]`) · `agents` (JSON — `[{agent, policy?, lead}]`) · `imported_from?` · `created_by_id` · `updated_by_id?` · `created_at` · `updated_at` | Unique `name`. At most one agent `lead`. A `template` is written once at the first start from data; an `imported` one is a draft until applied ([Project access templates](#project-access-templates)) |
 | `access_policy_attachments` | `policy_id` · `holder_kind` (`user` · `team` · `project` · `agent`) · `holder_id` · `attached_by_id` · `attached_at` | Unique (`policy_id`, `holder_kind`, `holder_id`). A project, like a user, holds any number; one policy may be held by many projects |
 
 ### Reads
@@ -330,6 +367,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | AI model versions, their addresses and whether each is local | [CP-F01](../../../control/features/CP-F01-ai-models/feature.md#engine) |
 | Limits of a holder — runs at once, tokens a month — the form's *Fleet / Workers* tab reads and sets | [CP-F04](../../../control/features/CP-F04-limits/feature.md#engine) |
 | Graph databases and their names | [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md#engine) |
+| Data stores, their names, modes and switches | [CP-F13](../../../control/features/CP-F13-data-stores/feature.md#engine) |
 | Projects, their names and their teams | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 
 ### Routes
@@ -347,7 +385,8 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 | `GET /policies/{name}/versions` | Every version: who saved it, who approved it, when, why, its rule count | AC-04 |
 | `GET /policies/{name}/attachments` · `PUT /policies/{name}/attachments/{holder_kind}/{holder}` · `DELETE …` | Its holders · attach · take off; attaching and taking off need signing in again | AC-11 |
 | `GET /catalogue` | The permission catalogue: each resource, its pattern, what each action means and its holders | AC-04 · AC-49 |
-| `GET /templates` | The Access templates, one list, each with its rules as the form, and each project type's default | AC-49 · PJ-02 |
+| `GET /templates` | The Access templates, one list, each with its rules as the form | AC-49 |
+| `GET /project-templates` · `POST /project-templates` · `GET /project-templates/{name}` · `PATCH /project-templates/{name}` · `DELETE /project-templates/{name}` · `POST /project-templates/{name}/apply` | The project access templates the reader may read, each with its effect per kind and each project type's first · write, read, change, delete one · apply a Team pack's draft; writing needs Edit on Access. Reading the list needs only Create on Projects, so New project offers it | PJ-02 |
 | `GET /built-in-agents` | Each built-in agent, what it acts for, its built-in ceiling and the custom policies attached to it | AC-20 |
 | `GET /kept-from-agents` · `POST /kept-from-agents` · `DELETE /kept-from-agents/{entry_id}` | The entries of *Hidden from agents* — resource, reason, who added it, when · add one `{resource, reason}` · ask to remove one; add and remove need signing in again and Manage on Access with Read on `access/policies` | AC-27 |
 | `POST /kept-from-agents/{entry_id}/approve` · `…/decline` | A second Admin's yes or no on a removal; always needed; needs signing in again; never the asker | AC-27 |
@@ -364,6 +403,7 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 | `access.policies.approve` · `access.policies.decline` | A second person approves or declines an `awaiting` version |
 | `access.attachments.create` · `access.attachments.delete` | A policy is attached to a holder · taken off — the holder in `details` |
 | `access.kept.add` · `access.kept.remove_request` · `access.kept.remove` · `access.kept.decline` | An entry of *Hidden from agents* is added · its removal is asked · approved and removed · declined — the entry and its reason in `details`, readable with Read on `access/policies` |
+| `access.project_templates.create` · `.update` · `.delete` · `.apply` | A project access template is written, changed, deleted or applied from a Team pack |
 | `access.check.refused` | An act or a step is refused — the check of [the order](#the-order-of-checks) that refused, and for a rule its policy |
 
 ### Refusals
@@ -372,7 +412,8 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 |---|---|---|---|
 | 422 | A rule outside the grammar — an unknown resource type, an action the resource does not take, an effect other than Allow · Ask · Deny | *Rule {n}: {why}.* | AC-04.3 |
 | 422 | A `*` inside a segment, or a `**` anywhere but the last segment of an `fs/` resource | *Rule {n}: `*` stands for a whole segment.* | AC-04.4 · AC-37.3 |
-| 422 | A rule naming a graph database, kind, property, model, AI model version, project, agent, skill, workflow, plugin or tool that does not exist | *Rule {n}: there is no {type} {name}.* | AC-04.5 · AC-49.9 |
+| 422 | A project access template naming an agent its project policy does not allow Run on | *{template}: its policy does not let {agent} work in a project.* | PJ-02.44 |
+| 422 | A rule naming a graph database, kind, property, data store, model, AI model version, project, agent, skill, workflow, plugin or tool that does not exist | *Rule {n}: there is no {type} {name}.* | AC-04.5 · AC-49.9 |
 | 409 | A policy name already used | *{name} is taken.* | AC-04.6 · AC-49.2 |
 | 422 | Editing, renaming or deleting Super user or a built-in ceiling · taking a built-in ceiling off its agent | *{name} is built in — copy it to change it.* | AC-04.7 · AC-11.6 |
 | 409 | Taking Super user off its last active holder, or deactivating them | *Super user always has a holder — give it to someone else first.* | AC-11.6 · AC-23.7 |
@@ -393,6 +434,7 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 | `invana createsuperuser` | Makes the first account, holding Super user; refused once any person exists |
 | `invana policy apply --file <yaml> [--why]` | Creates a custom policy or saves its next version, printing who it changes first; held to every refusal above; refused with a key |
 | `invana policy templates` | The Access templates and their rules |
+| `invana policy project-templates` · `invana policy project-template apply --file <yaml>` | The project access templates and their effect per kind · write one, held to every refusal above |
 | `invana policy list` · `invana policy show <name>` | Every policy with its origin, whether saved, its rules and its holders · one policy with its rules and versions |
 | `invana policy attach <name> --user <u> \| --team <t> \| --project <p> \| --agent <a>` · `invana policy detach …` | Attach a policy · take it off |
 | `invana access catalogue` | The permission catalogue |
@@ -416,6 +458,7 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 | The order of checks | `check(person?, project?, chain, action, resource, run?)` runs [the order](#the-order-of-checks) and returns the first refusal, or allow or ask; the ledger row and the outbound check follow ([AC-F09](../AC-F09-what-left-the-platform/feature.md#engine)). Every route, step and tool call goes through it |
 | Who can grant | A refusal names up to two active people who hold Manage on Access, by `GET /users?can=access:manage` ([AC-F03](../AC-F03-directory/feature.md#engine)) |
 | Super user and the built-in ceilings | Written from code at start, owned by the system user. A start rewrites each to the code's rules; a person's change is a copy |
+| Project access templates | Written at the first start only from the shipped data files, `origin = template`, after the Access templates they point at; never rewritten after. On a create, `projects.create` writes the team rows and attaches the project policy — or its copy for the project — in the project's transaction |
 | Access templates | Written at the first start only from the shipped data files, `origin = template`; never rewritten after. The deployment setting `access.newcomer_policies` names *Read only* until changed; the engine reads the setting, never a name |
 | Every built-in ceiling | Is attached with *Hidden from agents* ([Property access](#property-access)), and allows Run `llm/*`, so the AI model is bounded by the person and the project, never by a built-in agent. A person-started act is not narrowed by it ([A person's own act](#rules)) |
 | `assistant` — the Assistant: asking, answering, boards; every new person's default agent | Allow Read `data/*` · `model/*` · `memory/project/*` · `memory/org` · `project/*` · Allow Run `skill/*` · `workflow/*` · `plugin/*` · Ask Edit `project/*` · Ask Run `agent/*` · `tool/*/*` |
@@ -435,7 +478,7 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | Three tables in Postgres | — |
+| § 6 Data and storage | Four tables in Postgres | — |
 | § 8 APIs and events | The routes and `access.policies.*` · `access.attachments.*` · `access.check.refused` events above | — |
 | § 10 AI and agents | What an agent may read is its caller chain's projected schema: a hidden name fails at lookup like an absent one, a raw query is refused where anything is hidden, and no agent reads an entry | NFR-SEC-5 |
 | § 12 Qualities | Security: one catalogue, one order of checks on every act, one evaluator, default deny, Deny wins, a key never changes access, a locked Super user with a holder always, an optional second yes | NFR-SEC-1 · NFR-SEC-4 · NFR-SEC-8 |
@@ -459,6 +502,9 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 | Review reads everything | One scrollable page: every section's full read-back, who holds it and *Who it changes*, then *Create policy* and a confirm |
 | Kinds, relationships and properties | A policy reaches down to each kind of node and relationship — *None* · *Read* · *Read + write* — and each property — *Hidden* · *Read* · *Read + write* — so one property, *Crew member · Email*, is hidden without hiding the kind |
 | Access Policies alone decide what may be seen | No rule on the model and no named selection of the model grants or narrows what a person or an agent reads; *Not allowed by your access* is always a policy |
+| A project's access is one choice | New project picks one project access template that grants people and teams, agents, graph databases, data stores and AI models, so a person thinks of who and what the work needs, not of rules; *Adjust* and the policy form stay one step deeper |
+| Data stores are a resource of their own | `store/<data store>` is granted like Graph Data, so a project, a team or an agent reaches a data store by rule; connecting one stays Manage on its plugin ([CP-F13](../../../control/features/CP-F13-data-stores/feature.md)) |
+| AI models keep their word | The catalogue's `llm/` resource reads *AI models* on screen; *Models* is the ontology, never an AI model |
 | Policies add up | A project holds policies exactly as a user does: any number, their Allows added, any Deny winning; attaching one adds, never replaces |
 | A newcomer reads, nothing more | Every new person starts on *Read only*; what more they may do is attached by a holder of Manage on Access. *Explore* — read, ask the Assistant, start projects — is a template to attach, never a default |
 | Built-in agents are narrowed, never edited | A built-in ceiling stays attached to its built-in agent; it is narrowed by attaching a custom policy with a Deny |
@@ -481,7 +527,7 @@ Every route below needs Read on `access/policies`, except `GET /catalogue`; one 
 
 | Question | Who answers |
 |---|---|
-| — | — |
+| Where a project access template is made in Studio. Today it is shipped, carried by a Team pack, or written through the API and `invana policy project-template apply`. Recommend: a *Project access templates* list in Access Policies, beside the Access templates, as a story of its own | Ravi |
 
 ## Not building
 

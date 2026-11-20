@@ -100,7 +100,7 @@ Permissions are [the permission catalogue](../../../../os/access/features/AC-F02
 
 | Rule | Detail |
 |---|---|
-| Two models, one graph database | A project's **subject model** (what the work is about) and its **work model** (what is moving) are two models of the project's one read + write graph database, so one question reads both. Models of different types in one Graph join through links between models — a competitor Capability `matches` or `gaps` our Feature; a link never crosses graph databases |
+| Two models, one graph database | A project's **subject model** (what the work is about) and its **work model** (what is moving) are two models of the project's one read + write graph database — the one its access grants at *Read + write*, named on New project's Access step ([PJ-02.37](../PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)) — so one question reads both. Models of different types in one Graph join through links between models — a competitor Capability `matches` or `gaps` our Feature; a link never crosses graph databases |
 | The subject model is parsed, never hand-kept | It is read from the project's sources — specs folders and code for Software, web pages and documents for Research — each node citing its source, place and content hash. The source is the truth; the sync is one way: source to graph. Only an approved draft ever writes a source |
 | The work model is projected | Milestones, tasks, runs and linked issues stay recorded in the engine's tables ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#engine)); the engine projects each into the graph database as it settles, labelled *derived*. The graph can be rebuilt from the tables, never the other way |
 | Core nodes are generic | A project's core nouns are Project · Milestone · Task (with sub-tasks) · Run · Check · Review · Subject model. A milestone `covers` any subject node and `waits on` a milestone; a task is `about` any node, `changes` a node and is `linked to` an outside issue. No software word is in the core, a screen or the engine: the type supplies its own labels |
@@ -130,7 +130,7 @@ type *chooses*; the engine's generic core holds everything else, so no type adds
 | `reviewers` | The default reviewer — `creator` or the field holding a person | No | PJ-22 |
 | `agents` | The suggested agents, the `assistant` among them, and the skills each carries | No | PJ-02.14 |
 | `pick_up` | The default pick-up mode, `ask` unless a pack asks narrower | No | PJ-15 |
-| `access_template` | The Access template chosen first for a person or team on the Team step | No | PJ-02.38 |
+| `access_template` | The project access template the Access step picks first ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#project-access-templates)) | No | PJ-02.38 |
 | `report_template` | The report's starting point | No | [PJ-F05](../PJ-F05-project-reports/feature.md) |
 | `requires` | The connectors the type needs installed — every `connector` named in `sources`, and the code host when the type opens pull requests | Derived | PJ-02 About |
 
@@ -147,7 +147,7 @@ type *chooses*; the engine's generic core holds everything else, so no type adds
 | Checks are workflows | Each check step is the key of a workflow or a person; a key no workflow answers to fails the manifest. A check is applied to a new task by its `when`, and is a run of its own ([PJ-25](../PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md)) |
 | A manifest is valid or not offered | Every field is checked when the pack is installed: a field the schema does not know, a required field missing, a node kind used and not declared, a link with an undeclared end, a milestone naming itself, a duplicate `id`. A pack whose manifest fails installs nothing and names the file, the field and why |
 | A type with a missing connector is held | An installed type whose `requires` connector is not installed — for a connector kind, none of its kind — is listed in *New project* as unavailable, naming the connector or those that satisfy the kind — never hidden. Only a `required` source holds a type |
-| A pack agent's policy is a draft until applied | The Team step offers a pack agent's policy only once an Admin has applied it; until then the agent's row reads *Chooses nothing yet* ([PJ-02.39](../PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); a default policy is never applied |
+| A pack agent's policy is a draft until applied | The Access step offers a pack agent's policy only once an Admin has applied it; until then the agent's row reads *Chooses nothing yet* ([PJ-02.39](../PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md)); a default policy is never applied |
 | Every check key has one doer | A pack lists, for each workflow its `checks` name, the skill or program its step uses and the agent that runs it |
 | General is one with no model | General has no `subject_model`, no sources and no milestones; the same flow, the same work graph, only the work shows |
 
@@ -173,7 +173,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `projects_sources` | `project_id` · `kind` (`specs` · `code` · `web` · `documents` · `tracker`) · `address` · `tracker_id?` ([CP-F12](../../../../os/control/features/CP-F12-issue-trackers/feature.md#engine)) · `status` (`ok` · `failed`) · `last_read_at?` · `last_hash?` · `error?` · `created_by_id` | Unique (`project_id`, `kind`, `address`) |
 | `projects_draft_nodes` | `project_id` · `kind` · `name` · `fields` (JSON, checked against the type's node kind) · `links` (JSON) · `state` (`proposed` · `draft` · `approved` · `rejected`) · `proposed_by_kind` (`user` · `run`) · `proposed_by_id` · `decided_by_id?` · `note?` · `source_id?` (what an approval writes to or cites) | A `proposed` node is drawn dashed; none is in the graph until `approved` |
 | `projects_sketch_versions` | `project_id` · `name` · `snapshot` (JSON — the draft nodes and links as they stand) · `created_by_id` · `created_at` | Immutable |
-| `projects_graph_state` | `project_id` · `database_id?` · `work_projected_at?` · `work_graph` (`on` · `off`) · `off_reason?` | One row; `database_id` the project's read + write graph database |
+| `projects_graph_state` | `project_id` · `database_id?` · `work_projected_at?` · `work_graph` (`on` · `off`) · `off_reason?` | One row; `database_id` the project's read + write graph database, from its access; null, and `work_graph` `off`, when its access grants none |
 
 Subject nodes, work nodes and links between models are records of the project's graph database, stamped with the
 `_inv_` provenance and `derived` where projected ([system-design.md](../../../../system-design.md) § 6); they are not tables here.
@@ -256,6 +256,7 @@ Subject nodes, work nodes and links between models are records of the project's 
 
 | Decision | Detail |
 |---|---|
+| The subject model follows the grant | The graph database that holds a project's subject and work models is the one its access grants at *Read + write*; New project never asks for data apart from access ([PJ-28.16](stories/PJ-28-ground-a-project-in-its-subject-model/story.md)) |
 | One graph database, two models | The subject and work models sit in the project's graph database so one question reads both; the work's truth stays in the engine's tables, so the graph is disposable |
 | Parsed, not hand-kept | A subject node is never edited in the graph; it changes at its source. A sketch is drafts; approving writes the source |
 | Software's source of truth stays its files | A canvas edit is a draft; approving writes the story file; the next read parses it back |

@@ -75,7 +75,7 @@ flowchart TD
 | PJ-22.19 | A row | the person opens its effect | a person's reads what their policy lets them do in this project (AC-08); an agent's reads the effective matrix *In* this project ([AC-12.18](../../../../../../os/access/features/AC-F04-what-an-agent-may-touch/stories/AC-12-see-why-an-agent-can-or-cannot/story.md)); without Read on `access/policies` it reads *No access*, naming it and who can grant it |
 | PJ-22.20 | A row | the person presses *Pause* | it keeps its place and its policy but holds nothing here — no task is assigned to it, no run starts for it, and its open claims run out; *Resume* restores it; History records both; pausing the last active person is refused as PJ-22.6 says; *Remove* takes it off as before |
 | PJ-22.21 | *Invite an agent* | it opens | it lists the agents of the catalogue the project's policies let work here (AG-35), each with its version and what it is for; one the policies do not allow is disabled — *May not work here*; a picked agent is added with no policy until one is chosen |
-| PJ-22.22 | The create-project Team step (PJ-02.5 · PJ-02.38) | it is read beside this tab | it is this tab's first form — the same rows, picker, policies, effect and refusals — and the tab edits afterwards what that step made |
+| PJ-22.22 | The create-project Access step, *Adjust* open (PJ-02.5 · PJ-02.38) | it is read beside this tab | its *People and teams* and *Agents* rows are this tab's first form — the same rows, picker, policies, effect and refusals — and the tab edits afterwards what that step made |
 
 ## Screens
 

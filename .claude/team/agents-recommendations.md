@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**597 recommendations** · 371 open · 138 taken · 24 declined · 64 done
+**599 recommendations** · 373 open · 138 taken · 24 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -640,3 +640,5 @@ flowchart LR
 | R626 | open | 2026-11-20 | product-manager | session | docs | high | Specs still cite flow.* boards in boards: keys after flow boards were dropped | 45 story and feature files (CP-F02 · CP-F03 · CP-F04 · CP-F05 · CP-F13 · AC-F01..F10 · PJ-F01 · PJ-F08 · CP-01 · CP-37 · CP-60 · CP-73 …; grep 'flow\.' specs) list flow.<act> in boards:. check.py errors once P10 deletes a board a designed spec cites. Drop every flow.* entry from boards: before P10 (product-manager), and the flow.* mentions in designer task rows (CP-09-T3 · CP-10-T3 · CP-25..CP-41-T1 · CP-84-T1) as their owner closes them |  |  |
 | R627 | open | 2026-11-20 | product-manager | session | debt | medium | check.py: retire the flow-board rules; rebase --flows on flows.json | scripts/specs/check.py check_board_ids (flow./journey. naming) and check_flows (reads flow.*.dc.html frames, line ~515-570) assume flow boards, which design-language §7 no longer has. Retire both; make --flows report each non-later story's ## Screens node no flows.json path reaches (act.<act> ids after P04c). Supersedes R615 · R616's flow-frame part |  |  |
 | R628 | open | 2026-11-20 | product-manager | session | docs | low | TEAM.md §3 Links names a flow-board play link | .claude/team/TEAM.md:327 '#play-<board>' example uses flow.add_workers; flow and journey boards are dropped (design-language §7). Replace with a place-board example or a flows.json path link |  |  |
+| R629 | open | 2026-11-20 | designer | session | bug | medium | Cross-board links drop the lens, so an Operator path turns Admin | v2027 canvas: every board's href to another board (e.g. projects.new Creating → projects.projects Detail · Just created) omits ?lens=, so an Operator click-through lands in the Admin lens. Carry lens= on every cross-board link (P04c harness fixes). |  |  |
+| R630 | open | 2026-11-20 | designer | session | docs | medium | CP-01 · CP-61 Screens drift from the Add an LLM board (canvas v64) | CP-01 Screens: 'Add an endpoint · 1 Name · 2 Kind · 3 Its fields' → '1 Name and kind · 2 Its fields · 3 Ping' (per CP-F01 Decisions); name the drawn states New · Name refused/Name taken, New · Self-hosted (· Pinging · Proven · Ping failed), New · Agent SDK (same), Endpoint · New/Offered/Default set, Endpoint · Local; CP-01.23 Open-on-Locality holds only for a self-hosted endpoint — an outside provider opens on the endpoint to offer a version. |  |  |

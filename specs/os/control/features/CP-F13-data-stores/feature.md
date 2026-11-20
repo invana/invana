@@ -48,14 +48,14 @@ flowchart TD
 
 ## Access
 
-A data store is the outside system a connector drives, so every act is governed on `plugin/<connector id>` like any connection of a connector ([CP-F02 › Rules](../CP-F02-plugins-and-outside-tools/feature.md#rules)); no act here is new to [the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+A data store is the outside system a connector drives, so connecting and running it is governed on `plugin/<connector id>` like any connection of a connector ([CP-F02 › Rules](../CP-F02-plugins-and-outside-tools/feature.md#rules)); reading and writing what it holds is Read and Edit on `store/<data store>` in [the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue), granted to people, teams, projects and agents like Graph Data.
 
 | Act | Permission | Everyone else sees |
 |---|---|---|
 | Read every data store — name, connector, kind, mode, switch, health, region; never its credential | Read on `plugin/<connector>` | — |
 | Connect · change · test · remove a data store | Manage on `plugin/<connector>`, and the password again | Each act reads *Needs Manage on the {name} plugin — ask {who can grant}* |
 | Set read + write · switch on or off · set the region | Manage on `plugin/<connector>`, signing in again for read + write | The value reads; the act reads disabled with its reason |
-| Read or write a data store | An agent, within the mode and the switch set here and the model's own permissions | Refused before it starts, naming the rule, the mode or who switched it off |
+| Read or write a data store | Read · Edit on `store/<data store>` — a project's through its project access template — within the mode and the switch set here | Refused before it starts, naming the permission, the mode or who switched it off |
 | Install or remove a data store connector | None in Studio — done on the engine's machine ([CP-79](../CP-F02-plugins-and-outside-tools/stories/CP-79-install-a-connector/story.md)) | — |
 
 ## States
@@ -183,7 +183,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | S3 for files, RustFS bundled | Files go through the S3 API; RustFS is bundled so a deployment has a file store with nothing installed, and any S3-compatible store connects the same way ([system-design.md](../../../../system-design.md) § 6) |
 | MongoDB for an existing install only | Invana bundles no document store: a customer who already runs MongoDB connects it, and one who does not is not asked to run one |
 | A connection, not a credential | A data store is a connection of its own with a mode and a switch, as a graph database is, because a person turns it on and off and asks whether it works — not a work connection an agent holds |
-| The permission is the plugin's | Every act reuses Manage on `plugin/<connector>`, so no access is new; a resource of its own, `setting/data-stores`, is not added |
+| Connecting is the plugin's, reading is the store's | Connecting, changing, testing and switching a data store stay Manage on `plugin/<connector>`; what it holds is a resource of its own, `store/<data store>`, so a project access template grants a project its data stores as it grants graph databases |
 | Region is a tag, residency a rule | A region is a label an Admin chooses and Invana enforces on where steps run; it makes no promise about a provider's own placement. Designed now, built after MVP |
 
 ## Open questions
