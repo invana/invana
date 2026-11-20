@@ -522,7 +522,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01b | CRUD matrix | P01 | done | 2026-11-20 | gates green · reviews passed |
 | P01c | Settings, slimmed | P01b | done | 2026-11-20 | gates green · reviews passed |
 | P02 | Spec gaps | P01c | done | 2026-11-20 | gates green · reviews passed |
-| P02b | Security criteria — the five highs | P02 | in progress | 2026-11-20 | R587–R591 and NFR-SEC-15/17/18 written; D2 left |
+| P02b | Security criteria — the five highs | P02 | done | 2026-11-20 | gates green · reviews passed |
 | P03 | Board engine | P02b | done | 2026-11-20 | gates green · reviews passed |
 | P03b | Click-through harness | P03 | pending |  |  |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | pending |  |  |
