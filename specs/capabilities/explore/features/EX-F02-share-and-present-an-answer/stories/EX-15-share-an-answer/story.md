@@ -81,3 +81,9 @@ flowchart LR
 | A shared link opened | Operator | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | explore.board · Share · Not found |
 | An export · values left out | Admin | — | — | — | explore.board · Share · Export · Redacted | — | — | — |
 | An export · values left out | Operator | — | — | — | explore.board · Share · Export · Redacted | — | — | — |
+| Share · Export | Admin | explore.board · Share | — | — | explore.board · Share · Export | explore.board · Share · Failed | — | — |
+| Share · Export | Operator | explore.board · Share | — | — | explore.board · Share · Export | explore.board · Share · Failed | — | — |
+| Share · Stop sharing | Admin | explore.board · Share · Stop sharing | — | explore.board · Share · Stopping | explore.board · Share · Stopped | explore.board · Share · Failed | — | — |
+| Share · Stop sharing | Operator | explore.board · Share · Stop sharing | — | explore.board · Share · Stopping | explore.board · Share · Stopped | explore.board · Share · Failed | — | — |
+| Share · not an owner | Admin | — | — | — | — | — | — | — |
+| Share · not an owner | Operator | — | — | — | — | — | — | explore.board · Share · Not an owner |

@@ -4,7 +4,7 @@ title: Connect a data store
 feature: CP-F13
 status: idea
 personas: [admin]
-boards: [settings.databases, settings.connectors]
+boards: [settings.databases, settings.connectors, access.signin, flow.connect_data_store]
 ---
 
 # CP-84 · Connect a data store
@@ -61,6 +61,11 @@ flowchart TD
 | CP-84.14 | A switched-on data store | it stops answering | it reads *Failing* with the store's own words, a connection failed alert is raised ([CP-F11](../../../CP-F11-ops-alerting/feature.md#the-alert-kinds)), and the kinds that live in it read *Rows unavailable* (SE-23.13) |
 | CP-84.15 | Any data store | the list opens | each row shows connector, kind, mode, switch, health, region and the kinds that live in it; a store that is off is offered to no kind |
 | CP-84.16 | A region tag on a data store and on workers | a step that touches the store is admitted — after MVP | it runs only on a worker with the same tag, or fails — *No worker in {region} took it.* — and the tag alone changes nothing before then |
+| CP-84.17 | A data store connector not installed | the Admin picks it | its package is named, *Continue* stays off and *Install a connector* opens the install and returns to the same step |
+| CP-84.18 | A data store ready | the Admin presses *Set read + write*, *Switch on* or saves a region | read + write goes through *Sign in again*, which names the act and returns to *Ready · Read + write*; *Switch on* reads *On*; a saved region reads *Region saved*; *Done* returns to the list with the store as a row |
+| CP-84.19 | A switched-on data store reads *Failing* | the Admin presses *Test again* or *Open connector* | the test runs again, or the connector's details open |
+| CP-84.20 | An Admin | they press *Remove* on a data store | a confirm names what it holds, *Sign in again* names the act, and the store leaves the list as *Removed*; a refusal reads *Remove refused* (CP-84.13) |
+| CP-84.21 | The list reads *None yet* or *Could not load* | an Admin looks for the next act | *Connect a data store* and *Try again* are offered |
 
 ## Screens
 
@@ -68,11 +73,35 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The data stores | Admin | settings.databases · Data stores · None yet | settings.databases · Data stores · No match | settings.databases · Data stores · Loading | settings.databases · Data stores | settings.databases · Data stores · Could not load | — | — |
 | The data stores | Operator | settings.databases · Data stores · None yet · Read only | settings.databases · Data stores · No match | settings.databases · Data stores · Loading | settings.databases · Data stores · Read only | settings.databases · Data stores · Could not load | — | settings.databases · Data stores · Read only |
-| Connect a data store | Admin | settings.databases · Connect data store · Connector | — | settings.databases · Connect data store · Testing | settings.databases · Connect data store · Ready | settings.databases · Connect data store · Refused | — | — |
-| Connect a data store | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| A data store · Open, change, test, region | Admin | — | — | — | settings.databases · Data stores · A store | settings.databases · Data stores · Test failed | — | — |
+| A data store · Open, change, test, region | Operator | — | — | — | settings.databases · Data stores · A store · Read only | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · 1 Connector | Admin | settings.databases · Connect data store · Connector | — | — | settings.databases · Connect data store · Connector · TimescaleDB · S3 · MongoDB picked | — | — | — |
+| Connect a data store · 1 Connector | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · 2 Connect · TimescaleDB | Admin | — | — | — | settings.databases · Connect data store · Connect · TimescaleDB | settings.databases · Connect data store · Name taken · Field refused · Invana's own database · Unreachable · Password again missing or wrong | — | — |
+| Connect a data store · 2 Connect · TimescaleDB | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · 2 Connect · S3 | Admin | — | — | — | settings.databases · Connect data store · Connect · S3 | settings.databases · Connect data store · Name taken · Field refused · Unreachable · Password again missing or wrong | — | — |
+| Connect a data store · 2 Connect · S3 | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · 2 Connect · MongoDB | Admin | — | — | — | settings.databases · Connect data store · Connect · MongoDB | settings.databases · Connect data store · Name taken · Field refused · Invana's own database · Unreachable · Password again missing or wrong | — | — |
+| Connect a data store · 2 Connect · MongoDB | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · 3 Test | Admin | — | — | settings.databases · Connect data store · Testing | settings.databases · Connect data store · Ready | settings.databases · Connect data store · Refused | — | — |
+| Connect a data store · 3 Test | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · Ready · Set read + write | Admin | — | — | — | access.signin · Sign in again · Set read + write | access.signin · Sign in again · Set read + write · Wrong password | — | — |
+| Connect a data store · Ready · Set read + write | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · Ready · Read + write | Admin | — | — | — | settings.databases · Connect data store · Ready · Read + write | — | — | — |
+| Connect a data store · Ready · Read + write | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · Ready · Switch on | Admin | — | — | — | settings.databases · Connect data store · Ready · On | — | — | — |
+| Connect a data store · Ready · Switch on | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · Ready · Region | Admin | — | — | — | settings.databases · Connect data store · Ready · Region saved | — | — | — |
+| Connect a data store · Ready · Region | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Connect a data store · Done | Admin | — | — | — | settings.databases · Data stores | — | — | — |
+| Connect a data store · Done | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
 | A connector not installed | Admin | settings.connectors · Install · Not installed | — | — | — | settings.connectors · Detail · Not offered | — | — |
 | A connector not installed | Operator | settings.connectors · Install · Not installed · Read only | — | — | — | settings.connectors · Detail · Not offered | — | settings.connectors · Detail · Read only |
 | A data store failing | Admin | — | — | — | — | settings.databases · Data stores · Failing | — | — |
 | A data store failing | Operator | — | — | — | — | settings.databases · Data stores · Failing · Read only | — | — |
 | Remove a data store | Admin | — | — | — | settings.databases · Data stores · Remove | settings.databases · Data stores · Remove refused | — | — |
 | Remove a data store | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Remove a data store · Sign in again | Admin | — | — | — | access.signin · Sign in again · Remove | access.signin · Sign in again · Remove · Wrong password | — | — |
+| Remove a data store · Sign in again | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |
+| Remove a data store · Removed | Admin | — | — | — | settings.databases · Data stores · Removed | — | — | — |
+| Remove a data store · Removed | Operator | — | — | — | — | — | — | settings.databases · Data stores · Read only |

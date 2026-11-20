@@ -2,8 +2,8 @@
 id: J08
 title: Watch agent workloads and act on an alert
 personas: [admin, builder]
-stories: [CP-47, CP-60, CP-37, CP-59, CP-67, CP-36, CP-57, CP-50, CP-66, CP-58, CP-12, CP-05, CP-34, CP-11, CP-40, CP-39, CP-62, CP-49, CP-53]
-boards: [settings.fleet, settings.alerts, inbox, agents.runs, settings.workers, settings.limits, settings.databases, settings.plugins, projects.tasks]
+stories: [CP-34, CP-60, CP-37, CP-59, CP-67, CP-36, CP-57, CP-50, CP-66, CP-58, CP-12, CP-05, CP-11, CP-40, CP-39, CP-80, CP-81, CP-49, CP-53]
+boards: [settings.limits, settings.alerts, settings.notifications, inbox, agents.runs, settings.workers, settings.databases, settings.connectors, projects.tasks]
 ---
 
 # Watch agent workloads and act on an alert
@@ -15,7 +15,7 @@ boards: [settings.fleet, settings.alerts, inbox, agents.runs, settings.workers, 
 
 ```mermaid
 flowchart TD
-  A([Control Plane]) --> O["CP-47 · Overview · workloads by user, agent and team"]
+  A([Control Plane]) --> O["CP-34 · Usage · workloads by user, agent and team · running, waiting, failed"]
   A --> NR["CP-37 · Say which ops alerts reach whom — Inbox, email, Slack, Teams, webhook"]
   A --> TH["CP-60 · Tune when ops alerts fire"]
   TH --> AL
@@ -26,7 +26,7 @@ flowchart TD
   AL -->|a graph database unreachable| AL4["Ops alert · names the graph database"]
   AL -->|data sent from a schema-only workflow| AL5["Ops alert · names the run and what it carried"]
   AL -->|a task failed · blocked · needs input| AL6["CP-67 · Ops alert · names the task and its project"]
-  AL -->|a connection cannot sign in| AL7["CP-67 · Ops alert · names the work or personal connection"]
+  AL -->|a connection cannot sign in| AL7["CP-67 · Ops alert · names the work connection"]
   AL -->|security — a sandbox refusal, a chain break, token reuse, a lockout, a policy widened| AL8["CP-67 · Ops alert · names what happened"]
   AL1 --> IN["CP-59 · CP-36 · The alert reaches the people its kind names — named approvers, the task's assignee and people on the team, the person behind a run — and the Admins, in the Inbox and on their channels"]
   AL2 --> IN
@@ -42,7 +42,7 @@ flowchart TD
   R2 --> SS["CP-66 · Read it session by session · hand-off notes · runtime and model reported · connection used"]
   SS --> D{"Lee decides"}
   D -->|the task failed| FX(["A fix task from it · nothing re-runs the failed one"])
-  D -->|the connection failed| CN["CP-62 · Renew the work connection"]
+  D -->|the connection failed| CN["CP-80 · CP-81 · Renew the work connection"]
   CN --> E
   D -->|it should not go on| S["CP-58 · Stop the run · the person behind it is told"]
   D -->|it waits| W["CP-12 · CP-05 · Why it waits or was refused · where work queues"]
@@ -64,12 +64,12 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Read workloads by user, agent and team | Settings › Fleet › Workloads | CP-47 | `settings.fleet` |
-| 2 | Say which ops alerts reach whom, and on which channels | Control Plane · Inbox and notifications | CP-37 | `inbox` |
+| 1 | Read workloads by user, agent and team | Settings › Workers › Limits › Usage | CP-34 | `settings.limits · Usage` |
+| 2 | Say which ops alerts reach whom, and on which channels | Settings › Alerts and notifications | CP-37 | `settings.notifications` |
 | 3 | An ops alert fires — a task failed, blocked, needing input or stopped moving, a connection failed, a security event, or a platform kind — and reaches the people its kind names and the Admins | Control Plane · Ops alerting · Inbox | CP-59 · CP-67 · CP-36 | `settings.alerts` · `inbox` |
 | 4 | See what is running and what just ran | Control Plane · Runs | CP-57 | `agents.runs` |
 | 5 | Find the run behind the alert and read it session by session | Control Plane · Runs | CP-50 · CP-66 | `agents.runs · Detail` |
-| 6 | Stop the run · make a fix task for a failed one · renew a failed work connection | Control Plane · Runs · Projects · Plugins | CP-58 · CP-62 | `agents.runs · Detail` · `projects.tasks · Detail` · `settings.plugins` |
+| 6 | Stop the run · make a fix task for a failed one · renew a failed work connection | Control Plane · Runs · Projects · Connectors | CP-58 · CP-81 | `agents.runs · Detail` · `projects.tasks · Detail` · `settings.connectors · Detail · Credentials` |
 | 7 | See why a run waits or was refused, and where work queues | Control Plane · Limits · Workers and the queue | CP-12 · CP-05 | `settings.workers` |
 | 8 | Read spend against limits; raise or lower one | Control Plane · Limits | CP-34 · CP-11 | `settings.limits · Usage` |
 | 9 | Read a graph database's health; switch it off | Control Plane · Graph databases | CP-40 · CP-39 | `settings.databases` |
@@ -79,7 +79,7 @@ flowchart TD
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | Stopping a run is for the person behind it and the Admins; changing a limit, renewing a work connection or switching a graph database off is an Admin's | CP-58 · CP-11 · CP-62 | `agents.runs · Detail` · `settings.limits · Usage` · `settings.plugins` |
+| It needs permission | Stopping a run is for the person behind it and the Admins; changing a limit, renewing a work connection or switching a graph database off is an Admin's | CP-58 · CP-11 · CP-81 | `agents.runs · Detail` · `settings.limits · Usage` · `settings.connectors · Detail · Credentials` |
 | It fails | A run that cannot be stopped in time says what it finished; an unreachable graph database is named, and its runs are refused before they start | CP-58 · CP-59 | `agents.runs · Detail` |
 | A task fails | Nothing re-runs it; the task failed alert stays open until a fix task made from it is done | CP-67 | `settings.alerts` · `projects.tasks · Detail` |
 | The person has no access | An Operator sees the runs they are behind; any other run shows only that it ran, its status and its tokens, and its hand-off notes are *Withheld* | CP-57 · CP-50 · CP-66 | `agents.runs` · `agents.runs · Detail` |

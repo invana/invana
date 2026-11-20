@@ -48,3 +48,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Merge | Admin | data.records · Merge · Pick two | — | data.records · Merge · Loading | data.records · Merge | data.records · Merge · Refused | — | — |
 | Merge | Operator | data.records · Merge · Pick two | — | data.records · Merge · Loading | data.records · Merge · Compare only | — | — | data.records · Merge · Merge disabled |
+| Merge · run | Admin | data.records · Merge | — | data.records · Merge · Merging | data.records · Merge · Merged | data.records · Merge · Refused | — | — |
+| Merge · run | Operator | data.records · Merge | — | data.records · Merge · Merging | data.records · Merge · Merged | data.records · Merge · Refused | — | — |

@@ -230,12 +230,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, without Edit on `setting/deployment` | *Needs Edit on Deployment settings — ask {who can grant}.* | CP-59.9 · CP-60.4 · CP-60.11 |
+| 403 | Closing an alert, setting a threshold, or writing, changing or removing a History alert, without Edit on `setting/deployment` | *Needs Edit on Deployment settings — ask {who can grant}.* | CP-59.9 · CP-60.4 · CP-37.24 |
 | 409 | Closing an alert that is already closed | *Already closed — {by}.* | CP-59.10 |
 | 403 | Acknowledging an alert not sent to the reader, by anyone but an Admin | *This alert was not sent to you.* | API only — the dropdown offers *Acknowledge* only on alerts sent to the reader |
 | 409 | Acknowledging a closed alert | *Already closed — {by}.* | CP-69.4 |
 | 422 | A threshold or window outside its range | *{field}: {min} to {max}.* | CP-60.3 |
-| 422 | A History alert with nothing to match or no one to tell | *{field}: {why}.* | CP-60.10 |
+| 422 | A History alert with nothing to match or no one to tell | *{field}: {why}.* | CP-37.23 |
 
 ### CLI
 

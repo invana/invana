@@ -4,7 +4,7 @@ title: Grant agents to a team and see who gains them
 feature: AC-F03
 status: idea
 personas: [admin]
-boards: [settings.people]
+boards: [settings.people, access.signin, flow.grant_agent]
 ---
 
 # AC-39 · Grant agents to a team and see who gains them
@@ -56,6 +56,7 @@ flowchart TD
 | AC-39.8 | An Admin at the command line | they grant an agent or take it away | the preview prints first, then the change, held to every check Studio is |
 | AC-39.9 | A person without Manage on Access | they open a team or a person | grants read; every write is disabled, naming Manage on Access and who can grant it; the API refuses the write |
 | AC-39.10 | A grant made with a key | it is sent | it is refused — it needs a person's session |
+| AC-39.11 | A preview | the Admin presses *Save* | *Sign in again* names *Grant* or *Take away* and the state it returns to — *Agent grants* reading the change; a wrong password returns to the same *Sign in again*; a refusal reads *Could not save*, with *Back* to the preview |
 
 ## Screens
 
@@ -67,3 +68,9 @@ flowchart TD
 | Grant · 1 What changes | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |
 | Preview of a grant | Admin | — | — | settings.people · Teams · Grant · Preview · Loading | settings.people · Teams · Grant · Preview | settings.people · Teams · Grant · Preview · Could not save | settings.people · Teams · Grant · Preview · Default falls back | — |
 | Preview of a grant | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |
+| Grant · Sign in again | Admin | — | — | — | access.signin · Sign in again · Grant | access.signin · Sign in again · Grant · Wrong password | — | — |
+| Grant · Sign in again | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |
+| Grant · Granted | Admin | — | — | — | settings.people · Agent grants | settings.people · Teams · Grant · Preview · Could not save | — | — |
+| Grant · Granted | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |
+| Take away · Sign in again | Admin | — | — | — | access.signin · Sign in again · Take away | access.signin · Sign in again · Take away · Wrong password | — | — |
+| Take away · Sign in again | Operator | — | — | — | — | — | — | settings.people · Teams · Grant · Locked · A person |

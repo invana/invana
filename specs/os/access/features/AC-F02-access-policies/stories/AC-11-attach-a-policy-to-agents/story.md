@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin, builder]
-boards: [settings.policies]
+boards: [settings.policies, access.signin, flow.attach_policy]
 ---
 
 # AC-11 · Attach a policy to agents
@@ -49,6 +49,8 @@ flowchart TD
 | AC-11.7 | A policy attached or taken off | History is read | it shows who did it, to which agent, and when (AC-F06) |
 | AC-11.8 | A person with Read on `access/policies` but not Edit on Access | they open *Attached to* | every agent reads; *Attach to an agent* and *Take off* are disabled, naming Edit on Access and who can grant it; without Read it reads *No access* |
 | AC-11.9 | An attempt to attach a policy to a person, a team or a key | it is made | there is no such act; a person and a team are granted agents (AC-F03), and a key acts as its owner, narrowed |
+| AC-11.10 | An Admin | they press *Attach to an agent* | a *Pick a holder* step lists agents only; picking one opens *Who it changes*; *Sign in again* names *Attach* and returns to *Attached*; a wrong password returns to the same *Sign in again*; a refusal reads *Could not attach* with *Back* |
+| AC-11.11 | An Admin | they press *Take off* | *Who it changes* shows, *Sign in again* names *Take off* and returns to *Taken off* |
 
 ## Screens
 
@@ -58,3 +60,15 @@ flowchart TD
 | Attached to | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Attach to an agent | Admin | settings.policies · Attach | — | — | settings.policies · Attach · Who it changes | settings.policies · Attach · Could not attach | — | — |
 | Attach to an agent | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Attach · Pick a holder | Admin | — | — | — | settings.policies · Attach · Pick a holder | — | — | — |
+| Attach · Pick a holder | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Attach · Sign in again | Admin | — | — | — | access.signin · Sign in again · Attach | access.signin · Sign in again · Attach · Wrong password | — | — |
+| Attach · Sign in again | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Attach · Attached | Admin | — | — | — | settings.policies · Attach · Attached | settings.policies · Attach · Could not attach | — | — |
+| Attach · Attached | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Take off | Admin | — | — | — | settings.policies · Take off · Who it changes | — | — | — |
+| Take off | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Take off · Sign in again | Admin | — | — | — | access.signin · Sign in again · Take off | access.signin · Sign in again · Take off · Wrong password | — | — |
+| Take off · Sign in again | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Take off · Taken off | Admin | — | — | — | settings.policies · Take off · Taken off | — | — | — |
+| Take off · Taken off | Operator | — | — | — | — | — | — | settings.policies · No access |

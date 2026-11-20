@@ -65,6 +65,7 @@ flowchart TD
 | CP-02.14 | Anyone on the command line | they run `invana plugins mcp add` or `mcp refresh` | each does what its Studio act does, under the same checks |
 | CP-02.15 | A call whose arguments carry a value of a confidential or personal property | it is about to leave | it is refused before it leaves, naming the property and its level (AC-42) |
 | CP-02.16 | A tool's result | it comes back | it carries its lineage — the server, the tool and the connection — so every copy made from it shows only as far as its sources allow (GP-F02) |
+| CP-02.17 | An Admin | they list the tools of a new server and press *Add the server, off* | *Listing its tools* reads, then *Tools listed*; adding reads *Added* and the server's tools open; a name already used reads *Name taken* in place |
 
 ## Screens
 
@@ -76,3 +77,7 @@ flowchart TD
 | Add a server | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |
 | A server's tools | Admin | — | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Tools | settings.plugins · Servers · Address refused | — | — |
 | A server's tools | Operator | — | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Tools · Read only | settings.plugins · Servers · Address refused | — | settings.plugins · Servers · Read only |
+| Add a server · A token | Admin | — | — | — | settings.plugins · Servers · Add · A token | settings.plugins · Servers · Add · Name taken | — | — |
+| Add a server · A token | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |
+| Add a server · Added | Admin | — | — | — | settings.plugins · Servers · Added | — | — | — |
+| Add a server · Added | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |

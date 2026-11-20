@@ -4,9 +4,9 @@ title: Overview — Operations and workloads
 product: CP
 status: idea
 personas: [admin, builder, analyst]
-stories: [CP-47, CP-70]
+stories: [CP-70]
 journeys: [J08]
-boards: [settings.fleet, shell.operations]
+boards: [shell.operations]
 nfrs: [NFR-PERF-3, NFR-COST-2, NFR-PERF-7, NFR-UX-2]
 depends_on: [CP-F10, CP-F04, CP-F11, AC-F09, CP-F03, CP-F01, CP-F05, CP-F08]
 ---
@@ -29,7 +29,7 @@ flowchart TD
   od -->|Operator| odo["CP-70 · My runs only"]
   od -->|Agents › Runs| runs(["Agents › Runs (CP-F10)"])
   od -->|Workers| set(["Settings › Workers in the large modal"])
-  s([Settings › Fleet › Workloads]) --> o["CP-47 · Tiles: running · waiting · failed today · tokens today and this month against the deployment's limit"]
+  s([Settings › Workers › Limits › Usage]) --> o["CP-34 · Tiles: running · waiting · failed today · tokens today and this month against the deployment's limit"]
   o -->|nothing ran yet| e["What a run is, and that a question, a task or a schedule starts one"]
   o --> g{"Group by"}
   g -->|User| u["Each person behind runs: running · waiting · failed · tokens against their limit"]
@@ -48,7 +48,6 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| CP-47 | [See workloads by user, agent and team](stories/CP-47-see-workloads-by-user-agent-and-team/story.md) | idea |
 | CP-70 | [See what the deployment is doing from the header](stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md) | idea |
 
 ## Access
@@ -127,9 +126,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Route, after `/api/v1/control` | Does | Story |
 |---|---|---|
-| `GET /overview?window=today·7d·30d&tz=` | `tiles` — `running` · `waiting` · `failed` · `tokens` · `tokens_this_month` · `monthly_tokens` (the deployment's limit, null when none) · `alerts_open` (by kind) | CP-47 |
+| `GET /overview?window=today·7d·30d&tz=` | `tiles` — `running` · `waiting` · `failed` · `tokens` · `tokens_this_month` · `monthly_tokens` (the deployment's limit, null when none) · `alerts_open` (by kind) | CP-34 |
 | `GET /operations?tz=` | The Operations dropdown, scoped by permission (below): `tiles` — `running` · `queued` · `queue_waiting` · `queue_oldest_at` · `workers {busy, total, lost}` · `tokens_this_month` · `monthly_tokens` (null — no limit) · `near_limit`; `running[]` — `run_id` · `agent` · `behind` · `step` · `steps` · `may_stop` | CP-70 |
-| `GET /overview/groups?by=user·agent·team&window=&tz=` | By the list contract, busiest first: `subject_kind` · `subject_id` · `name` · `running` · `waiting` · `failed` · `runs` · `tokens` · `tokens_this_month` · `monthly_tokens` (null — no limit) · `at_limit`; `team_overlap` true when `by=team` and a run counts under more than one team | CP-47 |
+| `GET /overview/groups?by=user·agent·team&window=&tz=` | By the list contract, busiest first: `subject_kind` · `subject_id` · `name` · `running` · `waiting` · `failed` · `runs` · `tokens` · `tokens_this_month` · `monthly_tokens` (null — no limit) · `at_limit`; `team_overlap` true when `by=team` and a run counts under more than one team | CP-34 |
 
 ### Events
 
@@ -174,7 +173,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Decision | Detail |
 |---|---|
 | Operations is the header's glance | The deployment's state is one dropdown from every screen, never a page or a summoner; Agents › Runs in the Agents mode and Settings › Workers in the large modal are the depth behind it |
-| Workloads is a tab of Settings › Fleet | *Settings › Fleet* — Map · Workloads, in the large modal; *Workloads* reads runs and tokens by user, agent and team. How each agent performs is a tab of Agents › Runs ([CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Workloads is Usage on Limits | *Settings › Workers › Limits › Usage*, in the large modal, reads runs and tokens by user, agent and team ([CP-34](../CP-F04-limits/stories/CP-34-read-what-each-team-user-and-agent-spends-against-its-limits/story.md)). How each agent performs is a tab of Agents › Runs ([CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | An Operator sees their own | Their own runs going; the deployment's queue, workers and tokens need Read on `worker/<group>` |
 | A run counts under each of its teams | Teams are flat and a person may be on several; splitting a run across them would invent a share nobody set |
 | Everyone reads the counts | Counts and tokens are never content; who may read a run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s |
@@ -188,6 +187,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Item | Why not |
 |---|---|
+| CP-47 — merged into CP-34 | One story reads usage by team, user and agent: [CP-34](../CP-F04-limits/stories/CP-34-read-what-each-team-user-and-agent-spends-against-its-limits/story.md) |
+| The Fleet map | No story reads it; the agent, skill and function chain reads on each agent and skill |
 | Custom dashboards or charts | One page answering *whose work, and how much* beats a builder |
 | A cost figure | Tokens only |
 | Operations as a summoner | It links into Agents › Runs and Settings › Workers |

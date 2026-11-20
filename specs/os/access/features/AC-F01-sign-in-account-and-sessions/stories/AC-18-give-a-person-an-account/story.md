@@ -5,7 +5,7 @@ feature: AC-F01
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.people, access.signin]
+boards: [settings.people, access.signin, flow.create_account]
 ---
 
 # AC-18 · Give a person an account
@@ -52,6 +52,8 @@ flowchart TD
 | AC-18.7 | An email or a username no account has | a new password is set for it | it says no account has it, and changes nothing |
 | AC-18.8 | A person without Create on Access, or any call made with a key | an account is made through the API | it is refused — it needs Create on Access, from a session |
 | AC-18.9 | An Admin in Access › Who | they press *New person*, fill 1 email, username and name · 2 a first password, and enter their own password again | it is made as AC-18.3 makes it, each refusal of AC-18.4 and AC-18.5 shown in place on its field; no email is sent |
+| AC-18.10 | The *New person* steps | *Next* or *Make the account* is pressed with an email or username taken, or a password that breaks the rules | *Taken* or *Breaks the rules* reads in place on the step that holds the cause, with *Back*; nothing is made |
+| AC-18.11 | An Admin | they make the account and sign in again | *Sign in again* names *Make the account*; a right password returns to *Made* and the person in *Users*; a wrong password returns to the same *Sign in again* with the message |
 
 ## Screens
 
@@ -63,5 +65,7 @@ In Studio an account is made from Access › Who › *New person*; the command l
 | New person · 1 Who | Operator | — | — | — | — | — | — | settings.people · New person · Locked · Users |
 | New person · 2 First password | Admin | — | — | — | settings.people · New person · First password | settings.people · New person · Breaks the rules | — | — |
 | New person · 2 First password | Operator | — | — | — | — | — | — | settings.people · New person · Locked · Users |
-| New person · password again and made | Admin | — | — | access.signin · Sign in again · Checking | settings.people · New person · Made | access.signin · Sign in again · Wrong password | — | — |
+| New person · password again and made | Admin | — | — | access.signin · Sign in again · Make the account · Checking | settings.people · New person · Made | access.signin · Sign in again · Make the account · Wrong password | — | — |
 | New person · password again and made | Operator | — | — | — | — | — | — | settings.people · New person · Locked |
+| Where it lands · Users | Admin | — | — | — | settings.people | — | — | — |
+| Where it lands · Users | Operator | — | — | — | settings.people · Locked · Users | — | — | settings.people · Locked · Users |

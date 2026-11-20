@@ -5,7 +5,7 @@ feature: AC-F03
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.people]
+boards: [settings.people, access.signin, flow.create_team, flow.grant_agent]
 ---
 
 # AC-09 · Make teams and put people on them
@@ -58,6 +58,9 @@ flowchart TD
 | AC-09.11 | A person without Create or Edit on Access | they open *Teams* | everything reads; each write is disabled, naming the permission and who can grant it |
 | AC-09.12 | A filter that matches no team | it is applied | *Nothing matches* reads with *Clear filters* |
 | AC-09.13 | The teams could not load | *Teams* is opened | *Could not load teams* reads, with *Try again* |
+| AC-09.14 | An Admin | they save a *New team* | the team reads in the list with no people and no agents; a name taken reads in place and *Next* stays off |
+| AC-09.15 | An Admin | they delete a team no approvers name | a confirm names the team and what its people keep; confirming leaves *Teams* reading *Deleted*; a team an agent's approvers name reads *Team in use* with each agent |
+| AC-09.16 | An Admin | they grant agents to a team | the preview names who gains them, *Sign in again* names *Grant* and returns to the team's *Agent grants* |
 
 ## Screens
 
@@ -69,3 +72,9 @@ flowchart TD
 | New team | Operator | — | — | — | — | — | — | settings.people · Teams · New · Locked · A team |
 | Delete a team | Admin | — | — | — | settings.people · Teams · Delete a team | settings.people · Teams · Team in use | — | — |
 | Delete a team | Operator | — | — | — | — | — | — | settings.people · Teams · Locked · A team |
+| New team · Saved | Admin | — | — | — | settings.people · Teams · A team | — | — | — |
+| New team · Saved | Operator | — | — | — | — | — | — | settings.people · Teams · Locked · A team |
+| Delete a team · Deleted | Admin | — | — | — | settings.people · Teams · Deleted | — | — | — |
+| Delete a team · Deleted | Operator | — | — | — | — | — | — | settings.people · Teams · Locked · A team |
+| Grant agents to a team · Sign in again | Admin | — | — | — | access.signin · Sign in again · Grant | access.signin · Sign in again · Grant · Wrong password | — | — |
+| Grant agents to a team · Sign in again | Operator | — | — | — | — | — | — | settings.people · Teams · Locked · A team |

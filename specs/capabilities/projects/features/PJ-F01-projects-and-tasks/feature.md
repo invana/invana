@@ -6,7 +6,7 @@ status: idea
 personas: [decision-maker, analyst, researcher, investigator, builder]
 stories: [PJ-01, PJ-02, PJ-12, PJ-15, PJ-18, PJ-20, PJ-21, PJ-22, PJ-23, PJ-24, PJ-25, PJ-26, PJ-27]
 journeys: [J03, J11]
-boards: [projects.projects, projects.new, projects.tasks, projects.reviews, projects.graph, inbox]
+boards: [projects.projects, projects.new, projects.settings, projects.tasks, projects.reviews, projects.graph, inbox, flow.project_settings, shell.switcher, start.home]
 nfrs: [NFR-PERF-3]
 depends_on: [AG-F01, AG-F06, CP-F10, AG-F07, AC-F02, AC-F03, AC-F04, AC-F07, CP-F08, GP-F02]
 ---
@@ -182,7 +182,7 @@ grant it.
 | The Lead agent | At most one agent on the team is tagged **Lead agent** — the project assistant. It coordinates the project's agents: ideates in the project's thread, plans the work, splits a task into sub-tasks within its own run and assigns open tasks to the team's other agents. Every decision a person must give — a new task, group, check or relation, a plan, a goal, a change to the team or the policy, accepting or sending back a result — reaches the project's people as a proposal. It never accepts its own proposal (PJ-21 · PJ-22) |
 | A project owns its access | Every run inside the project — asked by anyone on its team, scheduled, picked up or started by the Lead agent — reaches **the project's policies ∩ the agent's ceiling** ∩ the run scope. The person who asked is recorded on the run; their own policies do not decide what the run may reach, and joining or leaving never changes what the project may do — but whatever a run shows a viewer is filtered by that viewer's own Deny Read, so a property Hidden to them is absent from every answer, record and count the run shows them ([AC-F02 › Rules](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)). The task's text is data to the agent, never an instruction that widens what it may do |
 | The project's policies | Access Policies attached to the project exactly as to a user — one or more, their Allows added, any Deny winning; attaching one adds, never replaces. Each is set through [AC-F02's policy form](../../../../os/access/features/AC-F02-access-policies/feature.md#the-policy-form): Graph Data down to kinds, relationships and properties · Models · AI models · Agents that may work here · Skills and plugins · Fleet · Outside Invana — beside the project's setting *Adding people needs approval*, for a sensitive project. *Edit as policy* opens the same policy as the matrix. They grant a person nothing outside the project |
-| The project's keys | CI, integrations and MCP clients that are no one person use a project key: it acts with the project's policies ∩ the agent's ceiling, keeps working when people join or leave, and is revoked when the project is archived or deleted ([AC-F10](../../../../os/access/features/AC-F10-keys/feature.md#rules)) |
+| The project's keys | CI, integrations and MCP clients that are no one person use a project key: it acts with the project's policies ∩ the agent's ceiling, keeps working when people join or leave, and is revoked when the project is archived ([AC-F10](../../../../os/access/features/AC-F10-keys/feature.md#rules)) |
 | A template to start from | New project's Team step gives each person, team and agent an Access Policy from the one list — a person's or team's starting at the type's Access template, an agent's chosen by hand — and *New policy for this project* runs *New policy*'s form inline, attaching the policy it makes to the new project ([AC-F02 › Access templates](../../../../os/access/features/AC-F02-access-policies/feature.md#access-templates)). A policy made in Access › *New policy* may be held by the project beside it |
 | Widening asks | Setting or widening the project's policies needs Manage on Projects. A person without it may still create the project: it starts read-only on what they chose — Read on the graph databases, models and agents they picked — and the rest waits as an ask in the Inbox of those with Manage on Projects; History records the ask and its answer. Narrowing is open to the team |
 | Joining is the gate | Joining a project is how a person reaches what it may do; adding a person is open to the team, unless the project is set to *Adding people needs approval*. Every join and leave is in History |
@@ -356,6 +356,7 @@ Proposals are read, accepted and rejected through `/api/v1/projects/{key}/propos
 | 422 | A task of a kind the project does not use, or a field its kind does not declare | *{kind}: {why}.* | PJ-20.4 |
 | 422 | A check naming a workflow that does not exist | *There is no workflow {key}.* | PJ-25.9 |
 | 422 | An edit that leaves the name empty | *A project needs a name.* | PJ-01.8 |
+| 422 | A task edit that leaves the title empty | *A task needs a title.* | PJ-12.38 |
 | 422 | A create or an edit naming a graph database the deployment does not attach | *There is no graph database {name}.* | PJ-02.22 |
 | 409 | A key already used | *The key `{key}` is taken.* | PJ-02.17 |
 | 422 | A key that is not URL-safe, or is `tasks`, `decisions` or `types` | *`{key}` cannot be a key — {why}.* | PJ-02.17 |

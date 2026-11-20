@@ -4,9 +4,9 @@ title: Project settings and the agents in a project
 product: PJ
 status: idea
 personas: [decision-maker, analyst, builder]
-stories: [PJ-33, PJ-34, PJ-35, PJ-36, PJ-37]
+stories: [PJ-33, PJ-34, PJ-36, PJ-37]
 journeys: [J03]
-boards: [projects.settings, projects.projects]
+boards: [projects.settings, projects.projects, flow.project_settings]
 nfrs: []
 depends_on: [PJ-F01, PJ-F07, AG-F01, CP-F04, CP-F05, AC-F04]
 ---
@@ -19,7 +19,7 @@ depends_on: [PJ-F01, PJ-F07, AG-F01, CP-F04, CP-F05, AC-F04]
 
 A project's settings are a place with five tabs: **General** (PJ-33) · **Data** (PJ-34) · **Team** (people, teams and
 agents in one list — [PJ-22](../PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md);
-the create-project Team step is its first form) · **An agent in this project** (PJ-35) · **Usage** (PJ-36). *Agents in
+the create-project Team step is its first form) · **An agent in this project** (PJ-37) · **Usage** (PJ-36). *Agents in
 this project* (PJ-37) is a section of the project page.
 
 ## User journey
@@ -33,7 +33,7 @@ flowchart TD
   st --> g["PJ-33 · General · name · description · question · objective"]
   st --> d["PJ-34 · Data · graph databases and sources · test a connection"]
   st --> t["PJ-22 · Team · people · teams · agents · policy per row · pause · remove"]
-  st --> a["PJ-35 · An agent in this project · version · what it may touch · its runs here"]
+  st --> a["PJ-37 · An agent in this project · version · what it may touch · its runs here"]
   st --> u["PJ-36 · Usage · the project's share of the limits · read only"]
   ag -->|a row| a
   ag -->|Invite an agent| t
@@ -49,7 +49,6 @@ flowchart TD
 |---|---|---|
 | PJ-33 | [Say what a project is about](stories/PJ-33-say-what-a-project-is-about/story.md) | idea |
 | PJ-34 | [See the data a project reads](stories/PJ-34-see-the-data-a-project-reads/story.md) | idea |
-| PJ-35 | [See an agent in a project](stories/PJ-35-see-an-agent-in-a-project/story.md) | idea |
 | PJ-36 | [See how much of the limits a project uses](stories/PJ-36-see-how-much-of-the-limits-a-project-uses/story.md) | idea |
 | PJ-37 | [See the agents in a project](stories/PJ-37-see-the-agents-in-a-project/story.md) | idea |
 
@@ -133,8 +132,8 @@ The low-level design: what this feature serves and refuses. Conventions — nami
 | `POST /drafts/goals` | Draft the question and the objective again — [PJ-F01](../PJ-F01-projects-and-tasks/feature.md#routes)'s route | PJ-33 |
 | `GET /{key}/data` | The graph databases the project's policies reach the reader may read — mode, switch, health, region, kinds read — the count of those hidden from the reader, and the project's sources | PJ-34 |
 | `POST /{key}/data/{database}/test` | A read that writes nothing against one graph database the project reaches → `{ok, holds, ms, error?}` | PJ-34 |
-| `GET /{key}/agents` | The agents on the team — version, Lead agent, state, policy, runs this week, tokens this month, last run | PJ-35 · PJ-37 |
-| `GET /{key}/agents/{agent}` | One agent: its head and its effective access *In* this project; its runs come from `GET /api/v1/control/runs?project=&agent=` | PJ-35 |
+| `GET /{key}/agents` | The agents on the team — version, Lead agent, state, policy, runs this week, tokens this month, last run | PJ-37 |
+| `GET /{key}/agents/{agent}` | One agent: its head and its effective access *In* this project; its runs come from `GET /api/v1/control/runs?project=&agent=` | PJ-37 |
 | `GET /{key}/usage` | Each limit that binds the project's runs — `{limit, scope, ceiling?, used, left, project_share, at_limit}` as last stored | PJ-36 |
 | `GET /{key}/team` · `PUT /{key}/team/{principal}` · `DELETE /{key}/team/{principal}` | The Team tab — [PJ-F01](../PJ-F01-projects-and-tasks/feature.md#routes)'s routes | PJ-22 |
 
@@ -196,3 +195,4 @@ The low-level design: what this feature serves and refuses. Conventions — nami
 | Connecting, switching or changing the mode of a graph database from a project | Databases owns it |
 | Per-project connectors | A connector is installed on the command line and attached in Databases |
 | A project's own settings for notifications | Notifications are the person's and the deployment's (CP-F08) |
+| PJ-35 — merged into PJ-37 | An agent's head, what it may touch and its runs here are one story with the agents section |

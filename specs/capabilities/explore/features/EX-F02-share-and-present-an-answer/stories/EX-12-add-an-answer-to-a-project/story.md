@@ -52,3 +52,5 @@ flowchart LR
 | Add to a project | Operator | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | explore.board · No access |
 | The finding | Admin | — | — | projects.branches · Finding · Loading | projects.branches · Finding | — | — | — |
 | The finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | — | — | — |
+| Add to a project · added | Admin | explore.board · Add to a project | — | explore.board · Adding | explore.board · Add to a project · Added | explore.board · Failed | — | — |
+| Add to a project · added | Operator | explore.board · Add to a project | — | explore.board · Adding | explore.board · Add to a project · Added | explore.board · Failed | — | — |

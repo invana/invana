@@ -53,3 +53,11 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Add records by hand | Admin | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | — |
 | Add records by hand | Operator | data.loads · Add by hand · No kind to add to | — | data.loads · Add by hand · Saving records | data.loads · Add by hand | data.loads · Add by hand · Records refused | — | data.loads · Add by hand · Needs Create on Graph Data |
+| Add by hand · 1 Kind | Admin | data.loads · Add by hand · Kind | — | — | data.loads · Add by hand | — | — | — |
+| Add by hand · 1 Kind | Operator | data.loads · Add by hand · Kind | — | — | data.loads · Add by hand | — | — | — |
+| Add by hand · Save | Admin | data.loads · Add by hand | — | data.loads · Add by hand · Saving records | data.loads · Add by hand · Saved | data.loads · Add by hand · Records refused | — | — |
+| Add by hand · Save | Operator | data.loads · Add by hand | — | data.loads · Add by hand · Saving records | data.loads · Add by hand · Saved | data.loads · Add by hand · Records refused | — | — |
+| Add by hand · a key missing | Admin | data.loads · Add by hand | — | — | — | data.loads · Add by hand · Key missing | — | — |
+| Add by hand · a key missing | Operator | data.loads · Add by hand | — | — | — | data.loads · Add by hand · Key missing | — | — |
+| Add by hand · too many records | Admin | data.loads · Add by hand | — | — | — | data.loads · Add by hand · Too many | — | — |
+| Add by hand · too many records | Operator | data.loads · Add by hand | — | — | — | data.loads · Add by hand · Too many | — | — |

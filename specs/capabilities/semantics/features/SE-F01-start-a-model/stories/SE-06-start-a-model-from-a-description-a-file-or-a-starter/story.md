@@ -63,9 +63,17 @@ flowchart LR
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New model | Admin | model.models · New | — | model.models · New · Reading the file | model.models · New · Starters | model.models · New · Name taken | — | — |
+| New model | Admin | model.models · New · How to start | — | model.models · New · Reading the file | model.models · New · Starters | model.models · New · Name taken | — | — |
 | New model | Operator | — | — | — | — | — | — | model.models · New · No access |
 | The draft | Admin | model.models · Draft · Empty draft | — | model.models · Draft · Arriving | model.models · Draft | model.models · Draft · Cannot publish | model.models · Draft · Assistant drafting | — |
 | The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
 | Connect a graph database · shape the model | Admin | settings.databases · Connect · Shape | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape · Starters | settings.databases · Connect · Shape · Name taken | settings.databases · Connect · Shape · Drafting | — |
 | Connect a graph database · shape the model | Operator | — | — | — | — | — | — | — |
+| The draft · discard | Admin | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |
+| The draft · discard | Operator | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |
+| New model · from a description | Admin | model.models · New · Describe it | — | model.models · Draft · Arriving | model.models · Draft | model.models · New · Name taken | — | — |
+| New model · from a description | Operator | model.models · New · Describe it | — | model.models · Draft · Arriving | model.models · Draft | model.models · New · Name taken | — | — |
+| New model · from a file | Admin | model.models · New · Pick a file | — | model.models · New · Reading the file | model.models · Draft | model.models · Import unreadable | — | — |
+| New model · from a file | Operator | model.models · New · Pick a file | — | model.models · New · Reading the file | model.models · Draft | model.models · Import unreadable | — | — |
+| New model · from a starter | Admin | model.models · New · Starters | — | model.models · Draft · Arriving | model.models · Draft | model.models · New · Name taken | — | — |
+| New model · from a starter | Operator | model.models · New · Starters | — | model.models · Draft · Arriving | model.models · Draft | model.models · New · Name taken | — | — |

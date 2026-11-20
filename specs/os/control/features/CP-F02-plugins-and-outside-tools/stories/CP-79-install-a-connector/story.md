@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.connectors]
+boards: [settings.connectors, settings.databases, flow.install_connector]
 ---
 
 # CP-79 · Install a connector
@@ -50,6 +50,19 @@ flowchart TD
 | CP-79.6 | A deployment with only the bundled `invana-files` | Connectors opens | *None installed* reads for every kind but that one, with *Install a connector* leading |
 | CP-79.7 | An Operator | they open *Install a connector* | it reads disabled — *This needs an Admin — ask {admins}* — and no act of Invana installs a connector for anyone |
 | CP-79.8 | A person | they look for a way to install a connector by Studio or by the API | none exists; the only install is the package command on the engine's machine |
+| CP-79.9 | A connector package installed beside the engine that declares a connector under the entry-point group `invana.connectors` | the engine starts | the connector is found by its registered name; no list in the engine names it |
+| CP-79.10 | Installed connectors | someone runs `invana version` | it lists the engine version and every installed connector — its name, language and package version |
+| CP-79.11 | Connecting a graph database (CP-25) | the connector choice draws | it offers every installed connector by name with its language — Neo4j, Memgraph and ArcadeDB in openCypher; JanusGraph, Amazon Neptune, TinkerGraph and ArcadeDB in Gremlin — and only those installed |
+| CP-79.12 | A database whose package is not installed | an Admin looks for it while connecting | it is not offered; the step names the package that would add it |
+| CP-79.13 | A package whose connector fails to load | the engine starts | the engine starts; `invana version` lists that connector as failed, naming the package and the error, and it is not offered |
+| CP-79.14 | A saved graph database | it is stored | it names its connector by the registered name, never by a code path |
+| CP-79.15 | A graph database whose connector's package was removed | it is read or a run reaches it | it says the connector is not installed, naming the package; nothing runs against it |
+| CP-79.16 | Two packages that register the same name | the engine starts | neither is offered under that name; `invana version` names both packages |
+| CP-79.17 | An Operator | they open a graph database's details | they read its connector and language; installing one is not an act of Invana — this story shows an Admin the command to run on the engine's machine |
+| CP-79.18 | Connectors in Settings › Connections | the list is read | each installed connector reads its graph databases and *Used by n agents*, as the engine counts them |
+| CP-79.19 | Installed graph connectors | a person opens Settings › Connections › Connectors | each lists with the graph database it connects, its version and *Used by n graph databases*; an Operator reads the same list, which has no acts of its own |
+| CP-79.20 | A connector's command is shown | the Admin ran it and restarted the engine and presses *I ran it — check again* | *Checking* reads, then the connector lists with its kind and version, or *Not found yet* names what was not found, with *Check again* and *Close*; *Copy* and *Close* stay on the command |
+| CP-79.21 | A connector the engine does not offer yet | its details open | *Not offered* names why and *Install a connector* leads to that connector's *Not installed* command |
 
 ## Screens
 
@@ -57,5 +70,11 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The connectors | Admin | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors | settings.connectors · Could not load | — | — |
 | The connectors | Operator | settings.connectors · None installed | settings.connectors · Nothing matches | settings.connectors · Loading | settings.connectors · Read only | settings.connectors · Could not load | — | settings.connectors · Read only |
-| Install a connector | Admin | settings.connectors · Install | — | settings.connectors · Install · Loading | settings.connectors · Install · Command | settings.connectors · Install · Not offered yet | — | — |
+| Install a connector | Admin | settings.connectors · Install · Not installed | — | settings.connectors · Install · Loading | settings.connectors · Install · Command | settings.connectors · Install · Not offered yet | — | — |
 | Install a connector | Operator | — | — | — | — | — | — | settings.connectors · Install · Read only |
+| Install a connector · Check again | Admin | — | — | settings.connectors · Install · Checking | settings.connectors | settings.connectors · Install · Not found yet | — | — |
+| Install a connector · Check again | Operator | — | — | — | — | — | — | settings.connectors · Install · Read only |
+| A connector not offered | Admin | — | — | — | settings.connectors · Install · Not installed | settings.connectors · Detail · Not offered | — | — |
+| A connector not offered | Operator | — | — | — | — | — | — | settings.connectors · Detail · Read only |
+| The connector choice | Admin | settings.databases · Connect · No connector installed | — | — | settings.databases · Connect | settings.databases · Connect · Connector failed | — | — |
+| The connector choice | Operator | — | — | — | — | — | — | settings.databases · Read only |

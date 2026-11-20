@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin, investigator]
-boards: [settings.policies]
+boards: [settings.policies, access.signin, flow.write_policy]
 ---
 
 # AC-49 · Make a policy from an Access template
@@ -117,3 +117,7 @@ flowchart TD
 | Review · Create policy | Admin | — | — | — | settings.policies · New · Review · Confirm | — | — | — |
 | Review · Create policy | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Review | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Review · Create policy · Sign in again | Admin | — | — | — | access.signin · Sign in again · Save the policy | access.signin · Sign in again · Save the policy · Wrong password | — | — |
+| Review · Create policy · Sign in again | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Review · Created | Admin | — | — | — | settings.policies · New · Created · Waiting for a second Admin | settings.policies · New · Could not create | — | — |
+| Review · Created | Operator | — | — | — | — | — | — | settings.policies · No access |

@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.policies]
+boards: [settings.policies, access.signin, flow.write_policy]
 ---
 
 # AC-04 · Write the rules of an Access Policy
@@ -75,6 +75,8 @@ flowchart TD
 | AC-04.17 | A person brings in an import or a Team pack holding an Access Policy file | it lands | the policy reads *Waiting to apply* and decides nothing; *Apply* by a person without Edit on Access is refused, naming Edit on Access and who can grant it; by a person with it, *Apply* shows who it changes, then saves it |
 | AC-04.18 | A second Admin's yes is set on | an Admin saves a policy | the version reads *Waiting for a second Admin* and the version before stays in force; every other Admin finds it in *Needs you*; another Admin's yes puts it in force and History names both; the saver's own *Approve* is refused, naming that another Admin approves |
 | AC-04.19 | A second Admin's yes is off — the default | an Admin saves a policy | it is in force at the next check, with no second yes |
+| AC-04.20 | Any act that asks for the password again — save a policy, delete one | *Sign in again* opens | it names the act (*Save the policy*), what it will do and the state it returns to; a right password returns there with the result — the version saved, *Waiting for a second Admin* when one is set; a wrong password returns to the same *Sign in again* with the message, and nothing changes |
+| AC-04.21 | An Admin | they confirm *Delete* on a custom policy | the agents that lose it were listed first; the policy leaves the list as *Deleted* and History records who and when |
 
 ## Screens
 
@@ -82,12 +84,18 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A policy — its rules | Admin | settings.policies · New | — | settings.policies · Loading | settings.policies | settings.policies · Rule refused | — | settings.policies · Built in |
 | A policy — its rules | Operator | — | — | — | — | — | — | settings.policies · No access |
-| Sign in again | Admin | — | — | — | settings.policies · Password again | settings.policies · Password again · Wrong password | — | — |
-| Sign in again | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Sign in again · Save the policy | Admin | — | — | — | access.signin · Sign in again · Save the policy | access.signin · Sign in again · Save the policy · Wrong password | — | — |
+| Sign in again · Save the policy | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Saved | Admin | — | — | — | settings.policies · Saved | — | — | — |
+| Saved | Operator | — | — | — | — | — | — | settings.policies · No access |
 | Waiting for a second Admin | Admin | — | — | settings.policies · Loading | settings.policies · Waiting for a second Admin | settings.policies · Approve refused | — | — |
 | Waiting for a second Admin | Operator | — | — | — | — | — | — | settings.policies · No access |
 | An imported policy file | Admin | — | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
 | An imported policy file | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Delete a policy | Admin | — | — | — | settings.policies · Delete · Agents that lose it | — | — | — |
+| Delete a policy | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Deleted | Admin | — | — | — | settings.policies · Deleted | — | — | — |
+| Deleted | Operator | — | — | — | — | — | — | settings.policies · No access |
 | A policy — History | Admin | — | — | settings.policies · Loading | settings.policies · History | settings.policies · Could not load | — | — |
 | A policy — History | Operator | — | — | — | — | — | — | settings.policies · No access |
 

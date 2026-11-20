@@ -175,7 +175,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Mechanism | How |
 |---|---|
 | Receiving a match | SE-F07's worker calls `projects.leads.open(rule_id, rule_version, source, records[])`. The engine computes `match_key`; an open lead with the same `rule_id` and `match_key` gets `matches + 1` and `projects.leads.matched`; otherwise a lead row and its task or branch are written in one transaction, citing the rule, the source and the records, `projects.leads.opened` |
-| A project that cannot take it | An archived or deleted project writes no lead; `projects.leads.not_opened` raises an Inbox item to the rule's author naming the project |
+| A project that cannot take it | An archived project writes no lead; `projects.leads.not_opened` raises an Inbox item to the rule's author naming the project |
 | Needs you | A new lead raises one Needs you item to the project's people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md#engine)); taking or dismissing it closes the item for everyone |
 | Take | A task lead writes its assignee through PJ-F01's assign — an agent opens its run with the taker behind it; `state = taken` |
 | Dismiss | A task lead is cancelled through PJ-F01 with `reason` as its note; a branch lead records a *drop* decision through PJ-F03 as the dismisser, `reason` its rationale; a rule that blocks it leaves the lead open. `state = dismissed` only once that write succeeds |

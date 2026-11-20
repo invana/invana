@@ -65,3 +65,5 @@ flowchart LR
 | Merge | Operator | projects.branches · Merge · Nothing to carry | — | projects.branches · Merging | projects.branches · Merge | projects.branches · Merge refused | projects.branches · Merge · From a proposal | projects.branches · Archived |
 | A merged branch | Admin | — | — | projects.branches · A branch · Loading | projects.branches · A branch · Merged | projects.branches · A branch · Could not load | — | projects.projects · Detail · Not found |
 | A merged branch | Operator | — | — | projects.branches · A branch · Loading | projects.branches · A branch · Merged | projects.branches · A branch · Could not load | — | projects.projects · Detail · Not found |
+| Merge · run | Admin | projects.branches · Merge | — | projects.branches · Merging | projects.branches · A branch · Merged | projects.branches · Merge refused | — | — |
+| Merge · run | Operator | projects.branches · Merge | — | projects.branches · Merging | projects.branches · A branch · Merged | projects.branches · Merge refused | — | — |

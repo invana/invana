@@ -66,3 +66,5 @@ flowchart LR
 | Import from SKOS | Operator | model.standards · New · Import SKOS | — | model.standards · New · Reading the vocabulary | model.standards · New · SKOS preview | model.standards · New · SKOS refused | — | model.standards · Not the creator |
 | Pick a concept scheme | Admin | — | — | model.standards · New · Reading the vocabulary | model.standards · New · Pick a scheme | model.standards · New · SKOS refused | — | — |
 | Pick a concept scheme | Operator | — | — | model.standards · New · Reading the vocabulary | model.standards · New · Pick a scheme | model.standards · New · SKOS refused | — | — |
+| Import from SKOS · hold to a standard | Admin | model.standards · New · Pick a scheme | — | model.standards · New · Reading the vocabulary | data.quality · Checks · Hold to a standard | model.standards · New · SKOS refused | — | — |
+| Import from SKOS · hold to a standard | Operator | model.standards · New · Pick a scheme | — | model.standards · New · Reading the vocabulary | data.quality · Checks · Hold to a standard | model.standards · New · SKOS refused | — | — |

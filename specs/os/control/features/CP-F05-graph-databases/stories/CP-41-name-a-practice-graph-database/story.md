@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, builder]
-boards: [settings.databases]
+boards: [settings.databases, flow.make_practice]
 ---
 
 # CP-41 · Name a practice graph database
@@ -47,10 +47,18 @@ flowchart TD
 | CP-41.5 | An Operator | they reach *Make practice* | it reads *Ask an Admin*, naming the Admins |
 | CP-41.6 | A practice graph database | the model and answers over Graph Data are read | it is never part of them |
 | CP-41.7 | A practice graph database | an Admin unnames it | it is an ordinary graph database again, off until an Admin turns it on |
+| CP-41.8 | An Admin | they press *Make practice* and pick the graph database it stands in for | only graph databases of the same connector are offered; saving reads *Practice for {name}* on its details and in the list |
+| CP-41.9 | An Admin | they press *Unname practice* | a confirm says it becomes an ordinary graph database, off; confirming shows it off in the list |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Practice | Admin | settings.databases · Detail · Make practice | — | settings.databases · Detail · Loading | settings.databases · Practice | settings.databases · Detail · Cannot be practice | — | — |
-| Practice | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Practice · Read only | — | — | settings.databases · Detail · Read only |
+| Make practice | Admin | settings.databases · Detail · Make practice | — | settings.databases · Detail · Loading | settings.databases · Detail · Make practice · Pick | settings.databases · Detail · Cannot be practice | — | — |
+| Make practice | Operator | — | — | settings.databases · Detail · Loading | — | — | — | settings.databases · Detail · Read only |
+| Practice | Admin | — | — | — | settings.databases · Detail · Practice | — | — | — |
+| Practice | Operator | — | — | — | settings.databases · Practice · Read only | — | — | settings.databases · Detail · Read only |
+| Unname practice | Admin | — | — | — | settings.databases · Detail · Unname practice | — | — | — |
+| Unname practice | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |
+| Unnamed | Admin | — | — | — | settings.databases · New and off | — | — | — |
+| Unnamed | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |

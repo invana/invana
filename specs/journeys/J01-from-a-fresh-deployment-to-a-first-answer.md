@@ -2,7 +2,7 @@
 id: J01
 title: From a fresh deployment to a first answer
 personas: [admin, modeller]
-stories: [AC-01, CP-22, CP-25, CP-17, CP-26, SE-04, SE-06, SE-15, CP-39, CP-38, CP-24, SE-05, RC-08, RC-09, CP-01, AG-35, EX-01, EX-02, EX-04]
+stories: [AC-01, CP-22, CP-25, CP-79, CP-26, SE-04, SE-06, SE-15, CP-39, CP-38, CP-24, SE-05, RC-08, RC-09, CP-01, AG-35, EX-01, EX-02, EX-04]
 boards: [access.signin, start.home, settings.databases, model.models, data.loads, settings.ai, explore.board]
 ---
 
@@ -19,7 +19,7 @@ flowchart TD
   B --> C["CP-22 · Home, first run: what are you trying to decide?"]
   C -->|Try it on demo data| SG(["Explore the demo graph database"])
   C -->|Connect a graph database| D{"Is its connector installed?"}
-  D -->|no| D1["CP-17 · Not offered · names the package to install"] --> D
+  D -->|no| D1["CP-79 · Not offered · names the package to install"] --> D
   D -->|yes| E["CP-25 · CP-26 · Connect a graph database · name · test · what is there"]
   E -->|the test fails| E1["The database's own words"] --> E
   E -->|it holds records| H["SE-04 · The agent drafts the model from the database's schema, never its records"]
@@ -52,7 +52,7 @@ flowchart TD
 | 0 | The deployment is readied and Priya's Admin account made | Access Plane · Directory | [J07](J07-ready-a-deployment.md) | — |
 | 1 | Sign in | Access Plane · Sign in, account and sessions | AC-01 | `access.signin` |
 | 2 | Say what she is deciding; pick *Connect a graph database* | Control Plane · Graph databases — Home, first run | CP-22 | `start.home` |
-| 3 | Name and connect the graph database — offered only if its connector is installed; the test says what is there | Control Plane · Graph databases | CP-25 · CP-26 · CP-17 | `settings.databases · Connect` |
+| 3 | Name and connect the graph database — offered only if its connector is installed; the test says what is there | Control Plane · Graph databases | CP-25 · CP-26 · CP-79 | `settings.databases · Connect` |
 | 4 | The agent drafts the model; Priya accepts or changes it | Ontology · Start a model | SE-04 · SE-06 · SE-15 | `settings.databases · Connect · Shape` |
 | 5 | Connect it — saved read-only and off — and turn it on | Control Plane · Graph databases | CP-25 · CP-39 | `settings.databases · Connect · Ready` · `settings.databases` |
 | 6 | See what is left before the first answer | Control Plane · Graph databases › Set-up | CP-24 | `start.home · Set-up` |
@@ -68,7 +68,7 @@ flowchart TD
 | It needs permission | Priya is an Admin: every set-up act is hers. An Operator reaching set-up reads it, each step naming the permission it needs | CP-24 | `start.home · Set-up` |
 | It fails | A failed test names the database's own error; records that do not fit are rejected, each named | CP-26 · RC-09 | `settings.databases · Connect` · `data.loads · Upload` |
 | The person has no access | Without an account, the sign-in card reads *Ask your admin for an account* | AC-01 | `access.signin` |
-| Her database's connector is not installed | It is not offered; the step names the package that adds it, installed on the engine's machine | CP-17 | `settings.databases · Connect` |
+| Her database's connector is not installed | It is not offered; the step names the package that adds it, installed on the engine's machine | CP-79 | `settings.databases · Connect` |
 | The database is empty | Drafting is offered disabled with its reason; a description, a starter or an ontology starts the model | CP-26 · SE-06 · SE-15 | `settings.databases · Connect · Shape` |
 | The graph database is read-only | Loading files is refused, naming the mode; an Admin signs in again and sets it read + write, recorded in History | RC-08 · CP-38 | `data.loads · Upload` · `access.signin · Sign in again` |
 | No AI model is offered | Asking is disabled with its reason; an Admin adds one, marked local or external | CP-01 | `settings.ai` |

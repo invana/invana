@@ -3,8 +3,9 @@ id: PJ-02
 title: Start a project of its type
 feature: PJ-F01
 status: idea
+milestone: MVP
 personas: [decision-maker, researcher, investigator, builder]
-boards: [projects.projects, projects.new, shell.switcher, start.home]
+boards: [projects.projects, projects.new, shell.switcher, start.home, projects.settings]
 ---
 
 # PJ-02 · Start a project of its type
@@ -104,10 +105,10 @@ flowchart TD
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New project · 1 Start | Admin | projects.new · Start | — | projects.new · Loading types | projects.new · Start · Type picked | projects.new · Start · Type needs a connector | — | — |
-| New project · 1 Start | Operator | projects.new · Start | — | projects.new · Loading types | projects.new · Start · Type picked | projects.new · Start · Type needs a connector | — | — |
-| New project · 1 Start · from a project | Admin | — | projects.new · Start · No project to start from | projects.new · Loading types | projects.new · Start · From a project | — | — | — |
-| New project · 1 Start · from a project | Operator | — | projects.new · Start · No project to start from | projects.new · Loading types | projects.new · Start · From a project | — | — | — |
+| New project · 1 Start | Admin | projects.new · Start | — | projects.new · Start · Loading types | projects.new · Start · Type picked | projects.new · Start · Type needs a connector | — | — |
+| New project · 1 Start | Operator | projects.new · Start | — | projects.new · Start · Loading types | projects.new · Start · Type picked | projects.new · Start · Type needs a connector | — | — |
+| New project · 1 Start · from a project | Admin | — | projects.new · Start · No project to start from | projects.new · Start · Loading types | projects.new · Start · From a project | — | — | — |
+| New project · 1 Start · from a project | Operator | — | projects.new · Start · No project to start from | projects.new · Start · Loading types | projects.new · Start · From a project | — | — | — |
 | New project · 2 About | Admin | projects.new · About | — | projects.new · About · Drafting | projects.new · About · Filled | projects.new · About · Slug taken | projects.new · About · Drafting | — |
 | New project · 2 About | Operator | projects.new · About | — | projects.new · About · Drafting | projects.new · About · Filled | projects.new · About · Slug taken | projects.new · About · Drafting | — |
 | New project · 3 Data | Admin | projects.new · Data · General | — | projects.new · Data · Loading | projects.new · Data | projects.new · Data · Could not load | — | — |
@@ -120,5 +121,17 @@ flowchart TD
 | *New project*, refused — Create on Projects | Operator | — | — | — | — | — | — | shell.switcher · Act disabled |
 | *New project* on Home, refused — Create on Projects | Admin | — | — | — | — | — | — | — |
 | *New project* on Home, refused — Create on Projects | Operator | — | — | — | — | — | — | start.home · Act disabled |
-| A new project's page | Admin | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | — |
-| A new project's page | Operator | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | — | projects.projects · Detail · Withheld |
+| A new project's page | Admin | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.settings · General | projects.projects · Detail · Could not load | — | — |
+| A new project's page | Operator | projects.projects · Detail · Just created | — | projects.projects · Detail · Loading | projects.settings · General | projects.projects · Detail · Could not load | — | projects.projects · Detail · Withheld |
+| New project · 3 Data · test a graph database | Admin | projects.new · Data · Test | — | projects.new · Data · Testing | projects.new · Data · Connected · holds data | projects.new · Data · Could not connect | — | — |
+| New project · 3 Data · test a graph database | Operator | projects.new · Data · Test | — | projects.new · Data · Testing | projects.new · Data · Connected · holds data | projects.new · Data · Could not connect | — | — |
+| New project · 3 Data · test an empty graph database | Admin | projects.new · Data · Test | — | projects.new · Data · Testing | projects.new · Data · Connected · empty | projects.new · Data · Could not connect | — | — |
+| New project · 3 Data · test an empty graph database | Operator | projects.new · Data · Test | — | projects.new · Data · Testing | projects.new · Data · Connected · empty | projects.new · Data · Could not connect | — | — |
+| New project · 4 Team · Add | Admin | projects.new · Team · Add | — | projects.new · Team · Loading people and agents | projects.new · Team · Added | projects.new · Team · Agent may not work here | — | — |
+| New project · 4 Team · Add | Operator | projects.new · Team · Add | — | projects.new · Team · Loading people and agents | projects.new · Team · Added | projects.new · Team · Agent may not work here | — | projects.new · Team · Will ask |
+| New project · 4 Team · New policy | Admin | projects.new · Team · New policy | — | — | projects.new · Team | — | — | — |
+| New project · 4 Team · New policy | Operator | projects.new · Team · New policy | — | — | projects.new · Team | — | — | — |
+| New project · Create | Admin | projects.new · Review | — | projects.new · Creating | projects.projects · Detail · Just created | projects.new · Review · Refused | — | — |
+| New project · Create | Operator | projects.new · Review | — | projects.new · Creating | projects.projects · Detail · Just created | projects.new · Review · Refused | — | — |
+| New project · Discard these answers | Admin | projects.new · Discard confirm | — | — | projects.new · Discarded | — | — | — |
+| New project · Discard these answers | Operator | projects.new · Discard confirm | — | — | projects.new · Discarded | — | — | — |

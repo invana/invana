@@ -4,7 +4,7 @@ title: Set the project team and its Lead agent
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.settings]
+boards: [projects.settings, flow.project_settings]
 ---
 
 # PJ-22 · Set the project team and its Lead agent
@@ -93,3 +93,5 @@ flowchart TD
 | Invite an agent | Operator | projects.settings · Team · Invite an agent | — | projects.settings · Team · Loading people and agents | projects.settings · Team · Invite an agent | projects.settings · Team · Agent may not work here | — | projects.settings · Team · Not on the team |
 | Lead agent | Admin | — | — | — | projects.settings · Team · Lead agent | projects.settings · Team · One person warning | — | — |
 | Lead agent | Operator | — | — | — | projects.settings · Team · Lead agent | projects.settings · Team · One person warning | — | projects.settings · Team · Not on the team |
+| Team · not on the team | Admin | — | — | — | — | — | — | — |
+| Team · not on the team | Operator | — | — | — | — | — | — | projects.settings · Team · Not on the team |

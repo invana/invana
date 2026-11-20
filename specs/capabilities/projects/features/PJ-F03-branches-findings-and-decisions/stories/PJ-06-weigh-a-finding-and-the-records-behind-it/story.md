@@ -80,3 +80,7 @@ flowchart LR
 | Add a finding | Operator | projects.branches · Finding · New | — | projects.branches · Finding · New · Adding | projects.branches · Finding · New · Filled | projects.branches · Finding · New · Add refused | — | projects.branches · Finding · Archived |
 | How it got here | Admin | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Could not load | — | — |
 | How it got here | Operator | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Could not load | — | projects.tasks · Detail · How it got here · Content withheld |
+| A finding · add it | Admin | projects.branches · Finding · New · Filled | — | projects.branches · Finding · New · Adding | projects.branches · Finding | projects.branches · Finding · New · Add refused | — | — |
+| A finding · add it | Operator | projects.branches · Finding · New · Filled | — | projects.branches · Finding · New · Adding | projects.branches · Finding | projects.branches · Finding · New · Add refused | — | — |
+| A finding · decide on it | Admin | projects.branches · Finding | — | — | projects.branches · Decide | — | — | — |
+| A finding · decide on it | Operator | projects.branches · Finding | — | — | projects.branches · Decide | — | — | — |

@@ -5,7 +5,7 @@ feature: CP-F01
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.ai]
+boards: [settings.ai, flow.add_ai_model]
 ---
 
 # CP-01 · Offer the model versions agents may pin
@@ -74,6 +74,7 @@ flowchart TD
 | CP-01.20 | An Admin | they remove an endpoint | it is refused while something pins one of its versions or one is the default — *{address} is named by {pins}*; otherwise the endpoint and its versions are removed |
 | CP-01.21 | Anyone on the command line | they run `invana llms list` or `invana llms models` | the endpoints, their model versions and local or external read as the section shows them, never a key |
 | CP-01.22 | An agent that pins no version, with no default set | a person asks a question or an agent run starts | it is refused before the run starts — *No AI model answers — ask {admins}* |
+| CP-01.23 | An endpoint saved | *Save and ping* is pressed | *Pinging* reads, then *Proven* with *Open*, which opens the endpoint on its *Locality*; a failure reads *Ping failed* with the provider's message and keeps *Back* and *Ping again* |
 
 ## Screens
 
@@ -87,3 +88,5 @@ flowchart TD
 | Add an endpoint · saved and pinged | Operator | — | — | — | — | — | — | settings.ai · Read only |
 | An endpoint | Admin | — | — | settings.ai · Pinging | settings.ai · Endpoint | settings.ai · Ping failed | — | — |
 | An endpoint | Operator | — | — | settings.ai · Loading | settings.ai · Endpoint · Read only | settings.ai · Ping failed | — | settings.ai · Read only |
+| Add an endpoint · Open | Admin | — | — | — | settings.ai · Endpoint · Locality | — | — | — |
+| Add an endpoint · Open | Operator | — | — | — | — | — | — | settings.ai · Read only |

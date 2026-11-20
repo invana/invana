@@ -92,3 +92,7 @@ sequenceDiagram
 | A recommendation | Operator | — | — | — | projects.projects · Assistant · Recommendation | — | projects.projects · Assistant · Recommendation · Triaging | projects.projects · Assistant · Recommendation · Withheld |
 | A proposal in Needs you | Admin | — | — | inbox · Loading | inbox · A proposal | inbox · Could not load | — | — |
 | A proposal in Needs you | Operator | — | — | inbox · Loading | inbox · A proposal | inbox · Could not load | — | — |
+| Proposals · open in Needs you | Admin | projects.projects · Assistant · Proposals | — | inbox · Loading | inbox · A proposal | inbox · Could not load | — | — |
+| Proposals · open in Needs you | Operator | projects.projects · Assistant · Proposals | — | inbox · Loading | inbox · A proposal | inbox · Could not load | — | — |
+| People · no assistant | Admin | projects.projects · Detail · People · No assistant | — | — | — | — | — | — |
+| People · no assistant | Operator | projects.projects · Detail · People · No assistant | — | — | — | — | — | — |

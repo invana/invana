@@ -71,7 +71,7 @@ flowchart TD
 | CP-59.18 | The list fails to load | it is opened | what could not be read, in the engine's words, and *Retry* |
 | CP-59.19 | An alert about a run the reader may not read | it is opened | it names the run number, agent and counts; the run opens with its content withheld (AC-31.2) |
 | CP-59.20 | An ask from a person decided by someone who put the asker on a team or granted them the agent in the last 30 days | the decision is recorded | the ask goes, and an alert *recently added decider* opens naming the ask, the asker and the decider, sent to the Admins |
-| CP-59.21 | An enabled History alert (CP-60.8) | a new History row matches it, or its count within its window is reached | an alert *History match* opens naming the History alert and the act, sent to the users and the people on the teams it names, then the Admins; a further match counts on the open alert |
+| CP-59.21 | An enabled History alert (CP-37.21) | a new History row matches it, or its count within its window is reached | an alert *History match* opens naming the History alert and the act, sent to the users and the people on the teams it names, then the Admins; a further match counts on the open alert |
 | CP-59.22 | An agent with no named approver who is still active | one of its kinds fires | the alert is sent to the Admins alone |
 | CP-59.23 | An alert *recently added decider*, *History match* or *data from a schema-only workflow* | no act settles it | it stays open until an Admin closes it with a note |
 

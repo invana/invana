@@ -81,3 +81,7 @@ flowchart TD
 | Runs of a workflow | Operator | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |
 | A run's ask | Admin | — | — | inbox · Loading | inbox · Asks first | — | inbox · Asks first | — |
 | A run's ask | Operator | — | — | inbox · Loading | inbox · Asks first | — | inbox · Asks first | inbox · Not yours to answer |
+| Run a workflow · Run | Admin | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.runs · Detail · Started by name | agents.skills · Workflow · Run, refused | — | — |
+| Run a workflow · Run | Operator | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.runs · Detail · Started by name | agents.skills · Workflow · Run, refused | — | — |
+| A run · asks first | Admin | agents.runs · Detail · Started by name | — | — | inbox · Asks first | — | — | — |
+| A run · asks first | Operator | agents.runs · Detail · Started by name | — | — | inbox · Asks first | — | — | — |

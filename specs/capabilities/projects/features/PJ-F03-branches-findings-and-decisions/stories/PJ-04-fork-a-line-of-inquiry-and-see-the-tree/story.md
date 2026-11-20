@@ -74,3 +74,5 @@ flowchart LR
 | The tree on the map | Operator | projects.graph · Just the question | — | projects.graph · Loading | projects.graph · Branch tree | projects.graph · Could not load | projects.graph · Fork proposed | projects.projects · Detail · Not found |
 | Fork | Admin | — | — | — | projects.branches · Fork | projects.branches · Fork refused | — | — |
 | Fork | Operator | — | — | — | projects.branches · Fork | projects.branches · Fork refused | — | projects.branches · Archived |
+| Fork · make the branch | Admin | projects.branches · Fork | — | projects.branches · Forking | projects.branches · A branch | projects.branches · Fork refused | — | — |
+| Fork · make the branch | Operator | projects.branches · Fork | — | projects.branches · Forking | projects.branches · A branch | projects.branches · Fork refused | — | — |

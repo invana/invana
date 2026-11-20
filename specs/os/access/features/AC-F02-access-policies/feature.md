@@ -6,7 +6,7 @@ status: idea
 personas: [admin, modeller, builder, analyst]
 stories: [AC-03, AC-04, AC-49, AC-37, AC-06, AC-11, AC-08, AC-20, AC-27, AC-07]
 journeys: [J05, J06, J07, J09]
-boards: [settings.policies, settings.agent_access, agents.runs, explore.board, settings.people, model.models, agents.agents]
+boards: [settings.policies, settings.agent_access, agents.runs, explore.board, settings.people, model.models, agents.agents, access.signin, flow.write_policy]
 nfrs: [NFR-SEC-1, NFR-SEC-4, NFR-SEC-8, NFR-SEC-5, NFR-SEC-11]
 depends_on: [AC-F01, AC-F03, AC-F05, AC-F06, AG-F01, AG-F04, SE-F03]
 ---

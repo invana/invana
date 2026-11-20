@@ -2,7 +2,7 @@
 id: J02
 title: Ask and trust the answer
 personas: [analyst]
-stories: [EX-01, EX-23, EX-02, EX-03, EX-25, EX-04, RC-05, RC-06, EX-26, EX-05, EX-06, EX-24, EX-15, EX-12, AG-50]
+stories: [EX-01, EX-23, EX-02, EX-07, EX-03, EX-25, EX-04, RC-01, RC-05, RC-06, EX-26, EX-05, EX-06, EX-24, EX-15, EX-12, EX-10, AG-50]
 boards: [explore.board, data.records]
 ---
 
@@ -18,12 +18,12 @@ flowchart TD
   A([Explore]) --> C["EX-01 · Ask in plain words, through the Assistant"]
   C --> D{"Is the question clear?"}
   D -->|no| E["EX-23 · Asked back: orders or order lines? · a recommendation"] --> C
-  D -->|yes| F["EX-02 · A typed plan runs one step per graph database · the answer arrives on the board"]
+  D -->|yes| F["EX-02 · EX-07 · A typed plan runs one step per graph database · the answer arrives on a board"]
   F --> G["EX-03 · EX-25 · In the shape that fits, and in words"]
   G --> H["EX-04 · Why? · How it got here: words, plan, query per graph database, records, load"]
   H --> I{"Tom decides"}
   I -->|an assumption is wrong| J["EX-24 · Challenge it · ask with an approach"] --> F
-  I -->|a cited record looks wrong| R["RC-05 · RC-06 · Open the record: what wrote it, every change to it"]
+  I -->|a cited record looks wrong| R["RC-01 · RC-05 · RC-06 · Open the record: what wrote it, every change to it"]
   R -->|a run he may not read| R1["Named, not opened"] --> I
   R --> I
   I -->|it holds| K{"What next"}
@@ -33,10 +33,10 @@ flowchart TD
   F -->|Graph Data does not hold it| N["EX-05 · Says what is missing and who can add it"]
   F -->|a typed plan cannot express it| NP["EX-05 · Says so · offers a function, never a raw query"]
   F -->|refused or failed| O["EX-06 · Says why, names who can help, the act that asks them"]
-  N --> P(["Ask a Modeller · or ask again"])
+  N --> P(["Ask again"])
   NP --> P
   O --> P
-  L --> Q(["AG-50 · The next run builds on this one, cited"])
+  L --> Q(["EX-10 · AG-50 · Reopen the conversation · the next run builds on this one, cited"])
 ```
 
 ## Steps
@@ -45,12 +45,12 @@ flowchart TD
 |---|---|---|---|---|
 | 1 | Ask in plain words | Evidence · Ask a question | EX-01 | `explore.board · Ask` |
 | 2 | Answer a question asked back, when his was unclear | Evidence · Ask a question | EX-23 | `explore.board` |
-| 3 | Watch the answer arrive on the board | Evidence · The answer | EX-02 | `explore.board` |
+| 3 | Watch the answer arrive on the board | Evidence · The answer | EX-02 · EX-07 | `explore.board` |
 | 4 | Read it in the shape that fits, and in words | Evidence · The answer | EX-03 · EX-25 | `explore.board · Chart` |
 | 5 | Open *Why?* on a citation | Evidence · The answer | EX-04 | `explore.board · Why` |
-| 5a | When a cited record looks wrong: open it — what wrote it, and every change to it | Intelligence · Records by kind · Provenance | RC-05 · RC-06 | `data.records · Detail` |
+| 5a | When a cited record looks wrong: open it — what wrote it, and every change to it | Intelligence · Records by kind · Provenance | RC-01 · RC-05 · RC-06 | `data.records · Detail` |
 | 6 | Share it, or add it to a project | Evidence · Board · Share · Projects | EX-15 · EX-12 | `explore.board · Share` |
-| 7 | Ask again later; the run recalls the last, cited | Agents · Learn from memory | AG-50 | `explore.board` |
+| 7 | Ask again later in the same conversation; the run recalls the last, cited | Explore · Conversations · Agents · Learn from memory | EX-10 · AG-50 | `explore.board` |
 
 ## Branches
 

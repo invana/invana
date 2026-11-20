@@ -5,7 +5,7 @@ feature: AC-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.policies]
+boards: [settings.policies, access.signin, flow.write_policy]
 ---
 
 # AC-06 · Draft a policy and see who it changes
@@ -57,6 +57,8 @@ flowchart TD
 | AC-06.14 | A person with Read on `access/policies` but not Edit on Access | they open a draft or the section | the draft reads; *Save* is disabled, naming Edit on Access and who can grant it; without Read it reads *No access* |
 | AC-06.15 | *Who it changes* | it is read | it is a per-agent table — the agent, what it gains or loses, the resource, its uses in the last 30 days — and, below it, each skill or workflow that would be refused, with its version and the need it loses, each with *Add {need} to this policy, then save*; an agent that loses nothing is not listed, and a change that loses nobody reads *Nobody loses access* |
 | AC-06.16 | A loss the table names | the Admin presses *Add {need} to this policy, then save* | the need is added to the draft, *Who it changes* is worked out again and the row leaves the table when nothing is lost; nothing is saved until *Save* |
+| AC-06.17 | *Who it changes* | it is read on *Review* | an agent that loses access reads under *What would break · Per agent*; nobody losing reads *Nobody loses*; *Save anyway* asks to sign in again for *Save the policy* (AC-04.20) |
+| AC-06.18 | A draft | the Admin presses *Discard* | a confirm names the draft; confirming leaves the list reading *Discarded* with nothing changed |
 
 ## Screens
 
@@ -64,7 +66,13 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A draft policy | Admin | settings.policies · New | — | settings.policies · Loading | settings.policies · Draft | settings.policies · Rule refused | — | — |
 | A draft policy | Operator | — | — | — | — | — | — | settings.policies · No access |
-| Who it changes | Admin | — | — | settings.policies · Working out who it changes | settings.policies · Nobody loses | settings.policies · What would break · Per agent | — | — |
-| Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |
-| New policy · 4 Who it changes | Admin | — | — | settings.policies · New · Working out who it changes | settings.policies · New · Nobody loses | settings.policies · New · What would break | — | — |
+| Review · Who it changes | Admin | — | — | settings.policies · Working out who it changes | settings.policies · Review · Nobody loses | settings.policies · Review · What would break · Per agent | — | — |
+| Review · Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |
+| New policy · 4 Who it changes | Admin | — | — | settings.policies · New · Working out who it changes | settings.policies · New · Nobody loses | settings.policies · New · What would break · Per agent | — | — |
 | New policy · 4 Who it changes | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Save anyway | Admin | — | — | — | access.signin · Sign in again · Save the policy | access.signin · Sign in again · Save the policy · Wrong password | — | — |
+| Save anyway | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Discard a draft | Admin | — | — | — | settings.policies · Discard | — | — | — |
+| Discard a draft | Operator | — | — | — | — | — | — | settings.policies · No access |
+| Discarded | Admin | — | — | — | settings.policies · Discarded | — | — | — |
+| Discarded | Operator | — | — | — | — | — | — | settings.policies · No access |

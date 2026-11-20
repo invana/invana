@@ -4,7 +4,7 @@ title: See who is acting and what was blocked, from the header
 feature: AC-F06
 status: idea
 personas: [admin]
-boards: [shell.access, settings.access_now, shell.avatar.access]
+boards: [shell.access, settings.history, settings.agent_access, shell.avatar.access, access.signin]
 ---
 
 # AC-48 · See who is acting and what was blocked, from the header
@@ -77,6 +77,7 @@ flowchart TD
 | AC-48.25 | A client, key, agent or rule name, or what an act touched | a timeline row or Access › Now is read | it reads as text on one line, cut short where it overflows; a self-registered client reads *Unverified* with the host it returns to |
 | AC-48.26 | An Admin | they open the dropdown or Access › Now | History records that they read the access summary — once per Admin per hour |
 | AC-48.27 | The access summary or Access › Now's read | it is called with a `tz` that is not an IANA zone | it is refused — *tz: {value} is not a time zone.* |
+| AC-48.28 | An Admin | they press *Revoke* on a delegation in *Delegations* of an agent in Agent access and sign in again | *Sign in again* names *Revoke a delegation* and returns to *Revoked*; a wrong password returns to the same *Sign in again* |
 
 ## Screens
 
@@ -84,9 +85,15 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | The Access dropdown | Admin | shell.access · Nobody touched anything | — | shell.access · Loading | shell.access | shell.access · Could not load | shell.access · Blocked in the timeline | — |
 | The Access dropdown | Operator | — | — | — | — | — | — | shell.access · No button |
-| Access › Now | Admin | settings.access_now · Nobody blocked today | — | settings.access_now · Loading | settings.access_now | settings.access_now · Could not load | settings.access_now · Agents acting | — |
-| Access › Now | Operator | — | — | — | — | — | — | settings.access_now · Locked |
-| Revoke a delegation | Admin | — | — | — | settings.access_now · Revoke | settings.access_now · Password refused | — | — |
-| Revoke a delegation | Operator | — | — | — | — | — | — | — |
+| Acting now | Admin | shell.access · Nobody acting now | — | shell.access · Loading | shell.access · Agents acting | shell.access · Could not load | — | — |
+| Acting now | Operator | — | — | — | — | — | — | shell.access · No button |
+| Blocked today | Admin | settings.history · Refused · Today · Nobody blocked today | — | settings.history · Loading | settings.history · Refused · Today | settings.history · Could not load | — | — |
+| Blocked today | Operator | — | — | — | — | — | — | settings.history · Counted, not shown |
+| Revoke a delegation | Admin | — | — | — | settings.agent_access · Detail · Delegations · Revoke | — | — | — |
+| Revoke a delegation | Operator | — | — | — | — | — | — | settings.agent_access · Locked · Agents |
+| Revoke a delegation · Sign in again | Admin | — | — | — | access.signin · Sign in again · Revoke a delegation | access.signin · Sign in again · Revoke a delegation · Wrong password | — | — |
+| Revoke a delegation · Sign in again | Operator | — | — | — | — | — | — | settings.agent_access · Locked · Agents |
+| Revoke a delegation · Revoked | Admin | — | — | — | settings.agent_access · Detail · Delegations · Revoked | — | — | — |
+| Revoke a delegation · Revoked | Operator | — | — | — | — | — | — | settings.agent_access · Locked · Agents |
 | Your access | Admin | shell.avatar.access · Nothing acts for you | — | shell.avatar.access · Loading | shell.avatar.access | shell.avatar.access · Could not load | — | — |
 | Your access | Operator | shell.avatar.access · Nothing acts for you | — | shell.avatar.access · Loading | shell.avatar.access | shell.avatar.access · Could not load | — | — |

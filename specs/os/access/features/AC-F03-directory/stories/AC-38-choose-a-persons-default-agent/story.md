@@ -4,7 +4,7 @@ title: Choose a person's default agent
 feature: AC-F03
 status: idea
 personas: [admin, analyst]
-boards: [settings.people, settings.me]
+boards: [settings.people, settings.me, access.signin, flow.grant_agent]
 ---
 
 # AC-38 · Choose a person's default agent
@@ -48,6 +48,7 @@ flowchart TD
 | AC-38.6 | A read on any Studio screen | the default agent's rules refuse it | it is refused, naming the rule and its policy (AC-07), never shown and hidden |
 | AC-38.7 | A person without Manage on Access | they open a person's page | the default agent reads; *Change default agent* is disabled, naming Manage on Access and who can grant it; the API refuses the write |
 | AC-38.8 | A change of default agent with a key | it is sent | it is refused — it needs a person's session |
+| AC-38.9 | An Admin | they change a person's default agent and sign in again | *Sign in again* names *Change default agent* and returns to the person's *Default agent* reading the new one; a wrong password returns to the same *Sign in again* |
 
 ## Screens
 
@@ -57,3 +58,7 @@ flowchart TD
 | A person — default agent | Operator | settings.people · Locked · Default is the Assistant | — | settings.people · Locked · Loading | settings.people · Locked · Default agent | settings.people · Locked · Could not load | — | settings.people · Locked · Default agent |
 | You — my default agent | Admin | settings.me · Default is the Assistant | — | settings.me · Loading | settings.me · Default agent | settings.me · Could not load | — | — |
 | You — my default agent | Operator | settings.me · Default is the Assistant | — | settings.me · Loading | settings.me · Default agent | settings.me · Could not load | — | — |
+| Change default agent · Sign in again | Admin | — | — | — | access.signin · Sign in again · Change default agent | access.signin · Sign in again · Change default agent · Wrong password | — | — |
+| Change default agent · Sign in again | Operator | — | — | — | — | — | — | settings.people · Locked · Default agent |
+| Change default agent · Changed | Admin | — | — | — | settings.people · Default agent | settings.people · Not granted | — | — |
+| Change default agent · Changed | Operator | — | — | — | — | — | — | settings.people · Locked · Default agent |

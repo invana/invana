@@ -72,3 +72,5 @@ flowchart LR
 | Import a model file | Operator | — | — | — | — | — | — | model.models · New · No access |
 | The imported draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft · Restored | model.models · Draft · Cannot publish | — | — |
 | The imported draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
+| Import · restore a model file | Admin | model.models · Restore · Preview | — | model.models · Restore · Reading the file | model.models · Draft · Restored | model.models · Import unreadable | — | — |
+| Import · restore a model file | Operator | model.models · Restore · Preview | — | model.models · Restore · Reading the file | model.models · Draft · Restored | model.models · Import unreadable | — | — |

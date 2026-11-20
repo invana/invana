@@ -29,7 +29,7 @@ The permission each act needs is in [the permission catalogue](../../../../../ac
 ```mermaid
 flowchart TD
   r([A step calls an outside server]) --> w{"The agent has a work connection there?"}
-  w -->|yes| wk(["Called with the work connection (CP-62)"])
+  w -->|yes| wk(["Called with the work connection (CP-80)"])
   w -->|no| who{"Did a person start this run, or the run it helps?"}
   who -->|no — a schedule, a pick-up, a project key| rf(["Refused before the call · someone with Edit on the agent attaches a work connection"])
   who -->|yes| pc{"That person has a personal connection there?"}

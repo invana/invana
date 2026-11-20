@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, modeller]
-boards: [settings.databases]
+boards: [settings.databases, flow.connect_graph_database]
 ---
 
 # CP-26 · Connect a graph database that already holds data
@@ -54,12 +54,17 @@ flowchart TD
 | CP-26.8 | The draft accepted | the Admin connects | the draft is kept unpublished, and set-up's next step is to review and publish it in Model |
 | CP-26.9 | A database that holds records of a published kind | it is turned on | set-up counts the records step done |
 | CP-26.10 | The password | it is saved | it is sealed and never read back |
+| CP-26.11 | *Connect* | the Admin presses *Back* | the type picked reads again with every typed value kept |
+| CP-26.12 | A test that fails or cannot reach the database | it returns | *Test failed* or *Unreachable* names the database's own error and what to check, with *Back* and *Try again* |
+| CP-26.13 | A test that passes on an empty database | it returns | *Connected · Empty* reads that nothing is there yet and *Continue* opens *Shape* with *The database holds nothing yet* |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| 2 · Connect | Admin | settings.databases · Connect · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Test failed | — | — |
-| 2 · Connect | Operator | — | — | — | — | — | — | — |
+| 2 · Connect | Admin | settings.databases · Connect · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Test failed · Unreachable | — | — |
+| 2 · Connect | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| 2 · Connect · Empty database | Admin | — | — | — | settings.databases · Connect · Connected · Empty | — | — | — |
+| 2 · Connect · Empty database | Operator | — | — | — | — | — | — | settings.databases · Read only |
 | 3 · Shape | Admin | settings.databases · Connect · Shape · Nothing there yet | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape | settings.databases · Connect · Shape · Unreachable | settings.databases · Connect · Shape · Drafting | — |
-| 3 · Shape | Operator | — | — | — | — | — | — | — |
+| 3 · Shape | Operator | — | — | — | — | — | — | settings.databases · Read only |

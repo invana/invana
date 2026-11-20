@@ -48,6 +48,7 @@ flowchart LR
 | CP-56.7 | A failed run that applied no skill | the step opens | *Improve this skill* is absent |
 | CP-56.8 | A proposed change to a skill from a failed run | it is shown | it names the change it recommends and why, beside the alternatives it weighed |
 | CP-56.9 | A failed run whose content the reader may not read | they open it | its steps read *withheld*; neither *Improve this skill* nor *Request a change* is offered |
+| CP-56.10 | A failed step | the reader presses *Adopt it into a skill* or *Request a change* | *Adopt* opens the skill's draft from the run (*Adopting*, then *From a run*, or *Test failed* naming why); *Request a change* sends the request to *Needs you* for those who may change the skill |
 
 ## Screens
 
@@ -59,3 +60,9 @@ flowchart LR
 | The skill's draft, the run as a test | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Read only | agents.skills · Detail · Test failed | — | agents.skills · Detail · Read only |
 | The request in Needs you | Admin | — | — | inbox · Loading | inbox · Request a change | — | — | — |
 | The request in Needs you | Operator | — | — | inbox · Loading | inbox · Request sent | — | — | inbox · Request sent |
+| Adopt it into a skill | Admin | — | — | agents.skills · Detail · Adopting | agents.skills · Detail · From a run | agents.skills · Detail · Test failed | — | — |
+| Adopt it into a skill | Operator | — | — | — | — | — | — | agents.skills · Detail · Read only |
+| Request a change | Admin | — | — | — | agents.runs · Detail · Request a change | — | — | — |
+| Request a change | Operator | — | — | — | inbox · Request sent | — | — | inbox · Request sent |
+| Request a change · In Needs you | Admin | — | — | — | inbox · Request a change | — | — | — |
+| Request a change · In Needs you | Operator | — | — | — | — | — | — | inbox · Request sent |

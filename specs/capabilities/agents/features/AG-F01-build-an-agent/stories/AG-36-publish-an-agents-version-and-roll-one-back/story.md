@@ -68,3 +68,7 @@ flowchart LR
 | Versions | Operator | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | agents.agents · Detail · Versions |
 | Agents — a draft in the list | Admin | — | agents.agents · No agents match | agents.agents · Loading | agents.agents · Draft | — | — | — |
 | Agents — a draft in the list | Operator | — | agents.agents · No agents match | agents.agents · Loading | agents.agents · Draft | — | — | agents.agents · Draft |
+| Publish a version | Admin | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Evals running | agents.agents · Detail · Published | agents.agents · Detail · Publish refused | — | — |
+| Publish a version | Operator | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Evals running | agents.agents · Detail · Published | agents.agents · Detail · Publish refused | — | — |
+| Roll back a version | Admin | agents.agents · Detail · Versions | — | agents.agents · Detail · Rolling back | agents.agents · Detail · Rolled back | agents.agents · Detail · Roll back refused | — | — |
+| Roll back a version | Operator | agents.agents · Detail · Versions | — | agents.agents · Detail · Rolling back | agents.agents · Detail · Rolled back | agents.agents · Detail · Roll back refused | — | agents.agents · Detail · Locked |

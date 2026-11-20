@@ -4,7 +4,7 @@ title: Tune when ops alerts fire
 feature: CP-F11
 status: idea
 personas: [admin]
-boards: [settings.alerts]
+boards: [settings.alerts, flow.tune_alert]
 ---
 
 # CP-60 · Tune when ops alerts fire
@@ -51,22 +51,15 @@ flowchart TD
 | CP-60.5 | A threshold change | it is saved | History holds a row naming the kind, the old and new values and who |
 | CP-60.6 | A fresh deployment | Thresholds is read | each kind reads its default: refusals 5 in 10 minutes · over a limit at 100% · stuck after 15 minutes · unreachable and skipped at once |
 | CP-60.7 | The read fails | Thresholds is opened | what could not be read, in the engine's words, and *Retry* |
-| CP-60.8 | An Admin | they write a History alert: what was done, what it touched, allowed or refused and why, optionally a count in a window, and which users or teams to tell | it saves, on; when a new History row matches, a *History match* alert opens (CP-59.21), and the list shows when it last fired |
-| CP-60.9 | A new History alert | rows matching it were written before it existed | it does not fire for them; *Last fired* reads *never* until a new row matches |
-| CP-60.10 | A History alert with nothing to match or no user or team to tell | it is saved | *{field}: {why}*; nothing is saved |
-| CP-60.11 | An Operator | they read History alerts | each reads; *New History alert*, its switch and *Edit* are disabled — *Needs Edit on Deployment settings — ask {who can grant}*; the route answers 403 with the same sentence |
-| CP-60.12 | A History alert written, changed, switched or removed | it is saved | History holds a row naming it and who |
-| CP-60.13 | No History alert yet | History alerts are read | *No History alerts yet*, with *New History alert* for an Admin |
+| CP-37.21 | An Admin | they press *Edit* on a threshold and save | *Saving* reads, then *Saved* shows the new value; a value outside its range reads *Out of range* naming the field, with the typed value kept |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Thresholds | Admin | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Out of range | — | — |
-| Thresholds | Operator | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Could not load | — | settings.alerts · Settings · Edit disabled |
-| History alerts | Admin | settings.alerts · Settings · No History alerts | — | settings.alerts · Settings · Loading | settings.alerts · Settings · History alerts | settings.alerts · Settings · Could not load | — | — |
-| History alerts | Operator | settings.alerts · Settings · No History alerts | — | settings.alerts · Settings · Loading | settings.alerts · Settings · History alerts · Read only | settings.alerts · Settings · Could not load | — | settings.alerts · Settings · History alerts · Read only |
-| New History alert | Admin | settings.alerts · Settings · New | — | — | settings.alerts · Settings · New · Filled | settings.alerts · Settings · New · Refused | — | — |
-| New History alert | Operator | — | — | — | — | — | — | settings.alerts · Settings · History alerts · Read only |
-| A History alert — edit | Admin | — | — | — | settings.alerts · Settings · History alert | settings.alerts · Settings · History alert refused | — | — |
-| A History alert — edit | Operator | — | — | — | — | — | — | settings.alerts · Settings · History alerts · Read only |
+| Thresholds | Operator | settings.alerts · Settings · Defaults | — | settings.alerts · Settings · Loading | settings.alerts · Settings | settings.alerts · Settings · Could not load | — | settings.alerts · Settings · Read only |
+| Thresholds · Edit | Admin | — | — | settings.alerts · Settings · Saving | settings.alerts · Settings · Edit | settings.alerts · Settings · Out of range | — | — |
+| Thresholds · Edit | Operator | — | — | — | — | — | — | settings.alerts · Settings · Read only |
+| Thresholds · Saved | Admin | — | — | — | settings.alerts · Settings · Saved | — | — | — |
+| Thresholds · Saved | Operator | — | — | — | — | — | — | settings.alerts · Settings · Read only |

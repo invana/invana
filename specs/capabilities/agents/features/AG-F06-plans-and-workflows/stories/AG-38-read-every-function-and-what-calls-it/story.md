@@ -73,7 +73,9 @@ flowchart TD
 | Functions | Operator | agents.skills · Functions, not used yet | agents.skills · No functions match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | A function | Admin | agents.skills · A function, not used yet | — | agents.skills · Loading | agents.skills · A function | agents.skills · No such function | — | — |
 | A function | Operator | agents.skills · A function, not used yet | — | agents.skills · Loading | agents.skills · A function | agents.skills · No such function | — | — |
-| A function's calls | Admin | agents.skills · A function's calls, none | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | — |
-| A function's calls | Operator | agents.skills · A function's calls, none | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | agents.skills · A function's calls, content withheld |
+| A function's calls | Admin | agents.skills · A function's calls · None | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | — |
+| A function's calls | Operator | agents.skills · A function's calls · None | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | agents.skills · A function's calls, content withheld |
 | A step's contract, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | — |
 | A step's contract, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A function's calls · content withheld | Admin | — | — | — | agents.skills · A function's calls · Content withheld | — | — | — |
+| A function's calls · content withheld | Operator | — | — | — | agents.skills · A function's calls · Content withheld | — | — | — |

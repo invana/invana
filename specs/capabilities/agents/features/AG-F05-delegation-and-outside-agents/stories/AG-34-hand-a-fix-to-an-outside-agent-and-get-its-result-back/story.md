@@ -59,7 +59,7 @@ flowchart LR
 | AG-34.13 | A run with an outside task | its page is read by someone who may read its content | *How it got here* shows the hand-off, what was sent and held back, its states and what came back |
 | AG-34.14 | Someone on an ask routed to another person | they open it | it reads, naming who it waits on; *Approve* and *Decline* are absent |
 | AG-34.15 | An outside agent on each person's own account, and a person behind the run who has not connected theirs | the agent hands it a task | it is refused, asking that person to connect their account first |
-| AG-34.16 | A task sent | anyone opens *What left the platform* | it lists the call — outbound, to that outside agent, from which run, for whom, schema-only or data-bearing, with the kinds, fields and record IDs sent |
+| AG-34.16 | A task sent | anyone opens History | it lists the call — outbound, to that outside agent, from which run, for whom, schema-only or data-bearing, with the kinds, fields and record IDs sent |
 
 ## Screens
 

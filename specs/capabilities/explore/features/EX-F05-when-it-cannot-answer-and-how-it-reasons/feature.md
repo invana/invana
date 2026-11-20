@@ -84,7 +84,7 @@ sequenceDiagram
   Note over E: check, compile and execute never see the approach
   E->>X: the plan, the tools and the simulator against the agent's Access Policies
   alt Allow
-    E->>W: search · fetch · simulate — each an outbound row in What left the platform
+    E->>W: search · fetch · simulate — each an outbound row in History
     W-->>E: content with its reference · predicted rows
   else Deny, or an Ask refused
     E-->>S: the step refused, the policy and rule named

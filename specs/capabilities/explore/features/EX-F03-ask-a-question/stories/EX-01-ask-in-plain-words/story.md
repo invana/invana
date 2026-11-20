@@ -85,3 +85,11 @@ flowchart LR
 | A plan gap | Operator | — | — | — | explore.board · Cannot · Plan gap | — | — | explore.board · Cannot · Plan gap, function not allowed |
 | Small talk | Admin | — | — | — | explore.board · Small talk | — | — | — |
 | Small talk | Operator | — | — | — | explore.board · Small talk | — | — | — |
+| A question · Ask | Admin | explore.board · Ask | — | explore.board · Working | explore.board · Answered | explore.board · Cannot · Failed | — | — |
+| A question · Ask | Operator | explore.board · Ask | — | explore.board · Working | explore.board · Answered | explore.board · Cannot · Failed | — | — |
+| A question · asked back | Admin | explore.board · Ask | — | explore.board · Working | — | — | explore.board · Asks back | — |
+| A question · asked back | Operator | explore.board · Ask | — | explore.board · Working | — | — | explore.board · Asks back | — |
+| A question · Graph Data does not hold it | Admin | explore.board · Ask | — | explore.board · Working | — | explore.board · Cannot · Nothing loaded | — | — |
+| A question · Graph Data does not hold it | Operator | explore.board · Ask | — | explore.board · Working | — | explore.board · Cannot · Nothing loaded | — | — |
+| A question · refused | Admin | explore.board · Ask | — | explore.board · Working | — | explore.board · Cannot · Refused | — | — |
+| A question · refused | Operator | explore.board · Ask | — | explore.board · Working | — | explore.board · Cannot · Refused | — | — |

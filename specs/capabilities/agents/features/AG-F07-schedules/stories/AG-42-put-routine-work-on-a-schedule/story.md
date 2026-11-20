@@ -87,3 +87,9 @@ flowchart LR
 | A delivered result and an outward ask | Operator | — | — | — | inbox · A schedule's result | inbox · A schedule's failed run | inbox · Send this schedule's result? · Waiting on the approver | — |
 | Projects › Schedules | Admin | projects.schedules · Nothing is scheduled | — | projects.schedules · Loading | projects.schedules | projects.schedules · Could not load | projects.schedules · Running | — |
 | Projects › Schedules | Operator | projects.schedules · Nothing is scheduled · Read only | — | projects.schedules · Loading | projects.schedules · Read only | projects.schedules · Could not load | projects.schedules · Running | projects.schedules · Read only |
+| New schedule · Save | Admin | agents.schedules · New · Filled | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| New schedule · Save | Operator | agents.schedules · New · Filled | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| New schedule · Allow without asking | Admin | agents.schedules · New · Confirm Allow | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| New schedule · Allow without asking | Operator | agents.schedules · New · Confirm Allow | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| A schedule · its first result | Admin | agents.schedules · A schedule | — | — | inbox · A schedule's result | inbox · A schedule's failed run | — | — |
+| A schedule · its first result | Operator | agents.schedules · A schedule | — | — | inbox · A schedule's result | inbox · A schedule's failed run | — | — |

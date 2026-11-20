@@ -5,7 +5,7 @@ feature: CP-F03
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.workers]
+boards: [settings.workers, flow.add_workers]
 ---
 
 # CP-10 · Add workers on my own machines with one command
@@ -70,27 +70,39 @@ flowchart TD
 | CP-10.16 | *Run it* on Docker | it is read | one `docker run` line carries the engine address, the join key, the group, labels and slots as `INVANA_ENGINE_URL` · `INVANA_JOIN_TOKEN` · `INVANA_POOL` · `INVANA_LABELS` · `INVANA_SLOTS`, with *Copy* and *Download .env*; the key's secret shows once, on this step |
 | CP-10.17 | *Run it* on Python | it is read | it reads the install, the one `invana worker` command with the same values and, below it, `invana worker install-service` for a service on the machine, each with *Copy* |
 | CP-10.18 | *Run it* on Kubernetes | it is read | three `kubectl` lines and a manifest with *Copy* and *Download*; Invana starts nothing — the replicas are declared by the Admin (CP-08.6) |
-| CP-10.19 | A worker group whose machine sits in a region | *Run it* is read | an optional *Region* field, a short tag from the data stores' regions ([CP-F13](../../../CP-F13-data-stores/feature.md#rules)), is part of the command as `INVANA_REGION`; untagged reads *anywhere*; the worker carries the tag it joined with, and *Joined* reads it |
+| CP-10.19 | A worker group whose machine sits in a region | *Join key* is filled and *Run it* is read | an optional *Region* field on *Join key*, a short tag from the data stores' regions ([CP-F13](../../../CP-F13-data-stores/feature.md#rules)), is part of the *Run it* command as `INVANA_REGION`; untagged reads *anywhere*; the worker carries the tag it joined with, and *Joined* reads it |
 | CP-10.20 | *Group* | it opens | it offers *Existing group* — the groups with their labels, slots, plugins, runtimes and secret names — or *New group*; choosing one shows what the worker will be held to |
 | CP-10.21 | The *Join keys* list | it is read | each key reads its group, who minted it and when, its prefix, expiry, how many joined of its cap and whether it is revoked — never its secret; an Admin's *Revoke* ends it for new workers (CP-09.8), and an Operator reads the list with *Revoke* disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |
+| CP-10.22 | A join key that expired or reached its cap | a worker tries to join with it | *Join key* reads *Expired* or *Used up*; *Back* returns to *Join key* to mint another |
+| CP-10.23 | An Admin | they press *Revoke* on a key | a confirm names the key, its group and how many workers it already joined; confirming marks the row *Revoked* and removes *Revoke*; History records who and when (AC-F06) |
+| CP-10.24 | A new group names a runtime that is not installed | the Admin presses *Install it in Plugins* | the install opens and, once done, returns to the same *Group* step |
+| CP-10.25 | *Joined* | it shows | it reads the worker and its region; *Done* closes to *All workers* with the new worker, *Add more* returns to *Where*; a failed join reads its cause and keeps *Cancel* and *Back* |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Add workers · 1 Where | Admin | settings.workers · Add workers | — | — | settings.workers · Add workers · Where picked | — | — | — |
+| Add workers · 1 Where | Admin | settings.workers · Add workers | — | — | settings.workers · Add workers · Where picked · Docker · Python · Kubernetes | — | — | — |
 | Add workers · 1 Where | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | Add workers · 2 Group | Admin | settings.workers · Add workers · New group | — | — | settings.workers · Add workers · Existing group | settings.workers · Add workers · Runtime not installed | — | — |
 | Add workers · 2 Group | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 3 Join key · 4 Run it | Admin | — | — | — | settings.workers · Add workers · Run it | settings.workers · Add workers · Key expired | — | — |
-| Add workers · 3 Join key · 4 Run it | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 4 Run it · Docker | Admin | — | — | — | settings.workers · Add workers · Run it · Docker | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 2 Group · New group filled | Admin | — | — | — | settings.workers · Add workers · New group · Filled | — | — | — |
+| Add workers · 2 Group · New group filled | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 3 Join key | Admin | settings.workers · Add workers · Join key | — | — | settings.workers · Add workers · Join key · Set | settings.workers · Add workers · Join key · Expired · Used up | — | — |
+| Add workers · 3 Join key | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Add workers · 4 Run it · Docker | Admin | — | — | — | settings.workers · Add workers · Run it · Docker | — | — | — |
 | Add workers · 4 Run it · Docker | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 4 Run it · Python | Admin | — | — | — | settings.workers · Add workers · Run it · Python | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 4 Run it · Python | Admin | — | — | — | settings.workers · Add workers · Run it · Python | — | — | — |
 | Add workers · 4 Run it · Python | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 4 Run it · Kubernetes | Admin | — | — | — | settings.workers · Add workers · Run it | settings.workers · Add workers · Key expired | — | — |
+| Add workers · 4 Run it · Kubernetes | Admin | — | — | — | settings.workers · Add workers · Run it · Kubernetes | — | — | — |
 | Add workers · 4 Run it · Kubernetes | Operator | — | — | — | — | — | — | settings.workers · Read only |
-| Add workers · 5 Joined | Admin | — | — | settings.workers · Add workers · Waiting to join | settings.workers · Add workers · Joined | settings.workers · Add workers · Join failed | — | — |
+| Add workers · 5 Joined | Admin | — | — | settings.workers · Add workers · Waiting to join | settings.workers · Add workers · Joined · Done · Add more | settings.workers · Add workers · Join failed · Engine not reached · Plugins not loaded · Runtimes not loaded · Labels outside the group · Nothing after 2 minutes | — | — |
 | Add workers · 5 Joined | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Where it lands · All workers | Admin | — | — | — | settings.workers · All workers | — | — | — |
+| Where it lands · All workers | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | Join keys | Admin | settings.workers · No join keys | — | settings.workers · Loading | settings.workers · Join keys | settings.workers · Could not load | — | — |
 | Join keys | Operator | settings.workers · No join keys | — | settings.workers · Loading | settings.workers · Join keys | settings.workers · Could not load | — | settings.workers · Read only |
+| Join keys · Revoke | Admin | — | — | — | settings.workers · Join keys · Revoke | — | — | — |
+| Join keys · Revoke | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Join keys · Revoked | Admin | — | — | — | settings.workers · Join keys · Revoked | — | — | — |
+| Join keys · Revoked | Operator | — | — | — | — | — | — | settings.workers · Read only |

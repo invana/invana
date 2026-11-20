@@ -58,7 +58,7 @@ flowchart LR
 | AG-57.10 | A guided skill, a planned skill or an agent | a person with Edit and Publish on the agent or skill runs the evals or publishes | the same cases, checks and gate apply |
 | AG-57.11 | An Operator | they open Tests or Evals | everything reads; *Run a test* and *Run the evals* are disabled, naming the permission |
 | AG-57.12 | The command line | `invana evals run --draft` runs the set | it exits `1` when the gate blocks and `3` when it warns, and needs the same permission as Studio |
-| AG-57.13 | A test or an eval run | it settles | every model, tool and graph database call it made reads in *What left the platform* and *Access usage*, marked as the run's |
+| AG-57.13 | A test or an eval run | it settles | every model, tool and graph database call it made reads in History, marked as the run's |
 
 ## Screens
 

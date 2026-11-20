@@ -6,7 +6,7 @@ status: idea
 personas: [builder, admin, analyst]
 stories: [AG-24, AG-33, AG-34, AG-62]
 journeys: [J03, J09]
-boards: [agents.runs, agents.agents, inbox]
+boards: [agents.runs, agents.agents, inbox, access.signin]
 nfrs: [NFR-PERF-2, NFR-COST-1, NFR-SEC-10, NFR-SEC-11]
 depends_on: [AG-F01, AC-F02, AC-F04, AC-F05, AC-F09, CP-F02, CP-F03, CP-F04, CP-F10, GP-F02]
 ---
@@ -194,7 +194,7 @@ Who an agent may hand work to is a rule on its Access Policies, which needs Edit
 | Added off | A new outside agent is off until an Admin turns it on; a hand-off to one that is off is refused, naming who switched it off |
 | Ask by default | A Run on an outside agent waits for the caller's named approvers unless a rule names that outside agent and allows it; a rule on `agent/*` asks at most |
 | Only what may leave, leaves | An outside agent receives only what the skill marks to send, within what the caller may read; a sensitive property is never sent — the step is refused, naming it ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)) |
-| Every hand-off out is in the ledger | Each task sent is an outbound row of *What left the platform*, schema-only or data-bearing, with the kinds, fields and record IDs sent ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
+| Every hand-off out is in the ledger | Each task sent is an outbound row in History, schema-only or data-bearing, with the kinds, fields and record IDs sent ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
 | One credential choice per outside agent | A shared secret, sealed, or each person's own account (per-user OAuth), chosen by an Admin as for an outside MCP server ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)); never an environment variable |
 | Invana applies nothing that came back | A pull request, a patch or a report from an outside agent is kept on the run; a person applies it |
 | An outside agent's own limits | Time, attempts and tasks at once; Invana's tokens cover only its own side |
@@ -348,7 +348,7 @@ Who an agent may hand work to is a rule on its Access Policies, which needs Edit
 | An ask is routed by the caller | A delegation ask goes to the named approvers of the agent whose rule said Ask — never the callee's approvers, never the person it benefits; a yes is for that hand-off only |
 | A lasting yes is an Admin's policy change | An Admin may *Draft a rule* from a delegation ask, which opens a draft for them to save; the ask itself allows only this hand-off |
 | An outside agent is added by its A2A card or its MCP server | The A2A agent card — at `/.well-known/agent-card.json` or the address an Admin gives — or an outside MCP server already added in the Control Plane; its name, version, skills, interfaces and how it signs in are kept as they were read; a change on its side reaches nothing until an Admin reads it again. The A2A version Invana speaks is pinned in [System design § 11](../../../../system-design.md#11-failure-modes-and-the-outside-boundary) › *Standards* |
-| An outside agent is an agent | Listed in Agents as *Outside*; it shows in Flow, Runs, *Access usage* and *What left the platform* like any agent, and is never given a task by a person |
+| An outside agent is an agent | Listed in Agents as *Outside*; it shows in Flow, Runs and History like any agent, and is never given a task by a person |
 | MCP carries tools, A2A carries tasks | An A2A task asks back, has states and returns what it made; an MCP outside agent is a server's tools called as one request and one answer each |
 | Calls go out from workers | From workers that can reach it; nothing passes through a hosted service |
 | A helper lives for the work | It retires when the work closes; a helper makes helpers only when its own policies allow Run `agent/*` |

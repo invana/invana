@@ -4,7 +4,7 @@ title: Read what people and agents did, and prove it
 feature: AC-F06
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.history, agents.runs]
+boards: [settings.history, agents.runs, flow.read_ledger]
 ---
 
 # AC-16 · Read what people and agents did, and prove it
@@ -73,6 +73,7 @@ flowchart LR
 | AC-16.28 | History on legal hold | its period passes | no row is removed until the hold is lifted (AC-44) |
 | AC-16.29 | A row naming a person who left while names are pseudonymised | it is read or exported | it names them by their code (AC-45); its hash still verifies |
 | AC-16.30 | A refused row | a person without Read on `access/policies` reads or exports it | it reads *refused* and the reason's sentence; the rule, its policy and who set it are left out, and no row names a kind or property a Deny hides — AC-27.25 |
+| AC-16.31 | An Admin | they press *Check the chain* | the head reads *Checking the chain*, then when it was last checked; a mismatch reads *Chain broken at row N* with the rows still readable |
 
 ## Screens
 
@@ -90,3 +91,5 @@ flowchart LR
 | Export | Operator | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | settings.history · Export |
 | The step a row opens | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | — |
 | The step a row opens | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | agents.runs · Detail · Not found |
+| Check the chain | Admin | — | — | settings.history · Checking the chain | settings.history · Everything | settings.history · Chain broken | — | — |
+| Check the chain | Operator | — | — | — | — | — | — | settings.history · Counted, not shown |

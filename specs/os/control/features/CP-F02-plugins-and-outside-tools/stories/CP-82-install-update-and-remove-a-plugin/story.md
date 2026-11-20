@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.plugins, settings.connectors]
+boards: [settings.plugins, settings.connectors, flow.install_plugin]
 ---
 
 # CP-82 · Install, update and remove a plugin
@@ -62,6 +62,9 @@ flowchart TD
 | CP-82.8 | An outside server | an Admin looks for *Remove* | it is not offered; *Turn it off* is, and its tools stay readable for the runs that used them |
 | CP-82.9 | An Operator | they open *Update* or *Remove* | what depends on the plugin reads; the acts are disabled — *This needs an Admin — ask {admins}* |
 | CP-82.10 | Anyone | they run `invana plugins list` after an update or a removal | it shows the version or the not-installed state Studio shows |
+| CP-82.11 | An Admin | they open *Install* for a plugin | the command to run on the engine's machine reads with *Copy*; *I ran it — check again* makes the engine look: *Checking*, then the plugin lists, or *Not found yet* names what was not found, with *Check again* and *Close* |
+| CP-82.12 | An Admin | they ran the update command and press *I ran it — check again* | *Checking*, then *Updated* to the version now installed, or *Still old version* naming the version found; *Copy command* and *Close* stay |
+| CP-82.13 | An Admin | they ran the remove command and press *I ran it — check again* | *Checking*, then *Removed* and the plugin leaves the list; a plugin still found reads *Refused*, naming why |
 
 ## Screens
 
@@ -69,7 +72,15 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A plugin | Admin | settings.plugins · Plugin off | — | settings.plugins · Loading | settings.plugins · Plugin | settings.plugins · Not installed | — | — |
 | A plugin | Operator | settings.plugins · Plugin off · Read only | — | settings.plugins · Loading | settings.plugins · Plugin · My switch | settings.plugins · Not installed | — | settings.plugins · Read only |
-| Update a plugin | Admin | — | — | settings.plugins · Update · Loading | settings.plugins · Update | settings.plugins · Update · Held | — | — |
-| Update a plugin | Operator | — | — | — | settings.plugins · Update · Read only | — | — | settings.plugins · Read only |
-| Before you remove it | Admin | — | — | settings.plugins · Remove · Loading | settings.plugins · Remove | settings.plugins · Remove · Refused | — | — |
-| Before you remove it | Operator | — | — | — | settings.plugins · Remove · Read only | — | — | settings.plugins · Read only |
+| Install a plugin · Command | Admin | settings.plugins · Install · Command | — | — | — | — | — | — |
+| Install a plugin · Command | Operator | — | — | — | — | — | — | settings.plugins · Read only |
+| Install a plugin · Checking | Admin | — | — | settings.plugins · Install · Checking | settings.plugins · Plugin | settings.plugins · Install · Not found yet | — | — |
+| Install a plugin · Checking | Operator | — | — | — | — | — | — | settings.plugins · Read only |
+| Update a plugin · Command | Admin | — | — | settings.plugins · Update · Loading | settings.plugins · Update · Command | settings.plugins · Update · Held | — | — |
+| Update a plugin · Command | Operator | — | — | — | settings.plugins · Update · Read only | — | — | settings.plugins · Read only |
+| Update a plugin · Checking | Admin | — | — | settings.plugins · Update · Checking | settings.plugins · Update · Updated | settings.plugins · Update · Still old version | — | — |
+| Update a plugin · Checking | Operator | — | — | — | — | — | — | settings.plugins · Read only |
+| Remove a plugin · Command | Admin | — | — | settings.plugins · Remove · Loading | settings.plugins · Remove · Command | settings.plugins · Remove · Refused | — | — |
+| Remove a plugin · Command | Operator | — | — | — | settings.plugins · Remove · Read only | — | — | settings.plugins · Read only |
+| Remove a plugin · Checking | Admin | — | — | settings.plugins · Remove · Checking | settings.plugins · Remove · Removed | — | — | — |
+| Remove a plugin · Checking | Operator | — | — | — | — | — | — | settings.plugins · Read only |

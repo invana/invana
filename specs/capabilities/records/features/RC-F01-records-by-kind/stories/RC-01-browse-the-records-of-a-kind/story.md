@@ -3,6 +3,7 @@ id: RC-01
 title: Browse the records of a kind
 feature: RC-F01
 status: idea
+milestone: MVP
 personas: [analyst, curator]
 boards: [data.records]
 ---

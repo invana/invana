@@ -79,7 +79,7 @@ sequenceDiagram
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Start a General project with the guide as its purpose | Projects · New project | [PJ-02](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md) | `projects.projects · New` |
+| 1 | Start a General project with the guide as its purpose | Projects · New project | [PJ-02](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md) | `projects.new` |
 | 2 | Name the assistant, a second person and the member agents | Projects · a project › People | [PJ-22](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-22-set-the-project-team-and-its-lead-agent/story.md) | `projects.projects · Detail` |
 | 3 | Ideate: who reads it, what done means | Projects · the project assistant | [PJ-21](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-21-ideate-with-the-project-assistant/story.md) | `projects.projects · Assistant` |
 | 4 | Accept the proposed sections, chapters and checks | Projects · the project assistant · Inbox | [PJ-21](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-21-ideate-with-the-project-assistant/story.md) · [PJ-20](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-20-give-a-project-its-kinds-of-task/story.md) | `projects.projects · Assistant` · `inbox` |

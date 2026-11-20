@@ -106,3 +106,9 @@ flowchart LR
 | Where it runs | Operator | agents.agents · Detail · Nothing starts it | — | agents.agents · Detail · Loading | agents.agents · Detail · Where it runs | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
 | Flow | Admin | agents.agents · Detail · Flow empty | — | agents.agents · Detail · Loading | agents.agents · Detail · Flow | agents.agents · Detail · Could not load | — | — |
 | Flow | Operator | agents.agents · Detail · Flow empty | — | agents.agents · Detail · Loading | agents.agents · Detail · Flow | agents.agents · Detail · Could not load | — | agents.agents · Detail · Flow |
+| New agent · Create agent | Admin | agents.agents · New | — | agents.agents · New · Saving | agents.agents · New · Created | agents.agents · New · Name taken | — | — |
+| New agent · Create agent | Operator | agents.agents · New | — | agents.agents · New · Saving | agents.agents · New · Created | agents.agents · New · Name taken | — | — |
+| New agent · Open the draft | Admin | agents.agents · New · Created | — | — | agents.agents · Detail · Unchecked draft | — | — | — |
+| New agent · Open the draft | Operator | agents.agents · New · Created | — | — | agents.agents · Detail · Unchecked draft | — | — | — |
+| New agent · without Create on Agents | Admin | — | — | — | — | — | — | — |
+| New agent · without Create on Agents | Operator | — | — | — | — | — | — | agents.agents · New · Locked |

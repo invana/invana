@@ -3,6 +3,7 @@ id: EX-10
 title: Pick up a conversation
 feature: EX-F03
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board, explore.conversations]
 ---

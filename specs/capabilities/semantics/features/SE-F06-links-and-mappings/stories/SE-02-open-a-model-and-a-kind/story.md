@@ -3,6 +3,7 @@ id: SE-02
 title: Open a model and a kind
 feature: SE-F06
 status: idea
+milestone: MVP
 personas: [modeller]
 boards: [model.models]
 ---

@@ -91,3 +91,9 @@ flowchart TD
 | Draft policies and servers it brought | Operator | — | — | — | settings.plugins · Servers to add · Read only | — | — | settings.policies · No access |
 | Export | Admin | — | — | agents.skills · Detail · Export · Writing | agents.skills · Detail · Export | agents.skills · Detail · Export · Refused | — | — |
 | Export | Operator | — | — | agents.skills · Detail · Export · Writing | agents.skills · Detail · Export | agents.skills · Detail · Export · Refused | — | agents.skills · Detail · Export · Disabled |
+| Import · Mapping | Admin | agents.skills · Import · Tool folders found | — | agents.skills · Import · Reading the files | agents.skills · Import · Mapping | agents.skills · Import · Refused file | — | — |
+| Import · Mapping | Operator | agents.skills · Import · Tool folders found | — | agents.skills · Import · Reading the files | agents.skills · Import · Mapping | agents.skills · Import · Refused file | — | — |
+| Import · Confirm · pack installed | Admin | agents.skills · Import · Confirm | — | — | settings.packs · Installed, off | agents.skills · Import · Skill not found | — | — |
+| Import · Confirm · pack installed | Operator | agents.skills · Import · Confirm | — | — | settings.packs · Installed, off | agents.skills · Import · Skill not found | — | — |
+| Import · Confirm · policies waiting | Admin | agents.skills · Import · Confirm | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |
+| Import · Confirm · policies waiting | Operator | agents.skills · Import · Confirm | — | — | settings.policies · Waiting to apply | settings.policies · Rule refused | — | — |

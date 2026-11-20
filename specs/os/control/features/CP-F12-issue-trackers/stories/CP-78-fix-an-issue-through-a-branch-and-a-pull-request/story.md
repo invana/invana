@@ -4,7 +4,7 @@ title: Fix an issue through a branch and a pull request
 feature: CP-F12
 status: idea
 personas: [builder, admin, decision-maker]
-boards: [projects.tasks, inbox, settings.plugins]
+boards: [projects.tasks, inbox, settings.connectors]
 ---
 
 # CP-78 · Fix an issue through a branch and a pull request
@@ -69,6 +69,7 @@ flowchart TD
 | CP-78.17 | An Operator not on the team | they try to say *Send it*, accept or change a connection's paths | it is disabled, naming the permission; the engine refuses the same |
 | CP-78.19 | An agent whose own `invana/*` branch needs a forced update — after a rebase, say | it asks to force push it | the guarded `force_push_branch` raises a Needs-you item for the people on the team, showing the branch, the commits it replaces and the files changed; nothing is pushed until a person approves, and an approval covers that one push; a refusal, or no answer, pushes nothing; the push then passes CP-78.5 and the outbound check like any push; History records `control.trackers.force_push_approved` or `control.trackers.force_push_refused`, naming the person, the branch and the commits replaced |
 | CP-78.20 | An agent | it asks to force push the default or a protected branch, a tag, or any branch it did not create for this task | it is refused before it leaves, naming the ref, whatever a person might approve; no Needs-you item is raised |
+| CP-78.21 | An approver | they allow the push or the pull request in *Needs you* | the task's *Pull request* reads *Opening*, then *Opened*; a refusal reads *Refused*, naming why; a review comment the agent answers reads *Answered* on the task; a merge reads *Merged* on the task and in *Needs you* |
 | CP-78.18 | A task | its *How it got here* is opened | it shows the branch, each commit pushed, the pull request, each check and review, who merged it and each Ask and its answer |
 
 ## Screens
@@ -85,5 +86,11 @@ flowchart TD
 | A force push waiting for a yes | Operator | — | — | — | inbox · Needs you · Force push | inbox · Needs you · Force push · Refused | inbox · Needs you · Force push | inbox · Needs you · Force push · Not on the team |
 | A merged task | Admin | — | — | — | inbox · Needs you · Merged | — | — | — |
 | A merged task | Operator | — | — | — | inbox · Needs you · Merged | — | — | inbox · Needs you · Merged · Not on the team |
-| A connection's agent prefix and protected paths | Admin | — | — | settings.plugins · Trackers · Paths · Loading | settings.plugins · Trackers · Paths | settings.plugins · Trackers · Paths · Refused | — | — |
-| A connection's agent prefix and protected paths | Operator | — | — | — | — | — | — | settings.plugins · Trackers · Paths · Read only |
+| A connection's agent prefix and protected paths | Admin | — | — | settings.connectors · Trackers · Paths · Loading | settings.connectors · Trackers · Paths | settings.connectors · Trackers · Paths · Refused | — | — |
+| A connection's agent prefix and protected paths | Operator | — | — | — | — | — | — | settings.connectors · Trackers · Paths · Read only |
+| The pull request opened | Admin | — | — | projects.tasks · Detail · Pull request · Opening | projects.tasks · Detail · Pull request · Opened | projects.tasks · Detail · Pull request · Refused | — | — |
+| The pull request opened | Operator | — | — | — | projects.tasks · Detail · Pull request · Opened | — | — | projects.tasks · Detail · Withheld |
+| A review comment answered | Admin | — | — | — | projects.tasks · Detail · Review comment · Answered | — | — | — |
+| A review comment answered | Operator | — | — | — | projects.tasks · Detail · Review comment · Answered | — | — | projects.tasks · Detail · Withheld |
+| Where a merge lands | Admin | — | — | — | projects.tasks · Detail · Merged | — | — | — |
+| Where a merge lands | Operator | — | — | — | projects.tasks · Detail · Merged | — | — | projects.tasks · Detail · Withheld |

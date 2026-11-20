@@ -4,7 +4,7 @@ title: Deactivate a person who leaves
 feature: AC-F03
 status: idea
 personas: [admin]
-boards: [settings.people]
+boards: [settings.people, access.signin, settings.me, flow.deactivate_person]
 ---
 
 # AC-23 · Deactivate a person who leaves
@@ -59,6 +59,7 @@ flowchart TD
 | AC-23.10 | A deactivated person | their work, boards, findings, authorship and History are read | everything stays, under their name, marked *Deactivated* |
 | AC-23.11 | The successor | the deactivation saves | an Update in their Inbox names the person they succeed and counts the chats, tasks and project team places now theirs |
 | AC-23.16 | The deactivated person's personal agents | the deactivation saves | each retires: granted to no one, no run starts with it, kept as it was; it reads *Retired — {person} was deactivated* |
+| AC-23.17 | An Admin | they confirm *Deactivate* and sign in again | *Sign in again* names *Deactivate* and returns to *Deactivated*; a wrong password returns to the same *Sign in again*; the successor's *You* reads what they took over (AC-23.11) |
 | AC-23.12 | A deactivated person | an Admin chooses *Reactivate* and signs in again | they may sign in again with their teams and policies; nothing handed on comes back; their retired personal agents stay retired |
 | AC-23.13 | A deactivation or a reactivation | History is read | it shows who did it, to whom, when, the successor and what went where (AC-F06) |
 | AC-23.14 | A person without Edit on Access | they open a deactivated person's row | it reads *Deactivated by Lee on 3 March · succeeded by Sam*; *Reactivate* is disabled, naming Edit on Access and who can grant it |
@@ -72,3 +73,7 @@ flowchart TD
 | Deactivate — what they hold · successor | Operator | — | — | — | — | — | — | settings.people · Locked · A person |
 | A deactivated person | Admin | — | — | — | settings.people · Deactivated | — | — | — |
 | A deactivated person | Operator | — | — | — | settings.people · Locked · Deactivated | — | — | settings.people · Locked · Deactivated |
+| Deactivate · Sign in again | Admin | — | — | — | access.signin · Sign in again · Deactivate | access.signin · Sign in again · Deactivate · Wrong password | — | — |
+| Deactivate · Sign in again | Operator | — | — | — | — | — | — | settings.people · Locked · A person |
+| Deactivated · What the successor sees | Admin | — | — | — | settings.me · Took over | — | — | — |
+| Deactivated · What the successor sees | Operator | — | — | — | — | — | — | settings.me · Took over |

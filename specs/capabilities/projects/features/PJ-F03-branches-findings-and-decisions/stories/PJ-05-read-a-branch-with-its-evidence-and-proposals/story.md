@@ -3,6 +3,7 @@ id: PJ-05
 title: Read a branch with its evidence and proposals
 feature: PJ-F03
 status: idea
+milestone: MVP
 personas: [decision-maker, analyst]
 boards: [projects.branches, projects.projects, projects.tasks]
 ---

@@ -84,3 +84,5 @@ flowchart TD
 | Supersede | Operator | — | — | — | projects.branches · Decide · Supersede | projects.branches · Decide · Supersede refused | — | projects.branches · Decide · Archived |
 | A branch's decisions | Admin | projects.branches · Decide · No decision yet | — | projects.branches · Decide · Loading | projects.branches · Decide · This branch | projects.branches · Decide · Could not load | — | projects.projects · Detail · Not found |
 | A branch's decisions | Operator | projects.branches · Decide · No decision yet | — | projects.branches · Decide · Loading | projects.branches · Decide · This branch | projects.branches · Decide · Could not load | — | projects.projects · Detail · Not found |
+| Decide · record it | Admin | projects.branches · Decide | — | projects.branches · Decide · Recording | projects.branches · Decide · Recorded | projects.branches · Decide · Could not record | — | — |
+| Decide · record it | Operator | projects.branches · Decide | — | projects.branches · Decide · Recording | projects.branches · Decide · Recorded | projects.branches · Decide · Could not record | — | — |

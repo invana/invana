@@ -4,7 +4,7 @@ title: Connect an issue tracker and link a project to it
 feature: CP-F12
 status: idea
 personas: [admin, builder, decision-maker]
-boards: [settings.plugins, projects.projects]
+boards: [settings.connectors, projects.projects, flow.connect_tracker]
 ---
 
 # CP-73 · Connect an issue tracker and link a project to it
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F12](../../feature.md)
 ```mermaid
 flowchart TD
   s([Settings › Connections › Trackers]) --> ad["Add a code host: GitHub · Gitea — or a read only source: Local files · Web"]
-  ad --> wc["Signs in with a work connection · CP-62"]
+  ad --> wc["Signs in with a work connection · CP-80"]
   wc -->|fails| af["Names the address and what failed · nothing stored"]
   wc --> ok["Connected · its adapter · read only or read and write"]
   ok --> lk["A project › Link to a repository or project key the connection may serve"]
@@ -45,7 +45,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-73.1 | An Admin with Manage on the tracker's plugin | they add a tracker with its address, a work connection (CP-62) and the repositories or project keys it may serve | it is tested, sealed and reads *Connected* with its adapter, whether it is read only or read and write and what it may serve (none until named); History records who, never the credential |
+| CP-73.1 | An Admin with Manage on the tracker's plugin | they add a tracker with its address, a work connection (CP-80) and the repositories or project keys it may serve | it is tested, sealed and reads *Connected* with its adapter, whether it is read only or read and write and what it may serve (none until named); History records who, never the credential |
 | CP-73.2 | The adapters | they are listed | GitHub and Gitea read and write — issues, branches, pull requests, checks and reviews, through the adapter's seventeen methods; Local files and Web read only — a write to either is refused, naming that it is read only; no other host is offered — another is a connector added later |
 | CP-73.3 | A tracker that cannot be reached or signs in badly | it is added | it fails naming the address and what failed; nothing is stored |
 | CP-73.4 | A person on a project's team | they link the project to a project or repository a connected tracker may serve (CP-73.16) | every issue read in becomes a twin task, and each twin shows its issue's address; a task made later in Invana creates its issue only when a person chooses *Create the issue* |
@@ -65,22 +65,28 @@ flowchart TD
 | CP-73.18 | A connection | it is linked or synced | Invana records whether the tracker's repository is public or private and checks it again on every sync; to a public one a created issue is refused and a comment carries only counts, check names, pass or fail and a link, until an Admin with Manage turns on *Allow data-bearing text* for that connection, a warning naming the public audience shown at that act and History recording who; every create, update and comment passes the outbound check |
 | CP-73.19 | A Web connection or a Local files connection | an Admin adds it | a Web connection holds the hosts an Admin with Manage allows and a Local files connection the workspace root they set; a source address outside it is refused, naming it |
 | CP-73.20 | The Web adapter or the Local files adapter | it fetches | Web takes https only, refuses private, unique-local, shared, mapped and metadata addresses, re-checks every redirect hop, uses the address it checked, sends no credential or cookie, runs no script and caps size, time and content types; Local files resolves a folder by real path under the root, refuses symlinks and `..`, and never reads secret, key or `.git` config files (NFR-SEC-16) |
+| CP-73.21 | An Admin | they press *Test and add* after signing in | *Testing* reads, then the tracker lists and opens on *Reach* to name what it may serve; a failure reads *Failed* naming the tracker's answer, with *Back* and *Test again* |
+| CP-73.22 | A tracker added | an Admin links a project | the project's *Tracker* reads *Not linked*, then *Reading issues*, then the tracker; a task the tracker changed reads *Tracker changed it* on the task |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Trackers | Admin | settings.plugins · Trackers · None yet | settings.plugins · Trackers · Nothing matches | settings.plugins · Trackers · Loading | settings.plugins · Trackers | settings.plugins · Trackers · Unreachable | — | — |
-| Trackers | Operator | settings.plugins · Trackers · None yet | settings.plugins · Trackers · Nothing matches | settings.plugins · Trackers · Loading | settings.plugins · Trackers | settings.plugins · Trackers · Unreachable | — | settings.plugins · Trackers · Read only |
-| Add a tracker | Admin | — | — | settings.plugins · Trackers · Add · Testing | settings.plugins · Trackers · Add | settings.plugins · Trackers · Add · Failed | — | — |
-| Add a tracker | Operator | — | — | settings.plugins · Trackers · Add · Testing | settings.plugins · Trackers · Add | settings.plugins · Trackers · Add · Failed | — | settings.plugins · Trackers · Read only |
+| Trackers | Admin | settings.connectors · Trackers · None yet | settings.connectors · Trackers · Nothing matches | settings.connectors · Trackers · Loading | settings.connectors · Trackers | settings.connectors · Trackers · Unreachable | — | — |
+| Trackers | Operator | settings.connectors · Trackers · None yet | settings.connectors · Trackers · Nothing matches | settings.connectors · Trackers · Loading | settings.connectors · Trackers | settings.connectors · Trackers · Unreachable | — | settings.connectors · Trackers · Read only |
+| Add a tracker | Admin | — | — | settings.connectors · Trackers · Add · Testing | settings.connectors · Trackers · Add | settings.connectors · Trackers · Add · Failed | — | — |
+| Add a tracker | Operator | — | — | settings.connectors · Trackers · Add · Testing | settings.connectors · Trackers · Add | settings.connectors · Trackers · Add · Failed | — | settings.connectors · Trackers · Read only |
 | Link a project | Admin | projects.projects · Detail · Tracker · Not linked | — | projects.projects · Detail · Tracker · Reading issues | projects.projects · Detail · Tracker | projects.projects · Detail · Tracker · Paused | projects.projects · Detail · Tracker · Agent acting | — |
 | Link a project | Operator | projects.projects · Detail · Tracker · Not linked | — | projects.projects · Detail · Tracker · Reading issues | projects.projects · Detail · Tracker | projects.projects · Detail · Tracker · Paused | projects.projects · Detail · Tracker · Agent acting | projects.projects · Detail · Tracker · Not on the team |
 | A twin's conflict | Admin | — | — | — | projects.tasks · Detail · Tracker changed it | projects.tasks · Detail · Tracker · Paused | — | — |
 | A twin's conflict | Operator | — | — | — | projects.tasks · Detail · Tracker changed it | projects.tasks · Detail · Tracker · Paused | — | projects.tasks · Detail · Withheld |
-| What a tracker may serve | Admin | settings.plugins · Trackers · Reach · None named | — | settings.plugins · Trackers · Reach · Loading | settings.plugins · Trackers · Reach | settings.plugins · Trackers · Reach · Held | — | — |
-| What a tracker may serve | Operator | settings.plugins · Trackers · Reach · None named | — | settings.plugins · Trackers · Reach · Loading | settings.plugins · Trackers · Reach | settings.plugins · Trackers · Reach · Held | — | settings.plugins · Trackers · Reach · Read only |
-| Allow data-bearing text | Admin | — | — | — | settings.plugins · Trackers · Public · Warning | — | — | — |
-| Allow data-bearing text | Operator | — | — | — | — | — | — | settings.plugins · Trackers · Public · Read only |
+| What a tracker may serve | Admin | settings.connectors · Trackers · Reach · None named | — | settings.connectors · Trackers · Reach · Loading | settings.connectors · Trackers · Reach | settings.connectors · Trackers · Reach · Held | — | — |
+| What a tracker may serve | Operator | settings.connectors · Trackers · Reach · None named | — | settings.connectors · Trackers · Reach · Loading | settings.connectors · Trackers · Reach | settings.connectors · Trackers · Reach · Held | — | settings.connectors · Trackers · Reach · Read only |
+| Allow data-bearing text | Admin | — | — | — | settings.connectors · Trackers · Public · Warning | — | — | — |
+| Allow data-bearing text | Operator | — | — | — | — | — | — | settings.connectors · Trackers · Public · Read only |
 | A link outside the reach | Admin | — | — | — | — | projects.projects · Detail · Tracker · Not served | — | — |
 | A link outside the reach | Operator | — | — | — | — | projects.projects · Detail · Tracker · Not served | — | projects.projects · Detail · Tracker · Not on the team |
+| Add a tracker · Sign in and test | Admin | — | — | settings.connectors · Trackers · Add · Testing | settings.connectors · Trackers · Add · Sign in and test | settings.connectors · Trackers · Add · Failed | — | — |
+| Add a tracker · Sign in and test | Operator | — | — | — | — | — | — | settings.connectors · Trackers · Read only |
+| Add a tracker · Added | Admin | — | — | — | settings.connectors · Trackers · Reach | — | — | — |
+| Add a tracker · Added | Operator | — | — | — | — | — | — | settings.connectors · Trackers · Read only |

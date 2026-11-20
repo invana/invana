@@ -4,7 +4,7 @@ title: Relate a project to another or start one from it
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.projects]
+boards: [projects.projects, projects.new]
 ---
 
 # PJ-23 · Relate a project to another or start one from it
@@ -66,5 +66,5 @@ flowchart TD
 | Related | Operator | projects.projects · Detail · Related · None yet | — | projects.projects · Detail · Related · Loading | projects.projects · Detail · Related | projects.projects · Detail · Related · Refused | — | projects.projects · Detail · Related · Not a person on the team |
 | A related project withheld | Admin | — | — | — | projects.projects · Detail · Related · Withheld | — | — | projects.projects · Detail · Related · Withheld |
 | A related project withheld | Operator | — | — | — | projects.projects · Detail · Related · Withheld | — | — | projects.projects · Detail · Related · Withheld |
-| Start a project from this | Admin | projects.projects · New · Started from | — | projects.projects · New · Loading people | projects.projects · New · Started from · Filled | projects.projects · New · Refused | — | — |
-| Start a project from this | Operator | projects.projects · New · Started from | — | projects.projects · New · Loading people | projects.projects · New · Started from · Filled | projects.projects · New · Refused | — | — |
+| Start a project from this | Admin | projects.new · Start · From a project | — | projects.new · Start · Loading types | projects.new · About · Filled | projects.new · Review · Refused | — | — |
+| Start a project from this | Operator | projects.new · Start · From a project | — | projects.new · Start · Loading types | projects.new · About · Filled | projects.new · Review · Refused | — | — |

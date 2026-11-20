@@ -57,6 +57,7 @@ flowchart TD
 | CP-45.10 | A channel change | it is made without the password, with a wrong one, or with a key | it is refused — *Enter your password again to do this* |
 | CP-45.11 | An Operator | they open *Where it can go* | every channel reads; *Add channel*, *Test* and *Remove* are disabled, naming the Admins; through the API they are refused |
 | CP-45.12 | A channel added, replaced or removed | it is done | History records who and when, never a secret |
+| CP-45.13 | A channel under test | the test ends | *Channel ready* offers *Save the channel*, which asks to sign in again for *Add a channel* and returns to *Channels* with the new channel; *Channel test failed* names the channel's own answer and keeps *Back* and *Test again* |
 
 ## Screens
 
@@ -66,5 +67,7 @@ flowchart TD
 | Where it can go | Operator | settings.notifications · In app only · Read only | — | settings.notifications · Loading | settings.notifications · Channels · Read only | settings.notifications · Channel failed | — | settings.notifications · Channels · Read only |
 | Add channel | Admin | settings.notifications · New channel | — | settings.notifications · New channel · Testing channel | settings.notifications · New channel · Channel ready | settings.notifications · New channel · Channel test failed | — | — |
 | Add channel | Operator | — | — | — | — | — | — | settings.notifications · Channels · Read only |
-| Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
+| Password again | Admin | — | — | access.signin · Sign in again · Add a channel · Checking | access.signin · Sign in again · Add a channel | access.signin · Sign in again · Add a channel · Wrong password | — | — |
 | Password again | Operator | — | — | — | — | — | — | — |
+| Add channel · Saved | Admin | — | — | — | settings.notifications · Channels · Channel added | — | — | — |
+| Add channel · Saved | Operator | — | — | — | — | — | — | settings.notifications · Channels · Read only |

@@ -47,7 +47,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | SE-05.1 | A published model and a person with Edit on it | they pick *Change in a draft* on the map or a kind | the model's draft opens full-bleed on its canvas with the header `Invana Model / Models › <model> vN · draft` and the draft bar `n staged · Discard · Publish vN` |
-| SE-05.2 | An open draft | the person adds a kind, adds a relationship between two kinds, adds or removes a property, or deletes | each joins the draft as a staged change, sorted first with a *staged* chip; nothing reaches the model yet |
+| SE-05.2 | An open draft | the person adds a kind, adds a relationship between two kinds, adds or removes a property, renames a kind or a property, or deletes | each joins the draft as a staged change, sorted first with a *staged* chip; nothing reaches the model yet |
 | SE-05.3 | A staged delete with dependents | the person confirms it | the confirm says it goes when published and names what depends on it |
 | SE-05.4 | Staged changes | the person discards one, or all | that change, or every change, leaves the draft; the model is as published |
 | SE-05.5 | A draft | the person reloads, or someone else opens the model | the staged changes are still there for everyone |
@@ -92,3 +92,11 @@ flowchart LR
 | Publish · breaking | Operator | — | — | — | — | — | — | — |
 | The approval | Admin | — | — | inbox · Loading | inbox · Publish approval | inbox · Stale | — | — |
 | The approval | Operator | — | — | inbox · Loading | inbox · Publish approval | inbox · Stale | — | — |
+| Publish · published | Admin | model.models · Publish | — | model.models · Publish · Checking | model.models · Published | model.models · Publish · Refused | — | — |
+| Publish · published | Operator | model.models · Publish | — | model.models · Publish · Checking | model.models · Published | model.models · Publish · Refused | — | — |
+| Publish · breaking · published | Admin | model.models · Publish · Breaking | — | model.models · Publish · Breaking previewing | model.models · Published | model.models · Publish · Review failed | model.models · Publish · Waiting on approval | — |
+| Publish · breaking · published | Operator | model.models · Publish · Breaking | — | model.models · Publish · Breaking previewing | model.models · Published | model.models · Publish · Review failed | model.models · Publish · Waiting on approval | — |
+| The approval · approved | Admin | inbox · Publish approval | — | inbox · Loading | model.models · Published | inbox · Stale | — | — |
+| The approval · approved | Operator | inbox · Publish approval | — | inbox · Loading | model.models · Published | inbox · Stale | — | — |
+| A kind · rename | Admin | model.models · Kind · Edit | — | — | model.models · Draft | model.models · Draft · Change refused | — | — |
+| A kind · rename | Operator | model.models · Kind · Edit | — | — | model.models · Draft | model.models · Draft · Change refused | — | — |

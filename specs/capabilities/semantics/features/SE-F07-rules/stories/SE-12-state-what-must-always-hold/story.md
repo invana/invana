@@ -75,3 +75,5 @@ flowchart LR
 | A rule | Operator | — | — | model.rules · Detail · Counting | model.rules · Detail · Read only | model.rules · Could not load | — | model.rules · Detail · Read only |
 | A rule's evidence | Admin | model.rules · Detail · Never offered | — | model.rules · Detail · Evidence loading | model.rules · Detail · Evidence | model.rules · Could not load | — | — |
 | A rule's evidence | Operator | model.rules · Detail · Never offered | — | model.rules · Detail · Evidence loading | model.rules · Detail · Evidence | model.rules · Could not load | — | — |
+| A rule · save | Admin | model.rules · Detail · Impact | — | model.rules · Detail · Saving | model.rules · Detail · Never offered | model.rules · Detail · Could not save | — | — |
+| A rule · save | Operator | model.rules · Detail · Impact | — | model.rules · Detail · Saving | model.rules · Detail · Never offered | model.rules · Detail · Could not save | — | — |

@@ -66,3 +66,7 @@ flowchart TD
 | Make a milestone | Operator | — | — | projects.graph · Make a milestone · Saving | projects.graph · Make a milestone | projects.graph · Make a milestone · Refused | — | projects.graph · Make a milestone · Not on the team |
 | Accept a milestone | Admin | — | — | — | projects.projects · Detail · Milestones · Ready to accept | projects.projects · Detail · Milestones · Refused | — | — |
 | Accept a milestone | Operator | — | — | — | projects.projects · Detail · Milestones · Ready to accept | projects.projects · Detail · Milestones · Refused | — | projects.projects · Detail · Milestones · Not on the team |
+| Make a milestone · save | Admin | projects.graph · Make a milestone | — | projects.graph · Make a milestone · Saving | projects.projects · Detail · Milestones | projects.graph · Make a milestone · Refused | — | — |
+| Make a milestone · save | Operator | projects.graph · Make a milestone | — | projects.graph · Make a milestone · Saving | projects.projects · Detail · Milestones | projects.graph · Make a milestone · Refused | — | — |
+| Accept a milestone · accept | Admin | projects.projects · Detail · Milestones · Ready to accept | — | — | projects.projects · Detail · Milestones · Accepted | projects.projects · Detail · Milestones · Refused | — | — |
+| Accept a milestone · accept | Operator | projects.projects · Detail · Milestones · Ready to accept | — | — | projects.projects · Detail · Milestones · Accepted | projects.projects · Detail · Milestones · Refused | — | — |

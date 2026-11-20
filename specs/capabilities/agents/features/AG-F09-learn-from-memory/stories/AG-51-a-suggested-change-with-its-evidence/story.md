@@ -74,3 +74,5 @@ flowchart TD
 | A suggested change in Needs you | Operator | inbox · Nothing suggested | inbox · Needs you filtered | inbox · Loading | inbox · Suggested change | inbox · Failed | inbox · Suggested by an agent | inbox · Suggested change, read only |
 | Its link from Evidence | Admin | — | — | — | agents.skills · Evidence, suggestion open | — | — | — |
 | Its link from Evidence | Operator | — | — | — | agents.skills · Evidence, suggestion open | — | — | — |
+| A suggested change · open its evidence | Admin | inbox · Suggested change | — | — | agents.skills · Evidence, suggestion open | — | — | — |
+| A suggested change · open its evidence | Operator | inbox · Suggested change | — | — | agents.skills · Evidence, suggestion open | — | — | — |

@@ -4,7 +4,7 @@ title: Say which events reach whom, and where
 feature: CP-F08
 status: idea
 personas: [admin, builder]
-boards: [settings.notifications]
+boards: [settings.notifications, flow.write_rule]
 ---
 
 # CP-37 · Say which events reach whom, and where
@@ -60,6 +60,11 @@ flowchart LR
 | CP-37.18 | Anyone without Edit on `setting/deployment` | they save a rule that reaches anyone but themselves, or names a team or a channel, or change another person's rule | it is refused — *Needs Edit on Deployment settings — ask {who can grant}* — and nothing is saved |
 | CP-37.19 | An alert (CP-59) | an Admin writes a rule matching its kind and naming a channel | each alert of that kind is delivered to that place as a line and a link, beside the Inbox rows CP-59 writes |
 | CP-37.20 | A rule an Operator wrote for themselves | it matches | it reaches them in the Inbox and on the channels they turned on (CP-46) |
+| CP-37.21 | A person with Edit on `setting/deployment` | *New rule* picks the trigger *A History row matches*, what was done, what it touched, allowed or refused and why, optionally a count in a window, and who to tell | it saves, on; when a new History row matches, or the count is reached inside the window, each recipient is told (CP-59.21) |
+| CP-37.22 | A new rule on a History row | rows that match it were written before it existed | it does not fire for them; *Last fired* reads *never* until a new row matches |
+| CP-37.23 | A rule on a History row | it has nothing to match or no recipient and is saved | *{field}: {why}*; nothing is saved |
+| CP-37.24 | An Operator | they read the rules on a History row | each reads; its switch, *Edit* and *A History row matches* are disabled — *Needs Edit on Deployment settings — ask {who can grant}*; the route answers 403 with the same sentence |
+| CP-37.25 | A rule on a History row written, changed, switched or removed | it is saved | History holds a row naming it and who |
 
 ## Screens
 
@@ -73,3 +78,7 @@ flowchart LR
 | A rule — edit | Operator | — | — | — | settings.notifications · Rule · Just me | settings.notifications · Rule refused | — | settings.notifications · Read only |
 | Where it can go — channels | Admin | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications | settings.notifications · Channel failed | — | — |
 | Where it can go — channels | Operator | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications · Read only | settings.notifications · Channel failed | — | settings.notifications · Read only |
+| New rule · History row | Admin | — | — | — | settings.notifications · New rule · History row | settings.notifications · New rule · Rule refused | — | — |
+| New rule · History row | Operator | — | — | — | — | — | — | settings.notifications · Read only |
+| Save the rule | Admin | — | — | settings.notifications · Saving | settings.notifications · Rule saved | settings.notifications · New rule · Rule refused | — | — |
+| Save the rule | Operator | — | — | — | settings.notifications · New rule · Just me · Saved | — | — | settings.notifications · Read only |

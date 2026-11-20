@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.databases]
+boards: [settings.databases, access.signin, flow.connect_graph_database]
 ---
 
 # CP-25 · Connect a graph database in one modal
@@ -61,16 +61,32 @@ flowchart TD
 | CP-25.11 | An Operator | they reach *Connect a graph database* | it reads *Ask an Admin*, naming the Admins |
 | CP-25.12 | Ready | the Admin reads the mode | it reads *Read-only* with *Allow writes*, which asks the Admin to sign in again and then sets *Read + write* as CP-38 does; nothing is turned on until *Turn it on* (CP-39) |
 | CP-25.13 | The sections of the modal | the Admin moves through them | each section reads its own state as it happens — the type picked, the credential saved sealed, *Testing*, *Connected*, the shape read, Ready — and the same states are the frames of the connect flow's journey |
+| CP-25.14 | Ready | the Admin presses *Open* | the graph database's details open, read-only and off |
+| CP-25.15 | Any section filled | the Admin presses *Close* | a confirm reads *Discard this connection?*, saying nothing is stored until Ready; *Discard* closes, *Keep going* returns to the section |
+| CP-25.16 | A name taken, no connector installed or a connector that failed to load (CP-79) | the Admin picks the type or presses *Connect* | the section says which, names the package that would add it where one is missing, and keeps every answer; *Back* returns to the type picked |
+| CP-25.17 | *Allow writes* on Ready | the Admin signs in again | the graph database reads *Read + write* in its details, still off; a wrong password returns to the same *Sign in again* with the message |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Name and type | Admin | settings.databases · Connect | — | — | settings.databases · Connect · Type picked | settings.databases · Connect · Name taken | — | — |
+| Name and type | Admin | settings.databases · Connect | — | — | settings.databases · Connect · Type picked | settings.databases · Connect · Name taken · No connector installed · Connector failed | — | — |
 | Name and type | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Type picked · Cypher form | Admin | — | — | — | settings.databases · Connect · Type picked · Neo4j · Memgraph · ArcadeDB | — | — | — |
+| Type picked · Cypher form | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Type picked · Gremlin form | Admin | — | — | — | settings.databases · Connect · Type picked · JanusGraph · Neptune · TinkerGraph · ArcadeDB | — | — | — |
+| Type picked · Gremlin form | Operator | — | — | — | — | — | — | settings.databases · Read only |
 | 4 · Shape | Admin | settings.databases · Connect · Shape · A starting point | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape | settings.databases · Connect · Shape · Unreachable | settings.databases · Connect · Shape · Drafting | — |
-| 4 · Shape | Operator | — | — | — | — | — | — | — |
+| 4 · Shape | Operator | — | — | — | — | — | — | settings.databases · Read only |
 | Ready | Admin | settings.databases · Connect · Ready | — | — | settings.databases · Connect · Ready | settings.databases · Connect · Ready · Could not connect | settings.databases · Connect · Ready · Drafting below | — |
-| Ready | Operator | — | — | — | — | — | — | — |
-| Ready · mode | Admin | settings.databases · Connect · Ready · Mode | — | — | settings.databases · Connect · Ready · Mode | settings.databases · Connect · Ready · Could not connect | — | — |
-| Ready · mode | Operator | — | — | — | — | — | — | — |
+| Ready | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Ready · Mode | Admin | settings.databases · Connect · Ready · Mode | — | — | settings.databases · Connect · Ready · Mode | settings.databases · Connect · Ready · Could not connect | — | — |
+| Ready · Mode | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Ready · Allow writes | Admin | — | — | — | access.signin · Sign in again · Set read + write | access.signin · Sign in again · Set read + write · Wrong password | — | — |
+| Ready · Allow writes | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Ready · Read + write | Admin | — | — | — | settings.databases · Detail · Read + write | settings.databases · Detail · Could not change mode | — | — |
+| Ready · Read + write | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Ready · Open | Admin | — | — | — | settings.databases · Detail · Read-only | — | — | — |
+| Ready · Open | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Close before Connect | Admin | — | — | — | settings.databases · Connect · Discard this connection? | — | — | — |
+| Close before Connect | Operator | — | — | — | — | — | — | settings.databases · Read only |

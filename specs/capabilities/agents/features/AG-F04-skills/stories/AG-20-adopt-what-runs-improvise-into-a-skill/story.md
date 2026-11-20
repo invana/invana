@@ -51,3 +51,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Exceptions | Admin | agents.skills · Detail · No exceptions recorded | — | agents.skills · Detail · Loading | agents.skills · Detail · Exceptions | agents.skills · Detail · Could not load | agents.skills · Detail · Adopt | — |
 | Exceptions | Operator | agents.skills · Detail · No exceptions recorded | — | agents.skills · Detail · Loading | agents.skills · Detail · Exceptions | agents.skills · Detail · Could not load | agents.skills · Detail · Exceptions | agents.skills · Detail · Exceptions |
+| An exception · its run | Admin | agents.skills · Detail · Exceptions | — | agents.skills · Detail · Loading | agents.skills · Detail · From a run | agents.runs · Detail · Step failed | — | — |
+| An exception · its run | Operator | agents.skills · Detail · Exceptions | — | agents.skills · Detail · Loading | agents.skills · Detail · From a run | agents.runs · Detail · Step failed | — | — |
+| Adopt · a handler | Admin | agents.skills · Detail · Exceptions | — | agents.skills · Detail · Adopt | agents.skills · Detail · Draft | agents.skills · Detail · Could not load | — | — |
+| Adopt · a handler | Operator | agents.skills · Detail · Exceptions | — | agents.skills · Detail · Adopt | agents.skills · Detail · Draft | agents.skills · Detail · Could not load | — | agents.skills · Detail · Locked |

@@ -3,6 +3,7 @@ id: SE-20
 title: Say what a kind means
 feature: SE-F03
 status: idea
+milestone: MVP
 personas: [modeller]
 boards: [model.models]
 ---

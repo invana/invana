@@ -5,7 +5,7 @@ feature: PJ-F01
 status: idea
 milestone: MVP
 personas: [decision-maker, analyst]
-boards: [projects.projects]
+boards: [projects.projects, projects.settings]
 ---
 
 # PJ-01 · See every project and open one
@@ -73,11 +73,13 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | Projects | Admin | projects.projects · No projects yet | projects.projects · Nothing matches | projects.projects · Loading | projects.projects | projects.projects · Could not load | projects.projects · Tasks running | — |
 | Projects | Operator | projects.projects · No projects yet | projects.projects · Nothing matches | projects.projects · Loading | projects.projects | projects.projects · Could not load | projects.projects · Tasks running | — |
-| A project and its Details | Admin | projects.projects · Detail · No purpose written | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | projects.projects · Detail · Tasks running | — |
+| A project and its Details | Admin | projects.projects · Detail · No purpose written | — | projects.projects · Detail · Loading | projects.settings · General | projects.projects · Detail · Could not load | projects.projects · Detail · Tasks running | — |
 | A project the reader may not read | Admin | — | — | — | — | — | — | projects.projects · Detail · Withheld |
 | A project the reader may not read | Operator | — | — | — | — | — | — | projects.projects · Detail · Withheld |
-| A project and its Details | Operator | projects.projects · Detail · No purpose written | — | projects.projects · Detail · Loading | projects.projects · Detail · Details | projects.projects · Detail · Could not load | projects.projects · Detail · Tasks running | projects.projects · Detail · Details · Not a person on the team |
-| Editing Details | Admin | — | — | — | projects.projects · Detail · Details · Editing | projects.projects · Detail · Details · Save refused | — | — |
-| Editing Details | Operator | — | — | — | projects.projects · Detail · Details · Editing | projects.projects · Detail · Details · Save refused | — | projects.projects · Detail · Details · Not a person on the team |
+| A project and its Details | Operator | projects.projects · Detail · No purpose written | — | projects.projects · Detail · Loading | projects.settings · General | projects.projects · Detail · Could not load | projects.projects · Detail · Tasks running | projects.settings · General · Not a person on the team |
+| Editing Details | Admin | — | — | — | projects.settings · General · Editing | projects.settings · General · Could not save | — | — |
+| Editing Details | Operator | — | — | — | projects.settings · General · Editing | projects.settings · General · Could not save | — | projects.settings · General · Not a person on the team |
 | An archived project | Admin | — | — | — | projects.projects · Detail · Archived | projects.projects · Detail · Archived · Could not unarchive | — | — |
 | An archived project | Operator | — | — | — | projects.projects · Detail · Archived | projects.projects · Detail · Archived · Could not unarchive | — | projects.projects · Detail · Archived · Not a person on the team |
+| A project · Archive | Admin | projects.projects · Detail · Archive · Confirm | — | — | projects.projects · Detail · Archived | — | — | — |
+| A project · Archive | Operator | projects.projects · Detail · Archive · Confirm | — | — | projects.projects · Detail · Archived | — | — | projects.projects · Detail · Join the team |

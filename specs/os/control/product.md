@@ -48,7 +48,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| CP-F09 | [Overview — workloads by user, agent and team](features/CP-F09-overview/feature.md) | CP-47 | idea |
+| CP-F09 | [Overview — workloads by user, agent and team](features/CP-F09-overview/feature.md) | CP-70 | idea |
 | CP-F10 | [Runs and how the agents are doing](features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) | CP-48 · CP-49 · CP-53 · CP-50 · CP-58 · CP-51 · CP-52 · CP-54 · CP-55 · CP-56 · CP-57 | idea |
 | CP-F12 | [Code hosts and issue trackers](features/CP-F12-issue-trackers/feature.md) | CP-73 · CP-74 · CP-78 | idea |
 | CP-F11 | [Ops alerting](features/CP-F11-ops-alerting/feature.md) | CP-59 · CP-60 | idea |
@@ -56,7 +56,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | CP-F02 | [Plugins and MCP](features/CP-F02-plugins-and-outside-tools/feature.md) | CP-04 · CP-44 · CP-02 · CP-42 · CP-43 · CP-03 · CP-75 · CP-20 | idea |
 | CP-F03 | [Workers and the queue](features/CP-F03-workers-and-the-queue/feature.md) | CP-05 · CP-06 · CP-07 · CP-08 · CP-09 · CP-10 | idea |
 | CP-F04 | [Limits](features/CP-F04-limits/feature.md) | CP-11 · CP-34 · CP-12 · CP-13 · CP-14 | idea |
-| CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 · CP-17 | idea |
+| CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 | idea |
 | CP-F13 | [Data stores](features/CP-F13-data-stores/feature.md) | CP-84 | idea |
 | CP-F06 | [Skill scripts](features/CP-F06-skill-scripts/feature.md) | CP-15 · CP-16 | idea |
 | CP-F07 | [Find your way — ⌘K and search](features/CP-F07-find-your-way/feature.md) | CP-30 · CP-68 · CP-71 | idea |
@@ -67,7 +67,7 @@ can unblock; and an agent can only do what the models and tools offered to it al
 | Surface | Tier | Board |
 |---|---|---|
 | Home — first use and set-up | page | `start.home` · `start.home · Set-up` |
-| Fleet — the map and workloads by user, agent and team, in Settings › Fleet | modal | `settings.fleet` |
+| Usage — workloads by team, user and agent, in Settings › Workers › Limits | modal | `settings.limits` |
 | Runs — how the agents are doing, every run | modal | `agents.agents` · `agents.runs` |
 | A run | modal | `agents.runs · Detail` · `agents.runs · Detail · Answer` |
 | Ops alerts — the list, an alert, thresholds | modal | `settings.alerts` · `settings.alerts · Detail` · `settings.alerts · Settings` |

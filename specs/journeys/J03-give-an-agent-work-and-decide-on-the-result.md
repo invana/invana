@@ -2,8 +2,8 @@
 id: J03
 title: Give an agent work and decide on the result
 personas: [decision-maker]
-stories: [PJ-01, PJ-12, PJ-15, PJ-18, CP-36, AC-15, AG-24, PJ-06, PJ-07, PJ-14]
-boards: [projects.projects, projects.tasks, inbox, projects.branches, projects.report]
+stories: [PJ-02, PJ-01, PJ-12, PJ-15, PJ-18, CP-36, AC-15, AG-24, PJ-05, PJ-06, PJ-07, PJ-14]
+boards: [projects.new, projects.projects, projects.tasks, inbox, projects.branches, projects.report]
 ---
 
 # Give an agent work and decide on the result
@@ -15,7 +15,9 @@ boards: [projects.projects, projects.tasks, inbox, projects.branches, projects.r
 
 ```mermaid
 flowchart TD
-  A([Projects]) --> B["PJ-01 · Open the project"]
+  A([Projects]) --> A0{"Has a project?"}
+  A0 -->|no| A1["PJ-02 · Start a project of its type"] --> B
+  A0 -->|yes| B["PJ-01 · Open the project"]
   B --> D["PJ-12 · Write a task with its criteria · assign it to an agent she may use"]
   D --> D2["PJ-18 · It waits on what it depends on"]
   D2 --> E["PJ-15 · The agent picks it up — assigned, asking first, or on its own"]
@@ -30,7 +32,7 @@ flowchart TD
   F -->|result posted| I["PJ-12 · In review · How it got here"]
   I --> J{"Ana decides"}
   J -->|send back| E
-  J -->|accept| K["PJ-06 · Weigh the finding and its records"]
+  J -->|accept| K["PJ-05 · PJ-06 · Open the branch · weigh the finding and its records"]
   K --> L["PJ-07 · Record a verdict and a decision the rules check"]
   L --> M(["PJ-14 · Publish what we decided"])
 ```
@@ -39,12 +41,13 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
+| 0 | Start a project of its type, when she has none | Evidence · Projects and tasks | PJ-02 | `projects.new` |
 | 1 | Open the project | Evidence · Projects and tasks | PJ-01 | `projects.projects` |
 | 2 | Write a task with its criteria and assign it to an agent she may use | Evidence · Projects and tasks | PJ-12 · PJ-18 | `projects.tasks · Detail` |
 | 3 | The agent picks it up and works, handing parts to helpers | Evidence · Projects and tasks · Agents · Delegation | PJ-15 · AG-24 | `projects.tasks · Detail · How it got here` |
 | 4 | A named approver decides what the agent asks before it acts | Access Plane · Asks and approvals · Control Plane · Inbox | AC-15 · CP-36 | `inbox` |
 | 5 | Review the result: accept or send back | Evidence · Projects and tasks | PJ-12 | `projects.tasks · Detail` |
-| 6 | Weigh the finding | Evidence · Branches, findings and decisions | PJ-06 | `projects.branches · Finding` |
+| 6 | Open the branch and weigh the finding | Evidence · Branches, findings and decisions | PJ-05 · PJ-06 | `projects.branches · Finding` |
 | 7 | Record the decision | Evidence · Branches, findings and decisions | PJ-07 | `projects.branches · Decide` |
 | 8 | Publish it | Evidence · Reports | PJ-14 | `projects.report` |
 

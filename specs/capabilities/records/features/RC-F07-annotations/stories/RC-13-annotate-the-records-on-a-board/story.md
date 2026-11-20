@@ -82,3 +82,7 @@ flowchart LR
 | Annotations on the board | Operator | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Someone else's |
 | The Annotations panel | Admin | explore.board · Annotate · Panel empty | explore.board · Annotate · Panel hidden | explore.board · Annotate · Loading | explore.board · Annotate · Panel | — | explore.board · Annotate · Evidence | — |
 | The Annotations panel | Operator | explore.board · Annotate · Panel empty | explore.board · Annotate · Panel hidden | explore.board · Annotate · Loading | explore.board · Annotate · Panel | — | explore.board · Annotate · Evidence | — |
+| An annotation · save | Admin | explore.board · Annotate | — | explore.board · Annotate · Saving | data.annotations | explore.board · Annotate · Could not save | — | — |
+| An annotation · save | Operator | explore.board · Annotate | — | explore.board · Annotate · Saving | data.annotations | explore.board · Annotate · Could not save | — | — |
+| An annotation · someone else's | Admin | — | — | — | explore.board · Annotate · Someone else's | — | — | — |
+| An annotation · someone else's | Operator | — | — | — | explore.board · Annotate · Someone else's | — | — | — |

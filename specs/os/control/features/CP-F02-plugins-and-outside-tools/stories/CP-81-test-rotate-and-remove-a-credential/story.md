@@ -5,7 +5,7 @@ feature: CP-F02
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.plugins, settings.me, settings.connectors]
+boards: [settings.connectors, access.signin, flow.manage_credential]
 ---
 
 # CP-81 · Test, rotate and remove a credential
@@ -45,29 +45,38 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-81.1 | A connection of one's own, or a work connection with Manage on its plugin | *Test* is pressed | Invana makes one read-only call to the server with the credential and shows *Works* with the account's name and the time, or *Failed* with the server's answer; no record of the Graph is carried |
-| CP-81.2 | A test | it is made | the call is ledgered naming the connection, never its credential ([AC-F09](../../../../../access/features/AC-F09-what-left-the-platform/feature.md)), and History records who tested which connection |
-| CP-81.3 | A connection the server stopped renewing | it is read or tested | it reads *Expired* with *Reconnect* for a person's own and *Renew* for a work connection; calls that need it are refused until it is replaced |
-| CP-81.4 | A work connection or a personal connection | its person or an Admin with Manage on the plugin presses *Rotate* and gives the password again | a token connection asks for the new token, an OAuth one sends the browser to the server's sign-in; the new credential is tried before anything is replaced |
+| CP-81.1 | A work connection with Manage on its plugin | *Test* is pressed | Invana makes one read-only call to the server with the credential and shows *Works* with the account's name and the time, or *Failed* with the server's answer; no record of the Graph is carried |
+| CP-81.2 | A test | it is made | the call is ledgered naming the connection, never its credential ([AC-F06](../../../../../access/features/AC-F06-history/feature.md)), and History records who tested which connection |
+| CP-81.3 | A connection the server stopped renewing | it is read or tested | it reads *Expired* with *Renew*; calls that need it are refused until it is replaced |
+| CP-81.4 | A work connection | an Admin with Manage on the plugin presses *Rotate* and gives the password again | a token connection asks for the new token, an OAuth one sends the browser to the server's sign-in; the new credential is tried before anything is replaced |
 | CP-81.5 | A rotation whose new credential works | the try ends | it replaces the old one at once; every attachment to an agent stays; the old credential stops working in Invana; History records who and when, never either secret |
 | CP-81.6 | A rotation whose new credential the server refuses | the try ends | nothing is replaced — the old credential stays in force — and the answer is named |
-| CP-81.7 | The second Admin's yes is on for the deployment | an Admin rotates a work connection | it reads *Waiting for another Admin*; the old credential stays in force until another Admin approves ([CP-62.3](../CP-62-make-a-work-connection-and-attach-it-to-agents/story.md)) |
+| CP-81.7 | The second Admin's yes is on for the deployment | an Admin rotates a work connection | it reads *Waiting for another Admin*; the old credential stays in force until another Admin approves (CP-80.14) |
 | CP-81.8 | A work connection attached to agents | an Admin presses *Remove* | the agents it is attached to are listed first; on confirm it is taken off each and removed; History records it |
-| CP-81.9 | A personal connection | its person presses *Disconnect* | it is removed at once and the next call for their runs is refused as [CP-43.5](../CP-43-connect-my-own-account-to-an-outside-server/story.md) says |
-| CP-81.10 | A removed credential | an agent's step needs it | the step is refused before the call, naming the agent and the server, as [CP-62.7](../CP-62-make-a-work-connection-and-attach-it-to-agents/story.md) says |
+| CP-81.9 | A work connection | an Admin removes it while an agent still calls through it | the next call for that agent is refused before it leaves, naming the agent and the server |
+| CP-81.10 | A removed credential | an agent's step needs it | the step is refused before the call, naming the agent and the server, as CP-80.18 says |
 | CP-81.11 | Rotating or removing | it is done without the password, with a wrong one, or with a key | it is refused — *Enter your password again to do this*; a test changes nothing, so it asks no password |
 | CP-81.12 | An Operator without Manage on the plugin | they test, rotate or remove a work connection by any path | it is refused — *Needs Manage on the {name} plugin — ask {who can grant}* — and the acts read disabled, naming the permission |
-| CP-81.13 | An Operator | they read another person's connection by any path | it is absent (`404`) |
+| CP-81.13 | An Operator | they read a work connection by any path | the credential is never shown |
+| CP-81.14 | An Admin | they rotate or remove a credential and sign in again | *Sign in again* names *Rotate the credential* or *Remove the credential* and returns to *Rotated* or *Removed*; the last credential removed leaves *None yet*; a wrong password returns to the same *Sign in again* with *Enter your password again to do this* |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A work connection | Admin | — | — | settings.plugins · Servers · Work connections · Testing | settings.plugins · Servers · Work connections · Works | settings.plugins · Servers · Work connections · Failed | — | — |
-| A work connection | Operator | — | — | — | settings.plugins · Servers · Work connections · Read only | — | — | settings.plugins · Servers · Work connections · Read only |
-| Rotate a credential | Admin | — | — | settings.plugins · Servers · Work connections · Rotating | settings.plugins · Servers · Work connections · Rotate | settings.plugins · Servers · Work connections · Rotate · Refused | — | — |
-| Rotate a credential | Operator | — | — | — | — | — | — | settings.plugins · Servers · Work connections · Read only |
-| Remove a credential | Admin | — | — | — | settings.plugins · Servers · Work connections · Remove | settings.plugins · Servers · Work connections · Remove · Refused | — | — |
-| Remove a credential | Operator | — | — | — | — | — | — | settings.plugins · Servers · Work connections · Read only |
-| My own account | Admin | settings.me · Connections · Personal connections | — | settings.me · Connections · Testing | settings.me · Connections · Works | settings.me · Connections · Expired | — | — |
-| My own account | Operator | settings.me · Connections · Personal connections | — | settings.me · Connections · Testing | settings.me · Connections · Works | settings.me · Connections · Expired | — | — |
+| Test a credential | Admin | — | — | settings.connectors · Detail · Credentials · Testing | settings.connectors · Detail · Credentials · Works | settings.connectors · Detail · Credentials · Failed | — | — |
+| Test a credential | Operator | — | — | — | settings.connectors · Detail · Credentials · Read only | — | — | settings.connectors · Detail · Credentials · Read only |
+| A credential that expired | Admin | — | — | — | — | settings.connectors · Detail · Credentials · Expired | — | — |
+| A credential that expired | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |
+| Rotate a credential | Admin | — | — | settings.connectors · Detail · Credentials · Rotating | settings.connectors · Detail · Credentials · Rotate | settings.connectors · Detail · Credentials · Rotate · Refused | — | — |
+| Rotate a credential | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |
+| Rotate · Password again | Admin | — | — | — | access.signin · Sign in again · Rotate the credential | access.signin · Sign in again · Rotate the credential · Wrong password | — | — |
+| Rotate · Password again | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |
+| Rotate · Rotated | Admin | — | — | — | settings.connectors · Detail · Credentials · Rotated | — | — | — |
+| Rotate · Rotated | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |
+| Remove a credential | Admin | — | — | — | settings.connectors · Detail · Credentials · Remove | settings.connectors · Detail · Credentials · Remove · Refused | — | — |
+| Remove a credential | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |
+| Remove · Password again | Admin | — | — | — | access.signin · Sign in again · Remove the credential | access.signin · Sign in again · Remove the credential · Wrong password | — | — |
+| Remove · Password again | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |
+| Remove · Removed | Admin | settings.connectors · Detail · Credentials · None yet | — | — | settings.connectors · Detail · Credentials · Removed | — | — | — |
+| Remove · Removed | Operator | — | — | — | — | — | — | settings.connectors · Detail · Credentials · Read only |

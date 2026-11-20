@@ -64,3 +64,7 @@ flowchart LR
 | To decide | Operator | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |
 | A problem | Admin | — | — | data.quality · Checks · Loading | data.quality · Checks · Problem | data.quality · Checks · Fix refused | — | — |
 | A problem | Operator | — | — | data.quality · Checks · Loading | data.quality · Checks · Problem | data.quality · Checks · Fix refused | — | data.quality · Checks · Fix needs a grant |
+| A problem · fix | Admin | data.quality · Checks · Problem | — | data.quality · Checks · Fixing | data.quality · Checks · Fixed | data.quality · Checks · Fix refused | — | — |
+| A problem · fix | Operator | data.quality · Checks · Problem | — | data.quality · Checks · Fixing | data.quality · Checks · Fixed | data.quality · Checks · Fix refused | — | — |
+| A problem · changed meanwhile | Admin | data.quality · Checks · Problem | — | — | — | data.quality · Checks · Changed meanwhile | — | — |
+| A problem · changed meanwhile | Operator | data.quality · Checks · Problem | — | — | — | data.quality · Checks · Changed meanwhile | — | — |

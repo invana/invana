@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [start.home]
+boards: [start.home, flow.start_first_run]
 ---
 
 # CP-24 · See what is left before the first answer
@@ -54,6 +54,7 @@ flowchart TD
 | CP-24.11 | A person signing in to a ready deployment | Home opens | they never see set-up |
 | CP-24.12 | An Operator | they reach a step's act | it reads the permission it needs — *Ask an Admin*, or *Needs {permission} on {resource} — ask {who can grant}* — naming who can grant it |
 | CP-24.13 | The AI model failing its check | set-up reads | the step reads not done, and Explore and the console keep working — the step says so |
+| CP-24.14 | An Admin on *Set-up* | they press *Continue set-up* | the next step's place opens at its first state — *Connect a graph database* while none is connected; an Operator reads *Ask an Admin* and the acts stay disabled |
 
 ## Screens
 
@@ -63,3 +64,5 @@ flowchart TD
 | Set-up | Operator | start.home · Set-up | — | start.home · Set-up · Loading | start.home · Set-up · Two of four | start.home · Set-up · Could not load | start.home · Set-up · Drafting below | start.home · Set-up · Ask an Admin |
 | Home mid set-up | Admin | — | — | start.home · Loading | start.home · Continue set-up | start.home · Could not load | — | — |
 | Home mid set-up | Operator | — | — | start.home · Loading | start.home · Continue set-up | start.home · Could not load | — | start.home · Continue set-up |
+| Continue set-up | Admin | — | — | — | settings.databases · Connect | — | — | — |
+| Continue set-up | Operator | — | — | — | — | — | — | start.home · Set-up · Ask an Admin |

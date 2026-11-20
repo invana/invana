@@ -42,7 +42,7 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Start a Software project and a Research project | Projects · New project | [PJ-02](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md) | `projects.projects · New` |
+| 1 | Start a Software project and a Research project | Projects · New project | [PJ-02](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-02-start-a-project-of-its-type/story.md) | `projects.new` |
 | 2 | Add sources; the subject models are parsed; link a competitor Capability to our Feature | Projects · a project › Map | [PJ-28](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-28-ground-a-project-in-its-subject-model/story.md) | `projects.graph` |
 | 3 | Sketch nodes with the assistant; save a version | Projects · a project › Map | [PJ-30](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-30-sketch-nodes-with-the-assistant/story.md) | `projects.graph · Sketch` |
 | 4 | Ask the graph from a node or a group | Projects · a project › Map | [PJ-29](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-29-ask-the-graph-from-a-node-or-a-group/story.md) | `projects.graph · Map · Ask` |

@@ -4,7 +4,7 @@ title: Give a project its kinds of task
 feature: PJ-F01
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.projects, projects.tasks]
+boards: [projects.projects, projects.tasks, projects.settings]
 ---
 
 # PJ-20 · Give a project its kinds of task
@@ -46,7 +46,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| PJ-20.1 | A project | its Details › *Task kinds* opens | it lists every kind its type declares — each with its fields and default checks — and which the project uses; *Task* and *Recommendation* are always on and cannot be turned off |
+| PJ-20.1 | A project | its settings › General › *Task kinds* opens | it lists every kind its type declares — each with its fields and default checks — and which the project uses; *Task* and *Recommendation* are always on and cannot be turned off |
 | PJ-20.2 | A person on the team | they turn a kind on or off | it is saved, *New task* offers only the kinds on, and History records who and which kind |
 | PJ-20.3 | *New task* on a project | it opens | the kind is asked first; picking it brings that kind's fields and its default checks (PJ-25) |
 | PJ-20.4 | A task of a kind the project does not use, or a field its kind does not declare | it is saved | it is refused, naming the kind or the field and why; nothing is saved |
@@ -60,7 +60,7 @@ flowchart TD
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Task kinds | Admin | projects.projects · Detail · Task kinds · Only the two | — | projects.projects · Detail · Task kinds · Loading | projects.projects · Detail · Task kinds | projects.projects · Detail · Task kinds · Kind in use | — | — |
-| Task kinds | Operator | projects.projects · Detail · Task kinds · Only the two | — | projects.projects · Detail · Task kinds · Loading | projects.projects · Detail · Task kinds | projects.projects · Detail · Task kinds · Kind in use | — | projects.projects · Detail · Task kinds · Not a person on the team |
+| Task kinds | Admin | projects.settings · General · Task kinds · Only the two | — | projects.settings · General · Task kinds · Loading | projects.settings · General · Task kinds | projects.settings · General · Task kinds · Kind in use | — | — |
+| Task kinds | Operator | projects.settings · General · Task kinds · Only the two | — | projects.settings · General · Task kinds · Loading | projects.settings · General · Task kinds | projects.settings · General · Task kinds · Kind in use | — | projects.settings · General · Task kinds · Not a person on the team |
 | New task by kind | Admin | projects.tasks · New · Pick a kind | — | — | projects.tasks · New · Kind fields | projects.tasks · New · Field refused | — | — |
 | New task by kind | Operator | projects.tasks · New · Pick a kind | — | — | projects.tasks · New · Kind fields | projects.tasks · New · Field refused | — | projects.tasks · Detail · Withheld |

@@ -6,7 +6,7 @@ status: idea
 personas: [admin, modeller, analyst]
 stories: [CP-84]
 journeys: [J07]
-boards: [settings.databases, settings.connectors]
+boards: [settings.databases, settings.connectors, access.signin, flow.connect_data_store]
 nfrs: [NFR-SEC-2, NFR-SEC-7, NFR-SEC-9, NFR-PERF-3]
 depends_on: [AC-F01, AC-F02, AC-F09, CP-F02, CP-F03, CP-F05, SE-F02]
 ---
@@ -28,7 +28,7 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 flowchart TD
   s([Settings › Databases › Data stores]) --> l["Every data store: connector · kind · mode · switch · health · region"]
   l -->|Admin · Connect a data store| pk{"Its connector installed?"}
-  pk -->|no| pn(["CP-17 · Not offered · names the package to install"])
+  pk -->|no| pn(["CP-79 · Not offered · names the package to install"])
   pk -->|yes| c["CP-84 · Name · Connect · Test · Ready"]
   c -->|the address is Invana's own database| own(["Refused · connect a separate instance"])
   c --> t{"Test connection"}

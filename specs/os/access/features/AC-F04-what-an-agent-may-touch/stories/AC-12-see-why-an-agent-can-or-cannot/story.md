@@ -63,6 +63,7 @@ flowchart TD
 | AC-12.18 | *What it can do* | it is read | it is a matrix of action × resource, and each row reads, in columns: what the skill needs · its policies · the person who started it · the project it runs in · the boundary · *Effective* · *Why not* — the first column that refuses is marked and the others read what they would have allowed |
 | AC-12.19 | *What it can do* | the reader picks *Started by* and *In a project* | the matrix is worked out again for that person and that project — the agent's ceiling when neither is picked (AC-12.5) — and the picks are in the address, so the view can be shared |
 | AC-12.20 | *Who it may hand work to* | it is read | it lists each agent the reader's agent may run (AC-12.11) inside the same view, below the matrix, with the rule that allows it |
+| AC-12.21 | A refused step on its run | the reader presses *Ask for more* | the ask opens in *Needs you* (AC-14) and the step holds; an ask decided meanwhile reads *Already decided* |
 | AC-12.15 | A refused step | the reader opens *How it got here* on its run | it shows the step, the check that refused it, the rule, its policy and version, any ceiling that narrowed it and who saved the rule, as they were when the step ran |
 | AC-12.16 | The list of agents | it fails to load | it says what could not load, with *Try again* |
 
@@ -78,3 +79,5 @@ flowchart TD
 | An agent — refusals | Operator | settings.agent_access · Locked · No refusals | — | settings.agent_access · Locked · Loading | settings.agent_access · Locked · Refusals | settings.agent_access · Locked · Could not load | — | settings.agent_access · Locked · Refusals |
 | The refused step on its run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Refused by a rule | agents.runs · Detail · Failed | — | — |
 | The refused step on its run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Refused by a rule | agents.runs · Detail · Failed | — | agents.runs · Detail · Content withheld |
+| The refused step · Ask for more | Admin | — | — | — | inbox · An agent asks for more | inbox · Already decided | — | — |
+| The refused step · Ask for more | Operator | — | — | — | inbox · An agent asks for more | inbox · Already decided | — | inbox · Not yours to answer |

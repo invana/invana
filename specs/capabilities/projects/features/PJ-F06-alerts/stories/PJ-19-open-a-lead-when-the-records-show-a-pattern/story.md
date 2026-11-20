@@ -49,7 +49,7 @@ flowchart TD
 |---|---|---|---|
 | PJ-19.1 | An alert rule naming a project — *a Customer whose Orders in the last 30 days fall below 3* — and a load whose records match it | the load settles | a lead opens in that project — a task or a branch, as the rule says — citing the rule, the load and the matched records |
 | PJ-19.2 | An open lead from a rule | the same records match it again | the match is added to that lead and its count moves; no second lead opens |
-| PJ-19.3 | A rule whose project is archived or deleted | it matches | no lead opens, and the rule's author is told in the Inbox, naming the project |
+| PJ-19.3 | A rule whose project is archived | it matches | no lead opens, and the rule's author is told in the Inbox, naming the project |
 | PJ-19.4 | A project with leads | its *Alerts* list opens | leads read newest first with the rule, how many records matched, when it opened and open · taken · dismissed — each count from the engine |
 | PJ-19.5 | A lead | a person who can see the project takes it | it becomes ordinary work, assigned as they pick — a person, or an agent they may use (PJ-F01); an agent they may not use is refused — *You may not use {agent} — ask an Admin* |
 | PJ-19.6 | A lead | a person dismisses it without a reason | it is refused, asking for the reason; nothing changes |

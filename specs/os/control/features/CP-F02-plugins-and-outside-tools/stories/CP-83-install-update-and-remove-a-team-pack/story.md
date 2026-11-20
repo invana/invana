@@ -4,7 +4,7 @@ title: Install, update and remove a Team pack
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.packs, settings.policies, settings.plugins]
+boards: [settings.packs, settings.policies, settings.plugins, flow.manage_pack]
 ---
 
 # CP-83 · Install, update and remove a Team pack
@@ -55,16 +55,23 @@ flowchart TD
 | CP-83.9 | A removed pack | it is read | it lists as not installed, with *Install* again; installing it again starts it off |
 | CP-83.10 | An Operator | they open *Install*, *Update* or *Remove* | everything reads, each act is disabled, naming the permission, and the engine refuses it the same ([CP-20.6](../CP-20-install-a-team-pack/story.md)) |
 | CP-83.11 | Any act on a pack | it is done | History records it with the pack's name and version, and the act is never an environment change or a restart |
+| CP-83.12 | An Admin | they confirm *Install*, *Apply upgrade* or *Remove* | each reads its wait — *Installing*, *Applying*, *Removing* — then its result — *Installed, off*, *Upgraded*, *Removed* — and the list shows the pack as it now is; a clash or a manifest the engine refuses reads *Pack clashes* or *Manifest refused* with *Back*; a refused upgrade or removal reads *Refused*, naming why |
 
 ## Screens
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Install a pack | Admin | settings.packs · Install | — | settings.packs · Install · Installing | settings.packs · Install · What it brings | settings.packs · Install · Pack clashes | — | — |
+| Install a pack | Admin | settings.packs · Install | — | settings.packs · Install · Installing | settings.packs · Install · What it brings | settings.packs · Install · Pack clashes · Manifest refused | — | — |
 | Install a pack | Operator | — | — | — | settings.packs · Install · What it brings · Read only | — | — | settings.packs · Packs · Read only |
+| Install a pack · Installed | Admin | — | — | — | settings.packs · Install · Installed, off | — | — | — |
+| Install a pack · Installed | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
 | Update a pack | Admin | — | — | settings.packs · Upgrade · Loading | settings.packs · Upgrade · Diff | settings.packs · Upgrade · Refused | — | — |
 | Update a pack | Operator | — | — | — | settings.packs · Upgrade · Diff · Read only | — | — | settings.packs · Packs · Read only |
+| Update a pack · Applying | Admin | — | — | settings.packs · Upgrade · Applying | settings.packs · Upgrade · Upgraded | settings.packs · Upgrade · Refused | — | — |
+| Update a pack · Applying | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
 | Remove a pack | Admin | — | — | settings.packs · Remove · Removing | settings.packs · Remove | settings.packs · Remove · Refused | — | — |
 | Remove a pack | Operator | — | — | — | settings.packs · Remove · Read only | — | — | settings.packs · Packs · Read only |
+| Remove a pack · Removed | Admin | — | — | — | settings.packs · Remove · Removed | — | — | — |
+| Remove a pack · Removed | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |
 | Team packs | Admin | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs | settings.packs · Pack clashes | — | — |
 | Team packs | Operator | settings.packs · No pack installed | settings.packs · Nothing matches | settings.packs · Loading | settings.packs · Packs · Read only | settings.packs · Could not load | — | settings.packs · Packs · Read only |

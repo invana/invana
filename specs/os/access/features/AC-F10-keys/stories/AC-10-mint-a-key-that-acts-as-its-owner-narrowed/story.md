@@ -4,7 +4,7 @@ title: Mint a key that acts as its owner, narrowed
 feature: AC-F10
 status: idea
 personas: [admin, builder, analyst]
-boards: [settings.me, access.signin, settings.people, projects.projects]
+boards: [settings.me, access.signin, settings.people, projects.projects, flow.mint_key]
 ---
 
 # AC-10 · Mint a key that acts as its owner, narrowed
@@ -92,6 +92,7 @@ sequenceDiagram
 | AC-10.25 | A project key | its minter leaves the team or is deactivated, or people join or leave | it keeps working, its reach still the project's policies |
 | AC-10.26 | A project with keys | it is archived or deleted | its keys are revoked in the same act; their next call is told so |
 | AC-10.27 | A key | it sends a raw query to a graph database where its owner's policies or the agent's ceiling hide anything | it is refused with *Raw queries are not available on {graph database}*, naming no kind and no rule; typed query plans run (AC-27.27) |
+| AC-10.28 | *New key* | the person fills its name, *Narrow to*, expiry and owner and enters their password | *Only you and your projects* limits the owner; *Sign in again* names *Make the key*; a wrong password returns to the same *Sign in again* with the message, nothing minted; a right one shows the secret once, *Copy* reads *Copied* and *Done* returns to *Keys* with the new row |
 
 ## Screens
 
@@ -99,9 +100,19 @@ sequenceDiagram
 |---|---|---|---|---|---|---|---|---|
 | Your keys | Admin | settings.me · No keys yet | — | settings.me · Loading | settings.me · Keys | settings.me · At the ceiling | — | — |
 | Your keys | Operator | settings.me · No keys yet | — | settings.me · Loading | settings.me · Keys | settings.me · At the ceiling | — | — |
-| New key — then its secret | Admin | settings.me · New key | — | access.signin · Sign in again | settings.me · New key · Secret once | settings.me · New key · Name taken | — | — |
-| New key — then its secret | Operator | settings.me · New key | — | access.signin · Sign in again | settings.me · New key · Secret once | settings.me · New key · Name taken | — | — |
+| New key — then its secret | Admin | settings.me · New key | — | access.signin · Sign in again · Make the key | settings.me · New key · Secret once | settings.me · New key · Name taken | — | — |
+| New key — then its secret | Operator | settings.me · New key | — | access.signin · Sign in again · Make the key | settings.me · New key · Secret once | settings.me · New key · Name taken | — | — |
 | A project's keys | Admin | projects.projects · Detail · Keys · No keys yet | — | projects.projects · Detail · Keys · Loading | projects.projects · Detail · Keys | projects.projects · Detail · Keys · At the ceiling | — | — |
 | A project's keys | Operator | projects.projects · Detail · Keys · No keys yet | — | projects.projects · Detail · Keys · Loading | projects.projects · Detail · Keys | projects.projects · Detail · Keys · Could not load | — | projects.projects · Detail · Keys · New key disabled |
 | Every key | Admin | settings.people · No keys yet | settings.people · Nothing matches | settings.people · Loading | settings.people · Keys | settings.people · Could not load | — | — |
 | Every key | Operator | — | — | — | — | — | — | settings.people · Locked · Keys |
+| New key · Owner and expiry | Admin | — | — | — | settings.me · New key · Only you and your projects | — | — | — |
+| New key · Owner and expiry | Operator | — | — | — | settings.me · New key · Only you and your projects | — | — | — |
+| New key · Your password | Admin | — | — | — | access.signin · Sign in again · Make the key | access.signin · Sign in again · Make the key · Wrong password | — | — |
+| New key · Your password | Operator | — | — | — | access.signin · Sign in again · Make the key | access.signin · Sign in again · Make the key · Wrong password | — | — |
+| New key · Copied | Admin | — | — | — | settings.me · New key · Copied | — | — | — |
+| New key · Copied | Operator | — | — | — | settings.me · New key · Copied | — | — | — |
+| Revoke a key | Admin | — | — | — | access.signin · Sign in again · Revoke the key | access.signin · Sign in again · Revoke the key · Wrong password | — | — |
+| Revoke a key | Operator | — | — | — | access.signin · Sign in again · Revoke the key | access.signin · Sign in again · Revoke the key · Wrong password | — | — |
+| Revoked | Admin | — | — | — | settings.me · Keys · Revoked | — | — | — |
+| Revoked | Operator | — | — | — | settings.me · Keys · Revoked | — | — | — |

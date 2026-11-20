@@ -112,3 +112,5 @@ flowchart LR
 | History | Operator | agents.skills · Detail · History one version | — | agents.skills · Detail · Loading | agents.skills · Detail · History | agents.skills · Detail · Could not load | — | agents.skills · Detail · History |
 | The drawing as a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | — |
 | The drawing as a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Not found |
+| Publish · model version | Admin | agents.skills · Detail · Publish | — | agents.skills · Detail · Eval running | agents.skills · Detail · Model version | agents.skills · Detail · Publish refused | — | — |
+| Publish · model version | Operator | agents.skills · Detail · Publish | — | agents.skills · Detail · Eval running | agents.skills · Detail · Model version | agents.skills · Detail · Publish refused | — | — |

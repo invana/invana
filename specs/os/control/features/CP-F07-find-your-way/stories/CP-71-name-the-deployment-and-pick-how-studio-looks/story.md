@@ -4,7 +4,7 @@ title: Name the deployment and pick how Studio looks
 feature: CP-F07
 status: idea
 personas: [admin, analyst]
-boards: [settings.general, settings.appearance, settings.about]
+boards: [settings.general, settings.me, settings.about]
 ---
 
 # CP-71 · Name the deployment and pick how Studio looks
@@ -54,9 +54,9 @@ flowchart LR
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| General | Admin | settings.general · Default name | — | settings.general · Loading | settings.general | settings.general · Could not save | — | — |
-| General | Operator | settings.general · Default name | — | settings.general · Loading | settings.general · Read only | settings.general · Could not load | — | settings.general · Read only |
-| Appearance | Admin | settings.appearance · As the deployment | — | settings.appearance · Loading | settings.appearance | settings.appearance · Could not save | — | — |
-| Appearance | Operator | settings.appearance · As the deployment | — | settings.appearance · Loading | settings.appearance | settings.appearance · Could not save | — | settings.appearance · Default read only |
+| General · name and default theme | Admin | settings.general · Default name | — | settings.general · Loading | settings.general | settings.general · Could not save | — | — |
+| General · name and default theme | Operator | settings.general · Default name | — | settings.general · Loading | settings.general · Read only | settings.general · Could not load | — | settings.general · Read only |
+| Your theme | Admin | settings.me · Your theme · As the deployment | — | settings.me · Loading | settings.me · Your theme | settings.me · Your theme · Could not save | — | — |
+| Your theme | Operator | settings.me · Your theme · As the deployment | — | settings.me · Loading | settings.me · Your theme | settings.me · Your theme · Could not save | — | — |
 | About | Admin | — | — | settings.about · Loading | settings.about | settings.about · Could not load | — | — |
 | About | Operator | — | — | settings.about · Loading | settings.about | settings.about · Could not load | — | — |

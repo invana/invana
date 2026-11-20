@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [settings.databases]
+boards: [settings.databases, flow.set_database_mode]
 ---
 
 # CP-39 · Switch a graph database on or off
@@ -55,6 +55,7 @@ flowchart TD
 | CP-39.8 | A schedule whose work needs a graph database that is off | it fires | it skips the firing and raises an ops alert to its creator and the Admins |
 | CP-39.9 | A workflow whose steps name a graph database that is off | the list of workflows reads | it is flagged, naming the graph database, and its runs are refused until it is on |
 | CP-39.10 | A person's own switch | another person's run reads the graph database | it is unaffected |
+| CP-39.11 | An Admin | they turn a graph database off for the deployment | its row reads *Off for the deployment*, naming who and when; turning it on again reads *On*; a refusal reads *Could not switch* and the switch is unchanged |
 
 ## Screens
 
@@ -62,3 +63,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Switches in the list | Admin | settings.databases · New and off | — | settings.databases · Loading | settings.databases | settings.databases · Could not switch | — | — |
 | Switches in the list | Operator | settings.databases · New and off · Read only | — | settings.databases · Loading | settings.databases · My switch | settings.databases · Off for the deployment | — | settings.databases · Read only |
+| Switch off for the deployment | Admin | — | — | settings.databases · Loading | settings.databases · Off for the deployment | settings.databases · Could not switch | — | — |
+| Switch off for the deployment | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Switch on | Admin | — | — | settings.databases · Loading | settings.databases · On | settings.databases · Could not switch | — | — |
+| Switch on | Operator | — | — | — | — | — | — | settings.databases · Read only |

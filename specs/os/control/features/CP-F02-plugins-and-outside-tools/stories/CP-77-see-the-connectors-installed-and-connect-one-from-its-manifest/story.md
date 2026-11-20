@@ -15,7 +15,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-A connector is installed on the engine's machine ([CP-17](../../../CP-F05-graph-databases/stories/CP-17-install-a-graph-connector-and-see-it-offered/story.md)); connecting one is the permission its kind already needs ([CP-25](../../../CP-F05-graph-databases/feature.md) for a graph database, [CP-73](../../../CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md) for a tracker or a source).
+A connector is installed on the engine's machine ([CP-79](../CP-79-install-a-connector/story.md)); connecting one is the permission its kind already needs ([CP-25](../../../CP-F05-graph-databases/feature.md) for a graph database, [CP-73](../../../CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md) for a tracker or a source).
 
 | Access | Can | Otherwise sees |
 |---|---|---|

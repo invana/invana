@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, builder, modeller]
 stories: [CP-30, CP-68, CP-71]
 journeys: [J05]
-boards: [shell.command, shell.switcher, settings.general, settings.appearance, settings.about]
+boards: [shell.command, shell.switcher, settings.general, settings.me, settings.about]
 nfrs: [NFR-SEC-1, NFR-PERF-3]
 depends_on: [AC-F02, AC-F01]
 ---

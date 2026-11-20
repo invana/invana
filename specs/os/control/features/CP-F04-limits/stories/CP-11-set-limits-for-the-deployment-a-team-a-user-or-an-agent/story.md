@@ -5,7 +5,7 @@ feature: CP-F04
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.limits]
+boards: [settings.limits, flow.set_limits]
 ---
 
 # CP-11 · Set limits for the deployment, a team, a user or an agent
@@ -77,6 +77,8 @@ flowchart TD
 | CP-11.22 | Settings › Workers › Limits | it is read | *AI model calls*, *graph database calls* and *heavy steps* each read their slots, how many are in use and how many steps wait on them — 20 · 50 · 4 on a new deployment — and an Admin may change the slots; an Operator reads them with *Edit* disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
 | CP-11.23 | A project | its limits are set — in its Access, the *Fleet / Workers* tab | only *Runs at once* and *Tokens a month* are offered; any other is refused — *A project takes runs at once and tokens a month.* — and Usage and limits lists the project beside teams, users and agents |
 | CP-11.24 | A project at its *Tokens a month*, with pick-up set to *Allow* | a team agent looks for work | it claims nothing and the project's runs are held — *{project} has used its {n} tokens this month*; there is no other pick-up cap; a person without Manage on Projects for it who sets the limit is refused, naming the permission |
+| CP-11.25 | An Admin | they save limits | the row reads the new figures as *Saved*; a refusal reads *Could not save* naming the field, with the typed values kept |
+| CP-11.26 | An Admin | they press *Clear its limits* on a team, user or agent | a confirm names the subject (*Clear Network planning's limits?*); confirming reads *Cleared* and the row returns to *No limit* |
 
 ## Screens
 
@@ -86,3 +88,9 @@ flowchart TD
 | Limits — the deployment, teams, users and agents | Operator | settings.limits · Default limits · Read only | settings.limits · Nothing matches | settings.limits · Loading | settings.limits · Read only | settings.limits · Could not load | — | settings.limits · Read only |
 | Edit limits | Admin | settings.limits · Edit limits | — | — | settings.limits · Edit limits | settings.limits · Could not save | — | — |
 | Edit limits | Operator | — | — | — | — | — | — | settings.limits · Read only |
+| Save limits | Admin | — | — | — | settings.limits · Saved | settings.limits · Could not save | — | — |
+| Save limits | Operator | — | — | — | — | — | — | settings.limits · Read only |
+| Clear limits | Admin | — | — | — | settings.limits · Clear · Confirm | — | — | — |
+| Clear limits | Operator | — | — | — | — | — | — | settings.limits · Read only |
+| Cleared | Admin | — | — | — | settings.limits · Cleared | — | — | — |
+| Cleared | Operator | — | — | — | — | — | — | settings.limits · Read only |

@@ -4,7 +4,7 @@ title: Say what a project is about
 feature: PJ-F08
 status: idea
 personas: [decision-maker, builder]
-boards: [projects.settings]
+boards: [projects.settings, flow.project_settings]
 ---
 
 # PJ-33 · Say what a project is about
@@ -59,3 +59,5 @@ flowchart TD
 | Settings · General | Operator | projects.settings · General · Just created | — | projects.settings · General · Loading | projects.settings · General | projects.settings · General · Could not save | projects.settings · General · Drafting | projects.settings · General · Read only |
 | Settings · General · archived | Admin | — | — | — | projects.settings · General · Archived | — | — | — |
 | Settings · General · archived | Operator | — | — | — | projects.settings · General · Archived | — | — | projects.settings · General · Read only |
+| Settings · General · save | Admin | projects.settings · General · Just created | — | projects.settings · General · Saving | projects.settings · General · Saved | projects.settings · General · Could not save | — | — |
+| Settings · General · save | Operator | projects.settings · General · Just created | — | projects.settings · General · Saving | projects.settings · General · Saved | projects.settings · General · Could not save | — | — |

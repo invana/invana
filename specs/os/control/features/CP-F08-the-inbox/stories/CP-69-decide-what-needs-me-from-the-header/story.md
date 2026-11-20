@@ -63,6 +63,7 @@ flowchart TD
 | CP-69.14 | The engine cannot read the Inbox | the dropdown opens | it says what it could not read, with *Try again* |
 | CP-69.15 | The dropdown | the person picks *Open the Inbox* | the dropdown closes and the full Inbox opens in the large modal (CP-36.20) |
 | CP-69.16 | An Operator | they read a card whose act needs another person | the act reads *Ask {approver}*, naming who it waits on |
+| CP-69.17 | A row in the dropdown | it is pressed | *Needs you* opens on that same ask; an ask decided meanwhile reads *Already decided* |
 
 ## Screens
 
@@ -72,3 +73,5 @@ flowchart TD
 | The Inbox dropdown | Operator | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | inbox.dropdown · Could not load | inbox.dropdown · A proposal | inbox.dropdown · Ask an approver |
 | Confirm what changes | Admin | — | — | — | inbox.dropdown · Confirm | inbox.dropdown · Confirm · Refused | — | — |
 | Confirm what changes | Operator | — | — | — | inbox.dropdown · Confirm | inbox.dropdown · Confirm · Refused | — | — |
+| A row opens its ask | Admin | — | — | — | inbox · Needs you · The same ask | inbox · Needs you · Already decided | — | — |
+| A row opens its ask | Operator | — | — | — | inbox · Needs you · The same ask | — | — | inbox · Not yours to answer |

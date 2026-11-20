@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder, decision-maker]
 stories: [CP-73, CP-74, CP-78]
 journeys: [J10, J11, J13]
-boards: [settings.plugins, projects.projects, projects.tasks, inbox]
+boards: [settings.connectors, projects.projects, projects.tasks, inbox]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-7, NFR-SEC-8, NFR-SEC-14, NFR-SEC-15, NFR-SEC-16]
 depends_on: [CP-F02, PJ-F01, AC-F02, AC-F05, AC-F09, CP-F08]
 ---
@@ -111,7 +111,7 @@ Permissions are [the permission catalogue](../../../access/features/AC-F02-acces
 | A public tracker gets no data | To a public repository only counts, check names, pass or fail and a link go out; data-bearing comments, created issues, pushes and pull requests are off until an Admin opts the connection in, with a warning shown at that act |
 | A fetch goes only where allowed | The Web adapter reaches only the hosts an Admin allows, over https, and Local files only under the Admin's root ([NFR-SEC-16](../../../../system-design.md#3-non-functional-requirements)) |
 | A milestone maps to the tracker's own | GitHub's milestone; a tracker with none gets the label `milestone:<name>` as the generic fallback |
-| A work connection signs in | A tracker signs in with a work connection ([CP-62](../CP-F02-plugins-and-outside-tools/stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md)); the agents' acts use the one attached to them |
+| A work connection signs in | A tracker signs in with a work connection ([CP-80](../CP-F02-plugins-and-outside-tools/stories/CP-80-add-a-credential-to-a-connector-and-connect-it/story.md)); the agents' acts use the one attached to them |
 | Sync is a pull, then a push | A worker reads a linked project's issues every 60 seconds (or on the tracker's webhook, when it has one) and applies the field map; an act in Invana writes through the adapter first and the twin follows what the tracker returns |
 | Backend owns every number | Counts of issues synced, conflicts and items waiting are the engine's |
 

@@ -73,3 +73,5 @@ flowchart TD
 | Deciding a suggested change | Operator | inbox · Nothing suggested | — | inbox · Loading | inbox · Suggested change | inbox · Stale base | inbox · Waits on approvers | inbox · Suggested change, read only |
 | The version's outcome | Admin | agents.skills · Detail · History, no outcomes | — | agents.skills · Detail · Watching | agents.skills · Detail · History | agents.skills · Detail · Worsened | agents.skills · Detail · Revert suggested | — |
 | The version's outcome | Operator | agents.skills · Detail · History, no outcomes | — | agents.skills · Detail · Watching | agents.skills · Detail · History | agents.skills · Detail · Worsened | agents.skills · Detail · Revert suggested | agents.skills · Detail · Read only |
+| Decide · accept | Admin | inbox · Suggested change | — | inbox · Publishing | agents.skills · Detail · History | inbox · Stale base | inbox · Waits on approvers | — |
+| Decide · accept | Operator | inbox · Suggested change | — | inbox · Publishing | agents.skills · Detail · History | inbox · Stale base | inbox · Waits on approvers | — |

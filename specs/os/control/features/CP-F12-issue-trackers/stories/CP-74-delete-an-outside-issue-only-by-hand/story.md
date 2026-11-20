@@ -4,7 +4,7 @@ title: Delete an outside issue only by hand
 feature: CP-F12
 status: idea
 personas: [admin, builder, decision-maker]
-boards: [settings.plugins, inbox]
+boards: [settings.connectors, inbox]
 ---
 
 # CP-74 · Delete an outside issue only by hand
@@ -52,7 +52,7 @@ flowchart TD
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Waiting deletion | Admin | settings.plugins · Waiting deletion · Nothing waiting | settings.plugins · Waiting deletion · Nothing matches | settings.plugins · Waiting deletion · Loading | settings.plugins · Waiting deletion | settings.plugins · Waiting deletion · Tracker unreachable | settings.plugins · Waiting deletion · Agent tagged | — |
-| Waiting deletion | Operator | settings.plugins · Waiting deletion · Nothing waiting | settings.plugins · Waiting deletion · Nothing matches | settings.plugins · Waiting deletion · Loading | settings.plugins · Waiting deletion | settings.plugins · Waiting deletion · Tracker unreachable | settings.plugins · Waiting deletion · Agent tagged | settings.plugins · Waiting deletion · Withheld |
+| Waiting deletion | Admin | settings.connectors · Trackers · Waiting deletion · Nothing waiting | settings.connectors · Trackers · Waiting deletion · Nothing matches | settings.connectors · Trackers · Waiting deletion · Loading | settings.connectors · Trackers · Waiting deletion | settings.connectors · Trackers · Waiting deletion · Tracker unreachable | settings.connectors · Trackers · Waiting deletion · Agent tagged | — |
+| Waiting deletion | Operator | settings.connectors · Trackers · Waiting deletion · Nothing waiting | settings.connectors · Trackers · Waiting deletion · Nothing matches | settings.connectors · Trackers · Waiting deletion · Loading | settings.connectors · Trackers · Waiting deletion | settings.connectors · Trackers · Waiting deletion · Tracker unreachable | settings.connectors · Trackers · Waiting deletion · Agent tagged | settings.connectors · Trackers · Waiting deletion · Withheld |
 | A deletion in Needs you | Admin | — | — | — | inbox · Needs you · Waiting deletion | inbox · Needs you · Waiting deletion · Tracker unreachable | — | — |
 | A deletion in Needs you | Operator | — | — | — | inbox · Needs you · Waiting deletion | inbox · Needs you · Waiting deletion · Tracker unreachable | — | inbox · Needs you · Waiting deletion · Withheld |

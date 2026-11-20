@@ -51,7 +51,7 @@ flowchart TD
 |---|---|---|---|
 | EX-05.1 | A valid plan that returns zero rows | the run settles | the reply is *Cannot answer*, worded as an answer to the question asked, never an empty table or a zeroed chart |
 | EX-05.2 | A cannot answer | it is shown | it is drawn calmly — a dashed border, no colour of alarm, no citation strip — so it is never mistaken for an answer |
-| EX-05.3 | A question about a kind no published model has | the run settles | it names what is missing and what Graph Data holds instead |
+| EX-05.3 | A question about a kind no published model has | the run settles | it names what is missing, what Graph Data holds instead and who can add the kind — the people with Edit on Models, by name — with no request to make |
 | EX-05.4 | A kind that is modelled but holds no data | the run settles | it says the kind is modelled but empty and offers *Load data* |
 | EX-05.5 | A deployment with nothing loaded | the person asks | it says nothing is loaded yet and offers *Load data* |
 | EX-05.6 | Any cannot answer | it is shown | it is worded in the agent's voice and ends with a question Graph Data can answer, one click to ask |

@@ -4,7 +4,7 @@ title: Let Claude Code and other clients use the deployment
 feature: CP-F02
 status: idea
 personas: [builder, curator, analyst, admin]
-boards: [settings.mcp]
+boards: [settings.mcp, settings.me, flow.connect_client_with_key]
 ---
 
 # CP-03 · Let Claude Code and other clients use the deployment
@@ -57,6 +57,7 @@ flowchart TD
 |---|---|---|---|
 | CP-03.1 | A signed-in person | they open *MCP server* | its address, *How a client connects* — the command for Claude Code, an IDE or a script with a key (AC-10) — what it serves with a switch each, and their recent calls read |
 | CP-03.16 | A person with no live key | they read *How a client connects* | it says a client connects with a key and offers *New key*, which opens AC-10's New key and returns here with the key in the command |
+| CP-03.17 | An Admin on *How a client connects* with no key yet | they press *Make a key* | *New key* opens (AC-10) and, once the key is made, returns to *With a key* with the address and the header the client needs |
 | CP-03.2 | Nothing served yet | the page opens | every agent and record tool that may be served lists with its switch off, and recent calls says *No calls yet* with how to connect |
 | CP-03.3 | An Admin | they serve an agent or a record tool | a caller lists it from their next call, if it is granted to the person and within their default agent's reach — an agent as `ask_<agent>`, *Check records* and *Load records* by their tool names |
 | CP-03.4 | An agent that is paused, retired or a draft | the served list is read, or a call reaches it | it cannot be served; a call to it is refused, naming its status |
@@ -82,3 +83,5 @@ flowchart TD
 | How a client connects | Operator | settings.mcp · How a client connects · No key yet | — | — | settings.mcp · How a client connects · With a key | settings.mcp · How a client connects · Key refused | — | — |
 | Recent calls | Admin | settings.mcp · No calls yet | settings.mcp · Nothing matches | settings.mcp · Loading | settings.mcp · Recent calls | settings.mcp · Call refused | — | — |
 | Recent calls | Operator | settings.mcp · No calls yet | settings.mcp · Nothing matches | settings.mcp · Loading | settings.mcp · My calls | settings.mcp · Call refused | — | — |
+| Make a key for a client | Admin | — | — | — | settings.me · New key | — | — | — |
+| Make a key for a client | Operator | — | — | — | — | — | — | settings.mcp · Read only |

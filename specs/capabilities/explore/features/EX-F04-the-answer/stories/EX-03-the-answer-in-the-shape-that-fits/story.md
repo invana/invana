@@ -83,3 +83,11 @@ flowchart LR
 | Author a template | Admin | agents.skills · Author template | — | — | agents.skills · Author template | agents.skills · Template refused | — | — |
 | Author a template | Operator | — | — | — | — | — | — | agents.skills · Read only |
 | Projection templates | Operator | agents.skills · Shipped templates | agents.skills · No template matches | agents.skills · Loading | agents.skills · Answer templates | — | — | agents.skills · Read only |
+| Author a template · 1 Name | Admin | agents.skills · Author template | — | — | agents.skills · Author template · Name | — | — | — |
+| Author a template · 1 Name | Operator | agents.skills · Author template | — | — | agents.skills · Author template · Name | — | — | — |
+| Author a template · 2 Kind and surface | Admin | agents.skills · Author template · Name | — | — | agents.skills · Author template · Kind and surface | — | — | — |
+| Author a template · 2 Kind and surface | Operator | agents.skills · Author template · Name | — | — | agents.skills · Author template · Kind and surface | — | — | — |
+| Author a template · 3 Accepts, shape and intent | Admin | agents.skills · Author template · Kind and surface | — | — | agents.skills · Author template · Accepts, shape and intent | agents.skills · Template refused | — | — |
+| Author a template · 3 Accepts, shape and intent | Operator | agents.skills · Author template · Kind and surface | — | — | agents.skills · Author template · Accepts, shape and intent | agents.skills · Template refused | — | — |
+| Author a template · 4 Judge and rubric | Admin | agents.skills · Author template · Accepts, shape and intent | — | — | agents.skills · Author template · Rubric | agents.skills · Template refused | — | — |
+| Author a template · 4 Judge and rubric | Operator | agents.skills · Author template · Accepts, shape and intent | — | — | agents.skills · Author template · Rubric | agents.skills · Template refused | — | — |

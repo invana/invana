@@ -160,6 +160,21 @@ None — the canvas and the harness need no stack.
 | Budget | |
 | Steps | 1. §4, MVP stories first (CP-10 · CP-25 · CP-84 · AC-04 · AC-06 · PJ-02). 2. The other §4 rows. 3. Sweep every E2E row's states into Screens, MVP journeys first. 4. Flow boards for the seven acts. 5. Index; check |
 
+### P02b · Security criteria — the five highs
+
+| | |
+|---|---|
+| Agent | product-manager |
+| Read | `.agent-reports/security/platform-design-2-threat-model.md` (Step 1 findings 1–5, *Proposed criteria and NFRs*, *Open decisions*) · R587–R591 in `.claude/team/agents-recommendations.md` · `/product-spec` · `/system-design` · CP-F02 · CP-F03 · CP-F12 · CP-78 · AC-F05 · NFR-SEC-14 · NFR-SEC-15 |
+| Stories | Every story the five findings name, and the MVP ones first (CP-F03 sessions · CP-09/CP-10 workers · AC-F05 asks) |
+| Done when | Each high is a criterion on its feature and story, with the states it adds in `## Screens`: **R587** no connection credential in a sandbox — outside calls through the engine, branch uploads by the worker's trusted process, a per-session proxy token for the model, no code host in `net/` (NFR-SEC-17) · **R588** a worker unseals a secret or reports an outcome only under its lease — single-use grants, refused, recorded and alerted outside one; join key 1 h, joins once, never on the command line · **R589** an ask carries the hash of the exact act and expires after 15 minutes; a forced update is pinned to the approved commit; the ask and its *Expired* and *Changed since you approved* states named (NFR-SEC-18) · **R590** branch upload from a fresh bare repository, hooks off, an engine-built `<sha>:refs/heads/<ref>`, a `[a-z0-9-]` slug, checks over the whole range · **R591** every outside text is tainted (tool and A2A results, record text, loads, imports, Memory from a tainted run), taint sticks through lineage and recall, every outward act asks while any is in context, red-team cases named. Ravi's decisions written: **D1** first-party connectors only in the engine process until out-of-process connectors exist · **D2** the refresh token in an HttpOnly cookie on the refresh route only. NFR-SEC-15 widened, NFR-SEC-17 and NFR-SEC-18 in `specs/system-design.md` §3 (only this phase edits §3 in this project). R587–R591, R595 and R597 taken. `check.py` 0 errors. `## Review links` names each story and the board each new state lands on |
+| Lands | The features and stories above · `specs/system-design.md` §3 · the recommendation rows |
+| Boards | — |
+| Review | |
+| Approve | — |
+| Budget | |
+| Steps | 1. MVP findings (R589 · R588 · R587 · R591). 2. R590. 3. NFRs. 4. D1 · D2. 5. Check |
+
 ### P03 · Board engine
 
 | | |
@@ -485,8 +500,9 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01 | Settings decisions |  | done | 2026-11-20 | gates green · reviews passed |
 | P01b | CRUD matrix | P01 | done | 2026-11-20 | gates green · reviews passed |
 | P01c | Settings, slimmed | P01b | done | 2026-11-20 | gates green · reviews passed |
-| P02 | Spec gaps | P01c | pending |  | E2E-007 · §4 |
-| P03 | Board engine | P02 | pending |  | E2E-001 · 002 · 003 · 004 · 021 |
+| P02 | Spec gaps | P01c | in progress | 2026-11-20 | E2E-007 · §4 |
+| P02b | Security criteria — the five highs | P02 | pending |  |  |
+| P03 | Board engine | P02b | pending |  | E2E-001 · 002 · 003 · 004 · 021 |
 | P03b | Click-through harness | P03 | pending |  |  |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | pending |  |  |
 | P04 | Workers | P03b | pending |  | E2E-008 · 009 · 010 |
@@ -519,7 +535,9 @@ What a later phase must know that the code does not say. One row per note, newes
 | — | The settings deferrals (the settings review) are applied by P01 with the recommendation, before Ravi has answered; they are reversible — a `later` story goes back to `idea` and its boards are wired in a later project |
 | — | Models: the run starts with `INVANA_RUNNER_LEAD_MODEL=opus` — every build session (product-manager, designer, the P03c coder and the P11 QA build) runs on Opus; fix rounds and QA review passes on Sonnet (`INVANA_RUNNER_CHEAP_MODEL`). The runner has no per-phase model (Questions) |
 | — | The project branch `feat/platform-design-3` is made off the tip of `platform-design-2/P19-build-plan` before `--start`; the runner forks phase branches from it, never merges or pushes |
-| — | Ravi pre-approved every phase: no Approve stops; he reviews the results afterwards and changes go through the product-manager |
+| — | The run stops for Ravi after P01c, P03, P08b and P11b (rule *Four stops for Ravi*). At P01c he kept every recommendation: S1–S6 and Q1–Q11 all (a), Q10 — non-MVP features stay drawn. After P08b's review the MVP stories move to `designed` and the build plan is written; P09–P11b run later |
+| P01b | The matrix is [platform-design-3-crud](../../../../.agent-reports/product-manager/platform-design-3-crud.md): 88 entities, 24 *missing* cells, 25 MVP gaps (G-A·· and G-B··, checked against the specs). No spec changed. Q1–Q11 (P01b rows) wait for Ravi at P01c's stop; P02 writes what he keeps, by gap ID. P01c folds G-A25 (boards drawn for `later` stories) and the *Beyond its stories?* column of §1 *Features* into its Settings weighing. G-A28 (which story reads the run on J06's `agents.runs`) is unverified — P02 settles it. The session could not write project.md (sensitive path refused unattended) — these rows came from the report |
+| P01c | Proposal only — nothing changed in specs or the mirror. Ravi decides S1–S6 with P01b's Q1–Q11. For each move he keeps: P02 rewrites the stories (CP-47 → CP-34 · CP-60.8–.12 → CP-37 · AC-48 Screens · CP-71 Screens · CP-73 · CP-74 · CP-80 · CP-81 Screens), J07 step 6, `design-language.md` §3 and §8; P03 changes the large-modal nav (Settings: General · You · Connections · Plugins · Workers · Alerts and notifications; Access: Who · What they may do · Record — the *Keeping* item goes whatever he answers, P01 parked it); the owning place phase moves the states and removes `settings.fleet` · `settings.appearance` · `settings.access_now` (project rule *Settings merges*, `null` on publish). If he keeps none, every board stays and only *Keeping* leaves the nav. P01's and P01b's notes are in their reports (*Hand-off note* · *For the project file*) |
 
 ## Questions for Ravi
 
@@ -535,3 +553,23 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 | 2026-11-20 | P01 | AC-49 (*New policy* from a template) starts the MVP policy path but has no milestone | (a) `milestone: MVP` · (b) leave unplanned | (a) | Ravi: (a) — P01 adds `milestone: MVP` |
 | 2026-11-20 | Start | R603 (design-story) and R604 (design-qa) edit `.claude/skills/` — team rules no agent may edit | (a) Ravi applies both in a short session before `--start` · (b) after the run; the project's rules and P11 already hold the end-to-end rule | (b) — the run does not depend on them | |
 | 2026-11-20 | P11 | The runner runs every build session on `INVANA_RUNNER_LEAD_MODEL`, so P11's QA build runs on Opus, not Sonnet | (a) accept · (b) run P11 alone with `--only P11` and the lead model `sonnet` (pauses the run) · (c) a per-phase *Model* row in the runner first (R055, a `.claude/` edit) | (a) | |
+| 2026-11-20 | P01b | Q1 · MVP journeys use stories with no `milestone: MVP`: CP-61 (J07 step 4) · PJ-02 (J03) · EX-07 (J01 J02) · PJ-05 (J03) · SE-02 (J01) · RC-01 (J02) · EX-10 reopen (J02) — [CRUD report](../../../../.agent-reports/product-manager/platform-design-3-crud.md) *MVP gaps* | (a) tag all seven MVP in P02 · (b) restate the needed act in the MVP story instead · (c) leave | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q2 · AC-22.4 lets an Admin attach a policy to a person; AC-11.9 (and AC-09.8) say there is no such act | (a) policies attach to agents only: AC-22 drops its attach act, `flow.attach_policy` agents only · (b) allow it: AC-11.9 and AC-09.8 change | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q3 · MVP acts with criteria and no flow frame: CP-81 · CP-82 · CP-41 · worker drain, join-key revoke (CP-09) · policy delete (AC-04.8 · AC-06.10) · team delete (AC-09.9) | (a) P02 names a `flow.<act>` per act; P04 · P04b · P05 · P06 frame it · (b) defer the acts | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q4 · Four MVP criteria or states missing: task edit (PJ-12) · kind and property rename (SE-05.2) · archive confirm and Archived (PJ-01.9) · Stop sharing (EX-15.14) | (a) add in P02 · (b) defer | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q5 · J01's refusal of a sensitive property to an outside AI needs a sensitivity level; only SE-20 (not MVP) sets one | (a) pull SE-20's sensitivity criteria into MVP · (b) drop the branch from J01 | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q6 · J02's node *Ask a Modeller* has no criterion that creates a model request (SE-13 not MVP) | (a) drop the node · (b) add an EX-05 criterion opening an SE-13 request | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q7 · Two stories for one act: CP-17 / CP-79 · CP-62 / CP-80 · PJ-35 / PJ-37 | (a) merge into CP-79 · CP-80 · PJ-37 in P02 · (b) keep apart | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q8 · J07's *agents reach outside* branch (CP-04 · CP-79 · CP-80 · CP-81 · CP-82) serves no other MVP journey | (a) keep in MVP · (b) move out of J07 | (a) — J07 is confirmed; the branch allows *not yet* | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q9 · 24 non-MVP gaps (report *Not MVP — one batch*) | (a) as the report lists: defer, or not needed with the reason; P02 rewords *archived or deleted* (PJ-19.3 · AC-F10) · (b) add them now | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q10 · Whole features with no MVP journey (report *Features* tables) | (a) record only — they stay `idea`, unplanned · (b) set them `later` (not drawn) | (a) — `later` would cut drawing the project's goal carries | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01b | Q11 · Tabs beyond their stories: `projects.projects` Details and Task kinds duplicate `projects.settings · General`; the `explore.board` Export rail has no story found | (a) merge the duplicate into `projects.settings` (P08); P02 names a story for Export or retires it · (b) keep both | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01c | S1 · Fleet repeats Limits › Usage (CP-47 vs CP-34) and draws a Map no story asks for — [report](../../../../.agent-reports/product-manager/platform-design-3-settings-slim.md) | (a) Workloads into Limits › Usage, CP-47 into CP-34, Map cut, Fleet leaves the nav · (b) keep · (c) keep Map, merge Workloads | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01c | S2 · History alerts (CP-60.8) and notification rules (CP-37) are both "when X, tell Y"; Alerts sit under Workers | (a) History alerts become a rule trigger; one section *Alerts and notifications* · (b) fold History alerts only · (c) keep apart | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01c | S3 · Access › Now (AC-48) repeats the header's Access dropdown and History | (a) remove it: acting now → `shell.access`, blocked today → History · Refused · Today, revoke a delegation → the agent's page · (b) keep | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01c | S4 · General · Appearance · About are three places for CP-71 | (a) Appearance goes: default theme → General, your theme → You; About stays the nav foot · (b) one General page · (c) keep three | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01c | S5 · Trackers sit under Plugins though a tracker is a connected code host (CP-77) | (a) move to Connections › Connectors · (b) keep | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P01c | S6 · A connector's credential is made on Connectors and managed on Plugins (J07 step 6) | (a) one home, the connector's Detail · (b) as drawn | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P02b | D1 · third-party connectors in the engine process (R595) | (a) first-party only until out-of-process connectors exist · (b) allow, hash-approved | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P02b | D2 · where the refresh token lives (R597) | (a) HttpOnly cookie on the refresh route · (b) keep in local storage | (a) | Ravi: (a) — 2026-11-20 |
+| 2026-11-20 | P02b | R587–R591 · the five high threat findings | (a) write each as criteria and NFRs before the board phases · (b) after P08b | (a) | Ravi: (a) — 2026-11-20 |

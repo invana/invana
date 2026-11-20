@@ -79,3 +79,5 @@ flowchart LR
 | Links between models | Operator | model.models · No links | model.models · No link matches | model.models · Links loading | model.models · Links | — | model.models · Committing | model.models · Read only |
 | A link | Admin | — | — | model.models · Link loading | model.models · Link | model.models · Remove refused | model.models · Withdrawing | — |
 | A link | Operator | — | — | model.models · Link loading | model.models · Link | — | — | model.models · Read only |
+| Link two models · stage | Admin | model.models · Link joins | — | model.models · Link counting | model.models · Links | model.models · Link refused | — | — |
+| Link two models · stage | Operator | model.models · Link joins | — | model.models · Link counting | model.models · Links | model.models · Link refused | — | — |

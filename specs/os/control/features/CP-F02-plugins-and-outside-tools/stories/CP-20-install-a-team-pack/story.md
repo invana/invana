@@ -4,7 +4,7 @@ title: Install a Team pack
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.packs, settings.policies, settings.plugins]
+boards: [settings.packs, settings.policies, settings.plugins, flow.manage_pack]
 ---
 
 # CP-20 · Install a Team pack
@@ -86,3 +86,5 @@ flowchart TD
 | A Custom copy | Operator | — | — | — | settings.packs · Custom copy · Read only | — | — | settings.packs · Packs · Read only |
 | A pack's upgrade | Admin | — | — | settings.packs · Upgrade · Loading | settings.packs · Upgrade · Diff | settings.packs · Upgrade · Refused | — | — |
 | A pack's upgrade | Operator | — | — | — | settings.packs · Upgrade · Diff · Read only | — | — | settings.packs · Packs · Read only |
+| Installing a pack | Admin | — | — | settings.packs · Install · Installing | settings.packs · Install · Installed, off | — | — | — |
+| Installing a pack | Operator | — | — | — | — | — | — | settings.packs · Packs · Read only |

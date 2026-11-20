@@ -4,9 +4,9 @@ title: Plugins and MCP
 product: CP
 status: idea
 personas: [admin, builder, analyst, curator]
-stories: [CP-04, CP-44, CP-02, CP-42, CP-62, CP-43, CP-63, CP-03, CP-75, CP-20, CP-64, CP-77, CP-79, CP-80, CP-81, CP-82, CP-83]
+stories: [CP-04, CP-44, CP-02, CP-42, CP-43, CP-63, CP-03, CP-75, CP-20, CP-64, CP-77, CP-79, CP-80, CP-81, CP-82, CP-83]
 journeys: [J07, J10]
-boards: [settings.connectors, settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers]
+boards: [settings.connectors, settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers, flow.install_plugin, flow.manage_pack, flow.manage_credential, flow.add_credential, flow.install_connector, flow.connect_client_with_key]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-SEC-9, NFR-SEC-15, NFR-PERF-3]
 depends_on: [AC-F02, AC-F04, AC-F05, AC-F09, AC-F10, AC-F11, CP-F03, AG-F06, RC-F02]
 ---
@@ -40,11 +40,11 @@ flowchart TD
   pl -->|Admin · Add a server| add["CP-02 · Address · name · how Invana signs in"]
   add -->|cannot list its tools · address refused| af(["Names the address and what failed · nothing stored"])
   add --> cr["CP-42 · None · a token · OAuth · may people connect their own?"]
-  cr --> wc["CP-62 · Admin makes a work connection — a service identity · sealed"]
+  cr --> wc["CP-80 · Admin makes a work connection — a service identity · sealed"]
   wc -->|none attached to the agent| nwc(["A call is refused before it leaves · names who can attach one"])
   cr -.->|later| per(["CP-43 · CP-63 · A person's own account for their own runs — parked"])
   wc -->|a second Admin's yes is on| aw(["Waits for another Admin · not in force until then"])
-  wc --> att["CP-62 · A person with Edit on the agent attaches it"]
+  wc --> att["CP-80 · A person with Edit on the agent attaches it"]
   add -->|listed| fz(["Tools frozen · off until an Admin turns it on"])
   fz --> rf["CP-02 · Read its tools again → a new revision"]
   pl -->|a runtime plugin · Admin| rti["CP-64 · Install Claude Code or Codex: its versions · where its model runs · what it needs"]
@@ -107,7 +107,6 @@ sequenceDiagram
 | CP-44 | [See what a plugin needs and which agents may use it](stories/CP-44-see-what-a-plugin-needs-and-which-agents-may-use-it/story.md) | idea |
 | CP-02 | [Add an outside MCP server and let agents call its tools](stories/CP-02-add-an-outside-mcp-server-and-let-agents-call-its-tools/story.md) | idea |
 | CP-42 | [Choose how Invana signs in to an outside server](stories/CP-42-choose-how-invana-signs-in-to-an-outside-server/story.md) | idea |
-| CP-62 | [Make a work connection and attach it to agents](stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md) | idea |
 | CP-43 | [Connect my own account to an outside server](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md) | later |
 | CP-63 | [Connect my own accounts for my own runs](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md) | later |
 | CP-03 | [Let Claude Code and other clients use the deployment](stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md) | idea |
@@ -169,7 +168,7 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | A plugin is content | A plugin is a folder of files in the Claude plugin layout — `.claude-plugin/plugin.json` · `agents/*.md` · `skills/<name>/SKILL.md` · `policies/*.yaml` · `project_types/*.yaml` · `ontology/*.yaml` · `lenses/*.yaml` · `.mcp.json` — with Invana's own fields under `metadata.invana` ([Mechanisms › A plugin's folder](#mechanisms)). The engine runs no code from it. A **pack** is a plugin of kind `pack`. A plugin made for Claude Code reads as one, and a pack made here loads unchanged in Claude Code, which ignores `metadata.invana` |
-| A connector is code | A **connector** is a pip package that implements one engine interface — `GraphConnector`, `CodeHostAdapter`, `SourceAdapter`, `RuntimeAdapter`, `DataStoreConnector` or `ComputeAdapter` — under `connectors/graph` · `connectors/code_hosts` · `connectors/sources` · `connectors/runtimes` · `connectors/data_stores` · `connectors/compute`, as `invana-<name>` with the package's folder named exactly its pip name, registered by a Python entry point and described by a `connector.yaml` manifest ([Mechanisms › A connector's manifest](#mechanisms)). Only `invana-files` ships bundled in the core; GitHub (`invana-github`), Gitea (`invana-gitea`) and every other connector are installed per need, on the engine's machine ([CP-17](../CP-F05-graph-databases/stories/CP-17-install-a-graph-connector-and-see-it-offered/story.md)). A connection of a connector is governed on `plugin/<id>` like every outside tool; no act here is new to the permission catalogue |
+| A connector is code | A **connector** is a pip package that implements one engine interface — `GraphConnector`, `CodeHostAdapter`, `SourceAdapter`, `RuntimeAdapter`, `DataStoreConnector` or `ComputeAdapter` — under `connectors/graph` · `connectors/code_hosts` · `connectors/sources` · `connectors/runtimes` · `connectors/data_stores` · `connectors/compute`, as `invana-<name>` with the package's folder named exactly its pip name, registered by a Python entry point and described by a `connector.yaml` manifest ([Mechanisms › A connector's manifest](#mechanisms)). Only `invana-files` ships bundled in the core; GitHub (`invana-github`), Gitea (`invana-gitea`) and every other connector are installed per need, on the engine's machine ([CP-79](stories/CP-79-install-a-connector/story.md)). A connection of a connector is governed on `plugin/<id>` like every outside tool; no act here is new to the permission catalogue |
 | A connector's secrets are names | A manifest names its secrets and never holds a value; values live in the engine's secret store, sealed. A manifest's `capabilities` never include `delete` or `merge` for a code host, and `force_push_branch` is listed as guarded — an agent's own `invana/*` branch only, after a person approves ([CP-F12](../CP-F12-issue-trackers/feature.md#rules)); its `scopes` list what it needs and which scopes warn — for a code host, any that could merge, delete, administer, edit workflows or transfer |
 | Files are the truth, SQL the record | A plugin's files are its source of truth; Postgres holds only the installed record — name, version, content hash, who installed and granted what. Installing validates the schema, the engine range and the connectors it `requires`, records it, and grants nothing: its agents go to nobody and its policies are drafts. A run pins the pack version it ran |
 | An installed pack is not edited | Editing a pack in Studio makes a **Custom** copy that is the editor's to change; the installed pack never changes. A newer pack version shows a diff against the installed one, and only an Admin applies it |
@@ -193,7 +192,7 @@ sequenceDiagram
 | Every outside call is ledgered | Outbound, with what it carried, before its result is used ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md)) |
 | Outside answers are data | A tool's result is cited with its source, carries its lineage ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) and is never followed as an instruction |
 | Credentials are never an environment variable | An outside server signs in with nothing, a token, or OAuth; every credential is sealed under the install key, never read back, and setting one asks for the password again. A shipped tool's settings — the mail server, the web search address — are the deployment's own secrets |
-| Work connections | A **work connection** is a service identity on one outside server — a token, or an OAuth sign-in as a service account — made once by a person with Manage on `plugin/<name>` and attached to agents by a person with Edit on the agent ([CP-62](stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md)). An agent holds at most one work connection per server. Shared work — a schedule, a pick-up, a project key's run, a delegation no person started — uses only work connections |
+| Work connections | A **work connection** is a service identity on one outside server — a token, or an OAuth sign-in as a service account — made once by a person with Manage on `plugin/<name>` and attached to agents by a person with Edit on the agent ([CP-80](stories/CP-80-add-a-credential-to-a-connector-and-connect-it/story.md)). An agent holds at most one work connection per server. Shared work — a schedule, a pick-up, a project key's run, a delegation no person started — uses only work connections |
 | Personal connections | A **personal connection** is a person's own account on a server that allows them, over OAuth ([CP-43](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md)). It is used only in runs that person starts and their helpers — never in shared work, never for anyone else ([CP-63](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md)). What it returns is a copy whose source is that person's connection: it shows only to them ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) |
 | Which connection a call uses | The work connection attached to the agent; otherwise the call is refused before it leaves, naming who can attach one |
 | A second Admin's yes, when set | With the deployment setting on, making, renewing or removing a work connection waits for another Admin's yes and is not in force until then ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#rules)) |
@@ -297,14 +296,14 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /mcp-servers` | Add `{name, url, auth, personal?, client_id?, client_secret?, password?}` — lists its tools with a work connection made in the same act, or with none, and freezes them → `201` | CP-02 · CP-42 |
 | `POST /mcp-servers/{name}/refresh` | Read its tools again — a new revision | CP-02 |
 | `PUT /mcp-servers/{name}/auth` | `{auth, personal, client_id?, client_secret?, password}` — change how Invana signs in; turning `personal` off disconnects every personal connection | CP-42 |
-| `GET /work-connections` · `POST /work-connections` | Every work connection — `name` · `server` · `label` · `kind` · `state` · `agents` · `made_by` · `last_used_at` · make one `{server, connector?, name, label, kind, token?, password}`; the credential is tried once before it is stored; `oauth` returns the address to send the browser to | CP-62 · CP-80 |
-| `PUT /work-connections/{id}` · `DELETE /work-connections/{id}` | Renew or rotate its credential `{token?, password}` — the new credential is tried first and the old stays in force when it fails · remove it `{password}`, the agents it is attached to listed first | CP-62 · CP-81 |
+| `GET /work-connections` · `POST /work-connections` | Every work connection — `name` · `server` · `label` · `kind` · `state` · `agents` · `made_by` · `last_used_at` · make one `{server, connector?, name, label, kind, token?, password}`; the credential is tried once before it is stored; `oauth` returns the address to send the browser to | CP-80 |
+| `PUT /work-connections/{id}` · `DELETE /work-connections/{id}` | Renew or rotate its credential `{token?, password}` — the new credential is tried first and the old stays in force when it fails · remove it `{password}`, the agents it is attached to listed first | CP-80 · CP-81 |
 | `POST /work-connections/{id}/test` · `POST /personal-connections/{server}/test` | One read-only call with the credential → `works` or `failed` with the server's answer, and `tested_at`; ledgered, carries no record | CP-81 |
-| `POST /work-connections/{id}/approve` · `…/decline` | A second Admin's yes or no on an `awaiting` connection, with the password again | CP-62 |
-| `PUT /work-connections/{id}/agents/{agent}` · `DELETE /work-connections/{id}/agents/{agent}` | Attach to an agent · take off | CP-62 |
+| `POST /work-connections/{id}/approve` · `…/decline` | A second Admin's yes or no on an `awaiting` connection, with the password again | CP-80 |
+| `PUT /work-connections/{id}/agents/{agent}` · `DELETE /work-connections/{id}/agents/{agent}` | Attach to an agent · take off | CP-80 |
 | `GET /personal-connections` | The caller's personal connections — `server` · `label` · `state` · `connected_at` · `last_used_at` · `runs` (the last runs that used it); an Admin reads every person's with `?user=` | CP-43 · CP-63 |
 | `POST /personal-connections/{server}/connect` | `{password}` → the address to send the browser to, with PKCE and the server as the resource | CP-43 |
-| `GET /connections/callback` | The server's redirect for a work or a personal connection: exchanges the code, seals the tokens, returns to the page it came from | CP-43 · CP-62 |
+| `GET /connections/callback` | The server's redirect for a work or a personal connection: exchanges the code, seals the tokens, returns to the page it came from | CP-43 · CP-80 |
 | `DELETE /personal-connections/{server}?user=` | Disconnect `{password}` — one's own, or any person's with Manage on the plugin | CP-43 |
 | `GET /mcp-server` | `url` · `transport` · `protocol_version` · how to connect (connected client and key) · `agents_served` · `tools_served` · `calls_today` | CP-03 |
 | `GET /mcp-server/served` · `PUT /mcp-server/served/{kind}/{ref}` | What may be served, each with `served` · serve or stop serving one `{served}` | CP-03 |
@@ -339,14 +338,14 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A deployment switch, an add, a refresh, an install or remove, a credential or secret change, a work connection made, renewed or removed, or serving, without the permission in Access above | *Needs {permission} on {resource} — ask {who can grant}.* | CP-04.9 · CP-02.11 · CP-42.8 · CP-62.9 · CP-20.6 · CP-03.13 |
-| 403 | Attaching or taking off a work connection without Edit on the agent | *Needs Edit on agent/{name} — ask {who can grant}.* | CP-62.10 |
-| 403 | The Admin who made a work connection approves it | *Another Admin approves this change.* | CP-62.4 |
-| 401 | A credential or secret change, a work connection made, renewed, removed or approved, or connecting or disconnecting a personal connection, without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-42.7 · CP-62.11 · CP-43.9 |
+| 403 | A deployment switch, an add, a refresh, an install or remove, a credential or secret change, a work connection made, renewed or removed, or serving, without the permission in Access above | *Needs {permission} on {resource} — ask {who can grant}.* | CP-04.9 · CP-02.11 · CP-42.8 · CP-80.11 · CP-20.6 · CP-03.13 |
+| 403 | Attaching or taking off a work connection without Edit on the agent | *Needs Edit on agent/{name} — ask {who can grant}.* | CP-80.20 |
+| 403 | The Admin who made a work connection approves it | *Another Admin approves this change.* | CP-80.15 |
+| 401 | A credential or secret change, a work connection made, renewed, removed or approved, or connecting or disconnecting a personal connection, without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-42.7 · CP-80.10 · CP-43.9 |
 | 422 | A credential the server refuses or cannot answer, when a connection is made or rotated — nothing is stored or replaced | *{server}: {what failed}.* | CP-80.4 · CP-81.6 |
 | 422 | A connector's `config` field that breaks its schema | *{field}: {why}.* | CP-80.5 |
 | 422 | A personal connection for a connector that allows none | *{connector} allows no personal connection.* | CP-80.7 |
-| 409 | Attaching a second work connection on one server to an agent | *{agent} already uses {connection} on {server} — take it off first.* | CP-62.6 |
+| 409 | Attaching a second work connection on one server to an agent | *{agent} already uses {connection} on {server} — take it off first.* | CP-80.17 |
 | 422 | `personal` on a server that does not sign in with OAuth | *People connect their own only over OAuth.* | CP-42.10 |
 | 409 | Switching a core plugin | *{name} is part of Invana and is always on.* | CP-04.3 |
 | 409 | Turning on a tool plugin whose extra is not installed | *{name} is not installed — install `invana[{extra}]`.* | CP-04.5 |
@@ -371,7 +370,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | start refused | A function whose manifest has no `needs` key, or a need outside the resource grammar — the process does not start | *{plugin}: {function} does not declare its needs.* | CP-44.5 |
 | step refused | A function needing a shipped tool's secret that is not set | *{plugin} needs {secret} — an Admin sets it.* | CP-42.6 |
 | step refused | A call from a run a person started, whose agent has no work connection on the server, and whose person has no personal connection there, or an expired one | *Connect your {server} account to let {agent} use it.* | CP-43.5 · CP-43.7 |
-| step refused | A call from shared work — a schedule, a pick-up, a project key's run — whose agent has no work connection on the server | *{agent} has no work connection on {server} — someone with Edit on the agent attaches one.* | CP-62.7 · CP-63.4 |
+| step refused | A call from shared work — a schedule, a pick-up, a project key's run — whose agent has no work connection on the server | *{agent} has no work connection on {server} — someone with Edit on the agent attaches one.* | CP-80.18 · CP-63.4 |
 | step refused | A call whose arguments carry a confidential or personal value | [AC-F09 › Refusals](../../../access/features/AC-F09-what-left-the-platform/feature.md#refusals) | CP-02.15 |
 | step failed | An outside server down at call time, or an address that now resolves somewhere refused | *{url} did not answer.* · *{url} resolves to {address}, which is refused.* | CP-02.9 · CP-02.10 |
 | 401 | A call to the MCP server with no client token and no key | [AC-F11 › Refusals](../../../access/features/AC-F11-connect-an-mcp-client/feature.md#refusals) | CP-03.5 |
@@ -452,7 +451,7 @@ The connector contract and the pack layout are [migrations.md](../../../../migra
 | Decision | Detail |
 |---|---|
 | Where its places sit | Settings › Plugins (`settings.plugins`) and Settings › Connections › Team packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`), with *How a client connects* — the command with a key |
-| Personal connections are parked | CP-43 and CP-63 are `later`: work connections carry every outside call; a call from an agent with no work connection on the server is refused before it leaves, naming who can attach one (CP-62). `settings.me` has no *Connections* until they return; the personal-connection records, routes and the personal branch of `connection_for` below are not built until then |
+| Personal connections are parked | CP-43 and CP-63 are `later`: work connections carry every outside call; a call from an agent with no work connection on the server is refused before it leaves, naming who can attach one (CP-80). `settings.me` has no *Connections* until they return; the personal-connection records, routes and the personal branch of `connection_for` below are not built until then |
 | A client connects with a key | The deployment's MCP server takes a key (AC-F10) — the key acts as key ∩ its owner ∩ the default agent; connecting a client as a person through OAuth is `later` (AC-F11) |
 | Plugins live in Settings › Plugins | A section of Settings in the large modal — Core · Tool · Outside servers · Runtimes: every plugin and outside server, each server with its work connections; each row reads *Used by n agents*. *Team packs* and *MCP server* are entries of Settings › Connections; an agent's work connections read on the agent |
 | Tools and runtimes are connectors | The tool plugins `web`, `mail` and `science` are connectors of kind `source`, and the Claude Code and Codex runtimes are connectors of kind `runtime`; plugins stay non-code packs — agents, skills and `.mcp.json`. Every plugin is content and every piece of code is a connector. `mail`'s `send` is a manifest capability, outbound and Ask like any send |
@@ -495,6 +494,7 @@ The connector contract and the pack layout are [migrations.md](../../../../migra
 
 | Item | Why not |
 |---|---|
+| CP-62 — merged into CP-80 | One story makes a work connection and attaches it: [CP-80](stories/CP-80-add-a-credential-to-a-connector-and-connect-it/story.md) |
 | Starting outside servers on Invana's machine (stdio) | No third-party processes beside the engine |
 | A credential in an environment variable | Secrets are sealed in Postgres under the install key |
 | MCP resources, prompts, sampling, elicitation | Plans call tools; the rest has no place in a plan |

@@ -69,3 +69,5 @@ flowchart LR
 | New standard · 3 Write the terms | Operator | model.standards · New · No terms yet | — | — | model.standards · New · Terms | model.standards · New · Standard unchanged | — | model.standards · Detail · Read only |
 | New version | Admin | — | — | — | model.standards · Write a standard | model.standards · Detail · Unchanged | — | — |
 | New version | Operator | — | — | — | model.standards · Write a standard | model.standards · Detail · Unchanged | — | model.standards · Detail · Read only |
+| New standard · 1 Name | Admin | model.standards · New · Name | — | — | model.standards · New · Write picked | — | — | — |
+| New standard · 1 Name | Operator | model.standards · New · Name | — | — | model.standards · New · Write picked | — | — | — |

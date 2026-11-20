@@ -4,7 +4,7 @@ title: Export everything held about a person
 feature: AC-F12
 status: idea
 personas: [admin]
-boards: [settings.people]
+boards: [settings.people, access.signin]
 ---
 
 # AC-47 · Export everything held about a person
@@ -50,6 +50,7 @@ flowchart TD
 | AC-47.8 | A person without Edit on `setting/retention` | they open a person's row, or call the route | *Export their data* is not offered; the API refuses it |
 | AC-47.9 | An export asked with a key | it is sent | it is refused — it needs a person's session |
 | AC-47.10 | The export fails while streaming | it is made | no exports row is written; the modal says why, with *Try again* |
+| AC-47.11 | The *Export their data* modal | the Admin signs in again | *Sign in again* names *Export* and returns through *Exporting* to *Exported* with the file; a wrong password returns to the same *Sign in again* |
 
 ## Screens
 
@@ -59,3 +60,7 @@ flowchart TD
 | Export their data | Operator | — | — | — | — | — | — | settings.people · Export their data · Locked · A person |
 | Export first — in the deactivate modal | Admin | — | — | — | settings.people · Deactivate · Export first | — | — | — |
 | Export first — in the deactivate modal | Operator | — | — | — | — | — | — | settings.people · Locked · A person |
+| Export · Sign in again | Admin | — | — | — | access.signin · Sign in again · Export | access.signin · Sign in again · Export · Wrong password | — | — |
+| Export · Sign in again | Operator | — | — | — | — | — | — | settings.people · Export their data · Locked · A person |
+| Export · Exported | Admin | — | — | — | settings.people · Export their data · Exported | settings.people · Export their data · Could not export | — | — |
+| Export · Exported | Operator | — | — | — | — | — | — | settings.people · Export their data · Locked · A person |

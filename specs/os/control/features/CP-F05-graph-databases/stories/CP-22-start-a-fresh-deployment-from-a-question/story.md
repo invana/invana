@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin, analyst]
-boards: [start.home]
+boards: [start.home, flow.start_first_run]
 ---
 
 # CP-22 · Start a fresh deployment from a question
@@ -58,3 +58,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Home | Admin | start.home · First use | — | start.home · Loading | start.home · Demo data | start.home · Could not load | — | — |
 | Home | Operator | start.home · First use · Ask an Admin | — | start.home · Loading | start.home · Demo data | start.home · Could not load | — | start.home · First use · Ask an Admin |
+| A typed question | Admin | — | — | start.home · Set-up · Drafting | start.home · Set-up | — | — | — |
+| A typed question | Operator | — | — | — | — | — | — | start.home · First use · Ask an Admin |

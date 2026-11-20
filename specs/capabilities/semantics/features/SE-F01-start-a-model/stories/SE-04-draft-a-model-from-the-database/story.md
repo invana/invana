@@ -66,3 +66,5 @@ flowchart LR
 | The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
 | What a graph database holds | Admin | model.health · Database not read | — | model.health · Reading the database | model.health · Database | model.health · Unreachable | — | — |
 | What a graph database holds | Operator | model.health · Database not read | — | model.health · Reading the database | model.health · Database | model.health · Unreachable | — | model.health · Database read only |
+| The draft · discard | Admin | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |
+| The draft · discard | Operator | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |

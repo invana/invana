@@ -78,7 +78,7 @@ flowchart TD
 | EX-26.16 | The web tool switched off — at install by an Admin, or by the person's own switch | a question needs the web | the search is refused, naming who switched it off and when, and the answer is from Graph Data |
 | EX-26.17 | The web tool with no search address set | an allowed question needs the web | the step says *Web search is not set up — an Admin sets it in Plugins*, and the answer is from Graph Data |
 | EX-26.18 | An Operator | they select third-party nodes | *Keep* is disabled — *Needs Edit on Source in {graph database} — ask {who can grant}* |
-| EX-26.19 | An answer with third-party claims | the person opens *How it got here* | it shows the search, each fetch with its reference, which claims came from where, and that each call is in *What left the platform* |
+| EX-26.19 | An answer with third-party claims | the person opens *How it got here* | it shows the search, each fetch with its reference, which claims came from where, and that each call is in History |
 | EX-26.20 | A kept third-party node | anyone opens it in the Element panel | it shows its reference, the run it came from, who kept it and when, and what it is about |
 
 ## Screens

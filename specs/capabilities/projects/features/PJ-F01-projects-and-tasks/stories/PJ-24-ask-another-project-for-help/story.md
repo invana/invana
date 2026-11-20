@@ -87,3 +87,5 @@ sequenceDiagram
 | Asked of other projects | Operator | — | — | projects.tasks · Detail · Loading | projects.tasks · Detail · Asked of other projects | projects.tasks · Detail · Ask declined | projects.tasks · Detail · Asked · Waiting | projects.tasks · Detail · Asked · Withheld |
 | An ask in Needs you | Admin | — | — | inbox · Loading | inbox · An ask from a project | inbox · Could not load | — | — |
 | An ask in Needs you | Operator | — | — | inbox · Loading | inbox · An ask from a project | inbox · Could not load | — | — |
+| Ask for help · send | Admin | projects.projects · Ask for help · Filled | — | projects.projects · Ask for help · Sending | inbox · An ask from a project | projects.projects · Ask for help · Refused | — | — |
+| Ask for help · send | Operator | projects.projects · Ask for help · Filled | — | projects.projects · Ask for help · Sending | inbox · An ask from a project | projects.projects · Ask for help · Refused | — | — |

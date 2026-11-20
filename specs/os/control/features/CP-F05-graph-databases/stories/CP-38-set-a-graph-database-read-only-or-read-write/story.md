@@ -5,7 +5,7 @@ feature: CP-F05
 status: idea
 milestone: MVP
 personas: [admin]
-boards: [settings.databases, access.signin]
+boards: [settings.databases, access.signin, flow.set_database_mode]
 ---
 
 # CP-38 · Set a graph database read-only or read + write
@@ -47,6 +47,8 @@ flowchart TD
 | CP-38.6 | An Operator | they reach *Change* | it reads *Ask an Admin*, naming the Admins |
 | CP-38.7 | Any graph database | the list or its details draw | its mode reads in words — *Read-only* · *Read + write* — with who set it and when |
 | CP-38.8 | A read on a read + write graph database | it runs | it still runs in the driver's read mode |
+| CP-38.9 | An Admin | they press *Set read + write* | *Sign in again* names the act, *Set read + write*, and the graph database; the right password returns to its details reading *Read + write*; a wrong one returns to the same *Sign in again* with the message and the mode unchanged |
+| CP-38.10 | An Admin | they press *Set read-only* on a read + write graph database | the mode changes without the password and its details read *Read-only*; a refusal reads *Could not change mode* |
 
 ## Screens
 
@@ -54,5 +56,7 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | Mode | Admin | settings.databases · Detail · Read-only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write | settings.databases · Detail · Could not change mode | — | — |
 | Mode | Operator | settings.databases · Detail · Read-only · Read only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write · Read only | settings.databases · Detail · Could not load | — | settings.databases · Detail · Read + write · Read only |
-| Sign in again | Admin | — | — | — | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
-| Sign in again | Operator | — | — | — | — | — | — | — |
+| Mode · Set read + write | Admin | — | — | — | access.signin · Sign in again · Set read + write | access.signin · Sign in again · Set read + write · Wrong password | — | — |
+| Mode · Set read + write | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |
+| Mode · Set read-only | Admin | — | — | — | settings.databases · Detail · Read-only | settings.databases · Detail · Could not change mode | — | — |
+| Mode · Set read-only | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |

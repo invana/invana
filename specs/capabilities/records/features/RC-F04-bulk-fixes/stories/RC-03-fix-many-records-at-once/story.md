@@ -50,3 +50,5 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | A fix | Admin | data.records · Fix · Nothing picked | data.records · Fix · Nothing to change | data.records · Fix · Building preview | data.records · Fix | data.records · Fix · Partly written | — | — |
 | A fix | Operator | data.records · Fix · Nothing picked | data.records · Fix · Nothing to change | data.records · Fix · Building preview | data.records · Fix · Preview only | — | — | data.records · Fix · Run disabled |
+| A fix · run | Admin | data.records · Fix · Preview | — | data.records · Fix · Running | data.records · Fix · Written | data.records · Fix · Refused | — | — |
+| A fix · run | Operator | data.records · Fix · Preview | — | data.records · Fix · Running | data.records · Fix · Written | data.records · Fix · Refused | — | — |

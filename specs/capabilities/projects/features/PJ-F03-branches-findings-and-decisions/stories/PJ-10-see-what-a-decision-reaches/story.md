@@ -54,7 +54,7 @@ flowchart LR
 | PJ-10.9 | A cited record gone from its graph database | impact is traced | it counts at hop 0 and reaches nothing |
 | PJ-10.10 | Impact with an option and hops picked | the page is reloaded | the same option and hops are traced again |
 | PJ-10.11 | A traced reach | it is read | every group and link is also listed in words, and no figure in any currency appears; every count is the engine's |
-| PJ-10.12 | A traced reach | its run is read | it is a run of the Assistant with the reader behind it, and every read it made is listed in *What left the platform* ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
+| PJ-10.12 | A traced reach | its run is read | it is a run of the Assistant with the reader behind it, and every read it made is listed in History |
 | PJ-10.13 | A reader who may not use the Assistant | they open Impact | *Trace* is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Screens

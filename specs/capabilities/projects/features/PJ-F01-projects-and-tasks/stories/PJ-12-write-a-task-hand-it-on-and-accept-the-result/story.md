@@ -110,6 +110,7 @@ flowchart TD
 | PJ-12.35 | Tasks written by or handed to the person, in projects or in none | they open Projects › My tasks | those tasks list across every project, grouped by status, each with its project and kind as badges |
 | PJ-12.36 | Results waiting on the person as a person on the team | they open Projects › Reviews | each task in review lists with its project, who posted the result and since when, oldest first; opening one opens the task at its result |
 | PJ-12.37 | A person on the team of the project, or a person not on its team, who is not an Admin | they press *New task*, add a check, draw a dependency or make a group | each is disabled — *Join the team to change it*; a call is refused the same way; a person on the team still starts and works the tasks assigned to them |
+| PJ-12.38 | A task the person may change | they edit its title, body or due date and save | the task reads the new values, History records the change, and the row says *Saved*; a save the engine refuses — an empty title — says *Could not save* with the reason and keeps what was typed; a person who may not change it reads the fields with *Edit* disabled — *Join the team to change it* |
 
 ## Screens
 
@@ -131,3 +132,15 @@ flowchart TD
 | A task's History | Operator | projects.tasks · Detail · History · Nothing yet | — | projects.tasks · Detail · Loading | projects.tasks · Detail · History | projects.tasks · Detail · Could not load | projects.tasks · Detail · History | projects.tasks · Detail · History · Content withheld |
 | Reviews on the left | Admin | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |
 | Reviews on the left | Operator | projects.reviews · Nothing to review | projects.reviews · No review matches | projects.reviews · Loading | projects.reviews | projects.reviews · Could not load | — | — |
+| New task · 1 Pick a kind | Admin | projects.tasks · New · Pick a kind | — | — | projects.tasks · New · Assign | — | — | — |
+| New task · 1 Pick a kind | Operator | projects.tasks · New · Pick a kind | — | — | projects.tasks · New · Assign | — | — | — |
+| New task · Save task | Admin | projects.tasks · New · Assign | — | projects.tasks · New · Saving | projects.tasks · Detail · Open | projects.tasks · New · Refused | — | — |
+| New task · Save task | Operator | projects.tasks · New · Assign | — | projects.tasks · New · Saving | projects.tasks · Detail · Open | projects.tasks · New · Refused | — | — |
+| New task · an agent not granted | Admin | projects.tasks · New · Assign | — | — | — | projects.tasks · New · Agent not granted | — | — |
+| New task · an agent not granted | Operator | projects.tasks · New · Assign | — | — | — | projects.tasks · New · Agent not granted | — | — |
+| A task · an agent claims it | Admin | projects.tasks · Detail · Open | — | — | projects.tasks · Detail · Claimed | projects.tasks · Detail · Failed | — | — |
+| A task · an agent claims it | Operator | projects.tasks · Detail · Open | — | — | projects.tasks · Detail · Claimed | projects.tasks · Detail · Failed | — | — |
+| A task · accept the result | Admin | inbox · A result to accept | — | — | projects.tasks · Detail · Done | — | — | — |
+| A task · accept the result | Operator | inbox · A result to accept | — | — | projects.tasks · Detail · Done | — | — | projects.tasks · Detail · In review · Not a person on the team |
+| A task · edit title, body and due date | Admin | projects.tasks · Detail · Edit | — | projects.tasks · Detail · Saving | projects.tasks · Detail · Saved | projects.tasks · Detail · Could not save | — | — |
+| A task · edit title, body and due date | Operator | projects.tasks · Detail · Edit | — | projects.tasks · Detail · Saving | projects.tasks · Detail · Saved | projects.tasks · Detail · Could not save | — | projects.tasks · Detail · Locked |

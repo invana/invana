@@ -29,10 +29,10 @@ flowchart TD
   start([Access › Who]) --> users["AC-22 · Every user: kind · teams · policies · default agent"]
   users --> who{"Does the reader hold Manage on Access?"}
   who -->|no| ro["Everything reads · each write disabled, naming the permission and who can grant it"]
-  who -->|yes| grant["AC-22 · Attach a policy to a person · or take it off"]
+  who -->|yes| grant["AC-22 · Grant an agent to a person · or take it away"]
   users --> eff["What can this person do? · each permission and the policy behind it"]
   start --> teams["AC-09 · Teams: make one · put people on it"]
-  teams --> tgrant["AC-39 · Attach a policy to a team"]
+  teams --> tgrant["AC-39 · Grant an agent to a team"]
   grant --> prev{"AC-39 · Preview: what each person gains or loses"}
   tgrant --> prev
   teams -->|add or take off a person| prev
@@ -56,7 +56,7 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| AC-22 | [See every user and attach policies to a person](stories/AC-22-see-every-user-and-attach-policies-to-a-person/story.md) | idea |
+| AC-22 | [See every user and the agents each may use](stories/AC-22-see-every-user-and-attach-policies-to-a-person/story.md) | idea |
 | AC-09 | [Make teams and put people on them](stories/AC-09-make-teams-and-put-people-on-them/story.md) | idea |
 | AC-39 | [Grant agents to a team and see who gains them](stories/AC-39-grant-agents-to-a-team-and-see-who-gains-them/story.md) | idea |
 | AC-38 | [Choose a person's default agent](stories/AC-38-choose-a-persons-default-agent/story.md) | idea |
@@ -70,7 +70,7 @@ without it the act shows, disabled, naming the permission and who can grant it.
 | Act | Permission |
 |---|---|
 | Read every user, their kind, teams, policies and default agent · every team, its people and its policies · *What can {person} do?* | None — every signed-in person |
-| Attach a policy to a person or a team, or take it off · set a person's default agent · name newcomers' policies | Manage on Access, in a session, signing in again |
+| Grant an agent to a person or a team, or take it away · set a person's default agent · name newcomers' policies | Manage on Access, in a session, signing in again |
 | New team · rename · describe · delete · add or remove a person | Create · Edit on Access, in a session |
 | Deactivate · reactivate a person, naming the successor | Edit on Access, in a session, signing in again |
 

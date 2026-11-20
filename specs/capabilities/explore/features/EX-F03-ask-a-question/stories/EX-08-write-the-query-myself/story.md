@@ -70,7 +70,7 @@ flowchart LR
 | EX-08.5 | A query naming a kind or property the model lacks | the person runs it | it is refused before it runs, naming the unknown one and what the person can see of the model; a kind or property a policy hides is unknown the same way |
 | EX-08.6 | A query with a write clause, from a person with Edit on its data, on a read + write graph database | the person runs it | it asks first: the run waits on the Query console's named approvers in the Inbox; approved, it runs; declined or expired, nothing is written and the reply says who decided |
 | EX-08.7 | A read query that mentions *offset*, *settings* or a quoted *merge* | the person runs it | it runs, in a read-only session (GP-04), without asking |
-| EX-08.8 | A valid query | it runs | the query and its outcome are turns in the thread, its rows are in the console's Data, and the call is recorded in *What left the platform* (AC-F09), naming the Query console and the person |
+| EX-08.8 | A valid query | it runs | the query and its outcome are turns in the thread, its rows are in the console's Data, and the call is recorded in History, naming the Query console and the person |
 | EX-08.9 | A query that returns zero rows | it finishes | the reply says Graph Data does not hold this, as an answer, not an error |
 | EX-08.10 | A slow query | it runs | the elapsed time shows with *Cancel* |
 | EX-08.11 | A very large result | it runs | it is counted first, and capped with the cap stated |
@@ -99,3 +99,7 @@ flowchart LR
 | The rows in the console | Operator | — | explore.board · Console · Zero rows | explore.board · Console · Running | explore.board · Console · Rows | explore.board · Console · Log | — | explore.board · Console · Query console not granted |
 | Queries on the left | Admin | explore.queries · No queries yet | explore.queries · No query matches | explore.queries · Loading | explore.queries | explore.queries · Could not load | — | — |
 | Queries on the left | Operator | explore.queries · No queries yet | explore.queries · No query matches | explore.queries · Loading | explore.queries | explore.queries · Could not load | — | explore.queries · Query console not granted |
+| Console · Run a query | Admin | explore.board · Console | — | explore.board · Console · Running | explore.board · Console · Rows | explore.board · Console · Query error | — | — |
+| Console · Run a query | Operator | explore.board · Console | — | explore.board · Console · Running | explore.board · Console · Rows | explore.board · Console · Query error | — | — |
+| Console · Save the query | Admin | explore.board · Console · Rows | — | — | explore.queries | explore.queries · Could not load | — | — |
+| Console · Save the query | Operator | explore.board · Console · Rows | — | — | explore.queries | explore.queries · Could not load | — | — |

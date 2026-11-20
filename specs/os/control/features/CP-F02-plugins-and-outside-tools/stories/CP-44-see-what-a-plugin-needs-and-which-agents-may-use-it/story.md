@@ -35,7 +35,7 @@ flowchart TD
   chk -->|a need no rule allows| m1(["Missing · No rule — denied · links What it may touch (AC-13)"])
   chk -->|a Write on a read-only graph database| m2(["Missing · names the graph database and its mode"])
   chk -->|the plugin is off| m3(["Off · names who switched it off"])
-  chk -->|an outside server and no work connection on the agent| m4(["Personal connection only · shared work refused (CP-62)"])
+  chk -->|an outside server and no work connection on the agent| m4(["Personal connection only · shared work refused (CP-80)"])
 ```
 
 ## Acceptance criteria
@@ -50,7 +50,7 @@ flowchart TD
 | CP-44.6 | An outside server's tool | it is frozen | it needs Run on its own `tool/<server>/<tool>` and nothing else is assumed |
 | CP-44.7 | A plugin turned on | nothing else changes | no agent gains anything: each need is still decided by the agent's policies alone, the same for everyone (AC-F04) |
 | CP-44.8 | A step whose function has a need that is missing | it would run | it is refused before it runs, naming the need and the agent (AC-13.7) |
-| CP-44.9 | An outside server's tool and an agent with no work connection on that server | it is read | it reads *Personal connection only — shared work is refused*, naming who attaches a work connection (CP-62) |
+| CP-44.9 | An outside server's tool and an agent with no work connection on that server | it is read | it reads *Personal connection only — shared work is refused*, naming who attaches a work connection (CP-80) |
 
 ## Screens
 

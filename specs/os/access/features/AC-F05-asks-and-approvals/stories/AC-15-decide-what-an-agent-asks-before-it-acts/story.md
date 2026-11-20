@@ -5,7 +5,7 @@ feature: AC-F05
 status: idea
 milestone: MVP
 personas: [admin, builder, analyst]
-boards: [inbox]
+boards: [inbox, flow.decide_ask]
 ---
 
 # AC-15 · Decide what an agent asks before it acts
@@ -74,6 +74,7 @@ flowchart LR
 | AC-15.29 | An ask | it fails to load | it says what could not load, with *Try again* |
 | AC-15.30 | Needs you filtered by kind or agent | nothing matches | *Nothing matches*, with *Clear filters* |
 | AC-15.31 | An ask on a run the reader is not behind, of an agent they do not own, not routed to them, and they are not an Admin | it is read | it shows that it waits, its kind, its agent, who it waits on and its time left; its act, arguments and what it will send are withheld (AC-31) |
+| AC-15.32 | An ask to send | the reader presses *See all it will send* | the whole message reads, with *Back* to the ask, *Not this time* and *Send it all*; *Send it* reads *Sent*, *Not this time* reads *Declined*, a failed send reads *Send failed* with *Try again*, an ask that expired reads *Expired*, and one an approver decided first reads *Already decided* |
 
 ## Screens
 
@@ -85,3 +86,9 @@ flowchart LR
 | An ask — what it will send | Operator | — | — | inbox · Loading | inbox · See all it will send | inbox · Already decided | inbox · An agent asks to send | inbox · Content withheld |
 | A person's ask | Admin | — | — | inbox · Loading | inbox · A person asks | inbox · Already decided | — | — |
 | A person's ask | Operator | — | — | inbox · Loading | inbox · A person asks | inbox · Already decided | — | inbox · Not yours to answer |
+| An ask · Send it | Admin | — | — | inbox · Sending | inbox · Sent | inbox · Send failed | — | — |
+| An ask · Send it | Operator | — | — | — | — | — | — | inbox · Not yours to answer |
+| An ask · Not this time | Admin | — | — | — | inbox · Declined | — | — | — |
+| An ask · Not this time | Operator | — | — | — | — | — | — | inbox · Not yours to answer |
+| An ask · Expired | Admin | — | — | — | inbox · Expired | — | — | — |
+| An ask · Expired | Operator | — | — | — | inbox · Expired | — | — | — |

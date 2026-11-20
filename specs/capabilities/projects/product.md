@@ -45,7 +45,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | PJ-F05 | [Project reports](features/PJ-F05-project-reports/feature.md) | PJ-14 | idea |
 | PJ-F07 | [The project graph](features/PJ-F07-the-project-graph/feature.md) | PJ-28 · PJ-29 · PJ-30 · PJ-31 | idea |
 | PJ-F06 | [Alerts](features/PJ-F06-alerts/feature.md) | PJ-19 | idea |
-| PJ-F08 | [Project settings and the agents in a project](features/PJ-F08-project-settings/feature.md) | PJ-33 · PJ-34 · PJ-35 · PJ-36 · PJ-37 | idea |
+| PJ-F08 | [Project settings and the agents in a project](features/PJ-F08-project-settings/feature.md) | PJ-33 · PJ-34 · PJ-36 · PJ-37 | idea |
 
 ## Surfaces
 
@@ -54,7 +54,7 @@ result was accepted, whether its checks ran, or pick the work up when the person
 | Projects | mode | `projects.projects` |
 | A project | mode | `projects.projects · Detail` |
 | The project assistant | the assistant region | `projects.projects · Assistant` |
-| A new project | modal | `projects.projects · New` |
+| A new project | modal | `projects.new` |
 | Ask another project for help | modal | `projects.projects · Ask for help` |
 | A task | mode | `projects.tasks · Detail` · `projects.tasks · Detail · How it got here` |
 | Options and a decision | mode · modal | `projects.branches` · `projects.branches · Decide` |

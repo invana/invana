@@ -66,3 +66,5 @@ flowchart LR
 | New model · from an ontology | Operator | — | — | — | — | — | — | model.models · New · No access |
 | The draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft | model.models · Draft · Cannot publish | — | — |
 | The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
+| The draft · discard | Admin | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |
+| The draft · discard | Operator | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |

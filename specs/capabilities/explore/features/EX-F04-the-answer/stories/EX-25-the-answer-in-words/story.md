@@ -58,7 +58,7 @@ flowchart LR
 | EX-25.9 | The model fails or times out | the words are written | the records stand as the answer; the Answer step is marked failed and the run is still answered |
 | EX-25.10 | An agent whose Access Policies allow Run on an outside tool | a claim comes from outside Graph Data | it is marked *Third-party* with its source (EX-26); a claim from a what-if is marked *Predicted* (EX-33) |
 | EX-25.11 | An answer with words | the person opens *How it got here* | the Answer step shows what it was given and the claims it kept and dropped |
-| EX-25.12 | The same rows, and an agent whose AI model is local | the answer settles | the words are written as usual; the call shows in *What left the platform* as data-bearing, naming every record ID sent |
+| EX-25.12 | The same rows, and an agent whose AI model is local | the answer settles | the words are written as usual; the call shows in History as data-bearing, naming every record ID sent |
 
 ## Screens
 

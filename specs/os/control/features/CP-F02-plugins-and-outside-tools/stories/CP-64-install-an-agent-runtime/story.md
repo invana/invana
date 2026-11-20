@@ -4,7 +4,7 @@ title: Install an agent runtime
 feature: CP-F02
 status: idea
 personas: [admin]
-boards: [settings.plugins, settings.workers]
+boards: [settings.plugins, settings.workers, flow.install_runtime]
 ---
 
 # CP-64 · Install an agent runtime
@@ -58,6 +58,7 @@ flowchart TD
 | CP-64.9 | An Operator | they look for *Install* or *Remove* | each is disabled — *This needs an Admin — ask {admins}* |
 | CP-64.10 | A runtime switched off | an agent that runs with it is started | the run is refused before it starts, naming who switched it off |
 | CP-64.11 | An installed, switched-on runtime no worker group carries | it reads | it says no group carries it and links *Workers* to add it to a group |
+| CP-64.12 | An Admin | they install a runtime plugin | the install reads *Installing*, then *Installed, off* naming what it declares; *Done* lists the runtime among *Runtimes*; *Open Workers* opens the worker group that can carry it |
 
 ## Screens
 
@@ -75,3 +76,7 @@ flowchart TD
 <parameter name="taskId">3</parameter>
 <parameter name="activeForm">CP-F04 session budget</parameter>
 </invoke>
+| Install a runtime · Installing | Admin | — | — | settings.plugins · Runtimes · Install · Installing | settings.plugins · Runtimes · Install · Installed, off | settings.plugins · Runtimes · Install · Install refused | — | — |
+| Install a runtime · Installing | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |
+| Install a runtime · Done | Admin | — | — | — | settings.plugins · Runtimes · Codex installed | — | — | — |
+| Install a runtime · Done | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |

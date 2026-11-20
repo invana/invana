@@ -4,9 +4,9 @@ title: Graph databases
 product: CP
 status: idea
 personas: [admin, modeller, builder, analyst]
-stories: [CP-22, CP-25, CP-26, CP-27, CP-24, CP-38, CP-39, CP-40, CP-35, CP-41, CP-17]
+stories: [CP-22, CP-25, CP-26, CP-27, CP-24, CP-38, CP-39, CP-40, CP-35, CP-41]
 journeys: [J01, J07]
-boards: [start.home, settings.databases, access.signin, settings.connectors]
+boards: [start.home, settings.databases, access.signin, settings.connectors, flow.connect_graph_database, flow.set_database_mode, flow.make_practice]
 nfrs: [NFR-REL-3, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-9, NFR-PERF-3]
 depends_on: [AC-F01, AC-F02, AC-F06, SE-F01, RC-F02, CP-F01, GP-F01]
 ---
@@ -31,7 +31,7 @@ flowchart TD
   q -->|Try it on demo data| dm(["Explore, on the demo graph database"])
   q -->|Connect a graph database| c["CP-25 · One modal: Name · Connect · Shape · Ready"]
   c --> pk{"Its connector installed?"}
-  pk -->|no| pkn["CP-17 · Not offered · names the package to install"]
+  pk -->|no| pkn["CP-79 · Not offered · names the package to install"]
   pk -->|yes| t{"Test connection"}
   t -->|fails| tf["The database's own words · Continue stays off"] --> t
   t -->|holds records| hd["CP-26 · What is there · the agent drafts the model"]
@@ -88,7 +88,6 @@ sequenceDiagram
 | CP-40 | [See every graph database and its health](stories/CP-40-see-every-graph-database-and-its-health/story.md) | idea |
 | CP-35 | [Keep a graph database connected](stories/CP-35-keep-a-graph-database-connected/story.md) | idea |
 | CP-41 | [Name a practice graph database](stories/CP-41-name-a-practice-graph-database/story.md) | idea |
-| CP-17 | [Install a graph connector and see it offered](stories/CP-17-install-a-graph-connector-and-see-it-offered/story.md) | idea |
 
 ## Access
 
@@ -202,7 +201,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /graph-databases/{name}/introspect` | *Read types again*, in the background | CP-35 |
 | `POST /graph-databases/{name}/acknowledge-version` · `PUT /graph-databases/{name}/version` | Accept an untested server version · declare one the connector cannot detect | CP-35 |
 | `GET /setup` · `POST /setup/{step}` | The four required steps and the offers, derived on every read — `{step, done, completed_at?, skipped_at?, required, gate?, blocked_by?, broken?}` · `{act: skip · reset}` on an offer | CP-24 |
-| `GET /connectors` | Every installed connector — `name` · `language` (`opencypher` · `gremlin`) · `package` · `version` · `state` (`loaded` · `failed`) · `error?` · `graph_databases` (how many use it) · `used_by_agents` | CP-17 |
+| `GET /connectors` | Every installed connector — `name` · `language` (`opencypher` · `gremlin`) · `package` · `version` · `state` (`loaded` · `failed`) · `error?` · `graph_databases` (how many use it) · `used_by_agents` | CP-79 |
 
 ### Events
 
@@ -238,7 +237,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | A route whose gate is shut — `setup_incomplete`, with `gate` and `missing` | *{surface} opens when {step}.* | CP-24.6 |
 | 422 | Skipping a required step | *{step} is required — it cannot be skipped.* | API only — Studio offers *Skip* only on an offer |
 | 503 | *Read types again* while it is not connected | *{name} is not connected — reconnect first.* | CP-35.18 |
-| 409 | A graph database whose connector is not installed | *{connector} is not installed — install {package}.* | CP-17.7 |
+| 409 | A graph database whose connector is not installed | *{connector} is not installed — install {package}.* | CP-79.15 |
 
 ### CLI
 
@@ -277,7 +276,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Installed connectors read in Settings › Connections | Settings › Connections › Connectors (`settings.connectors`, CP-17) lists each installed graph connector with *Used by n graph databases*; installing one is a package, never an act in Studio |
+| Installed connectors read in Settings › Connections | Settings › Connections › Connectors (`settings.connectors`, CP-79) lists each installed graph connector with *Used by n graph databases*; installing one is a package, never an act in Studio |
 | Graph databases are the deployment's | Settings › Connections › Graph databases; one list, Admin acts, everyone reads |
 | Connecting is one modal of sections | Name (optional) · the type as a grouped card grid · its details once a type is picked · Shape once the test passes — one page and one act, *Connect*; it shows a person's own data back to them before anything is saved |
 | A blank name takes the type's | The engine names it after its type, made unique (`neo4j`, `neo4j_2`), and shows that name before *Connect*, so every graph database still has the fixed name rules use |
@@ -307,3 +306,4 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Connection pooling settings in Studio | Tuning belongs to configuration |
 | A tour or a set-up page of its own | Each step opens the place that makes its fact; set-up steps aside at the first answer |
 | Writing demo data into a person's own database | Demo data lives in its own graph database |
+| CP-17 — merged into CP-79 | One story installs every connector: [CP-79](../CP-F02-plugins-and-outside-tools/stories/CP-79-install-a-connector/story.md) |

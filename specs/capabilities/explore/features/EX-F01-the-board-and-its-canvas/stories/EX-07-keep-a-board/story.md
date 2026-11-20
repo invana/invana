@@ -3,6 +3,7 @@ id: EX-07
 title: Keep a board
 feature: EX-F01
 status: idea
+milestone: MVP
 personas: [analyst]
 boards: [explore.board]
 ---
