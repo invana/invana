@@ -126,7 +126,7 @@ None — the canvas and the harness need no stack.
 | Lands | The report · *Questions for Ravi* |
 | Boards | — |
 | Review | |
-| Approve | — (Ravi decides it with P01c's, at P01c's stop) |
+| Approve | — |
 | Budget | |
 | Steps | 1. Entities from the glossary and the engine tables. 2. Each cell from stories, Screens and flows. 3. A recommendation per gap. 4. Questions |
 
