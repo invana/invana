@@ -4,7 +4,7 @@ title: Copy a built-in to change it
 feature: AC-F07
 status: idea
 personas: [builder, admin]
-boards: [settings.me]
+boards: [agents.agents, agents.skills, settings.policies]
 ---
 
 # AC-25 · Copy a built-in to change it
@@ -25,14 +25,14 @@ Tasks: [task.md](task.md) · Feature: [AC-F07](../../feature.md)
 
 ```mermaid
 flowchart TD
-  b([A built-in · owner System]) --> e{"Edit?"}
+  b([A built-in's own detail · Agents · Skills · Access policies · owner System]) --> e{"Edit?"}
   e --> ne["No Edit · Copy to change it"]
   ne --> c{"May the reader make one of its kind?"}
   c -->|no| na(["Copy disabled · names the permission and who can grant it"])
   c -->|yes| cp["Copy · a name for it"]
   cp -->|name taken| nt["Refused in place, naming it"]
   cp --> mine(["A custom one · copied from the built-in at its version · made by you · attached to nothing"])
-  mine -->|an agent| pers(["Your personal agent · granted to you alone · share it when ready (AC-24)"])
+  mine -->|an agent| pers(["Your personal agent · granted to you alone · opens on its own detail"])
   mine -->|a skill · a workflow · a policy| orgc(["The organisation's · made by you"])
   pers --> next(["Change it · then an Admin attaches policies and grants it"])
   orgc --> next
@@ -42,7 +42,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AC-25.1 | A built-in agent, skill, workflow or Access Policy | it is read | its owner reads *System*, with the version Invana ships; it offers *Copy* and no *Edit*, *Delete* or owner acts |
+| AC-25.1 | A built-in agent, skill, workflow or Access Policy | its own detail is read — in Agents, Skills or Access policies | its owner reads *System*, with the version Invana ships; it offers *Copy to change it* and no *Edit*, *Delete* or owner acts |
 | AC-25.2 | A built-in | an edit, a delete or an owner change is sent through the API | it is refused — an edit or a delete: *{name} is built in — copy it to change it*; an owner change: *{name} is the organisation's — nobody owns it alone* |
 | AC-25.3 | A person who may Create one of its kind | they *Copy* it with a free name | a custom one exists, reading *Copied from {built-in} at version {n}* and *Made by {person}* — an agent as their personal agent, anything else as the organisation's; History records it |
 | AC-25.4 | A copy of a built-in agent | it is made | it carries the built-in's instructions and skills, is its maker's personal agent granted to them alone, and has no policy attached until an Admin attaches one (AC-11); it reaches others only once shared (AC-24) and granted (AC-39) |
@@ -55,7 +55,15 @@ flowchart TD
 
 | Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A built-in's owner and Copy | Admin | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | settings.me · Owners · Could not copy | — | — |
-| A built-in's owner and Copy | Operator | — | — | settings.me · Owners · Loading | settings.me · Owners · Built in | — | — | settings.me · Owners · Locked · Copy needs a permission |
-| The copy | Admin | — | — | — | settings.me · Owners · Copied | settings.me · Owners · Name taken | — | — |
-| The copy | Operator | — | — | — | — | — | — | settings.me · Owners · Locked · Copy needs a permission |
+| A built-in agent and Copy | Admin | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Built in | agents.agents · Detail · Built in · Could not copy | — | — |
+| A built-in agent and Copy | Operator | — | — | agents.agents · Detail · Loading | agents.agents · Detail · Built in | — | — | agents.agents · Detail · Built in · Copy needs a permission |
+| A built-in skill or workflow and Copy | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Built in | agents.skills · Detail · Built in · Could not copy | — | — |
+| A built-in skill or workflow and Copy | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Built in | — | — | agents.skills · Detail · Built in · Copy needs a permission |
+| A built-in policy and Copy | Admin | — | — | settings.policies · Detail · Loading | settings.policies · Detail · Built in | settings.policies · Detail · Built in · Could not copy | — | — |
+| A built-in policy and Copy | Operator | — | — | settings.policies · Detail · Loading | settings.policies · Detail · Built in | — | — | settings.policies · Detail · Built in · Copy needs a permission |
+| An agent copy | Admin | — | — | agents.agents · Detail · Built in · Copying | agents.agents · Detail · Copied | agents.agents · Detail · Built in · Name taken | — | — |
+| An agent copy | Operator | — | — | agents.agents · Detail · Built in · Copying | agents.agents · Detail · Copied | agents.agents · Detail · Built in · Name taken | — | agents.agents · Detail · Built in · Copy needs a permission |
+| A skill or workflow copy | Admin | — | — | agents.skills · Detail · Built in · Copying | agents.skills · Detail · Copied | agents.skills · Detail · Built in · Name taken | — | — |
+| A skill or workflow copy | Operator | — | — | agents.skills · Detail · Built in · Copying | agents.skills · Detail · Copied | agents.skills · Detail · Built in · Name taken | — | agents.skills · Detail · Built in · Copy needs a permission |
+| A policy copy | Admin | — | — | settings.policies · Detail · Built in · Copying | settings.policies · Detail · Copied | settings.policies · Detail · Built in · Name taken | — | — |
+| A policy copy | Operator | — | — | settings.policies · Detail · Built in · Copying | settings.policies · Detail · Copied | settings.policies · Detail · Built in · Name taken | — | settings.policies · Detail · Built in · Copy needs a permission |
