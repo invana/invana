@@ -3,7 +3,7 @@ id: J13
 title: Plan and run work from the project graph
 personas: [decision-maker, builder, researcher]
 stories: [PJ-02, PJ-28, PJ-30, PJ-29, PJ-26, PJ-27, PJ-31, PJ-12, PJ-25, CP-73, CP-78, CP-74, CP-76]
-boards: [projects.projects, projects.tasks, projects.graph, settings.plugins, inbox]
+boards: [projects.new, projects.projects, projects.tasks, projects.graph, settings.connectors, inbox]
 ---
 
 # Plan and run work from the project graph
@@ -48,7 +48,7 @@ flowchart TD
 | 4 | Ask the graph from a node or a group | Projects · a project › Map | [PJ-29](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-29-ask-the-graph-from-a-node-or-a-group/story.md) | `projects.graph · Map · Ask` |
 | 5 | Make a milestone of the selection | Projects · a project › Map · Milestones | [PJ-26](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-26-make-a-milestone-from-a-selection/story.md) | `projects.graph · Make a milestone` |
 | 6 | Tag the tasks | Projects · a task | [PJ-27](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-27-tag-a-task/story.md) | `projects.tasks · Detail · Tags` |
-| 7 | Connect a tracker and link the project | Settings › Connections · a project | [CP-73](../os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md) | `settings.plugins · Trackers` |
+| 7 | Connect a tracker and link the project | Settings › Connections · a project | [CP-73](../os/control/features/CP-F12-issue-trackers/stories/CP-73-connect-an-issue-tracker-and-link-a-project/story.md) | `settings.connectors · Trackers` |
 | 7a | A Software task's issue goes to a branch, a pull request, checks and reviews; a person merges at the host | Projects · a task · Inbox | [CP-78](../os/control/features/CP-F12-issue-trackers/stories/CP-78-fix-an-issue-through-a-branch-and-a-pull-request/story.md) | `projects.tasks · Detail · Pull request` |
 | 8 | Agents work the tasks; checks run in runs of their own | Projects · a task | [PJ-12](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-12-write-a-task-hand-it-on-and-accept-the-result/story.md) · [PJ-25](../capabilities/projects/features/PJ-F01-projects-and-tasks/stories/PJ-25-gate-a-task-on-its-checks/story.md) | `projects.tasks · Detail` |
 | 9 | See the work beside the nodes | Projects · a project › Map | [PJ-31](../capabilities/projects/features/PJ-F07-the-project-graph/stories/PJ-31-see-the-work-in-the-same-graph/story.md) | `projects.graph · Map · Work` |
@@ -65,7 +65,7 @@ flowchart TD
 | An agent would create more than 5 issues | The run holds; a card names each | CP-73.9 · CP-76.3 | `inbox · Needs you · Agent waiting` |
 | A check fails twice | The run holds; a card in Needs you | CP-76.4 | `inbox · Needs you · Agent waiting` |
 | An agent pushes to the default branch, a workflow file, or tries to merge | Refused, naming the ref or that a merge is never granted; a person merges at the host | CP-78.4 · CP-78.11 | `projects.tasks · Detail · Pull request` |
-| An agent asks to delete an issue | Refused — it tags waiting-deletion; a person deletes it at the tracker | CP-74.1 · CP-74.3 | `settings.plugins · Waiting deletion` |
+| An agent asks to delete an issue | Refused — it tags waiting-deletion; a person deletes it at the tracker | CP-74.1 · CP-74.3 | `settings.connectors · Trackers · Waiting deletion` |
 | An Operator not on the team | Acts disabled — *Join the team to change it* | PJ-26.11 | `projects.projects · Detail · Milestones · Not on the team` |
 | The project has no read + write graph database | The map draws subject nodes only and says the work graph is off | PJ-31.5 | `projects.graph · Map · Work graph off` |
 

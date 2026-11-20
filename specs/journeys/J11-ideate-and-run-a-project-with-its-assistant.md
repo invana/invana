@@ -3,7 +3,7 @@ id: J11
 title: Ideate and run a project with its assistant
 personas: [builder, decision-maker]
 stories: [PJ-02, PJ-22, PJ-21, PJ-20, PJ-18, PJ-15, PJ-12, PJ-25, PJ-24, PJ-23, GP-08, GP-09]
-boards: [projects.projects, projects.tasks, inbox, graph.memory]
+boards: [projects.new, projects.projects, projects.tasks, inbox, graph.memory]
 ---
 
 # Ideate and run a project with its assistant

@@ -83,7 +83,7 @@ Each act needs the permission named, from [the permission catalogue](../AC-F02-a
 | Rule | Detail |
 |---|---|
 | A key belongs to a person or a project | **Personal key** — minted by a person for themselves; acts with that person's policies ∩ the agent's ceiling, as a run outside a project does ([AC-F02 › Rules](../AC-F02-access-policies/feature.md#rules)) · **Project key** — minted for a project; every run it starts is inside the project and acts with the project's policies ∩ the agent's ceiling. Either way the key's own rules narrow it further, all read at each call. A key never does more than its owner |
-| A project key outlives the people | It keeps working when people join or leave the team, its minter included; archiving or deleting the project revokes it. Use it for CI, integrations and MCP clients that are not one person |
+| A project key outlives the people | It keeps working when people join or leave the team, its minter included; archiving the project revokes it. Use it for CI, integrations and MCP clients that are not one person |
 | A key holds no policy | It inherits from its owner — a person or a project — and only narrows ([AC-F02 › Rules](../AC-F02-access-policies/feature.md#rules)) |
 | History names the key | Every call and every run a key starts is in History with the key named, and its owner — for a project key, the project, where a person would be ([AC-F06](../AC-F06-history/feature.md)) |
 | A key meets *Hidden from agents* | A key reads under its owner and the agent it calls, whose ceiling carries *Hidden from agents*; a raw query through a key is refused where the owner's or the agent's policies hide anything in that graph database ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)) |
@@ -179,7 +179,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Read at each call | Revocation, expiry, a person's deactivation and every change to the owner's policies take effect on the next call; nothing is cached on the key |
 | Last used | `last_used_at` is written at most once a minute per key |
 | Revoking | Sets `revoked_at` and `revoked_by_id` and deletes the key's `access_key_rules`; in the same act stops every run with its `key_id` that is queued or running, as [a stop](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#mechanisms) does, `stopped_by_id` the revoker — a History row for the revoke and one per run. When the revoker is not the owner, an Update reaches the owner — for a project key, its minter — in the Inbox ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md)), naming the key and who revoked it |
-| A project ends | Archiving or deleting a project revokes its keys in the same act, `revoked_by_id` the person who did it ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)) |
+| A project ends | Archiving a project revokes its keys in the same act, `revoked_by_id` the person who did it ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)) |
 | Session-only | Every route here refuses a key and a connected client's token; mint and revoke verify `password` as [signing in again](../AC-F01-sign-in-account-and-sessions/feature.md#mechanisms) does |
 | Never in a log | The secret enters no event, log line, span or ledger row (NFR-SEC-2) |
 

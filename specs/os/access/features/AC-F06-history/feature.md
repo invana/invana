@@ -26,9 +26,10 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 ```mermaid
 flowchart TD
   ad([The header lock · Admin only]) --> acc["AC-48 · The Access dropdown · tiles · what each one is touching · last hour"]
-  acc -->|Access| now["AC-48 · Access › Now · acting now · blocked today · delegations in force"]
+  acc -->|a blocked act| now["AC-48 · History · Refused · Today · blocked today"]
+  acc -->|an agent| dl["AC-48 · the agent's page · Delegations in force"]
   acc -->|Access › Record| s
-  now -->|Revoke · password again| rvk(["A client or key ends · History row"])
+  dl -->|Revoke · password again| rvk(["A key ends · History row"])
   s([Access › Record › History]) -->|nothing yet| e["No acts yet — a run or a person's act writes the first row"]
   s --> rows["AC-16 · Every act: when · who, through which agents · what · touched · allowed or refused · run"]
   rows -->|Everything · People · Agents · Refused · a window| f{"Matches?"}
@@ -86,8 +87,8 @@ sequenceDiagram
 | Read the event list and its live tail | Admin — every event; everyone else — their own acts and the change events of records they can open ([What a reader of `events` gets](#mechanisms)) | Another person's sign-ins, keys, clients and refusals are never sent |
 | Restore an earlier version | Not here — the record's own page, by the permission it needs (Edit on its resource) | — |
 | Read the Access dropdown — its tiles and what each person and agent touched in the last hour | Admin | No *Access* button in the header |
-| Read Access › Now — acting now, blocked today, delegations in force | Admin | *Ask {Admin}* |
-| Revoke a client or a key acting for a person or a project, from Access › Now | Admin, with the password again ([AC-F10](../AC-F10-keys/feature.md) · [AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) | — |
+| Read acting now in the Access dropdown, blocked today in History · Refused, delegations in force on an agent's page | Admin | *Ask {Admin}* |
+| Revoke a key acting for a person or a project, from the agent's page · Delegations | Admin, with the password again ([AC-F10](../AC-F10-keys/feature.md) · [AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) | — |
 | Read *Your access* — one's own policies, agents and delegations — and revoke one's own | Every signed-in person, for themselves | Another person's is absent |
 
 ## States
@@ -189,7 +190,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `GET /export?format=csv \| jsonl` · `GET /exports` | Stream the filtered rows, each with its hash and the previous one, and write an exports row · the exports, newest first | AC-16 |
 | `GET /integrity?full=` | `{verified_at, ok, last_seq, broken_seq?, keep_days?, held, checkpoint?, rows}`; `full` re-verifies from the latest checkpoint, or row 1 when none | AC-16 |
 | `GET /summary?tz=` | The Access dropdown, Admin only; `tz` an IANA zone: `tiles` — `people_signed_in` · `agents_acting` · `requests_waiting` · `blocked_today`; `window` — `from` · `to` (the last hour); `actors[]`, the most recent first — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` (an agent's) · `run_id?` · `blocked` (refused in the window) · `bars[]` — `layer` (`model` · `graph_data` · `graph_database` · `outside`) · `touched` · `from` · `to` · `refused`; `more_actors` (actors not sent) | AC-48 |
-| `GET /now?tz=` | Access › Now, Read on `access/history`; `tz` an IANA zone: `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `run_id?` · `last_acted` (`now` · `within_15_min` · `today`); `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`client` · `key`) · `id` · `name` · `acts_for` (a person or a project) · `ends_at?` (none — never expires) · `verified` (`false` for a self-registered client) · `redirect_host?` (a client's) | AC-48 |
+| `GET /now?tz=` | The Access dropdown's acting now, History · Refused's blocked today and an agent's Delegations, Read on `access/history`; `tz` an IANA zone: `acting_now[]` — `actor_kind` (`person` · `agent`) · `actor` · `on_behalf_of?` · `run_id?` · `last_acted` (`now` · `within_15_min` · `today`); `blocked_today[]` — `seq` · `at` · `actor` · `agent` · `act` · `touched` · `rule` · `policy`; `delegations[]` — `kind` (`key`; `client` when AC-F11 is built) · `id` · `name` · `acts_for` (a person or a project) · `ends_at?` (none — never expires) · `verified` (`false` for a self-registered client) · `redirect_host?` (a client's) | AC-48 |
 | `GET /changes/{kind}/{id}` | One record's changes: `{record_kind, record_id, name, items[ChangeEntry]}` | AC-17 |
 | `GET /changes/{kind}/{id}/compare?a=&b=` | Two versions; `a` omitted compares `b` with the one before | AC-17 |
 | `GET /events` · `GET /events/stream` | The events the reader may read ([What a reader of `events` gets](#mechanisms)) by the list contract, every filter composing with `?changes=true` · the live tail, by the same rule | AC-17 |
@@ -201,7 +202,7 @@ store: every feature's *Events* table names what it writes here, and links this 
 | `access.history.export` | An export is made |
 | `access.history.prune` | Rows older than History's period are removed, a whole window — itself a History row, naming its checkpoint |
 | `access.history.broken` | A check finds the chain broken, naming the row |
-| `access.history.summary_read` | An Admin reads the access summary or Access › Now — at most one per Admin per hour |
+| `access.history.summary_read` | An Admin reads the access summary — at most one per Admin per hour |
 
 ### Refusals
 
@@ -210,9 +211,9 @@ store: every feature's *Events* table names what it writes here, and links this 
 | 404 | A row the reader may not see is opened | *Not found.* | AC-16.21 |
 | 404 | A record's changes or compare, for a record the reader cannot open | *Not found.* | AC-17.17 |
 | 422 | A compare naming a version the record does not have | *{record} has no version {v}.* | API only — Studio offers only versions the record has |
-| 403 | The access summary or Access › Now without Read on `access/history` | *This needs Read on access/history — ask {who can grant}.* | AC-48.19 |
+| 403 | The access summary or the refusals read without Read on `access/history` | *This needs Read on access/history — ask {who can grant}.* | AC-48.19 |
 | 401 | *Revoke* without the password, or a wrong one | *Enter your password again to do this.* | AC-48.15 |
-| 422 | The access summary or Access › Now with a `tz` that is not an IANA zone | *tz: {value} is not a time zone.* | AC-48.27 |
+| 422 | The access summary with a `tz` that is not an IANA zone | *tz: {value} is not a time zone.* | AC-48.27 |
 
 ### CLI
 
@@ -230,12 +231,12 @@ store: every feature's *Events* table names what it writes here, and links this 
 | The live tail | A database trigger notifies every insert into `events`; the engine fans it out to the streams Studio holds open — the counts stream ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#mechanisms)) among them |
 | The access summary | Composed on read, storing nothing: *people signed in* — people with a live refresh row ([AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine)); *agents acting now* — runs queued or running ([CP-F10](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)); *requests waiting* — open asks ([AC-F05](../AC-F05-asks-and-approvals/feature.md#engine)); *blocked today* — `GET /refusals`' `refused_today`; the timeline — the History rows of the last hour (below) |
 | The timeline | From the History rows whose `at` falls in the last hour, by person or agent: an agent's entry names `behind_user_id` as whom it acts for. A row's layer maps to a timeline layer — `model` → `model`; `data` on one named graph database → `graph_database`, on Graph Data joined across them → `graph_data`; an act the `outside` preset counts → `outside`; other layers draw no bar. Rows of one actor, one timeline layer and one `touched` less than 60 s apart join one bar; a refused row is its own bar with `refused: true`. At most 20 actors are sent, the most recent first; `more_actors` counts the rest |
-| Access › Now | Composed on read, storing nothing: *acting now* — people with a live refresh row and runs queued or running, each with when it last acted (below); *blocked today* — `GET /refusals`' rows; *delegations in force* — connected clients ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#engine)) and live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), project keys among them, each with the person or project it acts for ([AC-F03](../AC-F03-directory/feature.md#engine)) |
+| Acting now, blocked today, delegations | Composed on read, storing nothing: *acting now* — people with a live refresh row and runs queued or running, each with when it last acted (below); *blocked today* — `GET /refusals`' rows; *delegations in force* — live keys ([AC-F10](../AC-F10-keys/feature.md#engine)), project keys among them, each with the person or project it acts for ([AC-F03](../AC-F03-directory/feature.md#engine)) |
 | When one last acted | From that person's or run's writes and run starts only — never a sign-in, a token renewal or a read — as `now` (the last 2 minutes) · `within_15_min` · `today`. Nothing stores presence: no table, no event, never an address, a device or a user agent |
 | Names are untrusted | Client, key, agent and rule names and `touched` are sent as data; a self-registered client carries `verified: false` and its `redirect_host` ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md#rules)) |
-| Reading the summary is recorded | The first read of the summary or Access › Now by an Admin in each clock hour writes `access.history.summary_read` and its History row; later reads in that hour write nothing |
+| Reading the summary is recorded | The first read of the summary by an Admin in each clock hour writes `access.history.summary_read` and its History row; later reads in that hour write nothing |
 | `tz` | Checked against the IANA zone list before anything is read; *today* is midnight to now in that zone |
-| Revoke from Access › Now | Calls the owning feature's revoke — `DELETE /api/v1/access/clients/{id}` or `DELETE /api/v1/access/keys/{id}` — with its password check; nothing is revoked here |
+| Revoke from an agent's Delegations | Calls the owning feature's revoke — `DELETE /api/v1/access/clients/{id}` or `DELETE /api/v1/access/keys/{id}` — with its password check; nothing is revoked here |
 | *Your access* | The person's own policies and agents from `GET /api/v1/access/auth/me`, and their own clients and keys from the owning routes |
 | Who reads `events` | The change list and the live tail, notification rules ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#engine)), provenance ([RC-F06](../../../../capabilities/records/features/RC-F06-provenance/feature.md#engine)), a task's tree ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)), the outbox relay that rebuilds the system graph, and traces — each a reading; none copies it |
 | One writer of History | `record()` takes the last row under a row lock, sets `seq` and the hash, inserts. The Control Plane calls it for each step it settles and each refusal; delegation for each helper and refusal; every manager for each act a person, an agent, a key or an MCP client causes. Nothing updates or deletes a row |
@@ -278,14 +279,14 @@ store: every feature's *Events* table names what it writes here, and links this 
 | A change shows no percentage on an empty week | The change in acts against the 7-day daily mean is absent while that mean is under 10 acts a day |
 | Compare carries tokens per run | The compare reads *Tokens per run* of one version against the other, as the engine counted it |
 | A model's change names its loads | A model version's effect lists the loads it touched and how many records fail |
-| History lives in Access | History is read in Access › Record › History; the Admin's glance at access now is the header's Access dropdown, and its depth is Access › Now |
-| Access is an Admin's glance | The dropdown and Access › Now are an Admin's alone; an Operator reads their own access under *Your access* in the avatar menu, and has no *Access* button |
-| Delegations are clients and keys | What acts for a person or a project until a time is a connected client or a key; Access › Now lists both, a project key with its project, and revokes through their own features |
+| History lives in Access | History is read in Access › Record › History; the Admin's glance at access now is the header's Access dropdown; blocked today is History · Refused · Today and delegations are on the agent's page |
+| Access is an Admin's glance | The dropdown is an Admin's alone; an Operator reads their own access under *Your access* in the avatar menu, and has no *Access* button |
+| Delegations are clients and keys | What acts for a person or a project until a time is a connected client or a key; the agent's page lists keys, a project key with its project, and revokes through their own feature; connected clients join when AC-F11 is built |
 | Events read as History does | The event list and its tail follow who may read what; presence and refusals are never rebuilt from them by anyone but an Admin |
 | Last acted is coarse | *Now · within 15 min · today*, from writes and runs only — enough to catch access going wrong, never a record of a person's day |
 | An Admin's look is recorded | Reading who is signed in leaves a History row, one per Admin per hour |
 | Requests stay in the Inbox | The dropdown counts asks waiting; deciding them is the Inbox's |
-| The dropdown shows touching, not lists | The Access dropdown draws what each person and agent touched in the last hour as a timeline, a row per actor and one layer a bar, a blocked act struck through; who acts, delegations and recent changes are read in Access › Now and Record |
+| The dropdown shows touching, not lists | The Access dropdown draws what each person and agent touched in the last hour as a timeline, a row per actor and one layer a bar, a blocked act struck through; who acts, delegations and recent changes are read in History and Record |
 | The engine sends the timeline | Actors, bars, layers and blocked counts are the engine's; Studio places the bars on the axis and derives nothing |
 
 ## Open questions
