@@ -1,6 +1,6 @@
 ---
 name: platform-design-3
-status: paused
+status: running
 branch: feat/platform-design-3
 scope: platform-design-3
 artifact_publish: auto approve
