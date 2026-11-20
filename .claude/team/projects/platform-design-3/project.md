@@ -12,7 +12,7 @@ Part 2 made the v2027 canvas the one final design. Part 3 makes every flow in it
 
 | | |
 |---|---|
-| Goal | Every flow in the v2027 canvas is a click-through by `specs/design-language.md` §7 *Every design is end to end*: its start reachable from a List or Detail, every step a state, every button leading on, every failure wired with a way out, the result where it lands, Admin and Operator — proven by the click-through gate, a live harness, not a static scan · `settings.*` reconsidered (connected clients, access policies end to end, Record and Keeping, *your connections*, owners) and the deferrals applied as `later` stories · the 70 rows of the gap report (E2E-001…070) each closed by one phase · the artifact `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX` stays the single final design, mirroring `.design/canvas-invana/project/` |
+| Goal | Every flow in the v2027 canvas is a click-through by `specs/design-language.md` §7 *Every design is end to end*: its start reachable from a List or Detail, every step a state, every button leading on, every failure wired with a way out, the result where it lands, Admin and Operator — played on the place boards themselves (no flow or journey boards), proven by the click-through gate on the runtime the published canvas renders with, plus a dead-button sweep, not a static scan · `settings.*` reconsidered (connected clients, access policies end to end, Record and Keeping, *your connections*, owners) and the deferrals applied as `later` stories · the 70 rows of the gap report (E2E-001…070) each closed by one phase · the artifact `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX` stays the single final design, mirroring `.design/canvas-invana/project/` |
 | Specs | `specs/design-language.md` §7 and §8 · CP-10 · CP-84 · CP-82 · CP-83 · CP-25 · CP-64 · CP-20 · AC-04 · PJ-02 · AG-42 · AG-64 · SE-13 · AC-06 · AG-38 · RC-13 (gap report §4) · the settings deferrals: AC-24 · AC-25 · AC-28 · AC-29 · AC-30 · AC-35 · AC-36 · AC-43 · AC-44 · AC-45 · AC-46 · CP-03 · CP-43 · CP-63 · every story an E2E row cites, by ID in its phase |
 | Not in this project | Engine, Studio, connector or design-kit code — the one exception is `scripts/specs/check.py` (P03c, R605) · the reference-only marks on *Invana Products* and the proposal canvases · story statuses beyond `later` for the deferrals · drawing any story set to `later` · any canvas but Pgtk · the `.claude/` skill edits R603 and R604 (team rules — Ravi's own session) |
 
@@ -38,20 +38,19 @@ Run it: `INVANA_RUNNER_LEAD_MODEL=opus python3 .claude/skills/run-project/run.py
 | End to end, by §7 | Every board a phase touches meets `specs/design-language.md` §7 *Every design is end to end* a–h for each act on it. Link it, never restate it. A state that exists is not done until a click reaches it and a click leaves it |
 | Close the whole row | A phase closes every state its E2E rows list, in that row's words. A row's *card row*, *wait row* and *failure row* parts apply P03's mechanisms to that board; nothing is wired by URL alone |
 | Spec decides — Invana Products wins only through the spec | `specs/` settles every conflict. Where *Invana Products* draws a fuller flow than the spec (CP-10 *Join key* as its own step 3), the spec changes first — P02 sweeps the rows; a designer phase never draws a step the spec lacks, it raises a recommendation and a hand-off note |
-| `later` is not drawn | A story set to `later` (P01) keeps its boards as drawn, unwired; no phase draws or wires its states, and no flow frames them |
-| Place boards hold the markup | A flow or journey board draws nothing of its own: each step is a frame of a place-board state opened from its URL (view · state · lens) |
-| Flow boards | A phase whose row is *flow frame wrong* (FF) fixes that flow board; every other flow and journey board, and every new one, is P10's |
-| One mechanism each | Choice cards' `go`, the Outcome control on wait states, failure exits, the Sign in again hub and the flow lens toggle are built once in P03 in the shared components; later phases use them, never a per-board copy. Only P03 edits the shared shell components |
-| The manifest is the flow list | `.design/canvas-invana/clickthrough/flows.json` (P03b) holds each flow's start, steps, failures and lenses and the phase that owns it; a designer phase updates its own flows' entries as it wires them |
+| `later` is not drawn | A story set to `later` (P01) keeps its boards as drawn, unwired; no phase draws or wires its states, and no `flows.json` path runs them |
+| No flow or journey boards | A flow is played on its place boards; its click path is its `flows.json` entry, a journey an ordered list of flows there (`specs/design-language.md` §7). No phase draws, frames or fixes a `flow.*` or `journey.*` board; P10 deletes them |
+| One mechanism each | Choice cards' `go`, the Outcome control on wait states, failure exits and the Sign in again hub are built once in P03 in the shared components; later phases use them, never a per-board copy. Only P03 edits the shared shell components |
+| The manifest is the flow list | `.design/canvas-invana/clickthrough/flows.json` (P03b, re-keyed by P04c) holds each flow's start, steps, failures and lenses and the phase that owns it; a place phase encodes its own flows' paths from its stories' `## Screens` as it wires them |
 | Board ids stay | Keep the ids the specs cite; a renamed state is renamed in the spec in the same phase only by the product-manager — a designer phase raises it |
 | MVP first | J07 · J01 · J02 · J03 · J06 rows first inside every phase |
 | Kit only, tokens only | `InvanaUI` from the mirror's bundle; tokens only; density by its token; graph rendering is `@invana/canvas` |
 | Four stops for Ravi | The run pauses only after P01c (the CRUD matrix and the slimmed Settings: scope), P03 (the board engine every board rests on), P08b (the MVP places drawn) and P11b. Elsewhere a question only Ravi can answer goes to *Questions for Ravi* with the recommendation, and the session applies the recommendation and goes on; every change Ravi asks for afterwards goes through the product-manager |
-| What changed, with links | Every phase ends its report (`.agent-reports/<agent>/platform-design-3-<ID>.md`) with `## Review links` by `.claude/team/TEAM.md` §3 *Links*: each board, flow and journey it added or changed, its deep link, and the View · State · Lens to set for each new or wired state; spec phases link each story and row they changed. The project-lead's update links each phase report first |
-| Settings merges | A board P01c merged away moves its states into the board that keeps it, in the place phase that owns the keeper; its file is removed, every link and flow frame repointed, and the canvas publish sends `null` for it |
+| What changed, with links | Every phase ends its report (`.agent-reports/<agent>/platform-design-3-<ID>.md`) with `## Review links` by `.claude/team/TEAM.md` §3 *Links*: each board it added or changed and each flow it encoded, its deep link, and the View · State · Lens to set for each new or wired state; spec phases link each story and row they changed. The project-lead's update links each phase report first |
+| Settings merges | A board P01c merged away moves its states into the board that keeps it, in the place phase that owns the keeper; its file is removed, every link and `flows.json` step repointed, and the canvas publish sends `null` for it |
 | CRUD matrix rows | A place phase also closes the P01b matrix rows Ravi kept for the boards it owns — the create, edit and delete/archive acts with their confirm, result and failure states — and records them in `flows.json` |
 | Re-check before writing | `git status` on `specs/` and `.design/canvas-invana/` before writing — a peer session may hold them |
-| Render and click-through check | Before a designer phase is done: every board it touched renders with no page error in both lenses (`node .design/canvas-nav-proposals/harness/shot.mjs <abs path to .design/canvas-invana/project> <out> <board>.dc.html`, then with `--props '{"lens":"Operator"}'`), and `node .design/canvas-invana/clickthrough/run.mjs --through <its ID>` exits 0 |
+| Render and click-through check | Before a designer phase is done: every board it touched renders with no page error in both lenses (`node .design/canvas-nav-proposals/harness/shot.mjs <abs path to .design/canvas-invana/project> <out> <board>.dc.html`, then with `--props '{"lens":"Operator"}'`), and `node .design/canvas-invana/clickthrough/run.mjs --through <its ID>` exits 0 — its paths and, from P04c, the dead-button sweep of every board owned up to that phase |
 | Who writes `canvas.json` | Only the phase's lead; change only `pages`, `boards`, `order` and `notes` |
 | Artifacts: read freely, publish only on Ravi's word | Publish the mirror only to the canvas in References, and only while this header says `artifact_publish: approved` or `auto approve`. Read the header each session; never change it |
 | Publish at phase end | After the render check and gates pass: 1. Artifact `read` of the canvas URL. 2. Artifact `publish` with `url` = the canvas, `root` = the absolute path of `.design/canvas-invana`, `file_path` = `project/canvas.json`, `files` = only the `project/` files the phase changed, `null` for each removed board. Never send `index.html`, `SKILL.md`, the type's own files or `clickthrough/` |
@@ -76,11 +75,12 @@ None — the canvas and the harness need no stack.
 | Gate | Command | In | Phases | Known failures |
 |---|---|---|---|---|
 | specs | `python3 scripts/specs/check.py` | `.` | all | |
-| links | `python3 .design/canvas-invana/linkcheck.py` | `.` | P03, P03b, P04, P04b, P05, P05b, P05c, P06, P06b, P07, P07b, P07c, P08, P08b, P09, P09b, P09c, P10, P11b | |
+| links | `python3 .design/canvas-invana/linkcheck.py` | `.` | P03, P03b, P04, P04b, P04c, P05, P05b, P05c, P06, P06b, P07, P07b, P07c, P08, P08b, P09, P09b, P09c, P10, P11b | |
 | spec tests | `python3 -m unittest discover -s scripts/specs` | `.` | P03c | |
 | click-through P03b | `node .design/canvas-invana/clickthrough/run.mjs --through P03b` | `.` | P03b | |
 | click-through P04 | `node .design/canvas-invana/clickthrough/run.mjs --through P04` | `.` | P04 | |
 | click-through P04b | `node .design/canvas-invana/clickthrough/run.mjs --through P04b` | `.` | P04b | |
+| click-through P04c | `node .design/canvas-invana/clickthrough/run.mjs --through P04c` | `.` | P04c | |
 | click-through P05 | `node .design/canvas-invana/clickthrough/run.mjs --through P05` | `.` | P05 | |
 | click-through P05b | `node .design/canvas-invana/clickthrough/run.mjs --through P05b` | `.` | P05b | |
 | click-through P05c | `node .design/canvas-invana/clickthrough/run.mjs --through P05c` | `.` | P05c | |
@@ -255,6 +255,22 @@ None — the canvas and the harness need no stack.
 | Budget | |
 | Steps | 1. Connect a graph database. 2. Mode, off, practice. 3. Data stores. 4. Flow boards. 5. Render and click-through check; gates; publish |
 
+### P04c · Click-through harness, without flow boards
+
+| | |
+|---|---|
+| Agent | designer |
+| Read | `specs/design-language.md` §7 (*A flow is played on its place boards*, *Every design is end to end*) · `.design/canvas-invana/clickthrough/` (README · `run.mjs` · `runtime.js` · `find.mjs` · `lib.mjs` · `flows.json`) · `.design/canvas-invana/linkcheck.py` · R619 · R622 · `.design/canvas-invana/pd3p03/hub.py` (`AGAIN_BLOCK`) · P04b's report · the `## Screens` of the stories P03–P04b own · `design-story` |
+| Stories | — |
+| Done when | **a. The real runtime** — `run.mjs` and `find.mjs` render each board with the runtime the published canvas renders with (the canvas type's own, read from the canvas with Artifact `read`, kept under `clickthrough/`, never published) and `runtime.js` is gone; if that runtime cannot run headless, `run.mjs --published` plays the same paths on the published canvas and rule *Publish at phase end* runs it after every publish — the report says which, and why · **b. No flow boards** — every `flows.json` id is `act.<act>` and P04c is in its `phases`; `seeded`, `"board": "not drawn"` and every field taken from a flow board are gone; no step has `"click": null` — each path of a phase up to P04b encoded from its stories' `## Screens`, a later phase's flow keeps its id, act, owner, stories, rows and start, its seeded paths dropped for its owner to encode; `find.mjs --frames` removed; `linkcheck.py` no longer reads `flow.*` or `journey.*` boards · **c. The dead-button sweep** — `flows.json` maps each board to the phase that owns it; `run.mjs --through <ID>` also opens every state of every board owned up to `<ID>`, in both lenses, clicks each enabled control and fails on one that lands nowhere (no state, view, overlay or board change); `--all` sweeps every board not `later`; `--no-sweep` skips it · **d. R619 · R622** — the `access.signin` Sign in again hub's Outcome controls no longer submit its form; each lands on its act's result state, *Wrong password* on the same act · `run.mjs --through P04c` exits 0 on the real runtime with the sweep green for `access.signin` · `settings.limits` · `settings.workers` · `settings.databases` · `settings.connectors` and the shared shell components · the README states the flags, the manifest's fields and how a place phase encodes its paths · every touched board renders in both lenses; links green |
+| Lands | `.design/canvas-invana/clickthrough/` (README · `run.mjs` · `find.mjs` · `lib.mjs` · `flows.json`; `runtime.js` removed) · `.design/canvas-invana/linkcheck.py` · the mirror: `access.signin` and the shared component that holds the hub · `canvas.json` (only if a board changed) |
+| Deliverable | `.agent-reports/designer/platform-design-3-P04c.md` |
+| Boards | `access.signin` |
+| Review | |
+| Approve | — |
+| Budget | |
+| Steps | 1. The real runtime under `run.mjs` and `find.mjs` (or `--published`). 2. Re-key `flows.json` to `act.<act>`, drop the flow-board fields, encode P03–P04b's paths from their Screens. 3. `linkcheck.py` without flow and journey boards. 4. The dead-button sweep and its board map. 5. R619 · R622 on the hub. 6. README. 7. Render and click-through check; gates; publish if a board changed |
+
 ### P05 · Connectors, credentials and plugins
 
 | | |
@@ -262,10 +278,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-014 · 017 · 018 · 019 · 054 · P01's note (no personal connections) · P02's CP-82 and CP-64 · `settings.plugin` and `settings.connections` in *Invana Products* · `design-story` |
 | Stories | CP-79 · CP-17 · CP-77 · CP-80 · CP-62 · CP-42 · CP-81 · CP-82 · CP-64 · CP-65 |
-| Done when | E2E-014 · 017 · 018 · 019 · 054 closed on `settings.connectors` and `settings.plugins`: Install · Command → Checking → listed or Not found yet; a credential's Connect with Name taken, the Manage refusal, Testing and Connecting exits, Attach to agents landing in the attach modal; Test · Rotate · Remove of a work connection with results (the *Personal* part is `later`); plugin Install, Update and Remove each Checking → result; runtime Install → Installed, off → Codex installed, the Workers link carrying its state. `flow.add_credential` · `flow.install_connector` · `flow.install_runtime` · `flow.switch_plugin` reframed where they moved, both lenses |
-| Lands | The mirror: these boards · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-014 · 017 · 018 · 019 · 054 closed on `settings.connectors` and `settings.plugins`: Install · Command → Checking → listed or Not found yet; a credential's Connect with Name taken, the Manage refusal, Testing and Connecting exits, Attach to agents landing in the attach modal; Test · Rotate · Remove of a work connection with results (the *Personal* part is `later`); plugin Install, Update and Remove each Checking → result; runtime Install → Installed, off → Codex installed, the Workers link carrying its state. The acts' `flows.json` paths (install a connector, add · test · rotate · remove a credential, install · update · remove a plugin, install a runtime) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: these boards · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P05.md` |
-| Boards | `settings.connectors` · `settings.plugins` · `flow.add_credential` · `flow.install_connector` · `flow.install_runtime` |
+| Boards | `settings.connectors` · `settings.plugins` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -278,10 +294,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-020 · 042 · 043 · `settings.llms.add` · `settings.mcp.add` · `settings.plugin` in *Invana Products* · `design-story` |
 | Stories | CP-01 · CP-61 · CP-73 · CP-74 · CP-02 · CP-44 · CP-42 |
-| Done when | E2E-020 · 042 · 043 closed: New AI endpoint Kind picked → Save and ping → Pinging → Proven or Ping failed → Locality → Sign in again → Local; tracker Add → Testing → Failed or Reach, the project and task tracker states reached; outside MCP server Add with None · A token · OAuth hand-off, Name taken, Listing → Tools listed → Added. `flow.add_ai_model` · `flow.connect_tracker` · `flow.add_outside_server` reframed, both lenses |
-| Lands | The mirror: `settings.ai` · `settings.plugins` · `projects.projects` · `projects.tasks` (tracker states only) · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-020 · 042 · 043 closed: New AI endpoint Kind picked → Save and ping → Pinging → Proven or Ping failed → Locality → Sign in again → Local; tracker Add → Testing → Failed or Reach, the project and task tracker states reached; outside MCP server Add with None · A token · OAuth hand-off, Name taken, Listing → Tools listed → Added. The acts' `flows.json` paths (add an AI model, connect a tracker, add an outside server) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `settings.ai` · `settings.plugins` · `projects.projects` · `projects.tasks` (tracker states only) · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P05b.md` |
-| Boards | `settings.ai` · `settings.plugins` · `flow.add_ai_model` · `flow.connect_tracker` · `flow.add_outside_server` |
+| Boards | `settings.ai` · `settings.plugins` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -294,10 +310,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-053 · 058 · P02's CP-83 and CP-20 · `builder.templates` · `shell.notifications.rule*` in *Invana Products* · `design-story` |
 | Stories | CP-20 · CP-83 · CP-60 · CP-59 · CP-37 · CP-45 · CP-67 |
-| Done when | E2E-053 · 058 closed: pack Install → What it brings → Installing → Installed, off, with Pack clashes and Manifest refused; Upgrade → Applying → Upgraded; Remove → Removing → Removed; alert New → Filled → Saving → History alert, Out of range; notification rule and channel with Channel ready, Rule refused, Channel test failed, Refused. `flow.install_pack` · `flow.tune_alert` reframed, both lenses |
-| Lands | The mirror: `settings.packs` · `settings.alerts` · `settings.notifications` · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-053 · 058 closed: pack Install → What it brings → Installing → Installed, off, with Pack clashes and Manifest refused; Upgrade → Applying → Upgraded; Remove → Removing → Removed; alert New → Filled → Saving → History alert, Out of range; notification rule and channel with Channel ready, Rule refused, Channel test failed, Refused. The acts' `flows.json` paths (install · upgrade · remove a pack, tune an alert, write a notification rule) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `settings.packs` · `settings.alerts` · `settings.notifications` · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P05c.md` |
-| Boards | `settings.packs` · `settings.alerts` · `settings.notifications` · `flow.install_pack` · `flow.tune_alert` |
+| Boards | `settings.packs` · `settings.alerts` · `settings.notifications` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -310,10 +326,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-022 · 023 · 024 · 025 · 026 · 027 · the settings review (*Access policies end to end*) · P02's AC-04 and AC-06 · `iam.*` in *Invana Products* · `design-story` |
 | Stories | AC-18 · AC-09 · AC-39 · AC-26 · AG-35 · AC-04 · AC-06 · AC-49 · AC-11 · AC-22 · AC-12 · AC-13 · AC-08 |
-| Done when | E2E-022 · 023 · 024 · 025 · 026 · 027 closed: New person and New team with Taken and the Operator refusal; agent grants Preview → Sign in again → Agent grants, Change default agent, Could not save; the policy path New · Start → What it allows → Who holds it → Review (Who it changes · What would break · Per agent) → Sign in again (Wrong password returns) → Saved, or Waiting for a second Admin when the setting is on; Attach with Pick a holder wired → Who it changes → Sign in again → Attached, Could not attach; Check from *What it may touch* → Why → Refused by a rule → Ask for more. `flow.create_account` · `flow.create_team` · `flow.grant_agent` · `flow.write_policy` · `flow.attach_policy` · `flow.check_access` reframed, both lenses |
-| Lands | The mirror: `settings.people` · `settings.policies` · `settings.agent_access` · `agents.agents` (grant and default states) · `agents.runs` (refused-by-a-rule state) · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-022 · 023 · 024 · 025 · 026 · 027 closed: New person and New team with Taken and the Operator refusal; agent grants Preview → Sign in again → Agent grants, Change default agent, Could not save; the policy path New · Start → What it allows → Who holds it → Review (Who it changes · What would break · Per agent) → Sign in again (Wrong password returns) → Saved, or Waiting for a second Admin when the setting is on; Attach with Pick a holder wired → Who it changes → Sign in again → Attached, Could not attach; Check from *What it may touch* → Why → Refused by a rule → Ask for more. The acts' `flows.json` paths (create an account, create a team, grant an agent, write a policy, attach a policy, check access) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `settings.people` · `settings.policies` · `settings.agent_access` · `agents.agents` (grant and default states) · `agents.runs` (refused-by-a-rule state) · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P06.md` |
-| Boards | `settings.people` · `settings.policies` · `settings.agent_access` · `flow.write_policy` · `flow.attach_policy` · `flow.grant_agent` · `flow.check_access` |
+| Boards | `settings.people` · `settings.policies` · `settings.agent_access` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -326,10 +342,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-028 · 046 · 056 · 057 · P01's note (no Keeping, no Owners, no Connected clients) · `shell.notifications.tray.*` · `iam.tokens.new` in *Invana Products* · `design-story` |
 | Stories | AC-15 · AC-14 · CP-36 · CP-69 · AC-10 · AC-16 · AC-17 · AC-23 · AC-45 · AC-47 |
-| Done when | E2E-028 · 046 · 056 · 057 closed: an ask's See all → Back, Send it → Sent, Not this time → Declined, Send failed, Already decided, the dropdown row opening the same ask; New key Name taken, Only you as owner, Your password · Wrong password, Copy → Copied → Done → Keys; History's verify act raising Chain broken; Export → Sign in again → Exporting → Exported, Deactivate → Sign in again → Deactivated, Export first and Could not save (the hold and *Took over* parts are `later`). `flow.decide_ask` · `flow.mint_key` · `flow.read_ledger` · `flow.deactivate_person` reframed, both lenses |
-| Lands | The mirror: `inbox` · `inbox.dropdown` · `settings.me` · `settings.history` · `settings.people` · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-028 · 046 · 056 · 057 closed: an ask's See all → Back, Send it → Sent, Not this time → Declined, Send failed, Already decided, the dropdown row opening the same ask; New key Name taken, Only you as owner, Your password · Wrong password, Copy → Copied → Done → Keys; History's verify act raising Chain broken; Export → Sign in again → Exporting → Exported, Deactivate → Sign in again → Deactivated, Export first and Could not save (the hold and *Took over* parts are `later`). The acts' `flows.json` paths (decide an ask, mint a key, read and verify History, deactivate a person) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `inbox` · `inbox.dropdown` · `settings.me` · `settings.history` · `settings.people` · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P06b.md` |
-| Boards | `inbox` · `inbox.dropdown` · `settings.me` · `settings.history` · `settings.people` · `flow.decide_ask` · `flow.mint_key` · `flow.deactivate_person` |
+| Boards | `inbox` · `inbox.dropdown` · `settings.me` · `settings.history` · `settings.people` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -342,10 +358,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-005 · 029 · 030 · P01's note (`access.consent` is `later`) · `shell.login` · `shell.first_run` · `shell.onboarding.*` in *Invana Products* · `design-story` |
 | Stories | AC-01 · AC-34 · CP-22 · CP-24 · CP-30 · CP-68 · CP-70 · CP-72 |
-| Done when | E2E-005 · 029 · 030 closed: Sign in → Signing in → `start.home`, or Could not sign in · Locked · Too many requests · No account; Session ended → Sign in again; `start.home` First use → Demo data → Set-up → Set-up · Two of four → Continue set-up → `settings.databases · Connect`, the typed question → Drafting below, Ask an Admin for the Operator; the switcher, the palette, Operations, the Agents glance and the Inbox dropdown each open their target in the state the flow frames. `flow.sign_in` · `flow.start_first_run` · `flow.command_palette` reframed, both lenses |
-| Lands | The mirror: `access.signin` · `start.home` · `shell.*` boards · `inbox.dropdown` (links only) · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-005 · 029 · 030 closed: Sign in → Signing in → `start.home`, or Could not sign in · Locked · Too many requests · No account; Session ended → Sign in again; `start.home` First use → Demo data → Set-up → Set-up · Two of four → Continue set-up → `settings.databases · Connect`, the typed question → Drafting below, Ask an Admin for the Operator; the switcher, the palette, Operations, the Agents glance and the Inbox dropdown each open their target in the state its story's `## Screens` names. The acts' `flows.json` paths (sign in, first run, the command palette and the shell glances) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `access.signin` · `start.home` · `shell.*` boards · `inbox.dropdown` (links only) · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P07.md` |
-| Boards | `access.signin` · `start.home` · `flow.sign_in` · `flow.start_first_run` · `flow.command_palette` |
+| Boards | `access.signin` · `start.home` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -358,10 +374,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-031 · 032 · 033 · `modeller.models.new*` · `modeller.draft*` · `datasets.upload*` in *Invana Products* · `design-story` |
 | Stories | SE-04 · SE-06 · SE-15 · SE-05 · SE-08 · SE-20 · RC-08 · RC-09 · RC-10 |
-| Done when | E2E-031 · 032 · 033 closed: Connect · Shape → Draft · Arriving across boards; How to start with each choice its own branch; Arriving and Reading exits; Discard → confirm → Discarded; Publish · Checking → Publish or Breaking → Published, Waiting on approval → the Inbox ask → Approve → Published, Refused and Review failed; Upload Drop → File chosen → Preview → Load → Loading → Started → the load's run, with Not rows · Cannot read · Licence missing · Refused rows · Unchanged. `flow.draft_model` · `flow.publish_model` · `flow.upload_file` reframed, both lenses |
-| Lands | The mirror: `model.models` · `data.loads` · `inbox` (publish approval) · `agents.runs` (load detail) · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-031 · 032 · 033 closed: Connect · Shape → Draft · Arriving across boards; How to start with each choice its own branch; Arriving and Reading exits; Discard → confirm → Discarded; Publish · Checking → Publish or Breaking → Published, Waiting on approval → the Inbox ask → Approve → Published, Refused and Review failed; Upload Drop → File chosen → Preview → Load → Loading → Started → the load's run, with Not rows · Cannot read · Licence missing · Refused rows · Unchanged. The acts' `flows.json` paths (draft a model, publish a model, upload a file) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `model.models` · `data.loads` · `inbox` (publish approval) · `agents.runs` (load detail) · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P07b.md` |
-| Boards | `model.models` · `data.loads` · `flow.draft_model` · `flow.publish_model` · `flow.upload_file` |
+| Boards | `model.models` · `data.loads` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -374,10 +390,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-034 · 035 · 064 · 065 · P02's RC-13 · `explorer.answer*` · `explorer.board.annotate.*` in *Invana Products* · `design-story` |
 | Stories | EX-01 · EX-02 · EX-03 · EX-04 · EX-05 · EX-06 · EX-23 · EX-25 · EX-15 · EX-12 · EX-17 · RC-13 · RC-07 · EX-08 · GP-05 |
-| Done when | E2E-034 · 035 · 064 · 065 closed: Ask → Working → Answered, ask back, not held or refused; Answered → Why → the run's Answer; Share → Export and its four failures resolving to drawn states; Add to a project → Adding → added → the branch's Finding; Annotate → Saving → `data.annotations`, *Someone else's* named once; Console → Rows → `explore.queries`. `flow.ask` · `flow.share_answer` · `flow.annotate` · `flow.write_query` reframed, both lenses |
-| Lands | The mirror: `explore.board` · `explore.queries` · `data.annotations` · `agents.runs` (answer) · `projects.branches` (finding) · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-034 · 035 · 064 · 065 closed: Ask → Working → Answered, ask back, not held or refused; Answered → Why → the run's Answer; Share → Export and its four failures resolving to drawn states; Add to a project → Adding → added → the branch's Finding; Annotate → Saving → `data.annotations`, *Someone else's* named once; Console → Rows → `explore.queries`. The acts' `flows.json` paths (ask, share an answer, annotate, write a query) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `explore.board` · `explore.queries` · `data.annotations` · `agents.runs` (answer) · `projects.branches` (finding) · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P07c.md` |
-| Boards | `explore.board` · `explore.queries` · `data.annotations` · `flow.ask` · `flow.share_answer` · `flow.annotate` · `flow.write_query` |
+| Boards | `explore.board` · `explore.queries` · `data.annotations` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -390,10 +406,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-038 · 039 · 040 · P02's PJ-02 · `shell.graph.new.*` and `projects.project` in *Invana Products* · `design-story` |
 | Stories | PJ-02 · PJ-23 · PJ-34 · PJ-22 · PJ-33 · PJ-35 · PJ-36 |
-| Done when | E2E-038 · 039 · 040 closed: `projects.new` Start (grid, From a project, Type needs a connector with Next off) → About (Slug taken, Drafting, Filled) → Data (Loading, Could not load, Testing → holds data · empty · Could not connect) → Team (Add, New policy) → Review (Refused) → Create → `projects.projects · Detail · Just created`, and Discard confirm; the legacy New modal retired; project settings' every state reached from the act that raises it, the Operator's Not on the team and Withheld. `flow.create_project` reframed, both lenses |
-| Lands | The mirror: `projects.new` · `projects.projects` · `projects.settings` · `flow.create_project` · `flows.json` entries · `canvas.json` |
+| Done when | E2E-038 · 039 · 040 closed: `projects.new` Start (grid, From a project, Type needs a connector with Next off) → About (Slug taken, Drafting, Filled) → Data (Loading, Could not load, Testing → holds data · empty · Could not connect) → Team (Add, New policy) → Review (Refused) → Create → `projects.projects · Detail · Just created`, and Discard confirm; the legacy New modal retired; project settings' every state reached from the act that raises it, the Operator's Not on the team and Withheld. The acts' `flows.json` paths (create a project, the project settings) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `projects.new` · `projects.projects` · `projects.settings` · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P08.md` |
-| Boards | `projects.new` · `projects.projects` · `projects.settings` · `flow.create_project` |
+| Boards | `projects.new` · `projects.projects` · `projects.settings` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -406,10 +422,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-036 · 037 · 066 · 067 · 068 · `projects.todo*` · `projects.branch.*` · `projects.finding` in *Invana Products* · `design-story` |
 | Stories | PJ-12 · PJ-15 · PJ-18 · PJ-25 · PJ-04 · PJ-05 · PJ-06 · PJ-07 · PJ-08 · PJ-21 · PJ-24 · PJ-26 · CP-78 |
-| Done when | E2E-036 · 037 · 066 · 067 · 068 closed: New task Pick a kind → Assign → Saving → the task → Claimed → In review → the Inbox result → Accept → Done, Agent not granted; Finding New → Filled → added; Fork → the new branch; Finding → Decide → Recording → decided; Merging exit; the assistant thread → Proposals → the Inbox proposal; Ask for help Loading; Milestones · Ready to accept; Pull request → the Inbox push → Review comment → Merged. `flow.write_task` · `flow.fork_and_decide` · `flow.ideate_project` · `flow.make_milestone` · `flow.fix_through_pull_request` reframed, both lenses |
-| Lands | The mirror: `projects.tasks` · `projects.branches` · `projects.projects` · `projects.graph` · `inbox` · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-036 · 037 · 066 · 067 · 068 closed: New task Pick a kind → Assign → Saving → the task → Claimed → In review → the Inbox result → Accept → Done, Agent not granted; Finding New → Filled → added; Fork → the new branch; Finding → Decide → Recording → decided; Merging exit; the assistant thread → Proposals → the Inbox proposal; Ask for help Loading; Milestones · Ready to accept; Pull request → the Inbox push → Review comment → Merged. The acts' `flows.json` paths (write a task, fork and decide, ideate a project, make a milestone, fix through a pull request) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `projects.tasks` · `projects.branches` · `projects.projects` · `projects.graph` · `inbox` · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P08b.md` |
-| Boards | `projects.tasks` · `projects.branches` · `projects.graph` · `flow.write_task` · `flow.fork_and_decide` |
+| Boards | `projects.tasks` · `projects.branches` · `projects.graph` |
 | Review | |
 | Approve | Ravi — review the phase's *Review links* before the run goes on |
 | Budget | |
@@ -422,10 +438,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-044 · 047 · 048 · 049 · 052 · P02's AG-64 and AG-38 · `builder.*` · `settings.remote_agents.add` in *Invana Products* · `design-story` |
 | Stories | AG-33 · AG-21 · AG-26 · AG-29 · AG-61 · AG-36 · AG-19 · AG-37 · AG-40 · AG-38 · AG-64 · AG-39 · AG-63 · AC-25 |
-| Done when | E2E-044 · 047 · 048 · 049 · 052 closed: Outside → Add → Reading the card → Card read · unreadable · version refused → Added, off, with Wrong password retry; New agent Type → Details → Saving → Created → Unchecked draft, Proposal and Runs with reached, Name taken; Versions → Draft → Run the evals → Published, Rolled back, Publish refused; skill template sections and Rubric open, Model version framed; Import → Reading → Mapping → Confirm → Installed, off → Waiting to apply; Export Writing · Disabled · Refused; a built-in's *Copy to change it* on its own detail (AC-25 after P01). `flow.add_outside_agent` · `flow.create_agent` · `flow.publish_agent` · `flow.create_skill` · `flow.import_agents` reframed, both lenses |
-| Lands | The mirror: `agents.agents` · `agents.skills` · `settings.packs` (import landing) · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-044 · 047 · 048 · 049 · 052 closed: Outside → Add → Reading the card → Card read · unreadable · version refused → Added, off, with Wrong password retry; New agent Type → Details → Saving → Created → Unchecked draft, Proposal and Runs with reached, Name taken; Versions → Draft → Run the evals → Published, Rolled back, Publish refused; skill template sections and Rubric open, Model version framed; Import → Reading → Mapping → Confirm → Installed, off → Waiting to apply; Export Writing · Disabled · Refused; a built-in's *Copy to change it* on its own detail (AC-25 after P01). The acts' `flows.json` paths (add an outside agent, create an agent, publish an agent, create a skill, import agents) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `agents.agents` · `agents.skills` · `settings.packs` (import landing) · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P09.md` |
-| Boards | `agents.agents` · `agents.skills` · `flow.create_agent` · `flow.publish_agent` · `flow.create_skill` · `flow.import_agents` · `flow.add_outside_agent` |
+| Boards | `agents.agents` · `agents.skills` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -438,10 +454,10 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-050 · 051 · 069 · 070 · P02's AG-42 · `shell.schedule.*` · `builder.skill.test` · `activity.run.*` in *Invana Products* · `design-story` |
 | Stories | AG-42 · AG-44 · AG-20 · CP-56 · AG-51 · AG-52 · CP-58 |
-| Done when | E2E-050 · 051 · 069 · 070 closed: New schedule Ask first or Allow → Saving → A schedule, the result's Inbox state; Workflow Run → checking → Started by name → Asks first; Step failed → From a run → Request a change; Suggested change → Evidence → History; Stop run → Stopping → Stopped → the Inbox's Run stopped. `flow.schedule_work` · `flow.run_workflow` · `flow.adopt_into_skill` · `flow.decide_suggested_change` · `flow.stop_run` reframed, both lenses |
-| Lands | The mirror: `agents.schedules` · `agents.skills` · `agents.runs` · `inbox` · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-050 · 051 · 069 · 070 closed: New schedule Ask first or Allow → Saving → A schedule, the result's Inbox state; Workflow Run → checking → Started by name → Asks first; Step failed → From a run → Request a change; Suggested change → Evidence → History; Stop run → Stopping → Stopped → the Inbox's Run stopped. The acts' `flows.json` paths (schedule work, run a workflow, adopt into a skill, decide a suggested change, stop a run) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `agents.schedules` · `agents.skills` · `agents.runs` · `inbox` · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P09b.md` |
-| Boards | `agents.schedules` · `agents.runs` · `flow.schedule_work` · `flow.run_workflow` · `flow.stop_run` |
+| Boards | `agents.schedules` · `agents.runs` |
 | Review | |
 | Approve | — |
 | Budget | |
@@ -454,30 +470,30 @@ None — the canvas and the harness need no stack.
 | Agent | designer |
 | Read | Rows E2E-041 · 059 · 060 · 061 · 062 · 063 · P02's SE-13 · `modeller.rules.*` · `modeller.models.import*` · `datasets.*` in *Invana Products* · `design-story` |
 | Stories | RC-11 · SE-12 · SE-13 · SE-22 · SE-03 · SE-16 · SE-17 · SE-18 · SE-19 · RC-02 · RC-12 · RC-03 · RC-04 |
-| Done when | E2E-041 · 059 · 060 · 061 · 062 · 063 closed: Add by hand Kind → Saving → Saved, Records refused · Key missing · Too many; rule New → Counting → Impact → Save → Never offered, Requests → Resolve → Already resolved; Link joins → counting · loading · refused → staged; Export → Exporting → Redacted or failed; Restore → Reading → Preview → Draft · Restored; Import a standard → No terms yet → Hold to a standard; Checks → Fix → Fixing → Fixed, Fix refused, Changed meanwhile; Fix many → Building preview → Running → Written · Partly written · Refused; Merge → Merging → Merged. `flow.add_records` · `flow.write_rule` · `flow.link_models` · `flow.export_import_model` · `flow.import_standard` · `flow.decide_quality` · `flow.fix_records` reframed, both lenses |
-| Lands | The mirror: `model.rules` · `model.inference` · `model.models` · `model.standards` · `data.loads` · `data.quality` · `data.records` · their flow boards · `flows.json` entries · `canvas.json` |
+| Done when | E2E-041 · 059 · 060 · 061 · 062 · 063 closed: Add by hand Kind → Saving → Saved, Records refused · Key missing · Too many; rule New → Counting → Impact → Save → Never offered, Requests → Resolve → Already resolved; Link joins → counting · loading · refused → staged; Export → Exporting → Redacted or failed; Restore → Reading → Preview → Draft · Restored; Import a standard → No terms yet → Hold to a standard; Checks → Fix → Fixing → Fixed, Fix refused, Changed meanwhile; Fix many → Building preview → Running → Written · Partly written · Refused; Merge → Merging → Merged. The acts' `flows.json` paths (add records, write a rule, link models, export and import a model, import a standard, decide quality, fix records) encoded from their stories' `## Screens`, both lenses |
+| Lands | The mirror: `model.rules` · `model.inference` · `model.models` · `model.standards` · `data.loads` · `data.quality` · `data.records` · `flows.json` entries · `canvas.json` |
 | Deliverable | `.agent-reports/designer/platform-design-3-P09c.md` |
-| Boards | `model.rules` · `model.standards` · `data.quality` · `data.records` · `flow.write_rule` · `flow.fix_records` |
+| Boards | `model.rules` · `model.standards` · `data.quality` · `data.records` |
 | Review | |
 | Approve | — |
 | Budget | |
 | Steps | 1. Records by hand and fixes. 2. Rules. 3. Links, export, restore. 4. Standards and quality. 5. Render and click-through check; gates; publish |
 
-### P10 · Flow and journey boards
+### P10 · Operator paths, journeys in the manifest, flow and journey boards deleted
 
 | | |
 |---|---|
 | Agent | designer |
-| Read | Row E2E-006 · P04–P09c's notes · P02's new flow boards · P03's lens toggle · `specs/design-language.md` §7 · every `flow.*` and `journey.*` board · `flows.json` |
+| Read | Row E2E-006 · P04c–P09c's notes · `specs/design-language.md` §7 · `specs/journeys/` · `flows.json` · R626 |
 | Stories | — |
-| Done when | E2E-006 closed: every flow whose stories have Operator rows has the Lens toggle on and its Operator frame (the refused or disabled state), MVP flows first; a flow board for each act P02 named (CP-84 · CP-81 · CP-82 · CP-41 · CP-83 · PJ-22 · CP-03); every other flow board frames its click path in order with no step skipped and every frame resolving; every journey board chains the flows as they now run; flows of `later` stories left as drawn; badges derived; `--through P10` exits 0 |
-| Lands | The mirror: `flow.*` · `journey.*` · `Main.dc.html` · `flows.json` entries · `canvas.json` |
+| Done when | E2E-006 closed: every flow whose stories have Operator rows has its `kind: "operator"` path in `flows.json` (the refused or disabled state), MVP flows first; each act P02 named (CP-84 · CP-81 · CP-82 · CP-41 · CP-83 · PJ-22 · CP-03) has its flow; every journey J01–J14 is an ordered list of its flows in `flows.json`, matching its `specs/journeys/` diagram, and `run.mjs --journeys` plays each in order; flows of `later` stories listed `later`. Then every `flow.*` and `journey.*` board is deleted — removed from the mirror, `canvas.json` and `Main.dc.html`, the publish sending `null` for each — once no spec cites one (R626, the product-manager, first); links and `check.py` green; `--through P10` exits 0 |
+| Lands | The mirror: `Main.dc.html` · `canvas.json` · the `flow.*` and `journey.*` files removed · `flows.json` entries · `clickthrough/` (`--journeys`) |
 | Deliverable | `.agent-reports/designer/platform-design-3-P10.md` |
-| Boards | `flow.*` · `journey.*` |
+| Boards | — (deletes `flow.*` · `journey.*`) |
 | Review | |
 | Approve | — |
 | Budget | |
-| Steps | 1. Operator frames, MVP first. 2. The seven new flow boards. 3. Every other flow. 4. Journeys and the Index. 5. Render and click-through check; gates; publish |
+| Steps | 1. Operator paths, MVP first. 2. The seven acts' flows. 3. Journeys in the manifest and `--journeys`. 4. Delete the flow and journey boards and their Index entries. 5. Render and click-through check; gates; publish with `null` for each deleted board |
 
 ### P11 · End-to-end QA
 
@@ -486,7 +502,7 @@ None — the canvas and the harness need no stack.
 | Agent | qa |
 | Read | `specs/design-language.md` §7 · the gap report (every row and §5) · every phase's hand-off notes · `flows.json` · `design-qa` |
 | Stories | — |
-| Done when | A report at `.agent-reports/qa/platform-design-3-clickthrough.md`, line 1 `RESULT: PASS` or `FAIL`: `run.mjs --all` run and its result; by hand, each flow of §5 *Unverified* and each MVP flow clicked start to result and through each failure, both lenses; each E2E-001…070 checked closed (or closed by deferral); every `## Screens` node of a non-`later` story reached; `later` boards untouched. Each finding names the flow, the board, the state and the fix, for P11b |
+| Done when | A report at `.agent-reports/qa/platform-design-3-clickthrough.md`, line 1 `RESULT: PASS` or `FAIL`: `run.mjs --all` (every path and the dead-button sweep) and `run.mjs --journeys` run and their results; by hand, each flow of §5 *Unverified* and each MVP flow clicked start to result and through each failure, both lenses; each E2E-001…070 checked closed (or closed by deferral); every `## Screens` node of a non-`later` story reached; `later` boards untouched. Each finding names the flow, the board, the state and the fix, for P11b |
 | Lands | The report · recommendations |
 | Deliverable | `.agent-reports/qa/platform-design-3-clickthrough.md` |
 | Boards | — |
@@ -528,7 +544,8 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P03c | Spec check flags unlinked flow states (R605) | P03b | done | 2026-11-20 | gates green · reviews passed |
 | P04 | Workers | P03b | done | 2026-11-20 | gates green · reviews passed |
 | P04b | Graph databases and data stores | P04 | done | 2026-11-20 | gates green · reviews passed |
-| P05 | Connectors, credentials and plugins | P04b | pending |  | E2E-014 · 017 · 018 · 019 · 054 |
+| P04c | Click-through harness, without flow boards | P04b | pending |  | R619 · R622 |
+| P05 | Connectors, credentials and plugins | P04c | pending |  | E2E-014 · 017 · 018 · 019 · 054 |
 | P05b | AI models, trackers and outside servers | P05 | pending |  | E2E-020 · 042 · 043 |
 | P05c | Team packs and alerts | P05b | pending |  | E2E-053 · 058 |
 | P06 | Access — people, teams and policies | P05c | pending |  | E2E-022 · 023 · 024 · 025 · 026 · 027 |
@@ -541,7 +558,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P09 | Agents — create, publish, skills, import | P08b | pending |  | E2E-044 · 047 · 048 · 049 · 052 |
 | P09b | Agents — schedules, runs, adopt, stop | P09 | pending |  | E2E-050 · 051 · 069 · 070 |
 | P09c | Model rules and Graph Data | P09b | pending |  | E2E-041 · 059 · 060 · 061 · 062 · 063 |
-| P10 | Flow and journey boards | P09c, P03c | pending |  | E2E-006 |
+| P10 | Operator paths, journeys in the manifest, flow and journey boards deleted | P09c, P03c | pending |  | E2E-006 |
 | P11 | End-to-end QA | P10 | pending |  |  |
 | P11b | Close the findings and publish | P11 | pending |  |  |
 

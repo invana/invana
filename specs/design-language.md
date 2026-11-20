@@ -344,15 +344,13 @@ Every renamed word — *Records*, *Load*, *Undone*, *Meaning*, *Broader kind*, *
 | The Operator access is the board's | The read-only access is the same board, each act a person lacks disabled with *Ask {who can grant}* — `<board> · Locked` names that state; there is no separate locked board. The exception is a board whose reading needs a permission the Operator lacks — Access Policies (`settings.policies`, `settings.agent_access`): the Operator state is `<board> · No access`, with no policy content shown |
 | A refusal names the resource, not its address | Copy reads *Needs {Action} on {Resource name} — ask {who can grant}*. The resource name is the *Resource* column of [the permission catalogue](os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) — Graph Data, Models, Projects, Agents, Skills, Memory, Access, Settings — or, when the refusal is about one item, the item's name: *Needs Edit on the Airways model*, *Needs Create on Models*. It never shows the address (`model/*`, `project/<project>`, `data/<graph database>/…`); addresses appear only on policy, API and History surfaces — the policy editor, the permission catalogue, History rows, API errors. *{who can grant}* is the people who can grant it, by name — *ask Priya or Lee* — written the same way everywhere. A refusal never names a policy or a rule, for anyone |
 | A modal many boards share is drawn once | *Sign in again* is `access.signin · Sign in again`; every story that asks for the password again cites it there |
-| Flow boards | One per act — create an agent, create a skill, create a project, connect a graph database, install a connector and add its credential. Named `flow.<act>` (`flow.create_agent`, `flow.connect_graph_database`), on the canvas page `flows`. They show the steps left to right, each step a live frame of `<board> · <view> · <state>` with its lens, plus arrows, a caption and the criteria IDs. Every one is end to end ([below](#every-design-is-end-to-end)) |
-| Journey boards | One per journey J01–J14, chaining flow boards across places. Named `journey.jNN` (`journey.j01`), on the canvas page `journeys` |
-| Flow and journey boards draw nothing of their own | They only frame place-board states, which open from the URL (view, state, lens) |
-| Milestone badge | Every board, flow and frame carries a badge for the [milestone](milestones.md) of the stories it cites — derived, never hand-typed. It reads *MVP?* while the milestone is proposed and unconfirmed |
+| A flow is played on its place boards | No board draws a flow or a journey. Each act's click path is an entry in the click-through manifest (`.design/canvas-invana/clickthrough/flows.json`) — its start, its steps by visible label, its failure, cancel and Operator paths — which the click-through gate plays ([below](#every-design-is-end-to-end)). A journey is an ordered list of those flows in the same manifest |
+| Milestone badge | Every board carries a badge for the [milestone](milestones.md) of the stories it cites — derived, never hand-typed. It reads *MVP?* while the milestone is proposed and unconfirmed |
 | A new board only for a new place | Two features in one place share its board; a feature in two places has a board in each |
 
 ### Every design is end to end
 
-A state that exists is not enough: a person clicks from where an act starts to where it ends. Flow boards above frame this click path.
+A state that exists is not enough: a person clicks from where an act starts to where it ends, on the place boards themselves.
 
 | Scope — every act | Includes |
 |---|---|
@@ -375,12 +373,12 @@ A state that exists is not enough: a person clicks from where an act starts to w
 | Naming | Rule |
 |---|---|
 | One name per node | A state is named `Step · Substate`, one name per click-path node; a story's `## Screens` lists every node |
-| Framed by URL | A `flow.<act>` board frames the nodes by `?view=…&st=…&lens=…` |
-| The flow board | Frames the same click path, in order, every frame resolving, no step skipped |
+| Opened by URL | Every node opens by `?view=…&st=…&lens=…`; a flow's manifest entry starts at one |
+| The manifest entry | Lists the same click path, in order, no step skipped |
 
 | Done check | Rule |
 |---|---|
-| Click-through | A board is done when a click-through of each flow — start to result, and each failure path — reaches every state with no dead end |
+| Click-through | A board is done when the click-through gate plays each of its flows — start to result, and each failure path — reaching every state with no dead end, and no enabled control on the board leads nowhere |
 | Who checks | The designer's render check and QA's design pass |
 | Not enough | That a state exists; every state is reached from the one before it |
 | A fuller flow in Invana Products than the spec | The product-manager changes the spec first; the designer never draws a step the spec lacks |

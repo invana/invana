@@ -24,4 +24,4 @@ Invana's roadmap is **milestones**. There is no *release*: the word is not a ter
 | A journey's milestone | Derived, never typed: a journey is in a milestone when every story it touches is in it |
 | A parked story | A story whose `status` is `later` carries no milestone |
 | A listed journey | Every story of a journey the milestone lists is in that milestone |
-| Boards | A board, flow board and frame shows a milestone badge derived from the stories it cites ([design-language §7](design-language.md#7-naming-boards)); the MVP is confirmed, so its badge reads *MVP* |
+| Boards | A board shows a milestone badge derived from the stories it cites ([design-language §7](design-language.md#7-naming-boards)); the MVP is confirmed, so its badge reads *MVP* |
