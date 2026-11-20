@@ -7,7 +7,7 @@ personas: [builder, admin, analyst]
 stories: [AG-24, AG-33, AG-34, AG-62]
 journeys: [J03, J09]
 boards: [agents.runs, agents.agents, inbox, access.signin]
-nfrs: [NFR-PERF-2, NFR-COST-1, NFR-SEC-10, NFR-SEC-11]
+nfrs: [NFR-PERF-2, NFR-COST-1, NFR-SEC-10, NFR-SEC-11, NFR-SEC-15]
 depends_on: [AG-F01, AC-F02, AC-F04, AC-F05, AC-F09, CP-F02, CP-F03, CP-F04, CP-F10, GP-F02]
 ---
 
@@ -167,6 +167,7 @@ Who an agent may hand work to is a rule on its Access Policies, which needs Edit
 | Rule | Detail |
 |---|---|
 | Five acts, each its own | Continuation, fork, delegation, escalation to a person and federation are distinct (the table under [User journey](#user-journey)); none stands in for another |
+| An outside agent's reply and a marked note are outside text | Whatever an outside agent returns is outside text; a hand-off note written by a session whose context held outside text carries `trust = outside` and its origins, and the session or forked run that starts from it begins marked ([system-design § 10 › The outside-text mark](../../../../system-design.md#10-ai-and-agents) · AG-34.17 · AG-62.14) |
 | At the session budget a run continues | When a session's tokens reach its session budget ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#rules)), the session writes a hand-off note and the run goes on in a fresh session from it — the same run, the same number, the same workspace, runtime, agent version and person behind it. It is never an ask and never an exit reason |
 | A hand-off note says three things | What is done, what is next and what it read — the sources, each a resource. The fresh session starts from the note and the run's task, never from the last session's transcript |
 | The runtime writes it, else Invana does | The session writes the note when told it reached its budget; a session that ends without one gets one Invana writes from the session's steps and sources — `written_by` says which |

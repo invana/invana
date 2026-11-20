@@ -31,13 +31,13 @@ flowchart TD
   g -->|existing| ge["Its labels · slots · plugins · runtimes · secret names · outbound domains"]
   g -->|new| gn["Name · labels · slots a worker · plugins · runtimes · secret names · outbound domains"]
   gn -->|a runtime not installed| ri(["Offered disabled · CP-64 · Install it in Plugins"])
-  ge --> k["Join key: expiry · cap · shown once"]
+  ge --> k["Join key: expiry 1 hour · cap 1 · shown once"]
   gn --> k
   k --> run["Run it: the command or the manifest"]
   run --> rr{"Where"}
-  rr -->|Docker| rd["One docker run line · its env · Copy · Download .env"]
-  rr -->|Python| rp["Install · invana worker · service install · Copy"]
-  rr -->|Kubernetes| rk["Three kubectl lines · manifest · Copy · Download"]
+  rr -->|Docker| rd["Download .env · one docker run --env-file line · Copy · no key in the line"]
+  rr -->|Python| rp["Install · a key file · invana worker --token-file · service install · Copy"]
+  rr -->|Kubernetes| rk["A Secret from the key · three kubectl lines · manifest · Copy · Download"]
   rd --> chk
   rp --> chk
   rk --> chk{"Joining checks"}
@@ -55,7 +55,7 @@ flowchart TD
 | CP-10.1 | An Admin | they press *Add workers* | a 720 px modal opens with a step strip — *Where*, Docker first, then *Group*, *Join key*, *Run it*, *Joined* — on *Where* |
 | CP-10.2 | *Add workers* from a short group | it opens | that group is chosen |
 | CP-10.3 | A new group | it is made | it has a name unique for the deployment, labels from `cpu · llm · egress · gpu · code`, slots a worker, plugins, the runtimes it carries, secret names and outbound domains |
-| CP-10.4 | A join key | it is minted | it is scoped to the group, with an expiry and a cap; its secret shows once, in the command; afterwards only its prefix reads |
+| CP-10.4 | A join key | it is minted | it is scoped to the group, with an expiry — *1 hour* unless the Admin picks another — and a cap — *1 worker* unless the Admin picks another; its secret shows once, on *Run it*; afterwards only its prefix reads |
 | CP-10.5 | *Run it* | it is read | Docker reads one `docker run` line; Python an install and one command, and a service install; Kubernetes three lines and a manifest to download — each carrying the group, labels and slots |
 | CP-10.6 | A worker joining | each check passes or fails | key used · engine reached · plugins loaded · labels fit · first heartbeat show as they happen, each failure with what to check |
 | CP-10.7 | Nothing after two minutes | *Joined* waits | a checklist of what to check reads |
@@ -67,9 +67,10 @@ flowchart TD
 | CP-10.13 | An Operator | they open *Join keys* | every key reads its group, prefix, expiry, how many joined of its cap, and whether it is revoked — never its secret |
 | CP-10.14 | A group's runtimes | an Admin picks them | only runtimes installed as runtime plugins are offered; one not installed reads disabled, naming *Install it in Plugins* (CP-64); a group that carries an outside runtime needs the `code` label, or the change is refused, naming it |
 | CP-10.15 | A worker joining a group that carries a runtime | the joining checks run | *runtimes loaded* passes only when the worker loaded each runtime the group carries, at a version its plugin allows; else the join is refused, naming the runtime |
-| CP-10.16 | *Run it* on Docker | it is read | one `docker run` line carries the engine address, the join key, the group, labels and slots as `INVANA_ENGINE_URL` · `INVANA_JOIN_TOKEN` · `INVANA_POOL` · `INVANA_LABELS` · `INVANA_SLOTS`, with *Copy* and *Download .env*; the key's secret shows once, on this step |
-| CP-10.17 | *Run it* on Python | it is read | it reads the install, the one `invana worker` command with the same values and, below it, `invana worker install-service` for a service on the machine, each with *Copy* |
-| CP-10.18 | *Run it* on Kubernetes | it is read | three `kubectl` lines and a manifest with *Copy* and *Download*; Invana starts nothing — the replicas are declared by the Admin (CP-08.6) |
+| CP-10.16 | *Run it* on Docker | it is read | *Download .env* holds the engine address, the join key, the group, labels and slots as `INVANA_ENGINE_URL` · `INVANA_JOIN_TOKEN` · `INVANA_POOL` · `INVANA_LABELS` · `INVANA_SLOTS`, and one `docker run --env-file` line reads it, with *Copy*; the key's secret shows once, on this step, and never in the line |
+| CP-10.17 | *Run it* on Python | it is read | it reads the install, a key file to save, the one `invana worker --token-file` command with the other values and, below it, `invana worker install-service` for a service on the machine, each with *Copy*; the key never sits in the command |
+| CP-10.18 | *Run it* on Kubernetes | it is read | three `kubectl` lines — the first makes a Secret from the key — and a manifest that reads the key from that Secret, with *Copy* and *Download*; Invana starts nothing — the replicas are declared by the Admin (CP-08.6) |
+| CP-10.26 | Any *Run it* | it is read or copied | no command line carries the join key as an argument, so neither a process list nor a shell history keeps it; the key travels in an environment file, a key file or a Secret |
 | CP-10.19 | A worker group whose machine sits in a region | *Join key* is filled and *Run it* is read | an optional *Region* field on *Join key*, a short tag from the data stores' regions ([CP-F13](../../../CP-F13-data-stores/feature.md#rules)), is part of the *Run it* command as `INVANA_REGION`; untagged reads *anywhere*; the worker carries the tag it joined with, and *Joined* reads it |
 | CP-10.20 | *Group* | it opens | it offers *Existing group* — the groups with their labels, slots, plugins, runtimes and secret names — or *New group*; choosing one shows what the worker will be held to |
 | CP-10.21 | The *Join keys* list | it is read | each key reads its group, who minted it and when, its prefix, expiry, how many joined of its cap and whether it is revoked — never its secret; an Admin's *Revoke* ends it for new workers (CP-09.8), and an Operator reads the list with *Revoke* disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |

@@ -37,6 +37,7 @@ flowchart TD
   x([A proposal arrives from another project]) --> cr["It carries its sources' lineage"]
   cr --> sr
   rc([An agent recalls a node]) --> pl
+  full -->|written by a run that held outside text| ot(["Labelled Outside text · fenced as data on recall · the run's outward acts ask"])
 ```
 
 ## Acceptance criteria
@@ -54,6 +55,8 @@ flowchart TD
 | GP-07.9 | A decision followed to its sources | a source is hidden from the person | the path leaves it out, with no count and no note (GP-03.7) |
 | GP-07.10 | A node with no recorded sources | it is read | it is not shown (GP-06.7) |
 | GP-07.11 | An agent's outcome that recalled memory | its run is read | How it got here shows each node it recalled, its sources and its level |
+| GP-07.12 | A memory node written by a run whose context held outside text, or made from such a node | it is made | it carries *Outside text*, naming each origin, through every copy and promotion; it reads with that label wherever it shows |
+| GP-07.13 | An agent | it recalls a node that carries *Outside text* | the label comes with it, the node is fenced as data in the agent's context, and the run is marked as holding outside text, so its outward acts ask, showing the node and its origin (AC-15.35, NFR-SEC-15) |
 
 ## Screens
 
@@ -61,3 +64,5 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A memory node | Admin | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |
 | A memory node | Operator | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |
+| A memory node holding outside text | Admin | — | — | — | graph.memory · Thinking · Outside text | — | — | graph.memory · Thinking · Withheld node |
+| A memory node holding outside text | Operator | — | — | — | graph.memory · Thinking · Outside text | — | — | graph.memory · Thinking · Withheld node |

@@ -37,6 +37,7 @@ flowchart TD
   dg --> d(["Drained · finishes what it holds · then stops"])
   dc -->|refused| df["Could not drain"]
   grp -->|a worker silent 30 s| lost["Lost · its steps handed on"]
+  w -->|it asked outside its lease| ol(["Refused outside its lease · nothing unsealed · security alert"])
   s --> keys["Join keys: group · made by · expires · joined n of cap"]
   keys -->|Revoke| rc["Confirm: key · group · joined"]
   rc --> rv(["Revoked · no new joins"])
@@ -63,6 +64,8 @@ flowchart TD
 | CP-09.15 | A worker running a session for a run the reader may not read | it is read | the session reads its agent, runtime and status; the run's content is *withheld*, naming who may read it |
 | CP-09.16 | An Admin | they press *Drain* on a worker or a group | a confirm names what it holds now; confirming reads *Draining* until the worker stops, then *Drained*; a refusal reads *Could not drain*, naming the cause, with *Cancel* and *Try again* |
 | CP-09.17 | An Admin | they press *Revoke* on a join key | a confirm names the key, its group and how many workers joined; confirming reads *Revoked* (CP-10.23) |
+| CP-09.18 | A worker A holding no live lease on run R — or a lease from a queue its group does not serve | it asks to start R's session, resolve a secret for it or post its outcome | it is refused 403 and nothing is unsealed; the worker's changes read *Refused outside its lease*, naming the run or secret and why; History records it and a security alert reaches the Admins ([CP-F11](../../../CP-F11-ops-alerting/feature.md)) |
+| CP-09.19 | A worker holding a live lease | it resolves a secret its step's function declares | it gets that secret once, for that lease; a second resolve, or a secret the function does not declare, is refused as CP-09.18 |
 
 ## Screens
 
@@ -78,6 +81,8 @@ flowchart TD
 | A worker · Drain | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | A worker · Drained | Admin | — | — | — | settings.workers · Worker · Drained | — | — | — |
 | A worker · Drained | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| A worker · Refused outside its lease | Admin | — | — | — | — | settings.workers · Worker · Refused outside its lease | — | — |
+| A worker · Refused outside its lease | Operator | — | — | — | — | settings.workers · Worker · Refused outside its lease · Read only | — | settings.workers · Read only |
 | A group · Drain | Admin | — | — | settings.workers · Group · Draining | settings.workers · Group · Drain | settings.workers · Group · Could not drain | — | — |
 | A group · Drain | Operator | — | — | — | — | — | — | settings.workers · Read only |
 | A group · Drained | Admin | — | — | — | settings.workers · Group · Drained | — | — | — |

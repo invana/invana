@@ -7,7 +7,7 @@ personas: [builder, decision-maker, analyst, admin]
 stories: [GP-03, GP-06, GP-07, GP-08, GP-09]
 journeys: [J02, J04, J11]
 boards: [graph.memory]
-nfrs: [NFR-REL-6, NFR-SEC-5, NFR-SEC-11, NFR-PERF-4]
+nfrs: [NFR-REL-6, NFR-SEC-5, NFR-SEC-11, NFR-SEC-15, NFR-PERF-4]
 depends_on: [CP-F10, AG-F06, AG-F09, PJ-F01, PJ-F03, AC-F02, AC-F06, AC-F09, SE-F03]
 ---
 
@@ -121,6 +121,7 @@ The permission catalogue is [AC-F02 › The permission catalogue](../../../acces
 | No sources, no copy | A copy with no recorded sources is not shown, and one that cannot record its sources is not written |
 | A memory node inherits its sources | Reading a memory node needs Read on its place — `memory/project/<project>` · `memory/agent/<agent>` · `memory/org` — and on every source; a proposal that arrives from another project carries its sources' lineage ([GP-07](stories/GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) |
 | A run's transcript is a copy | A run's content reads to the person behind the run, and to anyone else — an Admin included — only when the run belongs to a project and `lineage.may_see` is true ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
+| Outside text sticks | A node written by a run whose context held outside text, or made from such a node, carries `trust = outside` and its origins through every copy and promotion; recall returns the label and marks the recalling run ([system-design § 10 › The outside-text mark](../../../../system-design.md#10-ai-and-agents) · [GP-07](stories/GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) |
 | Never customer data | Memory holds record IDs and keyed hashes, never a record's values; a person reading a cited record reads it fresh, through the agent's Access Policies ([system-design § 12 › Privacy](../../../../system-design.md#privacy)) |
 | Postgres is the truth | Each node mirrors a Postgres record its owner writes; the system graph follows through the outbox, retried, rebuildable from History ([system-design § 6](../../../../system-design.md#6-data-and-storage) · NFR-REL-6) |
 | Kept, then aged out of recall | Every node is kept as long as its Postgres record; recall reads the last 180 days ([AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)) and an older node reads *Not recalled* |

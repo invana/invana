@@ -7,7 +7,7 @@ personas: [admin, builder, analyst, decision-maker]
 stories: [AC-26, AC-15, AC-32]
 journeys: [J03, J04, J05, J06]
 boards: [agents.agents, inbox]
-nfrs: [NFR-SEC-1, NFR-PERF-3]
+nfrs: [NFR-SEC-1, NFR-SEC-15, NFR-SEC-18, NFR-PERF-3]
 depends_on: [CP-F08, CP-F11, AC-F02, AC-F03, AC-F06]
 ---
 
@@ -36,7 +36,12 @@ flowchart TD
   ask --> who{"Is the reader one it waits on?"}
   who -->|no| ro["Reads · acts disabled, naming who it waits on · content withheld unless the run is theirs to read"]
   who -->|yes| dec{"Decide, in a session"}
-  dec -->|Allow · Send it| go(["That step goes, in this run only · the run carries on"])
+  dec -->|Allow · Send it| hs{"The act, as it runs, hashes to what was shown · within 15 minutes?"}
+  hs -->|yes| go(["That step goes, once, in this run only · the run carries on"])
+  hs -->|the act changed| chg(["AC-15 · Changed since you approved · nothing runs · asks again"])
+  hs -->|not run in 15 minutes| lap(["AC-15 · Expired · nothing runs · asks again"])
+  ev -->|the run's context holds outside text| ot["AC-15 · Every outward act asks · the outside text and its origin shown"]
+  ot --> route
   dec -->|Decline · Not this time, with a note| no(["Not done · the step ends refused"])
   dec -->|someone decided first| first["Says who decided, and when"]
   ask -->|half the time gone| rem["AC-32 · A reminder to those who have not decided"]
@@ -59,7 +64,11 @@ sequenceDiagram
   S->>E: reads it — what, to whom, who asked, why routed here, time left
   alt allowed
     P->>E: Allow, in a session
-    E->>A: the frozen act runs · the run carries on
+    E->>E: the act as it will run hashes to act_hash · inside 15 minutes · first attempt
+    E->>A: the frozen act runs, once · the run carries on
+  else the act changed, or 15 minutes passed
+    E->>E: nothing runs · the ask reads Changed since you approved or Expired
+    E-->>P: a new ask
   else declined
     P->>E: Decline, with a note
     E->>A: the step ends refused
@@ -105,6 +114,8 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | An ask shows what it will do | Exactly what will be sent — for a message its To, Subject and body; for a delivery the channel and message — frozen when it is asked. Every ask stores its exact act — function, arguments, targets and their versions — with a hash; a yes runs only that act, and a write whose targets changed since is refused |
+| A yes covers one act, once, for 15 minutes | When the act runs, the engine hashes the act it is about to run and compares it with the ask's; a mismatch runs nothing, the ask reads *Changed since you approved* and a new ask is raised. A yes covers one attempt, started within 15 minutes of it; past that, or for a retry, nothing runs, the ask reads *Expired* and a new ask is raised ([NFR-SEC-18](../../../../system-design.md#3-non-functional-requirements)) |
+| Outside text makes every outward act ask | While a run's context holds outside text ([NFR-SEC-15](../../../../system-design.md#3-non-functional-requirements)), every outward act — a send, a write at an outside system, an ask, a proposal, an access change, an outside tool's Run its rule allows — asks, whatever its policy says, and the ask shows the exact outside text and where it came from; reads and answers go on |
 | An ask names its routing | Each ask says who asked and on whose behalf (*Sam ▸ Reporting agent*), what it wants in one line, who it is routed to and why (*named approver* · *no approver — Admins* · *escalated* · *behind the run*), how long it has waited, and its run |
 | Routed to the named approvers | An ask goes to the named approvers of the agent whose rule said Ask — along a caller chain, the agent in the chain that asked ([AC-26](stories/AC-26-name-who-answers-an-agents-asks/story.md)). Approvers are people or teams; an agent's owner or maker is never in the route for being one. A person's own act set to Ask runs as a built-in agent and is routed the same way. A question for the person runs back to the person behind the run. Never the person or agent it benefits |
 | No approver falls to the Admins | When an agent names no approvers, or none who can answer is left — every one inactive, or the person it benefits — the ask goes to the Admins — the people who hold Manage on Access ([AC-F02 › Decisions](../AC-F02-access-policies/feature.md#decisions)) — and raises a *no approver* alert ([CP-F11](../../../control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)) |
@@ -141,7 +152,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `access_approvals` | `kind` (`access` · `budget` · `delegation` · `send` · `question` · `publish` · `act` · `workflow` · `access_change`) · `subject_kind` (`step` · `budget` · `delegation` · `question` · `model_publish` · `delivery` · `act` · `plan` · `policy_version` · `attachment` · `connection`) · `subject_id` · `agent_id` (whose rule asked) · `run_id?` · `step_run_id?` · `schedule_id?` · `title` · `wants` (one line) · `act` (function, arguments, targets and their versions, frozen) · `act_hash` · `payload` (exactly what goes, frozen) · `asked_by` (the actor chain) · `behind_user_id` · `asker_words?` · `recommended?` (the agent's answer and its reason) · `approver_ids[]` · `routed_reason` (`named approver` · `no approver` · `second admin` · `behind the run`) · `deadline_at` · `reminded_at?` · `escalated_at?` · `escalated_ids[]` · `status` (`pending` · `approved` · `declined` · `expired`) · `decided_by_id?` · `decided_at?` · `decided_via?` (`studio` · `cli` · `api`) · `opened_from?` (`inbox` · `mail` · `slack` · `teams` · `webhook`) · `note` · `declined_until?` · `created_at` | One row per ask. `payload` is what a send or a delivery sends; `act` is what a yes runs |
+| `access_approvals` | `kind` (`access` · `budget` · `delegation` · `send` · `question` · `publish` · `act` · `workflow` · `access_change`) · `subject_kind` (`step` · `budget` · `delegation` · `question` · `model_publish` · `delivery` · `act` · `plan` · `policy_version` · `attachment` · `connection`) · `subject_id` · `agent_id` (whose rule asked) · `run_id?` · `step_run_id?` · `schedule_id?` · `title` · `wants` (one line) · `act` (function, arguments, targets and their versions, frozen) · `act_hash` (sha256 of the canonical JSON of `act`) · `payload` (exactly what goes, frozen) · `outside_text?` (the outside text in the run's context when it asked — each excerpt with its origin: tool · outside agent · record · load · import · memory · tracker · web) · `asked_by` (the actor chain) · `behind_user_id` · `asker_words?` · `recommended?` (the agent's answer and its reason) · `approver_ids[]` · `routed_reason` (`named approver` · `no approver` · `second admin` · `behind the run`) · `deadline_at` · `reminded_at?` · `escalated_at?` · `escalated_ids[]` · `status` (`pending` · `approved` · `ran` · `declined` · `expired` · `changed`) · `expired_why?` (`deadline` · `run_ended` · `not_run_in_time` · `retry`) · `run_by?` (`decided_at` + 15 minutes) · `ran_at?` · `reasked_id?` (the new ask raised after `changed` or `not_run_in_time`) · `decided_by_id?` · `decided_at?` · `decided_via?` (`studio` · `cli` · `api`) · `opened_from?` (`inbox` · `mail` · `slack` · `teams` · `webhook`) · `note` · `declined_until?` · `created_at` | One row per ask. `payload` is what a send or a delivery sends; `act` is what a yes runs |
 | `access_agent_approvers` | `agent_id` · `approver_kind` (`user` · `team`) · `approver_id` · `named_by_id` · `named_at` | An agent's named approvers; unique (`agent_id`, `approver_kind`, `approver_id`). None means the Admins, with a *no approver* alert |
 
 ### Reads
@@ -185,7 +196,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `access.approvals.remind` | One reminder at half-time |
 | `access.approvals.escalate` | Three quarters of the time gone — who joined in `details` |
 | `access.approvals.no_approver` | An ask finds nobody to answer it and falls to the Admins — raises the *no approver* alert |
-| `access.approvals.expire` | The deadline passes, or its run ends |
+| `access.approvals.expire` | The deadline passes, its run ends, or a yes is not run within 15 minutes — `details.why` |
+| `access.approvals.ran` | The allowed act ran, its hash matching — once |
+| `access.approvals.changed` | The act about to run differs from the one allowed — nothing ran; both hashes and the new ask in `details` |
 | `access.approvers.update` | An agent's named approvers change — before and after in `details` |
 
 ### Refusals
@@ -198,6 +211,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 403 | A decision with a key, or by an agent | *Only a person's signed-in session decides an ask.* | AC-15.27 · AC-15.19 · AC-14.10 |
 | 409 | On a yes, the decider may not decide it now, or a check the act needs now refuses — nothing runs | *{check} does not allow this now.* | AC-15.23 |
 | 409 | On a yes, a target of the act changed since the ask | *{target} changed since this was asked — {what}.* | AC-15.24 · AC-14.15 |
+| step refused | The act about to run hashes differently from the one allowed — `changed` | *{act} changed since you approved — it asks again.* | AC-15.33 |
+| step refused | An allowed act not started within 15 minutes of the yes, or a second attempt — `expired` · `not_run_in_time` · `retry` | *The approval expired before it ran — it asks again.* | AC-15.34 |
+| step held | An outward act from a run whose context holds outside text, whatever its policy says | *{agent} read outside text — {origin}; this waits for a person.* | AC-15.35 |
 | 422 | Naming an agent, the system user or a deactivated user as an approver | *Only active people answer asks.* | AC-26.3 |
 | 403 | Changing an agent's approvers by someone without Manage on that agent, or with a key | *This needs Manage on agent/{name} — ask {who can grant}.* | AC-26.10 · AC-26.11 |
 | 403 | The Admin who made a change to access decides its ask | *Another Admin approves this change.* | AC-04.18 |
@@ -224,7 +240,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The clock | On the shared tick ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md#mechanisms)): at half-time one reminder to those who have not decided (`reminded_at`); at three quarters escalation — the Admins, less the person it benefits, join `approver_ids` and `escalated_ids` (`escalated_at`); at the deadline expired, timed at the deadline even when the engine was down; asks of ended runs closed expired. Each step is idempotent |
 | Delivery | Each ask, reminder, escalation and expiry writes an Inbox row for each person it reaches and goes to the channels they chose ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md#engine)); a channel carries a link to the ask, and opening it records `opened_from` |
 | Decided once | The decision takes the row under a lock; anything after the first is refused |
-| A yes | Re-checks that the decider may still decide it and every check the act needs, compares `act_hash` and its targets' versions, then runs the act and resumes the step's run. Nothing outlives the step: the next step meeting the same rule asks again |
+| A yes | Re-checks that the decider may still decide it and every check the act needs, compares `act_hash` and its targets' versions, sets `run_by` to 15 minutes on, then resumes the step's run. Nothing outlives the step: the next step meeting the same rule asks again |
+| The act runs only as allowed | The executor builds the act it is about to run, hashes its canonical JSON and compares it with `act_hash` under the row's lock: equal, `approved`, before `run_by` and not yet `ran` — it runs once and the row is `ran`; any other — nothing runs, the row is `changed` or `expired` (`not_run_in_time` · `retry`), and a new ask for the act as it now stands is raised, linked by `reasked_id` |
+| Outside text in context | The ask gate reads the run's outside-text mark ([system-design § 10](../../../../system-design.md#10-ai-and-agents)); while it is set, every outward act — a send, an outside write or tool Run, an ask, a proposal, an access change — is raised as an ask whatever the rule says, its `outside_text` carrying each excerpt with its origin |
 | A held send | Allowed, the step sends what was frozen; declined or expired, it fails `send_declined` · *not sent*. A resumed run re-runs the held step against its decision |
 | An ask that expires | The step ends refused; the run carries on with its other steps or ends as its plan says |
 | A recently added decider | An ask decided by someone who recently gave the asker their access goes; the alert is [CP-F11](../../../control/features/CP-F11-ops-alerting/feature.md#the-alert-kinds)'s *recently added decider* |
@@ -239,7 +257,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | § 8 APIs and events | The `…/access/approvals` routes and `access.approvals.*` events | — |
 | § 9 Distributed execution | Reminders, escalation and expiry run on the shared clock tick; each is idempotent, so two engine processes repeat nothing | — |
 | § 10 AI and agents | An agent's Ask, send, spend or delegation waits on its named approvers; a yes runs only the frozen act | NFR-SEC-1 |
-| § 12 Qualities | Security: decided once, only by a person's session, re-checked at the yes; an ask never decides itself and expires refused | NFR-SEC-1 |
+| § 12 Qualities | Security: decided once, only by a person's session, re-checked at the yes; an ask never decides itself and expires refused; a yes runs one act whose hash matches, once, within 15 minutes; outside text in a run's context makes every outward act ask | NFR-SEC-1 · NFR-SEC-15 · NFR-SEC-18 |
 
 ## Decisions
 
@@ -251,6 +269,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Escalation at three quarters | The reminder at half-time leaves the named approvers time to answer before the Admins are drawn in; escalation adds people, never removes the named approvers |
 | Admins name approvers | Who answers an agent's asks is part of its access, so only an Admin names them; owners and makers of an agent are not in the route for being one |
 | Channels carry a link | Email, Slack, Teams and webhooks carry the ask and a link to it; the decision is made in a signed-in session, so every decision is proven to be a person's |
+| A yes lasts 15 minutes and one attempt | The window bounds the yes, not the ask: an undecided ask keeps its deadline (24 hours by default) for the reminder and escalation, and an allowed act that has not started in 15 minutes asks again, so nothing runs on a yes given for a world that has moved |
 
 ## Open questions
 

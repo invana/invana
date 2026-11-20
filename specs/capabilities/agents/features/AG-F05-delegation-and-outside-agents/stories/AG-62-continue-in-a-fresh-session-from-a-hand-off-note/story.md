@@ -66,6 +66,7 @@ flowchart TD
 | AG-62.11 | Someone neither behind the run nor an Admin, or anyone on a note they may not read | they reach *Fork* | it is disabled — *Only the person behind this run or an Admin* — and the route refuses it; on a note they may not read it is not offered and the route answers *Not found* |
 | AG-62.12 | A run that continued | the person behind it opens *How it got here* | each session reads as its own group — its runtime, model reported, tokens and why it ended — with the hand-off note between each two and the note's sources linked |
 | AG-62.13 | A note whose body cannot be read from the blob store | it is opened | it names what could not be read, in the engine's words; its head and the run's sessions still read |
+| AG-62.14 | A session whose context held outside text | it writes its hand-off note | the note is marked *Holds outside text*, naming each origin; the next session — and a run forked from the note — starts marked as holding outside text, so its outward acts ask (AC-15.35, NFR-SEC-15) |
 
 ## Screens
 
@@ -79,3 +80,5 @@ flowchart TD
 | Stopped between sessions | Operator | — | — | — | agents.runs · Detail · Stopped between sessions | — | — | agents.runs · Detail · Content withheld |
 | Fork from a note | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Forked | agents.runs · Detail · Could not load | — | agents.runs · Detail · Note withheld |
 | Fork from a note | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Forked | agents.runs · Detail · Could not load | — | agents.runs · Detail · Fork disabled |
+| A note holding outside text | Admin | — | — | — | agents.runs · Detail · Hand-off note · Holds outside text | — | — | agents.runs · Detail · Note withheld |
+| A note holding outside text | Operator | — | — | — | agents.runs · Detail · Hand-off note · Holds outside text | — | — | agents.runs · Detail · Note withheld |

@@ -33,7 +33,12 @@ flowchart LR
   w -->|no| ro["Acts disabled, naming who it waits on"]
   ro -->|the run is not theirs to read| wh["Content withheld · kind, agent, approvers, time left"]
   w -->|yes| d{"Decide, in a session"}
-  d -->|Send it · Allow| go(["That step goes, in this run only · the run carries on"])
+  a -->|the run read outside text| ot["The outside text and its origin, fenced as data"]
+  ot --> w
+  d -->|Send it · Allow| hs{"The act as it runs matches what was shown · within 15 minutes?"}
+  hs -->|yes| go(["That step goes, once, in this run only · the run carries on"])
+  hs -->|the act changed| chg(["Changed since you approved · nothing runs · a new ask"])
+  hs -->|not run in 15 minutes · a retry| lap(["Expired · nothing runs · a new ask"])
   d -->|Not this time · Decline, with a note| no(["Not done · the step ends refused"])
   d -->|decided first by another| f["Already allowed by Sam at 10:02"]
   a -->|unanswered| ex(["AC-32 · reminds · escalates · expires refused"])
@@ -75,6 +80,10 @@ flowchart LR
 | AC-15.30 | Needs you filtered by kind or agent | nothing matches | *Nothing matches*, with *Clear filters* |
 | AC-15.31 | An ask on a run the reader is not behind, of an agent they do not own, not routed to them, and they are not an Admin | it is read | it shows that it waits, its kind, its agent, who it waits on and its time left; its act, arguments and what it will send are withheld (AC-31) |
 | AC-15.32 | An ask to send | the reader presses *See all it will send* | the whole message reads, with *Back* to the ask, *Not this time* and *Send it all*; *Send it* reads *Sent*, *Not this time* reads *Declined*, a failed send reads *Send failed* with *Try again*, an ask that expired reads *Expired*, and one an approver decided first reads *Already decided* |
+| AC-15.33 | An allowed ask | the act about to run — its function, arguments or targets — hashes differently from the one shown | nothing runs; the ask reads *Changed since you approved*, naming what differs; a new ask for the act as it now stands reaches the same approvers, linked from the old one; History records both hashes (NFR-SEC-18) |
+| AC-15.34 | An allowed ask | its act has not started 15 minutes after the yes, or the step tries it a second time | nothing runs; the ask reads *Expired* — *The approval expired before it ran* — and a new ask is raised, linked from it; an undecided ask keeps its own deadline (AC-32) |
+| AC-15.35 | A run whose context holds outside text — an outside tool's or outside agent's result, a record value stamped third-party, AI-written or unstamped, a loaded file, an imported skill or agent, a recalled memory or hand-off note written by such a run, an issue, a review or a web page | it would send, write outside, ask, propose, change access or Run an outside tool its rule allows | it holds and asks, whatever its policy says; the ask shows the exact outside text fenced as data, where it came from and the act it would steer; reads and answers carry on (NFR-SEC-15) |
+| AC-15.36 | An ask raised because the run read outside text | it is read | it says *{agent} read outside text*, lists each excerpt with its origin and link, and no answer is preselected, even with a recommended one |
 
 ## Screens
 
@@ -92,3 +101,9 @@ flowchart LR
 | An ask · Not this time | Operator | — | — | — | — | — | — | inbox · Not yours to answer |
 | An ask · Expired | Admin | — | — | — | inbox · Expired | — | — | — |
 | An ask · Expired | Operator | — | — | — | inbox · Expired | — | — | — |
+| An ask · Allowed, the act changed | Admin | — | — | — | — | inbox · Allowed · Changed since you approved | — | — |
+| An ask · Allowed, the act changed | Operator | — | — | — | — | inbox · Allowed · Changed since you approved | — | inbox · Not yours to answer |
+| An ask · Allowed, not run in 15 minutes | Admin | — | — | — | — | inbox · Allowed · Expired | — | — |
+| An ask · Allowed, not run in 15 minutes | Operator | — | — | — | — | inbox · Allowed · Expired | — | inbox · Not yours to answer |
+| An ask · Read outside text | Admin | — | — | — | inbox · Read outside text | — | inbox · Read outside text | — |
+| An ask · Read outside text | Operator | — | — | — | inbox · Read outside text | — | inbox · Read outside text | inbox · Content withheld |

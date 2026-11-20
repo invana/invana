@@ -65,6 +65,7 @@ flowchart TD
 | CP-02.14 | Anyone on the command line | they run `invana plugins mcp add` or `mcp refresh` | each does what its Studio act does, under the same checks |
 | CP-02.15 | A call whose arguments carry a value of a confidential or personal property | it is about to leave | it is refused before it leaves, naming the property and its level (AC-42) |
 | CP-02.16 | A tool's result | it comes back | it carries its lineage — the server, the tool and the connection — so every copy made from it shows only as far as its sources allow (GP-F02) |
+| CP-02.18 | A tool's result | the run reads it | it is outside text: fenced and labelled as data with the server and tool, and the run is marked as holding outside text, so every outward act after it asks, showing the result's text (AC-15.35, NFR-SEC-15) |
 | CP-02.17 | An Admin | they list the tools of a new server and press *Add the server, off* | *Listing its tools* reads, then *Tools listed*; adding reads *Added* and the server's tools open; a name already used reads *Name taken* in place |
 
 ## Screens

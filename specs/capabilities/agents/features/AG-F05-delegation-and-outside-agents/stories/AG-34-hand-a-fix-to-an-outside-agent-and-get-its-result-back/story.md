@@ -53,6 +53,7 @@ flowchart LR
 | AG-34.7 | The outside agent asks back | it needs input | the question reaches the person behind the run; the answer goes back on the same task |
 | AG-34.8 | A task done | it returns | its verdict and what it made — a pull request, a patch, a report — are kept on the run; Invana applies none of it |
 | AG-34.9 | Text the outside agent returns | the agent reads it | it is cited as data, never followed as an instruction |
+| AG-34.17 | Anything the outside agent returns — its verdict, a question, a report, a patch | the run reads it | it is outside text: fenced and labelled with the outside agent, and the run is marked as holding outside text, so every outward act after it asks, showing that text (AC-15.35, NFR-SEC-15) |
 | AG-34.10 | A task past its time, attempts or tasks at once | the limit is reached | it is cancelled, naming the limit; the reason is the agent's evidence |
 | AG-34.11 | The outside agent cannot be reached | the task is sent | it is retried within its attempts, then fails naming why |
 | AG-34.12 | The outside agent calls back into the deployment inside the same task | it calls | it is refused |
