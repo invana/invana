@@ -502,7 +502,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01c | Settings, slimmed | P01b | done | 2026-11-20 | gates green · reviews passed |
 | P02 | Spec gaps | P01c | done | 2026-11-20 | gates green · reviews passed |
 | P02b | Security criteria — the five highs | P02 | done | 2026-11-20 | gates green · reviews passed |
-| P03 | Board engine | P02b | done | 2026-11-20 | gates green · reviews passed |
+| P03 | Board engine | P02b | partial | 2026-11-20 | E2E-001 · 002 · 003 · 004 · 021 — session 1 handed off at 306k; steps 4–6 left |
 | P03b | Click-through harness | P03 | pending |  |  |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | pending |  |  |
 | P04 | Workers | P03b | pending |  | E2E-008 · 009 · 010 |
@@ -538,6 +538,7 @@ What a later phase must know that the code does not say. One row per note, newes
 | — | The run stops for Ravi after P01c, P03, P08b and P11b (rule *Four stops for Ravi*). At P01c he kept every recommendation: S1–S6 and Q1–Q11 all (a), Q10 — non-MVP features stay drawn. After P08b's review the MVP stories move to `designed` and the build plan is written; P09–P11b run later |
 | P01b | The matrix is [platform-design-3-crud](../../../../.agent-reports/product-manager/platform-design-3-crud.md): 88 entities, 24 *missing* cells, 25 MVP gaps (G-A·· and G-B··, checked against the specs). No spec changed. Q1–Q11 (P01b rows) wait for Ravi at P01c's stop; P02 writes what he keeps, by gap ID. P01c folds G-A25 (boards drawn for `later` stories) and the *Beyond its stories?* column of §1 *Features* into its Settings weighing. G-A28 (which story reads the run on J06's `agents.runs`) is unverified — P02 settles it. The session could not write project.md (sensitive path refused unattended) — these rows came from the report |
 | P01c | Proposal only — nothing changed in specs or the mirror. Ravi decides S1–S6 with P01b's Q1–Q11. For each move he keeps: P02 rewrites the stories (CP-47 → CP-34 · CP-60.8–.12 → CP-37 · AC-48 Screens · CP-71 Screens · CP-73 · CP-74 · CP-80 · CP-81 Screens), J07 step 6, `design-language.md` §3 and §8; P03 changes the large-modal nav (Settings: General · You · Connections · Plugins · Workers · Alerts and notifications; Access: Who · What they may do · Record — the *Keeping* item goes whatever he answers, P01 parked it); the owning place phase moves the states and removes `settings.fleet` · `settings.appearance` · `settings.access_now` (project rule *Settings merges*, `null` on publish). If he keeps none, every board stays and only *Keeping* leaves the nav. P01's and P01b's notes are in their reports (*Hand-off note* · *For the project file*) |
+| P03 | **Resume at step 4.** Session 1 built steps 1–3 (card `go`, Outcome control and failure exits, the Sign in again hub) in `.design/canvas-invana/pd3p03/` — not published. Left: 4 flow lens toggle · 5 `settings.limits` pilot and the LargeModal nav slim · 6 render both lenses, gates, publish. The full note, the open items (12 unnamed hub acts, undrawn result states, `Set read + write` serving two places, `settings.limits · Saving` missing from CP-11) and what is not repointed on purpose: [platform-design-3-P03](../../../../.agent-reports/designer/platform-design-3-P03.md) |
 
 ## Questions for Ravi
 
