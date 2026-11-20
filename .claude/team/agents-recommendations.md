@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**583 recommendations** · 359 open · 136 taken · 24 declined · 64 done
+**585 recommendations** · 361 open · 136 taken · 24 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -626,3 +626,5 @@ flowchart LR
 | R612 | open | 2026-11-20 | designer | phase platform-design-3/P03 | docs | low | Split Sign in again · Set read + write between graph databases and data stores | access.signin 'Sign in again · Set read + write' serves CP-38 (graph database) and CP-84 (data store) but returns to the graph database only. Name two states in the stories' Screens, e.g. 'Sign in again · Set read + write' (CP-38) and 'Sign in again · Set data store read + write' (CP-84); the designer splits the hub row once named. |  |  |
 | R613 | open | 2026-11-20 | designer | phase platform-design-3/P03 | docs | low | Add settings.limits · Saving to CP-11 Screens | P03 Done-when (E2E-021) draws settings.limits · Saving (the wait state between Save limits and Saved or Could not save, with its Outcome control). CP-11 ## Screens row 'Save limits' names Saved and Could not save but not Saving; add it to the Agent working / Loading cell. |  |  |
 | R614 | open | 2026-11-20 | designer | phase platform-design-3/P03b | bug | medium | Large modal Access › Who › Teams link opens Users, not Teams | LargeModal.dc.html: the Teams item links to settings.people.dc.html with no st, so it lands on has data (Users). Found live by the click-through harness (flow.create_team). Change: link it to settings.people?st=Teams · A team. Only P03 edits shared shell components, so no later phase of platform-design-3 owns it |  |  |
+| R615 | open | 2026-11-20 | coder | phase platform-design-3/P03c | debt | high | flow paths gate: most Screens nodes are on no click path | check.py --flows (P11b gate) lists 2005 Screens nodes reached by no flow frame or flows.json path on today's tree — mostly list states (Loading, Nothing matches, First use, Could not load) no act clicks to. Recommend design-language §7 Naming say which Screens columns are click-path nodes (or that each must be framed), so P04–P10 know what to frame before P11b runs --flows. |  |  |
+| R616 | open | 2026-11-20 | coder | phase platform-design-3/P03c | docs | medium | 21 flow frames name states their stories' Screens lack | check.py --flows: 21 frames on 15 flow boards are in no Screens of their cited stories — e.g. flow.set_limits frame 4 settings.limits · Saving (CP-11), flow.add_workers Add workers · Where picked/Run it/Joined, flow.watch_fleet settings.fleet (merged away by P01c). Recommend the owning phase adds each node to its story's Screens or repoints the frame. |  |  |
