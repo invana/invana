@@ -524,7 +524,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P02 | Spec gaps | P01c | done | 2026-11-20 | gates green · reviews passed |
 | P02b | Security criteria — the five highs | P02 | done | 2026-11-20 | gates green · reviews passed |
 | P03 | Board engine | P02b | done | 2026-11-20 | gates green · reviews passed |
-| P03b | Click-through harness | P03 | pending |  |  |
+| P03b | Click-through harness | P03 | in progress | 2026-11-20 |  |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | pending |  |  |
 | P04 | Workers | P03b | pending |  | E2E-008 · 009 · 010 |
 | P04b | Graph databases and data stores | P04 | pending |  | E2E-011 · 012 · 013 · 015 · 016 |
@@ -574,8 +574,8 @@ The project-lead's, batched. Answered rows stay until the phase they unblock is 
 | 2026-11-20 | P01 | Your connections (CP-43 · CP-63) | (a) defer; work connections carry every outside call · (b) keep | (a) | Ravi: (a) — applied by P01 |
 | 2026-11-20 | P01 | Owners (AC-24 · AC-25 · AC-43) | (a) defer the Owners tab and adoption; Copy on the built-in's detail; the ownership rule stays · (b) keep · (c) cut AC-F07 | (a) | Ravi: (a) — applied by P01 |
 | 2026-11-20 | P01 | AC-49 (*New policy* from a template) starts the MVP policy path but has no milestone | (a) `milestone: MVP` · (b) leave unplanned | (a) | Ravi: (a) — P01 adds `milestone: MVP` |
-| 2026-11-20 | Start | R603 (design-story) and R604 (design-qa) edit `.claude/skills/` — team rules no agent may edit | (a) Ravi applies both in a short session before `--start` · (b) after the run; the project's rules and P11 already hold the end-to-end rule | (b) — the run does not depend on them | |
-| 2026-11-20 | P11 | The runner runs every build session on `INVANA_RUNNER_LEAD_MODEL`, so P11's QA build runs on Opus, not Sonnet | (a) accept · (b) run P11 alone with `--only P11` and the lead model `sonnet` (pauses the run) · (c) a per-phase *Model* row in the runner first (R055, a `.claude/` edit) | (a) | |
+| 2026-11-20 | Start | R603 (design-story) and R604 (design-qa) edit `.claude/skills/` — team rules no agent may edit | (a) Ravi applies both in a short session before `--start` · (b) after the run; the project's rules and P11 already hold the end-to-end rule | (b) — the run does not depend on them | Ravi: (b) — 2026-11-20 |
+| 2026-11-20 | P11 | The runner runs every build session on `INVANA_RUNNER_LEAD_MODEL`, so P11's QA build runs on Opus, not Sonnet | (a) accept · (b) run P11 alone with `--only P11` and the lead model `sonnet` (pauses the run) · (c) a per-phase *Model* row in the runner first (R055, a `.claude/` edit) | (a) | Ravi: (a) — 2026-11-20 |
 | 2026-11-20 | P01b | Q1 · MVP journeys use stories with no `milestone: MVP`: CP-61 (J07 step 4) · PJ-02 (J03) · EX-07 (J01 J02) · PJ-05 (J03) · SE-02 (J01) · RC-01 (J02) · EX-10 reopen (J02) — [CRUD report](../../../../.agent-reports/product-manager/platform-design-3-crud.md) *MVP gaps* | (a) tag all seven MVP in P02 · (b) restate the needed act in the MVP story instead · (c) leave | (a) | Ravi: (a) — 2026-11-20 |
 | 2026-11-20 | P01b | Q2 · AC-22.4 lets an Admin attach a policy to a person; AC-11.9 (and AC-09.8) say there is no such act | (a) policies attach to agents only: AC-22 drops its attach act, `flow.attach_policy` agents only · (b) allow it: AC-11.9 and AC-09.8 change | (a) | Ravi: (a) — 2026-11-20 |
 | 2026-11-20 | P01b | Q3 · MVP acts with criteria and no flow frame: CP-81 · CP-82 · CP-41 · worker drain, join-key revoke (CP-09) · policy delete (AC-04.8 · AC-06.10) · team delete (AC-09.9) | (a) P02 names a `flow.<act>` per act; P04 · P04b · P05 · P06 frame it · (b) defer the acts | (a) | Ravi: (a) — 2026-11-20 |
