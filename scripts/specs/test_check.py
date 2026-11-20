@@ -4,6 +4,7 @@
 
 Each test builds a small spec tree in a temporary folder and points the checker at it. Standard library only.
 """
+import json
 import sys
 import tempfile
 import unittest
@@ -28,12 +29,16 @@ class Tree(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name).resolve()
         self.specs = self.root / 'specs'
-        patches = [mock.patch.object(check, 'ROOT', self.root), mock.patch.object(check, 'SPECS', self.specs)]
+        patches = [mock.patch.object(check, 'ROOT', self.root), mock.patch.object(check, 'SPECS', self.specs),
+                   mock.patch.object(check, 'MILESTONES', self.specs / 'milestones.md'),
+                   mock.patch.object(check, 'CANVAS', self.root / '.design' / 'canvas-invana' / 'project'),
+                   mock.patch.object(check, 'FLOWS_JSON', self.root / '.design' / 'flows.json')]
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
-        check.errors.clear()
-        self.addCleanup(check.errors.clear)
+        for found in (check.errors, check.warnings):
+            found.clear()
+            self.addCleanup(found.clear)
         self.addCleanup(self.tmp.cleanup)
 
     def write(self, rel, text=''):
@@ -255,6 +260,59 @@ class BoardIds(Tree):
         check.check_board_ids({'flow.Create-Agent', 'journey.1', 'journey.j99'}, {'J01'})
         self.assertEqual(len(check.errors), 3, check.errors)
         self.assertTrue(any('journey J99, which no journey defines' in e for e in check.errors))
+
+
+SCREENS = ('## Screens\n\n| Surface | Lens | a | b | c | d | e | f | g |\n|---|---|---|---|---|---|---|---|---|\n'
+           '| Limits | Admin | — | — | — | settings.limits | settings.limits · Could not save | — | — |\n'
+           '| Edit | Admin | — | — | — | settings.limits · Edit limits | {extra} | — | — |\n')
+FLOW_HTML = '<script>\nconst FLOW = {data};\n</script>\n'
+
+
+class FlowStates(Tree):
+    """Each flow board's frames are in its stories' Screens, and each Screens node is on its click path."""
+
+    def setUp(self):
+        super().setUp()
+        canvas = self.root / 'canvas' / 'project'
+        manifest = self.root / 'canvas' / 'clickthrough' / 'flows.json'
+        for p in (mock.patch.object(check, 'CANVAS', canvas), mock.patch.object(check, 'FLOWS_JSON', manifest)):
+            p.start()
+            self.addCleanup(p.stop)
+        frames =[{'n': 1, 'board': 'settings.limits', 'state': 'has data', 'stories': ['CP-11']},
+                  {'n': 2, 'board': 'settings.limits', 'state': 'Edit limits', 'stories': ['CP-11']}]
+        self.write('canvas/project/flow.set_limits.dc.html',
+                   FLOW_HTML.replace('{data}', json.dumps({'id': 'flow.set_limits', 'frames': frames})))
+        path = {'name': 'fails', 'steps': [{'click': 'Edit limits', 'state': 'Edit limits'},
+                                           {'click': 'Could not save', 'state': 'Could not save'}]}
+        self.write('canvas/clickthrough/flows.json', json.dumps({'flows': [
+            {'id': 'flow.set_limits', 'status': 'active', 'paths': [path],
+             'start': {'board': 'settings.limits', 'view': 'List', 'state': 'has data'}}]}))
+
+    def run_check(self, extra, strict=False):
+        story = self.write('specs/s/story.md')
+        check.check_flows({story: ('story', {'id': 'CP-11', 'status': 'designed'}, SCREENS.format(extra=extra))},
+                          strict=strict)
+        return check.warnings, check.errors
+
+    def test_frames_and_paths_covering_the_screens_pass(self):
+        self.assertEqual(self.run_check('settings.limits · Could not save'), ([], []))
+        self.assertEqual(self.run_check('—', strict=True), ([], []))
+
+    def test_a_loose_frame_and_an_unreached_node_warn_and_fail_with_flows(self):
+        self.write('canvas/project/flow.set_limits.dc.html', FLOW_HTML.replace('{data}', json.dumps(
+            {'id': 'flow.set_limits', 'frames': [{'n': 1, 'board': 'settings.limits', 'state': 'Saving',
+                                                  'stories': ['CP-11']}]})))
+        warns, errs = self.run_check('settings.limits · Saved')
+        self.assertEqual(errs, [])
+        self.assertEqual(len(warns), 1, warns)
+        self.assertIn('1 frame(s) in no ## Screens', warns[0])
+        self.assertIn('· 1 ## Screens node(s)', warns[0])  # Saved: the flows.json path reaches the rest
+        check.warnings.clear()
+        _warns, errs = self.run_check('settings.limits · Saved', strict=True)
+        self.assertTrue(any('frame 1 `settings.limits · Saving` is in no ## Screens of CP-11' in e for e in errs), errs)
+        self.assertTrue(any('`settings.limits · Saved` is reached by no frame of flow.set_limits' in e for e in errs),
+                        errs)
+        self.assertEqual(len(errs), 2, errs)
 
 
 class IndexLink(Tree):
