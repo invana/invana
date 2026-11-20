@@ -5,3 +5,4 @@ its own rows (`.claude/skills/product-spec/format.md` › *Tasks*).
 
 | ID | Owner | Title | Description | Story | Criteria | Boards | Depends on | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|---|
+| CP-26-T1 | designer | Connect and test, Connected · Empty and Shape on settings.databases | Connect · Connect with Back to Type picked; Testing's Outcome to Connected, Connected · Empty, Test failed, Unreachable; Connected · Empty → Shape · Nothing there yet; Shape Reading → Drafting → Ready. Both lenses (platform-design-3 P04b) | [CP-26](story.md) | CP-26.* | settings.databases · flow.connect_graph_database | — | doing | |

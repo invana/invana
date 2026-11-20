@@ -527,7 +527,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P03b | Click-through harness | P03 | done | 2026-11-20 | gates green · reviews passed |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | done | 2026-11-20 | gates green · reviews passed |
 | P04 | Workers | P03b | done | 2026-11-20 | gates green · reviews passed |
-| P04b | Graph databases and data stores | P04 | pending |  | E2E-011 · 012 · 013 · 015 · 016 |
+| P04b | Graph databases and data stores | P04 | partial | 2026-11-20 | handed off — the report says PARTIAL |
 | P05 | Connectors, credentials and plugins | P04b | pending |  | E2E-014 · 017 · 018 · 019 · 054 |
 | P05b | AI models, trackers and outside servers | P05 | pending |  | E2E-020 · 042 · 043 |
 | P05c | Team packs and alerts | P05b | pending |  | E2E-053 · 058 |
@@ -561,6 +561,7 @@ What a later phase must know that the code does not say. One row per note, newes
 | P01c | Proposal only — nothing changed in specs or the mirror. Ravi decides S1–S6 with P01b's Q1–Q11. For each move he keeps: P02 rewrites the stories (CP-47 → CP-34 · CP-60.8–.12 → CP-37 · AC-48 Screens · CP-71 Screens · CP-73 · CP-74 · CP-80 · CP-81 Screens), J07 step 6, `design-language.md` §3 and §8; P03 changes the large-modal nav (Settings: General · You · Connections · Plugins · Workers · Alerts and notifications; Access: Who · What they may do · Record — the *Keeping* item goes whatever he answers, P01 parked it); the owning place phase moves the states and removes `settings.fleet` · `settings.appearance` · `settings.access_now` (project rule *Settings merges*, `null` on publish). If he keeps none, every board stays and only *Keeping* leaves the nav. P01's and P01b's notes are in their reports (*Hand-off note* · *For the project file*) |
 | P02b | **Resume at step 4, D2:** the refresh token in an HttpOnly cookie on the refresh route (R597) — Ravi's D2 (a). Steps 1–3 and D1 are done (commit `64cc31dbf`); `grep -rl HttpOnly specs` finds nothing yet. Report: [platform-design-3-P02b](../../../../.agent-reports/product-manager/platform-design-3-P02b.md) |
 | P03 | Done, canvas v55. The engine is `.design/canvas-invana/pd3p03/` — which script a later phase runs again, and what is not repointed on purpose: the report's *Hand-off note*, [platform-design-3-P03](../../../../.agent-reports/designer/platform-design-3-P03.md) |
+| P04b | Resume from the hand-off note in [platform-design-3-P04b.md](../../../../.agent-reports/designer/platform-design-3-P04b.md). |
 
 ## Questions for Ravi
 

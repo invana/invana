@@ -5,3 +5,4 @@ its own rows (`.claude/skills/product-spec/format.md` › *Tasks*).
 
 | ID | Owner | Title | Description | Story | Criteria | Boards | Depends on | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|---|
+| CP-25-T1 | designer | Connect a graph database end to end on settings.databases | A form per connector family (Type picked per type), Name taken · No connector installed · Connector failed from Continue with Back, Test failed and Unreachable with Back, Shape Reading → Drafting → Ready, Ready · Mode → Sign in again → Detail · Read + write, Open → Detail · Read-only, Discard this connection?; `flow.connect_graph_database` reframed. Page *Settings · Connections*, both lenses (platform-design-3 P04b) | [CP-25](story.md) | CP-25.1–CP-25.17 | settings.databases · access.signin · flow.connect_graph_database | — | doing | |

@@ -5,3 +5,4 @@ its own rows (`.claude/skills/product-spec/format.md` › *Tasks*).
 
 | ID | Owner | Title | Description | Story | Criteria | Boards | Depends on | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|---|
+| CP-38-T1 | designer | Set read + write through Sign in again, and back to read-only | Detail · Read-only → Sign in again · Set read + write → Detail · Read + write, Wrong password and Could not change mode; Set read-only → Detail · Read-only; `flow.set_database_mode` reframed. Both lenses (platform-design-3 P04b) | [CP-38](story.md) | CP-38.1–CP-38.10 | settings.databases · access.signin · flow.set_database_mode | — | doing | |
