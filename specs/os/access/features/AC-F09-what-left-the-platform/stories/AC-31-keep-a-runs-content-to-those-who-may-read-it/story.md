@@ -4,7 +4,7 @@ title: Keep a run's content to those who may read it
 feature: AC-F09
 status: idea
 personas: [analyst, builder, admin]
-boards: [agents.runs, access.ledger, settings.history, inbox]
+boards: [agents.runs, settings.history, inbox]
 ---
 
 # AC-31 · Keep a run's content to those who may read it
@@ -29,7 +29,7 @@ by itself.
 
 ```mermaid
 flowchart TD
-  o([A run · from Runs, a call, a History row, an ask or usage]) --> b{"Behind it?"}
+  o([A run · from Runs, a History row or an ask]) --> b{"Behind it?"}
   b -->|yes| full["Its steps, queries, records, calls, what it sent and its answer"]
   b -->|no| p{"A project's run?"}
   p -->|no — a chat in someone's own space| meta["That it ran · agent · person behind · status · tokens"]
@@ -49,10 +49,10 @@ flowchart TD
 | AC-31.2 | A run outside any project | anyone else opens it, an Admin included | it reads that it ran, its agent, the person behind it, its status and its tokens; its content reads *withheld*; its content routes answer *Not found* |
 | AC-31.3 | A run that belongs to a project | someone not behind it opens it | its content reads in full when their default agent may read every source it drew on; otherwise it is withheld as in AC-31.2, naming the first source their agent may not read (GP-F02) |
 | AC-31.4 | A step of a run the reader may not read | *How it got here* is opened | the steps list by name and status; their arguments, rows and sources are withheld |
-| AC-31.5 | A call of such a run, in *What left the platform* | a person without Read on `access/history` opens it | its time, agent, target, class, verdict and tokens read; its kinds, fields, record IDs and query are withheld (AC-30) |
+| AC-31.5 | A call of such a run, on the run's step | a person without Read on `access/history` opens it | its time, agent, target, class, verdict and tokens read; its kinds, fields, record IDs and query are withheld |
 | AC-31.6 | A History row of such a run | it is opened | who, the act, the verdict and the rule read; its arguments are withheld (AC-16) |
 | AC-31.7 | An ask from such a run | it is read by someone not routed to it | its kind, agent, who it waits on and its time left read; its act and what it will send are withheld (AC-15) |
-| AC-31.8 | Usage over such runs | it is read | they are counted, not shown (AC-28) |
+| AC-31.8 | A count over such runs — on Runs or an agent | it is read | they are counted, not shown |
 | AC-31.9 | A reader whose default agent loses Read on a source, or whose default agent changes | they open a project's run again | it is decided again at that read; what their agent may not read at that moment is withheld |
 | AC-31.10 | A run started by a schedule, a pick-up or a key | its content is read | the person behind a key's run is its owner, who reads it; a schedule's or a pick-up's run has no person behind it, so it reads only through lineage as a project's run |
 | AC-31.11 | The tokens of a run the reader may not read | they are read | tokens read as the engine stored them; there is no currency |
@@ -64,8 +64,6 @@ flowchart TD
 |---|---|---|---|---|---|---|---|---|
 | A run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
 | A run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
-| A ledger call | Admin | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | — |
-| A ledger call | Operator | — | — | access.ledger · Call · Loading | access.ledger · Call | access.ledger · Call · Refused | — | access.ledger · Locked · Content withheld |
 | A History row | Admin | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | settings.history · Arguments withheld |
 | A History row | Operator | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | settings.history · Arguments withheld |
 | An ask | Admin | — | — | inbox · Loading | inbox | inbox · Could not load | inbox · An agent asks to send | inbox · Content withheld |

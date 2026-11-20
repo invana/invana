@@ -3,6 +3,7 @@ id: AC-49
 title: Make a policy from an Access template
 feature: AC-F02
 status: idea
+milestone: MVP
 personas: [admin, investigator]
 boards: [settings.policies]
 ---

@@ -34,17 +34,17 @@ flowchart TD
   pl -->|without Manage on the plugin| ro["The deployment's switch reads · Ask an Admin"]
   pl -->|Admin · MCP server| gt["CP-75 · Serve the graph and task tools: context · impact · find · query · tasks · milestones · proposals · needs_you"]
   gt --> gc(["A client with an expiring key acts as its person or agent, under their policies"])
-  pl -->|anyone · off for me| mine(["CP-63 · Off only for the runs I start"])
+  pl -->|anyone · off for me| mine(["CP-04 · Off only for the runs I start"])
   pl --> nd["CP-44 · What it needs · which agents may use it"]
   nd -->|a need no policy allows · no connection| miss(["Missing · names the rule, mode or connection · AC-13"])
   pl -->|Admin · Add a server| add["CP-02 · Address · name · how Invana signs in"]
   add -->|cannot list its tools · address refused| af(["Names the address and what failed · nothing stored"])
   add --> cr["CP-42 · None · a token · OAuth · may people connect their own?"]
   cr --> wc["CP-62 · Admin makes a work connection — a service identity · sealed"]
+  wc -->|none attached to the agent| nwc(["A call is refused before it leaves · names who can attach one"])
+  cr -.->|later| per(["CP-43 · CP-63 · A person's own account for their own runs — parked"])
   wc -->|a second Admin's yes is on| aw(["Waits for another Admin · not in force until then"])
   wc --> att["CP-62 · A person with Edit on the agent attaches it"]
-  cr -->|people may connect their own| per["CP-43 · A person connects their own account"]
-  per --> own(["CP-63 · Used only in runs that person starts and their helpers"])
   add -->|listed| fz(["Tools frozen · off until an Admin turns it on"])
   fz --> rf["CP-02 · Read its tools again → a new revision"]
   pl -->|a runtime plugin · Admin| rti["CP-64 · Install Claude Code or Codex: its versions · where its model runs · what it needs"]
@@ -53,7 +53,7 @@ flowchart TD
   rti -->|agents still run with it · Remove| rtb(["Refused, naming the agents"])
   pl -->|a connector| cn["CP-77 · Installed connectors: kind · version · engine range · scopes · capabilities"]
   cn -->|not installed| ci["CP-79 · Install a connector: the command to run on the engine's machine · restart"]
-  cn -->|Admin · a credential| cr2["CP-80 · A work connection, or my own account where allowed · tried before it is stored"]
+  cn -->|Admin · a credential| cr2["CP-80 · A work connection · tried before it is stored"]
   cr2 --> cr3["CP-81 · Test · Rotate · Remove"]
   pl -->|a plugin · update · remove| pu["CP-82 · Update or remove on the engine's machine · what depends on it first"]
   cn -->|manifest invalid · engine range outside · fails to load| cnf(["Listed failed · names the package and why · not offered"])
@@ -69,8 +69,8 @@ flowchart TD
   pk -->|its .mcp.json names a server| pks(["Listed for an Admin to add — CP-02 · never started"])
   m([Settings › Connections › MCP server]) --> sv["CP-03 · Address · what it serves · how to connect · recent calls"]
   sv -->|Admin| sw(["Serve or stop serving an agent or a record tool"])
-  out([Claude Code · an IDE · a script]) --> tok{"A connected client (AC-F11) or a key (AC-F10)?"}
-  tok -->|neither| rj(["401 · where to find the metadata"])
+  out([Claude Code · an IDE · a script]) --> tok{"A live key (AC-F10)?"}
+  tok -->|no| rj(["401 · names how to connect with a key"])
   tok -->|yes| run(["CP-03 · Lists served ∩ what the default agent may use · each call a run for the person"])
   run -->|a call the agents may not make| den(["Refused · names the rule · recorded"])
   run -->|a confidential or personal value in the result| red(["Left out and named · AC-42"])
@@ -89,7 +89,7 @@ sequenceDiagram
     P->>E: Send it
   end
   E->>E: the outbound check on the arguments (AC-F09)
-  E->>E: the connection — the agent's work connection, else P's own in a run P started
+  E->>E: the connection — the agent's work connection
   alt no connection may be used
     E-->>A: refused · names what is missing
   else
@@ -195,13 +195,13 @@ sequenceDiagram
 | Credentials are never an environment variable | An outside server signs in with nothing, a token, or OAuth; every credential is sealed under the install key, never read back, and setting one asks for the password again. A shipped tool's settings — the mail server, the web search address — are the deployment's own secrets |
 | Work connections | A **work connection** is a service identity on one outside server — a token, or an OAuth sign-in as a service account — made once by a person with Manage on `plugin/<name>` and attached to agents by a person with Edit on the agent ([CP-62](stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md)). An agent holds at most one work connection per server. Shared work — a schedule, a pick-up, a project key's run, a delegation no person started — uses only work connections |
 | Personal connections | A **personal connection** is a person's own account on a server that allows them, over OAuth ([CP-43](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md)). It is used only in runs that person starts and their helpers — never in shared work, never for anyone else ([CP-63](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md)). What it returns is a copy whose source is that person's connection: it shows only to them ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) |
-| Which connection a call uses | The work connection attached to the agent, when there is one; otherwise, in a run a person started, that person's personal connection; otherwise the call is refused before it leaves, naming what is missing |
+| Which connection a call uses | The work connection attached to the agent; otherwise the call is refused before it leaves, naming who can attach one |
 | A second Admin's yes, when set | With the deployment setting on, making, renewing or removing a work connection waits for another Admin's yes and is not in force until then ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#rules)) |
 | Addresses are checked | An outside address that is not `https`, or resolves to a loopback, link-local or the deployment's own address, is refused, at add and at every call |
 | An outside server's tools are frozen | The list an Admin saw when adding it; a later change on the server reaches no plan until an Admin reads its tools again, which is a new revision |
 | A function keeps its version | Each function versions on its own; a run records the version it ran; after a breaking version the previous one serves re-runs |
 | Outside work runs on workers | Tool steps run on workers, never in the engine serving Studio; with no worker free they wait, then fail saying no worker took them |
-| One MCP server for the deployment | `https://<deployment>/mcp`. Its sign-in is the Access Plane's — a connected client ([AC-F11](../../../access/features/AC-F11-connect-an-mcp-client/feature.md)) or a key ([AC-F10](../../../access/features/AC-F10-keys/feature.md)); this feature owns what it serves |
+| One MCP server for the deployment | `https://<deployment>/mcp`. Its sign-in is the Access Plane's — a key ([AC-F10](../../../access/features/AC-F10-keys/feature.md)); this feature owns what it serves |
 | It serves what an Admin chose, as far as the default agent may go | Nothing is served at first. An Admin serves agents — each as `ask_<agent>` — and the record tools *Check records* and *Load records*. A caller acts through the person's default agent ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#rules)): it lists only what is served, granted to the person and within the default agent's reach, and every call is checked again by the one evaluator |
 | Every call is a run | For the person behind the client or the key: the served agent — the Loader for the record tools — runs as the default agent's helper, so the caller chain narrows it ([AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)); in Runs, History and the ledger; a refusal before a run is recorded, not run |
 | A client is outside | What a call returns to a client passes the outbound check as an external target: a confidential or personal value is left out and named ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#rules)) |
@@ -451,8 +451,10 @@ The connector contract and the pack layout are [migrations.md](../../../../migra
 
 | Decision | Detail |
 |---|---|
-| Where its places sit | Settings › Plugins (`settings.plugins`) and Settings › Connections › Team packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`); a person's personal connections under Settings › You (`settings.me · Connections`) |
-| Plugins live in Settings › Plugins | A section of Settings in the large modal — Core · Tool · Outside servers · Runtimes: every plugin and outside server, each server with its work connections; each row reads *Used by n agents*. *Team packs* and *MCP server* are entries of Settings › Connections; a person's personal connections sit in *Settings › You*, beside keys and connected clients; an agent's work connections read on the agent |
+| Where its places sit | Settings › Plugins (`settings.plugins`) and Settings › Connections › Team packs (`settings.packs`), each item reading *Used by n agents*; Settings › Connections › MCP server (`settings.mcp`), with *How a client connects* — the command with a key |
+| Personal connections are parked | CP-43 and CP-63 are `later`: work connections carry every outside call; a call from an agent with no work connection on the server is refused before it leaves, naming who can attach one (CP-62). `settings.me` has no *Connections* until they return; the personal-connection records, routes and the personal branch of `connection_for` below are not built until then |
+| A client connects with a key | The deployment's MCP server takes a key (AC-F10) — the key acts as key ∩ its owner ∩ the default agent; connecting a client as a person through OAuth is `later` (AC-F11) |
+| Plugins live in Settings › Plugins | A section of Settings in the large modal — Core · Tool · Outside servers · Runtimes: every plugin and outside server, each server with its work connections; each row reads *Used by n agents*. *Team packs* and *MCP server* are entries of Settings › Connections; an agent's work connections read on the agent |
 | Tools and runtimes are connectors | The tool plugins `web`, `mail` and `science` are connectors of kind `source`, and the Claude Code and Codex runtimes are connectors of kind `runtime`; plugins stay non-code packs — agents, skills and `.mcp.json`. Every plugin is content and every piece of code is a connector. `mail`'s `send` is a manifest capability, outbound and Ask like any send |
 | Data stores and compute are connectors | A data store and a compute engine are outside systems reached by code, so each is a connector — kinds `data_store` and `compute` beside `graph` · `code_host` · `source` · `runtime`. The graph database stays Invana's one store of records; a data store holds what a graph database holds badly — bulk rows, time series and files — and the graph points to it ([CP-F13](../CP-F13-data-stores/feature.md#decisions)) |
 | Connector ids follow one pattern | Ids are `invana-<name>` and the pip name equals the package's folder under `connectors/`: `invana-github`, `invana-gitea` (code hosts) · `invana-web`, `invana-files` (sources) · `invana-timescaledb`, `invana-s3`, `invana-mongodb` (data stores); the other shipped connectors follow it — `invana-mail`, `invana-science`, `invana-claude-code`, `invana-codex` |
