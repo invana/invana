@@ -500,7 +500,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P01 | Settings decisions |  | done | 2026-11-20 | gates green · reviews passed |
 | P01b | CRUD matrix | P01 | done | 2026-11-20 | gates green · reviews passed |
 | P01c | Settings, slimmed | P01b | done | 2026-11-20 | gates green · reviews passed |
-| P02 | Spec gaps | P01c | in progress | 2026-11-20 | E2E-007 · §4 |
+| P02 | Spec gaps | P01c | done | 2026-11-20 | gates green · reviews passed |
 | P02b | Security criteria — the five highs | P02 | pending |  |  |
 | P03 | Board engine | P02b | pending |  | E2E-001 · 002 · 003 · 004 · 021 |
 | P03b | Click-through harness | P03 | pending |  |  |
