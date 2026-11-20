@@ -484,7 +484,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 |---|---|---|---|---|---|
 | P01 | Settings decisions |  | done | 2026-11-20 | gates green · reviews passed |
 | P01b | CRUD matrix | P01 | done | 2026-11-20 | gates green · reviews passed |
-| P01c | Settings, slimmed | P01b | pending |  |  |
+| P01c | Settings, slimmed | P01b | in progress | 2026-11-20 |  |
 | P02 | Spec gaps | P01c | pending |  | E2E-007 · §4 |
 | P03 | Board engine | P02 | pending |  | E2E-001 · 002 · 003 · 004 · 021 |
 | P03b | Click-through harness | P03 | pending |  |  |
