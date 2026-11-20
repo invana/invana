@@ -34,6 +34,10 @@ flowchart TD
   st --> ok{"Declared · manifest valid · engine range · loads?"}
   ok -->|yes| l(["Listed with its kind and version · offered where its kind connects · CP-77"])
   ok -->|no| f(["Listed failed · names the package and why · not offered · CP-77.5"])
+  st --> fp{"One of Invana's own · its hash the release's?"}
+  fp -->|not Invana's| rf(["Refused — not an Invana connector · never loaded"])
+  fp -->|hash differs| rh(["Refused — changed since release · security alert"])
+  fp -->|yes| ok
   i -->|a connector not yet restarted in| w(["Still not listed · the page says the engine reads connectors when it starts"])
   i -->|not an Admin| na(["Install disabled · names the Admins"])
 ```
@@ -63,6 +67,8 @@ flowchart TD
 | CP-79.19 | Installed graph connectors | a person opens Settings › Connections › Connectors | each lists with the graph database it connects, its version and *Used by n graph databases*; an Operator reads the same list, which has no acts of its own |
 | CP-79.20 | A connector's command is shown | the Admin ran it and restarted the engine and presses *I ran it — check again* | *Checking* reads, then the connector lists with its kind and version, or *Not found yet* names what was not found, with *Check again* and *Close*; *Copy* and *Close* stay on the command |
 | CP-79.21 | A connector the engine does not offer yet | its details open | *Not offered* names why and *Install a connector* leads to that connector's *Not installed* command |
+| CP-79.22 | A package beside the engine that registers a connector but is not one of Invana's own | the engine starts | it is not loaded — no code of it runs in the engine; Connectors and `invana version` list it *Refused — not an Invana connector*, naming the package; it is not offered |
+| CP-79.23 | One of Invana's own connectors whose installed files hash differently from the ones that engine release names | the engine starts | it is not loaded; it lists *Refused — changed since release*, naming the package and both hashes; a security alert reaches the Admins ([CP-F11](../../../CP-F11-ops-alerting/feature.md)) |
 
 ## Screens
 
@@ -76,5 +82,7 @@ flowchart TD
 | Install a connector · Check again | Operator | — | — | — | — | — | — | settings.connectors · Install · Read only |
 | A connector not offered | Admin | — | — | — | settings.connectors · Install · Not installed | settings.connectors · Detail · Not offered | — | — |
 | A connector not offered | Operator | — | — | — | — | — | — | settings.connectors · Detail · Read only |
+| A connector refused at start | Admin | — | — | — | — | settings.connectors · Detail · Refused · Not an Invana connector · Changed since release | — | — |
+| A connector refused at start | Operator | — | — | — | — | settings.connectors · Detail · Refused · Read only | — | settings.connectors · Detail · Read only |
 | The connector choice | Admin | settings.databases · Connect · No connector installed | — | — | settings.databases · Connect | settings.databases · Connect · Connector failed | — | — |
 | The connector choice | Operator | — | — | — | — | — | — | settings.databases · Read only |
