@@ -5,5 +5,5 @@ its own rows (`.claude/skills/product-spec/format.md` › *Tasks*).
 
 | ID | Owner | Title | Description | Story | Criteria | Boards | Depends on | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|---|
-| CP-34-T2 | designer | Usage reached from Limits and back | The Usage view opens from Limits' *Show* switch and returns to it; every Usage state renders in both lenses (platform-design-3 P03 pilot) | [CP-34](story.md) | CP-34.* | settings.limits | — | doing | — |
+| CP-34-T2 | designer | Usage reached from Limits and back | The Usage view opens from Limits' *Show* switch and returns to it; every Usage state renders in both lenses (platform-design-3 P03 pilot) | [CP-34](story.md) | CP-34.* | settings.limits | — | done | [settings.limits](https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX#artboard-settings-limits) · `.agent-reports/designer/platform-design-3-P03.md` |
 | CP-34-T1 | qa | Pass 1 · spec check | Story id, title and feature match the folder; criteria agree with the feature file and the P07 Done-when; spec check and links green. Specs only, no build | [CP-34](story.md) | CP-34.* | — | — | done | `.agent-reports/qa/specs-planes-P07-qa.md` |
