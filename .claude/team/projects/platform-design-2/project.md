@@ -1,6 +1,6 @@
 ---
 name: platform-design-2
-status: running
+status: done
 branch: feat/platform-design-2
 scope: platform-design-2
 artifact_publish: auto approve
