@@ -524,7 +524,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 | P02 | Spec gaps | P01c | done | 2026-11-20 | gates green · reviews passed |
 | P02b | Security criteria — the five highs | P02 | done | 2026-11-20 | gates green · reviews passed |
 | P03 | Board engine | P02b | done | 2026-11-20 | gates green · reviews passed |
-| P03b | Click-through harness | P03 | in progress | 2026-11-20 |  |
+| P03b | Click-through harness | P03 | done | 2026-11-20 | gates green · reviews passed |
 | P03c | Spec check flags unlinked flow states (R605) | P03b | pending |  |  |
 | P04 | Workers | P03b | pending |  | E2E-008 · 009 · 010 |
 | P04b | Graph databases and data stores | P04 | pending |  | E2E-011 · 012 · 013 · 015 · 016 |
