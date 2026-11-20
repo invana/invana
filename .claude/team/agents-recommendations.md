@@ -39,7 +39,7 @@ flowchart LR
 | Taken up as | The product-manager's: `session` · `phase <project>/<ID>` · `project <name>` · `declined — <reason>` |
 
 <!-- stats: written by add.py -->
-**582 recommendations** · 358 open · 136 taken · 24 declined · 64 done
+**583 recommendations** · 359 open · 136 taken · 24 declined · 64 done
 
 | ID | Status | Date | From | Raised in | Kind | Severity | Title | Description | Priority | Taken up as |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -625,3 +625,4 @@ flowchart LR
 | R611 | open | 2026-11-20 | designer | phase platform-design-3/P03 | docs | medium | Name the 12 Sign in again acts no story's Screens names | access.signin hub (P03, E2E-004) draws a Sign in again state per act; 12 acts have no story Screens cell: Reactivate · Add people · Attach Super user · Revoke their key · Set the secret · Replace the secret · Clear the secret · Save the sign-in · Save the paths · Allow data-bearing text · Hide from agents · Remove the graph database (UNNAMED in .design/canvas-invana/pd3p03/hub.py). Add 'access.signin · Sign in again · <act>' and its Wrong password to each owning story's Screens. |  |  |
 | R612 | open | 2026-11-20 | designer | phase platform-design-3/P03 | docs | low | Split Sign in again · Set read + write between graph databases and data stores | access.signin 'Sign in again · Set read + write' serves CP-38 (graph database) and CP-84 (data store) but returns to the graph database only. Name two states in the stories' Screens, e.g. 'Sign in again · Set read + write' (CP-38) and 'Sign in again · Set data store read + write' (CP-84); the designer splits the hub row once named. |  |  |
 | R613 | open | 2026-11-20 | designer | phase platform-design-3/P03 | docs | low | Add settings.limits · Saving to CP-11 Screens | P03 Done-when (E2E-021) draws settings.limits · Saving (the wait state between Save limits and Saved or Could not save, with its Outcome control). CP-11 ## Screens row 'Save limits' names Saved and Could not save but not Saving; add it to the Agent working / Loading cell. |  |  |
+| R614 | open | 2026-11-20 | designer | phase platform-design-3/P03b | bug | medium | Large modal Access › Who › Teams link opens Users, not Teams | LargeModal.dc.html: the Teams item links to settings.people.dc.html with no st, so it lands on has data (Users). Found live by the click-through harness (flow.create_team). Change: link it to settings.people?st=Teams · A team. Only P03 edits shared shell components, so no later phase of platform-design-3 owns it |  |  |
