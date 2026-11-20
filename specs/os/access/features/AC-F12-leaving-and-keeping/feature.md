@@ -70,9 +70,9 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| AC-44 | [Set how long memory and History are kept, and hold them](stories/AC-44-set-how-long-memory-and-history-are-kept-and-hold-them/story.md) | idea |
-| AC-45 | [Decide what happens to a person's name and personal data when they leave](stories/AC-45-decide-what-happens-to-a-persons-name-and-personal-data-when-they-leave/story.md) | idea |
-| AC-46 | [Forget a subject everywhere memory cites them](stories/AC-46-forget-a-subject-everywhere-memory-cites-them/story.md) | idea |
+| AC-44 | [Set how long memory and History are kept, and hold them](stories/AC-44-set-how-long-memory-and-history-are-kept-and-hold-them/story.md) | later |
+| AC-45 | [Decide what happens to a person's name and personal data when they leave](stories/AC-45-decide-what-happens-to-a-persons-name-and-personal-data-when-they-leave/story.md) | later |
+| AC-46 | [Forget a subject everywhere memory cites them](stories/AC-46-forget-a-subject-everywhere-memory-cites-them/story.md) | later |
 | AC-47 | [Export everything held about a person](stories/AC-47-export-everything-held-about-a-person/story.md) | idea |
 
 ## Access

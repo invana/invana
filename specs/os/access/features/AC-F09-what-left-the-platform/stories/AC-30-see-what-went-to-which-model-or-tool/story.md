@@ -2,7 +2,7 @@
 id: AC-30
 title: See what went to which model or tool
 feature: AC-F09
-status: idea
+status: later
 personas: [admin, builder]
 boards: [access.ledger, agents.runs]
 ---

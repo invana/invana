@@ -2,7 +2,7 @@
 id: AC-24
 title: See what I own and share a personal agent
 feature: AC-F07
-status: idea
+status: later
 personas: [builder, analyst, admin]
 boards: [settings.me]
 ---

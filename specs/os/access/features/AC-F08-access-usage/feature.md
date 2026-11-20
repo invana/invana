@@ -2,7 +2,7 @@
 id: AC-F08
 title: Access usage
 product: AC
-status: idea
+status: later
 personas: [admin, builder]
 stories: [AC-28, AC-29]
 journeys: [J09]
@@ -39,8 +39,8 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| AC-28 | [See what an agent touched](stories/AC-28-see-what-an-agent-touched/story.md) | idea |
-| AC-29 | [Find access an agent never uses](stories/AC-29-find-access-an-agent-never-uses/story.md) | idea |
+| AC-28 | [See what an agent touched](stories/AC-28-see-what-an-agent-touched/story.md) | later |
+| AC-29 | [Find access an agent never uses](stories/AC-29-find-access-an-agent-never-uses/story.md) | later |
 
 ## Access
 
@@ -150,7 +150,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Usage sits in Access › Record | *Usage* sits beside *History* and *What left* in *Access › Record*; an agent opens beside the list |
+| Parked | The feature is `later`: *Access › Record* is History alone. Usage is a reading of the ledger and History, so it returns with no change to them; its board `access.usage` stays as drawn, unwired |
+| Usage sits in Access › Record when it returns | *Usage* sits beside *History* in *Access › Record*; an agent opens beside the list |
 | 90 days by default for unused | A shorter window flags access used monthly or quarterly as unused |
 
 ## Open questions

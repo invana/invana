@@ -2,7 +2,7 @@
 id: AC-44
 title: Set how long memory and History are kept, and hold them
 feature: AC-F12
-status: idea
+status: later
 personas: [admin]
 boards: [settings.keeping]
 ---

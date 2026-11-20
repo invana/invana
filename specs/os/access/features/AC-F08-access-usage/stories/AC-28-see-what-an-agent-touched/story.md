@@ -2,7 +2,7 @@
 id: AC-28
 title: See what an agent touched
 feature: AC-F08
-status: idea
+status: later
 personas: [admin, builder]
 boards: [access.usage]
 ---

@@ -1,6 +1,6 @@
 ---
 name: platform-design-3
-status: ready
+status: running
 branch: feat/platform-design-3
 scope: platform-design-3
 artifact_publish: auto approve
@@ -466,7 +466,7 @@ only `partial` (it handed off) or `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|
-| P01 | Settings decisions |  | pending |  | E2E-045 · 055 (closed by deferral) |
+| P01 | Settings decisions |  | in progress | 2026-11-20 | E2E-045 · 055 (closed by deferral) |
 | P01b | CRUD matrix | P01 | pending |  |  |
 | P02 | Spec gaps | P01b | pending |  | E2E-007 · §4 |
 | P03 | Board engine | P02 | pending |  | E2E-001 · 002 · 003 · 004 · 021 |

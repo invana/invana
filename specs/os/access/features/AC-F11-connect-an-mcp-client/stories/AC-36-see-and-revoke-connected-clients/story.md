@@ -2,7 +2,7 @@
 id: AC-36
 title: See and revoke connected clients
 feature: AC-F11
-status: idea
+status: later
 personas: [analyst, admin]
 boards: [settings.me, access.signin, settings.people]
 ---

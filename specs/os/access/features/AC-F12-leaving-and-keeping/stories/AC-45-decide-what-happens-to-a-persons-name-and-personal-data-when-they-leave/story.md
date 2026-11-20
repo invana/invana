@@ -2,7 +2,7 @@
 id: AC-45
 title: Decide what happens to a person's name and personal data when they leave
 feature: AC-F12
-status: idea
+status: later
 personas: [admin]
 boards: [settings.keeping, settings.people]
 ---

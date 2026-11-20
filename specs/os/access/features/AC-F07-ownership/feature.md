@@ -50,9 +50,9 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| AC-24 | [See what I own and share a personal agent](stories/AC-24-see-what-i-own-and-share-a-personal-agent/story.md) | idea |
+| AC-24 | [See what I own and share a personal agent](stories/AC-24-see-what-i-own-and-share-a-personal-agent/story.md) | later |
 | AC-25 | [Copy a built-in to change it](stories/AC-25-copy-a-built-in-to-change-it/story.md) | idea |
-| AC-43 | [Adopt a departed person's agent and chats](stories/AC-43-adopt-a-departed-persons-agent-and-chats/story.md) | idea |
+| AC-43 | [Adopt a departed person's agent and chats](stories/AC-43-adopt-a-departed-persons-agent-and-chats/story.md) | later |
 
 ## Access
 

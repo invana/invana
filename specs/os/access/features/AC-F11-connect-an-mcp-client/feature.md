@@ -2,10 +2,10 @@
 id: AC-F11
 title: Connect an MCP client
 product: AC
-status: idea
+status: later
 personas: [analyst, builder, admin]
 stories: [AC-35, AC-36]
-journeys: [J07]
+journeys: []
 boards: [access.consent, access.signin, settings.me, settings.people]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-6, NFR-SEC-7]
 depends_on: [AC-F01, AC-F02, AC-F03, AC-F06, AC-F10]
@@ -19,7 +19,7 @@ depends_on: [AC-F01, AC-F02, AC-F03, AC-F06, AC-F10]
 
 ## User journey
 
-Journeys this feature is a step of: [J07 · Ready a deployment](../../../../journeys/J07-ready-a-deployment.md)
+Journeys this feature is a step of: none while it is `later`. Until it returns, a client connects to the MCP server with a key ([CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md) · [AC-F10](../AC-F10-keys/feature.md)).
 
 ```mermaid
 flowchart TD
@@ -72,8 +72,8 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| AC-35 | [Connect an MCP client as me](stories/AC-35-connect-an-mcp-client-as-me/story.md) | idea |
-| AC-36 | [See and revoke connected clients](stories/AC-36-see-and-revoke-connected-clients/story.md) | idea |
+| AC-35 | [Connect an MCP client as me](stories/AC-35-connect-an-mcp-client-as-me/story.md) | later |
+| AC-36 | [See and revoke connected clients](stories/AC-36-see-and-revoke-connected-clients/story.md) | later |
 
 ## Access
 
@@ -229,6 +229,7 @@ The code change is [migrations.md](../../../../migrations.md) M16.
 
 | Decision | Detail |
 |---|---|
+| Parked | The feature is `later`: a client connects with a key, the narrowest credential Invana already has, shown on `settings.mcp` › *How a client connects* ([CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md)). An authorization server is the largest auth surface to threat-model on-prem; it returns when a customer needs a client to act as a person. `access.consent` and `flow.connect_mcp_client` stay as drawn, unwired; `settings.me` and `settings.people` carry no *Connected clients* until then |
 | The MCP server sits under Connections | Settings › Connections › MCP server (`settings.mcp`, [CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md)) shows its address, what it serves and how to connect; a person's own connected clients are under Settings › You |
 | Invana is its own authorization server | No outside identity provider is needed, since sign-in is password only; one deployment, one issuer |
 | Dynamic registration, names shown as unverified | Any MCP client can connect without an Admin pre-registering it; the consent page says the name is the client's own word and shows where it returns |

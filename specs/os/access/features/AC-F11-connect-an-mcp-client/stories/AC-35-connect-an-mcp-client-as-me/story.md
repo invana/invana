@@ -2,7 +2,7 @@
 id: AC-35
 title: Connect an MCP client as me
 feature: AC-F11
-status: idea
+status: later
 personas: [analyst, builder, admin]
 boards: [access.consent, access.signin]
 ---

@@ -2,7 +2,7 @@
 id: CP-63
 title: Connect my own accounts for my own runs
 feature: CP-F02
-status: idea
+status: later
 personas: [analyst, builder, admin]
 boards: [settings.me, agents.runs, settings.plugins]
 ---

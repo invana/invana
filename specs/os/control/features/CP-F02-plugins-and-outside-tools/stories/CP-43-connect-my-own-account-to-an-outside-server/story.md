@@ -2,7 +2,7 @@
 id: CP-43
 title: Connect my own account to an outside server
 feature: CP-F02
-status: idea
+status: later
 personas: [analyst, builder, admin]
 boards: [settings.me, settings.people, access.signin]
 ---

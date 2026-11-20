@@ -2,7 +2,7 @@
 id: AC-43
 title: Adopt a departed person's agent and chats
 feature: AC-F07
-status: idea
+status: later
 personas: [admin, builder, analyst]
 boards: [settings.me]
 ---

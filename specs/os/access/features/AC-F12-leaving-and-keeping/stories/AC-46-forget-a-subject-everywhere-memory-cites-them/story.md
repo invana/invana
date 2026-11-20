@@ -2,7 +2,7 @@
 id: AC-46
 title: Forget a subject everywhere memory cites them
 feature: AC-F12
-status: idea
+status: later
 personas: [admin]
 boards: [settings.keeping]
 ---

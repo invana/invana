@@ -73,7 +73,7 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| AC-30 | [See what went to which model or tool](stories/AC-30-see-what-went-to-which-model-or-tool/story.md) | idea |
+| AC-30 | [See what went to which model or tool](stories/AC-30-see-what-went-to-which-model-or-tool/story.md) | later |
 | AC-31 | [Keep a run's content to those who may read it](stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | idea |
 | AC-42 | [Stop sensitive data at every exit](stories/AC-42-stop-sensitive-data-at-every-exit/story.md) | idea |
 

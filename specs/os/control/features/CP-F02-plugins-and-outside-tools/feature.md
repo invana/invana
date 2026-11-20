@@ -108,8 +108,8 @@ sequenceDiagram
 | CP-02 | [Add an outside MCP server and let agents call its tools](stories/CP-02-add-an-outside-mcp-server-and-let-agents-call-its-tools/story.md) | idea |
 | CP-42 | [Choose how Invana signs in to an outside server](stories/CP-42-choose-how-invana-signs-in-to-an-outside-server/story.md) | idea |
 | CP-62 | [Make a work connection and attach it to agents](stories/CP-62-make-a-work-connection-and-attach-it-to-agents/story.md) | idea |
-| CP-43 | [Connect my own account to an outside server](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md) | idea |
-| CP-63 | [Connect my own accounts for my own runs](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md) | idea |
+| CP-43 | [Connect my own account to an outside server](stories/CP-43-connect-my-own-account-to-an-outside-server/story.md) | later |
+| CP-63 | [Connect my own accounts for my own runs](stories/CP-63-connect-my-own-accounts-for-my-own-runs/story.md) | later |
 | CP-03 | [Let Claude Code and other clients use the deployment](stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md) | idea |
 | CP-75 | [Let a client read the graph and work the tasks](stories/CP-75-let-a-client-read-the-graph-and-work-the-tasks/story.md) | idea |
 | CP-20 | [Install a Team pack](stories/CP-20-install-a-team-pack/story.md) | idea |
