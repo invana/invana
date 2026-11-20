@@ -50,6 +50,7 @@ flowchart TD
 | AC-01.9 | An agent or the system user | a sign-in is tried with its username or email | it is refused as *Could not sign in* — only people sign in |
 | AC-01.10 | A right email and password | the card says it is signing in and the engine answers | the person lands on Home, or on the page they asked for (AC-01.5) |
 | AC-01.11 | A session that ended | the person acts | the card reads *Session ended* with the email kept; signing in again returns them to the page they were on (AC-01.6) |
+| AC-01.12 | A person signed in | the browser's local storage, session storage and every cookie a script can read are inspected | no token is in any of them: the access token lives in the page's memory, the refresh token in a cookie no script can read, sent only to the refresh route |
 
 ## Screens
 

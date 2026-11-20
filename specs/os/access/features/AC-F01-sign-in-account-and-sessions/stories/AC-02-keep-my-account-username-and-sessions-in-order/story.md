@@ -64,14 +64,16 @@ flowchart TD
 | AC-02.12 | A session whose access token expired mid-act | the person acts | it is renewed underneath and the act completes |
 | AC-02.13 | A retired refresh token | it is used again | it is refused, every session of the account ends, and History records it (AC-F06) |
 | AC-02.14 | A session that cannot be renewed | the person acts | they are told the session ended, sign in again, and return where they were |
-| AC-02.15 | A person with a live session | they reach the sign-in page | it says *Restoring your session…* and goes where they were heading — only to an address inside Studio — never asking for the password |
-| AC-02.16 | A stored session that is not valid | the sign-in page opens | the stored session is dropped and the sign-in form shows |
+| AC-02.15 | A person with a live session | they reload, or reach the sign-in page | Studio renews through the refresh cookie, says *Restoring your session…* and goes where they were heading — only to an address inside Studio — never asking for the password |
+| AC-02.16 | A refresh cookie that is missing, expired or retired | Studio opens | the renewal is refused, the cookie is cleared and the sign-in form shows |
 | AC-02.17 | A person whose policies changed, who lost an agent, or who was deactivated while working | their next call is made | it is read with the new policies and agents — or refused — and Studio says their access changed |
 | AC-02.18 | A call made with a key | it changes a password or makes any risky act | it is refused — *This needs a person's session, not a key* |
 | AC-02.19 | A failed sign-in, a lock or a used email | the message is read | it never says whether an account exists |
 | AC-02.20 | A session renewed again and again | 7 days have passed since its sign-in | its next renewal is refused and the person signs in again, returning where they were |
 | AC-02.21 | A risky act — changing access, keys or credentials | the person makes it | *Sign in again* asks for their password for this act, however recent the session; a right one lets the act go ahead, a wrong one refuses it and counts toward the lock (AC-34.6) |
-| AC-02.22 | Any page of Studio | it is served | it carries a Content Security Policy that runs scripts from Studio's own origin only; an injected inline script does not run |
+| AC-02.22 | Any page of Studio | it is served | it carries a Content Security Policy that runs scripts from Studio's own origin only, with Trusted Types required and connections only to Studio and the engine; an injected inline script does not run |
+| AC-02.23 | Two tabs of Studio whose access token expired together | both act | one renews, the other takes its new access token; neither is signed out as a reuse |
+| AC-02.24 | A refresh call without the renewal header, or from a page that is not Studio | it reaches the engine | it is refused — *A session renews only from Studio* — and the refresh row is untouched |
 
 ## Screens
 
