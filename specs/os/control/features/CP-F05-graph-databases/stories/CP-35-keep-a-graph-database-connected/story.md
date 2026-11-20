@@ -4,22 +4,22 @@ title: Keep a graph database connected
 feature: CP-F05
 status: idea
 personas: [admin]
-boards: [settings.databases.database, access.sign_in_again]
+boards: [settings.databases, access.signin]
 ---
 
 # CP-35 · Keep a graph database connected
 
 **As** an Admin **I want** one graph database's connection in one place — proven to work before anything depends on
-it, reconnected when it drops, and removable without touching its data **so that** the Graph rests on connections that
+it, reconnected when it drops, and removable without touching its data **so that** Graph Data rests on connections that
 were proven, and nothing is built on one that never was.
 
 Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Change description, address, user, password or database after a passing test; reconnect; read the types again; declare a server version or accept an untested one; remove it — signing in again for a credential change and for removal | — |
+| Admin | With Edit on `setting/graph-databases`: change description, address, user, password or database after a passing test; reconnect; read the types again; declare a server version or accept an untested one; remove it — signing in again for a credential change and for removal | — |
 | Operator | Read the graph database — connector, server version, address, user, database, mode, switch, status | The password field is absent; *Save*, *Test connection*, *Reconnect*, *Read types again*, *Declare version*, *Accept this version* and *Remove* read *Ask an Admin* |
 
 ## Flow
@@ -40,7 +40,7 @@ flowchart TD
   c -->|version untested| ut["Read-only, saying why"] --> acc{"Accept this version"}
   acc -->|accepted| rw(["Writes open if read + write · History records who"])
   c --> del["Remove · type its name · sign in again"]
-  del -->|a rule, match rule or workflow names it| blk(["Refused · names them"])
+  del -->|a rule, project or workflow names it| blk(["Refused · names them"])
   del -->|nothing names it| gone(["Gone · its data untouched · History keeps it"])
   c -->|an Operator| ask(["Reads · acts read Ask an Admin"])
 ```
@@ -60,10 +60,10 @@ flowchart TD
 | CP-35.9 | A test | it runs | History records who tested it and when |
 | CP-35.10 | An unreachable graph database | the Admin presses *Reconnect* | it tries again and the status refreshes, saying when it last connected |
 | CP-35.11 | Remove | the Admin types a name that is not this one | it is refused, saying *Type {name} to remove it* |
-| CP-35.12 | A graph database a rule, a match rule or a workflow names | the Admin removes it | it is refused, naming each of them |
-| CP-35.13 | An Operator or a Modeller | they reach any act | it reads *Ask an Admin*, naming the Admins; the password field is absent |
+| CP-35.12 | A graph database a rule, a project or a workflow names | the Admin removes it | it is refused, naming each of them |
+| CP-35.13 | An Operator | they reach any act | it reads *Ask an Admin*, naming the Admins; the password field is absent |
 | CP-35.14 | A credential change or a removal | the Admin sends it | they are asked for their password for this act; a wrong password or a key is refused and nothing changes |
-| CP-35.15 | Nothing names it | the Admin removes it, typing its name and signing in again | it is gone from the list and from the Graph; the database's own data is untouched; History keeps who removed it, with its name |
+| CP-35.15 | Nothing names it | the Admin removes it, typing its name and signing in again | it is gone from the list and from Graph Data; the database's own data is untouched; History keeps who removed it, with its name |
 | CP-35.16 | A connector that cannot detect its server version | the Admin declares the version | it is saved, and the property types the model offers follow it, as a detected version would |
 | CP-35.17 | A server version Invana has not tested | the graph database reads | it is read-only, saying the version is untested, with *Accept this version* |
 | CP-35.18 | A graph database that is not connected | the Admin presses *Read types again* | it is refused, saying it is not connected, with *Reconnect* |
@@ -72,13 +72,13 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Connection | Admin | — | — | settings.databases.database · Loading | settings.databases.database | settings.databases.database · Test failed | — | — |
-| Connection | Operator | — | — | settings.databases.database · Loading | settings.databases.database · Read only | settings.databases.database · Unreachable · Read only | — | settings.databases.database · Read only |
-| Server version | Admin | settings.databases.database · Declare version | — | settings.databases.database · Loading | settings.databases.database · Untested version | settings.databases.database · Test failed | — | — |
-| Server version | Operator | — | — | settings.databases.database · Loading | settings.databases.database · Untested version · Read only | settings.databases.database · Unreachable · Read only | — | settings.databases.database · Read only |
-| Remove | Admin | — | — | — | settings.databases.database · Remove | settings.databases.database · Named by rules | — | — |
-| Remove | Operator | — | — | — | — | — | — | settings.databases.database · Read only |
-| Sign in again | Admin | — | — | — | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Connection | Admin | — | — | settings.databases · Detail · Loading | settings.databases · Detail | settings.databases · Detail · Test failed | — | — |
+| Connection | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Detail · Read only | settings.databases · Detail · Unreachable · Read only | — | settings.databases · Detail · Read only |
+| Server version | Admin | settings.databases · Detail · Declare version | — | settings.databases · Detail · Loading | settings.databases · Detail · Untested version | settings.databases · Detail · Test failed | — | — |
+| Server version | Operator | — | — | settings.databases · Detail · Loading | settings.databases · Detail · Untested version · Read only | settings.databases · Detail · Unreachable · Read only | — | settings.databases · Detail · Read only |
+| Remove | Admin | — | — | — | settings.databases · Detail · Remove | settings.databases · Detail · Named by rules | — | — |
+| Remove | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |
+| Sign in again | Admin | — | — | — | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Sign in again | Operator | — | — | — | — | — | — | — |

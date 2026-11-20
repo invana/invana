@@ -4,7 +4,7 @@ title: Compare two runs of one question
 feature: CP-F10
 status: idea
 personas: [analyst, builder]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-55 · Compare two runs of one question
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Compare any two runs of one question | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): compare two runs of one question whose content they may both read ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) | *Compare* disabled, naming the run they may not read |
+| Operator | compare two runs of one question whose content they may both read ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) | *Compare* disabled, naming the run they may not read |
 
 ## Flow
 
@@ -45,7 +45,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Two runs compared | Admin | — | — | agents.run · Loading | agents.run · Compare | agents.run · Could not load | agents.run · Running | — |
-| Two runs compared | Operator | — | — | agents.run · Loading | agents.run · Compare | agents.run · Could not load | agents.run · Running | agents.run · Compare disabled |
+| Two runs compared | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Could not load | agents.runs · Detail · Running | — |
+| Two runs compared | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Compare | agents.runs · Detail · Could not load | agents.runs · Detail · Running | agents.runs · Detail · Compare disabled |

@@ -4,7 +4,7 @@ title: Read a run's thinking
 feature: AG-F09
 status: idea
 personas: [builder, analyst]
-boards: [agents.run.thinking]
+boards: [agents.runs]
 ---
 
 # AG-53 · Read a run's thinking
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the *Thinking* tab of a run they may read and open every node it links | On a run they may not read: that it ran, its status and its tokens; the tab withheld, naming who may read it |
-| Operator | An Operator or a Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): read the *Thinking* tab of a run they are behind or, for a project's run, whose sources their default agent may see | On anyone else's run: that it ran, its status and its tokens; the tab withheld, naming who may read it ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | An Operator ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): read the *Thinking* tab of a run they are behind or, for a project's run, whose sources their default agent may see | On anyone else's run: that it ran, its status and its tokens; the tab withheld, naming who may read it ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 
@@ -58,7 +58,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The run's Thinking tab | Admin | agents.run.thinking · Did not plan | agents.run.thinking · Nothing recalled | agents.run.thinking · Loading | agents.run.thinking | agents.run.thinking · Recall failed | agents.run.thinking · Recalling | — |
-| The run's Thinking tab | Operator | agents.run.thinking · Did not plan | agents.run.thinking · Nothing recalled | agents.run.thinking · Loading | agents.run.thinking | agents.run.thinking · Recall failed | agents.run.thinking · Recalling | agents.run.thinking · Withheld |
+| The run's Thinking tab | Admin | agents.runs · Detail · Thinking · Did not plan | agents.runs · Detail · Thinking · Nothing recalled | agents.runs · Detail · Thinking · Loading | agents.runs · Detail · Thinking | agents.runs · Detail · Thinking · Recall failed | agents.runs · Detail · Thinking · Recalling | — |
+| The run's Thinking tab | Operator | agents.runs · Detail · Thinking · Did not plan | agents.runs · Detail · Thinking · Nothing recalled | agents.runs · Detail · Thinking · Loading | agents.runs · Detail · Thinking | agents.runs · Detail · Thinking · Recall failed | agents.runs · Detail · Thinking · Recalling | agents.runs · Detail · Thinking · Withheld |

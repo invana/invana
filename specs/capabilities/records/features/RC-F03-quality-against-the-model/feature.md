@@ -6,7 +6,7 @@ status: idea
 personas: [curator, modeller]
 stories: [RC-02, RC-12]
 journeys: []
-boards: [data.quality, data.checks]
+boards: [data.quality]
 nfrs: [NFR-REL-1]
 depends_on: [SE-F02, SE-F05, SE-F07, SE-F10]
 ---
@@ -21,7 +21,7 @@ depends_on: [SE-F02, SE-F05, SE-F07, SE-F10]
 
 ```mermaid
 flowchart TD
-  start([Records › Quality]) --> run["RC-02 · Check the records against the published model"]
+  start([Model › Graph Data › Quality]) --> run["RC-02 · Check the records against the published model"]
   run --> any{Anything broken?}
   any -->|no| ok(["Every record fits the model — when it was checked"])
   any -->|yes| sum["RC-02 · Counts by kind and by rule"]
@@ -52,11 +52,11 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read records, their provenance and the fix queue | Every role — Operator, Modeller, Admin | — |
-| Run a check | Every role — Operator, Modeller, Admin | — |
-| Fix a problem from the queue | Every role — Operator, Modeller, Admin, through an agent granted to them, on a connection that writes | Disabled, naming the Access Policy of the agent that may not write the record |
+| Read records, their provenance and the fix queue | Read on `data/<graph database>/<kind>` | — |
+| Run a check | Read on `data/<graph database>/<kind>` | — |
+| Fix a problem from the queue | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled, naming the Access Policy of the agent that may not write the record |
 
 ## States
 
@@ -68,7 +68,7 @@ flowchart TD
 | Has data | Scores and counts by kind and rule; each rule opens its records; the queue lists each problem |
 | Failed | *Could not load the records* and *Try again* |
 | Agent working or proposing | A check running: what it has read so far, and *Stop* |
-| No access | Kinds a view hides are left out of the counts, and the page says so |
+| No access | Kinds the person's Access Policies do not allow are left out of the counts, and nothing says they were |
 
 ## Data touched
 
@@ -84,7 +84,7 @@ flowchart TD
 
 | Table | Columns | Notes |
 |---|---|---|
-| `record_checks` | `id` · `graph_id` · `model_id` · `model_version` · `run_id` · `status` (`running` · `succeeded` · `stopped` · `failed`) · `checked` · `conforming` · `problems` · `unreadable_kinds` · `started_by` · `started_at` · `settled_at` | One row per check; counts are written when the run settles, and kept as they stood when it was stopped (`stopped` is partial) |
+| `record_checks` | `id` · `database_id` · `model_id` · `model_version` · `run_id` · `status` (`running` · `succeeded` · `stopped` · `failed`) · `checked` · `conforming` · `problems` · `started_by` · `started_at` · `settled_at` | One row per check; counts are written when the run settles, and kept as they stood when it was stopped (`stopped` is partial) |
 | `record_check_scores` | `check_id` · `kind` · `records` · `conforming` · `score` | One row per kind checked; `score` is `conforming / records`, stored by the engine |
 | `record_check_problems` | `id` · `check_id` · `kind` · `record_ref` · `property` · `rule_ref` · `problem` (`missing` · `not_allowed` · `wrong_type` · `out_of_range` · `pattern` · `relationship`) · `value` · `fixed_at?` · `fixed_run_id?` | One row per record and rule it breaks; `rule_ref` names the validation rule, or the standard `publisher/name@v` and its term |
 
@@ -95,18 +95,18 @@ flowchart TD
 | Published versions, kinds, keys, validation rules and what each breaks to (`on_break`) | [SE-F02 › Engine](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Standard versions and their terms | [SE-F05](../../../semantics/features/SE-F05-standards/feature.md) |
 | Rules in scope and the `enforce` check a fix passes | [SE-F07 › Engine](../../../semantics/features/SE-F07-rules/feature.md#engine) |
-| The view an Operator reads through | [SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
+| The Access Policies an Operator reads under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Runs, their steps and stop | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) |
 | History — the value a fix writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
+| Route, after `/api/v1/records` | Does | Story |
 |---|---|---|
 | `POST /checks` | Start a check of a model's records against its published version | RC-02 |
 | `GET /checks/latest?model=` | The last settled check: counts by kind and by rule, scores, when, and kinds left out | RC-02 |
 | `POST /checks/{id}/stop` | Stop a running check; what it counted stays, marked partial | RC-02 |
-| `GET /problems?kind=&rule=` | *To decide* — the open problems of the last check, with the total, each kind's own total and score, and `unreadable` | RC-02 · RC-12 |
+| `GET /problems?kind=&rule=` | *To decide* — the open problems of the last check, with the total, each kind's own total and score | RC-02 · RC-12 |
 | `GET /problems/{id}` | One problem: the record, the term or constraint, the value and why it breaks it | RC-12 |
 | `POST /problems/{id}/fix` | `{value, why, seen_at}` — writes the value as one run and re-checks the record | RC-12 |
 
@@ -124,7 +124,7 @@ flowchart TD
 |---|---|---|---|
 | 403 | A fix on a record the person's agent may not write | *`{policy}` does not let this agent write `{kind}`.* | RC-12.9 |
 | 409 | The record changed since the problem was opened | *`{record}` changed since you opened it — reload and fix again.* | RC-12.6 |
-| 409 | A fix on a read-only connection | *This graph's connection is read-only — a fix needs a writable connection.* | RC-12.10 |
+| 409 | A fix on a read-only connection | *This graph database's connection is read-only — a fix needs a writable connection.* | RC-12.10 |
 | 422 | A fix whose value still breaks the rule, or with no reason | *`{value}` still breaks `{rule}`* · *A fix needs a reason.* | RC-12.11 |
 | 404 | A model with no published version | *`{model}` has no published version to check against.* | API only — *Quality* lists published models alone |
 
@@ -142,7 +142,7 @@ flowchart TD
 | Scored per kind | A record conforms when it breaks nothing; each kind's `score` is its share of conforming records, stored when the check settles |
 | A standard's term | A held standard's term is checked as the validation rule names it: `missing` — required and empty · `not_allowed` — not one of its codes · `wrong_type` — not its type |
 | The queue is the last check | *To decide* reads the open problems (`fixed_at` null) of each model's last settled check; a new check replaces them |
-| Kinds a view hides | A check counts every kind; a read through a view leaves the hidden kinds out of rows and totals and counts them in `unreadable`, which the page names |
+| Kinds access hides | A check counts every kind; a read under the person's Access Policies leaves the kinds they may not Read out of rows and totals, with no count and no note |
 | A fix | Passes `enforce` (SE-F07), writes the value as one run with `why`, re-checks that record, and sets `fixed_at` when it conforms — the item leaves the queue. `seen_at` older than the record's last write is refused |
 | Breaks on load | A load's `reject` breaks never reach the graph; its `flag` breaks are written and listed by the next check |
 
@@ -171,5 +171,4 @@ flowchart TD
 |---|---|
 | Fixing many records from the queue | A fix across records is previewed and run as one (RC-F04) |
 | Checks the model does not state | Quality reads the model's own constraints and rules, nothing else |
-| A queue across every Graph | Records' scope is the Graph; each Graph's queue is its own |
 | A claim on a standard outside the model | A kind or property holds a standard through its model (SE-F07); there is no second place to attach one |

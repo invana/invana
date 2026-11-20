@@ -4,7 +4,7 @@ title: Propose a plan that served as a workflow, and see where each comes from
 feature: AG-F06
 status: idea
 personas: [analyst, builder]
-boards: [agents.run, agents.skills, inbox]
+boards: [agents.runs, agents.skills, inbox]
 ---
 
 # AG-31 · Propose a plan that served as a workflow, and see where each comes from
@@ -19,12 +19,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Proposing and reading are every signed-in person's, on a run they are behind ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Proposing and reading are every signed-in person's, on a run they are behind ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Propose the plan of a run they are behind that served; read where every workflow and function comes from | On a run they are not behind: *Propose as a workflow* is not shown |
-| Operator | Propose the plan of a run they are behind; read where every workflow and function comes from; a Modeller the same | On a run they are not behind: *Propose as a workflow* is not shown |
+| Operator | Propose the plan of a run they are behind; read where every workflow and function comes from | On a run they are not behind: *Propose as a workflow* is not shown |
 
 ## Flow
 
@@ -63,19 +63,19 @@ flowchart TD
 | AG-31.9 | Any workflow | it is read | it says where it comes from — *built-in* (with its plugin) · *approved* (linking the run it came from and who approved it) · *copied from* `key@n` |
 | AG-31.10 | Functions | anyone opens it | functions group by where they come from — each plugin with its version and whether it is on, each library (AG-40) — and a function from a plugin switched off says so, naming who switched it off |
 | AG-31.11 | A run that did not serve, a plan already a workflow, or a run the proposer is not behind | a proposal for it reaches the engine | it is refused: *Only a plan drafted or composed for a run that served can be proposed — by the person behind it.* |
-| AG-31.12 | A key another workflow holds | the proposer names it | it is refused: *{key} is taken — propose a new key, or ask an Admin.*; proposing its next version is for a Modeller or an Admin (AG-48) |
+| AG-31.12 | A key another workflow holds | the proposer names it | it is refused: *{key} is taken — propose a new key, or ask an Admin.*; proposing its next version needs Edit on the workflow (AG-48) |
 | AG-31.13 | A proposal already waiting on the same run | *Propose as a workflow* is pressed again | it reads *This plan is already waiting on {approvers}* and sends nothing |
 | AG-31.14 | A proposal that keeps a record ID or property value as a default | it reaches the engine | it is refused: *{argument} holds a value from the data — it cannot be a default.* |
-| AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Control Plane › Plugins, where an Admin switches it (CP-F02); nothing here switches it |
+| AG-31.15 | A plugin to switch on or off | a person reads it here | it links to Settings › Plugins, where a person with Manage on the plugin switches it (CP-F02); nothing here switches it |
 | AG-31.16 | Skills | anyone opens *Answer templates* | the templates that shape answers read beside workflows and functions (EX-03 authors them) |
 | AG-31.17 | An approved workflow | a person opens *How it got here* on the run it came from | its steps show who proposed it, the arguments its literals became, who approved it and the version it published |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Propose as a workflow, on a run | Admin | — | — | agents.run · Loading | agents.run · Propose as a workflow | agents.run · Propose refused | agents.run · Waiting on approvers | — |
-| Propose as a workflow, on a run | Operator | — | — | agents.run · Loading | agents.run · Propose as a workflow | agents.run · Propose refused | agents.run · Waiting on approvers | agents.run · Content withheld |
+| Propose as a workflow, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a workflow | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | — |
+| Propose as a workflow, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Propose as a workflow | agents.runs · Detail · Propose refused | agents.runs · Detail · Waiting on approvers | agents.runs · Detail · Content withheld |
 | Where it comes from — workflows and functions | Admin | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | Where it comes from — workflows and functions | Operator | agents.skills · Workflows, built-in only | agents.skills · No workflows match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | Answer templates | Admin | agents.skills · Shipped templates | agents.skills · No template matches | agents.skills · Loading | agents.skills · Answer templates | agents.skills · Could not load | — | — |

@@ -4,7 +4,7 @@ title: Fork a conversation from a reply
 feature: EX-F05
 status: idea
 personas: [analyst, decision-maker]
-boards: [explore.board, explore.ask]
+boards: [explore.board, explore.conversations]
 ---
 
 # EX-27 · Fork a conversation from a reply
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | *Fork from here* on a settled reply of their own conversation; follow a fork to its parent and a parent to its forks | Another person's conversation: no *Fork from here* |
-| Operator | The same, on their own conversations; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *ask a question*) | Another person's conversation: no *Fork from here* |
+| Operator | The same, on their own conversations; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *ask a question*) | Another person's conversation: no *Fork from here* |
 
 ## Flow
 
@@ -59,11 +59,11 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Fork from here, on a reply | Admin | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |
 | Fork from here, on a reply | Operator | — | — | explore.board · Forking | explore.board · Fork from here | explore.board · Fork failed | — | explore.board · Not their conversation |
 | The fork | Admin | — | — | explore.board · Working | explore.board · Forked | explore.board · Parent deleted | explore.board · Working | — |
 | The fork | Operator | — | — | explore.board · Working | explore.board · Forked | explore.board · Parent deleted | explore.board · Working | — |
-| The conversation list | Admin | — | explore.ask · Conversations filtered | explore.ask · Loading | explore.ask · Forks | — | — | — |
-| The conversation list | Operator | — | explore.ask · Conversations filtered | explore.ask · Loading | explore.ask · Forks | — | — | — |
+| The conversation list | Admin | — | explore.conversations · Conversations filtered | explore.conversations · Loading | explore.conversations · Forks | — | — | — |
+| The conversation list | Operator | — | explore.conversations · Conversations filtered | explore.conversations · Loading | explore.conversations · Forks | — | — | — |

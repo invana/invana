@@ -4,7 +4,7 @@ title: The assistant beside the work
 feature: EX-F03
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.board.left_closed]
+boards: [explore.board]
 ---
 
 # EX-13 · The assistant beside the work
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open, close and reopen the assistant; attach or remove the selection; switch it off for themselves | — |
-| Operator | The same, through the agents they may use; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | No agent they may use: the assistant opens with its composer disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same, through the agents they may use; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ask a question*) | No agent they may use: the assistant opens with its composer disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 
@@ -55,11 +55,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The docked assistant | Admin | explore.board · New conversation | — | explore.board · Working | explore.board | explore.board · Failed | explore.board · Working | — |
 | The docked assistant | Operator | explore.board · New conversation | — | explore.board · Working | explore.board | explore.board · Failed | explore.board · Working | — |
-| The board with it closed | Admin | — | — | — | explore.board.left_closed · Assistant closed | — | explore.board.left_closed · Running behind | — |
-| The board with it closed | Operator | — | — | — | explore.board.left_closed · Assistant closed | — | explore.board.left_closed · Running behind | — |
-| Assistant switched off | Admin | explore.ask · Assistant off | — | — | explore.ask · Assistant off | — | — | — |
-| Assistant switched off | Operator | explore.ask · Assistant off | — | — | explore.ask · Assistant off | — | — | — |
+| The board with it closed | Admin | — | — | — | explore.board · Left closed · Assistant closed | — | explore.board · Left closed · Running behind | — |
+| The board with it closed | Operator | — | — | — | explore.board · Left closed · Assistant closed | — | explore.board · Left closed · Running behind | — |
+| Assistant switched off | Admin | explore.board · Ask · Assistant off | — | — | explore.board · Ask · Assistant off | — | — | — |
+| Assistant switched off | Operator | explore.board · Ask · Assistant off | — | — | explore.board · Ask · Assistant off | — | — | — |

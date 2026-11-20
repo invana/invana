@@ -3,8 +3,9 @@ id: CP-41
 title: Name a practice graph database
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, builder]
-boards: [settings.databases.database, settings.databases]
+boards: [settings.databases]
 ---
 
 # CP-41 · Name a practice graph database
@@ -16,9 +17,9 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Name a graph database as practice for another, or unname it | — |
+| Admin | With Edit on `setting/graph-databases`: name a graph database as practice for another, or unname it | — |
 | Operator | Read which graph databases are practice, and for which | *Make practice* reads *Ask an Admin*, naming the Admins |
 
 ## Flow
@@ -43,13 +44,21 @@ flowchart TD
 | CP-41.2 | A practice graph database | an agent's or a skill's test runs | each step on `data/{name}/<kind>` for the graph database it stands in for reads and writes the practice one instead, as the agent's policies allow |
 | CP-41.3 | A practice graph database | a question, a board, a schedule or a workflow step names it | it is refused, saying it is for practice |
 | CP-41.4 | Practice for itself, for a practice one, or for one of another connector | an Admin saves it | it is refused, saying why |
-| CP-41.5 | An Operator or a Modeller | they reach *Make practice* | it reads *Ask an Admin*, naming the Admins |
-| CP-41.6 | A practice graph database | the Graph's model and answers are read | it is never part of them |
+| CP-41.5 | An Operator | they reach *Make practice* | it reads *Ask an Admin*, naming the Admins |
+| CP-41.6 | A practice graph database | the model and answers over Graph Data are read | it is never part of them |
 | CP-41.7 | A practice graph database | an Admin unnames it | it is an ordinary graph database again, off until an Admin turns it on |
+| CP-41.8 | An Admin | they press *Make practice* and pick the graph database it stands in for | only graph databases of the same connector are offered; saving reads *Practice for {name}* on its details and in the list |
+| CP-41.9 | An Admin | they press *Unname practice* | a confirm says it becomes an ordinary graph database, off; confirming shows it off in the list |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Practice | Admin | settings.databases.database · Make practice | — | settings.databases.database · Loading | settings.databases · Practice | settings.databases.database · Cannot be practice | — | — |
-| Practice | Operator | — | — | settings.databases.database · Loading | settings.databases · Practice · Read only | — | — | settings.databases.database · Read only |
+| Make practice | Admin | settings.databases · Detail · Make practice | — | settings.databases · Detail · Loading | settings.databases · Detail · Make practice · Pick | settings.databases · Detail · Cannot be practice | — | — |
+| Make practice | Operator | — | — | settings.databases · Detail · Loading | — | — | — | settings.databases · Detail · Read only |
+| Practice | Admin | — | — | — | settings.databases · Detail · Practice | — | — | — |
+| Practice | Operator | — | — | — | settings.databases · Practice · Read only | — | — | settings.databases · Detail · Read only |
+| Unname practice | Admin | — | — | — | settings.databases · Detail · Unname practice | — | — | — |
+| Unname practice | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |
+| Unnamed | Admin | — | — | — | settings.databases · New and off | — | — | — |
+| Unnamed | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |

@@ -2,9 +2,9 @@
 id: CP-43
 title: Connect my own account to an outside server
 feature: CP-F02
-status: idea
+status: later
 personas: [analyst, builder, admin]
-boards: [settings.me, settings.people, access.sign_in_again, access.locked]
+boards: [settings.me, settings.people, access.signin]
 ---
 
 # CP-43 · Connect my own account to an outside server
@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Connect and disconnect their own personal connections; read every person's personal connections and disconnect any — each with the password again | — |
-| Operator | Connect and disconnect their own personal connections, with the password again; a Modeller the same | Another person's personal connections are absent. A service user has no personal connection |
+| Admin | Connect and disconnect their own personal connections; with Manage on `plugin/<name>`, read every person's personal connections and disconnect any — each with the password again | — |
+| Operator | Connect and disconnect their own personal connections, with the password again | Another person's personal connections are absent. A project key has no personal connection |
 
 ## Flow
 
@@ -37,7 +37,7 @@ flowchart TD
   use -->|not connected or expired| ref(["Refused before the call · Connect your account · an Inbox row"])
   ok -->|the server stops renewing it| exp(["Expired · Reconnect · an Inbox row"])
   ok -->|Disconnect · password again| dc(["Removed · the next call is refused"])
-  a([People and access › Personal connections]) -->|Admin| all(["Every person's personal connections · Disconnect any"])
+  a([Access › Who › Personal connections]) -->|Admin| all(["Every person's personal connections · Disconnect any"])
 ```
 
 ## Acceptance criteria
@@ -51,22 +51,22 @@ flowchart TD
 | CP-43.5 | A run the person started, whose agent has no work connection on that server, and no personal connection of theirs there | a step calls one of its tools | the step is refused before the call, telling the person to connect their account, and they get an Inbox row with *Connect* |
 | CP-43.6 | A connected personal connection | a step of a run the person started, or of its helper, calls the server and the agent has no work connection there | the call is made as that account, renewed first when its access token has run out, and *What left the platform* names the personal connection |
 | CP-43.7 | An account the server stops renewing | a renewal is refused | it reads *Expired* with *Reconnect*; the person gets an Inbox row; their calls are refused until they reconnect |
-| CP-43.8 | A service user's run, a schedule or a picked-up task | a step calls a server whose agent has no work connection there | it is refused before the call; no personal connection is used (CP-63.4) |
+| CP-43.8 | A project key's run, a schedule or a picked-up task | a step calls a server whose agent has no work connection there | it is refused before the call; no personal connection is used (CP-63.4) |
 | CP-43.9 | Connecting or disconnecting | it is done without the password, with a wrong one, or with a key | it is refused — *Enter your password again to do this* |
 | CP-43.10 | A person | they disconnect their account | it is removed at once; the next call for their runs is refused as in CP-43.5; History records it |
-| CP-43.11 | An Admin | they open *People and access › Personal connections* and disconnect a person's account with their password | it is removed; the person is told in the Inbox; History names the Admin |
+| CP-43.11 | An Admin | they open *Access › Who › Personal connections* and disconnect a person's account with their password | it is removed; the person is told in the Inbox; History names the Admin |
 | CP-43.12 | An Operator | they read another person's account by any path | it is absent (`404`) |
 | CP-43.13 | A person deactivated (AC-23) | it is done | every personal connection of theirs is disconnected |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Your personal connections | Admin | settings.me · No accounts connected | — | settings.me · Loading | settings.me · Personal connections | settings.me · Account expired | — | — |
-| Your personal connections | Operator | settings.me · No accounts connected | — | settings.me · Loading | settings.me · Personal connections | settings.me · Account expired | — | — |
-| Connect | Admin | — | — | settings.me · Connecting | settings.me · Account connected | settings.me · Not connected | — | — |
-| Connect | Operator | — | — | settings.me · Connecting | settings.me · Account connected | settings.me · Not connected | — | — |
+| Your personal connections | Admin | settings.me · Connections · No accounts connected | — | settings.me · Connections · Loading | settings.me · Connections · Personal connections | settings.me · Connections · Account expired | — | — |
+| Your personal connections | Operator | settings.me · Connections · No accounts connected | — | settings.me · Connections · Loading | settings.me · Connections · Personal connections | settings.me · Connections · Account expired | — | — |
+| Connect | Admin | settings.me · Connections · Connect | — | settings.me · Connections · Connect · Connecting | settings.me · Connections · Connect · Account connected | settings.me · Connections · Connect · Not connected | — | — |
+| Connect | Operator | settings.me · Connections · Connect | — | settings.me · Connections · Connect · Connecting | settings.me · Connections · Connect · Account connected | settings.me · Connections · Connect · Not connected | — | — |
 | Every person's personal connections | Admin | settings.people · No accounts connected | settings.people · Nothing matches | settings.people · Loading | settings.people · Personal connections | settings.people · Could not load | — | — |
-| Every person's personal connections | Operator | — | — | — | — | — | — | access.locked |
-| Password again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
-| Password again | Operator | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Every person's personal connections | Operator | — | — | — | — | — | — | settings.people · Locked |
+| Password again | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
+| Password again | Operator | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |

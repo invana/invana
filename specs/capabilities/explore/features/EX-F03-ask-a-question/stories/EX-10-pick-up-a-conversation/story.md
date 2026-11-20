@@ -3,8 +3,9 @@ id: EX-10
 title: Pick up a conversation
 feature: EX-F03
 status: idea
+milestone: MVP
 personas: [analyst]
-boards: [explore.ask, explore.board]
+boards: [explore.board, explore.conversations]
 ---
 
 # EX-10 · Pick up a conversation
@@ -18,13 +19,13 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 ## Who can
 
 A conversation is its asker's. Its content reads for the asker, those an answer in it is shared with
-([EX-15](../../../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and Admins; anyone else
-sees in Control Plane › Runs that its runs ran, their status and their tokens ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)).
+([EX-15](../../../EX-F02-share-and-present-an-answer/stories/EX-15-share-an-answer/story.md)) and anyone with Read on `run/<agent>`; anyone else
+sees in Agents › Runs that its runs ran, their status and their tokens ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Open, search, reopen, start, rename, pin, archive and delete their own conversations; pick the agent per conversation among those they may use; set a token budget per run; read any conversation's runs in Control Plane › Runs | — |
-| Operator | The same, for their own conversations, through the agents they may use; a Modeller the same | Another person's conversations are not listed. An agent they may not use is not offered. A budget above the agent's: clamped, and the settings say so |
+| Admin | Open, search, reopen, start, rename, pin, archive and delete their own conversations; pick the agent per conversation among those they may use; set a token budget per run; read any conversation's runs in Agents › Runs | — |
+| Operator | The same, for their own conversations, through the agents they may use | Another person's conversations are not listed. An agent they may not use is not offered. A budget above the agent's: clamped, and the settings say so |
 
 ## Flow
 
@@ -41,7 +42,7 @@ flowchart LR
   h -->|New| n["A blank thread · composer focused"] -->|first question| saved(["The conversation exists"])
   o --> ag["The agent in the composer"]
   ag -->|one they may use| run(["Every question after it runs through that agent · each turn names it"])
-  ag -->|cannot read the Graph| agr["Refused, naming the agent"]
+  ag -->|cannot read Graph Data| agr["Refused, naming the agent"]
   ag -->|not theirs to use now| ng["Refused · may not use it — ask an Admin"]
   row -->|rename · pin · archive| kept(["The list follows · nothing in the thread changes"])
   row -->|delete| del{Sure?}
@@ -63,12 +64,12 @@ flowchart LR
 | EX-10.9 | A turn | the person reads it | it names the graph databases its plan read |
 | EX-10.10 | The conversation's settings | the person sets a token budget per run above the agent's | it is clamped to the agent's, and the settings say so |
 | EX-10.11 | A conversation whose agent the person may not use now | they ask in it | it is refused before it runs — *{person} may not use {agent} — ask an Admin* — and the composer offers the agents they may use |
-| EX-10.12 | An Admin | they open Control Plane › Runs | every conversation's runs list, with their content |
+| EX-10.12 | An Admin | they open Agents › Runs | every conversation's runs list, with their content |
 | EX-10.13 | Two people on one deployment | one opens the history | they see only their own conversations; another's conversation opened by address reads *Not found* unless an answer in it is shared with them |
 | EX-10.14 | A conversation in the history | the person renames it | the new title shows in the list, the header and the crumbs |
 | EX-10.15 | A conversation in the history | the person pins it | it lists first, before the newest, until unpinned |
 | EX-10.16 | A conversation in the history | the person archives it | it leaves the list, *Show archived* brings it back, and unarchiving restores it; its thread and board are unchanged |
-| EX-10.17 | A conversation in the history | the person deletes it and confirms | it is gone from the list; its runs stay in Control Plane › Runs and its forks keep their turns |
+| EX-10.17 | A conversation in the history | the person deletes it and confirms | it is gone from the list; its runs stay in Agents › Runs and its forks keep their turns |
 | EX-10.18 | The agent in the composer | the person picks an agent whose policies let it read no kind of the published model | the question is refused before it runs, naming the agent; it is never sent to another agent |
 | EX-10.19 | A conversation whose board is open as a tab | the person opens it from the history or from a recent question | that tab is focused; the page that was in front steps behind it and nothing is closed |
 | EX-10.20 | A conversation whose board is kept but not open | the person opens it | its board is loaded as a tab and focused; nothing else is closed |
@@ -78,10 +79,10 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Conversations | Admin | explore.ask · No conversations | explore.board · No conversation matches | explore.board · Loading conversations | explore.board · Conversations | explore.board · Conversations failed | — | — |
-| Conversations | Operator | explore.ask · No conversations | explore.board · No conversation matches | explore.board · Loading conversations | explore.board · Conversations | explore.board · Conversations failed | — | — |
+| Conversations | Admin | explore.conversations · No conversations | explore.conversations · No conversation matches | explore.conversations · Loading conversations | explore.conversations | explore.conversations · Conversations failed | — | — |
+| Conversations | Operator | explore.conversations · No conversations | explore.conversations · No conversation matches | explore.conversations · Loading conversations | explore.conversations | explore.conversations · Conversations failed | — | — |
 | The agent in the composer | Admin | explore.board · Default agent | — | — | explore.board · Agent picked | explore.board · Agent cannot read | — | — |
 | The agent in the composer | Operator | explore.board · Default agent | — | — | explore.board · Agent picked | explore.board · Agent cannot read | — | explore.board · Agent not theirs to use |
 | Opening a conversation | Admin | — | — | explore.board · Loading conversations | explore.board · Conversations | explore.board · Board not loaded | — | — |

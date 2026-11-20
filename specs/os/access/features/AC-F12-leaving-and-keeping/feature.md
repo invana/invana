@@ -6,7 +6,7 @@ status: idea
 personas: [admin]
 stories: [AC-44, AC-45, AC-46, AC-47]
 journeys: [J12]
-boards: [settings.keeping, settings.people, access.forget, access.subject_export, access.locked]
+boards: [settings.keeping, settings.people]
 nfrs: [NFR-REL-4, NFR-SEC-2, NFR-SEC-10, NFR-SEC-12, NFR-SEC-13]
 depends_on: [AC-F03, AC-F06, AC-F07, AC-F09, GP-F02, CP-F02]
 ---
@@ -26,9 +26,9 @@ Journeys this feature is a step of: [J12 · A person leaves and the team keeps w
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › Leaving and keeping]) --> view["AC-44 · Each store: how long it is kept · holds"]
+  start([Access › Keeping — later]) -.-> view["AC-44 · Each store: how long it is kept · holds"]
   view --> who{"Is the reader an Admin?"}
-  who -->|no| ro["Everything reads · each act disabled, naming the Admin role and the Admins"]
+  who -->|no| ro["Everything reads · each act disabled, naming Edit on setting/retention and who can grant it"]
   who -->|yes| ret["AC-44 · Set a store's retention · default Keep"]
   ret -->|shorter than today| prev["Preview: rows the next prune removes"]
   prev -->|confirm · sign in again| saved(["In force at the next prune · History"])
@@ -39,10 +39,12 @@ flowchart TD
   who -->|yes| names["AC-45 · A departed person's name: Keep · Pseudonymise"]
   names --> nsaved(["Applies to each person deactivated from now · History"])
   dir([Directory › a person]) --> exp["AC-47 · Export everything held about them"]
-  exp --> json(["JSON: profile · what they did · personal-connection data"])
-  dir -->|Deactivate · AC-23| leave["Personal connections removed · their data erased · name kept or pseudonymised"]
-  leave -->|memory on hold| wait(["Erasure waits for the hold to lift"])
-  rec([A record's subject asks to be forgotten]) --> fg["AC-46 · Forget a subject: graph database · kind · record ID"]
+  exp --> json(["JSON: profile · what they did"])
+  dir -->|Deactivate · AC-23| leave["Everything kept · their name stays on their work"]
+  leave -->|Export first| exp
+  leave -.->|later| er["Personal connections removed · their data erased · name kept or pseudonymised"]
+  er -->|memory on hold| wait(["Erasure waits for the hold to lift"])
+  rec([A record's subject asks to be forgotten — later]) -.-> fg["AC-46 · Forget a subject: graph database · kind · record ID"]
   fg --> fprev["Preview: memory nodes and copies that cite it"]
   fprev -->|memory on hold| fr["Refused · lift the hold first"]
   fprev -->|confirm · sign in again| fdone(["Erased from memory · the record stays the customer's · History"])
@@ -70,17 +72,17 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| AC-44 | [Set how long memory and History are kept, and hold them](stories/AC-44-set-how-long-memory-and-history-are-kept-and-hold-them/story.md) | idea |
-| AC-45 | [Decide what happens to a person's name and personal data when they leave](stories/AC-45-decide-what-happens-to-a-persons-name-and-personal-data-when-they-leave/story.md) | idea |
-| AC-46 | [Forget a subject everywhere memory cites them](stories/AC-46-forget-a-subject-everywhere-memory-cites-them/story.md) | idea |
+| AC-44 | [Set how long memory and History are kept, and hold them](stories/AC-44-set-how-long-memory-and-history-are-kept-and-hold-them/story.md) | later |
+| AC-45 | [Decide what happens to a person's name and personal data when they leave](stories/AC-45-decide-what-happens-to-a-persons-name-and-personal-data-when-they-leave/story.md) | later |
+| AC-46 | [Forget a subject everywhere memory cites them](stories/AC-46-forget-a-subject-everywhere-memory-cites-them/story.md) | later |
 | AC-47 | [Export everything held about a person](stories/AC-47-export-everything-held-about-a-person/story.md) | idea |
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read each store's retention, the holds on and off, and the names setting | Every signed-in person — Operator, Modeller, Admin | — |
-| Set a store's retention · place or lift a legal hold · set the names setting | Admin, in a session, signing in again | Disabled — *Needs the Admin role — ask Priya or Lee* |
+| Read each store's retention, the holds on and off, and the names setting | None — every signed-in person | — |
+| Set a store's retention · place or lift a legal hold · set the names setting | Edit on `setting/retention`, in a session, signing in again | Disabled — *Needs Edit on Retention settings — ask Priya or Lee* |
 | Forget a subject · read the subjects forgotten | Admin, in a session, signing in again | Hidden — *Forget a subject* is not offered |
 | Export everything held about a person | Admin, in a session, signing in again | Hidden — *Export their data* is not offered on a person's row |
 
@@ -90,11 +92,11 @@ sequenceDiagram
 |---|---|
 | First use | Every store reads *Keep — nothing is removed until an Admin sets a period*; no holds; names *Keep*; *No subject forgotten yet* |
 | Empty after a filter | The forgotten subjects or the exports: *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; each store's row loads in place; a preview reads *Counting…* until the engine answers |
+| Loading | The section opens at once; each store's row loads in place; a preview reads *Counting…* until the engine answers |
 | Has data | Each store with its period, who set it and when, the date of its last prune; each hold with its reason, who placed it and when; the names setting; the subjects forgotten, newest first |
 | Failed | What could not load or save, in a sentence, with *Try again*; a refused act says why in place |
 | Agent working or proposing | — no agent sets retention, holds, the names setting, forgets or exports; an erasure waiting on a hold reads *Waiting for the hold on memory to lift* |
-| No access | An Operator or a Modeller reads each store, the holds and the names setting; each act is disabled, naming the Admin role and the Admins; *Forget a subject* and *Export their data* are not offered |
+| No access | A person without Edit on `setting/retention` reads each store, the holds and the names setting; each act is disabled, naming it and who can grant it; *Forget a subject* and *Export their data* are not offered |
 
 ## Rules
 
@@ -189,7 +191,7 @@ erasure is done by the feature that owns the store; this feature holds the setti
 | 409 | Forgetting a subject while memory is on hold | *Memory is on legal hold — lift the hold first.* | AC-46.6 |
 | 404 | Forgetting a record in a graph database the deployment does not have | *{database} is not connected.* | AC-46.8 |
 | 404 | A subject export for a user who is not a person | *{user} is not a person.* | AC-47.7 |
-| 403 | Any write here, or a forget or a subject export, by someone whose role is not Admin | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-44.10 · AC-45.8 · AC-46.10 · AC-47.8 |
+| 403 | Any write here, or a forget or a subject export, by someone without Edit on `setting/retention` | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-44.10 · AC-45.8 · AC-46.10 · AC-47.8 |
 | 403 | Any of these with a key or a connected client | [AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals) | AC-44.11 · AC-46.11 · AC-47.9 |
 
 ### CLI
@@ -209,7 +211,7 @@ erasure is done by the feature that owns the store; this feature holds the setti
 | The pseudonym | `Former member · ` and four hex characters of the keyed hash of the user's id, unique among departures; every surface that names a person reads their display name from `access_users`, so the work names them by the code at once |
 | Forget | `record_hash = HMAC(ledger key, database ‖ kind ‖ record_id)`. Lineage walks from the `RecordRef` back along `CITES`, `FOUND`, `CAME_FROM` and `FROM` ([GP-F02 › Edge kinds](../../../graph/features/GP-F02-memory/feature.md#mechanisms)): the `RecordRef` and every `CITES` edge to it are removed; each `Evidence` node citing it holds its `record_hash` in place of the record ID; each copy built from that evidence has its content erased, keeping its kind, when, who made it and *Erased — a forgotten subject*. The ledger holds the hash in place of its record IDs for it, through [AC-F09](../AC-F09-what-left-the-platform/feature.md#engine); recall items citing it go through [AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md#engine). One transaction per owner; the counts are the engine's |
 | Forgotten stays forgotten | The outbox relay and a rebuild from History look up each `RecordRef`'s keyed hash in `access_forgotten_subjects` and skip it when the source row was written before the subject was forgotten |
-| Subject export | One JSON document, streamed: `profile` (username, name, email, role, teams, grants, default agent, created, signed in, deactivated) · `work` (History rows where the person is the actor or behind the run, their conversations with their turns, tasks they set or were assigned, asks they raised or answered) · `personal_connections` (each server, label, connected and last used — never a token — and the copies those connections returned). It passes the outbound check as the exit kind `subject_export` ([AC-F09](../AC-F09-what-left-the-platform/feature.md#engine)) and is one ledger row and one History row, naming its subject |
+| Subject export | One JSON document, streamed: `profile` (username, name, email, policies, teams, grants, default agent, created, signed in, deactivated) · `work` (History rows where the person is the actor or behind the run, their conversations with their turns, tasks they set or were assigned, asks they raised or answered) · `personal_connections` (each server, label, connected and last used — never a token — and the copies those connections returned). It passes the outbound check as the exit kind `subject_export` ([AC-F09](../AC-F09-what-left-the-platform/feature.md#engine)) and is one ledger row and one History row, naming its subject |
 
 ## System impact
 
@@ -223,7 +225,8 @@ erasure is done by the feature that owns the store; this feature holds the setti
 
 | Decision | Detail |
 |---|---|
-| One sheet | *Settings › People and access › Leaving and keeping* holds retention, holds, the names setting and the subjects forgotten; *Forget a subject* opens a modal from it, *Export their data* a modal from a person's row in the Directory |
+| Keeping is parked | AC-44 · AC-45 · AC-46 are `later`: everything is kept, the default; Access has no *Keeping* tab. *Export their data* (AC-47) stays on a person's row in `settings.people` and in the deactivate modal. Risk: a request to erase a person or a subject has no Studio act until they return. `settings.keeping` stays as drawn, unwired |
+| One section, when it returns | *Access › Keeping* holds retention, holds, the names setting and the subjects forgotten; *Forget a subject* opens a modal from it, *Export their data* a modal from a person's row in the Directory |
 | Keep is the default | Nothing is removed until an Admin chooses to; a shorter period shows what the next prune removes before it is saved |
 | Holds are per store | A hold covers all of memory or all of History, never a person or a project — light, and enough for an on-prem deployment that answers one matter at a time |
 | Erasure at deactivation | A departed person's personal-connection data and, under *Pseudonymise*, their name go when they are deactivated; the modal says so before the Admin confirms |

@@ -4,7 +4,7 @@ title: Keep an eval set for an agent or a skill
 feature: AG-F10
 status: idea
 personas: [builder, admin]
-boards: [agents.skill, agents.agent, agents.run]
+boards: [agents.skills, agents.agents, agents.runs]
 ---
 
 # AG-56 · Keep an eval set for an agent or a skill
@@ -18,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F10](../../feature.md)
 
 ## Who can
 
-Keeping an eval set is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Keeping an eval set needs Edit on `agent/<name>` or `skill/<name>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | On any agent or skill not built in: write, accept and retire cases, set the judge and rubric, ask for proposed cases, promote a run's answer to a case | A built-in's set reads, with *Copy* — *Built in — copy it to change it* |
-| Operator | Read every eval set, its cases, checks, judge and rubric. A Modeller does what an Admin does; promote only from a run they may read | *Write a case*, *Propose from the instructions*, *Promote to eval* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| Operator | Read every eval set, its cases, checks, judge and rubric. With Edit on the agent or skill, does what an Admin does; promote only from a run they may read | *Write a case*, *Propose from the instructions*, *Promote to eval* disabled, naming the permission — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}* |
 
 ## Flow
 
@@ -33,7 +33,7 @@ flowchart LR
   h -->|no| w["Write a case — a question and its checks"]
   h -->|no| pr["Propose from the instructions"]
   pr -->|the Assistant proposes up to five| pc["Proposed — Accept or Retire, one by one"]
-  pr -->|no AI model offered| px["Says so, linking Control Plane › AI models"]
+  pr -->|no AI model offered| px["Says so, linking Settings › Connections › AI models"]
   r([A run's answer]) -->|Promote to eval · passing or failing| c["A case keeping its run"]
   r -->|content the person may not read| rx["Promote to eval disabled, naming who reads it"]
   w --> s["The set — cases, judge, rubric"]
@@ -47,27 +47,27 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-56.1 | An agent's or a skill's sheet | Evals opens | the set's cases read, each a question with its checks and *passing* or *failing*; a judged rubric names the model version that judges it |
+| AG-56.1 | An agent's or a skill's page | Evals opens | the set's cases read, each a question with its checks and *passing* or *failing*; a judged rubric names the model version that judges it |
 | AG-56.2 | No case | Evals opens | it reads *No eval set — nothing checked*, with *Write a case* and *Propose from the instructions* |
-| AG-56.3 | A Modeller or an Admin writing a case | they add checks | each check is hard and counted — cites records · says *cannot answer* when it should · a rule held · expected records present · tokens under N · time under N |
-| AG-56.4 | A set | a Modeller or an Admin sets a judge model version and a rubric | the judge is offered only from the versions Control Plane › AI models offers, each marked *Local* or *External* |
+| AG-56.3 | A person with Edit on the agent or skill writing a case | they add checks | each check is hard and counted — cites records · says *cannot answer* when it should · a rule held · expected records present · tokens under N · time under N |
+| AG-56.4 | A set | a person with Edit on the agent or skill sets a judge model version and a rubric | the judge is offered only from the versions Settings › Connections › AI models offers, each marked *Local* or *External* |
 | AG-56.5 | A judge set to the model version under test | the editor saves the set | it is refused, naming both |
-| AG-56.6 | A Modeller or an Admin | they press *Propose from the instructions* | the Assistant proposes up to five cases from the instructions, each waiting as *proposed* until a person accepts it; *How it got here* shows what it read and the model version that wrote them |
-| AG-56.7 | A proposed case | a Modeller or an Admin presses *Accept* or *Retire* | it becomes active or retired; no proposed case is ever replayed |
-| AG-56.8 | A run's answer | a Modeller or an Admin who may read the run presses *Promote to eval*, *passing* or *failing* | it becomes a case of that set with the question and checks, keeping its run; an agent never promotes |
+| AG-56.6 | A person with Edit on the agent or skill | they press *Propose from the instructions* | the Assistant proposes up to five cases from the instructions, each waiting as *proposed* until a person accepts it; *How it got here* shows what it read and the model version that wrote them |
+| AG-56.7 | A proposed case | a person with Edit on the agent or skill presses *Accept* or *Retire* | it becomes active or retired; no proposed case is ever replayed |
+| AG-56.8 | A run's answer | a person with Edit on the agent or skill who may read the run presses *Promote to eval*, *passing* or *failing* | it becomes a case of that set with the question and checks, keeping its run; an agent never promotes |
 | AG-56.9 | A run whose content the person may not read | they look for *Promote to eval* | it is disabled, naming who reads it — the person behind the run and, for a project's run, anyone whose default agent may see its sources |
 | AG-56.10 | A case whose run is gone, or a retired case | it is read | it keeps its question and checks, and a retired case the results it judged; a gone run's link reads *source gone* |
-| AG-56.11 | An Operator | they open Evals | everything reads; every act is disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| AG-56.11 | An Operator | they open Evals | everything reads; every act is disabled, naming the permission — *Needs Edit on the {agent} agent or the {skill} skill — ask {who can grant}* |
 | AG-56.12 | A built-in agent or skill | Evals opens | its set reads, with *Copy* in place of every act; the copy keeps the set's cases, owned by the copier |
 | AG-56.13 | A judged check | it is shown | it is labelled *judged* and kept apart from the hard checks |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A skill's Evals | Admin | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Evals | agents.skill · Judge refused | agents.skill · Proposing cases | — |
-| A skill's Evals | Operator | agents.skill · No eval set | — | agents.skill · Loading | agents.skill · Evals | agents.skill · Could not load | agents.skill · Proposing cases | agents.skill · Evals |
-| An agent's Evals | Admin | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Evals | agents.agent · Judge refused | agents.agent · Proposing cases | — |
-| An agent's Evals | Operator | agents.agent · No eval set | — | agents.agent · Loading | agents.agent · Evals | agents.agent · Could not load | agents.agent · Proposing cases | agents.agent · Evals |
-| Promote to eval, on a run | Admin | — | — | agents.run · Loading | agents.run · Promote to eval | agents.run · Failed | — | — |
-| Promote to eval, on a run | Operator | — | — | agents.run · Loading | agents.run | agents.run · Failed | — | agents.run |
+| A skill's Evals | Admin | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Judge refused | agents.skills · Detail · Proposing cases | — |
+| A skill's Evals | Operator | agents.skills · Detail · No eval set | — | agents.skills · Detail · Loading | agents.skills · Detail · Evals | agents.skills · Detail · Could not load | agents.skills · Detail · Proposing cases | agents.skills · Detail · Evals |
+| An agent's Evals | Admin | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Evals | agents.agents · Detail · Judge refused | agents.agents · Detail · Proposing cases | — |
+| An agent's Evals | Operator | agents.agents · Detail · No eval set | — | agents.agents · Detail · Loading | agents.agents · Detail · Evals | agents.agents · Detail · Could not load | agents.agents · Detail · Proposing cases | agents.agents · Detail · Evals |
+| Promote to eval, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Promote to eval | agents.runs · Detail · Failed | — | — |
+| Promote to eval, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail | agents.runs · Detail · Failed | — | agents.runs · Detail |

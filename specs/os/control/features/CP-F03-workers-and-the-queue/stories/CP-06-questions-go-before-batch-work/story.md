@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the order work is taken in and each person's share | — |
 | Operator | Read the order work is taken in and each person's share | — |
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers › Where work is]) --> o["Order: questions · project tasks · batch"]
+  s([Settings › Workers › Queue]) --> o["Order: questions · project tasks · batch"]
   o --> g["Each person's share of the workers"]
   g -->|a person with nothing waiting| lend(["Their share is lent to those whose work waits"])
   g -->|everyone's work waiting| eq(["Shared equally"])
@@ -44,7 +44,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The order and each person's share | Admin | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Order | settings.workers · Could not load | — | — |
 | The order and each person's share | Operator | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Order | settings.workers · Could not load | — | — |

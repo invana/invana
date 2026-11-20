@@ -4,7 +4,7 @@ title: Run a workflow on demand with today's arguments
 feature: AG-F06
 status: idea
 personas: [analyst, builder]
-boards: [agents.workflow, agents.run, agents.runs, inbox]
+boards: [agents.skills, agents.runs, inbox]
 ---
 
 # AG-44 · Run a workflow on demand with today's arguments
@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Starting a workflow is every role's, through the agents granted to the person ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Starting a workflow is Run on `workflow/<key>`, through the agents granted to the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Run or dry run a published workflow version with arguments, through an agent granted to them whose policies allow Run `workflow/<key>`; stop the run as any run | — |
-| Operator | The same; a Modeller the same | No agent granted to them is allowed: *Run* disabled — *No agent you may use may run {key} — ask an Admin* |
+| Operator | The same | No agent granted to them is allowed: *Run* disabled — *No agent you may use may run {key} — ask an Admin* |
 
 ## Flow
 
@@ -71,13 +71,17 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Run a workflow | Admin | agents.workflow · Run, no arguments | — | agents.workflow · Run, checking | agents.workflow · Run | agents.workflow · Run, refused | agents.workflow · Run, dry run | — |
-| Run a workflow | Operator | agents.workflow · Run, no arguments | — | agents.workflow · Run, checking | agents.workflow · Run | agents.workflow · Run, refused | agents.workflow · Run, dry run | agents.workflow · Run disabled |
-| The run it starts | Admin | — | — | agents.run · Loading | agents.run · Started by name | agents.run · Plan refused | agents.run · Running | — |
-| The run it starts | Operator | — | — | agents.run · Loading | agents.run · Started by name | agents.run · Plan refused | agents.run · Running | agents.run · Content withheld |
+| Run a workflow | Admin | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.skills · Workflow · Run | agents.skills · Workflow · Run, refused | agents.skills · Workflow · Run, dry run | — |
+| Run a workflow | Operator | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.skills · Workflow · Run | agents.skills · Workflow · Run, refused | agents.skills · Workflow · Run, dry run | agents.skills · Workflow · Run disabled |
+| The run it starts | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Started by name | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | — |
+| The run it starts | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Started by name | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
 | Runs of a workflow | Admin | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | — |
 | Runs of a workflow | Operator | agents.runs · Nothing ran | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | agents.runs · Running | agents.runs · Content withheld |
 | A run's ask | Admin | — | — | inbox · Loading | inbox · Asks first | — | inbox · Asks first | — |
 | A run's ask | Operator | — | — | inbox · Loading | inbox · Asks first | — | inbox · Asks first | inbox · Not yours to answer |
+| Run a workflow · Run | Admin | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.runs · Detail · Started by name | agents.skills · Workflow · Run, refused | — | — |
+| Run a workflow · Run | Operator | agents.skills · Workflow · Run, no arguments | — | agents.skills · Workflow · Run, checking | agents.runs · Detail · Started by name | agents.skills · Workflow · Run, refused | — | — |
+| A run · asks first | Admin | agents.runs · Detail · Started by name | — | — | inbox · Asks first | — | — | — |
+| A run · asks first | Operator | agents.runs · Detail · Started by name | — | — | inbox · Asks first | — | — | — |

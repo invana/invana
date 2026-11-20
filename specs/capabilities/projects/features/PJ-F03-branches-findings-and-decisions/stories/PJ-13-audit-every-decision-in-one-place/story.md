@@ -4,7 +4,7 @@ title: Audit every decision in one place
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.decide]
+boards: [projects.branches]
 ---
 
 # PJ-13 · Audit every decision in one place
@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read the Decisions page across every project they can see; open a decision, its project and its lineage; export the rows | A decision of a project their default agent may not Read lists its project, number and date; its content reads *Withheld* — Admins are not exempt |
-| Operator | The same, and export the rows; a Modeller the same | A decision of a project their default agent may not Read lists, its content *Withheld*. Nothing on the page is an act to refuse |
+| Admin | Read the Decisions page across every project they can see; open a decision, its project and its lineage; export the rows | A decision of a project they may not read lists its project, number and date; its content reads *Withheld* — Admins are not exempt |
+| Operator | The same, and export the rows | A decision of a project they may not read lists, its content *Withheld*. Nothing on the page is an act to refuse |
 
 ## Flow
 
@@ -34,7 +34,7 @@ flowchart LR
   load --> l["Newest first · 2 current · 5 recorded · project · branch · decision · verdict · by · when · cited · rules passed"]
   l --> o["Open a decision → its branch · its project · Lineage (PJ-11)"]
   l --> x["Export for audit → a CSV of the rows shown"]
-  l -->|the reader's default agent may not Read a project| h["Its decisions list, content Withheld"]
+  l -->|the reader may not read a project| h["Its decisions list, content Withheld"]
 ```
 
 ## Acceptance criteria
@@ -46,7 +46,7 @@ flowchart LR
 | PJ-13.3 | The page header | the list is drawn | it reads *2 current · 5 recorded*, as the engine counted them — current is the decisions no later one supersedes; it reads *5* alone when the two match |
 | PJ-13.4 | A decision | the person opens it | it opens its branch in its project, and its lineage (PJ-11) |
 | PJ-13.5 | A decision | the list names *By* | it names the person who decided — never an agent; a decision from a proposal also names the agent that proposed it |
-| PJ-13.6 | A project the reader's default agent may not Read | the list is drawn | each of its decisions lists its project, number and date, and its verdict, choice and rationale read *Withheld — your agent may not read `project/{key}`* — for an Admin as for anyone |
+| PJ-13.6 | A project the reader may not read | the list is drawn | each of its decisions lists its project, number and date, and its verdict, choice and rationale read *Withheld — join the team or ask {who can grant}* — for an Admin as for anyone |
 | PJ-13.7 | The list | the person chooses *Export for audit* | a CSV of the rows shown downloads |
 | PJ-13.8 | No decision in any project the reader can see | the page opens | it reads *No decisions yet* and says decisions are recorded on a branch |
 | PJ-13.9 | The engine cannot return the list | the page loads | it says *Could not load* with the reason and *Try again* |
@@ -54,7 +54,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Every decision | Admin | projects.decide · Every decision · None yet | — | projects.decide · Every decision · Loading | projects.decide · Every decision | projects.decide · Every decision · Could not load | — | — |
-| Every decision | Operator | projects.decide · Every decision · None yet | — | projects.decide · Every decision · Loading | projects.decide · Every decision | projects.decide · Every decision · Could not load | — | — |
+| Every decision | Admin | projects.branches · Decide · Every decision · None yet | — | projects.branches · Decide · Every decision · Loading | projects.branches · Decide · Every decision | projects.branches · Decide · Every decision · Could not load | — | — |
+| Every decision | Operator | projects.branches · Decide · Every decision · None yet | — | projects.branches · Decide · Every decision · Loading | projects.branches · Decide · Every decision | projects.branches · Decide · Every decision · Could not load | — | — |

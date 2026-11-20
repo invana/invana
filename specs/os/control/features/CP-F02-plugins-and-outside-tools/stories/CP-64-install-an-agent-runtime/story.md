@@ -17,18 +17,18 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-The role × feature table is [AC-F02 › The role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Install and remove a runtime plugin; switch it on or off; pick the worker groups that carry it (CP-10) | — |
-| Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it; a Modeller reads the same | *Install* and *Remove* disabled — *This needs an Admin — ask {admins}* |
+| Admin | With Create (install) or Manage (remove) on `plugin/<name>`: install and remove a runtime plugin; switch it on or off; pick the worker groups that carry it (CP-10) | — |
+| Operator | Read every runtime, what it declares, the groups that carry it and how many agents run with it | *Install* and *Remove* disabled — *Needs Create on Plugins — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Plugins › Runtimes]) --> l["Invana · always · then each installed runtime: versions · model local or external · needs · groups · agents"]
+  s([Settings › Plugins › Runtimes]) --> l["Invana · always · then each installed runtime: versions · model local or external · needs · groups · agents"]
   l -->|none installed| fu["Only Invana's runtime · Install a runtime"]
   fu --> i["Install: Claude Code or Codex"]
   l --> i
@@ -58,13 +58,16 @@ flowchart TD
 | CP-64.9 | An Operator | they look for *Install* or *Remove* | each is disabled — *This needs an Admin — ask {admins}* |
 | CP-64.10 | A runtime switched off | an agent that runs with it is started | the run is refused before it starts, naming who switched it off |
 | CP-64.11 | An installed, switched-on runtime no worker group carries | it reads | it says no group carries it and links *Workers* to add it to a group |
+| CP-64.12 | An Admin | they install a runtime plugin | the install reads *Installing*, then *Installed, off* naming what it declares; *Done* lists the runtime among *Runtimes*; *Open Workers* opens the worker group that can carry it |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Runtimes | Admin | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes | settings.plugins · Install refused | — | — |
 | Runtimes | Operator | settings.plugins · Only Invana's runtime | — | settings.plugins · Loading | settings.plugins · Runtimes · Read only | settings.plugins · Could not load | — | settings.plugins · Runtimes · Read only |
+| Install a runtime | Admin | settings.plugins · Runtimes · Install | — | — | settings.plugins · Runtimes · Install · Installed, off | settings.plugins · Runtimes · Install · Install refused | — | — |
+| Install a runtime | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |
 | A worker group's runtimes | Admin | — | — | settings.workers · Loading | settings.workers · Group | settings.workers · No worker carries the runtime | — | — |
 | A worker group's runtimes | Operator | — | — | settings.workers · Loading | settings.workers · Group · Read only | settings.workers · No worker carries the runtime | — | settings.workers · Read only |
 </content>
@@ -73,3 +76,7 @@ flowchart TD
 <parameter name="taskId">3</parameter>
 <parameter name="activeForm">CP-F04 session budget</parameter>
 </invoke>
+| Install a runtime · Installing | Admin | — | — | settings.plugins · Runtimes · Install · Installing | settings.plugins · Runtimes · Install · Installed, off | settings.plugins · Runtimes · Install · Install refused | — | — |
+| Install a runtime · Installing | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |
+| Install a runtime · Done | Admin | — | — | — | settings.plugins · Runtimes · Codex installed | — | — | — |
+| Install a runtime · Done | Operator | — | — | — | — | — | — | settings.plugins · Runtimes · Read only |

@@ -3,6 +3,7 @@ id: CP-09
 title: See every worker and what it is running
 feature: CP-F03
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.workers]
 ---
@@ -16,25 +17,30 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every group and worker; drain a worker; revoke a join key | — |
-| Operator | Read every group and worker and what each runs | *Drain* and *Revoke* disabled — *Needs the Admin role — ask {admins}* |
+| Admin | Read every group and worker; with Manage on `worker/<group>`, drain a worker; revoke a join key | — |
+| Operator | Read every group and worker and what each runs | *Drain* and *Revoke* disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers]) --> g["Each group: runs on · labels · workers · busy · waiting · state"]
+  s([Settings › Workers › Groups]) --> g["Each group: runs on · labels · workers · busy · waiting · state"]
   g -->|no workers anywhere| nw["Steps run inside the engine · Add workers"]
   g --> grp["A group: every worker · state · running now · heartbeat"]
   grp -->|filter by state| f["No worker matches"]
   grp --> w["A worker: runtimes · running now · workspaces · steps this hour · its log"]
   w -->|a run the reader may not read| wh["Its session's head · content withheld"]
-  w -->|Drain| d(["Finishes what it holds · then stops"])
+  w -->|Drain| dc["Confirm: what it holds"]
+  dc --> dg["Draining"]
+  dg --> d(["Drained · finishes what it holds · then stops"])
+  dc -->|refused| df["Could not drain"]
   grp -->|a worker silent 30 s| lost["Lost · its steps handed on"]
+  w -->|it asked outside its lease| ol(["Refused outside its lease · nothing unsealed · security alert"])
   s --> keys["Join keys: group · made by · expires · joined n of cap"]
-  keys -->|Revoke| rv(["No new joins"])
+  keys -->|Revoke| rc["Confirm: key · group · joined"]
+  rc --> rv(["Revoked · no new joins"])
 ```
 
 ## Acceptance criteria
@@ -50,16 +56,20 @@ flowchart TD
 | CP-09.7 | An Admin | they drain a worker | it takes no new work, finishes what it holds, then stops |
 | CP-09.8 | An Admin | they revoke a join key | no new worker joins with it; joined workers keep running |
 | CP-09.9 | Every number on Workers | it is read | it is the engine's, stored every 30 s; a change against last week reads `—` when nothing was measured |
-| CP-09.10 | An Operator | they open Workers | everything reads; *Drain* and *Revoke* are disabled — *Needs the Admin role — ask {admins}* |
+| CP-09.10 | An Operator | they open Workers | everything reads; *Drain* and *Revoke* are disabled — *Needs Manage on the {group} worker group — ask {who can grant}* |
 | CP-09.11 | An Admin | they drain a worker group | every worker in it takes no new work, finishes what it holds, then stops; History records who and when (AC-F06) |
 | CP-09.12 | An Operator | they read a group's changes | every join, loss, drain, revoke and change to the group reads newest first, with who or what caused it and why |
 | CP-09.13 | A lost worker | it heartbeats again | it reads busy or idle again; the steps already handed on are not run a second time |
 | CP-09.14 | A worker | it opens | its open workspaces read — the task and run each belongs to, kept or open, since when — never the files in them |
 | CP-09.15 | A worker running a session for a run the reader may not read | it is read | the session reads its agent, runtime and status; the run's content is *withheld*, naming who may read it |
+| CP-09.16 | An Admin | they press *Drain* on a worker or a group | a confirm names what it holds now; confirming reads *Draining* until the worker stops, then *Drained*; a refusal reads *Could not drain*, naming the cause, with *Cancel* and *Try again* |
+| CP-09.17 | An Admin | they press *Revoke* on a join key | a confirm names the key, its group and how many workers joined; confirming reads *Revoked* (CP-10.23) |
+| CP-09.18 | A worker A holding no live lease on run R — or a lease from a queue its group does not serve | it asks to start R's session, resolve a secret for it or post its outcome | it is refused 403 and nothing is unsealed; the worker's changes read *Refused outside its lease*, naming the run or secret and why; History records it and a security alert reaches the Admins ([CP-F11](../../../CP-F11-ops-alerting/feature.md)) |
+| CP-09.19 | A worker holding a live lease | it resolves a secret its step's function declares | it gets that secret once, for that lease; a second resolve, or a secret the function does not declare, is refused as CP-09.18 |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Workers | Admin | settings.workers · No workers | — | settings.workers · Loading | settings.workers | settings.workers · Could not load | — | — |
 | Workers | Operator | settings.workers · No workers | — | settings.workers · Loading | settings.workers · Read only | settings.workers · Could not load | — | settings.workers · Read only |
@@ -67,3 +77,17 @@ flowchart TD
 | A group | Operator | — | settings.workers · No worker matches | settings.workers · Loading | settings.workers · Group · Read only | settings.workers · Worker lost | — | settings.workers · Read only |
 | A worker | Admin | — | — | settings.workers · Loading | settings.workers · Worker | settings.workers · Worker lost | — | — |
 | A worker | Operator | — | — | settings.workers · Loading | settings.workers · Worker · Read only | settings.workers · Worker lost | — | settings.workers · Read only |
+| A worker · Drain | Admin | — | — | settings.workers · Worker · Draining | settings.workers · Worker · Drain | settings.workers · Worker · Could not drain | — | — |
+| A worker · Drain | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| A worker · Drained | Admin | — | — | — | settings.workers · Worker · Drained | — | — | — |
+| A worker · Drained | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| A worker · Refused outside its lease | Admin | — | — | — | — | settings.workers · Worker · Refused outside its lease | — | — |
+| A worker · Refused outside its lease | Operator | — | — | — | — | settings.workers · Worker · Refused outside its lease · Read only | — | settings.workers · Read only |
+| A group · Drain | Admin | — | — | settings.workers · Group · Draining | settings.workers · Group · Drain | settings.workers · Group · Could not drain | — | — |
+| A group · Drain | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| A group · Drained | Admin | — | — | — | settings.workers · Group · Drained | — | — | — |
+| A group · Drained | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Join keys · Revoke | Admin | — | — | — | settings.workers · Join keys · Revoke | — | — | — |
+| Join keys · Revoke | Operator | — | — | — | — | — | — | settings.workers · Read only |
+| Join keys · Revoked | Admin | — | — | — | settings.workers · Join keys · Revoked | — | — | — |
+| Join keys · Revoked | Operator | — | — | — | — | — | — | settings.workers · Read only |

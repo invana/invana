@@ -4,7 +4,7 @@ title: Read what people and agents did, and prove it
 feature: AC-F06
 status: idea
 personas: [admin, builder, analyst]
-boards: [inbox.history, agents.run]
+boards: [settings.history, agents.runs]
 ---
 
 # AC-16 · Read what people and agents did, and prove it
@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every row, the counts over the deployment, by actor, by record and refusals; a row's arguments when they may read its run; export | — |
 | Operator | Read their own acts and the rows of runs they may read, with the filters; export those rows | The rest is counted, not shown: *N rows today belong to runs you cannot read — counted, not shown*; the counts over the deployment are not shown |
@@ -26,12 +26,12 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ```mermaid
 flowchart LR
-  s([Inbox › History]) -->|nothing yet| e["No acts yet"]
+  s([Access › Record › History]) -->|nothing yet| e["No acts yet"]
   s --> r["Rows, today: when · who ▸ through which agents · act · touched · allowed or refused · run"]
   r -->|Everything · People · Agents · Refused · window| f{"Matches?"}
   f -->|no| z["0 of N match · Clear all"]
   r -->|a row| d["Chain of custody · the act and its rule · hash and previous · the acts around it"]
-  d -->|Open the step| run(["The run's sheet, on that step"])
+  d -->|Open the step| run(["The run's page, on that step"])
   r -->|a person or agent| a["Their acts, writes, refusals, and the helpers they acted through"]
   r -->|a record| rec["Every act on it · who can see it now"]
   r -->|Export| x(["CSV or JSON Lines, with each row's hash"])
@@ -47,11 +47,11 @@ flowchart LR
 | AC-16.2 | Acts today | History opens | rows read newest first: when · who, with the chain they acted through (*Sam ▸ Reporting agent ▸ Order checker*) · the act · what it touched · allowed, refused, waiting on an ask or held · the run |
 | AC-16.3 | An agent acting for a person | its row is read | both are named, apart — never one name for both |
 | AC-16.4 | A step an agent took, a step it was refused, a helper it started, and a person who published, stopped a run, decided an ask or saved a policy | History is read | each is one row, in the deployment's one chain |
-| AC-16.5 | A refused act | its row is read | it names the reason — the role · may not use the agent · an Access Policy rule · switched off · a read-only graph database · a sensitive property · over a limit · the site's robots.txt — and the rule in words, with its policy |
+| AC-16.5 | A refused act | its row is read | it names the reason — the permission it needs · may not use the agent · an Access Policy rule · switched off · a read-only graph database · a sensitive property · over a limit · the site's robots.txt — and the rule in words, with its policy |
 | AC-16.6 | History | the reader picks *People*, *Agents* or *Refused*, or a window — today · last 24 hours · 7 days · 30 days · any time | only those rows list, the filter shown with a way to clear it; with no window chosen it reads today |
 | AC-16.7 | Filters that match nothing | History is read | it reads *0 of N match*, with *Clear all* |
 | AC-16.8 | A row | the reader opens it | its detail opens beside the list: who started it and each agent with how it got there, the function and its version, where it ran · the act, its arguments and the rule that allowed or refused it, its policy and version · its hash, the previous hash and whether the chain held · the acts around it |
-| AC-16.9 | A row from a run | the reader presses *Open the step* | the run's sheet opens on that step |
+| AC-16.9 | A row from a run | the reader presses *Open the step* | the run's page opens on that step |
 | AC-16.10 | A person or an agent and a window | By actor is read | it counts their acts, writes, outside reads, secrets used and refusals, and lists the helpers they acted through, one kind grouped as *Order checker ×4* |
 | AC-16.11 | A record's address and a window | By record is read | it lists every act on that record, counts reads, writes, refusals, people and agents, and says which agents may read and write its kind now, and for which teams |
 | AC-16.12 | Refusals | they are read | refused today as a share of all acts, counts by reason, refused a day over 30 days, the most refused functions, and each rule that held |
@@ -62,8 +62,8 @@ flowchart LR
 | AC-16.17 | A credential used by an act | its row is read | the secret is named, never its value; it never entered the record |
 | AC-16.18 | A row about a record since deleted | it is read | it names the record as it was |
 | AC-16.19 | Rows older than the period an Admin set | they are removed | a whole window goes, never chosen rows; the removal is itself a row, and a signed checkpoint keeps the number and hash of the last row removed |
-| AC-16.20 | An Operator or a Modeller | they open History | they read their own acts and the rows of runs they may read (AC-31); a line counts the rest, *counted, not shown*; the counts over the deployment are not shown |
-| AC-16.21 | An Operator or a Modeller | they follow a link to a row they cannot see | it reads *not found* |
+| AC-16.20 | A person without Read on `access/history` | they open History | they read their own acts and the rows of runs they may read (AC-31); a line counts the rest, *counted, not shown*; the counts over the deployment are not shown |
+| AC-16.21 | A person without Read on `access/history` | they follow a link to a row they cannot see | it reads *not found* |
 | AC-16.22 | The engine cannot read History | it opens | it says what it could not read, with *Try again* |
 | AC-16.23 | A call through a key or an MCP client | its row is read | it is named as outside, with the key's or the client's name and the person it acts as |
 | AC-16.24 | Rows arriving while History is open | the reader is on the first page | new rows join the top without moving the rows below |
@@ -72,20 +72,24 @@ flowchart LR
 | AC-16.27 | A checkpoint whose signature or link does not hold | the chain is next checked | the head reads *broken at the checkpoint of {date}* in red; rows still read |
 | AC-16.28 | History on legal hold | its period passes | no row is removed until the hold is lifted (AC-44) |
 | AC-16.29 | A row naming a person who left while names are pseudonymised | it is read or exported | it names them by their code (AC-45); its hash still verifies |
+| AC-16.30 | A refused row | a person without Read on `access/policies` reads or exports it | it reads *refused* and the reason's sentence; the rule, its policy and who set it are left out, and no row names a kind or property a Deny hides — AC-27.25 |
+| AC-16.31 | An Admin | they press *Check the chain* | the head reads *Checking the chain*, then when it was last checked; a mismatch reads *Chain broken at row N* with the rows still readable |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| History — rows | Admin | inbox.history · No acts yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history · Everything | inbox.history · Chain broken | inbox.history · Agents | — |
-| The head after a prune | Admin | — | — | — | inbox.history · From a checkpoint | inbox.history · Checkpoint broken | — | — |
-| The head after a prune | Operator | — | — | — | inbox.history · From a checkpoint | inbox.history · Checkpoint broken | — | — |
-| History — rows | Operator | inbox.history · No acts yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history · Counted, not shown | inbox.history · Chain broken | inbox.history · Agents | inbox.history · Counted, not shown |
-| A row's detail | Admin | — | — | inbox.history · Loading | inbox.history · Row | inbox.history · Could not load | — | — |
-| A row's detail | Operator | — | — | inbox.history · Loading | inbox.history · Row | inbox.history · Could not load | — | inbox.history · Arguments withheld |
-| By actor · by record · refusals | Admin | inbox.history · No acts yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history · Refused | inbox.history · Could not load | — | — |
-| By actor · by record · refusals | Operator | — | — | — | — | — | — | inbox.history · Counted, not shown |
-| Export | Admin | — | inbox.history · Nothing to export | — | inbox.history · Export | inbox.history · Could not load | — | — |
-| Export | Operator | — | inbox.history · Nothing to export | — | inbox.history · Export | inbox.history · Could not load | — | inbox.history · Export |
-| The step a row opens | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | — |
-| The step a row opens | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Failed | — | agents.run · Not found |
+| History — rows | Admin | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Everything | settings.history · Chain broken | settings.history · Agents | — |
+| The head after a prune | Admin | — | — | — | settings.history · From a checkpoint | settings.history · Checkpoint broken | — | — |
+| The head after a prune | Operator | — | — | — | settings.history · From a checkpoint | settings.history · Checkpoint broken | — | — |
+| History — rows | Operator | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Counted, not shown | settings.history · Chain broken | settings.history · Agents | settings.history · Counted, not shown |
+| A row's detail | Admin | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | — |
+| A row's detail | Operator | — | — | settings.history · Loading | settings.history · Row | settings.history · Could not load | — | settings.history · Arguments withheld |
+| By actor · by record · refusals | Admin | settings.history · No acts yet | settings.history · Nothing matches | settings.history · Loading | settings.history · Refused | settings.history · Could not load | — | — |
+| By actor · by record · refusals | Operator | — | — | — | — | — | — | settings.history · Counted, not shown |
+| Export | Admin | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | — |
+| Export | Operator | — | settings.history · Nothing to export | — | settings.history · Export | settings.history · Could not load | — | settings.history · Export |
+| The step a row opens | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | — |
+| The step a row opens | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Failed | — | agents.runs · Detail · Not found |
+| Check the chain | Admin | — | — | settings.history · Checking the chain | settings.history · Everything | settings.history · Chain broken | — | — |
+| Check the chain | Operator | — | — | — | — | — | — | settings.history · Counted, not shown |

@@ -4,7 +4,7 @@ title: Annotate the records on a board
 feature: RC-F07
 status: idea
 personas: [analyst]
-boards: [explore.board.annotate]
+boards: [explore.board]
 ---
 
 # RC-13 · Annotate the records on a board
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [RC-F07](../../feature.md) · The board: [
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read, write, hide and show annotations on a read + write graph database; add the assistant's to the graph database or dismiss them; change or delete their own; delete anyone's, with a reason | A read-only graph database: Annotate off, naming it and its mode |
-| Operator | The same, except deleting another person's annotation; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *annotations*) | Someone else's annotation: change and delete off — *Only its author or an Admin can change it* |
+| Operator | The same, except deleting another person's annotation; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *annotations*) | Someone else's annotation: change and delete off — *Only its author or a holder of Edit on the graph database can change it* |
 
 Annotations are written to the customer's graph database as the built-in Assistant, within its Access Policies.
 
@@ -61,8 +61,8 @@ flowchart LR
 | RC-13.8 | Only part of a group's records on the board | it draws | the frame is drawn dashed around those here, saying *3 of 7 on this board* |
 | RC-13.9 | An answer, or *Explain this* on a selection | the assistant annotates records | its annotations show as the assistant's, in this conversation only, each with *Add to the graph database* · *Dismiss*; nothing is written until a person adds one |
 | RC-13.10 | An assistant's annotation | the person opens it | it carries its evidence: *How it got here* shows its query, what came back and the reply |
-| RC-13.11 | A question the Graph cannot answer | the assistant annotates | it writes a gap annotation saying what is missing, never a number |
-| RC-13.12 | Someone else's annotation | the person selects it | its author's initials show; change and delete are off — *Only its author or an Admin can change it* |
+| RC-13.11 | A question Graph Data does not hold the answer to | the assistant annotates | it writes a gap annotation saying what is missing, never a number |
+| RC-13.12 | Someone else's annotation | the person selects it | its author's initials show; change and delete are off — *Only its author or a holder of Edit on the graph database can change it* |
 | RC-13.13 | Saving an annotation fails | the graph database refuses | the card keeps its text and says *Could not save · Try again* |
 | RC-13.14 | Records in a read-only graph database | the person opens the mode picker | Annotate is off, naming the graph database and that it is read-only; every annotation still shows, and the API refuses the same |
 | RC-13.15 | No rule allowing the Assistant Write on `data/<graph database>/Annotation`, or a Deny | the person annotates or adds the assistant's annotation | it is refused, naming the policy and the rule; the card keeps its text. An Ask rule waits for the agent's approvers |
@@ -76,9 +76,13 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Annotations on the board | Admin | explore.board.annotate · Nothing annotated | explore.board.annotate · All hidden | explore.board.annotate · Loading | explore.board.annotate | explore.board.annotate · Could not save | explore.board.annotate · Assistant proposes | explore.board.annotate · Read-only database |
-| Annotations on the board | Operator | explore.board.annotate · Nothing annotated | explore.board.annotate · All hidden | explore.board.annotate · Loading | explore.board.annotate | explore.board.annotate · Could not save | explore.board.annotate · Assistant proposes | explore.board.annotate · Someone else's |
-| The Annotations panel | Admin | explore.board.annotate · Panel empty | explore.board.annotate · Panel hidden | explore.board.annotate · Loading | explore.board.annotate · Panel | — | explore.board.annotate · Evidence | — |
-| The Annotations panel | Operator | explore.board.annotate · Panel empty | explore.board.annotate · Panel hidden | explore.board.annotate · Loading | explore.board.annotate · Panel | — | explore.board.annotate · Evidence | — |
+| Annotations on the board | Admin | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Read-only database |
+| Annotations on the board | Operator | explore.board · Annotate · Nothing annotated | explore.board · Annotate · All hidden | explore.board · Annotate · Loading | explore.board · Annotate | explore.board · Annotate · Could not save | explore.board · Annotate · Assistant proposes | explore.board · Annotate · Someone else's |
+| The Annotations panel | Admin | explore.board · Annotate · Panel empty | explore.board · Annotate · Panel hidden | explore.board · Annotate · Loading | explore.board · Annotate · Panel | — | explore.board · Annotate · Evidence | — |
+| The Annotations panel | Operator | explore.board · Annotate · Panel empty | explore.board · Annotate · Panel hidden | explore.board · Annotate · Loading | explore.board · Annotate · Panel | — | explore.board · Annotate · Evidence | — |
+| An annotation · save | Admin | explore.board · Annotate | — | explore.board · Annotate · Saving | data.annotations | explore.board · Annotate · Could not save | — | — |
+| An annotation · save | Operator | explore.board · Annotate | — | explore.board · Annotate · Saving | data.annotations | explore.board · Annotate · Could not save | — | — |
+| An annotation · someone else's | Admin | — | — | — | explore.board · Annotate · Someone else's | — | — | — |
+| An annotation · someone else's | Operator | — | — | — | explore.board · Annotate · Someone else's | — | — | — |

@@ -4,7 +4,7 @@ title: Merge what one branch learned into another
 feature: PJ-F03
 status: idea
 personas: [decision-maker]
-boards: [projects.options]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-08 · Merge what one branch learned into another
@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Merge any branch into another open, pursuing or parked branch of the same project | On an archived project *Merge* is disabled |
-| Operator | The same; a Modeller the same | As Admin |
+| Operator | The same | As Admin |
 
 ## Flow
 
@@ -59,9 +59,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Merge | Admin | projects.options · Merge · Nothing to carry | — | projects.options · Merging | projects.options · Merge | projects.options · Merge refused | projects.options · Merge · From a proposal | — |
-| Merge | Operator | projects.options · Merge · Nothing to carry | — | projects.options · Merging | projects.options · Merge | projects.options · Merge refused | projects.options · Merge · From a proposal | projects.options · Archived |
-| A merged branch | Admin | — | — | projects.options · A branch · Loading | projects.options · A branch · Merged | projects.options · A branch · Could not load | — | projects.project · Not found |
-| A merged branch | Operator | — | — | projects.options · A branch · Loading | projects.options · A branch · Merged | projects.options · A branch · Could not load | — | projects.project · Not found |
+| Merge | Admin | projects.branches · Merge · Nothing to carry | — | projects.branches · Merging | projects.branches · Merge | projects.branches · Merge refused | projects.branches · Merge · From a proposal | — |
+| Merge | Operator | projects.branches · Merge · Nothing to carry | — | projects.branches · Merging | projects.branches · Merge | projects.branches · Merge refused | projects.branches · Merge · From a proposal | projects.branches · Archived |
+| A merged branch | Admin | — | — | projects.branches · A branch · Loading | projects.branches · A branch · Merged | projects.branches · A branch · Could not load | — | projects.projects · Detail · Not found |
+| A merged branch | Operator | — | — | projects.branches · A branch · Loading | projects.branches · A branch · Merged | projects.branches · A branch · Could not load | — | projects.projects · Detail · Not found |
+| Merge · run | Admin | projects.branches · Merge | — | projects.branches · Merging | projects.branches · A branch · Merged | projects.branches · Merge refused | — | — |
+| Merge · run | Operator | projects.branches · Merge | — | projects.branches · Merging | projects.branches · A branch · Merged | projects.branches · Merge refused | — | — |

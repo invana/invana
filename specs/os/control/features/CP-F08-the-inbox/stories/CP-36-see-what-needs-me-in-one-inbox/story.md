@@ -3,8 +3,9 @@ id: CP-36
 title: See what needs me in one inbox
 feature: CP-F08
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker, builder, admin]
-boards: [inbox]
+boards: [inbox.dropdown, inbox]
 ---
 
 # CP-36 · See what needs me in one inbox
@@ -16,16 +17,17 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read their own Needs you and Updates; mark updates read; open what each is about | — |
-| Operator | Operator · Modeller: read their own Needs you and Updates; mark updates read; open what each is about ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | An item they cannot act on reads, its act disabled with its reason |
+| Admin | Read their own Needs you, Running, Updates and Done; mark updates read; open what each is about; filter *All open alerts* | — |
+| Operator | read their own Needs you, Running, Updates and Done; mark updates read; open what each is about ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | An item they cannot act on reads, its act disabled with its reason; *All open alerts* is not offered |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  c([A count on the Inbox icon]) --> i["Inbox — Needs you · Updates"]
+  c([The header Inbox badge: Needs you, or a dot for Updates]) --> dd(["CP-69 · The Inbox dropdown"])
+  dd -->|Open the Inbox| i["The full Inbox, in the large modal — Needs you · Running · Updates · Done"]
   t([A toast: a new ask or question]) -->|Review| i
   i -->|nothing| e["Nothing needs you"]
   i --> n["Needs you: asks, then runs waiting on my answer, then project work · open ops alerts sent to me"]
@@ -45,8 +47,8 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-36.1 | Asks, runs waiting on the reader's answer, open ops alerts sent to the reader and unread updates | any screen in Studio is open | the Inbox icon carries one count: unread updates + asks waiting on the reader + runs waiting on their answer + open ops alerts sent to them |
-| CP-36.2 | Nothing waits and nothing is unread | the reader opens the Inbox | Needs you reads *Nothing needs you*, as good news |
+| CP-36.1 | Asks, runs waiting on the reader's answer and open ops alerts sent to the reader | any screen in Studio is open | the header Inbox badge reads one count — asks waiting on the reader + runs waiting on their answer + open ops alerts sent to them — the engine's, live, and the browser title reads *(n) Invana* |
+| CP-36.2 | Nothing waits and nothing is unread | the reader opens the Inbox | Needs you reads *Nothing needs you*, as good news, and the badge draws nothing |
 | CP-36.3 | No rule has been written | the reader opens Updates | it reads *Nothing needs you*, with *New rule* — failures reach a person only through a rule |
 | CP-36.4 | Items waiting | Needs you opens | asks are listed first, nearest deadline first, then runs waiting on the reader's answer, then project work — a task in review (PJ-12), *Start this task?* (PJ-15), an agent's proposal (PJ-05), a new lead (PJ-19) |
 | CP-36.5 | A run held on an ask | Needs you is read | it is listed once, as the ask, never also as a run waiting on an answer |
@@ -60,16 +62,23 @@ flowchart LR
 | CP-36.13 | The engine cannot read the Inbox | it opens | it says what it could not read, with *Try again* |
 | CP-36.14 | A row | its product is shown | it is where the thing lives — a load Records', a task's run Projects', a link between models Model's, a typed query Explore's, any other agent run Agents' |
 | CP-36.15 | An event on a project a recipient's default agent may not Read | a rule matches it | they are told in a line and a link; opening it reads *Withheld — your agent may not read `project/{key}`* |
-| CP-36.16 | An Operator or a Modeller | they open the Inbox | they read their own items; acts they may not take are disabled with their reason |
+| CP-36.16 | An Operator | they open the Inbox | they read their own items; acts they may not take are disabled with their reason |
 | CP-36.17 | An open ops alert sent to the reader (CP-59) | Needs you is read | it is listed until it closes; when it closes it reads closed, naming what closed it, and moves to Updates |
 | CP-36.18 | A run the reader is behind | someone else stops it (CP-58) | the reader gets an update naming who stopped it, which opens the run |
+| CP-36.19 | Nothing waits on the reader and an update is unread | the header is read | the Inbox badge is a dot, with no number |
+| CP-36.20 | The Inbox dropdown | the reader picks *Open the Inbox* | the full Inbox opens in the large modal on Needs you, its nav Needs you · Running · Updates · Done |
+| CP-36.21 | A person with Read on `run/*` in the full Inbox | they filter *All open alerts* | every open ops alert in the deployment lists, whoever it was sent to; anyone without it is not offered the filter |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The Inbox icon and its count | Admin | inbox · Nothing needs you | — | inbox · Loading | inbox | — | — | — |
-| The Inbox icon and its count | Operator | inbox · Nothing needs you | — | inbox · Loading | inbox | — | — | inbox |
+| The header Inbox badge | Admin | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | — | — | — |
+| The header Inbox badge, Updates only | Admin | — | — | — | inbox.dropdown · Updates dot | — | — | — |
+| The header Inbox badge | Operator | inbox.dropdown · Nothing needs you | — | inbox.dropdown · Loading | inbox.dropdown | — | — | inbox.dropdown |
+| The header Inbox badge, Updates only | Operator | — | — | — | inbox.dropdown · Updates dot | — | — | — |
+| Inbox › All open alerts | Admin | — | inbox · All open alerts · Nothing matches | inbox · Loading | inbox · All open alerts | inbox · Could not load | — | — |
+| Inbox › All open alerts | Operator | — | — | — | — | — | — | — |
 | Inbox › Needs you | Admin | inbox · Nothing needs you | inbox · Nothing matches | inbox · Loading | inbox | inbox · Could not load | inbox · A question from an agent | — |
 | Inbox › Needs you | Operator | inbox · Nothing needs you | inbox · Nothing matches | inbox · Loading | inbox | inbox · Could not load | inbox · A question from an agent | inbox · Not yours to answer |
 | An ops alert in Needs you | Admin | — | — | — | inbox · Ops alert | — | — | — |

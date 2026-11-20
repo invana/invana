@@ -6,7 +6,7 @@ status: idea
 personas: [modeller]
 stories: [SE-04, SE-06, SE-15]
 journeys: [J01]
-boards: [settings.databases.connect, settings.databases.connect.shape, model.new, model.board.draft, model.health]
+boards: [settings.databases, model.models, model.health]
 nfrs: []
 depends_on: []
 ---
@@ -15,8 +15,8 @@ depends_on: []
 
 > A model is never started from a blank page: Invana drafts it from what a graph database already holds, from a
 > description the assistant turns into kinds, from a file, a starter or an ontology a field already published. The
-> person decides what to keep, and nothing is published until they publish it. Every published model joins the one
-> stitched model of the deployment.
+> person decides what to keep, and nothing is published until they publish it. Every published model joins the whole
+> model of the deployment.
 > The decision it helps make: *which drafted kinds and links belong in the model, and is it ready to publish?*
 
 ## User journey
@@ -25,8 +25,8 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  start([A deployment with no model, or a new model wanted]) --> may{Modeller or Admin?}
-  may -->|no| na["New model disabled — Needs the Modeller role · the map still reads"]
+  start([A deployment with no model, or a new model wanted]) --> may{"Holds Create on model/<model>?"}
+  may -->|no| na["New model disabled — Needs Create on Models · the map still reads"]
   may -->|yes| from{Start from}
   from -->|what a graph database holds| r["SE-04 · Read a graph database"]
   r -->|empty| e["Nothing there yet — start from a description, a file or a starter"] --> from
@@ -72,16 +72,16 @@ sequenceDiagram
 
 ## Access
 
-The role each act needs is the role table's *Ontology* row
-([AC-F02 › The role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); this
+The permission each act needs is the *Model* row of
+([AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this
 table names the acts.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| See the models, the drafts and what each graph database holds | Operator · Modeller · Admin | — |
-| Read a graph database · start a model from it | Modeller · Admin, through the Modeller agent | *Read the database* disabled — *Needs the Modeller role — ask an Admin* |
-| New model — describe it, a file, a starter, an ontology | Modeller · Admin, through the Modeller agent | *New model* disabled — *Needs the Modeller role — ask an Admin* |
-| Connect a graph database | Admin, in Graph databases ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)) | — |
+| See the models, the drafts and what each graph database holds | Read on `model/<model>` | — |
+| Read a graph database · start a model from it | Create on `model/<model>`, through the Modeller agent | *Read the database* disabled — *Needs Create on Models — ask {who can grant}* |
+| New model — describe it, a file, a starter, an ontology | Create on `model/<model>`, through the Modeller agent | *New model* disabled — *Needs Create on Models — ask {who can grant}* |
+| Connect a graph database | Create on `setting/graph-databases`, in Graph databases ([CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md)) | — |
 
 ## States
 
@@ -93,7 +93,7 @@ table names the acts.
 | Has data | The new draft open on its canvas, its kinds staged, the draft bar counting them |
 | Failed | The graph database unreachable or switched off, an unreadable file or ontology, a name taken — said in a sentence where it happened, with the next act; nothing half-made |
 | Agent working or proposing | The assistant drafting kinds from a description, docked beside the draft, each kind arriving staged |
-| No access | Every start disabled with *Needs the Modeller role — ask an Admin*; the map and drafts still read |
+| No access | Every start disabled with *Needs Create on Models — ask {who can grant}*; the map and drafts still read |
 
 ## Rules
 
@@ -102,8 +102,8 @@ table names the acts.
 | A start is always a draft | Every way in lands on the new model's draft canvas; nothing publishes until a person does (SE-F02) |
 | What a graph database holds is not the model | It is named as such, per graph database, shown with the time it was read, and compared against the model; it never grounds an answer |
 | A model lives in one graph database | Every model is bound to the graph database its records are in — picked when it is made, fixed once saved; a model drafted from a graph database is bound to it |
-| One stitched model | The deployment's published models, their links and identity match rules are one model — what every question is grounded in, across every graph database (SE-F06) |
-| A model is named for its domain | `Customers`, `Orders`, `Suppliers` — unique in the deployment and portable to another deployment as a file; models meet only through declared links and identity match rules (SE-F06) |
+| One whole model | The deployment's published models and their links are one whole model — what every question is grounded in; each model stays in its graph database, and links join models in the same one (SE-F06) |
+| A model is named for its domain | `Customers`, `Orders`, `Suppliers` — unique in the deployment and portable to another deployment as a file; models meet only through declared links, inside one graph database (SE-F06) |
 | The graph database decides what a property can be | A property type the model's graph database cannot hold is refused when it is authored, naming the type and the server version; an import with one lands as a draft that cannot publish, naming it |
 | Starters are ordinary models | Memory and Provenance ship as model files, renamed on arrival; nothing in Invana depends on their kind names |
 | An ontology maps into Invana's model | RDFS, an OWL subset and schema.org, from JSON-LD, Turtle or RDF/XML. Subclasses are flattened; what Invana cannot hold is skipped and listed; equivalences come back as links to confirm, never made |
@@ -165,7 +165,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A write by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-04.11 · SE-06.13 · SE-15.14 · SE-07.19 |
+| 403 | A write by someone without Create on models | *Needs Create on model/{model} — ask {who can grant}.* | SE-04.11 · SE-06.13 · SE-15.14 · SE-07.19 |
 | 409 | A name already used by a model in the deployment — create, import or ontology import; nothing is written | *A model named {name} already exists — pick another name or bring it in as a new version.* (`model_name_taken`) | SE-06.8 · SE-15.11 |
 | 409 | Reading a graph database that is unreachable or switched off — before the run starts | *{database} is {unreachable, or off — switched off by whom}.* | SE-04.4 |
 | 422 | Ontology text that cannot be read, a remote context, more than 20 MB, or a kind named in `types` the ontology lacks | *{format} could not be read: {why} — {line or name}.* | SE-15.9 |
@@ -216,6 +216,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | The picker is the all-kinds preview | Up to 500 classes are listed with their property counts; above 500 the picker takes names |
 | A first version changed everything | The first published version is compared against nothing, so every kind reads as added |
 | Broader kind, meaning only | A subclass in an ontology becomes a kind whose *Broader kind* is its parent — meaning only (SE-F04); each kind carries its ancestors' properties as its own, so storage and queries stay flattened |
+| The draft explains itself | The assistant's first message names what was read and the sample, then each choice with its evidence — counts are the engine's, never the model's own |
 
 ## Open questions
 

@@ -41,14 +41,14 @@ tagline does not need it.
 
 | Claim | Means |
 |---|---|
-| **Ontology-governed** | The Graph's ontology is the one contract people and agents share: every question, load, plan and change is checked against it ([The ontology](#the-ontology)) |
+| **Ontology-governed** | The deployment's ontology is the one contract people and agents share: every question, load, plan and change is checked against it ([The ontology](#the-ontology)) |
 | **A decision intelligence platform** | Every pillar, capability, feature and story serves a person making a decision: the data is given meaning, agents work it into insight, and the evidence is shown so the person decides with a trail anyone can follow ([Pillars and capabilities](#pillars-and-capabilities)) |
-| **For humans and AI agents** | People act through agents: a person is granted the agents they may use, and every read, write and run is an agent's — held to the same ontology and Access Policies, run by the same operating system, in the same History ([The operating system](#the-operating-system)) |
+| **For humans and AI agents** | People and agents are held to one ontology and one access model — Access Policies on people, teams and projects, a ceiling on every agent — run by the same operating system, in the same History ([The operating system](#the-operating-system)) |
 | **An agent orchestrator over a curated graph** | Invana decides which agent takes a piece of work, what it may run, what it is offered, in what order, and who checks the result |
-| **One deployment** | One deployment is everything: its graph databases, stitched into one Graph, its people, teams, agents and work. There are no workspaces, no tenants and no unit inside a deployment that holds a graph of its own ([Scope](#scope)) |
-| **Stitched, never copied** | The Graph is the model and data across every graph database the deployment connects. A question runs one step per graph database, in its own query language, and the results are joined on identity links a Modeller declares; no customer data is copied into Invana ([Where things live](#where-things-live)) |
-| **Grounded** | Every question resolves against the published model, and every answer cites the records that produced it. When the Graph cannot answer, it says so rather than invent |
-| **Third-party, badged** | Anything from beyond the Graph — the internet, an outside service, or the model's own knowledge — comes only where an agent's Access Policies allow it, badged **third-party** with the reference it came from |
+| **One deployment** | One deployment is everything: the many graph databases it attaches, read as Graph Data — each person, team, project and agent reaching only those its access allows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)) — its people, teams, agents and work. There are no workspaces, no tenants and no unit inside a deployment that holds a graph of its own ([Scope](#scope)) |
+| **Read in place, never copied** | Graph Data is everything the deployment's graph databases hold, read in place. A question runs one step per graph database it reads, in its own query language; results from different graph databases are shown side by side and never joined — links between models stay inside one graph database ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)). No customer data is copied into Invana ([Where things live](#where-things-live)) |
+| **Grounded** | Every question resolves against the published model, and every answer cites the records that produced it. When Graph Data does not hold it, Invana says so rather than invent |
+| **Third-party, badged** | Anything from outside Graph Data — the internet, an outside service, or the model's own knowledge — comes only where an agent's Access Policies allow it, badged **third-party** with the reference it came from |
 | **Governed** | An agent runs only inside its Access Policies, a plan is checked before it runs, skills are offered rather than forced, and no agent accepts its own work |
 | **Accountable** | Every call to an AI model, a tool or a graph database is recorded — what was sent, to whom, for which run and person. What may hold a person's data never goes to an external model unseen |
 
@@ -57,8 +57,8 @@ tagline does not need it.
 | Store | Holds | Never holds |
 |---|---|---|
 | **Graph databases** | The customer's records — Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune, TinkerGraph — each reached through its connector, read-only or read + write | Invana's own state |
-| **The Graph** | Nothing of its own: the stitched model and data read in place across the graph databases | A copy of a record |
-| **The system graph** | Invana's own graph, governed by the system ontology: Memory with its lineage, the ledger's edges and identity links | Customer data; it is never part of the Graph |
+| **Graph Data** | Nothing of its own: everything the graph databases hold, read in place — never created, opened, selected or listed | A copy of a record |
+| **The system graph** | Invana's own graph, governed by the system ontology: Memory with its lineage and the ledger's edges | Customer data; it is never part of Graph Data |
 | **Postgres** | The source of truth for everything Invana records — users, agents, policies, runs, History; the system graph follows it and is rebuilt from it | — |
 | **The blob store** | Files — uploads, load batches, reports — over the S3 API, each encrypted with its own key | — |
 
@@ -66,15 +66,15 @@ How each store is run, secured and kept in step is [system-design.md](system-des
 
 ## The ontology
 
-The Graph's ontology is what its data means and what may hold in it. It is not one record: it is these parts together.
+The deployment's ontology is what its Graph Data means and what may hold in it. It is not one record: it is these parts together.
 
 | Part | Is | Studio shows |
 |---|---|---|
-| **Models** | The kinds of node and relationship, and their properties — one stitched model across every graph database | Model · Kind |
+| **Models** | The kinds of node and relationship, and their properties — each model bound to one graph database | Model · Kind |
 | **Meaning** | What each kind and property means — definitions, synonyms, units, the outside terms it is the same as, and which properties are sensitive | Meaning, a tab on a kind |
 | **Taxonomies** | Broader kinds, for meaning only, and hierarchies of a property's values | Broader kind |
 | **Standards** | Shared, versioned terms and allowed values a kind or property is held to | Standard |
-| **Links and mappings** | Declared meetings of two models, a model and a standard, or two standards — and the identity match rules that say when records in two graph databases are the same entity | Link between models |
+| **Links and mappings** | Declared meetings of two models in the same graph database, a model and a standard, or two standards | Link between models |
 | **Rules** | Constraints that refuse data, derivations that add facts, and alerts — on the deployment or a project | Rule · Constraint · Derivation |
 | **Derived facts** | Facts the derivations add by inference, written to a read + write graph database, labelled derived with their rule and version | Derived |
 
@@ -87,12 +87,12 @@ The Graph's ontology is what its data means and what may hold in it. It is not o
 | **A person and an agent alike** | A person acts through agents, so both are held to the same model, rules and Access Policies |
 
 Invana's own records follow a second ontology: the **system ontology**, shipped with Invana, versioned and read-only.
-It governs the system graph and is never part of the Graph's.
+It governs the system graph and is never part of the deployment's ontology.
 
 | Decision | Detail |
 |---|---|
 | *Ontology*, *semantics* and *taxonomy* are vision and docs words | Studio never shows them; it shows the parts by their glossary words — *Meaning*, *Broader kind*, *Derivation*, *Rule*, *Standard* |
-| *From an ontology* stays on screen | There the word names an outside RDFS, OWL or schema.org file a model starts from — not the Graph's own ontology |
+| *From an ontology* stays on screen | There the word names an outside RDFS, OWL or schema.org file a model starts from — not the deployment's own ontology |
 
 ## The operating system
 
@@ -103,15 +103,15 @@ three planes.
 | Plane | Answers | Holds | Spec |
 |---|---|---|---|
 | **Control Plane** | What runs, where, and within which limits? | The overview of workloads by user, agent and team · every run, and stopping one · ops alerting · the Inbox and its channels · graph databases — connecting one, its mode, switching it on or off, its health · finding the way — ⌘K and search · workers and the queue · limits per team, user and agent · AI models, local or external · plugins, the deployment's MCP server and outside tools · skill scripts | `os/control/` — `CP` |
-| **Access Plane** | Who may act, through which agent, and what did they do? | Sign-in, sessions, keys and connected MCP clients · Access Policies — Allow · Ask · Deny on Read · Write · Run — and the one role table · the Directory — users, teams, the agents each may use · ownership · asks and approvals · access usage · what left the platform · History | [os/access/product.md](os/access/product.md) — `AC` |
-| **Graph Plane** | What does Invana read, and what does it remember? | **Data** — the customer's Graph, read in place through a connector per graph database, in its own language, joined on identity links · **Memory** — Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their relations, each with its lineage | [os/graph/product.md](os/graph/product.md) — `GP` |
+| **Access Plane** | Who may act, through which agent, and what did they do? | Sign-in, sessions, keys and connected MCP clients · Access Policies from one permission catalogue, on people, teams, projects and agents · the Directory — users and teams · ownership · asks and approvals · access usage · what left the platform · History | [os/access/product.md](os/access/product.md) — `AC` |
+| **Graph Plane** | What does Invana read, and what does it remember? | **Data** — the customer's Graph Data, read in place through a connector per graph database, in its own language · **Memory** — Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their relations, each with its lineage | [os/graph/product.md](os/graph/product.md) — `GP` |
 
 | An OS has | Invana has | Plane |
 |---|---|---|
-| **Users** | Users — human, agent, service and the system user — and the teams people are on; a person holds the agents they may use and one role | Access |
+| **Users** | Users — human, agent and the system user — and the teams people are on; each person, team and project holds Access Policies; a key belongs to a person or a project | Access |
 | **A type system** | The ontology — every record has a kind, every kind its rules; owned by the Ontology pillar, enforced here | — |
-| **Permissions** | Access Policies on agents, whose every rule is Allow · Ask · Deny on Read · Write · Run of a named resource; default deny, the strictest wins | Access |
-| **Mounts** | Graph databases, each connected read-only or read + write and switched on or off, stitched into the one Graph | Control |
+| **Permissions** | Access Policies — Allow · Ask · Deny × an action × a resource, from the permission catalogue — on people, teams, projects and, as a ceiling, agents; default deny, Deny wins | Access |
+| **Mounts** | Graph databases, each connected read-only or read + write and switched on or off, read as Graph Data | Control |
 | **Drivers** | Connectors — one package per graph database type | Graph |
 | **Processes** | Runs — every execution of a plan or a workflow, by an agent for a person, in one journal, executed on workers | Control |
 | **A scheduler** | Workers and the queue; Agents sets the schedules that feed it | Control |
@@ -139,11 +139,11 @@ three planes.
 | **Plain words in, work out** | A question in plain English becomes a typed query plan, a workflow reused or a plan drafted, and an answer — or choices to pick from |
 | **Simple by default** | The person sees the decision and its result, not the machinery |
 | **Traceable on demand** | Every answer, proposal and act shows how it got there — steps, sources, assumptions, who did what — one click away, never on the first screen |
-| **Acts only as far as the person allows** | Every act runs through an agent, and each Read, Write and Run is Allow, Ask or Deny by the Access Policies on that agent; what no rule reaches is denied, and the strictest rule wins. An Ask waits for the agent's named approvers, showing exactly what will happen, and is never decided by the one it benefits ([Access Plane](os/access/product.md#decisions)) |
+| **Acts only as far as a policy allows** | Inside a project a run reaches the project's policies ∩ its agent's ceiling; outside one, the person behind it ∩ the ceiling ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)); what no rule allows is denied, and Deny wins. An Ask waits for the agent's named approvers, showing exactly what will happen, and is never decided by the one it benefits ([Access Plane](os/access/product.md#decisions)) |
 | **Nothing leaves unseen** | Every call to a model, tool or graph database is in the ledger; a sensitive property never goes to an external model |
 | **Learns from outcomes** | Every plan, run, finding and decision is kept in Memory; what served is recalled first, and what failed is kept as what to avoid |
 | **General-purpose** | Nothing in the platform is domain-specific. A team's ontology, its agents and skills and its project types ship together as a Team pack |
-| **Split by role** | An Operator asks and decides; a Modeller shapes the model; an Admin runs the deployment — each sees the acts their role holds ([personas](personas.md)) |
+| **Everyone sees, the policy decides** | Every place and act shows to everyone; an act a person lacks is disabled with its reason and who can grant it, data a policy hides does not exist for them, and the engine refuses ([personas](personas.md)) |
 
 How these look on screen is [design-language.md](design-language.md); the words a person reads are
 [glossary.md](glossary.md).
@@ -163,9 +163,9 @@ all of them run on [the operating system](#the-operating-system). How each looks
 
 | Code | Capability | Pillar | Tier | Lets a person |
 |---|---|---|---|---|
-| `SE` | [Semantics](capabilities/semantics/product.md) | Ontology | mode · sheet | Say what the data means across every graph database — models, meaning and sensitive properties, taxonomies, standards, links and identity match rules, rules, inference — drafted, reviewed and published |
-| `RC` | [Records](capabilities/records/product.md) | Intelligence | modal · sheet | Know the records in the graph databases and how each got there — loads, quality against the model, fixes, merges, provenance, annotations |
-| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal · sheet | Build agents and skills, test them, turn plans into workflows, schedule them, and recall what they learned from Memory |
+| `SE` | [Semantics](capabilities/semantics/product.md) | Ontology | mode · modal | Say what the data means in every graph database — models, meaning and sensitive properties, taxonomies, standards, links between models, rules, inference — drafted, reviewed and published |
+| `RC` | [Records](capabilities/records/product.md) | Intelligence | mode · modal | Know the records in the graph databases and how each got there — loads, quality against the model, fixes, merges, provenance, annotations |
+| `AG` | [Agents](capabilities/agents/product.md) | Agents | modal | Build agents and skills, test them, turn plans into workflows, schedule them, and recall what they learned from Memory |
 | `EX` | [Explore](capabilities/explore/product.md) | Evidence | mode | Ask and look — boards, conversations, answers traced to their records, what-if reasoning labelled predicted |
 | `PJ` | [Projects](capabilities/projects/product.md) | Evidence | mode | Pursue a question — tasks, branches, findings for and against, decisions, reports, alerts |
 
@@ -184,15 +184,15 @@ The deployment defines, limits and uses; a project narrows.
 
 | Scope | Holds |
 |---|---|
-| **Deployment** | Graph databases and their connections · the Graph — one stitched model and its data · the system graph · standards, Team packs and rules that must always hold · users, teams and the agents each may use · agents, skills, workflows and Access Policies · workers, AI models, plugins and limits · runs and History |
+| **Deployment** | Graph databases and their connections · Graph Data — everything the graph databases hold · the system graph · standards, Team packs and rules that must always hold · users, teams and the agents each may use · agents, skills, workflows and Access Policies · workers, AI models, plugins and limits · runs and History |
 | **Project** | Branches, tasks, findings, decisions, project rules |
 
 | Rule | Detail |
 |---|---|
 | One deployment, one organisation | No multi-tenancy, no workspaces and no Organisation record; the deployment is the widest scope |
 | Hosted means single-tenant | A hosted Invana is one deployment per customer, never shared tenancy |
-| One Graph per deployment | Every graph database the deployment connects is part of its one Graph; the system graph never is |
-| A person uses agents | A person is granted the agents they may use; an agent's Access Policies say what it may Read, Write and Run, the same for everyone who may use it |
+| One deployment, many graph databases, read as Graph Data | Every graph database the deployment connects is part of its Graph Data; the system graph never is. Graph Data is never created, opened, selected or listed; each person, team, project and agent reaches only the graph databases its access allows ([AC-F02 › Rules](os/access/features/AC-F02-access-policies/feature.md#rules)) |
+| A project owns its access | A person's Access Policies bound their own work; a project's access bounds every run inside it, whoever asked; an agent's policies are only its ceiling |
 
 ## What it is used for
 
@@ -200,10 +200,10 @@ The same records host different kinds of work; none is a special case.
 
 | Use case | How it composes |
 |---|---|
-| **Curated context for AI** | The stitched model and its records, which an outside agent queries through the deployment's MCP server as the person who connected it, with provenance on every value |
+| **Curated context for AI** | The whole model and its records, which an outside agent queries through the deployment's MCP server as the person who connected it, with provenance on every value |
 | **Deep search and research** | A model of sources and claims, the rows an extractor loads into it, and skills that recall prior records |
 | **Analytics** | A metrics-and-dimensions model and projections: a closed question in, a table or chart out |
-| **Knowledge management** | Several graph databases, stitched on identity links, answered as one |
+| **Knowledge management** | Several graph databases under one whole model, each answered in place |
 | **Compliance and audit** | The append-only History, the ledger of what left the platform, criteria checked per task, and provenance from every value back to its load |
 | **Domain intelligence** | A model of the entities that matter, and agents staffed on a project working tasks against criteria |
 | **Domain memory** | Memory: every plan, run and decision kept, recalled by its outcome |
@@ -215,8 +215,9 @@ The same records host different kinds of work; none is a special case.
 |---|---|
 | An extractor — source connectors, cursors, a mapping grammar | Invana is a destination: whatever already pulls the data hands it over as a load into a model |
 | Write-back to a source | The graph databases are the destination; Invana writes to one only through a read + write connection, never to a system upstream of it |
-| A copy of the customer's records | The Graph is read in place; a load is a batch written to a graph database, never a second store of records |
-| Fuzzy entity resolution · node merge on an anchor | Identity links come from match rules a Modeller declares, never guessed silently; an anchor links, it never merges. Two records merge only when a person picks them ([Records](capabilities/records/product.md)) |
+| A copy of the customer's records | Graph Data is read in place; a load is a batch written to a graph database, never a second store of records |
+| A join across graph databases | Later: links between models stay inside one graph database, and an answer shows each graph database's results side by side ([SE-F06](capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| Fuzzy entity resolution · node merge on an anchor | Links between models come from keys a Modeller declares, never guessed silently; an anchor links, it never merges. Two records merge only when a person picks them ([Records](capabilities/records/product.md)) |
 | Multi-tenancy · workspaces · an Organisation record | One deployment is one organisation |
 | Proprietary data · pricing · a marketplace | Records, standards and Team packs are reusable knowledge first |
 | Soft deletes · a trash tier · undo | Deletes are hard and cascade downward; retiring and undoing a load exist where history must stay resolvable |

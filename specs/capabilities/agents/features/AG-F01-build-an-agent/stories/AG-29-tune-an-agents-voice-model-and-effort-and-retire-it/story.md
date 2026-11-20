@@ -4,7 +4,7 @@ title: Tune an agent's voice, model and effort, and retire it
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.agent, settings.ai]
+boards: [agents.agents, settings.ai]
 ---
 
 # AG-29 · Tune an agent's voice, model and effort, and retire it
@@ -17,13 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 ## Who can
 
-Tuning and retiring an agent is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Tuning and retiring an agent needs Edit on `agent/<name>`; publishing a version, Publish ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Control Plane › AI models | A built-in agent's settings read; *Copy* in place of every edit |
-| Modeller | Every act an Admin has here, except offering model versions | Offering model versions reads *Ask an Admin* |
-| Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle | Every edit and lifecycle act disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| Admin | On any agent not built in: set the voice and its dials, preview it, pin and move a model version, set effort, Pause, Resume, Retire; offer model versions and set the deployment's default model in Settings › Connections › AI models | A built-in agent's settings read; *Copy* in place of every edit |
+| Operator | Read the voice, model version, effort, the versions it has run on and its lifecycle. With Edit on the agent, every act an Admin has here, except offering model versions (Edit on `setting/ai-models`), which reads *Ask an Admin* | Every edit and lifecycle act disabled, naming the permission — *Needs Edit on the {agent} agent — ask {who can grant}* |
 
 ## Flow
 
@@ -55,36 +54,37 @@ flowchart TD
 | AG-29.5 | Any voice | the agent refuses, cannot answer, fails or pauses at a limit | it says so without humour, whatever the dial reads |
 | AG-29.6 | A long voice | it is typed | Voice shows its length in characters, which every ask carries |
 | AG-29.7 | A run in flight when the voice changes | it ends | it spoke with the voice it opened with; the next run speaks with the new one; a helper it creates speaks with its voice |
-| AG-29.8 | Model version | it opens | it lists only the versions Control Plane › AI models offers, each by the provider's exact name and marked *Local* or *External*; a provider alias cannot be pinned |
+| AG-29.8 | Model version | it opens | it lists only the versions Settings › Connections › AI models offers, each by the provider's exact name and marked *Local* or *External*; a provider alias cannot be pinned |
 | AG-29.9 | A pinned version moved to another | the builder saves | the agent's evals run on the new version first (AG-F10); a failing hard check refuses the move naming it; otherwise the move becomes the next version with its reason |
-| AG-29.10 | A pinned version the deployment does not offer | a run opens | the run is refused, naming the pin; nothing calls another model; Control Plane › AI models warns, naming the agents that pin it |
+| AG-29.10 | A pinned version the deployment does not offer | a run opens | the run is refused, naming the pin; nothing calls another model; Settings › Connections › AI models warns, naming the agents that pin it |
 | AG-29.11 | An agent with no pin | it runs | the deployment's default model decides, and the run records the version it called |
 | AG-29.12 | A pinned agent | Model version opens | *Versions it has run on* lists each recorded version with its first run, runs, served rate and p95 — the engine's numbers; a set pin can be moved, never cleared |
 | AG-29.13 | Effort | it opens | the most steps, replans and questions a run may take, each with the number a run reads; *0 questions* means it never asks, and every reading it picks is a declared assumption shown before the answer |
-| AG-29.14 | A live agent | a Modeller or an Admin presses *Pause* | a dialog lists each piece of open work and what happens to it — a run in flight finishes; an open task is blocked, naming the agent; a task in review is unchanged; a conversation with the agent refuses its next ask, naming the state; a schedule that starts it stays on and its firings are refused until it resumes — before *Pause* applies |
-| AG-29.15 | A paused agent | a Modeller or an Admin presses *Resume* | it takes work again from now, in one click; nothing is replayed and its blocked tasks unblock |
-| AG-29.16 | A live agent | a Modeller or an Admin presses *Retire* | the same list names a task in review as blocked and each schedule that starts it as paused; *Why* is asked and kept in Versions; once retired it never takes work, its row stays so every run, trace and helper resolves, and its name stays taken |
-| AG-29.17 | The deployment's default agent | a Modeller or an Admin retires it | it is refused until an Admin makes another agent the default |
+| AG-29.14 | A live agent | a person with Edit on the agent presses *Pause* | a dialog lists each piece of open work and what happens to it — a run in flight finishes; an open task is blocked, naming the agent; a task in review is unchanged; a conversation with the agent refuses its next ask, naming the state; a schedule that starts it stays on and its firings are refused until it resumes — before *Pause* applies |
+| AG-29.15 | A paused agent | a person with Edit on the agent presses *Resume* | it takes work again from now, in one click; nothing is replayed and its blocked tasks unblock |
+| AG-29.16 | A live agent | a person with Edit on the agent presses *Retire* | the same list names a task in review as blocked and each schedule that starts it as paused; *Why* is asked and kept in Versions; once retired it never takes work, its row stays so every run, trace and helper resolves, and its name stays taken |
+| AG-29.17 | The deployment's default agent | a person with Edit on the agent retires it | it is refused until an Admin makes another agent the default |
 | AG-29.18 | A helper an agent created | the work it was made for closes | it retires itself |
-| AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its sheet is disabled |
+| AG-29.19 | A retired agent | it appears in a run's trace | it reads normally, marked *retired*; every act on its page is disabled |
 | AG-29.20 | An ask to a paused or retired agent | it is sent | it is refused, naming the state, and *How it got here* shows the refused step and why |
-| AG-29.21 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume* and *Retire* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| AG-29.21 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every edit, *Preview*, *Pause*, *Resume* and *Retire* are disabled, naming the permission — *Needs Edit on the {agent} agent — ask {who can grant}* |
 | AG-29.22 | A paused agent with a run already queued | the run's turn comes | it starts and finishes; only work that arrives after the pause is refused |
 | AG-29.23 | A step that calls a model | the run opens | the version is the person's pick for that one question, else the skill version's pin, else the agent's pin, else the deployment's default; one that is not offered refuses the run, naming it — nothing falls back |
-| AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's evals run first, as AG-29.9; someone without the Modeller role is refused, naming it |
-| AG-29.25 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every act is disabled — *Needs the Modeller role — ask an Admin* |
+| AG-29.24 | The command line | `invana agents pin` moves an agent's model version | the agent's evals run first, as AG-29.9; someone without Edit on agent/{agent} is refused, naming it |
+| AG-29.25 | An Operator | they open Voice, Model version or Lifecycle | each reads as saved; every act is disabled — *Needs Edit on the {agent} agent — ask {who can grant}* |
+| AG-29.26 | Effort | it opens | a *Confidence bar* sits beside steps, replans and questions — a whole number from 1 to 100, empty by default; the run reports a confidence for each step, and a step ending below the bar holds the run in Needs you ([CP-76.2](../../../../../../os/control/features/CP-F08-the-inbox/stories/CP-76-see-why-an-agent-is-waiting-for-me/story.md)); with no bar set the agent never holds for confidence |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Voice | Admin | agents.agent · Default voice | — | agents.agent · Loading | agents.agent · Voice | agents.agent · Could not save | agents.agent · Previewing | — |
-| Voice | Operator | agents.agent · Default voice | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
-| Model version and effort | Admin | agents.agent · No pin | — | agents.agent · Loading | agents.agent | agents.agent · Version not offered | agents.agent · Evals running | — |
-| Model version and effort | Operator | agents.agent · No pin | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Version not offered | — | agents.agent · Read only |
+| Voice | Admin | agents.agents · Detail · Default voice | — | agents.agents · Detail · Loading | agents.agents · Detail · Voice | agents.agents · Detail · Could not save | agents.agents · Detail · Previewing | — |
+| Voice | Operator | agents.agents · Detail · Default voice | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
+| Model version and effort | Admin | agents.agents · Detail · No pin | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Version not offered | agents.agents · Detail · Evals running | — |
+| Model version and effort | Operator | agents.agents · Detail · No pin | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Version not offered | — | agents.agents · Detail · Read only |
 | Pinned by | Admin | settings.ai · No pins | — | settings.ai · Loading | settings.ai | settings.ai · Pin not offered | — | — |
 | Pinned by | Operator | settings.ai · No pins | — | settings.ai · Loading | settings.ai | settings.ai · Pin not offered | — | settings.ai · Read only |
-| Pause and Retire | Admin | — | — | agents.agent · Reading open work | agents.agent · Retire | agents.agent · Default cannot retire | — | — |
-| Pause and Retire | Operator | — | — | — | — | — | — | agents.agent · Read only |
-| A retired agent | Admin | — | — | — | agents.agent · Retired | — | — | — |
-| A retired agent | Operator | — | — | — | agents.agent · Retired | — | — | agents.agent · Retired |
+| Pause and Retire | Admin | — | — | agents.agents · Detail · Reading open work | agents.agents · Detail · Retire | agents.agents · Detail · Default cannot retire | — | — |
+| Pause and Retire | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |
+| A retired agent | Admin | — | — | — | agents.agents · Detail · Retired | — | — | — |
+| A retired agent | Operator | — | — | — | agents.agents · Detail · Retired | — | — | agents.agents · Detail · Retired |

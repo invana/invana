@@ -98,7 +98,7 @@ retired story keeps its ID in the feature's *Not building* table with the reason
 | 2 | `## Who can` | An **Admin** row and an **Operator** row: what each can do, what the Operator sees otherwise, and any grant that lets them do more |
 | 3 | `## Flow` | A mermaid flowchart of this story's steps and every branch |
 | 4 | `## Acceptance criteria` | Given / When / Then, one ID per row (`RC-08.2`). A refusal row for the Operator; a trace row for every agent outcome (*Then How it got here shows its steps and sources*) |
-| 5 | `## Screens` | Every surface the story shows × the seven states × Admin and Operator. Every cell names its board (`area.feature.surface`, or `… · State` on a board with a State switch) or `—` where the state cannot happen. You name the boards; the designer draws exactly those and never edits the spec |
+| 5 | `## Screens` | Every surface the story shows × the seven states × Admin and Operator. Every cell reads `<board> · <view or overlay> · <state>` — `model.kinds · Detail · Edit`; a cell with no view is the List — or `—` where the state cannot happen (`specs/design-language.md` §7). You name the boards; the designer draws exactly those and never edits the spec |
 
 Write in tables and bullets, so a person and an agent read it the same way. Use only glossary words on screen.
 Operator is the role code still calls `viewer` (migration M1) — write *Operator*, never touch code.

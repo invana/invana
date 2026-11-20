@@ -3,7 +3,7 @@ id: J04
 title: Build an agent and improve it from what runs teach
 personas: [builder]
 stories: [AG-19, AG-20, AG-26, AG-21, AG-36, AG-31, AG-44, AG-42, CP-36, AC-15, CP-49, AG-49, AG-51, AG-52, CP-56]
-boards: [agents.skill, agents.skills, agents.new, agents.agent, agents.schedules, agents.runs, agents.run, inbox]
+boards: [agents.skills, agents.agents, agents.schedules, agents.runs, inbox]
 ---
 
 # Build an agent and improve it from what runs teach
@@ -48,27 +48,27 @@ flowchart TD
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Write a skill and read the plan it becomes | Agents · Skills | AG-19 | `agents.skill` |
+| 1 | Write a skill and read the plan it becomes | Agents · Skills | AG-19 | `agents.skills · Detail` |
 | 2 | Test it in the practice graph database and keep its eval cases | Agents · Skills · Test an agent and a skill | AG-20 | `agents.skills` |
-| 3 | Let the assistant draft the agent; see what it will do | Agents · Build an agent | AG-26 · AG-21 | `agents.new` |
-| 4 | Test the agent and publish a version | Agents · Build an agent · Test an agent and a skill | AG-36 | `agents.agent` |
-| 5 | Approve a plan that served as a workflow | Agents · Plans and workflows | AG-31 | `agents.run` |
-| 6 | Run the workflow on demand with today's arguments | Agents · Plans and workflows | AG-44 | `agents.run` |
+| 3 | Let the assistant draft the agent; see what it will do | Agents · Build an agent | AG-26 · AG-21 | `agents.agents · New` |
+| 4 | Test the agent and publish a version | Agents · Build an agent · Test an agent and a skill | AG-36 | `agents.agents · Detail` |
+| 5 | Approve a plan that served as a workflow | Agents · Plans and workflows | AG-31 | `agents.runs · Detail` |
+| 6 | Run the workflow on demand with today's arguments | Agents · Plans and workflows | AG-44 | `agents.runs · Detail` |
 | 7 | Put the work on a schedule | Agents · Schedules | AG-42 | `agents.schedules` |
 | 8 | A named approver decides what it asks before sending | Access Plane · Asks and approvals · Control Plane · Inbox | AC-15 · CP-36 | `inbox` |
 | 9 | Read how it is doing | Control Plane · Runs | CP-49 | `agents.runs` |
-| 10 | Accept or decline a change its runs suggest | Agents · Learn from memory · Control Plane · Runs | AG-49 · AG-51 · AG-52 · CP-56 | `agents.run` |
+| 10 | Accept or decline a change its runs suggest | Agents · Learn from memory · Control Plane · Runs | AG-49 · AG-51 · AG-52 · CP-56 | `agents.runs · Detail` |
 
 ## Branches
 
 | When | What happens | Story | Board |
 |---|---|---|---|
 | It needs permission | A firing that would send outside asks the agent's named approvers in the Inbox; *Not this time* sends nothing. Approving a plan as a workflow is theirs too; the workflow is the organisation's, made by Sam, who asked | AC-15 · AG-31 | `inbox` |
-| It fails | A failed run reads why; *Turn it into a better skill* drafts the fix for Sam to accept | CP-56 | `agents.run` |
-| The person has no access | Without the role building needs, Sam reads every agent, skill and workflow; building names the role it needs | AG-21 | `agents.agent` |
+| It fails | A failed run reads why; *Turn it into a better skill* drafts the fix for Sam to accept | CP-56 | `agents.runs · Detail` |
+| The person has no access | Without the permission building needs, Sam reads every agent, skill and workflow; building names the permission it needs | AG-21 | `agents.agents · Detail` |
 | A hard check fails | Publishing the skill is blocked, naming the check | AG-20 | `agents.skills` |
 | A firing is missed or skipped | It is kept with why; one that needs a switched-off graph database or plugin also raises an alert | AG-42 | `agents.schedules` |
-| A workflow changes | A change is a new version; runs keep the version they started on | AG-31 | `agents.run` |
+| A workflow changes | A change is a new version; runs keep the version they started on | AG-31 | `agents.runs · Detail` |
 
 ## Done when
 

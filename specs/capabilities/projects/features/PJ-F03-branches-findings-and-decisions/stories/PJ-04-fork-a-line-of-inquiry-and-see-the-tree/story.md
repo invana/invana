@@ -4,7 +4,7 @@ title: Fork a line of inquiry and see the tree
 feature: PJ-F03
 status: idea
 personas: [decision-maker]
-boards: [projects.options]
+boards: [projects.branches, projects.graph, projects.projects]
 ---
 
 # PJ-04 · Fork a line of inquiry and see the tree
@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the tree; fork any open, pursuing or parked branch into children; accept or reject an agent's fork proposal | A dropped or merged branch cannot be forked — *Revisit it with a new decision first*; on an archived project every act is disabled |
-| Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
+| Operator | The same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
 
 ## Flow
 
@@ -60,12 +60,19 @@ flowchart LR
 | PJ-04.11 | A branch in the tree | the person clicks it | the branch opens (PJ-05) |
 | PJ-04.12 | An archived project | someone opens the tree or a fork proposal | both read; *Fork*, *Accept* and *Reject* are disabled, saying the project is archived |
 | PJ-04.13 | The engine cannot return the tree or refuses a fork | the page loads or the fork is made | it says *Could not load* / *Could not fork* with the reason and *Try again*; the tree is unchanged |
+| PJ-04.14 | A project with forks, merges, parked and dropped branches | the tree is read | each is drawn apart — a fork an edge from parent to child, a merge a dashed *merged* edge into its target, a parked branch dimmed with a *parked* mark and *Resume*, a dropped branch hollow — and a legend names the four |
+| PJ-04.15 | The project's map | the person switches to the branch tree | the same branches are the nodes of the project's map (`projects.graph`) — one record each, never a second copy — and a branch selected on one stays selected on the other |
+| PJ-04.16 | A branch in the tree | the person selects it | a peek opens with its status, balance and open proposals and *Open* (PJ-05); *Fork*, *Decide* and *Merge…* are on the peek |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The tree | Admin | projects.options · Just the question | — | projects.options · Loading | projects.options | projects.options · Could not load | projects.options · Fork proposed | projects.project · Not found |
-| The tree | Operator | projects.options · Just the question | — | projects.options · Loading | projects.options | projects.options · Could not load | projects.options · Fork proposed | projects.project · Not found |
-| Fork | Admin | — | — | — | projects.options · Fork | projects.options · Fork refused | — | — |
-| Fork | Operator | — | — | — | projects.options · Fork | projects.options · Fork refused | — | projects.options · Archived |
+| The tree | Admin | projects.branches · Just the question | — | projects.branches · Loading | projects.branches | projects.branches · Could not load | projects.branches · Fork proposed | projects.projects · Detail · Not found |
+| The tree | Operator | projects.branches · Just the question | — | projects.branches · Loading | projects.branches | projects.branches · Could not load | projects.branches · Fork proposed | projects.projects · Detail · Not found |
+| The tree on the map | Admin | projects.graph · Just the question | — | projects.graph · Loading | projects.graph · Branch tree | projects.graph · Could not load | projects.graph · Fork proposed | projects.projects · Detail · Not found |
+| The tree on the map | Operator | projects.graph · Just the question | — | projects.graph · Loading | projects.graph · Branch tree | projects.graph · Could not load | projects.graph · Fork proposed | projects.projects · Detail · Not found |
+| Fork | Admin | — | — | — | projects.branches · Fork | projects.branches · Fork refused | — | — |
+| Fork | Operator | — | — | — | projects.branches · Fork | projects.branches · Fork refused | — | projects.branches · Archived |
+| Fork · make the branch | Admin | projects.branches · Fork | — | projects.branches · Forking | projects.branches · A branch | projects.branches · Fork refused | — | — |
+| Fork · make the branch | Operator | projects.branches · Fork | — | projects.branches · Forking | projects.branches · A branch | projects.branches · Fork refused | — | — |

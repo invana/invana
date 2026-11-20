@@ -3,8 +3,9 @@ id: RC-09
 title: See every load and what it rejected
 feature: RC-F02
 status: idea
+milestone: MVP
 personas: [curator, modeller]
-boards: [data.upload, agents.run, explore.board.menu]
+boards: [data.loads, agents.runs, explore.board]
 ---
 
 # RC-09 · See every load and what it rejected
@@ -17,23 +18,23 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
-Loading and undoing a load are the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); every role reads the loads.
+Loading needs Create, and undoing a load Edit, on `data/<graph database>/<kind>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); everyone with Read on the graph database reads the loads.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Load into any model; read and export every load; undo any load | — |
-| Operator | Read and export every load in the Graph — its outcome, what was rejected, its log and what landed. A Modeller also loads from the command line or the API and undoes loads, as an Admin does | Loading refused before anything is written — *Needs the Modeller role — ask an Admin*; *Undo load* disabled with the same reason |
+| Operator | Read and export every load in the deployment — its outcome, what was rejected, its log and what landed. With Create on the kind, also loads from the command line or the API; with Edit, undoes loads | Loading refused before anything is written — *Needs Create on {kind} in {graph database} — ask {who can grant}*; *Undo load* disabled, naming Edit on the kind |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   c([load into a model from the command line or the API]) --> mv{"The model and its published version?"}
-  mv -->|no such model| x1["Fails before writing — lists the graph's models"]
+  mv -->|no such model| x1["Fails before writing — lists the published models"]
   mv -->|read-only connection| x2["Refused at the start, naming the connection setting"]
   mv -->|a rule refuses the model| x3["Cannot answer — names the rule, nothing written"]
   mv -->|yes| r["A run: check each record · write · resolve links · keep the model version"]
-  r --> imp["Records › Loads"]
+  r --> imp["Model › Graph Data › Loads"]
   imp --> o["A load: outcome · steps · what was rejected · log · what landed"]
   o --> rj["Rejected, grouped by reason → sample rows, the exact field"]
   o --> wl["What landed: Checked against Model@v3 · counts per kind"]
@@ -48,7 +49,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| RC-09.1 | A load that names no model, or one the Graph lacks | it starts | it fails before writing anything, listing the Graph's models |
+| RC-09.1 | A load that names no model, or one the deployment lacks | it starts | it fails before writing anything, listing the published models |
 | RC-09.2 | A load against a read-only connection | it starts | it is refused at the start, naming the connection setting |
 | RC-09.3 | A rule that refuses writing into the model | a load starts | it ends *cannot answer* naming the rule; nothing is written |
 | RC-09.4 | A load whose records include bad ones | it runs | each good record is written; each bad one is rejected naming its record, field and reason; the load does not fail for them |
@@ -56,7 +57,7 @@ flowchart LR
 | RC-09.6 | The same file loaded twice | the second run ends | records are matched by the model's keys and the report says how many were updated and how many created |
 | RC-09.7 | A model published while a load runs | the load ends | it reports the version it checked against when it started |
 | RC-09.8 | A load from the command line | it ends | it exits non-zero when rejections exceed the threshold, so a scheduler can branch on it; progress streams on a terminal |
-| RC-09.9 | Loads in the Graph | the person opens *Loads* | each row reads the file, its model, where it came from (CLI · API · here · by hand), who ran it, when, records written and rejected — newest first; the tiles (loads · running · failed · median time) and *loads a day* are the engine's |
+| RC-09.9 | Loads in the deployment | the person opens *Loads* | each row reads the file, its model, where it came from (CLI · API · here · by hand), who ran it, when, records written and rejected — newest first; the tiles (loads · running · failed · median time) and *loads a day* are the engine's |
 | RC-09.10 | No load yet | *Loads* opens | it reads *No loads yet*, what a load is, and the command to run one |
 | RC-09.11 | A run with rejections | the person opens it | *What was rejected* groups them by reason with a count each; a group opens to sample rows and the exact field |
 | RC-09.12 | A load | the person opens it | it reads *Outcome* (its id, content hash and licence · written of total · duration · who ran it · where the file came from), *Steps* in the same view every run uses, *Log* (time · level · step · message, filterable by level), and *What landed* (the model version checked against, counts per kind) |
@@ -67,18 +68,18 @@ flowchart LR
 | RC-09.17 | A run past retention | it is opened | its counts stay and it says the rows are gone |
 | RC-09.18 | A finished load | the person opens *How it got here* | the run's steps show what each one checked, wrote and rejected |
 | RC-09.19 | A finished load | the person picks *Export* | the load's records download with their provenance — the load's id, content hash, licence, file and run on each |
-| RC-09.20 | A Modeller or an Admin, and a load | they pick *Undo load* and confirm | the records it created are removed, values it wrote that nothing changed since are reverted, and every finding, report and simulation that cites it carries a *load undone* notice; a bulk load or one already undone is refused, saying why |
-| RC-09.21 | An Operator | they open a load | *Undo load* is disabled with *Needs the Modeller role — ask an Admin* |
+| RC-09.20 | A person with Edit on the kind, and a load | they pick *Undo load* and confirm | the records it created are removed, values it wrote that nothing changed since are reverted, and every finding, report and simulation that cites it carries a *load undone* notice; a bulk load or one already undone is refused, saying why |
+| RC-09.21 | A person without Edit on the kind | they open a load | *Undo load* is disabled with *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Loads | Admin | data.upload · No loads yet | data.upload · No loads match | data.upload · Loads loading | data.upload | data.upload · Loads could not load | — | — |
-| Loads | Operator | data.upload · No loads yet | data.upload · No loads match | data.upload · Loads loading | data.upload | data.upload · Loads could not load | — | — |
-| A load's run | Admin | — | — | agents.run · Load running | agents.run · Load | agents.run · Load failed | — | — |
-| A load's run | Operator | — | — | agents.run · Load running | agents.run · Load | agents.run · Load failed | — | agents.run · Undo not theirs |
-| What was rejected | Admin | — | — | agents.run · Load running | agents.run · Load rejected | agents.run · Load failed | — | — |
-| What was rejected | Operator | — | — | agents.run · Load running | agents.run · Load rejected | agents.run · Load failed | — | — |
-| A node's provenance | Admin | — | — | — | explore.board.menu · Provenance | explore.board.menu · No provenance | — | — |
-| A node's provenance | Operator | — | — | — | explore.board.menu · Provenance | explore.board.menu · No provenance | — | — |
+| Loads | Admin | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
+| Loads | Operator | data.loads · No loads yet | data.loads · No loads match | data.loads · Loads loading | data.loads | data.loads · Loads could not load | — | — |
+| A load's run | Admin | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load | agents.runs · Detail · Load failed | — | — |
+| A load's run | Operator | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load | agents.runs · Detail · Load failed | — | agents.runs · Detail · Undo not theirs |
+| What was rejected | Admin | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load rejected | agents.runs · Detail · Load failed | — | — |
+| What was rejected | Operator | — | — | agents.runs · Detail · Load running | agents.runs · Detail · Load rejected | agents.runs · Detail · Load failed | — | — |
+| A node's provenance | Admin | — | — | — | explore.board · Menu · Provenance | explore.board · Menu · No provenance | — | — |
+| A node's provenance | Operator | — | — | — | explore.board · Menu · Provenance | explore.board · Menu · No provenance | — | — |

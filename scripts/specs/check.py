@@ -4,8 +4,9 @@
     python3 scripts/specs/check.py --index    # check, then rewrite specs/README.md
     python3 scripts/specs/check.py --graph [--out PATH]        # parse specs/ into specs-graph.json (graph.py)
     python3 scripts/specs/check.py --placeholders [--write]   # list, or create, missing placeholders (graph.py)
+    python3 scripts/specs/check.py --flows    # check, with the flow-board click-path findings as errors
 
-The three modes are exclusive; ``--out`` needs ``--graph`` and a path, ``--write`` needs ``--placeholders``.
+The four modes are exclusive; ``--out`` needs ``--graph`` and a path, ``--write`` needs ``--placeholders``.
 
 The format is .claude/skills/product-spec/format.md. This script enforces the mechanical half of it — front-matter,
 required sections, IDs, story shape, the task table, cross-links, screen words and the no-history rule — so the
@@ -18,20 +19,21 @@ A spec area is a part of the operating system every capability uses (``os/<p>/``
 ``<area>/<p>/features/<CODE>-F<nn>-<slug>/feature.md``; each of its
 stories is a folder under
 ``stories/<CODE>-<nn>-<slug>/`` holding ``story.md`` and ``task.md``. A story's status may not run ahead of its tasks,
-and a feature's status is the lowest of its stories'. Boards are checked against the Agent version canvas when it is
+and a feature's status is the lowest of its stories'. Boards are checked against the Invana design canvas's local mirror when it is
 built locally (`.design/` is not in git); without it the board check is skipped and says so. A board is drawn once its
 story is designed, so an undrawn board is an error from `designed` up and a warning below it. A story or feature at
 `later` is parked, outside the ladder: a feature's status is the lowest of its stories that are not parked, or
 `later` when all of them are. A file at `placeholder` is outside the ladder too: it is named so the graph shows it,
 nothing in it is decided, and only its front-matter is checked; it never counts toward a feature's status.
 """
+import json
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SPECS = ROOT / 'specs'
-CANVAS = ROOT / '.design' / 'canvas-agent-version' / 'project'
+CANVAS = ROOT / '.design' / 'canvas-invana' / 'project'
 
 STALE = '_stale'  # specs/_stale/: not live, never checked, never linked to
 # Index order: the operating system, then the capabilities.
@@ -62,6 +64,13 @@ TASK_STATUSES = ['todo', 'doing', 'blocked', 'done', 'dropped']
 GATE_OWNER = {'designed': 'designer', 'built': 'coder', 'verified': 'qa'}
 HISTORY = re.compile(r'\b(was renamed|renamed from|used to be|formerly|no longer|previously|replaced by|superseded by)\b', re.I)
 DECISION_ID = re.compile(r'\((?:[A-Z]{1,4}\d{1,3})(?:\s*[,·]\s*[A-Z]{1,4}\d{1,3})*\)')
+
+FLOWS_JSON = ROOT / '.design' / 'canvas-invana' / 'clickthrough' / 'flows.json'  # the click-through manifest
+FLOW_DATA = re.compile(r'^const FLOW = (\{.*\});\s*$', re.M)  # a flow board's frame list
+
+MILESTONES = SPECS / 'milestones.md'
+FLOW_BOARD = re.compile(r'flow\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*')
+JOURNEY_BOARD = re.compile(r'journey\.j(\d{2})')
 
 errors, warnings = [], []
 
@@ -394,7 +403,174 @@ def check_journey_diagram(path, fm, body, stories):
         err(path, f'The journey diagram draws {", ".join(sorted(drawn - declared))}, missing from `stories`')
 
 
-def main(write_index=False):
+def milestones():
+    """Read ``specs/milestones.md``: ``{id: {'journeys': [J<nn>], 'confirmed': bool}}``.
+
+    A milestone's *Journeys* cell lists journeys as links. It is *proposed* while the cell opens with ``*Proposed``;
+    only a confirmed milestone holds its journeys' stories to it. Returns ``{}`` when the file is absent.
+    """
+    if not MILESTONES.exists():
+        return {}
+    rows = table_rows(section(MILESTONES.read_text(), 'Milestones'))
+    if not rows or 'ID' not in rows[0] or 'Journeys' not in rows[0]:
+        return {}
+    i_id, i_j = rows[0].index('ID'), rows[0].index('Journeys')
+    return {r[i_id]: {'journeys': re.findall(r'\[(J\d{2})\]', r[i_j]),
+                      'confirmed': not r[i_j].lstrip().lower().startswith('*proposed')}
+            for r in rows[1:] if len(r) > max(i_id, i_j)}
+
+
+def check_milestones(docs):
+    """Hold every story's ``milestone:`` and every confirmed milestone's journeys to ``milestones.md``.
+
+    A story's milestone names a row of the table; a parked (``later``) story carries none; a journey a confirmed
+    milestone lists has every one of its stories in that milestone.
+    """
+    table = milestones()
+    milestone_of = {}
+    for path, (kind, fm, _body) in docs.items():
+        if kind != 'story' or 'milestone' not in fm:
+            continue
+        m = fm['milestone']
+        if m not in table:
+            err(path, f'milestone `{m}` is not a row of milestones.md ({", ".join(table) or "none"})')
+        if fm.get('status') == LATER:
+            err(path, 'a `later` story carries no milestone — it is parked')
+        milestone_of[fm.get('id', '')] = m
+    journeys = {fm['id']: (path, fm) for path, (kind, fm, _b) in docs.items() if kind == 'journey' and 'id' in fm}
+    for mid, row in table.items():
+        if not row['confirmed']:
+            continue
+        for jid in row['journeys']:
+            if jid not in journeys:
+                err(MILESTONES, f'milestone `{mid}` lists `{jid}`, which no journey defines')
+                continue
+            path, fm = journeys[jid]
+            out = [s for s in fm.get('stories', []) if milestone_of.get(s) != mid]
+            if out:
+                err(path, f'milestone `{mid}` lists {jid}, but {", ".join(out)} are not in it')
+
+
+def check_board_ids(boards, journey_ids):
+    """Hold the flow and journey board ids cited by specs or drawn on the canvas to design-language §7.
+
+    A flow board is ``flow.<act>`` (lower snake); a journey board is ``journey.jNN`` for a journey that exists.
+    """
+    for b in sorted(boards):
+        if b.startswith('flow.') and not FLOW_BOARD.fullmatch(b):
+            errors.append(f'board `{b}` breaks design-language §7: a flow board is `flow.<act>`, lower snake')
+        elif b.startswith('journey.'):
+            m = JOURNEY_BOARD.fullmatch(b)
+            if not m:
+                errors.append(f'board `{b}` breaks design-language §7: a journey board is `journey.jNN`')
+            elif f'J{m.group(1)}' not in journey_ids:
+                errors.append(f'board `{b}` names journey J{m.group(1)}, which no journey defines')
+
+
+def node_key(board, state):
+    """One click-path node as ``(board, state)``, the state lower-cased; a bare board is its ``has data`` state."""
+    s = ' '.join(state.split()).lower()
+    return board.strip('` '), '' if s == 'has data' else s
+
+
+def screens_nodes(body):
+    """The nodes a story's ``## Screens`` names: ``{node_key: cell}``, each cell ``<board> · <Step · Substate>``."""
+    nodes = {}
+    for cells in table_rows(section(body, 'Screens')):
+        if len(cells) != 9 or cells[0] == 'Surface':
+            continue
+        for c in cells[2:]:
+            if c not in ('—', '-', ''):
+                board, _, state = c.partition(' · ')
+                nodes.setdefault(node_key(board, state), c)
+    return nodes
+
+
+def flow_board(path):
+    """The ``FLOW`` object a ``flow.<act>`` board's script declares — its ``frames`` — or ``None``."""
+    m = FLOW_DATA.search(path.read_text(encoding='utf-8', errors='replace'))
+    try:
+        return json.loads(m.group(1)) if m else None
+    except ValueError:
+        return None
+
+
+def path_nodes(flow):
+    """Every node a ``flows.json`` flow reaches: its start, each path's start, and each step's state."""
+    start = flow.get('start') or {}
+    out = {node_key(start['board'], start.get('state', ''))} if start.get('board') else set()
+    for p in flow.get('paths', []):
+        s = p.get('start') or start
+        board = s.get('board', '')
+        if p.get('start'):
+            out.add(node_key(board, s.get('state', '')))
+        for step in p.get('steps', []):
+            board = step.get('board', board)
+            if step.get('state'):
+                out.add(node_key(board, step['state']))
+    return out
+
+
+def check_flows(docs, strict=False):
+    """Hold every ``flow.<act>`` board to the ``## Screens`` of the stories it cites (design-language §7 *Naming*).
+
+    Two findings, per flow board: a frame whose ``Step · Substate`` is in no ``## Screens`` of the stories its frames
+    cite, and a ``## Screens`` node of those stories that no frame and no ``flows.json`` path reaches. A node counts
+    as reached when any flow board citing its story frames it, or any ``flows.json`` path of such a flow clicks to it,
+    so a story split across acts (create · delete) is not flagged under each. A ``later`` story's nodes and a
+    ``later`` flow are skipped: neither is wired. Lenses are not told apart — a node is one ``board · state``.
+
+    By default each flow board with a finding gets one warning with its counts; ``strict`` (``--flows``) lists every
+    finding as an error, each unreached node once with the flow boards that cite its story.
+    """
+    if not CANVAS.exists():
+        warnings.append('flow check skipped — the Invana design canvas is not built locally')
+        return
+    stories = {fm['id']: (fm.get('status'), screens_nodes(body))
+               for kind, fm, body in docs.values() if kind == 'story' and fm.get('id')}
+    manifest = {}
+    if FLOWS_JSON.exists():
+        manifest = {f['id']: f for f in json.loads(FLOWS_JSON.read_text()).get('flows', []) if f.get('id')}
+    boards = {}
+    for path in sorted(CANVAS.glob('flow.*.dc.html')):
+        fid = path.name[:-len('.dc.html')]
+        if manifest.get(fid, {}).get('status') == LATER:
+            continue
+        data = flow_board(path)
+        if data is None:
+            (errors if strict else warnings).append(f'{fid}: declares no `FLOW` frames to check')
+            continue
+        frames = data.get('frames', [])
+        cited = sorted({s for f in frames for s in f.get('stories', [])}
+                       | {c['story'] for c in data.get('crit', []) if c.get('story')})
+        reached = {node_key(f.get('board', ''), f.get('state', '')) for f in frames}
+        reached |= path_nodes(manifest.get(fid, {}))
+        boards[fid] = (frames, cited, reached)
+    reached_of = {}
+    for _frames, cited, reached in boards.values():
+        for sid in cited:
+            reached_of.setdefault(sid, set()).update(reached)
+    unreached = {}  # (sid, node) -> flow boards citing sid
+    for fid, (frames, cited, _reached) in boards.items():
+        named = {k for sid in cited if sid in stories for k in stories[sid][1]}
+        loose = [f for f in frames if node_key(f.get('board', ''), f.get('state', '')) not in named]
+        lost = [(sid, k) for sid in cited if sid in stories and stories[sid][0] not in (LATER, PLACEHOLDER)
+                for k in stories[sid][1] if k not in reached_of[sid]]
+        for key in lost:
+            unreached.setdefault(key, []).append(fid)
+        if strict:
+            errors.extend(f'{fid}: frame {f.get("n", "?")} `{f.get("board")} · {f.get("state")}` is in no '
+                          f'## Screens of {", ".join(cited) or "a cited story"}' for f in loose)
+        elif loose or lost:
+            warnings.append(f'{fid}: {len(loose)} frame(s) in no ## Screens of its stories · {len(lost)} '
+                            '## Screens node(s) of its stories reached by no frame or flows.json path — '
+                            '`check.py --flows` lists them')
+    if strict:
+        errors.extend(f'{sid}: ## Screens node `{stories[sid][1][k]}` is reached by no frame of '
+                      f'{", ".join(fids)} and no flows.json path' for (sid, k), fids in unreached.items())
+
+
+def main(write_index=False, flows=False):
     docs = {}
     for path in sorted(SPECS.rglob('*.md')):
         if is_stale(path):
@@ -511,8 +687,13 @@ def main(write_index=False):
             if not (path.parent / target).resolve().exists():
                 err(path, f'link to `{target}` does not resolve')
 
+    check_milestones(docs)
+    journey_ids = {fm.get('id') for k, fm, _b in docs.values() if k == 'journey'}
+    on_canvas = {p.name[:-8] for p in CANVAS.glob('*.dc.html')} if CANVAS.exists() else set()
+    check_board_ids(set(boards_cited) | on_canvas, journey_ids)
+
     if CANVAS.exists():
-        drawn = {p.name[:-8] for p in CANVAS.glob('*.dc.html')}
+        drawn = on_canvas
         for b in sorted(set(boards_cited) - drawn):
             if boards_cited[b] >= STATUSES.index('designed'):
                 errors.append(f'board `{b}` is cited by a designed spec but is not on the canvas')
@@ -520,6 +701,7 @@ def main(write_index=False):
                 warnings.append(f'board `{b}` is not drawn yet')
     elif boards_cited:
         warnings.append('board check skipped — the Agent version canvas is not built locally')
+    check_flows(docs, strict=flows)
 
     if write_index and not errors:
         index(docs, tasks_of)
@@ -568,6 +750,7 @@ def index(docs, tasks_of):
         'user stories and the tasks that '
         'deliver them, journeys. Every spec follows one format and passes `python3 scripts/specs/check.py`. '
         'This index is generated by `python3 scripts/specs/check.py --index` — do not edit it by hand.\n'
+        + ('\nRoadmap: [milestones](milestones.md) — Invana\'s own milestones (MVP first).\n' if MILESTONES.exists() else '')
         + ('\n'.join(rows) if rows else '\nNo specs yet.') + '\n')
 
 
@@ -579,6 +762,8 @@ def cli(argv=None):
     mode.add_argument('--index', action='store_true', help='check, then rewrite specs/README.md')
     mode.add_argument('--graph', action='store_true', help='parse specs/ into specs-graph.json')
     mode.add_argument('--placeholders', action='store_true', help='list the missing placeholders')
+    mode.add_argument('--flows', action='store_true',
+                      help='check, with every flow-board frame and Screens node off the click path an error')
     parser.add_argument('--out', metavar='PATH', help='where --graph writes (default: specs-graph.json at the repo root)')
     parser.add_argument('--write', action='store_true', help='with --placeholders, create them')
     args = parser.parse_args(argv)
@@ -592,7 +777,7 @@ def cli(argv=None):
             graph.write_graph(args.out)
             return 0
         return graph.placeholders(write=args.write)
-    return main(args.index)
+    return main(args.index, flows=args.flows)
 
 
 if __name__ == '__main__':

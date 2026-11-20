@@ -4,7 +4,7 @@ title: "Say what an agent may touch on a worker: files, commands, network"
 feature: AC-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.access, access.locked]
+boards: [settings.policies]
 ---
 
 # AC-37 · Say what an agent may touch on a worker: files, commands, network
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [AC-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Write `fs/` · `cmd/` · `net/` rules on a custom policy; read what each agent may touch on a worker | — |
-| Operator | Read every `fs/` · `cmd/` · `net/` rule and what each agent may touch on a worker; a Modeller reads the same | *Edit* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Nothing here without Read on `access/policies`; a person who holds Read but not Edit on Access reads every `fs/` · `cmd/` · `net/` rule and what each agent may touch on a worker | *No access* — *Needs Read on Access — ask Priya or Lee*; with Read, *Edit* disabled — *Needs Edit on Access — ask Priya or Lee* |
 
 ## Flow
 
@@ -55,12 +55,12 @@ flowchart TD
 | AC-37.6 | An outside runtime on a worker | a session starts | its own allow list is generated from the agent's Access Policies for that session and never kept by hand; a change saved to the policies reaches the next session |
 | AC-37.7 | A rule that says Ask on a worker resource | the run reaches it | it waits for the agent's named approvers like any ask ([AC-F05](../../../AC-F05-asks-and-approvals/feature.md)); a yes covers this step of this run |
 | AC-37.8 | A skill, a plugin or a runtime | it declares the files, programs or hosts it needs | the declaration grants nothing; *Who it changes* names each declared need no policy meets |
-| AC-37.9 | An Operator | they open a policy with worker rules | they read; *Edit* is disabled, naming the Admin role and the Admins |
+| AC-37.9 | A person with Read on `access/policies` but not Edit on Access | they open a policy with worker rules | they read; *Edit* is disabled, naming Edit on Access and who can grant it; without Read it reads *No access* |
 | AC-37.10 | A run refused on a worker | the person behind it opens *How it got here* | it shows the step, the file, program or host, and the rule that refused it |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Worker rules on a policy | Admin | settings.access · No worker rules | — | settings.access · Loading | settings.access · Worker rules | settings.access · Rule refused | — | — |
-| Worker rules on a policy | Operator | access.locked · No worker rules | — | access.locked · Loading | access.locked · Worker rules | access.locked · Could not load | — | access.locked · Worker rules |
+| Worker rules on a policy | Admin | settings.policies · No worker rules | — | settings.policies · Loading | settings.policies · Worker rules | settings.policies · Rule refused | — | — |
+| Worker rules on a policy | Operator | — | — | — | — | — | — | settings.policies · No access |

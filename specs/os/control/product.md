@@ -48,50 +48,52 @@ can unblock; and an agent can only do what the models and tools offered to it al
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| CP-F09 | [Overview — workloads by user, agent and team](features/CP-F09-overview/feature.md) | CP-47 | idea |
+| CP-F09 | [Overview — workloads by user, agent and team](features/CP-F09-overview/feature.md) | CP-70 | idea |
 | CP-F10 | [Runs and how the agents are doing](features/CP-F10-runs-and-how-the-agents-are-doing/feature.md) | CP-48 · CP-49 · CP-53 · CP-50 · CP-58 · CP-51 · CP-52 · CP-54 · CP-55 · CP-56 · CP-57 | idea |
+| CP-F12 | [Code hosts and issue trackers](features/CP-F12-issue-trackers/feature.md) | CP-73 · CP-74 · CP-78 | idea |
 | CP-F11 | [Ops alerting](features/CP-F11-ops-alerting/feature.md) | CP-59 · CP-60 | idea |
 | CP-F01 | [AI models](features/CP-F01-ai-models/feature.md) | CP-01 · CP-61 | idea |
-| CP-F02 | [Plugins and MCP](features/CP-F02-plugins-and-outside-tools/feature.md) | CP-04 · CP-44 · CP-02 · CP-42 · CP-43 · CP-03 · CP-20 | idea |
+| CP-F02 | [Plugins and MCP](features/CP-F02-plugins-and-outside-tools/feature.md) | CP-04 · CP-44 · CP-02 · CP-42 · CP-43 · CP-03 · CP-75 · CP-20 | idea |
 | CP-F03 | [Workers and the queue](features/CP-F03-workers-and-the-queue/feature.md) | CP-05 · CP-06 · CP-07 · CP-08 · CP-09 · CP-10 | idea |
 | CP-F04 | [Limits](features/CP-F04-limits/feature.md) | CP-11 · CP-34 · CP-12 · CP-13 · CP-14 | idea |
-| CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 · CP-17 | idea |
+| CP-F05 | [Graph databases](features/CP-F05-graph-databases/feature.md) | CP-22 · CP-25 · CP-26 · CP-27 · CP-24 · CP-38 · CP-39 · CP-40 · CP-35 · CP-41 | idea |
+| CP-F13 | [Data stores](features/CP-F13-data-stores/feature.md) | CP-84 | idea |
 | CP-F06 | [Skill scripts](features/CP-F06-skill-scripts/feature.md) | CP-15 · CP-16 | idea |
-| CP-F07 | [Find your way — ⌘K and search](features/CP-F07-find-your-way/feature.md) | CP-30 | idea |
+| CP-F07 | [Find your way — ⌘K and search](features/CP-F07-find-your-way/feature.md) | CP-30 · CP-68 · CP-71 | idea |
 | CP-F08 | [The Inbox — what needs me, and notifications](features/CP-F08-the-inbox/feature.md) | CP-36 · CP-37 · CP-45 · CP-46 | idea |
 
 ## Surfaces
 
 | Surface | Tier | Board |
 |---|---|---|
-| Home — first use and set-up | page | `start.home` · `start.setup` |
-| Overview — workloads by user, agent and team | page | `control.overview` |
-| Runs — how the agents are doing, every run | modal | `agents` · `agents.runs` · `agents.agent` |
-| A run | sheet | `agents.run` · `agents.run.answer` |
-| Ops alerts — the list, an alert, thresholds | modal | `control.alerts` · `control.alerts.alert` · `control.alerts.settings` |
-| Graph databases — the list, one graph database | modal | `settings.databases` · `settings.databases.database` |
-| Connect a graph database | modal | `settings.databases.connect` · `settings.databases.connect.files` · `settings.databases.connect.shape` · `settings.databases.connect.ready` |
+| Home — first use and set-up | page | `start.home` · `start.home · Set-up` |
+| Usage — workloads by team, user and agent, in Settings › Workers › Limits | modal | `settings.limits` |
+| Runs — how the agents are doing, every run | modal | `agents.agents` · `agents.runs` |
+| A run | modal | `agents.runs · Detail` · `agents.runs · Detail · Answer` |
+| Ops alerts — the list, an alert, thresholds | modal | `settings.alerts` · `settings.alerts · Detail` · `settings.alerts · Settings` |
+| Graph databases — the list, one graph database | modal | `settings.databases` · `settings.databases · Detail` |
+| Connect a graph database | modal | `settings.databases · Connect` · `settings.databases · Connect · Files` · `settings.databases · Connect · Shape` · `settings.databases · Connect · Ready` |
 | ⌘K | modal | `shell.command` |
 | Inbox — Needs you · Updates · Running · Done | modal | `inbox` |
 | Settings › Notifications — rules and channels | modal | `settings.notifications` |
 | Settings › You — outside accounts · where asks reach me | modal | `settings.me` |
 | Plugins — every plugin, a plugin, Team packs | modal | `settings.plugins` |
-| An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins.server` |
+| An outside MCP server — its tools, how Invana signs in | modal | `settings.plugins · Servers` |
 | The deployment's MCP server — what it serves, recent calls | modal | `settings.mcp` |
 | AI models | modal | `settings.ai` |
 | Workers | modal | `settings.workers` |
-| Usage and limits | modal | `settings.usage` |
+| Usage and limits | modal | `settings.limits · Usage` |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| The deployment's, set by an Admin | Graph databases, AI models, plugins, outside servers, the MCP server, channels, workers and limits are set by an Admin and read by everyone ([the role table](../access/features/AC-F02-access-policies/feature.md#the-role-table)) |
+| The deployment's, set by an Admin | Graph databases, AI models, plugins, outside servers, the MCP server, channels, workers and limits are set by an Admin and read by everyone ([the permission catalogue](../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) |
 | Two switches, new starts off | Graph databases and plugins have the deployment's switch and each person's own; anything new starts off until an Admin turns it on; off is refused before the work starts, naming who switched it off |
 | No credential in an environment variable | Graph database credentials, AI model keys, outside servers' secrets and accounts, and channel secrets are sealed under the install key, set with the password again, never read back |
 | Allow never passes a limit | Allow on a spend never passes a limit ([CP-F04](features/CP-F04-limits/feature.md)) |
 | One record of runs | Every run is one row of [CP-F10](features/CP-F10-runs-and-how-the-agents-are-doing/feature.md); the overview, Runs, the Inbox's Running and ops alerts all read it |
-| Those it costs can stop it | The person behind a run and the Admins stop it ([the role table](../access/features/AC-F02-access-policies/feature.md#the-role-table)); whoever acts on an ops alert closes it |
+| Those it costs can stop it | The person behind a run and the Admins stop it ([the permission catalogue](../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); whoever acts on an ops alert closes it |
 | Everything later happens on one clock | Schedules, deliveries, rules and ask deadlines run on one clock that repeats nothing after a restart |
 | Tokens, never currency | Every budget, limit, usage figure and alert is in tokens ([glossary › Token budget](../../glossary.md#what-may-happen)) |
 

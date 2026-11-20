@@ -6,8 +6,8 @@ status: idea
 personas: [builder, admin, analyst]
 stories: [AG-24, AG-33, AG-34, AG-62]
 journeys: [J03, J09]
-boards: [agents.run, agents.agent, agents.external, inbox]
-nfrs: [NFR-PERF-2, NFR-COST-1, NFR-SEC-10, NFR-SEC-11]
+boards: [agents.runs, agents.agents, inbox, access.signin]
+nfrs: [NFR-PERF-2, NFR-COST-1, NFR-SEC-10, NFR-SEC-11, NFR-SEC-15]
 depends_on: [AG-F01, AC-F02, AC-F04, AC-F05, AC-F09, CP-F02, CP-F03, CP-F04, CP-F10, GP-F02]
 ---
 
@@ -17,7 +17,7 @@ depends_on: [AG-F01, AC-F02, AC-F04, AC-F05, AC-F09, CP-F02, CP-F03, CP-F04, CP-
 > agent outside Invana. At its session budget a run **continues** in a fresh session from a **hand-off note** — what is
 > done, what is next, what it read — the same run, the same number. A **fork** starts a new run from a note. A
 > **delegation** hands part of the work to a helper it makes or another agent of the deployment, as a Run on
-> `agent/<name>`: the callee runs with its own Access Policies ∩ every caller's, narrowing at every hop, only to agents
+> `agent/<name>`: the callee runs with the person behind the run ∩ its own Access Policies ∩ every caller's, narrowing at every hop, only to agents
 > granted to the person behind the run, within the caller's depth and helpers. **Federation** hands a task to an agent
 > outside Invana over A2A or MCP. Every hand-off is drawn on the run with who made whom, on whose behalf and what came
 > back. The decisions it helps make: *may this agent hand this work on, to whom, and is what came back fit to use?*
@@ -49,7 +49,7 @@ flowchart TD
   may -->|Ask| ask
   ask -->|declined or expired| dec["The step ends declined; the agent carries on without it"]
   ask -->|approved| helper
-  need -->|Allow| helper["AG-24 · It runs — its policies ∩ every caller's, tokens set aside"]
+  need -->|Allow| helper["AG-24 · It runs — the person's reach ∩ its policies ∩ every caller's, tokens set aside"]
   may -->|Allow| helper
   helper --> ret["Its answer returns, cited by the agent · unspent tokens go back"]
   ret --> tree(["AG-24 · Who did what: who made whom, on which run, on whose behalf"])
@@ -61,7 +61,7 @@ flowchart TD
   oask -->|approved| sent["Sent from a worker · working · a ledger row"]
   sent -->|asks back| qq["A question to the person behind the run"] --> sent
   sent --> back(["A verdict and what it returned — a person applies it"])
-  admin([Agents › Outside agents]) --> add["AG-33 · Add an outside agent — an A2A card or an outside MCP server — added off"]
+  admin([Agents › Agents · the Outside filter]) --> add["AG-33 · Add an outside agent — an A2A card or an outside MCP server — added off"]
   add --> son["Turned on · its approvers · its credential · its limits"]
   son --> on
 ```
@@ -132,20 +132,22 @@ sequenceDiagram
 
 ## Access
 
-Delegation and outside agents are *Reads* for Operator and *Acts* for Modeller and Admin in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table).
-Who an agent may hand work to is a rule on its Access Policies, which only an Admin changes.
+The permission each act needs is the *Agents* and *Plugins* rows of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
+Who an agent may hand work to is a rule on its Access Policies, which needs Edit on `access/policies`.
 
-| Act | Role | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Read who made whom, every hand-off and what came back on a run | Who may read the run's content — the person behind it and Admins; others see that it ran ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) | Each hand-off reads *ran*, its state and its cost, never its content |
-| Allow, Ask or Deny an agent handing work to another — a rule on Run `agent/<name>` | Admin, on an Access Policy ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The rules read on the agent's Access; changing them reads *Ask an Admin* |
+| Allow, Ask or Deny an agent handing work to another — a rule on Run `agent/<name>` | Edit on `access/policies`, on an Access Policy ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | The rules read on the agent's Access; changing them reads *Ask an Admin* |
 | Approve or decline a hand-off that asks | The caller's named approvers, else the Admins with a *no approver* alert, never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, naming who it waits on |
 | Answer a helper's or an outside agent's question back | The person behind the run | The question reads, naming who it waits on |
 | Read a run's hand-off notes — what is done, what is next, what it read | The person behind the run; anyone else, an Admin included, only when the run belongs to a project and their default agent may read every source of the note ([AC-31](../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) · [GP-F02](../../../../os/graph/features/GP-F02-memory/feature.md#rules)) | The note's head — its sessions, when, its size and tokens — with its body *withheld*, naming the first source their agent may not read |
-| Fork a new run from a hand-off note | The person behind the run; an Admin who may read the note. Runs — re-run in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table): *Own* for Operator and Modeller, *Acts* for Admin | *Fork* disabled — *Only the person behind this run or an Admin*; on a note they may not read, *Fork* is not offered |
-| Set the session budget at which a run continues | Admin, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The session budget reads on the run; *Edit in Usage and limits* reads *Ask an Admin* |
-| Add an outside agent, turn it on or off, read its card again, set its credential and limits, remove it | Admin, in a session, with the password again for a credential | Outside agents read; each act disabled — *Needs the Admin role* |
-| Name an outside agent's approvers | Admin ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; *Change approvers* reads *Needs the Admin role* |
+| Fork a new run from a hand-off note | The person behind the run; an Admin who may read the note. Run content as [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) says: a person's own runs; another's needs Read on `run/<agent>` | *Fork* disabled — *Only the person behind this run or an Admin*; on a note they may not read, *Fork* is not offered |
+| Set the session budget at which a run continues | Edit on `setting/deployment`, in the Control Plane ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md)) | The session budget reads on the run; *Edit in Usage and limits* reads *Ask an Admin* |
+| Add an outside agent, turn it on or off, read its card again, set its credential and limits, remove it | Create on `plugin/*` to add; Manage on `plugin/<name>` for the rest — in a session, with the password again for a credential | Outside agents read; each act disabled — *Needs Create on Plugins* or Manage on plugin/{plugin} — ask {who can grant}* |
+| Name an outside agent's approvers | Manage on `agent/<name>` ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The approvers read; *Change approvers* reads *Needs Manage on the {agent} agent — ask {who can grant}* |
 | Apply what an outside agent returned — merge, publish | A person, outside Invana or in the record's own feature | Invana applies none of it |
 
 ## States
@@ -165,6 +167,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Rule | Detail |
 |---|---|
 | Five acts, each its own | Continuation, fork, delegation, escalation to a person and federation are distinct (the table under [User journey](#user-journey)); none stands in for another |
+| An outside agent's reply and a marked note are outside text | Whatever an outside agent returns is outside text; a hand-off note written by a session whose context held outside text carries `trust = outside` and its origins, and the session or forked run that starts from it begins marked ([system-design § 10 › The outside-text mark](../../../../system-design.md#10-ai-and-agents) · AG-34.17 · AG-62.14) |
 | At the session budget a run continues | When a session's tokens reach its session budget ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#rules)), the session writes a hand-off note and the run goes on in a fresh session from it — the same run, the same number, the same workspace, runtime, agent version and person behind it. It is never an ask and never an exit reason |
 | A hand-off note says three things | What is done, what is next and what it read — the sources, each a resource. The fresh session starts from the note and the run's task, never from the last session's transcript |
 | The runtime writes it, else Invana does | The session writes the note when told it reached its budget; a session that ends without one gets one Invana writes from the session's steps and sources — `written_by` says which |
@@ -177,7 +180,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Federation is outside agents only | Handing a task to an agent outside Invana, over A2A or MCP (AG-33 · AG-34); an agent of the deployment is delegated to, never federated with |
 | Handing on is a Run on `agent/<name>` | Delegating to an agent of the deployment or an outside agent is a step that runs `agent/<name>`; the caller's Access Policies Allow, Ask or Deny it like any resource; no rule, no hand-off ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#rules)) |
 | Making a helper needs Run `agent/*` | The function that makes a helper declares the need Run `agent/*` ([declared needs](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)); the Coordinator's built-in policy allows it, the Assistant's asks first |
-| Narrowed at every hop | The callee runs with its own Access Policies ∩ every caller's on the chain, agent to agent only; a step any of them denies is refused, naming the agent in the chain whose rule denied it ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
+| Narrowed at every hop | The callee runs with the person behind the run ∩ its own Access Policies — its ceiling — ∩ every caller's on the chain; a step any of them denies is refused, naming the agent in the chain whose rule denied it ([AC-F04](../../../../os/access/features/AC-F04-what-an-agent-may-touch/feature.md#rules)) |
 | A helper holds its parent's policies | A helper is attached to its parent's Access Policies and may only narrow them; it holds no grant of its own and is in its run's delegation chain |
 | Delegation follows grants | An agent hands work only to an agent granted to the person behind the run, or one already in the run's delegation chain; a run with no person behind it — a schedule or a pick-up — hands work only where its agent's rules allow. An outside agent is granted to nobody and is reached only through a rule on Run `agent/<name>`, Ask by default ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#rules)) |
 | Within the caller's limits | Depth below the first agent and helpers in all are the caller's limits ([CP-F04](../../../../os/control/features/CP-F04-limits/feature.md#rules)); past either the hand-off is refused before it starts, naming the limit and the count. A helper's run takes a slot like any run; at runs at once it waits *queued* |
@@ -192,7 +195,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Added off | A new outside agent is off until an Admin turns it on; a hand-off to one that is off is refused, naming who switched it off |
 | Ask by default | A Run on an outside agent waits for the caller's named approvers unless a rule names that outside agent and allows it; a rule on `agent/*` asks at most |
 | Only what may leave, leaves | An outside agent receives only what the skill marks to send, within what the caller may read; a sensitive property is never sent — the step is refused, naming it ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)) |
-| Every hand-off out is in the ledger | Each task sent is an outbound row of *What left the platform*, schema-only or data-bearing, with the kinds, fields and record IDs sent ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
+| Every hand-off out is in the ledger | Each task sent is an outbound row in History, schema-only or data-bearing, with the kinds, fields and record IDs sent ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
 | One credential choice per outside agent | A shared secret, sealed, or each person's own account (per-user OAuth), chosen by an Admin as for an outside MCP server ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md#rules)); never an environment variable |
 | Invana applies nothing that came back | A pull request, a patch or a report from an outside agent is kept on the run; a person applies it |
 | An outside agent's own limits | Time, attempts and tasks at once; Invana's tokens cover only its own side |
@@ -205,7 +208,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | Helper agents — who made them, on which run, retired with the work | Write · read |
 | A helper's or delegated run — tokens set aside and returned, why it ended, its caller chain | Write · read |
 | Delegation asks and their answers (AC-F05) | Write · read |
-| Outside agents — protocol, card or MCP server, skills on the card, credential choice, workers they call from, limits, on or off | Write · read (Admin) |
+| Outside agents — protocol, card or MCP server, skills on the card, credential choice, workers they call from, limits, on or off | Write · read (Manage on `plugin/<name>`) |
 | An outside task — state, what was sent, what was held back, what came back | Write · read |
 | Ledger rows of every task sent (AC-F09) · History rows of every hand-off (AC-F06) | Write · read |
 | Hand-off notes — the run, the sessions it joins, why it was written, its body in the blob store, its sources | Write · read |
@@ -283,7 +286,7 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | 422 | A document that is not an A2A agent card, or offers no A2A version Invana speaks | *Found {version}; Invana speaks A2A {pinned}.* | AG-33.9 |
 | 422 | An `mcp` outside agent naming an outside MCP server that does not exist | *{server} is not an outside MCP server here.* | AG-33.10 |
 | 409 | Removing an outside agent a run has reached | *{outside agent} has run — turn it off instead.* | AG-33.11 |
-| 403 | Adding, turning on or off, reading again, changing or removing an outside agent without the Admin role | *This needs the Admin role.* | AG-33.8 |
+| 403 | Adding, turning on or off, reading again, changing or removing an outside agent without Create on plugin/* or Manage on the plugin | *This needs Create on plugin/* or Manage on plugin/{plugin} — ask {who can grant}.* | AG-33.8 |
 | 401 | Setting an outside agent's secret without the password again | *Enter your password again to do this.* | AG-33.3 |
 | run failed | A hand-off note whose sources cannot be recorded as lineage rows — the note is not written | *The hand-off note could not record its sources — {reason}.* | AG-62.6 |
 | 403 | Forking by someone who is neither the person behind the run nor an Admin | *Only the person behind this run or an Admin.* | AG-62.11 |
@@ -346,14 +349,14 @@ Who an agent may hand work to is a rule on its Access Policies, which only an Ad
 | An ask is routed by the caller | A delegation ask goes to the named approvers of the agent whose rule said Ask — never the callee's approvers, never the person it benefits; a yes is for that hand-off only |
 | A lasting yes is an Admin's policy change | An Admin may *Draft a rule* from a delegation ask, which opens a draft for them to save; the ask itself allows only this hand-off |
 | An outside agent is added by its A2A card or its MCP server | The A2A agent card — at `/.well-known/agent-card.json` or the address an Admin gives — or an outside MCP server already added in the Control Plane; its name, version, skills, interfaces and how it signs in are kept as they were read; a change on its side reaches nothing until an Admin reads it again. The A2A version Invana speaks is pinned in [System design § 11](../../../../system-design.md#11-failure-modes-and-the-outside-boundary) › *Standards* |
-| An outside agent is an agent | Listed in Agents as *Outside*; it shows in Flow, Runs, *Access usage* and *What left the platform* like any agent, and is never given a task by a person |
+| An outside agent is an agent | Listed in Agents as *Outside*; it shows in Flow, Runs and History like any agent, and is never given a task by a person |
 | MCP carries tools, A2A carries tasks | An A2A task asks back, has states and returns what it made; an MCP outside agent is a server's tools called as one request and one answer each |
 | Calls go out from workers | From workers that can reach it; nothing passes through a hosted service |
 | A helper lives for the work | It retires when the work closes; a helper makes helpers only when its own policies allow Run `agent/*` |
-| An agent's helpers read over a window | Its sheet lists the helpers it made in 7, 30 or 90 days, each with its run; who made whom inside one run is the run's |
-| Outside agents live in Agents | *Agents › Outside agents* lists and adds them; it is the board `agents.external` |
+| An agent's helpers read over a window | Its page lists the helpers it made in 7, 30 or 90 days, each with its run; who made whom inside one run is the run's |
+| Outside agents are a filter of the Agents list | Agents › All agents filtered to *Outside* lists them, and *Add an outside agent* sits on that filter; it is the board `agents.agents · Outside`. There is no separate Outside agents place in the Agents section's nav |
 | Continuation is the run going on | At its session budget a run continues in a fresh session from a hand-off note — body in the blob store, row in Postgres. It is not an ask, not an exit reason and not a new run; the run's number, agent version, runtime and person behind it stay |
-| A note is read on the run | Between two sessions on the run's sheet; its head always reads, its body as far as the reader's agent may see its sources |
+| A note is read on the run | Between two sessions on the run's page; its head always reads, its body as far as the reader's agent may see its sources |
 | A fork is a person's act | Only a person forks, from a note they may read; an agent never forks its own run |
 | Federation means outside agents | Over A2A or MCP only; within the deployment it is delegation |
 

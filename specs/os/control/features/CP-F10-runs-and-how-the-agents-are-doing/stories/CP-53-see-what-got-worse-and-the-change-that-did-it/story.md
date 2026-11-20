@@ -4,7 +4,7 @@ title: See what got worse and the change that did it
 feature: CP-F10
 status: idea
 personas: [builder, admin]
-boards: [agents, agents.runs]
+boards: [agents.runs]
 ---
 
 # CP-53 · See what got worse and the change that did it
@@ -17,16 +17,16 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read how every agent, skill, plan and model version is doing; open the runs behind a figure; open a change to compare | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): the same — every figure reads and opens its runs | A run behind a figure whose content they may not read lists with its head and *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | the same — every figure reads and opens its runs | A run behind a figure whose content they may not read lists with its head and *withheld* ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([How they are doing]) --> t{"Agents · Skills · Plans · Model versions"}
+  a(["Agents › Runs › How they are doing"]) --> t{"Agents · Skills · Plans · Model versions"}
   t --> w{"7 · 30 · 90 days"}
   w --> n["Tiles · trend · one row per subject"]
   n -->|degraded| d["p95 now against its baseline · the change before it"]
@@ -40,7 +40,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| CP-53.1 | Runs in the window | the person opens how they are doing | tiles read success · p50 · p95 · runs · tokens a run · degraded, each against the same window before |
+| CP-53.1 | Runs in the window | the person opens the *How they are doing* tab of Runs | tiles read success · p50 · p95 · runs · tokens a run · degraded, each against the same window before |
 | CP-53.2 | Any tab | it opens | one row per subject — runs · success · p50 · p95 · trend · tokens a run · signal |
 | CP-53.3 | A subject whose last 3 runs each took more than 1.5× its 7-day p95, with at least 5 runs in that baseline | the tab opens | its row reads *degraded*, with p95 now against the baseline |
 | CP-53.4 | A degraded subject with an agent or skill version published inside its baseline before the first slow run | its row opens | the change is named with who published it and *Compare*; with none, it is named by its numbers alone — *p95 7.4s, up from 4.6s* |
@@ -56,9 +56,9 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| How they are doing — tiles, trend, rows | Admin | agents · Nothing ran | — | agents · Loading | agents · How they are doing | agents · Could not load | agents · Degraded | — |
-| How they are doing — tiles, trend, rows | Operator | agents · Nothing ran | — | agents · Loading | agents · How they are doing | agents · Could not load | agents · Degraded | agents · How they are doing |
+| How they are doing — tiles, trend, rows | Admin | agents.runs · How they are doing · Nothing ran | — | agents.runs · How they are doing · Loading | agents.runs · How they are doing | agents.runs · How they are doing · Could not load | agents.runs · How they are doing · Degraded | — |
+| How they are doing — tiles, trend, rows | Operator | agents.runs · How they are doing · Nothing ran | — | agents.runs · How they are doing · Loading | agents.runs · How they are doing | agents.runs · How they are doing · Could not load | agents.runs · How they are doing · Degraded | agents.runs · How they are doing |
 | Runs a figure opens | Admin | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | — | — |
 | Runs a figure opens | Operator | — | agents.runs · No runs match | agents.runs · Loading | agents.runs · Filtered | agents.runs · Could not load | — | agents.runs · Content withheld |

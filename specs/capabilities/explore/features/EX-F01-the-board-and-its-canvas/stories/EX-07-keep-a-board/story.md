@@ -3,8 +3,9 @@ id: EX-07
 title: Keep a board
 feature: EX-F01
 status: idea
+milestone: MVP
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.share]
+boards: [explore.board]
 ---
 
 # EX-07 · Keep a board
@@ -17,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through an agent granted to the person. A board is the organisation's, made by a person; making it grants nothing.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create boards; rename, delete, restore any board; schedule the question through an agent they may use | — |
-| Operator | The same; a Modeller the same | Without the Assistant: *Rename*, *Delete* and *Restore* disabled — *{person} may not use Assistant — ask an Admin*. A link to a board that does not exist: *Not found* |
+| Operator | The same | Without the Assistant: *Rename*, *Delete* and *Restore* disabled — *{person} may not use Assistant — ask an Admin*. A link to a board that does not exist: *Not found* |
 
 ## Flow
 
@@ -63,11 +64,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Boards on the left | Admin | explore.ask | explore.board · No board matches | explore.board · Loading | explore.board | explore.board · Failed | — | — |
-| Boards on the left | Operator | explore.ask | explore.board · No board matches | explore.board · Loading | explore.board | explore.board · Failed | — | — |
+| Boards on the left | Admin | explore.board · Ask | explore.board · Boards · No board matches | explore.board · Boards · Loading | explore.board · Boards | explore.board · Boards · Failed | — | — |
+| Boards on the left | Operator | explore.board · Ask | explore.board · Boards · No board matches | explore.board · Boards · Loading | explore.board · Boards | explore.board · Boards · Failed | — | — |
 | History · Save a version · Rename | Admin | — | — | — | explore.board | explore.board · Failed | — | — |
 | History · Save a version · Rename | Operator | — | — | — | explore.board | explore.board · Failed | — | explore.board · Not an owner |
-| Schedule this | Admin | — | — | — | explore.share · Schedule | explore.share · Failed | — | — |
-| Schedule this | Operator | — | — | — | explore.share · Schedule | explore.share · Failed | — | explore.share · No access |
+| Schedule this | Admin | — | — | — | explore.board · Share · Schedule | explore.board · Share · Failed | — | — |
+| Schedule this | Operator | — | — | — | explore.board · Share · Schedule | explore.board · Share · Failed | — | explore.board · Share · No access |

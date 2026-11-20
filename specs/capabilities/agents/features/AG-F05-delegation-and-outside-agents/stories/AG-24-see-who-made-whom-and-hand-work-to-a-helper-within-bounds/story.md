@@ -3,8 +3,9 @@ id: AG-24
 title: See who made whom, and hand work to a helper within bounds
 feature: AG-F05
 status: idea
+milestone: MVP
 personas: [builder, analyst]
-boards: [agents.run, agents.agent, inbox]
+boards: [agents.runs, agents.agents, inbox]
 ---
 
 # AG-24 · See who made whom, and hand work to a helper within bounds
@@ -17,11 +18,10 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read who made whom on any run; write the rules on Run `agent/<name>` that let an agent hand work on; answer a delegation ask that falls or escalates to Admins | — |
-| Modeller | Read who made whom on the runs whose content they may read; answer a delegation ask they are a named approver for | The rules read; changing them reads *Ask an Admin*; an ask routed to someone else reads, naming who it waits on |
-| Operator | As Modeller | As Modeller |
+| Operator | Read who made whom on the runs whose content they may read; answer a delegation ask they are a named approver for | The rules read; changing them reads *Ask an Admin*; an ask routed to someone else reads, naming who it waits on |
 
 ## Flow
 
@@ -65,17 +65,17 @@ flowchart LR
 | AG-24.18 | A helper or a delegated agent | it takes a step | its own policies ∩ every caller's bind, the same whoever is behind the run; work handed on never does what the root agent was denied, and a refusal names the agent in the chain whose rule denied it |
 | AG-24.19 | A helper an agent makes | it is made | it lives only for the work, holds no grant of its own, is in its run's delegation chain, and may make helpers only if its policies allow Run `agent/*` |
 | AG-24.21 | An agent of the deployment not granted to the person behind the run, and not already in its chain | the agent delegates to it | it is refused before it starts, naming the agent and who grants agents; an outside agent is reached only by a rule on Run `agent/<name>` and is Ask by default |
-| AG-24.20 | An agent's sheet | its helpers are read | every helper it made in the last 7, 30 or 90 days lists with the run it was made in, its state and its tokens against what it was given; a retired helper stays listed |
+| AG-24.20 | An agent's page | its helpers are read | every helper it made in the last 7, 30 or 90 days lists with the run it was made in, its state and its tokens against what it was given; a retired helper stays listed |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Who did what on a run | Admin | agents.run · One agent | — | agents.run · Loading | agents.run · Who did what | agents.run · Refused at a bound | agents.run · Helpers running | — |
-| Who did what on a run | Operator | agents.run · One agent | — | agents.run · Loading | agents.run · Who did what | agents.run · Refused at a bound | agents.run · Helpers running | agents.run · Ran, content hidden |
-| Who it may hand work to | Admin | agents.agent · Hands work to nobody | — | agents.agent · Loading | agents.agent · Flow | agents.agent · Could not load | — | — |
-| Who it may hand work to | Operator | agents.agent · Hands work to nobody | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Could not load | — | agents.agent · Read only |
+| Who did what on a run | Admin | agents.runs · Detail · One agent | — | agents.runs · Detail · Loading | agents.runs · Detail · Who did what | agents.runs · Detail · Refused at a bound | agents.runs · Detail · Helpers running | — |
+| Who did what on a run | Operator | agents.runs · Detail · One agent | — | agents.runs · Detail · Loading | agents.runs · Detail · Who did what | agents.runs · Detail · Refused at a bound | agents.runs · Detail · Helpers running | agents.runs · Detail · Ran, content hidden |
+| Who it may hand work to | Admin | agents.agents · Detail · Hands work to nobody | — | agents.agents · Detail · Loading | agents.agents · Detail · Flow | agents.agents · Detail · Could not load | — | — |
+| Who it may hand work to | Operator | agents.agents · Detail · Hands work to nobody | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Could not load | — | agents.agents · Detail · Read only |
 | A delegation ask | Admin | — | — | inbox · Loading | inbox · Delegation ask | — | — | — |
 | A delegation ask | Operator | — | — | inbox · Loading | inbox · Not yours to answer | — | — | inbox · Not yours to answer |
-| An agent's helpers over time | Admin | agents.agent · No helpers | agents.agent · No helpers | agents.agent · Loading | agents.agent · Helpers | agents.agent · Could not load | — | — |
-| An agent's helpers over time | Operator | agents.agent · No helpers | agents.agent · No helpers | agents.agent · Loading | agents.agent · Helpers | agents.agent · Could not load | — | — |
+| An agent's helpers over time | Admin | agents.agents · Detail · No helpers | agents.agents · Detail · No helpers | agents.agents · Detail · Loading | agents.agents · Detail · Helpers | agents.agents · Detail · Could not load | — | — |
+| An agent's helpers over time | Operator | agents.agents · Detail · No helpers | agents.agents · Detail · No helpers | agents.agents · Detail · Loading | agents.agents · Detail · Helpers | agents.agents · Detail · Could not load | — | — |

@@ -4,7 +4,7 @@ title: Read every function and what calls it
 feature: AG-F06
 status: idea
 personas: [admin, builder]
-boards: [agents.skills, agents.run]
+boards: [agents.skills, agents.runs]
 ---
 
 # AG-38 · Read every function and what calls it
@@ -18,10 +18,10 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every function, its contract, its needs, its calls and what calls it | — |
-| Operator | Read every function, its contract, its needs and what calls it — a contract, not a permission; read the calls of runs whose content they may read; a Modeller the same | A call from another person's run reads that it ran, its status and its tokens. Nothing on it adds, edits, switches or runs a function, for anyone |
+| Operator | Read every function, its contract, its needs and what calls it — a contract, not a permission; read the calls of runs whose content they may read | A call from another person's run reads that it ran, its status and its tokens. Nothing on it adds, edits, switches or runs a function, for anyone |
 
 ## Flow
 
@@ -61,19 +61,21 @@ flowchart TD
 | AG-38.9 | A function | it is read | it names the agents whose Access Policies allow Run on its plugin or tool; none reads *No agent may run it yet* |
 | AG-38.10 | A run's step, a workflow's step or a refusal | a person picks the function it names | its contract shows beside it, linking to the function's page |
 | AG-38.11 | A plan step naming a function this deployment does not have | the plan is read | the step reads *No such function*; the plan cannot run and its row says why |
-| AG-38.12 | An Operator, a Modeller or an Admin | they open a function | everything reads the same; there is no *Add*, *Edit*, *Switch off* or *Try it* |
+| AG-38.12 | An Operator or an Admin | they open a function | everything reads the same; there is no *Add*, *Edit*, *Switch off* or *Try it* |
 | AG-38.13 | A call by a run whose content the reader may read | they open it from *Calls* | the run's *How it got here* shows that step, its arguments and what it returned |
 | AG-38.14 | A function whose plugin is switched off | it is read | its head says the plugin is off, naming who switched it off, and that plans needing it are refused (CP-F02) |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Functions | Admin | agents.skills · Functions, not used yet | agents.skills · No functions match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | Functions | Operator | agents.skills · Functions, not used yet | agents.skills · No functions match | agents.skills · Loading | agents.skills · Functions | agents.skills · Could not load | — | — |
 | A function | Admin | agents.skills · A function, not used yet | — | agents.skills · Loading | agents.skills · A function | agents.skills · No such function | — | — |
 | A function | Operator | agents.skills · A function, not used yet | — | agents.skills · Loading | agents.skills · A function | agents.skills · No such function | — | — |
-| A function's calls | Admin | agents.skills · A function's calls, none | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | — |
-| A function's calls | Operator | agents.skills · A function's calls, none | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | agents.skills · A function's calls, content withheld |
-| A step's contract, on a run | Admin | — | — | agents.run · Loading | agents.run · Step | agents.run · Plan refused | agents.run · Running | — |
-| A step's contract, on a run | Operator | — | — | agents.run · Loading | agents.run · Step | agents.run · Plan refused | agents.run · Running | agents.run · Content withheld |
+| A function's calls | Admin | agents.skills · A function's calls · None | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | — |
+| A function's calls | Operator | agents.skills · A function's calls · None | — | agents.skills · Loading | agents.skills · A function's calls | agents.skills · Could not load | agents.skills · A function's calls | agents.skills · A function's calls, content withheld |
+| A step's contract, on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | — |
+| A step's contract, on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step | agents.runs · Detail · Plan refused | agents.runs · Detail · Running | agents.runs · Detail · Content withheld |
+| A function's calls · content withheld | Admin | — | — | — | agents.skills · A function's calls · Content withheld | — | — | — |
+| A function's calls · content withheld | Operator | — | — | — | agents.skills · A function's calls · Content withheld | — | — | — |

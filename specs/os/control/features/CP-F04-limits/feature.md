@@ -6,17 +6,17 @@ status: idea
 personas: [admin, builder]
 stories: [CP-11, CP-34, CP-12, CP-13, CP-14]
 journeys: [J07, J08]
-boards: [settings.usage, settings.workers, agents.run]
+boards: [settings.limits, settings.workers, agents.runs]
 nfrs: [NFR-REL-2, NFR-SEC-4, NFR-PERF-1, NFR-COST-1, NFR-COST-2]
 depends_on: [CP-F03, CP-F10, AC-F03, AC-F05]
 ---
 
 # Limits
 
-> What the deployment, each team, each user and each agent may spend and have running at once, and what one session of
+> What the deployment, each team, each user, each project and each agent may spend and have running at once, and what one session of
 > a run may spend before it continues in a fresh one — set in one place by an Admin, read by everyone — what each
 > spends against them, and why a run started, waits or was refused. Team and user limits bound the runs a person starts;
-> projects and schedules run within the agent's and the deployment's. The decision it helps make: *do we raise this
+> a project's bound every run inside it, pick-up included; every run is inside the agent's and the deployment's. The decision it helps make: *do we raise this
 > team's, user's or agent's limit, or let the work queue?*
 
 ## User journey
@@ -26,8 +26,8 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Usage and limits]) --> lim["CP-11 · Limits for the deployment, each team, user and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
-  lim -->|not an Admin| ro(["Reads · Edit disabled, naming the Admins"])
+  s([Settings › Workers › Limits]) --> lim["CP-11 · Limits for the deployment, each team, user, project and agent: tokens a month · a run · a session · runs at once · helpers · depth · worker time · queue or refuse"]
+  lim -->|without Edit on setting/deployment| ro(["Reads · Edit disabled, naming the permission"])
   s --> use["CP-34 · What each team, user and agent spends against its limits"]
   use -->|at a limit| al(["An ops alert (CP-59)"])
   start([A run starts]) --> adm["CP-12 · Admitted, waiting or refused · the limit that decided, and whose"]
@@ -55,37 +55,39 @@ flowchart TD
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)
-(*Workers and the queue · limits · AI models · skill scripts*: Operator Reads · Modeller Reads · Admin Acts); this is
-what it means here.
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+(*Workers* for reading, *Settings* › `deployment` for setting); this table names the acts.
 
-| Act | Role | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every limit and what each team, user and agent spends against it | Operator · Modeller · Admin | — |
-| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit | Admin | *Edit* disabled — *Needs the Admin role — ask {admins}* |
+| Read every limit and what each team, user and agent spends against it | Read on `worker/<group>` | — |
+| Set, change or clear a limit — the deployment's, a team's, a user's or an agent's; a model's rate limit; the slots of *AI model calls*, *graph database calls* and *heavy steps* | Edit on `setting/deployment` | *Edit* disabled — *Needs Edit on Deployment settings — ask {who can grant}* |
 | Ask for a higher limit from a held run | The person behind the run | *Ask for more* absent; why it is held reads |
-| Allow that ask | Admin, in Needs you (AC-15) | As AC-F05 |
+| Allow that ask | Edit on `setting/deployment`, in Needs you (AC-15) | As AC-F05 |
+| Set a project's *Runs at once* and *Tokens a month* | Manage on Projects for it, in the project's Access — the policy form's *Fleet / Workers* tab ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#the-policy-form)); its creator in New project's Access step, a raise beyond what they may grant asked of those with Manage on Projects | The tab reads; its limits disabled, naming the permission and who can grant it |
 
 ## States
 
 | State | What the person sees |
 |---|---|
-| First use | The deployment on its defaults — four runs at once, queue, no monthly token limit — and *No team, user or agent has its own limits* |
+| First use | The deployment on its defaults — four runs at once, queue, no monthly token limit — and *No team, user, project or agent has its own limits* |
 | Empty after a filter | *No {team · user · agent} has its own limits* · *Clear* |
 | Loading | The section opens at once; rows fill in place |
 | Has data | Each limit row: who it bounds, each limit with its ceiling, used now and a meter; each start admitted, waiting or refused with the limit that decided; each AI model's rate limit and what waits on it |
 | Failed | A limit refused names the field and its range; a run refused at a limit names the limit and whose; a rate-limit wait that ran out names the model |
 | Agent working or proposing | A run held by a limit says which, whose, how full and what is ahead, with *Ask for more* for the person behind it |
-| No access | Everything reads; *Edit* is disabled for everyone but an Admin, naming the Admins |
+| No access | Everything reads; *Edit* is disabled for everyone without Edit on `setting/deployment`, naming the permission |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
-| One place for limits | The deployment's, each team's, each user's and each agent's limits are set here and nowhere else; an agent's page reads its limits from here |
-| What a limit holds | *Tokens* a month · *Tokens* a run · *Tokens* a session — the deployment's and an agent's only · *Runs at once* · *Helpers* a run · *Helper depth* · *Worker time* an hour · *Worker groups* it may use · *At the limit* — queue or refuse · *May ask for more* |
-| No row, no limit | A team, user or agent with no limit row adds none; the deployment's always applies. A limit with no ceiling reads *No limit*; *Tokens a session* always has one — the deployment's is 200,000 unless an Admin sets another |
-| What binds a run | The agent's limits and the deployment's bind every run. The limits of the person behind it and of each team that person was on when the run opened bind only a **personal run** — one a person starts outside a project and a schedule (a question, a typed query, a load, a call over MCP) — and its helpers. A project's task, a pick-up and a schedule's firing run within the agent's and the deployment's limits alone. The tightest binds, and a run held or refused names which limit and whose |
+| One place for limits | The deployment's, each team's, each user's, each project's and each agent's limits live here; an agent's page reads its limits from here, and the policy form's *Fleet / Workers* tab writes a holder's through this feature's routes |
+| What a limit holds | *Tokens* a month · *Tokens* a run · *Tokens* a session — the deployment's and an agent's only · *Runs at once* — a project's limits are *Runs at once* and *Tokens a month* alone · *Helpers* a run · *Helper depth* · *Worker time* an hour · *Worker groups* it may use · *At the limit* — queue or refuse · *May ask for more* |
+| No row, no limit | A team, user, project or agent with no limit row adds none; the deployment's always applies. A limit with no ceiling reads *No limit*; *Tokens a session* always has one — the deployment's is 200,000 unless an Admin sets another |
+| What binds a run | The agent's limits and the deployment's bind every run. The limits of the person behind it and of each team that person was on when the run opened bind only a **personal run** — one a person starts outside a project and a schedule (a question, a typed query, a load, a call over MCP) — and its helpers. A run inside a project — its task, a pick-up, a schedule's firing on it — is bound by the project's limits too; a schedule's firing outside any project runs within the agent's and the deployment's alone. The tightest binds, and a run held or refused names which limit and whose |
 | A session budget continues a run | When a session reaches its *Tokens a session*, the run writes a hand-off note and continues in a fresh session — same run, same number ([AG-62](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/stories/AG-62-continue-in-a-fresh-session-from-a-hand-off-note/story.md)). It is never an ask and never an exit reason; *Tokens a run* and *Tokens a month* still bind the whole run |
 | Used now is the engine's | Tokens this month; a run's tokens as the 95th percentile over 30 days of finished runs; runs at once; helpers as the largest live tree, naming its run; Studio derives none |
 | At runs at once, the limit decides | *Queue* — the run waits, with its position and why; *refuse* — the firing is recorded as skipped, with the reason. The deployment's default is four at once, queue |
@@ -95,16 +97,17 @@ what it means here.
 | Helpers never make room | A helper draws on its parent's runs at once, tokens a run, helpers and depth |
 | A run's sub-tasks are bounded by its agent | An agent's sub-tasks stop at its helper depth (2 by default), helpers (12 in all) and tokens a run; people's sub-tasks have no limit |
 | A rate limit is a wait, not a failure | Backed off and shown as waiting; a failure only when the wait runs out, naming the model |
+| Pick-up spends the project's month | Runs a project's pick-up *Allow* opens count against the project's *Tokens a month* like any run inside it; at it, pick-up claims nothing and the project's runs are held, naming the project's limit. There is no pick-up cap of its own ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) |
 | Ask for more | The person behind a held run asks the Admins for more of the limit that holds it — for this run, for some days, or always — when that limit *May ask for more* |
-| Over a limit alerts | A team, user or agent reaching its monthly tokens raises an ops alert ([CP-F11](../CP-F11-ops-alerting/feature.md)) |
+| Over a limit alerts | A team, user, project or agent reaching its monthly tokens raises an ops alert ([CP-F11](../CP-F11-ops-alerting/feature.md)) |
 | Tokens, never currency | Every limit, meter and figure counts tokens ([glossary › Token budget](../../../../glossary.md#what-may-happen)) |
-| Leans on | Workers and the queue (CP-F03) · runs and their sessions (CP-F10) · continuation (AG-F05) · ops alerts (CP-F11) · teams and users (AC-F03) · asks (AC-F05) |
+| Leans on | Workers and the queue (CP-F03) · projects and their pick-up (PJ-F01) · the policy form (AC-F02) · runs and their sessions (CP-F10) · continuation (AG-F05) · ops alerts (CP-F11) · teams and users (AC-F03) · asks (AC-F05) |
 
 ## Data touched
 
 | Record | Read or write |
 |---|---|
-| Limits — the deployment's, each team's, user's and agent's | Read · write |
+| Limits — the deployment's, each team's, user's, project's and agent's | Read · write |
 | Spend this month and runs at once for each | Write (at each settle) · read |
 | A session's tokens against its session budget (CP-F10) | Read |
 | Grants from *Ask for more* | Write · read |
@@ -119,7 +122,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `control_limits` | `scope` (`deployment` · `team` · `user` · `agent`) · `subject_id?` · `monthly_tokens?` · `tokens_per_run?` · `tokens_per_session?` (`deployment` and `agent` rows only; the deployment's seeded at 200,000) · `max_concurrent_runs?` · `max_helpers?` · `max_depth?` · `worker_seconds_hour?` · `pools[]?` · `at_limit` (`queue` · `refuse`) · `may_ask_for_more` · `updated_by_id` · `updated_at` | Unique (`scope`, `subject_id`); the `deployment` row always exists, seeded with four runs at once and `queue`. A null column is *No limit* |
+| `control_limits` | `scope` (`deployment` · `team` · `user` · `project` · `agent`) · `subject_id?` · `monthly_tokens?` · `tokens_per_run?` · `tokens_per_session?` (`deployment` and `agent` rows only; the deployment's seeded at 200,000) · `max_concurrent_runs?` · `max_helpers?` · `max_depth?` · `worker_seconds_hour?` · `pools[]?` · `at_limit` (`queue` · `refuse`) · `may_ask_for_more` · `updated_by_id` · `updated_at` | Unique (`scope`, `subject_id`); the `deployment` row always exists, seeded with four runs at once and `queue`. A `project` row holds `monthly_tokens` and `max_concurrent_runs` only. A null column is *No limit* |
 | `control_spend` | `scope` · `subject_id?` · `month` · `tokens` · `held_tokens` · `runs_at_once` · `updated_at` | Written when a call settles or a run is admitted or ends, never computed on read; unique (`scope`, `subject_id`, `month`) |
 | `control_capacity_pools` | `name` (unique) · `slots` | Named capacity for the deployment; `llm` (20) · `graphdb` (50) · `heavy` (4) ship. Who waits on which, with position, is read — never stored twice |
 | `control_llm_rate_limits` | `llm_id` · `requests_per_minute` · `tokens_per_minute` | One row per offered model version that has a limit |
@@ -131,6 +134,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Runs — `status`, `queued_at`, `triggered_by`, the person behind it, `team_ids[]`, tokens, the reason a run waits | [CP-F10](../CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) |
 | Teams and users, and who is on which team | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
+| Projects a limit names, and whether a run is inside one | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | Agents a limit names | [AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine) |
 | The ask *Ask for more* raises and its answer | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | Worker groups, the queue order and suggested workers | [CP-F03](../CP-F03-workers-and-the-queue/feature.md#engine) |
@@ -143,11 +147,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Route, after `/api/v1/control` | Does | Story |
 |---|---|---|
 | `GET /limits` | Every limit row with its spend and used now — `?scope=` · `?subject_id=`; each row: `scope` · `subject_id` · `name` · each limit's `ceiling` (null — no limit) · `used` · `used_line` · `at_limit` · `may_ask_for_more` · grants in force | CP-11 · CP-34 |
-| `PUT /limits/{scope}/{subject_id}` · `PUT /limits/deployment` · `DELETE /limits/{scope}/{subject_id}` | Set a team's, user's or agent's limits · the deployment's · clear one, back to *No limit* | CP-11 |
+| `PUT /limits/{scope}/{subject_id}` · `PUT /limits/deployment` · `DELETE /limits/{scope}/{subject_id}` | Set a team's, user's, project's or agent's limits · the deployment's · clear one, back to *No limit* | CP-11 |
 | `GET /limits/binding?run_id=` · `GET /limits/binding?user_id=&agent_id=` | Which limits bind a run, or would bind a person running an agent, the tightest first | CP-12 · CP-14 |
 | `GET /contention` | `running` (run ids) · `queued` (`run_id` · `position` · `triggered_by` · `queued_at` · `reason` · `binding` {scope, subject, limit}) · `running_count` · `queued_count` · `pools` — every capacity pool with `size` and `in_use`, idle ones included | CP-12 · CP-14 |
 | `GET /starts` | Each start — admitted, waiting or refused — with the limit and whose that decided it, newest first | CP-12 |
 | `POST /limits/asks` | *Ask for more* from a held run `{run_id, limit, span (run · days · always), days?}` → an ask in the Admins' Needs you | CP-14 |
+| `PUT /contention/pools/{name}` | Set a capacity's slots `{slots}` — `llm` · `graphdb` · `heavy` | CP-11 |
 | `GET /llm-limits` · `PUT /llm-limits/{llm_id}` | Each offered model version's rate limit, how much is used and the steps waiting on it · set one | CP-13 |
 
 ### Events
@@ -156,8 +161,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | `control.limits.update` · `control.limits.clear` | An Admin sets or clears a limit row — scope, subject, old and new |
 | `control.limits.grant` | An ask for more is allowed, with its span |
-| `control.runs.queue` · `control.runs.admit` · `control.runs.refuse` | A start waits, is admitted, or is refused — naming the limit and its scope (`deployment` · `team` · `user` · `agent` · `pool`) |
-| `control.limits.reached` | A team, user or agent reaches its monthly tokens — read by ops alerting |
+| `control.runs.queue` · `control.runs.admit` · `control.runs.refuse` | A start waits, is admitted, or is refused — naming the limit and its scope (`deployment` · `team` · `user` · `project` · `agent` · `pool`) |
+| `control.limits.reached` | A team, user, project or agent reaches its monthly tokens — read by ops alerting |
 | `control.pools.saturated` | A capacity pool has had no free slot for a stated interval |
 | `control.llms.wait` | A step waits on a model version's rate limit, naming it |
 
@@ -165,11 +170,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Setting or clearing a limit, or a model's rate limit, by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-11.10 · CP-13.6 |
+| 403 | Setting or clearing a limit, or a model's rate limit, without Edit on `setting/deployment` — a project's, by anyone without Manage on Projects for it | *Needs Edit on Deployment settings — ask {who can grant}.* · *This needs Manage on {project} — ask {who can grant}.* | CP-11.10 · CP-13.6 · CP-11.24 |
 | 422 | A limit outside its range, or naming a team, user or agent that does not exist | *{field}: {why}.* | CP-11.11 |
+| 422 | A project limit other than *Runs at once* or *Tokens a month* | *A project takes runs at once and tokens a month.* | CP-11.23 |
 | 422 | *Tokens a session* on a team or a user, or cleared on the deployment | *Tokens a session is set for the deployment and for agents.* · *The deployment always has tokens a session.* | CP-11.20 |
 | run skipped | A start at a runs-at-once limit set to `refuse` | *Skipped — {subject} is at {n} runs at once.* | CP-11.5 |
-| run held | A team, user, agent or the deployment at its tokens a month — an agent's run | *{subject} has used its {n} tokens this month.* | CP-11.9 |
+| run held | A team, user, project, agent or the deployment at its tokens a month — an agent's run | *{subject} has used its {n} tokens this month.* | CP-11.9 |
 | run refused | An agent at its own runs at once | *{agent} is at its {n} runs at once.* | CP-12.4 |
 | step failed | A rate-limit wait that runs out | *{model} stayed at its rate limit past {wait}.* | CP-13.3 |
 | step refused | A step needing more slots than its pool has | *{step} needs {n} slots — {pool} has {size}.* | API only — a plan is checked before it runs, and the refusal reads on the run's Plan step (AG-18.17) |
@@ -185,14 +191,14 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Mechanism | How |
 |---|---|
-| Personal or not | A run is personal when `triggered_by` is `user`, `canvas` or `mcp` and it carries no project task — or it is a helper of such a run. Only a personal run reads the `user` and `team` rows; every other run reads the `agent` and `deployment` rows alone |
+| Personal or not | A run is personal when `triggered_by` is `user`, `canvas` or `mcp` and it carries no project task — or it is a helper of such a run. Only a personal run reads the `user` and `team` rows; a run inside a project — `project_id` on the run, a pick-up included — reads its `project` row; every run reads the `agent` and `deployment` rows |
 | Admission | At a run's start, in order: the access check ([AC-F04](../../../access/features/AC-F04-what-an-agent-may-touch/feature.md)) · every switch the work needs ([CP-F02](../CP-F02-plugins-and-outside-tools/feature.md) · [CP-F05](../CP-F05-graph-databases/feature.md)) · the agent's `max_concurrent_runs` — refused, never queued · for a personal run the person behind it and each of their teams, then the deployment, each `max_concurrent_runs` by its `at_limit` · every binding `monthly_tokens`. Each outcome is a `control.runs.*` event and a row of `GET /starts`, naming the binding limit; waiting is never a refusal |
-| The tightest binds | For each limit, the smallest ceiling among the agent's, the deployment's and — for a personal run — the person's and each of their teams' at open, plus any grant in force for that subject; ties name the narrowest scope — agent, then user, then team, then deployment |
-| A slot | Counted at admission for the agent, the person, each team, the deployment and each capacity pool; a waiting or paused run holds none. Lowering a limit below what runs stops new starts until the count is under it |
+| The tightest binds | For each limit, the smallest ceiling among the agent's, the deployment's, — for a run inside a project — the project's and — for a personal run — the person's and each of their teams' at open, plus any grant in force for that subject; ties name the narrowest scope — agent, then project, then user, then team, then deployment |
+| A slot | Counted at admission for the agent, the project, the person, each team, the deployment and each capacity pool; a waiting or paused run holds none. Lowering a limit below what runs stops new starts until the count is under it |
 | A helper's slot | Counted against its parent's agent, person, teams and the deployment like any run; its wait or refusal carries `parent_run_id` |
 | A run's sub-tasks | Checked when a run writes a sub-task: levels below the run's task against `max_depth`, the run's sub-tasks in all against `max_helpers`, tokens against `tokens_per_run`; one past any is PJ-F01's 422, and the run carries on |
 | Capacity pools | A step declares its pool and `pool_slots` (default 1; the function gives the default pool). A slot is taken after the access check and released when the call ends; any left are swept when the run settles. Slots go round-robin across runs, then by the order work is taken (CP-F03); the lowest of pool · step `max_parallel` · every binding runs at once wins |
-| Holding tokens | A call's `max_tokens` is held against the run and every binding month — agent, person, each team, deployment — in `control_spend.held_tokens` before it is sent, and the unspent part returned when it settles |
+| Holding tokens | A call's `max_tokens` is held against the run and every binding month — agent, project, person, each team, deployment — in `control_spend.held_tokens` before it is sent, and the unspent part returned when it settles |
 | Rate limits are backpressure | Per model version, requests and tokens a minute: a step that would pass the bucket waits before dispatch, `queued`, holding no slot and no worker, and is not counted in suggested workers; past its wait it fails naming the model |
 | A month | `monthly_tokens` counts from 00:00 UTC on the first of the month; at it, an agent's run waits *held* and `control.limits.reached` is written once for that subject and month |
 | Used now | `control_spend` for tokens this month and runs at once; a run's tokens as the p95 over 30 days of finished runs and the largest live helper tree are computed in the engine from stored per-run numbers |
@@ -204,7 +210,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | Five tables: limits by scope, spend by scope and month, capacity pools, model rate limits, grants | — |
+| § 6 Data and storage | Five tables: limits by scope — `project` among them —, spend by scope and month, capacity pools, model rate limits, grants | — |
 | § 8 APIs and events | `/api/v1/control/limits`, `/contention`, `/starts`, `/llm-limits`; `control.limits.*` · `control.runs.queue/admit/refuse` · `control.pools.saturated` · `control.llms.wait` events | — |
 | § 9 Distributed execution | Admission and slots at the coordinator across agent, person, teams and the deployment; a waiting run holds nothing; rate limits wait before dispatch | NFR-REL-2 |
 | § 10 AI and agents | Tokens are held before each call against every binding month; a run's sub-tasks are bounded by its agent's depth, helpers and tokens; a session budget ends a session and the run continues from a hand-off note | — |
@@ -214,13 +220,16 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
+| A capacity is named for what it limits | On screen the three capacities read *AI model calls* (`llm`) · *graph database calls* (`graphdb`) · *heavy steps* (`heavy`), each with its slots, in use and waiting, in Settings › Workers › Limits; *pool* is never shown |
+| Setting a limit is a deployment setting | Limits are the deployment's spend and capacity, saved per holder — never per worker group — so setting or clearing one, a model's rate limit or a capacity's slots, and allowing an ask for more, need Edit on `setting/deployment`; reading needs Read on `worker/<group>`. A project's limits stay with Manage on Projects. Refusal copy: *Needs Edit on Deployment settings — ask {who can grant}* |
 | Limits sit with Usage | *Usage and limits* is one page: each limit beside what is spent against it |
-| Four scopes, the tightest binds | Deployment, team, user and agent; a run is inside every one that applies, and the one that stops it is named |
-| Team and user limits bound personal runs | A project's work and a schedule do the same thing whoever set them going, so they run within the agent's and the deployment's limits; a person's and a team's limits bound what that person starts |
+| Five scopes, the tightest binds | Deployment, team, user, project and agent; a run is inside every one that applies, and the one that stops it is named |
+| Team and user limits bound personal runs | A project's work and a schedule do the same thing whoever set them going, so they run within the project's, the agent's and the deployment's limits; a person's and a team's limits bound what that person starts |
 | A session budget continues, never stops | A fresh session keeps a long run sharp; reaching it writes a hand-off note and carries on, and the run's own limits still bound the whole. The deployment's default is 200,000 tokens |
 | Teams at open | A run counts against the teams of the person behind it when it opened, so a team change never moves a run between limits mid-flight |
 | Sub-tasks reuse the helper limits | Depth and count of an agent's sub-tasks are its helper depth and helpers; one set of numbers bounds what an agent spawns |
-| Only Admins set limits | Spend and capacity are the deployment's; a person asks for more from a held run |
+| Only Admins set limits | Spend and capacity are the deployment's; a person asks for more from a held run. A project's two limits are set with its access, by Manage on Projects |
+| A project's month bounds its pick-up | One number bounds everything a project's runs spend, pick-up included; there is no separate pick-up cap |
 
 ## Open questions
 
@@ -232,7 +241,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Item | Why not |
 |---|---|
-| A limit per project, per graph database or per Access Policy | Spend is bounded by who runs it — team, user, agent — and the deployment; a policy says what may be touched, never how much |
-| Anyone but an Admin raising a limit | Spend and capacity are the deployment's; *Ask for more* reaches the Admins |
+| A limit per graph database or per Access Policy | Spend is bounded by who runs it — team, user, project, agent — and the deployment; a policy says what may be touched, never how much |
+| Anyone without Edit on `setting/deployment` raising a limit | Spend and capacity are the deployment's; *Ask for more* reaches the Admins |
 | Nested teams adding up | Teams are flat; each team's limit stands on its own |
 | A cost limit | Tokens only |

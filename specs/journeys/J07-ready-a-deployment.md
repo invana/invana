@@ -2,8 +2,8 @@
 id: J07
 title: Ready a deployment
 personas: [admin]
-stories: [AC-18, CP-17, CP-25, CP-38, CP-39, CP-40, CP-41, CP-01, CP-04, AC-09, AG-35, AC-04, CP-10, CP-09, CP-11, CP-34]
-boards: [settings.databases.connect, settings.databases, settings.databases.database, settings.ai, settings.access, settings.workers, settings.usage]
+stories: [AC-18, CP-79, CP-25, CP-38, CP-39, CP-40, CP-41, CP-01, CP-61, CP-82, CP-80, CP-81, CP-04, AC-09, AG-35, AC-04, CP-10, CP-09, CP-11, CP-34]
+boards: [settings.databases, settings.connectors, settings.plugins, settings.ai, settings.policies, settings.workers, settings.limits]
 ---
 
 # Ready a deployment
@@ -16,19 +16,22 @@ boards: [settings.databases.connect, settings.databases, settings.databases.data
 
 ```mermaid
 flowchart TD
-  A([Invana is deployed on Lee's machines]) --> B["AC-18 · Make the first Admin, then each person's account with one role"]
+  A([Invana is deployed on Lee's machines]) --> B["AC-18 · Make the first Admin, then each person's account with the newcomer policies"]
   B -->|an email or username taken · a rule broken| B1["Refused, naming which"] --> B
-  B --> C["CP-17 · Install the connector for each kind of graph database"]
+  B --> C["CP-79 · Install the connector for each kind of graph database"]
   C -->|a package fails to load · two claim one name| C1["invana version names the package and the error · not offered"] --> C
   C --> D["CP-25 · CP-38 · CP-39 · Connect each graph database · read-only or read + write · switch it on"]
   D --> D2["CP-41 · Name a practice graph database for agent tests"]
   D --> D3["CP-40 · Every graph database healthy, in one list"]
   D -->|the test fails| D1["The database's own words"] --> D
-  D --> E["CP-01 · Add AI models · mark each local or external · ping it"]
+  D --> E["CP-01 · CP-61 · Add AI models · ping it · mark each local or external"]
   E -->|the ping fails| E1["The provider's message, word for word"] --> E
   E --> F{"Should agents reach outside?"}
-  F -->|yes| F2["CP-04 · Switch a plugin on, deliberately"]
+  F -->|yes| F1["CP-79 · CP-82 · Install the connector or plugin, shown the command to run"]
   F -->|not yet| T
+  F1 --> F4["CP-80 · CP-81 · Add a credential and connect it · test, rotate or remove it later"]
+  F4 -->|the credential is refused| F5["The outside tool's own words"] --> F4
+  F4 --> F2["CP-04 · Switch a plugin on, deliberately"]
   F2 -->|its extra is not installed| F3["Says so, naming the extra · cannot be switched on"] --> T
   F2 --> T["AC-09 · Make teams and put people on them"]
   T --> G["AG-35 · Grant agents to teams and people — the Assistant among them"]
@@ -40,38 +43,40 @@ flowchart TD
   I --> J(["People sign in and ask · J01 · J05"])
   J --> K["CP-34 · Read what each team, user and agent spends against its limits"]
   K -->|near or at a limit| L(["Lee raises it in CP-11, or leaves it"])
-  B -.->|an Operator| N(["Reads what its role reaches · every set-up act names the Admins"])
+  B -.->|an Operator| N(["Reads what its policies reach · every set-up act names the Admins"])
 ```
 
 ## Steps
 
 | # | Step | Product · surface | Story | Board |
 |---|---|---|---|---|
-| 1 | Make the first Admin and each person's account, with one role | Access Plane · Directory · `invana users create` | AC-18 | — |
-| 2 | Install the connector package for each kind of graph database; read it in `invana version` | Control Plane · Graph databases · the engine's machine | CP-17 | — |
-| 3 | Connect each graph database, set its mode, switch it on and name a practice one | Control Plane · Graph databases | CP-25 · CP-38 · CP-39 · CP-41 | `settings.databases.connect` · `settings.databases.database` |
-| 4 | Add AI models, each marked local or external | Control Plane · AI models | CP-01 | `settings.ai` |
-| 5 | Switch on the plugins agents may use | Control Plane · Plugins and MCP | CP-04 | — |
-| 6 | Make teams and put people on them | Access Plane · Directory | AC-09 | `settings.access` |
-| 7 | Grant agents to teams and people | Agents · The agents catalogue | AG-35 | — |
-| 8 | Write the Access Policies and attach them to agents | Access Plane · Access Policies | AC-04 | `settings.access` |
-| 9 | Add workers on Lee's own machines and watch them join | Control Plane · Workers and the queue | CP-10 | `settings.workers` |
-| 10 | See every worker and where steps wait | Control Plane · Workers and the queue | CP-09 | `settings.workers` |
-| 11 | Set limits per team, user and agent | Control Plane · Limits | CP-11 | `settings.usage` |
-| 12 | Read what each spends against its limits | Control Plane · Limits | CP-34 | `settings.usage` |
+| 1 | Make the first Admin and each person's account, with the newcomer policies | Access Plane · Directory · `invana users create` | AC-18 | — |
+| 2 | Install the connector package for each kind of graph database; read it in `invana version` | Control Plane · Connectors · the engine's machine | CP-79 | `settings.connectors · Install` |
+| 3 | Connect each graph database, set its mode, switch it on and name a practice one | Control Plane · Graph databases | CP-25 · CP-38 · CP-39 · CP-41 | `settings.databases · Connect` · `settings.databases · Detail` |
+| 4 | Add AI models, each marked local or external | Control Plane · AI models | CP-01 · CP-61 | `settings.ai` |
+| 5 | Install a connector or a plugin agents may use — shown the command, run on the engine's machine | Control Plane · Plugins and MCP | CP-79 · CP-82 | `settings.connectors` · `settings.plugins` |
+| 6 | Add a credential to a connector, connect it, and test, rotate or remove it later | Control Plane · Plugins and MCP | CP-80 · CP-81 | `settings.connectors · Detail · Credentials` |
+| 7 | Switch on the plugins agents may use | Control Plane · Plugins and MCP | CP-04 | — |
+| 8 | Make teams and put people on them | Access Plane · Directory | AC-09 | `settings.people` |
+| 9 | Grant agents to teams and people | Agents · The agents catalogue | AG-35 | — |
+| 10 | Write the Access Policies and attach them to agents | Access Plane · Access Policies | AC-04 | `settings.policies` |
+| 11 | Add workers on Lee's own machines and watch them join | Control Plane · Workers and the queue | CP-10 | `settings.workers` |
+| 12 | See every worker and where steps wait | Control Plane · Workers and the queue | CP-09 | `settings.workers` |
+| 13 | Set limits per team, user and agent | Control Plane · Limits | CP-11 | `settings.limits · Usage` |
+| 14 | Read what each spends against its limits | Control Plane · Limits | CP-34 | `settings.limits · Usage` |
 
 ## Branches
 
 | When | What happens | Story | Board |
 |---|---|---|---|
-| It needs permission | Every set-up act is an Admin's; a person near a limit reads that an Admin sets it, and Lee raises it | CP-34 · CP-11 | `settings.usage` |
-| It fails | A failed connection test names the database's error; a failed ping shows the provider's message word for word; a refused join tells the worker why; a connector that fails to load is listed as failed, naming the package | CP-25 · CP-01 · CP-10 · CP-17 | `settings.databases.connect` · `settings.ai` · `settings.workers` |
+| It needs permission | Every set-up act is an Admin's; a person near a limit reads that an Admin sets it, and Lee raises it | CP-34 · CP-11 | `settings.limits · Usage` |
+| It fails | A failed connection test names the database's error; a failed ping shows the provider's message word for word; a refused join tells the worker why; a connector that fails to load is listed as failed, naming the package | CP-25 · CP-01 · CP-10 · CP-79 | `settings.databases · Connect` · `settings.ai` · `settings.workers` |
 | The person has no access | An Operator reads AI models, plugins, workers and graph databases; every act is disabled, naming the Admins; secrets never show | CP-01 · CP-04 · CP-09 · CP-10 · CP-40 | `settings.ai` · `settings.workers` |
-| A connector is not installed | Its kind of graph database cannot be connected; the step names the package that adds it | CP-17 | — |
+| A connector is not installed | Its kind of graph database cannot be connected; the step names the package that adds it | CP-79 | `settings.connectors · Install · Not installed` |
 | A graph database or plugin stays off | Work that needs it is refused before it starts, naming who switched it off | CP-39 · CP-04 | — |
 | No agent is granted | A person who signs in can read but not ask; asking names the Admins who grant agents | AG-35 | — |
 
 ## Done when
 
-- Every person who needs Invana has an account with one role, and no account has a default password.
+- Every person who needs Invana has an account with the newcomer policies, and no account has a default password.
 - Every graph database is connected in the mode Lee chose and switched on, an AI model answers, every team holds the agents it needs under Access Policies Lee wrote, workers take every step, and each team, user and agent runs inside the limits Lee set.

@@ -4,7 +4,7 @@ title: Put routine work on a schedule
 feature: AG-F07
 status: idea
 personas: [analyst, decision-maker, admin]
-boards: [agents.schedules, inbox]
+boards: [agents.schedules, projects.schedules, inbox]
 ---
 
 # AG-42 · Put routine work on a schedule
@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F07](../../feature.md)
 
 ## Who can
 
-Schedules are *Acts* for every role in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); a person acts on a schedule through its agent, granted to them.
+A person acts on a schedule through its agent, Run on `agent/<name>` held by them ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Create, edit, pause, resume, run now and delete a schedule whose agent is granted to them; read every schedule and firing, and open a run as [AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules) allows | On a schedule whose agent is not granted to them, every act disabled — *Uses {agent}, which is not granted to you* |
-| Operator | The same; a Modeller the same | The same |
+| Operator | The same | The same |
 
 ## Flow
 
@@ -48,7 +48,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | AG-42.1 | No schedules | a person opens Agents › Schedules | it reads *Nothing is scheduled* with *New schedule* |
-| AG-42.2 | A person of any role | they save a schedule naming what to do, an agent granted to them, a repeat, a time zone and where to deliver | it is saved with no project, and its next run reads in their zone |
+| AG-42.2 | Any signed-in person | they save a schedule naming what to do, an agent granted to them, a repeat, a time zone and where to deliver | it is saved with no project, and its next run reads in their zone |
 | AG-42.3 | A new schedule | its repeat is invalid, its time zone unknown, or its agent or a channel is missing | it is refused before saving, the dialog naming the field and why |
 | AG-42.4 | A saved schedule | its time comes | a run of the named agent opens with its instructions, acting as the agent, who set the schedule recorded on it, and the firing is kept as *opened* with its run |
 | AG-42.5 | A schedule whose last run is still going, *If the last run is still going* = *Skip* | its next firing comes | the firing is kept as *skipped*, saying why; with *Run anyway* a second run opens |
@@ -73,15 +73,23 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Schedules | Admin | agents.schedules · Nothing is scheduled | — | agents.schedules · Loading | agents.schedules | agents.schedules · Could not load | agents.schedules · Running | — |
 | Schedules | Operator | agents.schedules · Nothing is scheduled · Read only | — | agents.schedules · Loading | agents.schedules · Read only | agents.schedules · Could not load | agents.schedules · Running | agents.schedules · Read only |
-| New schedule | Admin | agents.schedules · New schedule | — | — | agents.schedules · New schedule | agents.schedules · New schedule refused | — | — |
+| New schedule | Admin | agents.schedules · New | — | — | agents.schedules · New · Filled | agents.schedules · New · Refused | — | — |
 | New schedule | Operator | — | — | — | — | — | — | agents.schedules · Read only |
-| Outward approval off | Admin | — | — | — | agents.schedules · Confirm Allow | agents.schedules · New schedule refused | — | — |
+| Outward approval off | Admin | — | — | — | agents.schedules · New · Confirm Allow | agents.schedules · New · Refused | — | — |
 | Outward approval off | Operator | — | — | — | agents.schedules · A schedule · Read only | — | — | agents.schedules · Read only |
 | A schedule | Admin | agents.schedules · A schedule · No firings yet | — | agents.schedules · A schedule · Loading | agents.schedules · A schedule | agents.schedules · A schedule · Last run failed | agents.schedules · A schedule · Running | — |
 | A schedule | Operator | agents.schedules · A schedule · No firings yet | — | agents.schedules · A schedule · Loading | agents.schedules · A schedule · Read only | agents.schedules · A schedule · Last run failed | agents.schedules · A schedule · Running | agents.schedules · A schedule · Read only |
 | A delivered result and an outward ask | Admin | — | — | — | inbox · A schedule's result | inbox · A schedule's failed run | inbox · Send this schedule's result? | — |
 | A delivered result and an outward ask | Operator | — | — | — | inbox · A schedule's result | inbox · A schedule's failed run | inbox · Send this schedule's result? · Waiting on the approver | — |
+| Projects › Schedules | Admin | projects.schedules · Nothing is scheduled | — | projects.schedules · Loading | projects.schedules | projects.schedules · Could not load | projects.schedules · Running | — |
+| Projects › Schedules | Operator | projects.schedules · Nothing is scheduled · Read only | — | projects.schedules · Loading | projects.schedules · Read only | projects.schedules · Could not load | projects.schedules · Running | projects.schedules · Read only |
+| New schedule · Save | Admin | agents.schedules · New · Filled | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| New schedule · Save | Operator | agents.schedules · New · Filled | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| New schedule · Allow without asking | Admin | agents.schedules · New · Confirm Allow | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| New schedule · Allow without asking | Operator | agents.schedules · New · Confirm Allow | — | agents.schedules · New · Saving | agents.schedules · A schedule | agents.schedules · New · Refused | — | — |
+| A schedule · its first result | Admin | agents.schedules · A schedule | — | — | inbox · A schedule's result | inbox · A schedule's failed run | — | — |
+| A schedule · its first result | Operator | agents.schedules · A schedule | — | — | inbox · A schedule's result | inbox · A schedule's failed run | — | — |

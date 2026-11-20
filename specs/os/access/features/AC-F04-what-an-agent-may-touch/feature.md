@@ -6,15 +6,15 @@ status: idea
 personas: [admin, builder, analyst]
 stories: [AC-12, AC-13, AC-14]
 journeys: [J06, J09]
-boards: [settings.access, access.locked, inbox, agents.run]
+boards: [settings.agent_access, agents.runs, inbox, settings.policies]
 nfrs: [NFR-SEC-1, NFR-SEC-5]
 depends_on: [AC-F02, AC-F03, AC-F05, AC-F06, AG-F01, AG-F04, AG-F05]
 ---
 
 # What an agent may touch
 
-> What each agent can actually Read, Write and Run and why not — its Access Policies narrowed by every caller along a
-> chain and by the ceilings of the run it is in — the same for everyone who may use it — beside what its skills,
+> What each agent can actually do in a run and why not — the person behind the run ∩ the project's policies ∩ the
+> agent's ceiling, narrowed by every caller along a chain and by the ceilings of the run it is in — beside what its skills,
 > plugins and workflows declare they need, and the ask a denied agent raises for more.
 > The decision it helps make: *should this agent be able to touch this — and should it have more when it asks?*
 
@@ -25,14 +25,14 @@ Journeys this feature is a step of: [J06 · Set what an agent may touch](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › Agents]) --> ag["AC-12 · Every agent — what it can do, and why not"]
-  ag -->|Open in Agents| agx(["AG-F01 · the agent's sheet"])
+  start([Access › What they may do › Agents]) --> ag["AC-12 · Every agent — what it can do, and why not"]
+  ag -->|Open in Agents| agx(["AG-F01 · the agent's page"])
   ag --> touch["AC-13 · What it may touch — each resource, its effect, the rule and policy that set it · each declared need, met or missing · its ceilings"]
   touch -->|Change · an Admin| pol(["AC-04 · the policy, at that rule"])
   touch -->|Change · not an Admin| ro(["The policy reads · editing names the Admins"])
   run([A step of a run]) --> need{"Declared needs within the policies?"}
   need -->|no| nr(["Refused before it runs · names what is missing"])
-  need -->|yes| chain{"The strictest rule — this agent ∩ every caller"}
+  need -->|yes| chain{"The strictest rule — the project's policies, or the person outside a project ∩ this agent's ceiling ∩ every caller's"}
   chain -->|Allow| ceil{"Within the ceilings — key · run scope · graph database mode?"}
   ceil -->|yes| go(["It runs"])
   ceil -->|no| cr(["Refused · names the ceiling"])
@@ -56,7 +56,7 @@ sequenceDiagram
   E->>E: A's rules allow Run agent/B? within A's depth and fan-out?
   E->>B: B runs, held to B ∩ A, within the run's ceilings
   B->>E: a step: Read data/sales/Order
-  E->>E: B's needs declared? strictest of B and A · key ∩ run scope ∩ the database's mode
+  E->>E: B's needs declared? strictest of the project's policies (or P's permissions outside a project), B and A · key ∩ run scope ∩ the database's mode
   alt allowed
     E-->>B: runs · the verdict kept with the step
   else denied
@@ -75,12 +75,14 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
-|---|---|---|
-| Read every agent's access — what it can do, every rule that reaches it, its declared needs, its ceilings, its refusals | Every signed-in person — Operator, Modeller, Admin | — |
-| Attach a policy to an agent from here, or *Change* a rule | Admin, in a session ([AC-11](../AC-F02-access-policies/stories/AC-11-attach-a-policy-to-agents/story.md) · [AC-04](../AC-F02-access-policies/stories/AC-04-write-the-rules-of-an-access-policy/story.md)) | Disabled, naming the Admin role and the Admins |
-| Decide an ask for more | The agent's named approvers, then Admins, in a session — never the person it benefits ([AC-F05](../AC-F05-asks-and-approvals/feature.md)) | The ask reads; its acts are disabled, naming who it waits on |
-| Set the caps on asks for more | Admin, in Limits ([CP-F04](../../../control/features/CP-F04-limits/feature.md)) | The caps read |
+Permissions are [the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)'s; an act a person lacks shows disabled, naming the permission and who can grant it.
+
+| Act | Permission |
+|---|---|
+| Read every agent's access — what it can do, every rule that reaches it, its declared needs, its ceilings, its refusals — on the page, in a check and at the command line | Read on `access/policies`; without it *No access*, naming the permission and who can grant it |
+| Attach a policy to an agent from here ([AC-11](../AC-F02-access-policies/stories/AC-11-attach-a-policy-to-agents/story.md)) · *Change* a rule ([AC-04](../AC-F02-access-policies/stories/AC-04-write-the-rules-of-an-access-policy/story.md)) | Manage on Access · Edit on Access, in a session |
+| Decide an ask for more | The agent's named approvers, then Admins, in a session — never the person it benefits ([AC-F05](../AC-F05-asks-and-approvals/feature.md)) |
+| Set the caps on asks for more | Edit on Workers, in Limits ([CP-F04](../../../control/features/CP-F04-limits/feature.md)) |
 
 ## States
 
@@ -88,39 +90,39 @@ sequenceDiagram
 |---|---|
 | First use | The built-in agents, each with its built-in policy; an agent made here with no policy attached reads *Holds no policy — every act is denied* |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; lists show loading rows; counts read `—` until the engine gives them |
+| Loading | The section opens at once; lists show loading rows; counts read `—` until the engine gives them |
 | Has data | Each agent, what it can actually do and why not; each resource with its effect and the rule and policy that set it; each declared need, met or missing; the ceilings a run would add |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | A denied agent asking for more in Needs you |
-| No access | Every agent's access reads; attaching and *Change* are disabled, naming the Admin role and the Admins |
+| No access | Without Read on `access/policies`, every agent's access reads *No access*, naming the permission and who can grant it, and nothing says what a ceiling holds or hides; with Read and without Edit or Manage, attaching and *Change* are disabled, naming the permission and who can grant it |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
-| Everyone reads an agent's access | What an agent may touch is read from Access Policies, which every signed-in person reads; a person must see a rule to know whom to ask. What an agent did — its usage, its calls and a run's content — is read as [Access usage](../AC-F08-access-usage/feature.md) and [What left the platform](../AC-F09-what-left-the-platform/feature.md) say |
-| The same for everyone | An agent's access is its Access Policies', narrowed only by its callers and its ceilings; the person behind a run, their role and their teams never change what the agent reaches. Who may start a run is the role and the grant ([AC-F02 › The order of checks](../AC-F02-access-policies/feature.md#the-order-of-checks)) |
-| Who is behind a run | A run a person starts has that person behind it; a key's run has the key's owner; a connected client's run has the person who consented. A scheduled run and a project's pick-up run as the agent, with the person who set them recorded ([AG-F07](../../../../capabilities/agents/features/AG-F07-schedules/feature.md)); no person's grant or role is checked for them, and they keep running if that person leaves |
-| Narrowed at every hop | Delegating is a Run on `agent/<name>`; the callee runs with the callee's rules ∩ every caller's rules, within the caller's depth and fan-out ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md)). The strictest effect along the chain wins. Narrowing is agent to agent only. A helper an agent makes holds its maker's access, narrowed, and none of its own |
+| Readers of policies read an agent's access | What an agent may touch is read from Access Policies, which only a person with Read on `access/policies` reads — every agent's ceiling carries *Hidden from agents* ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)). Anyone else reads the check that refused and who can grant. What an agent did — its usage, its calls and a run's content — is read as [Access usage](../AC-F08-access-usage/feature.md) and [What left the platform](../AC-F09-what-left-the-platform/feature.md) say |
+| What a run reaches | Inside a project: the project's policies ∩ the agent's ceiling; outside one: the person behind it ∩ the agent's ceiling — each ∩ every caller's ceiling ∩ the ceilings below ([AC-F02 › Rules](../AC-F02-access-policies/feature.md#rules)). Never more than the agent's ceiling for anyone. Outside a project the person's permissions are checked at every step; when they leave, the slot falls back to their successor, and the run waits until it has one ([AC-F07](../AC-F07-ownership/feature.md#slots-and-fallbacks)) |
+| Narrowed at every hop | Delegating is a Run on `agent/<name>`; the callee runs with the project's policies, or outside a project the person, ∩ the callee's ceiling ∩ every caller's, within the caller's depth and fan-out ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md)). The strictest effect along the chain wins. A helper an agent makes holds its maker's access, narrowed, and none of its own |
+| A project's team grants nothing | Being on a project's team, the Lead agent included, lets an agent be assigned and pick up the project's tasks; it never widens what its runs reach |
 | Ceilings only narrow | What the rules allow is narrowed by every ceiling that applies to the run — never widened: the **key** it runs under ([AC-F10](../AC-F10-keys/feature.md)) or the connected client's narrowing ([AC-F11](../AC-F11-connect-an-mcp-client/feature.md)) · the **run scope** · a **credential's scope** at the outside system · the **graph database's mode** — a Write needs a read + write graph database ([CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) · the **worker sandbox** on a worker ([CP-F03](../../../control/features/CP-F03-workers-and-the-queue/feature.md)) |
-| The run scope | A run inside a project reaches `memory/project/…` and `project/…` only for its own project, the projects related to it ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md)) and its task, whatever its policies allow beyond them; a run outside any project has no run scope |
+| The run scope | A run inside a project reaches `memory/project/…` and `project/…` only for its own project, the projects related to it ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md)) and its task, and only what its project's policies allow ([PJ-F01 › Rules](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#rules)) — whatever its ceiling allows beyond them; a run outside any project has no run scope |
 | Outside agents | An agent of kind *external*, reached over A2A or MCP, is Ask by default: a Run on it waits for a named approver unless a rule allows it ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md)) |
-| Declared needs | A skill, plugin, workflow or function declares the verbs and resources it needs; a declaration grants nothing. It is usable by an agent when every need is within the agent's policies and its ceilings. Otherwise it is refused before it runs, naming the first need missing |
+| Declared needs | A skill, plugin, workflow or function declares the actions and resources it needs; a declaration grants nothing. It is usable by an agent when every need is within the agent's ceiling and the run's. Otherwise it is refused before it runs, naming the first need missing |
 | Switched off is refused first | A step needing a graph database or plugin switched off is refused before any rule is read, naming who switched it off — the install's switch for every run, the person's own for the runs they start ([CP-F02](../../../control/features/CP-F02-plugins-and-outside-tools/feature.md) · [CP-F05](../../../control/features/CP-F05-graph-databases/feature.md)) |
-| Only people change access | No agent writes a policy, a rule, an attachment, a grant, a role, a team, an owner or an approver; a step that would is refused. An agent's route to more is an ask for the act it needs |
-| Asks for more are bounded | An *item* is one verb on one resource. A denied step asks at most once per run per item; a match to an open ask joins it; a helper's or a delegate's asks count against its root agent. Asks for more are capped per agent per day and for the deployment per day — limits an Admin sets in [Limits](../../../control/features/CP-F04-limits/feature.md) |
+| Only people change access | No agent writes a policy, a rule, an attachment, a team, an owner or an approver; a step that would is refused. An agent's route to more is an ask for the act it needs |
+| Asks for more are bounded | An *item* is one action on one resource. A denied step asks at most once per run per item; a match to an open ask joins it; a helper's or a delegate's asks count against its root agent. Asks for more are capped per agent per day and for the deployment per day — limits an Admin sets in [Limits](../../../control/features/CP-F04-limits/feature.md) |
 | A yes is for this step of this run | An allowed ask for more lets that step, for that agent, in that run — never its children and never another run. A lasting change is a rule an Admin saves, after *Who it changes* (AC-06) |
 | Checked when the step runs | Each step is checked against the policies in force when it runs; a policy saved mid-run holds from the next step, and an open ask on an act it now denies closes refused, naming the rule |
-| Leans on | Access Policies, the order of checks and the one evaluator (AC-F02) · grants (AC-F03) · asks (AC-F05) · History of every verdict (AC-F06) · keys (AC-F10) · agents (AG-F01) · skills and their needs (AG-F04) · delegation (AG-F05) · projects and their relations (PJ-F01) |
+| Leans on | Access Policies, the order of checks and the one evaluator (AC-F02) · people, teams and their policies (AC-F03) · asks (AC-F05) · History of every verdict (AC-F06) · keys (AC-F10) · agents (AG-F01) · skills and their needs (AG-F04) · delegation (AG-F05) · projects and their relations (PJ-F01) |
 
 ## Data touched
 
 | Record | Read or write |
 |---|---|
 | Access Policies, their rules, versions and attachments (AC-F02) | Read |
-| Grants of agents (AC-F03) | Read |
+| People, teams and the policies attached to each (AC-F03) | Read |
 | Declared needs of skills, plugins, workflows and functions | Read |
-| A run's key, project, related projects and task — its ceilings | Read |
+| A run's key, project, related projects, the project's graph databases and task — its ceilings | Read |
 | Asks for more (AC-F05) and refusals in History (AC-F06) | Read |
 
 ## Engine
@@ -139,7 +141,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | Access Policies, rules, attachments, the order of checks and the one evaluator `decide()` | [AC-F02](../AC-F02-access-policies/feature.md#engine) |
-| Users and the agents granted to each | [AC-F03](../AC-F03-directory/feature.md#engine) |
+| Users, their teams and policies | [AC-F03](../AC-F03-directory/feature.md#engine) · [AC-F02](../AC-F02-access-policies/feature.md#engine) |
 | Asks for more — raised, joined, declined until a date | [AC-F05](../AC-F05-asks-and-approvals/feature.md#engine) |
 | History — refusals, and the verdict kept with each step | [AC-F06](../AC-F06-history/feature.md#engine) |
 | A key's narrowing | [AC-F10](../AC-F10-keys/feature.md#engine) |
@@ -155,8 +157,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Route, after `/api/v1/access` | Does | Story |
 |---|---|---|
-| `GET /agents` | One row per agent by the list contract (`?kind=builtin · custom · external` · `?q=`): `name` · `kind` · `policies[]` · `allowed` (resources it may reach) · `needs_missing` · `refused_7d` · `made_by` · `granted_count`; helpers counted on their maker | AC-12 |
-| `GET /agents/{name}/effective?caller=&project=&key=` | What it can do, called by that agent chain, within the ceilings of that project and key: `{agent, callers[], ceilings[], rows[], needs[], delegates[]}`; a row `{verb, resource, effect, rule, policy, policy_version, set_by, narrowed_by?, ceiling?, why}` | AC-12 · AC-13 |
+| `GET /agents` · every route below needs Read on `access/policies` | One row per agent by the list contract (`?kind=builtin · custom · external` · `?q=`): `name` · `kind` · `policies[]` · `allowed` (resources it may reach) · `needs_missing` · `refused_7d` · `made_by` · `granted_count`; helpers counted on their maker | AC-12 |
+| `GET /agents/{name}/effective?person=&caller=&project=&key=` | What it can do — its ceiling, or for that person behind the run, called by that agent chain, within the ceilings of that project and key: `{agent, person?, callers[], ceilings[], rows[], needs[], delegates[]}`; a row `{verb, resource, effect, rule, policy, policy_version, set_by, narrowed_by?, ceiling?, why}` | AC-12 · AC-13 |
 | `GET /agents/{name}/needs` | Each skill, plugin, workflow and function the agent uses, each need, and whether it is met — missing names the rule, the ceiling or the switch | AC-13 |
 | `GET /agents/{name}/refusals` | A page of the agent's refused History rows | AC-12 |
 
@@ -170,12 +172,12 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| step | A step no rule along the chain allows, or a Deny — `policy_refused`; it fails before it runs and nothing is spent | *{agent} may not {verb} {resource} — {rule} on {policy}{, via caller}.* | AC-12.10 · AC-14.1 |
+| step | A step no rule along the chain allows — `policy_refused`; it fails before it runs and nothing is spent. A name a Deny hides never reaches this check: it fails at lookup as one that does not exist ([AC-F02 › Refusals](../AC-F02-access-policies/feature.md#refusals)) | *{agent} may not {verb} {resource}.* — a reader of policies reads *— {rule} on {policy}{, via caller}* after it | AC-12.10 · AC-14.1 |
 | step | A step its rules allow but a ceiling does not — the key, the run scope or a credential's scope | *{ceiling} keeps {agent} from {verb} {resource}.* | AC-13.16 |
 | step | A step whose skill, plugin, workflow or function declares a need the agent's policies do not allow | *{thing} needs {verb} {resource} — {agent}'s policies do not allow it.* | AC-13.7 |
 | step | A Write on a read-only graph database | *{database} is read-only — {thing} needs to write.* | AC-13.8 |
 | step | A step needing a graph database or plugin switched off | *{name} is switched off by {person}.* | AC-13.9 |
-| step | A step that would write a policy, rule, attachment, grant, role, team, owner or approver | *Only a person changes access.* | AC-14.10 |
+| step | A step that would write a policy, rule, attachment, team, owner or approver | *Only a person changes access.* | AC-14.10 |
 | step | A second ask for the same item in one run | *Already asked — {ask}.* | AC-14.9 |
 | step | An ask for more past the agent's daily cap or the deployment's | *{n} asks today — the {agent or deployment} cap is {cap}.* | AC-14.13 |
 | step | An ask for more on an item declined for that agent until a date | *Declined until {date} by {person}.* | AC-14.12 |
@@ -191,10 +193,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Mechanism | How |
 |---|---|
 | The gate | Steps 3 – 5 of [the order of checks](../AC-F02-access-policies/feature.md#the-order-of-checks): the switches its graph databases and plugins need; then each declared need and the step's own verb and resource through `decide(agent, verb, resource)` ([AC-F02](../AC-F02-access-policies/feature.md#engine)) for the agent and for every caller along the chain — the strictest answer wins; then the ceilings. The first refusal is named |
-| A step's resource | A graph read or write: `data/<graph database>/<kind>` for each kind the typed query plan names · memory: `memory/project/<project>` · `memory/agent/<agent>` · `memory/org` · a project's tasks, files and context: `project/<project>` · a skill: `skill/<name>` · a workflow: `workflow/<name>` · handing work on: `agent/<name>` · a plugin's function: `plugin/<name>` · a tool: `tool/<plugin>/<tool>` · on a worker: `fs/<path>` · `cmd/<program>` · `net/<host>` |
-| The caller chain | A run carries its chain of agents from the root; `decide()` runs once per agent on it, none with a person; depth and fan-out are the caller's ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine)) |
-| The ceilings | `ceilings(run)` intersects, in order, the key's allow list ([AC-F10](../AC-F10-keys/feature.md#engine)) · the run scope — a run with a project keeps `memory/project/…` and `project/…` to its project, its related projects and its task · the graph database's mode. A credential's scope is the outside system's own and refuses there; the worker sandbox enforces `fs/` · `cmd/` · `net/` on the worker ([CP-F03](../../../control/features/CP-F03-workers-and-the-queue/feature.md#engine)) |
-| Declared needs | Read from the registry and the skill's version; each need is a verb and a resource. A need on `data/…` with Write is also held to the graph database's mode |
+| A step's resource | A graph read, add or change: `data/<graph database>/<kind>` for each kind the typed query plan names · memory: `memory/project/<project>` · `memory/agent/<agent>` · `memory/org` · a project's tasks, files and context: `project/<project>` · a skill: `skill/<name>` · a workflow: `workflow/<name>` · handing work on: `agent/<name>` · a plugin's function: `plugin/<name>` · a tool: `tool/<plugin>/<tool>` · on a worker: `fs/<path>` · `cmd/<program>` · `net/<host>` |
+| The caller chain | A run carries the person behind it, its project and its chain of agents from the root; outside a project the person check runs for the person; inside one `decide()` runs for the project's policies; then once per agent on the chain; depth and fan-out are the caller's ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine)) |
+| The ceilings | `ceilings(run)` intersects, in order, the key's allow list ([AC-F10](../AC-F10-keys/feature.md#engine)) · the run scope — a run with a project keeps `memory/project/…` and `project/…` to its project, its related projects and its task, and `data/<graph database>/…` to the graph databases its project names (`projects.graph_databases`, [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)) · the graph database's mode. A credential's scope is the outside system's own and refuses there; the worker sandbox enforces `fs/` · `cmd/` · `net/` on the worker ([CP-F03](../../../control/features/CP-F03-workers-and-the-queue/feature.md#engine)) |
+| Declared needs | Read from the registry and the skill's version; each need is an action and a resource. A need on `data/…` with Create or Edit is also held to the graph database's mode |
 | A verdict is kept | Each step's History row keeps the effect, the rule, its policy and version, any ceiling that narrowed it and who saved the rule, as they were when the step ran; *How it got here* reads these, never today's policies |
 | An ask for more | A denied step raises one `access` ask per run per item; a match to an open ask joins it; caps count asks raised since 00:00 UTC, per root agent and for the deployment |
 | A policy saved mid-run | The next step is checked against it; an open ask on an act it now denies closes refused, naming the rule |
@@ -205,14 +207,14 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | HLD section | Change | NFRs |
 |---|---|---|
 | § 10 AI and agents | Every step is checked before it runs against its declared needs, the strictest rule along the caller chain and the run's ceilings; a denied agent asks a person, capped per agent and for the deployment | NFR-SEC-5 |
-| § 12 Qualities | Security: an agent never does more than its own policies and its callers' allow, within its ceilings, the same for everyone; no agent changes access; every verdict is kept with the step | NFR-SEC-1 |
+| § 12 Qualities | Security: a run never does more than the person behind it may, inside a project never more than the project's policies, and never more than its agent's and callers' ceilings; no agent changes access; every verdict is kept with the step | NFR-SEC-1 |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| Agents are read here, built in Agents | *People and access › Agents* reads each agent's access; *Open in Agents* opens its sheet |
-| One view for everyone | *What it can do* reads the same for every reader, since no rule depends on the person; a reader may add a caller, a project or a key to see the ceilings a run would add |
+| Agents are read here, built in Agents | *Access › What they may do › Agents* reads each agent's access; *Open in Agents* opens its page |
+| Ceiling first, then for a person | *What it can do* opens on the agent's ceiling; a reader may add a person behind the run, a caller, a project or a key to see what a run for them would reach |
 | An ask for more allows this step of this run only | A lasting change is an Admin's saved rule; the ask offers an Admin *Draft a rule*, which opens a draft with *Who it changes* (AC-06) |
 
 ## Open questions
@@ -226,6 +228,5 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | Building agents here | Agents builds them (AG-F01); this reads them |
 | Rules held by a worker | Workers run any agent's steps; access belongs to the agent, and the sandbox enforces the agent's `fs/` · `cmd/` · `net/` rules there |
-| Narrowing by the person or their teams | The same agent does the same thing for everyone who may use it |
 | Allowing an ask for more for days or always | A lasting change is a rule an Admin saves after seeing who it changes |
 | Rules of an agent's own beside its policies | Every rule lives on an Access Policy attached to the agent |

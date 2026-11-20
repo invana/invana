@@ -4,7 +4,7 @@ title: Continue in a fresh session from a hand-off note
 feature: AG-F05
 status: idea
 personas: [builder, admin]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # AG-62 · Continue in a fresh session from a hand-off note
@@ -17,14 +17,13 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 ## Who can
 
-Runs — read, stop and re-run in [the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
-*Own* for Operator and Modeller, *Acts* for Admin. A note's body reads only as far as the reader's default agent may
-read its sources ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); no role grants content.
+Runs — read, stop and re-run in [the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
+a person's own runs, and another's with Read or Manage on `run/<agent>`. A note's body reads only as far as the reader's default agent may
+read its sources ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)); no permission grants content.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every run's sessions and each note's head; a note's body as anyone else — when the run belongs to a project and their default agent may read every source; stop any run, between sessions too; fork a run from a note they may read; set the session budget (CP-F04) | A note they may not read: its head, body *withheld*, naming the first source; *Fork* not offered |
-| Modeller | As Operator | As Operator |
 | Operator | On a run they are behind: read every session and note in full, stop it, fork it from a note. On a project's run they are not behind: read its sessions, and a note's body when their default agent may read every source | A note they may not read: its head, body *withheld*, naming the first source; *Fork* disabled — *Only the person behind this run or an Admin* |
 
 ## Flow
@@ -42,7 +41,7 @@ flowchart TD
   s2 -->|stopped before it starts| stop(["Stopped · the note kept · no session 2"])
   s2 --> b
   s2 -->|tokens a run, time or steps reached| lim(["Ends for that limit"])
-  n([A note on the run's sheet]) --> may{"The reader's agent may read every source?"}
+  n([A note on the run's page]) --> may{"The reader's agent may read every source?"}
   may -->|no| wh(["Head only · body withheld, naming the first source"])
   may -->|yes| rd["Done · next · read"]
   rd -->|Fork| fk{"Behind the run, or an Admin?"}
@@ -54,7 +53,7 @@ flowchart TD
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-62.1 | A run in its first session | its tokens reach the session budget ([CP-F04](../../../../../../os/control/features/CP-F04-limits/feature.md)) | the session writes a hand-off note and the run goes on in *Session 2* — the same run, the same number, never an ask; the run's sheet reads *Continued in session 2* |
+| AG-62.1 | A run in its first session | its tokens reach the session budget ([CP-F04](../../../../../../os/control/features/CP-F04-limits/feature.md)) | the session writes a hand-off note and the run goes on in *Session 2* — the same run, the same number, never an ask; the run's page reads *Continued in session 2* |
 | AG-62.2 | A hand-off note | the person behind the run opens it | it reads three parts — what is done, what is next, what it read — with each source named, the session it ends and the one it starts, when it was written, its tokens and whether the runtime or Invana wrote it |
 | AG-62.3 | A fresh session | it starts | it starts from the note and the run's task, never the earlier session's transcript, in the same workspace, on the same runtime and agent version, behind the same person |
 | AG-62.4 | A run that continued | it ends | its exit reason is its last session's — *Continued* is never an exit reason; its tokens are every session's together, and reaching its tokens a run, time or steps ends it for that limit, whatever session it is in |
@@ -67,16 +66,19 @@ flowchart TD
 | AG-62.11 | Someone neither behind the run nor an Admin, or anyone on a note they may not read | they reach *Fork* | it is disabled — *Only the person behind this run or an Admin* — and the route refuses it; on a note they may not read it is not offered and the route answers *Not found* |
 | AG-62.12 | A run that continued | the person behind it opens *How it got here* | each session reads as its own group — its runtime, model reported, tokens and why it ended — with the hand-off note between each two and the note's sources linked |
 | AG-62.13 | A note whose body cannot be read from the blob store | it is opened | it names what could not be read, in the engine's words; its head and the run's sessions still read |
+| AG-62.14 | A session whose context held outside text | it writes its hand-off note | the note is marked *Holds outside text*, naming each origin; the next session — and a run forked from the note — starts marked as holding outside text, so its outward acts ask (AC-15.35, NFR-SEC-15) |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The run's sessions and notes | Admin | agents.run · One session | — | agents.run · Loading | agents.run · Sessions | agents.run · Note sources not recorded | agents.run · Continuing | — |
-| The run's sessions and notes | Operator | agents.run · One session | — | agents.run · Loading | agents.run · Sessions | agents.run · Note sources not recorded | agents.run · Continuing | agents.run · Content withheld |
-| A hand-off note | Admin | — | — | agents.run · Loading | agents.run · Hand-off note | agents.run · Note could not load | agents.run · Writing the note | agents.run · Note withheld |
-| A hand-off note | Operator | — | — | agents.run · Loading | agents.run · Hand-off note | agents.run · Note could not load | agents.run · Writing the note | agents.run · Note withheld |
-| Stopped between sessions | Admin | — | — | — | agents.run · Stopped between sessions | — | — | — |
-| Stopped between sessions | Operator | — | — | — | agents.run · Stopped between sessions | — | — | agents.run · Content withheld |
-| Fork from a note | Admin | — | — | agents.run · Loading | agents.run · Forked | agents.run · Could not load | — | agents.run · Note withheld |
-| Fork from a note | Operator | — | — | agents.run · Loading | agents.run · Forked | agents.run · Could not load | — | agents.run · Fork disabled |
+| The run's sessions and notes | Admin | agents.runs · Detail · One session | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Note sources not recorded | agents.runs · Detail · Continuing | — |
+| The run's sessions and notes | Operator | agents.runs · Detail · One session | — | agents.runs · Detail · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Note sources not recorded | agents.runs · Detail · Continuing | agents.runs · Detail · Content withheld |
+| A hand-off note | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Hand-off note | agents.runs · Detail · Note could not load | agents.runs · Detail · Writing the note | agents.runs · Detail · Note withheld |
+| A hand-off note | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Hand-off note | agents.runs · Detail · Note could not load | agents.runs · Detail · Writing the note | agents.runs · Detail · Note withheld |
+| Stopped between sessions | Admin | — | — | — | agents.runs · Detail · Stopped between sessions | — | — | — |
+| Stopped between sessions | Operator | — | — | — | agents.runs · Detail · Stopped between sessions | — | — | agents.runs · Detail · Content withheld |
+| Fork from a note | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Forked | agents.runs · Detail · Could not load | — | agents.runs · Detail · Note withheld |
+| Fork from a note | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Forked | agents.runs · Detail · Could not load | — | agents.runs · Detail · Fork disabled |
+| A note holding outside text | Admin | — | — | — | agents.runs · Detail · Hand-off note · Holds outside text | — | — | agents.runs · Detail · Note withheld |
+| A note holding outside text | Operator | — | — | — | agents.runs · Detail · Hand-off note · Holds outside text | — | — | agents.runs · Detail · Note withheld |

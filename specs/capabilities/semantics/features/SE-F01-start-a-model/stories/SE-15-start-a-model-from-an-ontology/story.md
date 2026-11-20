@@ -3,8 +3,9 @@ id: SE-15
 title: Start a model from an ontology
 feature: SE-F01
 status: idea
+milestone: MVP
 personas: [modeller]
-boards: [model.new, model.board.draft]
+boards: [model.models]
 ---
 
 # SE-15 · Start a model from an ontology
@@ -16,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read an ontology, pick its kinds, preview the mapping and open it as a draft | — |
-| Operator | See the models and their drafts; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *New model* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | See the models and their drafts; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *New model* disabled — *Needs Create on Models — ask {who can grant}* |
 
 ## Flow
 
@@ -54,14 +55,16 @@ flowchart LR
 | SE-15.11 | The name is used by a model in the deployment | the person opens the draft | the name is asked again beside the name field; nothing is made |
 | SE-15.12 | Property types the model's graph database cannot hold | the draft opens | they are named, and the draft still lands, unable to publish until changed |
 | SE-15.13 | The preview | the person picks *Back* | the picks are kept; a reload starts the dialog again |
-| SE-15.14 | An Operator | they reach *New model* | it is disabled with *Needs the Modeller role — ask an Admin* |
+| SE-15.14 | An Operator | they reach *New model* | it is disabled with *Needs Create on Models — ask {who can grant}* |
 | SE-15.15 | An ontology whose labels carry several languages | it is previewed | Each kind and property takes its label in the chosen language, else an untagged one, else any; names that clash are suffixed `_2`, and the preview says so |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| New model · from an ontology | Admin | model.new · Ontology | model.new · Ontology no match | model.new · Reading the ontology | model.new · Ontology preview | model.new · Ontology unreadable | — | — |
-| New model · from an ontology | Operator | — | — | — | — | — | — | model.new · No access |
-| The draft | Admin | — | — | model.board.draft · Arriving | model.board.draft | model.board.draft · Cannot publish | — | — |
-| The draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
+| New model · from an ontology | Admin | model.models · New · Ontology | model.models · New · Ontology no match | model.models · New · Reading the ontology | model.models · New · Ontology preview | model.models · New · Ontology unreadable | — | — |
+| New model · from an ontology | Operator | — | — | — | — | — | — | model.models · New · No access |
+| The draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft | model.models · Draft · Cannot publish | — | — |
+| The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
+| The draft · discard | Admin | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |
+| The draft · discard | Operator | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |

@@ -4,7 +4,7 @@ title: Read a run session by session with its hand-off notes
 feature: CP-F10
 status: idea
 personas: [analyst, builder, admin]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-66 · Read a run session by session with its hand-off notes
@@ -18,20 +18,20 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
 (*Runs — read, stop and re-run*). Who reads a run's content is
 [AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every run's session heads; read a session's steps and a hand-off note's body as AC-31 says — the role adds none — and only as far as the note's sources allow | A run whose content they may not read: its session heads; each note's head, its body *withheld* |
-| Operator | An Operator or a Modeller: read every run's session heads; read a session's steps and a hand-off note's body of a run they are behind, or of a project's run whose sources their default agent may read, as far as the note's sources allow | Any other run: its session heads; each note's head, its body *withheld — only {person behind}, or someone whose agent may read its sources, reads it*; a direct link to a note reads *Not found* |
+| Admin | Read every run's session heads; read a session's steps and a hand-off note's body as AC-31 says — the permission adds none — and only as far as the note's sources allow | A run whose content they may not read: its session heads; each note's head, its body *withheld* |
+| Operator | An Operator: read every run's session heads; read a session's steps and a hand-off note's body of a run they are behind, or of a project's run whose sources their default agent may read, as far as the note's sources allow | Any other run: its session heads; each note's head, its body *withheld — only {person behind}, or someone whose agent may read its sources, reads it*; a direct link to a note reads *Not found* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  r([A run's sheet · Sessions]) --> ld{"Loaded?"}
+  r([A run's page · Sessions]) --> ld{"Loaded?"}
   ld -->|could not load| f["What could not be read · Try again"]
   ld --> n{"How many sessions?"}
   n -->|one| one["Session 1 · runs with · model set and reported · connection · worker · tokens · why it ended"]
@@ -44,7 +44,7 @@ flowchart TD
   note --> l{"lineage.may_see for the note? (GP-F02)"}
   l -->|no| nw(["The note's head · its body withheld, naming the first source"])
   l -->|yes| body["What is done · what is next · what it read"]
-  body -->|it forked a run| fk(["The forked run #M, its own sheet"])
+  body -->|it forked a run| fk(["The forked run #M, its own page"])
   c -->|yes| st["A session's steps"] --> hig(["How it got here · its steps and sources"])
 ```
 
@@ -61,18 +61,18 @@ flowchart TD
 | CP-66.7 | A run of one session | *Sessions* is read | it reads that one session's head, and no hand-off note |
 | CP-66.8 | A run whose content the reader may not read (AC-31) | *Sessions* is read | every session's head reads; each note's head reads with its body *withheld*; the session's steps are withheld |
 | CP-66.9 | A run still going that reached its session budget | *Sessions* is read | the ended session reads *session budget*, the next one is live, counting tokens against the session budget, and the run keeps its number; no ask is raised |
-| CP-66.10 | A hand-off note a fork started from | it is read | it names the run the fork started, `#M`, which opens as its own sheet |
+| CP-66.10 | A hand-off note a fork started from | it is read | it names the run the fork started, `#M`, which opens as its own page |
 | CP-66.11 | A session the reader may read | its steps are opened | *How it got here* shows its steps and sources |
-| CP-66.12 | An Operator or a Modeller not behind a run outside any project | they follow a direct link to one of its hand-off notes | it reads *Not found*; the route answers 404 with *Not found.* |
+| CP-66.12 | An Operator not behind a run outside any project | they follow a direct link to one of its hand-off notes | it reads *Not found*; the route answers 404 with *Not found.* |
 | CP-66.13 | A session that ended *refused* | it is read | it names what was refused — a file, a program or a host — and the rule, for a reader who may read the run; a session head for anyone else |
 | CP-66.14 | A run's sessions | their tokens are read | each session's tokens are the engine's; the run's own tokens are their sum; a number not recorded reads `—`, never `0` |
 | CP-66.15 | The engine cannot read the sessions | *Sessions* opens | it says what it could not read, with *Try again* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A run — Sessions | Admin | agents.run · Sessions · One session | — | agents.run · Sessions · Loading | agents.run · Sessions | agents.run · Sessions · Could not load | agents.run · Sessions · Continuing | agents.run · Sessions · Content withheld |
-| A run — Sessions | Operator | agents.run · Sessions · One session | — | agents.run · Sessions · Loading | agents.run · Sessions | agents.run · Sessions · Could not load | agents.run · Sessions · Continuing | agents.run · Sessions · Content withheld |
-| A hand-off note | Admin | — | — | agents.run · Sessions · Loading | agents.run · Sessions · Hand-off note | agents.run · Sessions · Could not load | — | agents.run · Sessions · Note withheld |
-| A hand-off note | Operator | — | — | agents.run · Sessions · Loading | agents.run · Sessions · Hand-off note | agents.run · Sessions · Could not load | — | agents.run · Sessions · Note withheld |
+| A run — Sessions | Admin | agents.runs · Detail · Sessions · One session | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sessions · Could not load | agents.runs · Detail · Sessions · Continuing | agents.runs · Detail · Sessions · Content withheld |
+| A run — Sessions | Operator | agents.runs · Detail · Sessions · One session | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions | agents.runs · Detail · Sessions · Could not load | agents.runs · Detail · Sessions · Continuing | agents.runs · Detail · Sessions · Content withheld |
+| A hand-off note | Admin | — | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions · Hand-off note | agents.runs · Detail · Sessions · Could not load | — | agents.runs · Detail · Sessions · Note withheld |
+| A hand-off note | Operator | — | — | agents.runs · Detail · Sessions · Loading | agents.runs · Detail · Sessions · Hand-off note | agents.runs · Detail · Sessions · Could not load | — | agents.runs · Detail · Sessions · Note withheld |

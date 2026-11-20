@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [AC-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Is held to the same lock and limit as everyone; reads locks and limits in History; clears a lock by setting a new password from the command line ([AC-18](../AC-18-give-a-person-an-account/story.md)) | — |
 | Operator | Is held to the lock and the limit; reads when to try again | A lock never says whether the email has an account |
@@ -52,7 +52,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Sign in | Admin | — | — | — | — | access.signin · Locked | — | access.signin · Too many requests |
 | Sign in | Operator | — | — | — | — | access.signin · Locked | — | access.signin · Too many requests |

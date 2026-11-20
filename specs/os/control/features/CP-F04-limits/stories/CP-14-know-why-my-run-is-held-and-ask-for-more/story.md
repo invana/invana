@@ -4,7 +4,7 @@ title: Know why my run is held and ask for more
 feature: CP-F04
 status: idea
 personas: [builder]
-boards: [agents.run]
+boards: [agents.runs]
 ---
 
 # CP-14 · Know why my run is held and ask for more
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [CP-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read why any run is held; allow or decline an ask for more in Needs you; *Ask for more* on a run they are behind | *Ask for more* absent on a run someone else is behind |
-| Operator | Operator · Modeller: read why a run is held; *Ask for more* on a run they are behind, when its limit *May ask for more* ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Ask for more* absent on anyone else's run, or on a limit that does not take asks |
+| Admin | Read why any run is held; with Edit on `setting/deployment`, allow or decline an ask for more in Needs you; *Ask for more* on a run they are behind | *Ask for more* absent on a run someone else is behind |
+| Operator | read why a run is held; *Ask for more* on a run they are behind, when its limit *May ask for more* ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Ask for more* absent on anyone else's run, or on a limit that does not take asks |
 
 ## Flow
 
@@ -49,7 +49,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A held run | Admin | — | — | agents.run · Loading | agents.run · Held by a limit | agents.run · Ask declined | agents.run · Held by a limit | agents.run · Read only |
-| A held run | Operator | — | — | agents.run · Loading | agents.run · Held by a limit | agents.run · Ask declined | agents.run · Held by a limit | agents.run · Read only |
+| A held run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Held by a limit | agents.runs · Detail · Ask declined | agents.runs · Detail · Held by a limit | agents.runs · Detail · Read only |
+| A held run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Held by a limit | agents.runs · Detail · Ask declined | agents.runs · Detail · Held by a limit | agents.runs · Detail · Read only |

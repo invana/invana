@@ -3,8 +3,9 @@ id: EX-23
 title: Be asked back, not guessed for
 feature: EX-F03
 status: idea
+milestone: MVP
 personas: [analyst]
-boards: [explore.board, explore.board.cannot]
+boards: [explore.board]
 ---
 
 # EX-23 · Be asked back, not guessed for
@@ -16,17 +17,17 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Answer a question asked back on their own run, in the thread or in Inbox › Needs you, or type something else | — |
-| Operator | The same, on their own runs; a Modeller the same — only a person answers ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ask a question*) | A question asked back on another person's run is not shown to them |
+| Operator | The same, on their own runs; only a person answers ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ask a question*) | A question asked back on another person's run is not shown to them |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   a([An ambiguous question]) --> o{Options}
-  o -->|read from the Graph| r{Rows?}
+  o -->|read from Graph Data| r{Rows?}
   r -->|none| ca(["Cannot answer — nothing to choose between"])
   r -->|some| q["A closed question · one row per option"]
   o -->|a fixed set| q
@@ -43,8 +44,8 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-23.1 | A question the assistant cannot settle | it is understood | the reply asks one closed question — a choice, several choices or yes/no — and no answer is given yet |
-| EX-23.2 | Options read from the Graph | the question is asked | the options are the rows a checked plan returned, read only where the agent's Access Policies allow; none is invented |
-| EX-23.3 | Options read from the Graph return no rows | the question would be asked | no empty picker is shown; the reply is *cannot answer — nothing to choose between* |
+| EX-23.2 | Options read from Graph Data | the question is asked | the options are the rows a checked plan returned, read only where the agent's Access Policies allow; none is invented |
+| EX-23.3 | Options read from Graph Data return no rows | the question would be asked | no empty picker is shown; the reply is *cannot answer — nothing to choose between* |
 | EX-23.4 | Options whose labels say enough | the question is drawn | each option is one line; a second line shows only on an option written with a description |
 | EX-23.5 | A question asked back | the person taps an option | it folds to *Answered · <choice>* and the same run goes on with it, not a new run |
 | EX-23.6 | A folded answer | the person opens it | the question shows with the options not taken dimmed |
@@ -59,7 +60,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The question in the thread | Admin | — | explore.board.cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
-| The question in the thread | Operator | — | explore.board.cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
+| The question in the thread | Admin | — | explore.board · Cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |
+| The question in the thread | Operator | — | explore.board · Cannot · Nothing to choose | explore.board · Working | explore.board · Answered | explore.board · Closed unanswered | explore.board · Asks back | — |

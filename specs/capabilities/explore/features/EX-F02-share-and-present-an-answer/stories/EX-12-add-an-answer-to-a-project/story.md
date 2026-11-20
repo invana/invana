@@ -3,8 +3,9 @@ id: EX-12
 title: Add an answer to a project
 feature: EX-F02
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker]
-boards: [explore.board, projects.finding]
+boards: [explore.board, projects.branches]
 ---
 
 # EX-12 · Add an answer to a project
@@ -16,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add any settled answer they may read to a branch of any project | — |
-| Operator | Add a settled answer whose run they may read to a branch of a project they may add findings to ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)); a Modeller the same | A project they may not add to is not offered; with none, *Add to a project* is disabled, naming the project's members |
+| Operator | Add a settled answer whose run they may read to a branch of a project they may add findings to ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) | A project they may not add to is not offered; with none, *Add to a project* is disabled, naming the project's members |
 
 ## Flow
 
@@ -45,9 +46,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Add to a project | Admin | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | — |
 | Add to a project | Operator | explore.board · No projects | — | explore.board · Adding | explore.board · Add to a project | explore.board · Failed | explore.board · Agent working | explore.board · No access |
-| The finding | Admin | — | — | projects.finding · Loading | projects.finding | — | — | — |
-| The finding | Operator | — | — | projects.finding · Loading | projects.finding | — | — | — |
+| The finding | Admin | — | — | projects.branches · Finding · Loading | projects.branches · Finding | — | — | — |
+| The finding | Operator | — | — | projects.branches · Finding · Loading | projects.branches · Finding | — | — | — |
+| Add to a project · added | Admin | explore.board · Add to a project | — | explore.board · Adding | explore.board · Add to a project · Added | explore.board · Failed | — | — |
+| Add to a project · added | Operator | explore.board · Add to a project | — | explore.board · Adding | explore.board · Add to a project · Added | explore.board · Failed | — | — |

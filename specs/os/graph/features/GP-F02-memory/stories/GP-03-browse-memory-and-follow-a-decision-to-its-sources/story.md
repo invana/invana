@@ -4,7 +4,7 @@ title: Browse memory and follow a decision to its sources
 feature: GP-F02
 status: idea
 personas: [builder, decision-maker, admin]
-boards: [agents.thinking]
+boards: [graph.memory]
 ---
 
 # GP-03 · Browse memory and follow a decision to its sources
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [GP-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Browse the whole thinking graph, filter it, open any node with its content, follow a decision to its sources | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)): browse and filter the whole thinking graph; open any node; content of the runs they start or whose agent they own, and of any node whose sources their default agent may Read ([GP-07](../GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) | A node of anyone else's run: that it ran, its status, its tokens, the plan or workflow, its outcome labels and record IDs — content withheld, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | An Operator or a Modeller ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)): browse and filter the whole thinking graph; open any node; content of the runs they start or whose agent they own, and of any node whose sources their default agent may Read ([GP-07](../GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) | A node of anyone else's run: that it ran, its status, its tokens, the plan or workflow, its outcome labels and record IDs — content withheld, naming who may read it ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 
@@ -36,7 +36,7 @@ flowchart TD
   n -->|a run they may not read| wd(["Head only · content withheld"])
   n -->|a decision| src["Follow to its sources · findings · steps · evidence · records"]
   src --> rec["Records read fresh through the agent's Access Policies"]
-  rec -->|a policy refuses one| rw(["Counted as withheld"])
+  rec -->|a policy refuses one| rw(["Left out · no count · no note"])
   n --> mk(["Mark good or bad — AG-55"])
 ```
 
@@ -50,7 +50,7 @@ flowchart TD
 | GP-03.4 | A filter nothing matches | it is applied | it says nothing matches, names the filter and offers *Clear filters* |
 | GP-03.5 | Any node | the person opens it | it shows its kind, its outcome labels and marks, its links and — when they may read it — its content |
 | GP-03.6 | A decision | the person follows it to its sources | the findings it weighed, the steps they came from, and the evidence and record IDs they cite are drawn as a path |
-| GP-03.7 | A record on that path | the person opens it | it is read fresh through the agent's Access Policies; a record the policies refuse is never shown, and the path says how many were withheld |
+| GP-03.7 | A record on that path | the person opens it | it is read fresh through the agent's Access Policies; a record the policies refuse is left out, with no count and no note |
 | GP-03.8 | A node older than 180 days | it is opened | it reads in full and says *Not recalled — older than 180 days* |
 | GP-03.9 | A node of a run the reader may not read | it is opened | it shows that it ran, its status, its tokens, the plan or workflow, its labels and record IDs; the content is withheld, naming who may read it |
 | GP-03.10 | The system graph behind | the page opens | it says how far behind it is and when it last caught up, and draws what it holds |
@@ -61,9 +61,9 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The thinking graph | Admin | agents.thinking · Fills as runs settle | agents.thinking · Nothing matches | agents.thinking · Loading | agents.thinking | agents.thinking · Unavailable | agents.thinking · Behind | — |
-| The thinking graph | Operator | agents.thinking · Fills as runs settle | agents.thinking · Nothing matches | agents.thinking · Loading | agents.thinking | agents.thinking · Unavailable | agents.thinking · Behind | agents.thinking · Withheld node |
-| A node and its sources | Admin | — | — | agents.thinking · Node loading | agents.thinking · Decision sources | agents.thinking · Unavailable | — | — |
-| A node and its sources | Operator | — | — | agents.thinking · Node loading | agents.thinking · Decision sources | agents.thinking · Unavailable | — | agents.thinking · Withheld node |
+| The thinking graph | Admin | graph.memory · Thinking · Fills as runs settle | graph.memory · Thinking · Nothing matches | graph.memory · Thinking · Loading | graph.memory · Thinking | graph.memory · Thinking · Unavailable | graph.memory · Thinking · Behind | — |
+| The thinking graph | Operator | graph.memory · Thinking · Fills as runs settle | graph.memory · Thinking · Nothing matches | graph.memory · Thinking · Loading | graph.memory · Thinking | graph.memory · Thinking · Unavailable | graph.memory · Thinking · Behind | graph.memory · Thinking · Withheld node |
+| A node and its sources | Admin | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | — |
+| A node and its sources | Operator | — | — | graph.memory · Thinking · Node loading | graph.memory · Thinking · Decision sources | graph.memory · Thinking · Unavailable | — | graph.memory · Thinking · Withheld node |

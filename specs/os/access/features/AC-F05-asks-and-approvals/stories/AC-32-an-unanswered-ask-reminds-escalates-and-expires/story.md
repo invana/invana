@@ -17,7 +17,9 @@ Tasks: [task.md](task.md) · Feature: [AC-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../AC-F02-access-policies/feature.md#decisions)).
+
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Receive every escalated ask; decide it once escalated; read every ask's reminders, escalation and expiry | — |
 | Operator | Receive the reminders of asks routed to them; decide them; read the state of asks of runs they are behind | An ask not routed to them reads its state — waiting, reminded, escalated, expired — its acts disabled, naming who it waits on |
@@ -59,7 +61,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | An ask — reminded or escalated | Admin | — | inbox · Nothing matches | inbox · Loading | inbox · Escalated | inbox · Channel failed | inbox · An agent asks to send | — |
 | An ask — reminded or escalated | Operator | — | inbox · Nothing matches | inbox · Loading | inbox · Reminded | inbox · Channel failed | inbox · An agent asks to send | inbox · Not yours to answer |

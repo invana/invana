@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read where work is across the deployment | — |
 | Operator | Read where work is across the deployment | — |
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers › Where work is]) --> f["Started → let in → running → waiting · counts for each"]
+  s([Settings › Workers › Queue]) --> f["Started → let in → running → waiting · counts for each"]
   f --> w["Waiting: on a person · on an ask · on a limit · on an AI model · on workers"]
   w --> one["A waiting run: why · for how long · what is ahead"]
   one --> run(["Opens the run (CP-F10)"])
@@ -46,7 +46,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Where work is | Admin | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Where work is | settings.workers · Could not load | — | — |
 | Where work is | Operator | settings.workers · Nothing running | — | settings.workers · Loading | settings.workers · Where work is | settings.workers · Could not load | — | — |

@@ -17,7 +17,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and write graph databases through the agents they may use, as those agents' Access Policies, each database's mode and its switches allow | — |
 | Operator | Read graph databases through the agents they may use, as the same allow | A write is refused before it starts, naming the rule or the mode; *Edit on the board* needs a Modeller |
@@ -38,7 +38,7 @@ flowchart TD
   w -->|no, or read + write| x["Runs · a read-only session for every read · recorded"]
   x -->|the vendor cannot do it| r2(["Refused before the wire · names the vendor and the act"])
   x -->|the database fails| r3(["The database's own message"])
-  x --> o(["Vertices · edges · records, one shape · joined on identity links"])
+  x --> o(["Vertices · edges · records, one shape · each graph database's apart"])
 ```
 
 ## Acceptance criteria
@@ -60,7 +60,7 @@ flowchart TD
 
 No board: the asking surface — Explore, a board, a run — is its own story's.
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A step through the connector | Admin | — | — | — | — | — | — | — |
 | A step through the connector | Operator | — | — | — | — | — | — | — |

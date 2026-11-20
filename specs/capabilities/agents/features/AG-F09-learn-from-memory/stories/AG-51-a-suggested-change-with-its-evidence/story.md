@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every suggested change, its evidence and its difference; open the runs behind it; decide it (AG-52) | — |
-| Operator | An Operator or a Modeller ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)): read every suggested change, its evidence and its difference; open the runs they may read | Deciding it needs what its target needs — the Modeller role for a skill, workflow, agent, answer template or the model, the Admin role for an index — read only, naming the role |
+| Operator | An Operator ({PCS}): read every suggested change, its evidence and its difference; open the runs they may read | Deciding it needs what its target needs — Edit on the skill, workflow, agent, answer template or model, Edit on `setting/graph-databases` for an index — read only, naming the permission |
 
 ## Flow
 
@@ -60,17 +60,19 @@ flowchart TD
 | AG-51.10 | Several suggested changes | the person opens Inbox › Needs you | they are ranked by the size of their evidence, not their age, and never block a run |
 | AG-51.11 | Evidence with a suggested change open | the person reads Evidence | the count says a suggested change waits, one click to it |
 | AG-51.12 | A suggested change | nothing is decided | nothing changes; no threshold applies it by itself |
-| AG-51.13 | A person without what its target needs | they open it | they read it; deciding is read only, naming the role it needs and whom to ask |
+| AG-51.13 | A person without what its target needs | they open it | they read it; deciding is read only, naming the permission it needs and whom to ask |
 | AG-51.14 | A suggested change | the person opens *How it got here* | its steps and sources are shown — the detector or run that made it and the runs its evidence counts |
 | AG-51.15 | Questions that keep failing on a term the model does not know | the detector runs | a suggested change opens to the model — a synonym or a definition on the kind — with the failing runs as its evidence |
-| AG-51.16 | A query shape that keeps running slow on one kind | the detector runs | an index suggestion opens, with the runs and their latency as evidence; only an Admin may apply it |
+| AG-51.16 | A query shape that keeps running slow on one kind | the detector runs | an index suggestion opens, with the runs and their latency as evidence; only a person with Edit on `setting/graph-databases` may apply it |
 | AG-51.17 | A plan with the same intent drafted and served again and again | the detector runs | a suggested change proposes approving it into a workflow, with the runs behind it, and goes to the agent's named approvers as an ask; nothing becomes a workflow until they approve |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A suggested change in Needs you | Admin | inbox · Nothing suggested | inbox · Needs you filtered | inbox · Loading | inbox · Suggested change | inbox · Failed | inbox · Suggested by an agent | — |
 | A suggested change in Needs you | Operator | inbox · Nothing suggested | inbox · Needs you filtered | inbox · Loading | inbox · Suggested change | inbox · Failed | inbox · Suggested by an agent | inbox · Suggested change, read only |
 | Its link from Evidence | Admin | — | — | — | agents.skills · Evidence, suggestion open | — | — | — |
 | Its link from Evidence | Operator | — | — | — | agents.skills · Evidence, suggestion open | — | — | — |
+| A suggested change · open its evidence | Admin | inbox · Suggested change | — | — | agents.skills · Evidence, suggestion open | — | — | — |
+| A suggested change · open its evidence | Operator | inbox · Suggested change | — | — | agents.skills · Evidence, suggestion open | — | — | — |

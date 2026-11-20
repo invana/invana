@@ -6,7 +6,7 @@ status: idea
 personas: [modeller]
 stories: [SE-07, SE-09]
 journeys: []
-boards: [model.health, model.board, model.board.draft]
+boards: [model.health, model.models]
 nfrs: [NFR-UX-2]
 depends_on: [SE-F01, SE-F02, SE-F06]
 ---
@@ -31,8 +31,8 @@ flowchart TD
   db -->|never read · stale| rd["Read the database (SE-04)"]
   db -->|Add it in a draft| draft(["The draft — SE-05"])
   h -->|hot and slow · failed questions| perf["Performance: per kind — failed questions, slow query shapes, suggested indexes"]
-  perf -->|Add index to draft| may{An Admin?}
-  may -->|no| na["Needs the Admin role — ask an Admin"]
+  perf -->|Add index to draft| may{"Holds Edit on setting/graph-databases?"}
+  may -->|no| na["Needs Edit on Graph database settings — ask {who can grant}"]
   may -->|yes| draft
   h -->|Save report| rep(["A saved report · frozen · Back to live"])
   h -->|History| hist["SE-09 · Who changed what, why, the effect after"]
@@ -52,13 +52,13 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read health — Overview, Database, Usage, Performance, Growth — and history | Every signed-in person — Operator, Modeller, Admin | — |
-| Save a report · open saved reports | Every signed-in person — Operator, Modeller, Admin | — |
-| Read the database · *Add it in a draft* | Modeller · Admin | Absent; the reading stays — *Needs the Modeller role — ask an Admin* on the drift rows |
-| *Add index to draft* — apply a suggested index | Admin | Absent; the suggestion reads — *Needs the Admin role — ask an Admin* |
-| Archive, restore or delete a model | Modeller · Admin | Absent from the model's `⋯`; *Needs the Modeller role — ask an Admin* |
+| Read health — Overview, Database, Usage, Performance, Growth — and history | Read on `model/<model>` | — |
+| Save a report · open saved reports | Read on `model/<model>` | — |
+| Read the database · *Add it in a draft* | Edit on `model/<model>` | Absent; the reading stays — *Needs Edit on the {model} model — ask {who can grant}* on the drift rows |
+| *Add index to draft* — apply a suggested index | Edit on `setting/graph-databases` | Absent; the suggestion reads — *Needs Edit on Graph database settings — ask {who can grant}* |
+| Archive, restore or delete a model | Edit on `model/<model>` | Absent from the model's `⋯`; *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## States
 
@@ -78,13 +78,13 @@ flowchart TD
 |---|---|
 | One page, the model a filter | Overview · Database · Usage · Performance · Growth, read for all models or one; changing scope keeps the tab. History opens from *Versions* |
 | One window | 7 · 30 · 90 days, read by every number on the page; Database ignores it and says so |
-| Signals are fixed rules, not a score | *Unused* — records and no query touched it. *Empty* — published, no records. *Cold property* — never filtered, returned or ordered on, where the database can explain a query. *Hot* — touched by a quarter of the window's queries. *Hot and slow* — hot, with p95 at or above the Graph's. *Supernode* — a kind whose most connected record has at least a hundred times the median and at least 1,000. Nothing is called with fewer than 50 queries in the window |
+| Signals are fixed rules, not a score | *Unused* — records and no query touched it. *Empty* — published, no records. *Cold property* — never filtered, returned or ordered on, where the database can explain a query. *Hot* — touched by a quarter of the window's queries. *Hot and slow* — hot, with p95 at or above the deployment's. *Supernode* — a kind whose most connected record has at least a hundred times the median and at least 1,000. Nothing is called with fewer than 50 queries in the window |
 | Every use is split by who called | Agent · plan · Explore · API, read off the run, never guessed from the query |
 | Queries are grouped by shape | A query with its values taken out; a thousand calls of one generated query are one row, with p50 · p95 · rows · callers |
 | Drift is matched by what a row covers | A kind, relationship, index or constraint is *in both*, *model only* or *database only* by what it covers, never by its name |
 | Growth moves only when something writes | Records are counted after every read of the database, load and link commit, each mark naming the run that wrote; never sampled on a timer |
-| Query performance per kind | Performance reads, per kind, the questions that failed — *cannot answer*, refused or erroring, each with its reason — the slow query shapes, and the indexes the engine suggests from them |
-| Advice is a draft change, never a write | A suggested index is offered as *Add index to draft*, to an Admin alone; the next publish adds it. Explore's memory may suggest the same index (AG-F09); it lands here, never applied by an agent |
+| Query performance per kind | Performance reads, per kind, the questions that failed — *cannot answer*, refused or erroring, each with its reason — the slow query shapes, and the advice the engine draws from them: the indexes to add, and a faster way to reach the same records (SE-07.25) |
+| Advice is a draft change, never a write | A suggested index is offered as *Add index to draft*, to a person with Edit on `setting/graph-databases` alone; the next publish adds it. Explore's memory may suggest the same index (AG-F09); it lands here, never applied by an agent |
 | Archive, not delete | A published model is archived — out of the map, its versions still resolve for every answer and load that used them; only a never-published model is deleted. A model with active links cannot be archived |
 | The engine counts every number | Studio formats; history's effect after is stored when the version publishes and never recomputed |
 | Leans on | SE-F01 — reading the database · SE-F02 — the draft, the comparison, the review · SE-F06 — links · RC-F02 — loads into a model · AG-F09 — suggestions from memory · Agents › Runs — each run a number links to |
@@ -111,8 +111,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `model_type_counts` | `graph_id` · `at` · `source` (`introspect` · `load` · `link_commit`) · `source_id` (the run) · `kind` · `count` · `max_degree` · `median_degree` | A snapshot per kind each time something writes. Degree only at a read of the database and the end of a load |
-| `model_query_log` | `graph_id` · `at` · `shape_hash` · `shape_text` · `language` · `caller_kind` (`agent` · `plan` · `explorer` · `api`) · `caller_id` · `run_id` · `duration_ms` · `rows` · `ok` · `types_touched` · `properties_touched` (filtered · returned · ordered · scanned) · `touched_from` (`plan` · `results`) | One row per graph query that answered or failed. Rows older than 90 days are pruned by its writer |
+| `model_type_counts` | `database_id` · `at` · `source` (`introspect` · `load` · `link_commit`) · `source_id` (the run) · `kind` · `count` · `max_degree` · `median_degree` | A snapshot per kind each time something writes. Degree only at a read of the database and the end of a load |
+| `model_query_log` | `database_id` · `at` · `shape_hash` · `shape_text` · `language` · `caller_kind` (`agent` · `plan` · `explorer` · `api`) · `caller_id` · `run_id` · `duration_ms` · `rows` · `ok` · `types_touched` · `properties_touched` (filtered · returned · ordered · scanned) · `touched_from` (`plan` · `results`) | One row per graph query that answered or failed. Rows older than 90 days are pruned by its writer |
 
 ### Reads
 
@@ -127,7 +127,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/model` | Does | Story |
+| Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
 | `GET /models/insights?model=&window=` | Overview · usage · performance · growth · `catalog` — every number the page shows | SE-07 |
 | `GET /models/insights/shapes/{hash}` | One shape: `plan[]` · `slowest[]` · `advice[]` · `explains` | SE-07 |
@@ -168,7 +168,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | What is not logged | A query with no caller — a read of the database, counts, the page's own reads; the plans that write data (a load, a bulk load, a link commit, a link withdrawal) and platform runs (`triggered_by = system`) set no caller: their effect is Growth's |
 | The caller is read off the run | A canvas run is `explorer`; a query typed in a query language is `api`, whichever agent carried it; any other run with an agent, or a question in language, is `agent`; any other plan is `plan` |
 | A shape | Strings and numbers become `$p0`, `$p1` … in order, parameters stay, whitespace collapses; `shape_hash` is SHA-256 cut to 16 hex. A traversal's shape is its bytecode's text. A shape is explained once, with its first call's parameters |
-| Advice explains, never profiles | Over the window's slowest shapes by total time, `EXPLAIN` — never `PROFILE` — against the indexes the database reports now. `missing_index` is a property filtered after a label scan with no index on that label and property, naming the model whose active version declares the label; Neo4j and Memgraph only |
+| Advice explains, never profiles | Over the window's slowest shapes by total time, `EXPLAIN` — never `PROFILE` — against the indexes the database reports now; Neo4j and Memgraph only. Each advice row is a `kind`, the plan step it reads, and one sentence: `missing_index` — a property filtered after a label scan with no index on that label and property, naming the model whose active version declares the label (the only kind with an act) · `no_label` — a scan of every node where a kind would narrow it · `unbounded_hop` — a variable-length hop with no upper bound · `supernode_expand` — an expansion from a kind the Usage signals call a supernode, with no relationship-kind filter · `cartesian` — two patterns with nothing joining them |
 | A connector that cannot explain | The shape returns `explains = false` and no advice; nothing is refused |
 | Counts move when something writes | A `model_type_counts` snapshot after every read of the database, load and link commit, naming its run; a count that errors is logged and dropped, never failing the act. Degree is read as a histogram; growth is stepped by day |
 | Drift matching | Labels and relationship types match by name, exactly. An index or constraint matches by label and properties, and a constraint's kind, never by name. A label no model declares is `database_only` and reads only at all models. A link's relationship is `in_both`. Rows come from the mirror; counts are live. A model counts as published once any version was |
@@ -195,6 +195,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | History reads effect after | Each version: when · by · what changed · why · effect after — *1 kind now warns · 6 records* or *2 kinds hold*, else the runs and tokens while it was published. *Compare vA and vB* and each row's *Compare* open the map's Comparing bar |
 | All models, all history | At all models, History lists every model's versions with a model column, newest first |
 | The query log keeps 90 days | The widest window; older rows are pruned by the engine |
+| Usage draws before it lists | Bars per kind, grouped by model, with the signal marked; the table is *View as table*. The rows are the engine's `rows[]` and `stitches[]` — no new read |
+| *Hot and slow* needs the database to explain a query | Where it cannot, that one signal reads *not available on <database>*; the other signals do not depend on it |
 
 ## Open questions
 
@@ -208,6 +210,6 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | A health score | Signals are fixed rules a person can argue with |
 | Running an index from the page | Advice lands in a draft; publishing adds it |
-| An agent applying an index | An index changes the database for every reader; an Admin applies it |
+| An agent applying an index | An index changes the database for every reader; a person with Edit on `setting/graph-databases` applies it |
 | Numbers from telemetry | The query log is Invana's own, so the page works with telemetry off |
 | Recomputing a past version's effect | What a publish affected is stored when it publishes |

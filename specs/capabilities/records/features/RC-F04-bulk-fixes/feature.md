@@ -6,7 +6,7 @@ status: idea
 personas: [curator]
 stories: [RC-03]
 journeys: []
-boards: []
+boards: [data.records]
 nfrs: []
 depends_on: [RC-F01, RC-F03]
 ---
@@ -20,10 +20,10 @@ depends_on: [RC-F01, RC-F03]
 
 ```mermaid
 flowchart TD
-  start([Records or a Quality rule]) --> sel["RC-03 · The records to change"]
+  start([Graph Data › Records or a Quality rule]) --> sel["RC-03 · The records to change"]
   sel --> ch["RC-03 · Set · clear · map one property"]
   ch --> pv["RC-03 · Preview: before → after, record by record · what the model refuses"]
-  pv --> g{Modeller or Admin · the connection writes?}
+  pv --> g{"Holds Edit on data/<graph database>/<kind> · the connection writes?"}
   g -->|no| na["Run disabled — the reason"]
   g -->|yes| run{"Run the fix"}
   run -->|written| done(["One run · each record's History names it"])
@@ -48,10 +48,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Preview a fix | Every role — Operator, Modeller, Admin | — |
-| Run a fix | Modeller · Admin, through an agent granted to them, on a connection that writes | Disabled — *Needs the Modeller role — ask an Admin*; a read-only connection gives its own reason |
+| Preview a fix | Read on `data/<graph database>/<kind>` | — |
+| Run a fix | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}*; a read-only connection gives its own reason |
 
 ## States
 
@@ -92,7 +92,7 @@ flowchart TD
 
 | Question | Who answers |
 |---|---|
-| EX-F06 › Not building says bulk changes are an upload in Records; here a fix sets, clears or maps one property, with no upload. Recommend: a fix as written here, and EX-F06's row reads *bulk changes are a fix in Data (RC-F04)* | Ravi |
+| EX-F06 › Not building says bulk changes are an upload in Graph Data; here a fix sets, clears or maps one property, with no upload. Recommend: a fix as written here, and EX-F06's row reads *bulk changes are a fix in Data (RC-F04)* | Ravi |
 ## Not building
 
 | Item | Why not |

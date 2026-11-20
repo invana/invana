@@ -6,8 +6,8 @@ status: idea
 personas: [builder, decision-maker, analyst, admin]
 stories: [GP-03, GP-06, GP-07, GP-08, GP-09]
 journeys: [J02, J04, J11]
-boards: [agents.thinking, graph.memory.lineage, graph.memory.project_map, graph.memory.org_knowledge]
-nfrs: [NFR-REL-6, NFR-SEC-5, NFR-SEC-11, NFR-PERF-4]
+boards: [graph.memory]
+nfrs: [NFR-REL-6, NFR-SEC-5, NFR-SEC-11, NFR-SEC-15, NFR-PERF-4]
 depends_on: [CP-F10, AG-F06, AG-F09, PJ-F01, PJ-F03, AC-F02, AC-F06, AC-F09, SE-F03]
 ---
 
@@ -36,13 +36,13 @@ flowchart TD
   br -->|a run they may not read| wd(["Head only · content withheld"])
   br -->|a decision| src["GP-03 · Follow it to its sources"]
   src --> rec["Records read fresh through the agent's Access Policies"]
-  rec -->|refused| rw(["Counted as withheld"])
+  rec -->|refused| rw(["Left out · no count · no note"])
   m --> lf(["Agents recall and learn from it — AG-F09"])
   m --> mp["GP-07 · A node reads only as far as its place and its sources allow"]
-  mp -->|a source the agent may not read| wd2(["Head only · content withheld"])
+  mp -->|a source the agent may not read| wd2(["Absent · no note"])
   cp([Any copy · an answer · a finding · a report · a snapshot · a transcript · a note · an export]) --> ln["GP-06 · Its sources recorded with it"]
   ln --> sm{"The viewer's default agent may Read every source?"}
-  sm -->|no| rd(["Redacted · kind, when, who made it · content withheld"])
+  sm -->|no| rd(["Absent · Not found by link · no note"])
   sm -->|yes| full(["Shown · its sources named"])
   pj([A project › Map]) --> pm["GP-08 · Groups, tasks, runs, findings, decisions, related projects · Moving now"]
   pm -->|default agent may not Read memory/project/{key}| pw(["Head only · withheld"])
@@ -66,9 +66,9 @@ sequenceDiagram
   P->>E: browse Memory · open a node
   E->>G: nodes and edges for the filter
   G-->>E: nodes, edges · how far behind
-  E->>E: withhold content of runs the reader may not read
+  E->>E: withhold content of runs the reader may not read · leave out what a source hides
   E->>E: lineage.may_see — the reader's default agent against every source
-  E-->>P: the graph, a node, a decision's sources — redacted where a source is not readable
+  E-->>P: the graph, a node, a decision's sources — a node or copy whose source is not readable left out
 ```
 
 ## Stories
@@ -83,19 +83,19 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)
+The permission catalogue is [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
 (*thinking graph and memory*); who reads a run's content is
 [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s, never restated.
 
-| Act | Role | Everyone else sees |
+| Act | Permission | Everyone else sees |
 |---|---|---|
-| Browse Memory and follow a decision to its sources | Operator · Modeller · Admin | — (nodes of runs they may not read show their head only) |
-| Read a node's content | Whoever may read its run ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) and whose default agent may Read the node's place and every source it inherits | That it ran, its status, its tokens, the plan or workflow, its labels and record IDs — content *withheld*, naming who may read it or the resource their agent may not read |
-| See any copy and its sources | Operator · Modeller · Admin, when their default agent may Read every source | The copy redacted: its kind, when and who made it; content *Withheld — your agent may not read {resource}* |
-| Read a cited record | An agent the person may use, as its Access Policies allow | Counted as withheld; never shown |
-| Open a project's map | Operator · Modeller · Admin, when their default agent may Read `memory/project/<key>` | The project's head only — *Withheld — your agent may not read `memory/project/{key}`* |
-| Read org knowledge and its proposals | Operator · Modeller · Admin, when their default agent may Read `memory/org` and every source | Its head only — when, which agent, its state — content withheld |
-| Promote, decline or retire org knowledge | Modeller · Admin | Each act disabled — *Modellers and Admins only* |
+| Browse Memory and follow a decision to its sources | None — every signed-in person | — (nodes of runs they may not read show their head only) |
+| Read a node's content | Whoever may read its run ([AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) and whose default agent may Read the node's place and every source it inherits | That it ran, its status, its tokens, the plan or workflow, its labels and record IDs — content *withheld*, naming who may read it; a node whose place or sources their agent may not read is absent |
+| See any copy and its sources | None — when their default agent may Read every source | The copy is absent from lists and *Not found* by link, with no note |
+| Read a cited record | An agent the person may use, as its Access Policies allow | Left out, uncounted; never shown |
+| Open a project's map | None — when their default agent may Read `memory/project/<key>` | The project's head only — *Withheld — your agent may not read `memory/project/{key}`* |
+| Read org knowledge and its proposals | None — when their default agent may Read `memory/org` and every source | Org knowledge or a proposal whose place the reader's agent may not Read: its head only, content withheld; one whose sources it may not Read is absent |
+| Promote, decline or retire org knowledge | Edit on `memory/org` | Each act disabled — *Needs Edit on Memory — ask {who can grant}* |
 
 ## States
 
@@ -107,20 +107,21 @@ The role × feature table is [AC-F02 › The role table](../../../access/feature
 | Has data | The thinking graph drawn on the canvas; a node with its kind, labels, marks and links; a decision's path to its sources |
 | Failed | The system graph down: Memory unavailable and why; a run's *Thinking* tab still reads |
 | Agent working or proposing | The system graph behind: how far, and what it holds drawn; a project's map marks what is moving now; an agent's org-knowledge proposal waits as *Proposed* |
-| No access | A node of a run the reader may not read, or of sources their agent may not read: its head only, content withheld, naming who may read it or the resource; a copy redacted the same way |
+| No access | A node of a run the reader may not read: its head only, content withheld, naming who may read it. A node or copy whose place or sources their agent may not read is absent, with no note |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
-| Memory is Invana's own graph | It lives in the system graph, governed by the system ontology, and is never part of the Graph |
+| Memory is Invana's own graph | It lives in the system graph, governed by the system ontology, and is never part of Graph Data |
 | Every piece of work is a node | Every plan, workflow, run, step, evidence, finding and decision is a node, linked: a run ran a plan or a workflow · a plan composed workflows · a step found evidence citing records by ID · a finding came from steps · a decision weighed findings · a decision supersedes another · a workflow was approved from a plan |
 | Lineage is its edges | What each node came from — the steps, findings and record IDs behind it — is an edge, so a decision is followed back to the records it cites |
 | Every copy records its sources | An answer, a finding, a report, a snapshot, a run transcript, a note (a hand-off note, an annotation), a memory node and an export each record the resources it was read from, in [AC-F02's grammar](../../../access/features/AC-F02-access-policies/feature.md#engine) — `data/<graph database>/<kind>/<level>` for each property level it carries, `memory/…`, `project/…` — in the same transaction that makes the copy ([GP-06](stories/GP-06-see-where-any-excerpt-came-from-and-who-may-see-it/story.md)) |
-| A copy shows as far as the viewer's agent reads | A copy shows to a viewer only when the viewer's default agent is allowed Read on every source; otherwise it is redacted — kind, when and who made it, content *Withheld — your agent may not read {resource}*. Its level is the highest level among its sources |
+| A copy shows as far as the viewer's agent reads | A copy shows to a viewer only when the viewer's default agent is allowed Read on every source; otherwise it does not exist for them: absent from lists, threads and maps, *Not found* by link, naming nothing. Its level is the highest level among its sources |
 | No sources, no copy | A copy with no recorded sources is not shown, and one that cannot record its sources is not written |
 | A memory node inherits its sources | Reading a memory node needs Read on its place — `memory/project/<project>` · `memory/agent/<agent>` · `memory/org` — and on every source; a proposal that arrives from another project carries its sources' lineage ([GP-07](stories/GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) |
 | A run's transcript is a copy | A run's content reads to the person behind the run, and to anyone else — an Admin included — only when the run belongs to a project and `lineage.may_see` is true ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
+| Outside text sticks | A node written by a run whose context held outside text, or made from such a node, carries `trust = outside` and its origins through every copy and promotion; recall returns the label and marks the recalling run ([system-design § 10 › The outside-text mark](../../../../system-design.md#10-ai-and-agents) · [GP-07](stories/GP-07-read-memory-only-as-far-as-its-sources-allow/story.md)) |
 | Never customer data | Memory holds record IDs and keyed hashes, never a record's values; a person reading a cited record reads it fresh, through the agent's Access Policies ([system-design § 12 › Privacy](../../../../system-design.md#privacy)) |
 | Postgres is the truth | Each node mirrors a Postgres record its owner writes; the system graph follows through the outbox, retried, rebuildable from History ([system-design § 6](../../../../system-design.md#6-data-and-storage) · NFR-REL-6) |
 | Kept, then aged out of recall | Every node is kept as long as its Postgres record; recall reads the last 180 days ([AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)) and an older node reads *Not recalled* |
@@ -176,11 +177,11 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 | Route, after `/api/v1/graph` | Does | Story |
 |---|---|---|
 | `GET /memory` | Nodes and edges for `agent` · `workflow` · `label` · `behind` (a user) · `window` (`7d` · `30d` · `90d` · `180d` · `all`) · `around` (a node, and hops); at most 3,000 nodes, with `sample` when cut · `behind_s` · `applied_at` | GP-03 |
-| `GET /memory/nodes/{kind}/{id}` | One node: its kind, labels, marks, edges and content — content withheld for a run the reader may not read, or when `lineage.may_see` is false; `recallable` (inside 180 days) | GP-03 · GP-07 |
-| `GET /lineage/{copy_kind}/{copy_id}` | A copy's sources — resource, level, `recorded_at` — and its level; for a copy the reader may not see, only its kind, when and who made it, with `withheld` (the first resource the reader's default agent may not read, and `more`). Every surface that shows a copy gets the same answer from `lineage.may_see` | GP-06 |
+| `GET /memory/nodes/{kind}/{id}` | One node: its kind, labels, marks, edges and content — content withheld for a run the reader may not read; *Not found* when `lineage.may_see` is false; `recallable` (inside 180 days) | GP-03 · GP-07 |
+| `GET /lineage/{copy_kind}/{copy_id}` | A copy's sources — resource, level, `recorded_at` — and its level; for a copy the reader may not see, *Not found*. Every surface that shows a copy gets the same answer from `lineage.may_see` | GP-06 |
 | `GET /memory/projects/{key}/map` | A project's nodes and edges — groups and their waits, tasks with their state, the runs and checks that worked them, findings, decisions, related projects' heads — and `moving[]` (runs open, claims held, checks running); `window` · at most 3,000 nodes, with `sample` when cut · `behind_s`; the project's head and `withheld` when the reader's default agent may not Read `memory/project/{key}` | GP-08 |
 | `GET /memory/org` · `POST /memory/org/{id}/promote` · `POST /memory/org/{id}/decline` · `POST /memory/org/{id}/retire` | Proposals and org knowledge (`?status=`), each through `lineage.may_see` · promote · decline with a note · retire with a note — a Modeller or an Admin | GP-09 |
-| `GET /memory/decisions/{id}/sources` | The path from a decision to the findings it weighed, the steps they came from, the evidence and the record IDs it cites; each record read fresh through the agent's Access Policies, `records_withheld` counted | GP-03 |
+| `GET /memory/decisions/{id}/sources` | The path from a decision to the findings it weighed, the steps they came from, the evidence and the record IDs it cites; each record read fresh through the agent's Access Policies, a refused one left out, uncounted | GP-03 |
 
 ### Events
 
@@ -193,7 +194,7 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| — | Memory refuses nothing on a read: a run's content, or a copy or node whose sources the reader's agent may not read, is withheld, never refused | — | GP-03.9 · GP-03.14 · GP-06.4 · GP-07.3 |
+| — | Memory refuses nothing on a read: a run's content is withheld; a copy or node whose sources the reader's agent may not read is absent — never refused | — | GP-03.9 · GP-03.14 · GP-06.4 · GP-07.3 |
 | 409 | A copy written with no source recorded | *{copy kind} was not saved — it names no sources.* | GP-06.8 |
 | 404 | A copy that does not exist, or that has no recorded sources | *Not found.* | GP-06.7 |
 | 403 | Promoting, declining or retiring org knowledge by an Operator, or by an agent | *Modellers and Admins only.* | GP-09.6 · GP-09.9 |
@@ -215,11 +216,11 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 | Edge kinds | `RAN` Run → Plan or Workflow version · `IN_SESSION` Step → Session · `HAS_SESSION` Run → Session · `HANDED_OFF` Session → HandoffNote · `CONTINUED_FROM` Session → HandoffNote · `FORKED_FROM` Run → HandoffNote · `COMPOSED` Plan → Workflow (a pinned `composite` step) · `APPROVED_FROM` Workflow → Plan · `HAS_STEP` Run → Step · `FOUND` Step → Evidence · `CITES` Evidence → RecordRef · `CAME_FROM` Finding → Step · `WEIGHED` Decision → Finding · `SUPERSEDES` Decision → Decision · `RECALLED` Step → the node it recalled, with rank and label · `AVOIDED` Run → Plan or Workflow version · `FED` Run → Finding or Decision · `FROM` copy → source, in the system graph, one per `graph_lineage` row · `IN_PROJECT` Task or Group → Project · `IN_GROUP` Task → Group · `WAITS_ON` Group → Group · `STARTED_FROM` · `RELATED` Project → Project · `WORKED` Run → Task · `CHECKED` Run → Task, with its outcome · `PROPOSED_FROM` OrgKnowledge → the run it came from |
 | Reading a node | Content of a `Run` or `Step` node reads only through `may_read_run()` and `lineage.may_see`; otherwise the head — status, tokens, the plan or workflow, labels and record IDs |
 | Lineage | Every copy writes its sources as `graph_lineage` rows and, through the outbox, `(copy)-[:FROM]->(source)` edges in the system graph, in the transaction that writes the copy; a copy with no row is not shown and a write that cannot record one is refused — fail closed. A copy made from another copy lists the first copy's sources too. A copy's level is the highest `level` among its rows |
-| `lineage.may_see(person, copy)` | The one mechanism every surface that shows a copy calls — a list, a thread, a report, a board, a hand-off note, an export. It resolves the person's **default agent** ([AC-F02 › Rules](../../../access/features/AC-F02-access-policies/feature.md#rules)) at the time of the read, then runs `decide()` for Read on each source; it is true only when every answer is Allow — Ask and Deny both withhold, as does a copy with no row. A false answer redacts: the copy lists its kind, when and who made it, and its content reads *Withheld — your agent may not read {resource}*, naming the first refused source and the count of the rest |
+| `lineage.may_see(person, copy)` | The one mechanism every surface that shows a copy calls — a list, a thread, a report, a board, a hand-off note, an export. It resolves the person's **default agent** ([AC-F02 › Rules](../../../access/features/AC-F02-access-policies/feature.md#rules)) at the time of the read, then runs `decide()` for Read on each source; it is true only when every answer is Allow — Ask and Deny both hide, as does a copy with no row. A false answer leaves the copy out of every list, thread, map and read as if it did not exist |
 | A memory node's sources | A memory node inherits its sources' resources, so reading it needs Read on `memory/project/<project>` · `memory/agent/<agent>` · `memory/org` and on every source. A proposal that arrives from another project is written with its sources' lineage, whichever project holds it. Recall ([AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)) applies the same check for the agent that recalls |
 | Run privacy | A run's transcript is a copy: who reads it is [AC-F09 › Engine](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine); this feature adds only that, for anyone but the person behind the run, the run belongs to a project and `lineage.may_see` is true |
 | A personal connection's source | What a personal connection returned records `personal/<username>/<server>` as a source ([CP-F02](../../../control/features/CP-F02-plugins-and-outside-tools/feature.md#engine)); `lineage.may_see` is true for it only when the person is that username, whatever their default agent may read |
-| A decision's sources | `WEIGHED` → `CAME_FROM` → `FOUND` → `CITES`; each `RecordRef` read fresh through the agent's Access Policies, a refused one counted in `records_withheld` |
+| A decision's sources | `WEIGHED` → `CAME_FROM` → `FOUND` → `CITES`; each `RecordRef` read fresh through the agent's Access Policies, a refused one left out, uncounted |
 | Behind | Every read returns `behind_s` from the relay's position; the system graph down returns `unavailable` with why |
 | A project's map | `GET /memory/projects/{key}/map` calls `decide()` for the reader's default agent on `memory/project/<key>`; on Allow it reads the project's nodes and edges in the window, each node's content through `may_read_run()` and `lineage.may_see`; `moving[]` is read from Postgres — open runs, unexpired claims, checks with no result — so it is never behind. Studio re-reads `moving[]` every 10 seconds while the map is open |
 | Proposing org knowledge | The agent function `memory.org.propose` writes a `graph_org_knowledge` row as `proposed` from a learning on the calling agent ([AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md#engine)), with its sources as `graph_lineage` rows, in one transaction. No agent function promotes, declines or retires |
@@ -239,12 +240,13 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 
 | Decision | Detail |
 |---|---|
+| Memory opens in Explore | Lineage, a project as a map and org knowledge (`graph.memory.*`) open as board tabs in Explore, drawn on `@invana/canvas` like any board; an agent's or a run's thinking stays in Agents (`graph.memory · Thinking`) |
 | Memory is the store; learning is Agents' | Memory holds and serves the nodes; recall, outcome labels, marks, evidence and suggested changes are [AG-F09](../../../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)'s |
 | One store | No separate memory store and no memory kinds in a customer's model; a derived fact written to a customer's graph database is the records' own ([RC-F07](../../../../capabilities/records/features/RC-F07-annotations/feature.md) · [SE-F08](../../../../capabilities/semantics/features/SE-F08-inference/feature.md)), not memory |
 | Lineage is Memory's, shown by every surface | Recording a copy's sources and `lineage.may_see` live here; the answer, a finding, a report, a board, a hand-off note and an export each call it, and none keeps a rule of its own |
 | Memory opens from Agents | Agents › Thinking draws the thinking graph on the canvas; a run's thinking is a tab of the run |
 | A project's map opens from the project | *Map* is a tab of the project, drawn from Memory; moving now is read live from Postgres so it is never behind |
-| Org knowledge is a Modeller's or an Admin's to promote | It reaches every agent allowed `memory/org`, as meaning reaches every model — so it takes the role that shapes what agents read |
+| Org knowledge is promoted with Edit on `memory/org` | It reaches every agent allowed `memory/org`, as meaning reaches every model — so it takes the permission that shapes what agents read |
 
 ## Open questions
 
@@ -261,4 +263,4 @@ Memory — recall, outcome labels, marks, evidence and suggested changes — is 
 | Org knowledge written by hand | It is promoted from what an agent learned, with its sources; a person decides, never authors it |
 | Editing Memory by hand | It follows Postgres and is rebuilt from History, never repaired |
 | Guessing a copy's sources | A copy with no recorded sources is not shown; its sources are recorded when it is made, never inferred later |
-| A role that overrides lineage | An Admin reads a copy through their own default agent like anyone; an Admin who needs more changes what their default agent may Read, in History |
+| A permission that overrides lineage | An Admin reads a copy through their own default agent like anyone; an Admin who needs more changes what their default agent may Read, in History |

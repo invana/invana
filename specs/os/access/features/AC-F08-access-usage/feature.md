@@ -2,11 +2,11 @@
 id: AC-F08
 title: Access usage
 product: AC
-status: idea
+status: later
 personas: [admin, builder]
 stories: [AC-28, AC-29]
 journeys: [J09]
-boards: [access.usage, access.locked]
+boards: [access.usage]
 nfrs: [NFR-SEC-1, NFR-SEC-7]
 depends_on: [AC-F02, AC-F04, AC-F06, AC-F09]
 ---
@@ -23,7 +23,7 @@ Journeys this feature is a step of: [J09 · Audit what an agent touched](../../.
 
 ```mermaid
 flowchart TD
-  start([Settings › People and access › Usage]) --> list["AC-28 · Every agent: reads · writes · runs · people behind · in a window"]
+  start([Access › Record › Usage]) --> list["AC-28 · Every agent: reads · writes · runs · people behind · in a window"]
   list -->|nothing has run| none["No usage yet — a run writes the first call"]
   list -->|a filter matches nothing| nm["Nothing matches · Clear filters"]
   list --> one["AC-28 · One agent: each resource used, how often, for whom, the last run"]
@@ -39,17 +39,17 @@ flowchart TD
 
 | ID | Story | Status |
 |---|---|---|
-| AC-28 | [See what an agent touched](stories/AC-28-see-what-an-agent-touched/story.md) | idea |
-| AC-29 | [Find access an agent never uses](stories/AC-29-find-access-an-agent-never-uses/story.md) | idea |
+| AC-28 | [See what an agent touched](stories/AC-28-see-what-an-agent-touched/story.md) | later |
+| AC-29 | [Find access an agent never uses](stories/AC-29-find-access-an-agent-never-uses/story.md) | later |
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every agent's usage — every resource, count and person behind | Admin | — |
-| Read an agent's usage over the runs the reader may read — runs they are behind and runs of a project their default agent may see | Every signed-in person — Operator, Modeller | The rest is counted, not shown — *N runs are not yours to read* |
-| Read access an agent never uses | Modeller · Admin | Hidden for an Operator; the agent's access reads in [AC-F04](../AC-F04-what-an-agent-may-touch/feature.md) |
-| Draft a narrower policy from unused access | Admin, in a session ([AC-06](../AC-F02-access-policies/stories/AC-06-draft-a-policy-and-see-who-it-changes/story.md)) | Disabled, naming the Admin role and the Admins |
+| Read every agent's usage — every resource, count and person behind | Read on `run/<agent>` and on `access/policies` | The usage over runs the reader may read — the rest counted, not shown |
+| Read an agent's usage over the runs the reader may read — runs they are behind and runs of a project their default agent may see | None — every signed-in person | The rest is counted, not shown — *N runs are not yours to read* |
+| Read access an agent never uses | Read on `access/policies` | Hidden; the agent's access reads in [AC-F04](../AC-F04-what-an-agent-may-touch/feature.md) |
+| Draft a narrower policy from unused access | Edit on Access, in a session ([AC-06](../AC-F02-access-policies/stories/AC-06-draft-a-policy-and-see-who-it-changes/story.md)) | Disabled, naming Edit on Access and who can grant it |
 
 ## States
 
@@ -57,11 +57,11 @@ flowchart TD
 |---|---|
 | First use | *No usage yet — a run writes the first call* |
 | Empty after a filter | *Nothing matches*, with the filter named and *Clear filters* |
-| Loading | The sheet opens at once; counts read `—` until the engine gives them |
+| Loading | The section opens at once; counts read `—` until the engine gives them |
 | Has data | Each agent with its reads, writes and runs in the window and the people behind them; one agent's resources, each with its count and last use; access never used |
 | Failed | What could not load, in a sentence, with *Try again* |
 | Agent working or proposing | Runs still going count as they settle; a running run reads *running* beside its count |
-| No access | An Operator or a Modeller reads usage over runs they may read; a line counts the rest |
+| No access | A person without Read on `access/policies` reads usage over runs they may read; a line counts the rest |
 
 ## Rules
 
@@ -150,7 +150,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| A tab beside Access Policies | *Usage* is a tab of *Settings › People and access*; an agent opens beside the list |
+| Parked | The feature is `later`: *Access › Record* is History alone. Usage is a reading of the ledger and History, so it returns with no change to them; its board `access.usage` stays as drawn, unwired |
+| Usage sits in Access › Record when it returns | *Usage* sits beside *History* in *Access › Record*; an agent opens beside the list |
 | 90 days by default for unused | A shorter window flags access used monthly or quarterly as unused |
 
 ## Open questions

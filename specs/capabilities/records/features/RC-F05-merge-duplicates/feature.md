@@ -6,7 +6,7 @@ status: idea
 personas: [curator]
 stories: [RC-04]
 journeys: []
-boards: []
+boards: [data.records]
 nfrs: []
 depends_on: [RC-F01]
 ---
@@ -22,7 +22,7 @@ depends_on: [RC-F01]
 flowchart TD
   start([Two records of one kind]) --> side["RC-04 · Side by side · pick each value"]
   side --> rel["RC-04 · Relationships of both, moved to the survivor"]
-  rel --> g{Modeller or Admin · the connection writes?}
+  rel --> g{"Holds Edit on data/<graph database>/<kind> · the connection writes?"}
   g -->|no| na["Merge disabled — the reason"]
   g -->|yes| run{Merge}
   run -->|written| done(["One record · History names the merge and both keys"])
@@ -45,10 +45,10 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Compare two records | Every role — Operator, Modeller, Admin | — |
-| Merge them | Modeller · Admin, through an agent granted to them, on a connection that writes | Disabled — *Needs the Modeller role — ask an Admin*; a read-only connection gives its own reason |
+| Compare two records | Read on `data/<graph database>/<kind>` | — |
+| Merge them | Edit on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/record-editor`), on a connection that writes | Disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}*; a read-only connection gives its own reason |
 
 ## States
 

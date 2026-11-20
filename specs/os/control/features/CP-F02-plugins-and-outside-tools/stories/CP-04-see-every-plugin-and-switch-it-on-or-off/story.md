@@ -3,6 +3,7 @@ id: CP-04
 title: See every plugin and switch it on or off
 feature: CP-F02
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.plugins]
 ---
@@ -17,18 +18,18 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every plugin; turn one on or off for the deployment; turn one off or on for their own runs | — |
-| Operator | Read every plugin, its functions, versions, skills and workflows, and both switches; turn a plugin off, or back on, for the runs they start; a Modeller the same | The deployment's switch reads, with who set it and when — *Ask an Admin — Priya or Lee* |
+| Admin | Read every plugin; with Manage on `plugin/<name>`, turn one on or off for the deployment; turn one off or on for their own runs | — |
+| Operator | Read every plugin, its functions, versions, skills and workflows, and both switches; turn a plugin off, or back on, for the runs they start | The deployment's switch reads, with who set it and when — *Ask an Admin — Priya or Lee* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Plugins]) --> l["Every plugin: core · tool · outside server · pack · on or off"]
+  s([Settings › Plugins]) --> l["Every plugin: core · tool · outside server · pack · on or off"]
   l -->|filter| f["Nothing matches · Clear filters"]
   l --> p["A plugin: its functions and versions · skills · workflows"]
   p -->|core| always(["Always on · no switch"])
@@ -68,10 +69,11 @@ flowchart TD
 | CP-04.16 | A tool step and no worker free | it waits past its allowance | it fails, saying no worker took it |
 | CP-04.17 | A web page whose robots.txt disallows it | a web tool would read it | nothing is read, and the step says so with the address |
 | CP-04.18 | Anyone on the command line | they run `invana plugins list`, `show`, `on` or `off` | each does what its Studio act does, under the same checks |
+| CP-04.19 | Plugins in Agents | the list is read | each plugin reads *Used by n agents* — the agents that may use any of its functions, as the engine counts them |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Plugins | Admin | settings.plugins · New and off | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins | settings.plugins · Could not load | — | — |
 | Plugins | Operator | settings.plugins · New and off · Read only | settings.plugins · Nothing matches | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Could not load | — | settings.plugins · Read only |

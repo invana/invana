@@ -4,7 +4,7 @@ title: Tell a story in steps
 feature: EX-F02
 status: idea
 personas: [analyst]
-boards: [explore.board.present]
+boards: [explore.board]
 ---
 
 # EX-22 · Tell a story in steps
@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); the walkthrough is part of the board.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); the walkthrough is part of the board.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add, word, move and remove authored steps on any board; present them | — |
-| Operator | The same; a Modeller the same | Without the Assistant: the steps read and play; *Add a step here* is disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same | Without the Assistant: the steps read and play; *Add a step here* is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 
@@ -52,9 +52,9 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The walkthrough | Admin | explore.board.present · No annotations | — | — | explore.board.present · Authoring | explore.board.present · Refused | — | — |
-| The walkthrough | Operator | explore.board.present · No annotations | — | — | explore.board.present · Authoring | explore.board.present · Refused | — | explore.board.present · Read only |
-| Presenting an authored step | Admin | — | — | explore.board.present · Step settling | explore.board.present · Authored step | explore.board.present · Record gone | — | — |
-| Presenting an authored step | Operator | — | — | explore.board.present · Step settling | explore.board.present · Authored step | explore.board.present · Record gone | — | — |
+| The walkthrough | Admin | explore.board · Present · No annotations | — | — | explore.board · Present · Authoring | explore.board · Present · Refused | — | — |
+| The walkthrough | Operator | explore.board · Present · No annotations | — | — | explore.board · Present · Authoring | explore.board · Present · Refused | — | explore.board · Present · Read only |
+| Presenting an authored step | Admin | — | — | explore.board · Present · Step settling | explore.board · Present · Authored step | explore.board · Present · Record gone | — | — |
+| Presenting an authored step | Operator | — | — | explore.board · Present · Step settling | explore.board · Present · Authored step | explore.board · Present · Record gone | — | — |

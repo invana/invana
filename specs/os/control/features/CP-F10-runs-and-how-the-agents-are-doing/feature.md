@@ -4,9 +4,9 @@ title: Runs and how the agents are doing
 product: CP
 status: idea
 personas: [admin, builder, analyst]
-stories: [CP-48, CP-49, CP-53, CP-50, CP-66, CP-58, CP-51, CP-52, CP-54, CP-55, CP-56, CP-57]
+stories: [CP-48, CP-49, CP-53, CP-50, CP-66, CP-58, CP-51, CP-52, CP-54, CP-55, CP-56, CP-57, CP-72]
 journeys: [J04, J08]
-boards: [agents, agents.agent, agents.runs, agents.run, agents.run.answer, agents.skill, inbox]
+boards: [agents.runs, inbox, agents.agents, agents.skills, shell.agents]
 nfrs: [NFR-PERF-3, NFR-COST-2, NFR-OPS-3, NFR-UX-2]
 depends_on: [AG-F01, AG-F05, AC-F09, CP-F02, CP-F03, CP-F04, GP-F02]
 ---
@@ -28,13 +28,14 @@ Journeys this feature is a step of: [J04 · Build an agent and improve it from w
 
 ```mermaid
 flowchart TD
-  start([Control Plane › Runs]) --> dash["CP-48 · Runs: runs today · failed · needs you · tokens against the budget"]
+  start([Agents › Runs]) --> dash["CP-48 · Runs: runs today · failed · needs you · tokens against the budget"]
   dash -->|nothing ran yet| empty["What a run is, and that a question, a task or a schedule starts one"]
   dash -->|a run failing| run
   dash -->|an ask waiting| inbox(["Inbox › Needs you"])
   dash -->|an agent got slower| perf
   start --> agent["CP-49 · An agent: its runs, served, p95, tokens today and this month"]
-  agent --> perf["CP-53 · How they are doing: agents · skills · plans · model versions over 7, 30 or 90 days"]
+  start --> perf["CP-53 · Runs › How they are doing: agents · skills · plans · model versions over 7, 30 or 90 days"]
+  agent -->|its own line| perf
   perf -->|too few runs| few["Says there were too few runs, never a flat line"]
   perf -->|degraded| change["The change before the first slow run, opened to compare"]
   perf -->|a figure| list
@@ -50,19 +51,21 @@ flowchart TD
   run -->|past 50 agents| big["CP-51 · The same run, grouped by role, with its rates and time left"]
   run -->|an answer| ans["CP-52 · The answer's run, with its conversation one click away"]
   run -->|Stop run| stop["CP-58 · Stopped · its helpers end · the person behind it is told"]
-  stop -->|not behind it, not an Admin| sr["Stop run disabled, naming who may"]
+  stop -->|not behind it, without Manage on `run/<agent>`| sr["Stop run disabled, naming who may"]
   run -->|failed| fx(["Never re-run on its own · a task's run raises Task failed and waits on a fix task (CP-F11)"])
   run -->|Re-run| rr{"CP-54 · As it was · on today's versions · retuned"}
   rr --> newrun(["A new run with its own number"])
   newrun --> cmp["CP-55 · Compare the two runs"]
   run -->|failed| imp["CP-56 · Improve this skill — a draft with this run as a test"]
-  imp -->|an Operator| req["Request a change — to the Modellers and Admins"]
+  imp -->|an Operator| req["Request a change — to those who can Edit the skill, and the Admins"]
   imp --> back(["Back to the run once the fix is published"])
   inb([Inbox › Running]) --> r57["CP-57 · What is running now and what ended today, helpers nested"]
   r57 -->|nothing running| e57["Nothing is running — a question, a load, a task or a schedule starts a run"]
   r57 -->|Stop| stop
   r57 -->|open a run| run
   r57 -->|See every run| list
+  gl([Agents summoner]) --> r72["CP-72 · The Agents glance: waits on you · running · workers"]
+  r72 -->|Open in Agents| run
 ```
 
 ```mermaid
@@ -75,7 +78,7 @@ sequenceDiagram
   E-->>S: every number as stored · content only if the reader may read it
   P->>S: Re-run — retuned
   S->>E: a new run on the chosen versions and budget
-  E-->>S: run #N+1 · its own sheet
+  E-->>S: run #N+1 · its own page
   P->>S: Compare
   E-->>S: what differs — versions, answer, time, tokens
 ```
@@ -92,7 +95,7 @@ sequenceDiagram
   A-->>E: delegates a helper — a child run
   E-->>S: the helper nests under its run
   P->>S: Stop run
-  S->>E: stop — is this person behind it, or an Admin?
+  S->>E: stop — is this person behind it, or holds Manage on run/<agent>?
   E-->>S: stopped · helpers stopped with their parent · a History row
   E-->>P: the person behind it is told, in the Inbox
 ```
@@ -133,24 +136,26 @@ sequenceDiagram
 | CP-55 | [Compare two runs of one question](stories/CP-55-compare-two-runs-of-one-question/story.md) | idea |
 | CP-56 | [Turn a failed run into a better skill](stories/CP-56-turn-a-failed-run-into-a-better-skill/story.md) | idea |
 | CP-57 | [See what is running and what just ran](stories/CP-57-see-what-is-running-and-what-just-ran/story.md) | idea |
+| CP-72 | [Glance at the agents without leaving my work](stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md) | idea |
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)
-(*Runs — read, stop and re-run*: Operator Own · Modeller Own · Admin Acts); this is what it means here. Who reads a
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) (*Runs*); this table names the acts. Who reads a
 run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)'s, never restated.
 
-| Act | Role | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| List every run; read how every agent, skill, plan and model version is doing | Operator · Modeller · Admin | — |
-| Read a run's sessions — each one's head: runs with, model set and reported, connection used, worker, tokens, why it ended | Operator · Modeller · Admin, on every run they may list | — |
-| Read a run's content — steps, queries, records, what it sent, its answer | As [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md): the person behind it; for a project's run, anyone whose default agent may read its sources. The Admin role adds nothing | That it ran, its agent, the person behind it, its status, its tokens and its session heads; content *withheld*, naming who may read it |
+| List every run; read how every agent, skill, plan and model version is doing | None — every signed-in person | — |
+| Read a run's sessions — each one's head: runs with, model set and reported, connection used, worker, tokens, why it ended | None — on every run they may list | — |
+| Read a run's content — steps, queries, records, what it sent, its answer | As [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md): the person behind it; for a project's run, anyone whose default agent may read its sources. A permission adds nothing | That it ran, its agent, the person behind it, its status, its tokens and its session heads; content *withheld*, naming who may read it |
 | Read a hand-off note's body | Whoever may read the run's content, when `lineage.may_see` is true for the note ([GP-F02](../../../graph/features/GP-F02-memory/feature.md#engine)) | The note's head — between which sessions, when, its tokens; its body *withheld*, naming the first source the reader's agent may not read |
 | Open the conversation behind an answer's run | The person who asked | The run reads; *Open the conversation* is absent |
-| Stop a run | The person behind it (Own) · Admin (Acts) | *Stop run* disabled, naming who may stop it |
-| Re-run a run — as it was, on today's versions, or retuned | The person behind it (Own) · Admin (Acts) | *Re-run* disabled, naming who may |
+| Stop a run | None — the person behind it · Manage on `run/<agent>` for any other run | *Stop run* disabled, naming who may stop it |
+| Re-run a run — as it was, on today's versions, or retuned | None — the person behind it · Manage on `run/<agent>` for any other run | *Re-run* disabled, naming who may |
 | Compare two runs | Whoever may read both runs' content | *Compare* disabled, naming the run they may not read |
-| Improve this skill from a run | Modeller · Admin, through an agent granted to them | An Operator: *Request a change* in its place, sent to the Modellers and the Admins |
+| Improve this skill from a run | Edit on `skill/<name>`, through an agent the person may Run | Without it: *Request a change* in its place, sent to those who can Edit the skill and to the Admins |
 | Answer an ask a run waits on | Whoever the ask is routed to ([AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, with who it waits on |
 
 ## States
@@ -160,7 +165,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 | First use | Nothing ran: tiles read `0` or `—`, *Nothing ran in the last 30 days*, and what a run is — a question, a task or a schedule starts one |
 | Empty after a filter | *0 of N runs match*, the filters named as chips, *Clear all* |
 | Loading | The head and its acts drawn at once; the body loads in place |
-| Has data | Tiles against the window before, the runs list, a run's sheet with its sessions and hand-off notes, each agent's and skill's numbers |
+| Has data | Tiles against the window before, the runs list, a run's page with its sessions and hand-off notes, each agent's and skill's numbers |
 | Failed | What could not be read, in the engine's words; a refused act names why; a session that failed names why it ended |
 | Agent working or proposing | A run in flight: *running*, time so far, its agents and steps filling in, its current session counting tokens against the session budget, refreshed every few seconds; a run continuing reads *continuing in session {n}* |
 | No access | A run whose content the reader may not read shows that it ran, its status, its tokens and its session heads, with its content and hand-off notes withheld; acts they may not take are disabled, naming who may |
@@ -169,7 +174,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 
 | Rule | Detail |
 |---|---|
-| One runs list | Control Plane › Runs lists every run in the deployment; an agent's runs, a person's runs, a team's runs, a graph database's runs and a schedule's runs are that list, filtered |
+| One runs list | Agents › Runs lists every run in the deployment; an agent's runs, a person's runs, a team's runs, a graph database's runs and a schedule's runs are that list, filtered |
 | A run has a number | `#2291` is how people quote a run; numbered for the deployment, never reused; a helper's run and a step carry none |
 | Its status is why it ended | Once ended, a run reads its reason: served · cannot answer · out of tokens · out of time · out of steps · no progress · loop · stopped with its parent · stopped · refused · failed. Running reads *running*; held on a person, *waiting* |
 | From | Where a run started, in the reader's words: Ask · Task · Schedule · Project · API |
@@ -178,7 +183,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 | Graph databases touched | A run records each graph database it read or wrote; filtering by graph database reads that |
 | One run, read one way | The same parts for one agent, nine or seven hundred; past 50 agents the numbers read as rates and agents group by role |
 | Content is not listing | Every run is listed for everyone; its content opens only for those [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) names |
-| Who stops | The person behind a run and the Admins; a run with no person behind it is stopped by an Admin |
+| Who stops | The person behind a run and anyone with Manage on `run/<agent>`; a run with no person behind it is stopped only by the latter |
 | A run is one or more sessions | Each session is one stretch of the run in one fresh context on its runtime, numbered *Session 1, 2 …*; a run read whole sums its sessions |
 | Continuation keeps the run | At its session budget ([CP-F04](../CP-F04-limits/feature.md)) a run continues in a fresh session from a hand-off note ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md)) — the same run, the same number, its cursor where it was. Reaching the session budget is never an ask and never why a run ended |
 | Fork is a new run | A run forked from a hand-off note is a run of its own with its own number; the note names the run it started, and that run names the note ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md)) |
@@ -200,7 +205,7 @@ run's content is [AC-31](../../../access/features/AC-F09-what-left-the-platform/
 | An ended run holds no asks | Its pending asks close as expired and leave *Needs you* |
 | Stop is the run's one write | *Stop run* is the only act that changes a run; re-running makes a new run |
 | Stopping tells | The person behind a stopped run, when someone else stopped it, is told in the Inbox, naming who stopped it |
-| One journal | There is one record of runs in the deployment. Control Plane › Runs is the full list; the Overview (CP-F09), Inbox › Running and Done and a load's history are readings of it — never a second record |
+| One journal | There is one record of runs in the deployment. Agents › Runs is the full list; the Overview (CP-F09), Inbox › Running and Done and a load's history are readings of it — never a second record |
 | Running is not History | A run is what executed — how it ended, what it spent; a History row is what a person or an agent did — who, on whose behalf. Neither is drawn from the other |
 | Everything that runs is a run | A question, a typed query, a load, a link between models, an enrichment, a planner and a checker are each a run; a step is never a run of its own in a list |
 | Helpers nest | A helper an agent delegated to, or a part a step fanned out, sits under the run that started it, never as a sibling; past the second level it collapses, showing how many it holds |
@@ -236,9 +241,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `control_runs` | `number?` · `parent_run_id?` · `todo_id?` · `plan_id` · `task_id?` (the plan step a child row runs) · `task_key?` (its function) · `step_key?` (its plan step's key) · `agent_id?` · `agent_version` · `model_version` · `ontology_version` · `role` (`plan` · `execute` · `evaluate`) · `plan_snapshot` · `plan_revision` · `plan_origin` (`template:<key>@<v>` · `generated`) · `triggered_by` (`user` · `schedule` · `task` · `delegation` · `automation` · `canvas` · `mcp` · `system`) · `author_kind` · `author_id` · `on_behalf_of_user_id?` (the person behind it; none for a schedule's or a pick-up's run) · `team_ids[]` (their teams at open) · `graph_databases[]` (each one read or written) · `session_id?` · `lane` · `iteration` · `attempt` · `status` · `outcome` · `exit_reason` · `stopped_by_id?` · `cursor` · `args` · `input` · `output` · `result` · `error` · `idem_key` · `trace_id` · `queued_at` · `started_at` · `finished_at` · `queue_ms` · `work_ms` · `ask_ms` · `wait_ms` · `duration_ms` · `tokens_in` · `tokens_out` · `run_tokens_in` · `run_tokens_out` · `run_tokens` · `steps_done` · `steps_total` · `replans` · `clarifications` · `escrow_tokens` · `escrow_returned` · `skills_offered[]` · `skills_applied[]` · `rules_offered[]` · `rules_cited[]` · `rerun_of_run_id?` | One table for every run and every step: a root has no `parent_run_id` and a `number` for the deployment, never reused; a step, a lane, an iteration and an attempt are rows under it — (`parent_run_id`, `task_id`, `lane`, `iteration`, `attempt`) unique. Every number is written when its fact settles |
+| `control_runs` | `number?` · `parent_run_id?` · `todo_id?` · `plan_id` · `task_id?` (the plan step a child row runs) · `task_key?` (its function) · `step_key?` (its plan step's key) · `agent_id?` · `agent_version` · `model_version` · `ontology_version` · `role` (`plan` · `execute` · `evaluate`) · `plan_snapshot` · `plan_revision` · `plan_origin` (`template:<key>@<v>` · `generated`) · `triggered_by` (`user` · `schedule` · `task` · `delegation` · `automation` · `canvas` · `mcp` · `system`) · `author_kind` · `author_id` · `on_behalf_of_user_id?` (the person behind it; none for a schedule's or a pick-up's run) · `key_id?` (the [key](../../../access/features/AC-F10-keys/feature.md#engine) whose call opened it) · `client_connection_id?` (the [connected client](../../../access/features/AC-F11-connect-an-mcp-client/feature.md#engine) whose call opened it) · `team_ids[]` (their teams at open) · `graph_databases[]` (each one read or written) · `session_id?` · `lane` · `iteration` · `attempt` · `status` · `outcome` · `exit_reason` · `stopped_by_id?` · `cursor` · `args` · `input` · `output` · `result` · `error` · `idem_key` · `trace_id` · `queued_at` · `started_at` · `finished_at` · `queue_ms` · `work_ms` · `ask_ms` · `wait_ms` · `duration_ms` · `tokens_in` · `tokens_out` · `run_tokens_in` · `run_tokens_out` · `run_tokens` · `steps_done` · `steps_total` · `replans` · `clarifications` · `escrow_tokens` · `escrow_returned` · `skills_offered[]` · `skills_applied[]` · `rules_offered[]` · `rules_cited[]` · `rerun_of_run_id?` | One table for every run and every step: a root has no `parent_run_id` and a `number` for the deployment, never reused; a step, a lane, an iteration and an attempt are rows under it — (`parent_run_id`, `task_id`, `lane`, `iteration`, `attempt`) unique. Every number is written when its fact settles |
 | `control_run_sessions` | `run_id` · `seq` (1, 2, …) · `runtime` (`invana` · `claude_code` · `codex`) · `runtime_version` · `model_set` (the agent's pin) · `model_reported?` (what the runtime said it ran on) · `connection_kind?` (`work` · `personal`) · `connection_id?` · `worker_id?` · `workspace_id?` · `started_at` · `ended_at?` · `ended_because?` (`finished` · `session_budget` · `stopped` · `failed` · `refused`) · `tokens_in` · `tokens_out` · `handoff_in_id?` · `handoff_out_id?` | One row per session of a root run; (`run_id`, `seq`) unique. `handoff_in_id` and `handoff_out_id` are [AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine)'s `agents_handoff_notes`; `connection_id` a [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#engine) connection; `worker_id` and `workspace_id` [CP-F03](../CP-F03-workers-and-the-queue/feature.md#engine)'s |
-| `control_run_stream` | `seq` (the resume cursor) · `run_id` · `ts` · `frame_type` · `payload` | A run's frames in order, for the live sheet and Running |
+| `control_run_stream` | `seq` (the resume cursor) · `run_id` · `ts` · `frame_type` · `payload` | A run's frames in order, for the live run page and Running |
 | `control_run_prompts` | `run_id` · `task_id` · `kind` (`clarification` · `approval` · `verdict`) · `question` · `options` · `deadline_s?` · `answered_by_kind?` · `answered_by_id?` · `answer?` · `answered_at?` | A question a run asks and its answer. A verdict may be answered by an agent or a person; an approval only by a person |
 | `control_run_artifacts` | `run_id` · `task_id` · `key` · `media_type` · `size_bytes` · `digest` (sha256) · `uri` | What a run produced, addressed by digest in the blob store; the run row carries the digest, never the payload |
 
@@ -282,7 +287,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /runs/{id}/trace` | The run — `body` · `ask_kind` · `outcome` · `agent_version` · `plan_origin` · `plan_revision` · `triggered_by` · `trace_id` · `clarifications` · `replans` · times · tokens · `budget` (every ceiling, the run's as frozen) · `result`; each step — `task_key` · `step_key` · `lane` · `attempt` · `max_attempts` · `args` (bound) · `bound` · `input` · `output` · `result` · `error` · times · tokens · share of the run · skills and rules offered and applied · `child_run_id` | CP-50 · CP-52 |
 | `GET /runs/{id}/tasks/{task_key}` | One step: its resolved input, its result document, its artifacts and its log slice | CP-50 |
 | `GET /runs/{id}/chain` | A run's descendant count, worst outcome and summed tokens | CP-57 |
-| `GET /runs/{id}/stream?after=` | Frames from `seq` on — the live sheet resumes from its last cursor; a reader who may not read the content gets status and tokens frames only | CP-50 · CP-57 |
+| `GET /runs/{id}/stream?after=` | Frames from `seq` on — the live run page resumes from its last cursor; a reader who may not read the content gets status and tokens frames only | CP-50 · CP-57 |
 | `GET /runs/compare?a=&b=` | What differs — versions, answer, time, tokens | CP-55 |
 | `POST /runs/{id}/stop` | Stop the run; its helpers end *stopped with its parent*; the person behind it is told when someone else stopped it | CP-58 |
 | `POST /runs/{id}/rerun` | `{versions: same · current · retune, retune?: {agent_version, model_version, max_tokens_run}}` → `{run_id, rerun_of_run_id, model_version, stream_url}` | CP-54 |
@@ -310,10 +315,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
 | 404 | A content route of a run the reader may not read — a step, a session's steps, a hand-off note — or a conversation's run by anyone but its author or whom it is shared with | *Not found.* | CP-50.21 · CP-57.15 · CP-66.12 |
-| 403 | Stop by anyone but the person behind it or an Admin | *Only {person} or an Admin can stop this run.* — for a run with no person behind it, *Only an Admin can stop this run.* | CP-58.6 |
+| 403 | Stop by anyone but the person behind it or a holder of Manage on `run/<agent>` | *Only {person} or someone with Manage on run/{agent} can stop this run* — for a run with no person behind it, *Only an Admin can stop this run.* | CP-58.6 |
 | 409 | `run_ended` — stop on a run that already ended | *This run already ended — {reason}.* | CP-58.7 |
 | 403 | Compare where the reader may not read one of the two runs | *Only those who may read #{n} can compare it.* — the comparison route answers 404 | CP-55.6 |
-| 403 | Re-run by anyone but the person behind it or an Admin | *Only {person} or an Admin can re-run this run.* | CP-54.9 |
+| 403 | Re-run by anyone but the person behind it or a holder of Manage on `run/<agent>` | *Only {person} or someone with Manage on run/{agent} can re-run this run* | CP-54.9 |
 | 409 | `run_live` — a re-run of a run still going | *Re-run is offered once the run ends.* | CP-54.6 |
 | 409 | `version_not_offered` — *As it was* with a recorded agent or model version the deployment does not offer today, or a retuned version it does not offer | *{version} is not offered.* | CP-54.7 |
 | 409 | `version_not_recorded` — *As it was* on a run that recorded no version | *This run recorded no version — choose Today's versions or Retune.* | CP-54.10 |
@@ -338,7 +343,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Status and exit reason | Running reads `running`; held on a person `waiting` (`awaiting_approval` · `needs_input`); once ended `exit_reason` names why — `served` · `cannot_answer` · `out_of_tokens` · `budget_declined` · `out_of_time` · `step_limit` · `no_progress` · `loop` · `stopped_with_parent` · `stopped` · `refused` · `failed`. *Cannot answer* is never counted inside *failed* |
 | Origin | `triggered_by` and the task, schedule or session map to the reader's words — Ask · Task · Schedule · Project · API |
 | Content | Every content route and every row's `body` call `may_read_run()` ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)); a reader it refuses gets the head and `withheld`, and content routes answer 404 |
-| Who may stop, re-run | Stop: `on_behalf_of_user_id` · an Admin; a run with no `on_behalf_of_user_id`, an Admin only. Re-run: `on_behalf_of_user_id` · an Admin. `may_stop` and `may_rerun` are computed on each row so Studio never decides |
+| Who may stop, re-run | Stop: `on_behalf_of_user_id` · Manage on `run/<agent>`; a run with no `on_behalf_of_user_id`, Manage only. Re-run: `on_behalf_of_user_id` · Manage on `run/<agent>`. `may_stop` and `may_rerun` are computed on each row so Studio never decides |
 | A session per fresh context | When a root run is first dispatched, the runtime opens `seq` 1 with its `runtime`, `runtime_version`, `model_set` (the agent's `model_version`), the connection it signs in with, the worker and the workspace, and writes `control.runs.session_start`. A session is never opened for a step or a helper's part: a helper is a run of its own, with sessions of its own |
 | Continuation | When a session's tokens reach the session budget ([CP-F04](../CP-F04-limits/feature.md#engine)), dispatch pauses between steps, the hand-off note is written (`agents.handoff_notes.write`, [AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#mechanisms)) and set as `handoff_out_id`, the session ends `session_budget`, `control.runs.continue` is written, and `seq` + 1 opens with `handoff_in_id` on the same run row — same `number`, same `cursor`, its status still *running*. No ask is raised and the run's `exit_reason` is untouched |
 | Model reported | The runtime writes `model_reported` when the session ends, from what the model provider answered; `model_differs` is `model_reported` ≠ `model_set`, computed by the engine. A runtime that reports none leaves it null |
@@ -381,11 +386,13 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Runs are the Control Plane's | Every run, whatever started it, is read, filtered and stopped in one place; Agents is where agents and skills are built |
+| Runs live in Agents › Runs | Every run, whatever started it, is read, filtered and stopped in one place, Agents › Runs in the Agents mode, beside the agents and skills it ran |
+| How they are doing is a tab of Runs | *How they are doing* — each agent, skill, plan and model version against its own baseline — is a tab of Agents › Runs, beside the runs it counts; an agent's page shows that agent's own line. The Fleet map and Workloads are Settings › Fleet ([CP-F09](../CP-F09-overview/feature.md)) |
+| Running now is everyone's glance | The header's *● n running* opens Operations ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) with each run's step, tokens, time, worker group and *Stop*; the Inbox's Running holds the reader's own |
 | Runs opens on what needs you | Tiles — runs today against the same day last week · failed today · needs you · p95 over 7 days · tokens this month against the agents' monthly limits · success over 7 days — then *Needs attention*, runs a day over 30 days and what changed recently |
 | Needs attention | Failing workflows first, then agents, then degraded agents; an agent whose latest failure is a listed workflow's run is not listed again; each item has one act that opens where it is answered |
-| A run is a sheet | A run opens as a sheet over the work: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
-| Sessions are a part of the sheet | *Sessions* lists each session in order, a hand-off note between two; a run of one session reads that one session, with no note |
+| A run is a page | A run opens as a page in Agents › Runs: its head (number, agent, the person behind it, status, what started it, what it runs with, the model reported, the connection used, sessions, tokens against its budget, *Re-run*, *Stop run*, *Compare*) and its parts — numbers, who did what, steps, sessions, what it produced, data touched, history |
+| Sessions are a part of the page | *Sessions* lists each session in order, a hand-off note between two; a run of one session reads that one session, with no note |
 | A step opens inside its run | Its input, output, what it touched and its log; a step that fanned out opens on its first part with *All parts* beside it |
 | A step's detail reads by layer | Bands in order — Touches · Slice · What it sent · Attempts · Model · Cache; a layer the run touched nothing in draws its band dark, never hidden |
 | Queued behind a schedule | A run waiting its turn shows its place in the queue; one held on a person reads *a person is waiting* |
@@ -400,7 +407,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | A change is the engine's | `↑ 38%`, `▲ 1.2 pt` or *flat* — under 2% or 0.1 pt reads flat; run time and tokens up read worse, success up reads better, counts are neutral |
 | A failed run is the way into a better skill | *Improve this skill* opens the skill's draft with the run added as a test and a way back to the run |
 | Spend in tokens | No cost is shown anywhere, even when a provider prices tokens |
-| Running is the Inbox's, the list is Runs' | Inbox › Running answers *what is moving now*; Control Plane › Runs is where every run is found, filtered and opened. A run opens as one sheet wherever it is listed |
+| Running is the Inbox's, the list is Runs' | Inbox › Running answers *what is moving now*; Agents › Runs is where every run is found, filtered and opened. A run opens as one page wherever it is listed |
 | Done is today | Done lists the runs that ended today, the reader's day; older runs are in Runs |
 | Mine first | Running lists the runs the reader is behind first, then everyone else's |
 
@@ -416,11 +423,11 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | A cost per run, agent or model | Tokens only |
 | Custom windows or date ranges | 7, 30 and 90 days answer *since it shipped* |
-| *Roll back* from how agents are doing | A version rolls back on its own sheet, after its tests (AG-36) |
+| *Roll back* from how agents are doing | A version rolls back on its own page, after its tests (AG-36) |
 | A provider's release feed | Invana does not poll vendors; an Admin offers the version they want (CP-F01) |
 | Who pins each model version | AI models (CP-F01) |
 | An icicle of a big run | Who did what and by role answer *who made whom* and *how each role is doing* |
-| Saved copies of a run | A settled run never changes; its sheet reads it any time |
+| Saved copies of a run | A settled run never changes; its page reads it any time |
 | A section of its own for big runs | A run of hundreds of agents is a run, started like any other |
 | An estimate before a big run starts | The engine stores none, and Studio never derives a number (AG-F01) |
 | Stopping many runs at once | A stop is read and confirmed one run at a time; switching an agent, a plugin or a graph database off stops new work |

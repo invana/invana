@@ -3,8 +3,9 @@ id: CP-38
 title: Set a graph database read-only or read + write
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin]
-boards: [settings.databases.database, access.sign_in_again]
+boards: [settings.databases, access.signin]
 ---
 
 # CP-38 · Set a graph database read-only or read + write
@@ -16,9 +17,9 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Set read + write, signing in again; set read-only | — |
+| Admin | With Edit on `setting/graph-databases`: set read + write, signing in again; set read-only | — |
 | Operator | Read each graph database's mode, who set it and when | *Change* reads *Ask an Admin*, naming the Admins |
 
 ## Flow
@@ -26,7 +27,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 ```mermaid
 flowchart TD
   d([A graph database · read-only]) --> c{"Change to read + write"}
-  c -->|an Operator or Modeller| ask(["Ask an Admin"])
+  c -->|an Operator| ask(["Ask an Admin"])
   c -->|an Admin| pw["Sign in again — the password for this act"]
   pw -->|wrong, or a key| no(["Refused · nothing changes"])
   pw -->|right| rw(["Read + write · History: who, when, from and to"])
@@ -43,15 +44,19 @@ flowchart TD
 | CP-38.3 | The password wrong, missing, or the act made with a key | the change is sent | it is refused and the mode is unchanged |
 | CP-38.4 | A mode change, either way | it is saved | History records who changed it, when, and from what to what |
 | CP-38.5 | A read-only graph database | a load, an edit, an annotation, a derived fact or an agent's write reaches it | it is refused before the wire, naming the graph database and its mode |
-| CP-38.6 | An Operator or a Modeller | they reach *Change* | it reads *Ask an Admin*, naming the Admins |
+| CP-38.6 | An Operator | they reach *Change* | it reads *Ask an Admin*, naming the Admins |
 | CP-38.7 | Any graph database | the list or its details draw | its mode reads in words — *Read-only* · *Read + write* — with who set it and when |
 | CP-38.8 | A read on a read + write graph database | it runs | it still runs in the driver's read mode |
+| CP-38.9 | An Admin | they press *Set read + write* | *Sign in again* names the act, *Set read + write*, and the graph database; the right password returns to its details reading *Read + write*; a wrong one returns to the same *Sign in again* with the message and the mode unchanged |
+| CP-38.10 | An Admin | they press *Set read-only* on a read + write graph database | the mode changes without the password and its details read *Read-only*; a refusal reads *Could not change mode* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Mode | Admin | settings.databases.database · Read-only | — | settings.databases.database · Loading | settings.databases.database · Read + write | settings.databases.database · Could not change mode | — | — |
-| Mode | Operator | settings.databases.database · Read-only · Read only | — | settings.databases.database · Loading | settings.databases.database · Read + write · Read only | settings.databases.database · Could not load | — | settings.databases.database · Read + write · Read only |
-| Sign in again | Admin | — | — | — | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
-| Sign in again | Operator | — | — | — | — | — | — | — |
+| Mode | Admin | settings.databases · Detail · Read-only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write | settings.databases · Detail · Could not change mode | — | — |
+| Mode | Operator | settings.databases · Detail · Read-only · Read only | — | settings.databases · Detail · Loading | settings.databases · Detail · Read + write · Read only | settings.databases · Detail · Could not load | — | settings.databases · Detail · Read + write · Read only |
+| Mode · Set read + write | Admin | — | — | — | access.signin · Sign in again · Set read + write | access.signin · Sign in again · Set read + write · Wrong password | — | — |
+| Mode · Set read + write | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |
+| Mode · Set read-only | Admin | — | — | — | settings.databases · Detail · Read-only | settings.databases · Detail · Could not change mode | — | — |
+| Mode · Set read-only | Operator | — | — | — | — | — | — | settings.databases · Detail · Read only |

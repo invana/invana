@@ -6,7 +6,7 @@ status: idea
 personas: [analyst, decision-maker, admin]
 stories: [AG-42]
 journeys: [J04]
-boards: [agents.schedules, inbox]
+boards: [agents.schedules, projects.schedules, inbox]
 nfrs: [NFR-PERF-3]
 depends_on: [AG-F01, CP-F10]
 ---
@@ -82,13 +82,15 @@ sequenceDiagram
 
 ## Access
 
-Schedules are *Acts* for every role in [the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table); a schedule is the organisation's, and a person acts on it only through its agent, granted to them ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
+The permission each act needs is the *Agents* row of [the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue); a schedule is the organisation's, and a person acts on it only through its agent, granted to them ([AC-F03](../../../../os/access/features/AC-F03-directory/feature.md)).
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every schedule and its firings | Every signed-in person — Operator, Modeller, Admin | — |
+| Read every schedule and its firings | None — every signed-in person | — |
 | Read a firing's run | As any run ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)) | That it ran, its agent, its status and its tokens |
-| Create, edit, pause, resume, run now or delete a schedule | Operator · Modeller · Admin, when the schedule's agent is granted to them | Only granted agents are offered to name; a schedule whose agent is not granted to the reader reads, every act disabled — *Uses {agent}, which is not granted to you* |
+| Create, edit, pause, resume, run now or delete a schedule | Run on the schedule's `agent/<name>` | Only granted agents are offered to name; a schedule whose agent is not granted to the reader reads, every act disabled — *Uses {agent}, which is not granted to you* |
 | Approve or decline an outward delivery | The agent's named approvers, then the Admins ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads, naming who it waits on |
 | Read a delivered result | Who set the schedule and the named recipients, in their Inbox | — |
 
@@ -117,8 +119,8 @@ Schedules are *Acts* for every role in [the role table](../../../../os/access/fe
 | Delivery follows the settled run | Inbox rows to who set it and the recipients, and one delivery per channel. A failed run is delivered as a failure that opens the run, never dropped |
 | Outward deliveries ask | A delivery to a channel is Ask: it waits in the Inbox for the agent's named approvers, then the Admins ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)), until its deadline (a day by default) — then it is not sent. A person may set it to Allow ([the three modes](../../../../os/access/product.md#decisions)) after seeing what goes where; the schedule records who set it. An edit, or the setter losing the right to set Allow, returns it to Ask (AG-42.19) |
 | Pause and resume | Pausing keeps every firing; a run going when paused finishes and is delivered. Resuming fires from now — what fell while paused is not missed, because nobody wanted it |
-| Runs as the agent | A firing's run acts as the schedule's agent, its Access Policies alone deciding each step ([the order of checks](../../../../os/access/features/AC-F02-access-policies/feature.md#the-order-of-checks)); no person bounds it. Who set the schedule and who last edited it are recorded, and neither narrows nor widens the run |
-| A setter who leaves | The schedule keeps running as its agent; who set it stays recorded ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#slots-and-fallbacks)) |
+| Acts for who set it | A firing's run has who set the schedule behind it. Outside any project each step reaches the setter's policies ∩ the agent's ceiling; inside one, the project's policies ∩ the agent's ceiling ([the order of checks](../../../../os/access/features/AC-F02-access-policies/feature.md#the-order-of-checks)). Who last edited it is recorded. When the setter leaves, the setter's slot falls to their successor ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#slots-and-fallbacks)) |
+| A setter who leaves | Their successor becomes the setter and the person behind the next firing; who set it first stays recorded ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#slots-and-fallbacks)) |
 | A paused agent | Its schedule's firings fail, naming the agent; the schedule stays on |
 | A retired agent | Retiring it pauses each schedule that starts it, naming the agent; the schedule fires again only once a person points it at another agent and resumes it (AG-F01) |
 | A channel in use | Removing a channel a schedule delivers to is refused, naming the schedule |
@@ -143,8 +145,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Table | Columns | Notes |
 |---|---|---|
-| `agents_schedules` | `graph_id` · `name` · `agent_id` · `instructions` · `trigger` (`time` · `event`) · `cron` · `timezone` · `event_pattern?` · `event_scope?` · `status` (`active` · `paused`) · `missed` (`catch_up` · `run_all` · `skip`) · `overlap` (`skip` · `allow`) · `deliver_in_app` · `recipient_ids[]` · `channel_ids[]` · `approve_outward` · `allow_set_by?` · `allow_set_at?` · `approval_deadline_s` (a day) · `next_fire_at` · `made_by` · `updated_by` · `created_at` · `updated_at` | `name` unique in the Graph. Owned by the platform ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); `made_by` is who set it and never changes; `updated_by` who last edited it. Neither is an identity the run takes |
-| `agents_schedule_firings` | `schedule_id` · `graph_id` · `due_at` · `fired_at` · `outcome` (`queued` · `opened` · `skipped` · `failed`) · `catch_up` · `manual` · `run_id?` · `reason` · `delivered_at?` · `actor_id?` | Unique (`schedule_id`, `due_at`), so two engine processes never fire one occurrence twice |
+| `agents_schedules` | `name` · `agent_id` · `instructions` · `trigger` (`time` · `event`) · `cron` · `timezone` · `event_pattern?` · `event_scope?` · `status` (`active` · `paused`) · `missed` (`catch_up` · `run_all` · `skip`) · `overlap` (`skip` · `allow`) · `deliver_in_app` · `recipient_ids[]` · `channel_ids[]` · `approve_outward` · `allow_set_by?` · `allow_set_at?` · `approval_deadline_s` (a day) · `next_fire_at` · `made_by` · `updated_by` · `created_at` · `updated_at` | `name` unique in the deployment. Owned by the platform ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md#engine)); `made_by` is who set it and never changes; `updated_by` who last edited it. Neither is an identity the run takes |
+| `agents_schedule_firings` | `schedule_id` · `due_at` · `fired_at` · `outcome` (`queued` · `opened` · `skipped` · `failed`) · `catch_up` · `manual` · `run_id?` · `reason` · `delivered_at?` · `actor_id?` | Unique (`schedule_id`, `due_at`), so two engine processes never fire one occurrence twice |
 
 ### Reads
 
@@ -159,7 +161,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/agents/schedules` | Does | Story |
+| Route, after `/api/v1/agents/schedules` | Does | Story |
 |---|---|---|
 | `GET /` · `POST /` | List (with the paused count and *Coming up* over seven days) · create | AG-42 |
 | `GET /{id}` · `PATCH /{id}` · `DELETE /{id}` | Read · change · delete | AG-42 |
@@ -221,7 +223,8 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Schedules sit in Agents | Agents › Schedules — routine work is an agent's run on a clock; anyone schedules an agent granted to them, from wherever they work |
+| One Schedules list, in Agents › Schedules | Routine work is an agent's run on a clock; anyone schedules an agent granted to them, from wherever they work. Each mode's Schedules view — Projects › Schedules — is that list filtered, never a second list |
+| The *Kind* filter shows only when a second kind exists | Every schedule today opens an agent's run, so the list shows no *Kind* filter; it appears once a second kind of scheduled work exists, and never names a kind no feature builds |
 | A schedule carries instructions, not a plan | The agent plans each firing's run as it plans any run; a schedule never names a plan or a skill |
 | The list reads at a glance | What · who runs it · when as words · next run · last result · on — a failed last run is marked |
 | No sources, tools or project to pick | Sources are written in the instructions, tools are the agent's, and a schedule needs no project |

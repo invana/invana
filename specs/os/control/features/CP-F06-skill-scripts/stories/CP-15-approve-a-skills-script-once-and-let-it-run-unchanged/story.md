@@ -4,7 +4,7 @@ title: Approve a skill's script once and let it run unchanged
 feature: CP-F06
 status: idea
 personas: [admin]
-boards: [agents.skill, inbox]
+boards: [agents.skills, inbox]
 ---
 
 # CP-15 · Approve a skill's script once and let it run unchanged
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read a script in full; approve it, decline it with a reason, revoke an approval | — |
-| Operator | Read every script and its approval | *Approve*, *Decline* and *Revoke* are absent; a waiting script reads *Waiting for an Admin*, naming the Admins. The Modeller role does not add them |
+| Admin | Read a script in full; with Publish on `skill/<name>`, approve it, decline it with a reason, revoke an approval | — |
+| Operator | Read every script and its approval | *Approve*, *Decline* and *Revoke* are absent; a waiting script reads *Waiting for an Admin*, naming the Admins. Edit on the skill does not add them |
 
 ## Flow
 
@@ -51,13 +51,13 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Scripts — on the skill | Admin | — | — | agents.skill · Loading | agents.skill · Scripts | agents.skill · Script declined | — | — |
-| Scripts — on the skill | Operator | — | — | agents.skill · Loading | agents.skill · Scripts read only | agents.skill · Script declined | — | agents.skill · Scripts read only |
-| A script to approve | Admin | agents.skill · Script waiting | — | agents.skill · Loading | agents.skill · Script approved | agents.skill · Script revoked | — | — |
-| A script to approve | Operator | agents.skill · Scripts read only | — | agents.skill · Loading | agents.skill · Scripts read only | agents.skill · Script revoked | — | agents.skill · Scripts read only |
+| Scripts — on the skill | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Scripts | agents.skills · Detail · Script declined | — | — |
+| Scripts — on the skill | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Scripts read only | agents.skills · Detail · Script declined | — | agents.skills · Detail · Scripts read only |
+| A script to approve | Admin | agents.skills · Detail · Script waiting | — | agents.skills · Detail · Loading | agents.skills · Detail · Script approved | agents.skills · Detail · Script revoked | — | — |
+| A script to approve | Operator | agents.skills · Detail · Scripts read only | — | agents.skills · Detail · Loading | agents.skills · Detail · Scripts read only | agents.skills · Detail · Script revoked | — | agents.skills · Detail · Scripts read only |
 | The ask in Needs you | Admin | — | — | inbox · Loading | inbox · Script waits | inbox · Could not load | — | — |
 | The ask in Needs you | Operator | — | — | — | — | — | — | — |
-| Publish with a script not approved | Admin | — | — | — | agents.skill · Publish refused | agents.skill · Publish refused | — | — |
-| Publish with a script not approved | Operator | — | — | — | — | — | — | agents.skill · Read only |
+| Publish with a script not approved | Admin | — | — | — | agents.skills · Detail · Publish refused | agents.skills · Detail · Publish refused | — | — |
+| Publish with a script not approved | Operator | — | — | — | — | — | — | agents.skills · Detail · Read only |

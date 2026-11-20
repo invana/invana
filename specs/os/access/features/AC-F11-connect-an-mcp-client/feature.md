@@ -2,11 +2,11 @@
 id: AC-F11
 title: Connect an MCP client
 product: AC
-status: idea
+status: later
 personas: [analyst, builder, admin]
 stories: [AC-35, AC-36]
-journeys: [J07]
-boards: [access.consent, access.signin, access.sign_in_again, settings.me, settings.people, access.locked]
+journeys: []
+boards: [access.consent, access.signin, settings.me, settings.people]
 nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-6, NFR-SEC-7]
 depends_on: [AC-F01, AC-F02, AC-F03, AC-F06, AC-F10]
 ---
@@ -19,7 +19,7 @@ depends_on: [AC-F01, AC-F02, AC-F03, AC-F06, AC-F10]
 
 ## User journey
 
-Journeys this feature is a step of: [J07 · Ready a deployment](../../../../journeys/J07-ready-a-deployment.md)
+Journeys this feature is a step of: none while it is `later`. Until it returns, a client connects to the MCP server with a key ([CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md) · [AC-F10](../AC-F10-keys/feature.md)).
 
 ```mermaid
 flowchart TD
@@ -35,7 +35,7 @@ flowchart TD
   use -->|token expires| ren(["Renewed by the client · refresh rotates"])
   use -->|a retired refresh reused| reuse(["The client is revoked · History"])
   me([Settings › You › Connected clients]) --> list["AC-36 · Own connected clients"]
-  ad([People and access › Connected clients]) --> who{"Admin?"}
+  ad([Access › Who › Connected clients]) --> who{"Admin?"}
   who -->|no| lk(["Locked · names the Admins"])
   who -->|yes| all["AC-36 · Every connected client"]
   list --> rv["AC-36 · Revoke · password"]
@@ -72,17 +72,17 @@ sequenceDiagram
 
 | ID | Story | Status |
 |---|---|---|
-| AC-35 | [Connect an MCP client as me](stories/AC-35-connect-an-mcp-client-as-me/story.md) | idea |
-| AC-36 | [See and revoke connected clients](stories/AC-36-see-and-revoke-connected-clients/story.md) | idea |
+| AC-35 | [Connect an MCP client as me](stories/AC-35-connect-an-mcp-client-as-me/story.md) | later |
+| AC-36 | [See and revoke connected clients](stories/AC-36-see-and-revoke-connected-clients/story.md) | later |
 
 ## Access
 
-| Act | Role ([the role table](../AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
 | Register a client · read the metadata | Anyone who can reach the deployment — no credential; rate-limited | — |
-| Connect a client as oneself — consent | Every person with an active account — Operator, Modeller, Admin — in a session, with the password again | A service user, an agent and the system user never sign in, so never consent; a service user uses a key |
+| Connect a client as oneself — consent | Every person with an active account, in a session, with the password again | An agent and the system user never sign in, so never consent; a client that is no one person uses a project key |
 | Read and revoke one's own connected clients | Every signed-in person, in a session; revoking with the password again | — |
-| Read every connected client · revoke any | Admin, in a session; revoking with the password again | *People and access › Connected clients* locked — *Needs the Admin role — ask Priya or Lee*; another person's client is absent (`404`) |
+| Read every connected client · revoke any | Manage on Access, in a session; revoking with the password again | *Access › Who › Connected clients* locked — *Needs Manage on Access — ask Priya or Lee*; another person's client is absent (`404`) |
 | Call the MCP server | A connected client, as its person · a key, as key ∩ owner | `401` with where to find the metadata |
 
 ## States
@@ -95,7 +95,7 @@ sequenceDiagram
 | Has data | The consent card; one row per connected client: name · returns to · connected · last used |
 | Failed | A bad authorize request is an error page naming what was wrong; a list that could not load says so, with *Try again* |
 | Agent working or proposing | — no agent connects or revokes a client |
-| No access | An Operator or a Modeller reads *People and access › Connected clients* as locked, naming the Admin role |
+| No access | A person without Manage on Access reads *Access › Who › Connected clients* as locked, naming Manage on Access |
 
 ## Rules
 
@@ -107,12 +107,13 @@ sequenceDiagram
 | Clients register themselves | Dynamic client registration (RFC 7591); a name a client gives itself is shown as *Unverified*. Return addresses are `https` or loopback, matched exactly — a loopback's port may vary |
 | Consent is a person's yes | A signed-in person, with the password again; nothing is connected without it, and a code is sent only to a registered return address |
 | Tokens are bound to the MCP server | Every authorize and token request names the MCP server as its resource (RFC 8707); a token carries it as its audience and is refused anywhere else |
-| A connected client acts as its person | Their role and the agents they may use, read at each call; every call is ledgered naming the person and the client |
+| A connected client acts as its person | Their policies and the agents they may use, read at each call; every call is ledgered naming the person and the client |
 | Never session-only acts | A connected client never manages keys, access or credentials |
 | Revoking ends it at once | Every access and refresh token of the connection ends; the client connects again from the start |
 | Sign out and password changes leave clients alone | Only revoking or deactivating the person ends a connected client |
 | Rate-limited | Registration, the token endpoint and the MCP server take at most 30 requests a minute from one address (NFR-SEC-6) |
-| Keys still work | A key on the MCP server acts as key ∩ owner ([AC-F10](../AC-F10-keys/feature.md)) |
+| A client carries *Hidden from agents* | A connected client is an agent identity: its ceiling carries *Hidden from agents* whoever connected it, and a raw-query tool of the MCP server is refused where the caller's policies hide anything in that graph database ([AC-F02 › Property access](../AC-F02-access-policies/feature.md#property-access)) |
+| Keys still work | A key on the MCP server acts as key ∩ its owner ∩ the agent's ceiling ([AC-F10](../AC-F10-keys/feature.md)); a client that is no one person — a shared bot, an integration — uses a project key, acting with the project's policies |
 | Leans on | Sign in and signing in again (AC-F01) · the Directory (AC-F03) · Access Policies and the one evaluator (AC-F02) · keys (AC-F10) · History (AC-F06) · the ledger (AC-F09) · the MCP server and what it serves (CP-F02) |
 
 ## Data touched
@@ -122,7 +123,7 @@ sequenceDiagram
 | Registered clients — name, return addresses | Write · read |
 | Connections — a person's yes to a client, with last use and revocation | Write · read |
 | Codes and tokens — hashed | Write · read |
-| The person's role, active state and agents (AC-F03) | Read |
+| The person's policies, active state and agents (AC-F03) | Read |
 | History rows of a registration, a consent, a denial, a revoke and a reuse (AC-F06) | Write |
 
 ## Engine
@@ -144,7 +145,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Record | Owner |
 |---|---|
 | The session, signing in again, the lock and the rate limit | [AC-F01](../AC-F01-sign-in-account-and-sessions/feature.md#engine) |
-| The person's role, active state and the agents they may use | [AC-F03](../AC-F03-directory/feature.md#engine) |
+| The person's policies, active state and the agents they may use | [AC-F03](../AC-F03-directory/feature.md#engine) |
 | The one evaluator | [AC-F02](../AC-F02-access-policies/feature.md#engine) |
 | A key on the MCP server | [AC-F10](../AC-F10-keys/feature.md#engine) |
 | The ledger row of each call | [AC-F09](../AC-F09-what-left-the-platform/feature.md#engine) |
@@ -208,9 +209,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | PKCE | The code stores the `S256` challenge; the token request's verifier must hash to it |
 | Consent is session-bound | `POST /oauth/consent` needs a person's session token and verifies `password` as [signing in again](../AC-F01-sign-in-account-and-sessions/feature.md#mechanisms) does; `state` is returned to the client unchanged |
 | Rotation and reuse | Each refresh retires the presented refresh token and issues a new pair; a retired one presented again revokes the connection with `revoked_why = reuse` |
-| Read at each call | The person's role, active state and agents are read at each MCP call; a deactivation revokes their connections with `revoked_why = deactivated` |
+| Read at each call | The person's policies, active state and agents are read at each MCP call; a deactivation revokes their connections with `revoked_why = deactivated` |
 | Who is behind the call | The person of the connection, and the connection's client name, are what the ledger and History record — never a name the client sends in a header |
 | Cleanup | Registrations with no connection after 24 hours, used and expired codes, and retired tokens past their expiry are removed by the deployment's housekeeping |
+| Revoking | Sets `revoked_at`, `revoked_by_id` and `revoked_why` and retires every token of the connection; in the same act stops every run with its `client_connection_id` that is queued or running, as [a stop](../../../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#mechanisms) does, `stopped_by_id` the revoker — a History row for the revoke and one per run. When an Admin revokes another person's connection, an Update reaches that person in the Inbox ([CP-F08](../../../control/features/CP-F08-the-inbox/feature.md)), naming the client and the Admin |
 | Never in a log | Codes, verifiers and tokens enter no event, log line, span or ledger row (NFR-SEC-2) |
 
 ## System impact
@@ -227,12 +229,16 @@ The code change is [migrations.md](../../../../migrations.md) M16.
 
 | Decision | Detail |
 |---|---|
+| Parked | The feature is `later`: a client connects with a key, the narrowest credential Invana already has, shown on `settings.mcp` › *How a client connects* ([CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md)). An authorization server is the largest auth surface to threat-model on-prem; it returns when a customer needs a client to act as a person. `access.consent` stays as drawn, unwired; `settings.me` and `settings.people` carry no *Connected clients* until then |
+| The MCP server sits under Connections | Settings › Connections › MCP server (`settings.mcp`, [CP-03](../../../control/features/CP-F02-plugins-and-outside-tools/stories/CP-03-let-claude-code-and-other-clients-use-the-deployment/story.md)) shows its address, what it serves and how to connect; a person's own connected clients are under Settings › You |
 | Invana is its own authorization server | No outside identity provider is needed, since sign-in is password only; one deployment, one issuer |
 | Dynamic registration, names shown as unverified | Any MCP client can connect without an Admin pre-registering it; the consent page says the name is the client's own word and shows where it returns |
 | Consent asks for the password | Connecting a client makes a credential; it signs in again like keys and access |
 | One scope: act as me | A connected client acts as its person through the agents they may use; a client that should do less uses a narrowed key ([AC-F10](../AC-F10-keys/feature.md)) |
 | Consent each time | A client that connects again is asked again and becomes a new connection; nothing is remembered silently |
-| Connected clients sit beside keys | *Settings › You › Connected clients*, and for Admins *People and access › Connected clients* |
+| Revoking stops its runs | A revoked connection's queued and running runs stop with it, so ending a client ends what it set going |
+| The person is told | A connection an Admin revokes is an Update in its person's Inbox, naming the client and the Admin |
+| Connected clients sit beside keys | *Settings › You › Connected clients*, and for Admins *Access › Who › Connected clients* |
 
 ## Open questions
 

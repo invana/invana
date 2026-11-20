@@ -4,7 +4,7 @@ title: Follow a decision back to the original authors
 feature: PJ-F03
 status: idea
 personas: [decision-maker, analyst]
-boards: [projects.decide]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-11 · Follow a decision back to the original authors
@@ -16,13 +16,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read the lineage of any decision they can see; open every node's source, every run among them | A project their default agent may not Read: its head only, the lineage *Withheld — your agent may not read `project/{key}`* |
-| Operator | The same; a Modeller the same | A run they are not behind, whose agent they do not own, reads *Content withheld* in the lineage. There is no act on a lineage to refuse |
+| Admin | Read the lineage of any decision they can see; open every node's source, every run among them | A project they may not read: its head only, the lineage *Withheld — join the team or ask {who can grant}* |
+| Operator | The same | A run they are not behind, whose agent they do not own, reads *Content withheld* in the lineage. There is no act on a lineage to refuse |
 
 ## Flow
 
@@ -49,18 +49,18 @@ flowchart LR
 | PJ-11.3 | Any node | the person opens it | it opens its source: the finding, the run at its step, the load or the author |
 | PJ-11.4 | The lineage | it is drawn | *Links* under the drawing names every node's hops in words (*cites run 8195c5e8 · cited by d1*), so a reader without the drawing, or a clipped label, loses nothing |
 | PJ-11.5 | A lineage with loads from several sources | the person picks one under *Show* | loads, and their authors, narrow to that source; findings and runs stay |
-| PJ-11.6 | A cited load that was undone in Records | the lineage opens | that node is marked *a load undone*, with who undid it and why, and the path through it stays |
+| PJ-11.6 | A cited load that was undone in Graph Data | the lineage opens | that node is marked *a load undone*, with who undid it and why, and the path through it stays |
 | PJ-11.7 | A decision that cited no findings | its lineage opens | it says it cites nothing, and shows the decision alone |
-| PJ-11.8 | A decision in a project the reader's default agent may not Read | they ask for its lineage | it reads *Withheld — your agent may not read `project/{key}`*; nothing reads *Not found* |
+| PJ-11.8 | A decision in a project the reader may not read | they ask for its lineage | it reads *Withheld — join the team or ask {who can grant}*; nothing reads *Not found* |
 | PJ-11.9 | The engine cannot return the records | the lineage loads | it says *Could not load* with the reason and *Try again* |
-| PJ-11.10 | A run in the lineage the reader may not read — they are not behind it, do not own its agent and are not an Admin | the lineage is drawn | its node reads that it ran, its status and its tokens — *Content withheld* — and the path through it stays |
+| PJ-11.10 | A run in the lineage the reader may not read — they are not behind it, do not own its agent and do not hold Read on `run/<agent>` | the lineage is drawn | its node reads that it ran, its status and its tokens — *Content withheld* — and the path through it stays |
 | PJ-11.11 | A decision that supersedes another | its lineage opens | it links back to the decision it supersedes, which opens its own lineage |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Lineage | Admin | projects.decide · Lineage · Cites nothing | projects.decide · Lineage · Nothing from this source | projects.decide · Lineage · Loading | projects.decide · Lineage | projects.decide · Lineage · Could not load | — | projects.project · Withheld |
-| Lineage | Operator | projects.decide · Lineage · Cites nothing | projects.decide · Lineage · Nothing from this source | projects.decide · Lineage · Loading | projects.decide · Lineage | projects.decide · Lineage · Could not load | — | projects.decide · Lineage · Content withheld |
-| A load undone | Admin | — | — | — | projects.decide · Lineage · Load undone | — | — | — |
-| A load undone | Operator | — | — | — | projects.decide · Lineage · Load undone | — | — | — |
+| Lineage | Admin | projects.branches · Decide · Lineage · Cites nothing | projects.branches · Decide · Lineage · Nothing from this source | projects.branches · Decide · Lineage · Loading | projects.branches · Decide · Lineage | projects.branches · Decide · Lineage · Could not load | — | projects.projects · Detail · Withheld |
+| Lineage | Operator | projects.branches · Decide · Lineage · Cites nothing | projects.branches · Decide · Lineage · Nothing from this source | projects.branches · Decide · Lineage · Loading | projects.branches · Decide · Lineage | projects.branches · Decide · Lineage · Could not load | — | projects.branches · Decide · Lineage · Content withheld |
+| A load undone | Admin | — | — | — | projects.branches · Decide · Lineage · Load undone | — | — | — |
+| A load undone | Operator | — | — | — | projects.branches · Decide · Lineage · Load undone | — | — | — |

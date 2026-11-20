@@ -6,7 +6,7 @@ status: idea
 personas: [builder, analyst, admin]
 stories: [AG-18, AG-31, AG-38, AG-44, AG-46, AG-47, AG-48]
 journeys: [J04]
-boards: [agents.skills, agents.skill, agents.workflow, agents.run, agents.runs, inbox]
+boards: [agents.skills, agents.runs, inbox]
 nfrs: [NFR-PERF-2, NFR-PERF-3]
 depends_on: [AG-F01, AG-F02, AG-F04, AG-F09, CP-F02, CP-F10, AC-F02, AC-F05, AC-F07]
 ---
@@ -58,7 +58,7 @@ flowchart TD
   page -->|Retire a version| ret["AG-48 · Not chosen or started again · pins keep running it, marked"]
   page -->|Copy a built-in| cp(["AG-48 · A custom workflow — the platform's, made by the copier"])
   page -->|a step| fn["AG-38 · A function: its contract, what it needs, what calls it"]
-  page -->|not a Modeller or an Admin| ro["Reads · Retire and Propose a version disabled, naming the Modeller role"]
+  page -->|without Edit on the workflow| ro["Reads · Retire and Propose a version disabled, naming the permission"]
 ```
 
 ```mermaid
@@ -101,23 +101,25 @@ sequenceDiagram
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
-*Plans and workflows* is *Acts* for Operator, Modeller and Admin — within the agents granted to the person and those
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
+Each act needs the permission below — within the agents granted to the person and those
 agents' Access Policies. A workflow is the platform's ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)):
 making it grants nothing over it.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+*Admins* are the people who hold Manage on Access ([AC-F02 › Decisions](../../../../os/access/features/AC-F02-access-policies/feature.md#decisions)).
+
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read workflows, a workflow's page, its versions and arguments, and functions | Every signed-in person | — |
+| Read workflows, a workflow's page, its versions and arguments, and functions | Read on `workflow/<name>` | — |
 | Read a run's plan — its rung, why, the check's result | Whoever may read the run's content — the person behind it, and for a project's run anyone whose default agent may see its sources (run privacy, [AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) | That it ran, its status and its tokens; the plan reads *Content withheld* |
-| Run a workflow by name · dry run | Operator · Modeller · Admin, through an agent granted to them whose Access Policies allow Run `workflow/<key>` | *Run* disabled, naming the rule that denies it and *ask an Admin* |
+| Run a workflow by name · dry run | Run on `workflow/<key>`, through an agent the person may Run whose Access Policies allow it | *Run* disabled, reading *Needs Run on {Resource name}* and *ask an Admin*, naming no rule |
 | Propose a plan that served as a workflow | The person behind the run | *Propose as a workflow* hidden |
 | Approve or decline a plan into a workflow | The agent's named approvers — else the other approvers, else the Admins — never the person it benefits ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | The ask reads; *Approve* and *Decline* absent — *Not yours to answer* |
-| Propose a workflow's next version · retire a version · move a pin | Modeller · Admin | Disabled — *Needs the Modeller role — ask an Admin* |
-| Copy a built-in workflow | Modeller · Admin ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | *Copy* disabled — *Needs the Modeller role — ask an Admin* |
-| Switch a plugin on or off | Admin ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) | The plugin reads; its switch disabled, naming *Admin* |
-| Approve a library's functions | Admin ([AG-F08](../AG-F08-portable-agents-and-skills/feature.md)) | Proposals read *Waiting for an Admin* |
-| Decide a suggested change to a workflow | Modeller · Admin ([AG-52](../AG-F09-learn-from-memory/stories/AG-52-decide-on-a-suggested-change/story.md)) | Read only — *Needs the Modeller role — ask an Admin* |
+| Propose a workflow's next version · retire a version · move a pin | Edit on `workflow/<name>` | Disabled — *Needs Edit on the {workflow} workflow — ask {who can grant}* |
+| Copy a built-in workflow | Create on `workflow/*` ([AC-F07](../../../../os/access/features/AC-F07-ownership/feature.md)) | *Copy* disabled — *Needs Create on Skills* — ask {who can grant}* |
+| Switch a plugin on or off | Manage on `plugin/<name>` ([CP-F02](../../../../os/control/features/CP-F02-plugins-and-outside-tools/feature.md)) | The plugin reads; its switch disabled, naming the permission |
+| Approve a library's functions | Publish · Approve on `skill/<name>` ([AG-F08](../AG-F08-portable-agents-and-skills/feature.md)) | Proposals read *Waiting for an Admin* |
+| Decide a suggested change to a workflow | Edit on `workflow/<name>` ([AG-52](../AG-F09-learn-from-memory/stories/AG-52-decide-on-a-suggested-change/story.md)) | Read only — *Needs Edit on the {workflow} workflow — ask {who can grant}* |
 
 ## States
 
@@ -129,7 +131,7 @@ making it grants nothing over it.
 | Has data | Workflows with where each comes from, version, what it touches, who made it and what composes it; a workflow's page over its window; functions grouped by what they touch |
 | Failed | Could not load, with *Try again*; a refused plan names what refused it and spends nothing; a workflow flagged because a plugin or graph database it needs is off names it and who switched it off |
 | Agent working or proposing | A run climbing the ladder; a workflow running from *Run*; a proposal waiting on the named approvers; a suggested change to retire a version or move a pin |
-| No access | Everything reads; a run's plan whose content the person may not read reads *Content withheld*; acts they may not take are disabled, naming the role or the rule |
+| No access | Everything reads; a run's plan whose content the person may not read reads *Content withheld*; acts they may not take are disabled, naming the permission or the rule |
 
 ## Rules
 
@@ -166,7 +168,7 @@ plugin it comes from. The default kit's plugins are [CP-F02](../../../../os/cont
 | Namespace | Functions | What it touches | Plugin |
 |---|---|---|---|
 | `graph.read` | `query` · `get_neighbors` · `types_count` · `resolve` · `validate` | Reads graph databases (`validate` touches nothing) | Core |
-| `graph.stitch` | `preview` · `declare` · `commit` · `withdraw` · `run` | `preview` reads; the rest write match rules and identity links | Core |
+| `graph.stitch` | `preview` · `declare` · `commit` · `withdraw` · `run` | `preview` reads; the rest write links between models and the relationships they make | Core |
 | `graph.write` | `records` · `bulk` · `edits` | Writes a read + write graph database | Core |
 | `data` | `bundle.check` · `records.validate` · `snapshot` | Brings data in | Core |
 | `model` | `propose` · `understand_ask` · `validate_proposal` · `migrate` | Changes the model | Core |
@@ -188,7 +190,7 @@ plugin it comes from. The default kit's plugins are [CP-F02](../../../../os/cont
 | `ql-direct` | A typed query, and every re-run, with no translation | Reads graph databases |
 | `count-types` · `expand-neighbours` · `resolve-elements` | One act of a board, each one step | Reads graph databases |
 | `board-open` | Open one of Studio's lists with the filters an ask names | Nothing outside |
-| `stitch-preview` · `stitch-apply` · `stitch-commit` · `stitch-withdraw` | Identity match rules, previewed and applied | Reads graph databases · writes identity links |
+| `stitch-preview` · `stitch-apply` · `stitch-commit` · `stitch-withdraw` | Links between models, counted and applied | Reads a graph database · writes a link's relationships in it |
 | `data-edit` | A board's saved edits, checked against the model | Writes a read + write graph database |
 | `model-import` · `bulk-load` | Load a dataset into a model · write a folder through the connector | Brings data in · writes a read + write graph database |
 | `modeller-propose` · `model-migration` | Stage a described change on the model draft · preview or publish a breaking change | Changes the model |
@@ -253,7 +255,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /{key}/versions/{v}/retire` | Retire a version | AG-48 |
 | `POST /{key}/copy` | `{key, name}` — a built-in or any workflow copied to a new key, v1, `made_by` the copier | AG-48 |
 | `POST /{key}/pins` | `{step_key, version}` — propose the composing workflow's next version with one pin moved; it waits on approval like any version | AG-48 |
-| `POST /proposals` | `{run_id, key?, name, description, intent[], args[{literal_path, name, label, default?}]}` — a served one-off plan proposed as v1 of a new key, or as the next version of `key` (a Modeller · Admin only); raises an ask (`kind = workflow`) → `202 {approval_id}` | AG-31 · AG-48 |
+| `POST /proposals` | `{run_id, key?, name, description, intent[], args[{literal_path, name, label, default?}]}` — a served one-off plan proposed as v1 of a new key, or as the next version of `key` (needs Edit on that workflow); raises an ask (`kind = workflow`) → `202 {approval_id}` | AG-31 · AG-48 |
 | `GET /proposals?run_id=` | The proposal on a run and the state of its ask | AG-31 · AG-47 |
 
 | Route, after `/api/v1/agents` | Does | Story |
@@ -296,12 +298,12 @@ the version.
 | 409 | A start of a retired version | *{key}@{v} is retired — the current version is {key}@{n}.* | AG-44.6 |
 | 403 | A start through an agent the person may not use | *You may not use {agent} — ask an Admin.* | AG-44.14 |
 | 409 | Proposing a plan that did not serve, a plan already a workflow, or a run the proposer is not behind | *Only a plan drafted or composed for a run that served can be proposed — by the person behind it.* | AG-31.11 |
-| 409 | A proposal naming a key another workflow holds, by someone who is not a Modeller or an Admin | *{key} is taken — propose a new key, or ask an Admin.* | AG-31.12 · AG-47.10 |
+| 409 | A proposal naming a key another workflow holds, by someone without Edit on that workflow | *{key} is taken — propose a new key, or ask an Admin.* | AG-31.12 · AG-47.10 |
 | 409 | A proposal while one waits on the same run | *This plan is already waiting on {approvers}.* | AG-31.13 |
 | 422 | A proposal keeping a record ID or a property value as a default | *{argument} holds a value from the data — it cannot be a default.* | AG-31.14 |
 | 403 | Answering a proposal one is not a named approver of, or one that benefits them | *Not yours to answer — it waits on {approvers}.* | AG-47.6 |
-| 403 | Retiring, proposing a version or moving a pin without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-48.9 |
-| 403 | Copying without the Modeller role | *Needs the Modeller role — ask an Admin.* | AG-48.10 |
+| 403 | Retiring, proposing a version or moving a pin without Edit on workflow/{workflow} | *Needs Edit on workflow/{workflow} — ask {who can grant}.* | AG-48.9 |
+| 403 | Copying without Create on workflow/* | *Needs Create on workflow/* — ask {who can grant}.* | AG-48.10 |
 | 409 | Editing a built-in workflow | *{key} is built in — copy it to change it.* | AG-48.11 |
 | 422 | `window` other than `7d` · `30d` · `90d` | *window: one of 7d, 30d, 90d.* | API only — Studio offers the three |
 | 404 | An unknown workflow, version, plan or function | *Not found.* | API only — Studio links only what exists |
@@ -355,7 +357,7 @@ the version.
 
 | Decision | Detail |
 |---|---|
-| Workflows live under Agents › Skills | *Workflows* and *Functions* are sections of Skills, beside *Answer templates*; a workflow opens as its own page (`agents.workflow`), a function as its own page |
+| Workflows live under Agents › Skills | *Workflows* and *Functions* are sections of Skills in the Agents mode, beside *Answer templates*; a workflow opens as its own page (`agents.skills · Workflow`), a function as its own page |
 | A workflow's page answers *how has it behaved* | Overview · Layers · Flow · Runs, over 7 · 30 · 90 days; what it is sits in its head — version, steps, intent, what it touches, who made it, what composes it, the agents allowed to run it |
 | *Composed by* means pinned | The workflows whose steps compose it, each with the version it pins; an agent allowed to run it is a permission, read in the head |
 | What changed is step by step | Each version against the one before: steps added, removed, moved or changed, pins moved, declared arguments; v1 reads *the first version* |

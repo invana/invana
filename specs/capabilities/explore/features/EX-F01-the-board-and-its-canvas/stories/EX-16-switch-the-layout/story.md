@@ -4,7 +4,7 @@ title: Switch the layout
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-16 · Switch the layout
@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)), through the Assistant.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through the Assistant.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Pick a preset, change its options, reset it — kept on any board | — |
-| Operator | The same; a Modeller the same | Without the Assistant: the card is disabled — *{person} may not use Assistant — ask an Admin* |
+| Operator | The same | Without the Assistant: the card is disabled — *{person} may not use Assistant — ask an Admin* |
 
 ## Flow
 
@@ -54,10 +54,13 @@ flowchart LR
 | EX-16.12 | Tree, Flow or Radial laying out | the footer's message line reads | it says *Laying out 2,159 nodes · Flow →* with no step count, because the layered and radial layouts report no progress; Network counts its steps (EX-F01 › States) |
 | EX-16.13 | A drawn cycle | Tree or Flow lays it out | one relationship of the cycle is drawn reversed so the layers can be ranked; the relationship itself is unchanged |
 | EX-16.14 | A board whose preset another person switched | someone opens it | it opens on that preset; History lists the change, naming who made it |
+| EX-16.15 | The Flow layout | it is drawn | every edge runs at right angles, leaving a node on its right and entering the next on its left, and edges that meet share a trunk; Network, Tree and Radial draw their edges as before |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The Layout card | Admin | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Too large | — | — |
-| The Layout card | Operator | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Too large | — | — |
+| The Layout card | Admin | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Too large | — | — |
+| The Layout card | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Too large | — | — |
+| Flow · orthogonal edges | Admin | — | — | — | explore.board · Menu · Flow orthogonal | — | — | — |
+| Flow · orthogonal edges | Operator | — | — | — | explore.board · Menu · Flow orthogonal | — | — | — |

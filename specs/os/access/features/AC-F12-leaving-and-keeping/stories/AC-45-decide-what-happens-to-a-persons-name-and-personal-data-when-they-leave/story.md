@@ -2,9 +2,9 @@
 id: AC-45
 title: Decide what happens to a person's name and personal data when they leave
 feature: AC-F12
-status: idea
+status: later
 personas: [admin]
-boards: [settings.keeping, settings.people, access.locked]
+boards: [settings.keeping, settings.people]
 ---
 
 # AC-45 · Decide what happens to a person's name and personal data when they leave
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Set *Keep* or *Pseudonymise* for departed people's names, signing in again; read before deactivating a person what will be erased (AC-23) | — |
-| Operator | Read the setting; read a departed person's work under their name or their code; a Modeller reads the same | *Change* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read the setting; read a departed person's work under their name or their code | *Change* disabled — *Needs Edit on Retention settings — ask Priya or Lee* |
 
 ## Flow
 
@@ -52,17 +52,17 @@ flowchart TD
 | AC-45.5 | A person deactivated under *Keep* | their work is read — tasks, findings, decisions, History | it names them as before, marked *Deactivated* |
 | AC-45.6 | Memory on hold | a person is deactivated | their personal connections are removed at once; the copies they returned wait, *Leaving and keeping* reading *Waiting for the hold on memory to lift*, and are erased when the hold lifts |
 | AC-45.7 | A person deactivated under *Pseudonymise* | their work, History rows and exports are read | their name and email are gone; they read as *Former member · 4F7A*, the same code everywhere; each History row still verifies |
-| AC-45.8 | An Operator or a Modeller | they reach *Change* | it is disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-45.8 | A person without Edit on `setting/retention` | they reach *Change* | it is disabled, naming Edit on `setting/retention` and who can grant it; the API refuses the write |
 | AC-45.9 | A pseudonymised person | an Admin reactivates them (AC-23) | the Admin gives a name and an email again; nothing erased comes back |
 | AC-45.10 | The setting could not save | it is sent | it stays as it was, saying why, with *Try again* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A departed person's name | Admin | settings.keeping · Keep | — | settings.keeping · Loading | settings.keeping · Pseudonymise | settings.keeping · Could not save | — | — |
-| A departed person's name | Operator | access.locked · Keeping · Keep | — | access.locked · Keeping · Loading | access.locked · Keeping | — | — | access.locked · Keeping |
+| A departed person's name | Operator | settings.keeping · Locked · Keeping · Keep | — | settings.keeping · Locked · Keeping · Loading | settings.keeping · Locked · Keeping | — | — | settings.keeping · Locked · Keeping |
 | What leaving erases — in the deactivate modal | Admin | settings.people · Deactivate · Nothing personal | — | settings.people · Deactivate · Loading | settings.people · Deactivate · What goes | settings.people · Deactivate · Could not save | settings.people · Deactivate · Waiting on a hold | — |
-| What leaving erases — in the deactivate modal | Operator | — | — | — | — | — | — | access.locked · A person |
+| What leaving erases — in the deactivate modal | Operator | — | — | — | — | — | — | settings.people · Locked · A person |
 | A departed person's work | Admin | — | — | — | settings.people · Former member | — | — | — |
-| A departed person's work | Operator | — | — | — | access.locked · Former member | — | — | access.locked · Former member |
+| A departed person's work | Operator | — | — | — | settings.people · Locked · Former member | — | — | settings.people · Locked · Former member |

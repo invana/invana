@@ -2,9 +2,9 @@
 id: AC-35
 title: Connect an MCP client as me
 feature: AC-F11
-status: idea
+status: later
 personas: [analyst, builder, admin]
-boards: [access.consent, access.signin, access.sign_in_again]
+boards: [access.consent, access.signin]
 ---
 
 # AC-35 · Connect an MCP client as me
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [AC-F11](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | — |
-| Operator | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | A person without an account reads *Ask your admin for an account* on sign-in; a service user connects with a key, never this way |
+| Operator | Connect an MCP client as themselves, consenting with the password again; the client acts as them through the agents they may use | A person without an account reads *Ask your admin for an account* on sign-in; a client that is no one person connects with a project key, never this way |
 
 ## Flow
 
@@ -77,21 +77,22 @@ sequenceDiagram
 | AC-35.7 | *Deny* | it is pressed | the client is told access was denied; nothing is connected; History records it |
 | AC-35.8 | An authorize request with no code challenge, `plain`, a return address not registered, or a resource other than the deployment's MCP server | it arrives | an error page names what was wrong, and the client is never sent a code |
 | AC-35.9 | A code | it is traded with the wrong verifier, a second time, or after 60 seconds | it is refused, and a code used twice ends every token issued from it |
-| AC-35.10 | A connected client | it calls the MCP server | it acts as the person — their role and the agents they may use, read at each call — and *Access usage*, *What left the platform* and History name the person and the connected client |
+| AC-35.10 | A connected client | it calls the MCP server | it acts as the person — their policies and the agents they may use, read at each call — and *Access usage*, *What left the platform* and History name the person and the connected client |
 | AC-35.11 | A connected client's token | it is sent to any route but the MCP server | it is refused — the token is bound to the MCP server |
 | AC-35.12 | A connected client | it tries a session-only act — keys, access, credentials | it is refused — *This needs a person's session, not a key* |
 | AC-35.13 | A connected client's access token | it expires | the client renews it with its refresh token without the person; the refresh token rotates, and reusing a retired one revokes the client and is recorded |
 | AC-35.14 | A person who is deactivated, or whose client is revoked | the client calls | it is refused at once (AC-23.4 · AC-36.3) |
 | AC-35.15 | A key | it calls the MCP server | it still works, as key ∩ owner (AC-10.19) |
 | AC-35.16 | One address | it calls the token endpoint or the MCP server more than 30 times a minute | the rest are refused as too many requests (AC-34.4) |
+| AC-35.17 | A connected client | it calls a raw-query tool on a graph database where its caller's policies hide anything, or names a kind or property an entry of *Hidden from agents* hides | the raw query is refused with *Raw queries are not available on {graph database}*; the name fails as one that does not exist (AC-27.25 · AC-27.27) |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Consent | Admin | access.consent | — | access.consent · Loading | access.consent | access.consent · Bad request | — | — |
 | Consent | Operator | access.consent | — | access.consent · Loading | access.consent | access.consent · Bad request | — | access.signin · No account |
-| Sign in again to allow | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
-| Sign in again to allow | Operator | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Sign in again to allow | Admin | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
+| Sign in again to allow | Operator | — | — | access.signin · Sign in again · Checking | access.signin · Sign in again | access.signin · Sign in again · Wrong password | — | — |
 | Connected — back to the client | Admin | — | — | — | access.consent · Connected | access.consent · Denied | — | — |
 | Connected — back to the client | Operator | — | — | — | access.consent · Connected | access.consent · Denied | — | — |

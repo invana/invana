@@ -4,7 +4,7 @@ title: Set up where asks and alerts can go
 feature: CP-F08
 status: idea
 personas: [admin]
-boards: [settings.notifications, access.sign_in_again]
+boards: [settings.notifications, access.signin]
 ---
 
 # CP-45 · Set up where asks and alerts can go
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add, test and remove a channel; replace its secret — each with the password again | — |
-| Operator | Read every channel — its kind, masked target and whether it is ready | *Add channel*, *Test* and *Remove* are disabled — *Needs the Admin role — ask Priya or Lee*. A secret never reads back to anyone |
+| Admin | With Create or Edit on `setting/connections`: add, test and remove a channel; replace its secret — each with the password again | — |
+| Operator | Read every channel — its kind, masked target and whether it is ready | *Add channel*, *Test* and *Remove* are disabled — *Needs Create or Edit on setting/connections — ask {who can grant}*. A secret never reads back to anyone |
 
 ## Flow
 
@@ -57,14 +57,17 @@ flowchart TD
 | CP-45.10 | A channel change | it is made without the password, with a wrong one, or with a key | it is refused — *Enter your password again to do this* |
 | CP-45.11 | An Operator | they open *Where it can go* | every channel reads; *Add channel*, *Test* and *Remove* are disabled, naming the Admins; through the API they are refused |
 | CP-45.12 | A channel added, replaced or removed | it is done | History records who and when, never a secret |
+| CP-45.13 | A channel under test | the test ends | *Channel ready* offers *Save the channel*, which asks to sign in again for *Add a channel* and returns to *Channels* with the new channel; *Channel test failed* names the channel's own answer and keeps *Back* and *Test again* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Where it can go | Admin | settings.notifications · In app only | — | settings.notifications · Loading | settings.notifications · Channels | settings.notifications · Channel failed | — | — |
 | Where it can go | Operator | settings.notifications · In app only · Read only | — | settings.notifications · Loading | settings.notifications · Channels · Read only | settings.notifications · Channel failed | — | settings.notifications · Channels · Read only |
-| Add channel | Admin | settings.notifications · Add channel | — | settings.notifications · Testing channel | settings.notifications · Channel ready | settings.notifications · Channel test failed | — | — |
+| Add channel | Admin | settings.notifications · New channel | — | settings.notifications · New channel · Testing channel | settings.notifications · New channel · Channel ready | settings.notifications · New channel · Channel test failed | — | — |
 | Add channel | Operator | — | — | — | — | — | — | settings.notifications · Channels · Read only |
-| Password again | Admin | — | — | access.sign_in_again · Checking | access.sign_in_again | access.sign_in_again · Wrong password | — | — |
+| Password again | Admin | — | — | access.signin · Sign in again · Add a channel · Checking | access.signin · Sign in again · Add a channel | access.signin · Sign in again · Add a channel · Wrong password | — | — |
 | Password again | Operator | — | — | — | — | — | — | — |
+| Add channel · Saved | Admin | — | — | — | settings.notifications · Channels · Channel added | — | — | — |
+| Add channel · Saved | Operator | — | — | — | — | — | — | settings.notifications · Channels · Read only |

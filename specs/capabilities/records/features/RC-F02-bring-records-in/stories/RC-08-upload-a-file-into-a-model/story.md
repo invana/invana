@@ -3,8 +3,9 @@ id: RC-08
 title: Upload a file into a model
 feature: RC-F02
 status: idea
+milestone: MVP
 personas: [curator]
-boards: [data.upload]
+boards: [data.loads]
 ---
 
 # RC-08 · Upload a file into a model
@@ -16,19 +17,19 @@ Tasks: [task.md](task.md) · Feature: [RC-F02](../../feature.md)
 
 ## Who can
 
-Loading records is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Loading records needs Create on `data/<graph database>/<kind>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Upload a file into any published model of the Graph and load it | — |
-| Operator | Read the loads. A Modeller uploads as an Admin does | *Upload* disabled — *Needs the Modeller role — ask an Admin* |
+| Admin | Upload a file into any published model and load it | — |
+| Operator | Read the loads. With Create on the kind, uploads as an Admin does | *Upload* disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([Records › Bring records in · Upload]) --> g{Modeller or Admin?}
-  g -->|no| na["Upload disabled — Needs the Modeller role"]
+  a([Model › Graph Data › Loads › Bring records in · Upload]) --> g{Create on the kind?}
+  g -->|no| na["Upload disabled — Needs Create on the kind"]
   g -->|yes| f["Drop a file"]
   f --> m["Pick the model · the key column · the licence"]
   m --> p["What it becomes: each column, the kind and property it maps to, an example"]
@@ -41,7 +42,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| RC-08.1 | Records › Bring records in with no file | it opens | a drop zone says what a file needs — a header row, a key column and a licence — and which published models it can load into |
+| RC-08.1 | Model › Graph Data › Loads › Bring records in with no file | it opens | a drop zone says what a file needs — a header row, a key column and a licence — and which published models it can load into |
 | RC-08.2 | A file dropped | the browser reads it | it shows the file's rows and columns and *What it becomes*: each column, the kind and property it maps to, an example value, before anything is written |
 | RC-08.3 | A file and a model | the person sets up the load | they pick the model, the key column and the licence; *Load* waits until all are set |
 | RC-08.4 | Rows without a key, or two rows with one key | the person loads | the load is refused, naming the first five rows; nothing is written |
@@ -49,14 +50,27 @@ flowchart LR
 | RC-08.6 | A file whose content hash matches an earlier load into the same model | it is previewed | it reads *Unchanged — loading it updates nothing*, naming the earlier load |
 | RC-08.7 | Columns that map to no property of the model | the preview shows | they are listed as *not loaded*, never silently dropped |
 | RC-08.8 | A file the browser cannot read | it is dropped | it says why, with *Choose another* |
-| RC-08.9 | An Operator | they open Bring records in | *Upload* is disabled with *Needs the Modeller role — ask an Admin* |
+| RC-08.9 | A person without Create on the kind | they open Bring records in | *Upload* is disabled with *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 | RC-08.10 | A document, a paper or any file that is not rows with a header | it is dropped | it is refused before anything is read: *Only rows that fit a kind can be loaded — extract them first*; nothing is written |
+| RC-08.11 | A load an agent starts whose rows name a kind or a property that *Hidden from agents* hides | it starts | it fails as *There is no kind {kind}* or *{kind} has no property {property}*, as for one that does not exist; nothing is written; a load a person starts through the Loader is held to the person's own policies, not to the entry ([AC-27.19](../../../../../../os/access/features/AC-F02-access-policies/stories/AC-27-keep-a-kind-or-a-sensitive-property-from-agents/story.md)) |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Upload | Admin | data.upload · Drop a file | — | data.upload · Reading the file | data.upload | data.upload · Refused rows | — | — |
-| Upload | Operator | data.upload · Drop a file | — | data.upload · Reading the file | data.upload | data.upload · Refused rows | — | data.upload · Needs the model grant |
-| What it becomes | Admin | — | — | data.upload · Reading the file | data.upload · Preview | data.upload · Unchanged | — | — |
-| What it becomes | Operator | — | — | data.upload · Reading the file | data.upload · Preview | data.upload · Unchanged | — | data.upload · Needs the model grant |
+| Upload | Admin | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | — |
+| Upload | Operator | data.loads · Upload · Drop a file | — | data.loads · Upload · Reading the file | data.loads · Upload | data.loads · Upload · Refused rows | — | data.loads · Upload · Needs Create on Graph Data |
+| What it becomes | Admin | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | — |
+| What it becomes | Operator | — | — | data.loads · Upload · Reading the file | data.loads · Upload · Preview | data.loads · Upload · Unchanged | — | data.loads · Upload · Needs Create on Graph Data |
+| Upload · 1 Drop a file | Admin | data.loads · Upload · Drop a file | — | — | data.loads · Upload · File chosen | — | — | — |
+| Upload · 1 Drop a file | Operator | data.loads · Upload · Drop a file | — | — | data.loads · Upload · File chosen | — | — | — |
+| Upload · a file that is not rows | Admin | data.loads · Upload · File chosen | — | — | — | data.loads · Upload · Not rows | — | — |
+| Upload · a file that is not rows | Operator | data.loads · Upload · File chosen | — | — | — | data.loads · Upload · Not rows | — | — |
+| Upload · a file it cannot read | Admin | data.loads · Upload · File chosen | — | — | — | data.loads · Upload · Cannot read | — | — |
+| Upload · a file it cannot read | Operator | data.loads · Upload · File chosen | — | — | — | data.loads · Upload · Cannot read | — | — |
+| Upload · a file without its licence | Admin | data.loads · Upload · File chosen | — | — | — | data.loads · Upload · Licence missing | — | — |
+| Upload · a file without its licence | Operator | data.loads · Upload · File chosen | — | — | — | data.loads · Upload · Licence missing | — | — |
+| Upload · Load | Admin | data.loads · Upload · Preview | — | data.loads · Upload · Loading | data.loads · Upload · Started | data.loads · Upload · Refused rows | — | — |
+| Upload · Load | Operator | data.loads · Upload · Preview | — | data.loads · Upload · Loading | data.loads · Upload · Started | data.loads · Upload · Refused rows | — | — |
+| Upload · without Create on Graph Data | Admin | — | — | — | — | — | — | — |
+| Upload · without Create on Graph Data | Operator | — | — | — | — | — | — | data.loads · Upload · Locked |

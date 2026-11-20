@@ -4,7 +4,7 @@ title: Add an outside agent by its card or its MCP server
 feature: AG-F05
 status: idea
 personas: [admin]
-boards: [agents.external]
+boards: [agents.agents, access.signin]
 ---
 
 # AG-33 · Add an outside agent by its card or its MCP server
@@ -17,13 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F05](../../feature.md)
 
 ## Who can
 
-Adding an outside agent is the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Adding an outside agent needs Create on `plugin/*`; the rest, Manage on `plugin/<name>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Add an outside agent, choose its credential, turn it on or off, read its card again, set its limits, remove one no run reached | — |
-| Modeller | Read every outside agent, its skills, who added it and limits, never its secret | *Add an outside agent* and every act disabled — *Needs the Admin role* |
-| Operator | As Modeller | As Modeller |
+| Operator | Read every outside agent, its skills, who added it and limits, never its secret | *Add an outside agent* and every act disabled — *Needs Create on Plugins* or Manage on plugin/{plugin} — ask {who can grant}* |
 
 ## Flow
 
@@ -56,7 +55,7 @@ flowchart LR
 | AG-33.5 | A card changed on the other side | nothing is done | nothing changes until an Admin presses *Read the card again*; a skill the card has dropped refuses, naming the card's date |
 | AG-33.6 | An outside agent | it is read | it shows its protocol, endpoint or server, skills, credential choice (never a secret's value), workers it calls from, limits — time, attempts, tasks at once — who added it, and on or off with who switched it |
 | AG-33.7 | An outside agent | it is listed in Agents | it reads *Outside*, is granted to nobody, is never given a task by a person, and holds no limits of Invana's own |
-| AG-33.8 | An Operator or Modeller | they open Outside agents | everything reads; *Add an outside agent*, *Turn on*, *Read the card again* and *Remove* are disabled — *Needs the Admin role* |
+| AG-33.8 | An Operator | they open Outside agents | everything reads; *Add an outside agent*, *Turn on*, *Read the card again* and *Remove* are disabled — *Needs Create on Plugins* or Manage on plugin/{plugin} — ask {who can grant}* |
 | AG-33.9 | A document that is not an A2A agent card, or one whose interfaces offer no A2A version Invana speaks | they add it | it is refused, naming the version it found and the one Invana speaks; nothing is added |
 | AG-33.10 | An MCP outside agent naming a server not added in the Control Plane | they add it | it is refused, naming the server |
 | AG-33.11 | An outside agent a run has reached | an Admin removes it | it is refused — *turn it off instead* — so every run that reached it still resolves |
@@ -64,11 +63,25 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Outside agents | Admin | agents.external · No outside agents | agents.external · No outside agents match | agents.external · Loading | agents.external | agents.external · Could not load | — | — |
-| Outside agents | Operator | agents.external · No outside agents | agents.external · No outside agents match | agents.external · Loading | agents.external · Read only | agents.external · Could not load | — | agents.external · Read only |
-| Add an outside agent | Admin | agents.external · Add an outside agent | — | agents.external · Reading the card | agents.external · Card read | agents.external · Card unreadable | — | — |
-| Add an outside agent | Operator | — | — | — | — | — | — | agents.external · Read only |
-| A card Invana cannot speak | Admin | — | — | — | — | agents.external · Card version refused | — | — |
-| A card Invana cannot speak | Operator | — | — | — | — | — | — | agents.external · Read only |
+| Outside agents | Admin | agents.agents · Outside · No outside agents | agents.agents · Outside · No outside agents match | agents.agents · Outside · Loading | agents.agents · Outside | agents.agents · Outside · Could not load | — | — |
+| Outside agents | Operator | agents.agents · Outside · No outside agents | agents.agents · Outside · No outside agents match | agents.agents · Outside · Loading | agents.agents · Outside · Read only | agents.agents · Outside · Could not load | — | agents.agents · Outside · Read only |
+| Add an outside agent | Admin | agents.agents · Outside · Add | — | agents.agents · Outside · Add · Reading the card | agents.agents · Outside · Add · Card read | agents.agents · Outside · Add · Card unreadable | — | — |
+| Add an outside agent | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| Add an outside agent · 3 Name, credential, workers and limits | Admin | — | — | — | agents.agents · Outside · Add · Name and credential | access.signin · Sign in again · Add an outside agent · Wrong password | — | — |
+| Add an outside agent · 3 Name, credential, workers and limits | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| Add an outside agent · Added | Admin | — | — | — | agents.agents · Outside · Add · Added, off | — | — | — |
+| Add an outside agent · Added | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| A card Invana cannot speak | Admin | — | — | — | — | agents.agents · Outside · Add · Card version refused | — | — |
+| A card Invana cannot speak | Operator | — | — | — | — | — | — | agents.agents · Outside · Read only |
+| Add an outside agent · 1 Outside | Admin | agents.agents · Outside | — | — | agents.agents · Outside · Add | — | — | — |
+| Add an outside agent · 1 Outside | Operator | agents.agents · Outside | — | — | agents.agents · Outside · Add | — | — | — |
+| Add an outside agent · 2 The card | Admin | agents.agents · Outside · Add | — | agents.agents · Outside · Add · Reading the card | agents.agents · Outside · Add · Card read | agents.agents · Outside · Add · Card unreadable | — | — |
+| Add an outside agent · 2 The card | Operator | agents.agents · Outside · Add | — | agents.agents · Outside · Add · Reading the card | agents.agents · Outside · Add · Card read | agents.agents · Outside · Add · Card unreadable | — | — |
+| Add an outside agent · a card version it cannot speak | Admin | agents.agents · Outside · Add | — | agents.agents · Outside · Add · Reading the card | — | agents.agents · Outside · Add · Card version refused | — | — |
+| Add an outside agent · a card version it cannot speak | Operator | agents.agents · Outside · Add | — | agents.agents · Outside · Add · Reading the card | — | agents.agents · Outside · Add · Card version refused | — | — |
+| Add an outside agent · Add it | Admin | agents.agents · Outside · Add · Name and credential | — | agents.agents · Outside · Add · Adding | agents.agents · Outside · Add · Added, off | access.signin · Sign in again · Add an outside agent · Wrong password | — | — |
+| Add an outside agent · Add it | Operator | agents.agents · Outside · Add · Name and credential | — | agents.agents · Outside · Add · Adding | agents.agents · Outside · Add · Added, off | access.signin · Sign in again · Add an outside agent · Wrong password | — | — |
+| Add an outside agent · Sign in again | Admin | access.signin · Sign in again · Add an outside agent | — | — | agents.agents · Outside · Add · Added, off | access.signin · Sign in again · Add an outside agent · Wrong password | — | — |
+| Add an outside agent · Sign in again | Operator | access.signin · Sign in again · Add an outside agent | — | — | agents.agents · Outside · Add · Added, off | access.signin · Sign in again · Add an outside agent · Wrong password | — | — |

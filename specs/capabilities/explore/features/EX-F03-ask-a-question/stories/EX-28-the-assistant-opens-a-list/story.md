@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Ask for Runs, Agents, Inbox › Needs you or Inbox › History with filters, and open it | — |
-| Operator | The same, through the agents they may use — the list opens with what they may read, counted under their rights; a Modeller the same | A name they cannot see is said as not found, never as forbidden; a run whose content they may not read lists with *withheld* (CP-F10) |
+| Admin | Ask for Runs, Agents, Inbox › Needs you or Access › Record › History with filters, and open it | — |
+| Operator | The same, through the agents they may use — the list opens with what they may read, as their rights allow | A name they cannot see is said as not found, never as forbidden; a run whose content they may not read lists with *withheld* (CP-F10) |
 
 ## Flow
 
@@ -43,7 +43,7 @@ flowchart LR
 | # | Given | When | Then |
 |---|---|---|---|
 | EX-28.1 | *Show me Order Checker's failed runs this month* | the person asks | the reply carries a card — the list's name, a chip per filter and the row count, *Runs · 3 filters · 2 runs* |
-| EX-28.2 | The card | the person opens it | Control Plane › Runs opens with the agent, *failed* and the last 30 days applied, each chip marked *set by the assistant* |
+| EX-28.2 | The card | the person opens it | Agents › Runs opens with the agent, *failed* and the last 30 days applied, each chip marked *set by the assistant* |
 | EX-28.3 | The question asked from Agents | it is answered | the list opens by itself, and the card stays in the thread as the way back |
 | EX-28.4 | The words *this week*, *today*, *didn't serve* | they are asked | they become the last 7 days, the last 24 hours and *not served* |
 | EX-28.5 | *Order Chekcer*, an agent name that does not exist | the person asks | the reply says *No agent named "Order Chekcer"* and the card carries the filters that did resolve |
@@ -52,12 +52,12 @@ flowchart LR
 | EX-28.8 | A list the assistant opened | its count is compared with the list | the card's count is the list's own total |
 | EX-28.9 | A request for something that is not a list it can open | the person asks | it is answered as an ordinary question |
 | EX-28.10 | An Operator asking for an agent they cannot see | the person asks | the agent is said as not found, and the count is of what they may read |
-| EX-28.11 | Any list the assistant opens | it opens | nothing in the Graph or the list changes |
+| EX-28.11 | Any list the assistant opens | it opens | nothing in Graph Data or the list changes |
 | EX-28.12 | A card the assistant drew | the person opens *How it got here* | its steps and sources are shown — the words it read and the filter each became |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The card in the thread | Admin | — | explore.board · List card, 0 rows | explore.board · Working | explore.board · List card | explore.board · Name not found | explore.board · Working | — |
 | The card in the thread | Operator | — | explore.board · List card, 0 rows | explore.board · Working | explore.board · List card | explore.board · Name not found | explore.board · Working | explore.board · Name not found |

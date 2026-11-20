@@ -4,7 +4,7 @@ title: Shape the board by hand
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board, explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-09 · Shape the board by hand
@@ -16,21 +16,21 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)), through the Assistant.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)), through the Assistant.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Expand, hide, style on any board; read and restore any board's history; reads run as the Assistant, within its Access Policies | A kind a rule denies the Assistant: the expansion refused, naming the rule |
-| Operator | The same; a Modeller the same | Without the Assistant: expand, styling and *Restore* disabled — *{person} may not use Assistant — ask an Admin*; History still reads |
+| Operator | The same | Without the Assistant: expand, styling and *Restore* disabled — *{person} may not use Assistant — ask an Admin*; History still reads |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   a([A drawn board]) -->|right-click a node · Expand neighbours| ck{"The Assistant's Access Policies · each graph database on"}
-  ck -->|a rule denies the kind| r["Refused — names the rule, its policy and who set it"]
+  ck -->|a rule denies the kind| r["Refused — Needs {Action} on {Resource name}"]
   ck -->|a graph database off| off["Refused — names it and who switched it off"]
-  ck -->|allowed| c{The count, across graph databases}
+  ck -->|allowed| c{The count, in the node's graph database}
   c -->|within the cap| d["Neighbours added · nothing replaced"]
   c -->|over the cap| k["The count · raise the cap or pick a kind"] --> d
   c -->|queued · failed| q["Queued behind runs · or the run's message"]
@@ -55,7 +55,7 @@ flowchart LR
 | EX-09.9 | A node gone from its graph database since it was drawn | the board reopens | the node stays drawn, marked missing, with when it was last seen |
 | EX-09.10 | A dense result zoomed out | over 500 relationships are drawn below 50% zoom | about 1 in 10 is drawn and the footer says *About 1 in 10 relationships drawn · zoom in for all* until every edge is drawn again |
 | EX-09.11 | A drawn node | the person picks *Expand…* | a card offers direction, relationship kind, neighbour kind, how many, and a property to match; the count shows before anything draws |
-| EX-09.12 | A Customer in `sales` with identity links to Customers in `crm` | the person expands it | its neighbours in both graph databases are counted and drawn, each in the Element panel naming its graph database |
+| EX-09.12 | A Customer in `sales`, and a Customer with the same email in `crm` | the person expands the one in `sales` | only its neighbours in `sales` are counted and drawn, the Element panel naming `sales`; the Customer in `crm` is not reached — nothing is joined across graph databases |
 | EX-09.13 | A graph database that cannot count by kind | the Legend opens | every drawn kind is listed without a number, and no total is made up from a partial sum |
 | EX-09.14 | The Legend open | the person picks *Count again* | the kinds are counted again as the Assistant, as a run, and nothing drawn changes |
 | EX-09.15 | Styling open | the person sets a relationship kind's width, or labels a node kind by a key, its id or its kind | the board repaints at once and keeps it |
@@ -67,9 +67,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Right-click · Expand | Admin | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Failed | — | — |
-| Right-click · Expand | Operator | — | — | explore.board.menu · Loading | explore.board.menu | explore.board.menu · Failed | — | — |
+| Right-click · Expand | Admin | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |
+| Right-click · Expand | Operator | — | — | explore.board · Menu · Loading | explore.board · Menu | explore.board · Menu · Failed | — | — |
 | Legend · Styling · History | Admin | — | explore.board · Empty after a filter | — | explore.board | — | — | — |
 | Legend · Styling · History | Operator | — | explore.board · Empty after a filter | — | explore.board | — | — | — |
+| History | Admin | explore.board · History · One version | — | explore.board · History · Loading | explore.board · History | explore.board · History · Could not restore | — | — |
+| History | Operator | explore.board · History · One version | — | explore.board · History · Loading | explore.board · History | explore.board · History · Could not restore | — | explore.board · History · Restore disabled |

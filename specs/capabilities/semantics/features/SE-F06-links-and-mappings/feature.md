@@ -6,15 +6,15 @@ status: idea
 personas: [modeller]
 stories: [SE-01, SE-02, SE-03, SE-16]
 journeys: []
-boards: [model.board, model.board.kind, model.new]
+boards: [model.models]
 nfrs: [NFR-PERF-4, NFR-SEC-11]
 depends_on: [SE-F01, SE-F02]
 ---
 
 # Links and mappings
 
-> Every published model on one map, the links between them declared by a person — never guessed — the mappings from
-> a model to a standard and between standards, and each model carried to another Graph as one file. The decision it helps make: *do these two models describe the same thing, and
+> Every published model on one map, the links between models in the same graph database declared by a person — never guessed — the mappings from
+> a model to a standard and between standards, and each model carried to another deployment as one file. The decision it helps make: *do these two models describe the same thing, and
 > on which key?* — answered with the count of records each rule joins before it is made.
 
 ## User journey
@@ -24,11 +24,11 @@ flowchart TD
   start([Model]) --> map["SE-01 · The map: every published model, links between models dashed"]
   map -->|a model with nothing published| empty["An empty frame that says so"]
   map -->|a kind| k["SE-02 · The kind: its properties, records, key · Open it"]
-  k -->|Mappings · Map to a standard| mp{Modeller or Admin?}
-  mp -->|no| na2["Reads · Needs the Modeller role — ask an Admin"]
+  k -->|Mappings · Map to a standard| mp{"Holds Edit on model/<model>?"}
+  mp -->|no| na2["Reads · Needs Edit on the {model} model — ask {who can grant}"]
   mp -->|yes| ms(["SE-02 · Staged in the draft: this property is that standard's term"])
-  map -->|drag from one model to another · Link models| may{Modeller or Admin?}
-  may -->|no| na["Disabled — Needs the Modeller role — ask an Admin"]
+  map -->|drag from one model to another · Link models| may{"Holds Edit on model/<model>?"}
+  may -->|no| na["Disabled — Needs Edit on the {model} model — ask {who can grant}"]
   may -->|yes| dec["SE-03 · Link two models: same thing, or a relationship · a key on each side"]
   dec --> cnt{Records joined?}
   cnt -->|none match| fix["Matches nothing — Try another key"] --> dec
@@ -36,13 +36,14 @@ flowchart TD
   cnt -->|n of m join| st["Staged · changes no answer yet"]
   ok0 --> st
   dec -->|already linked| ex["Names the existing link · Open it"]
+  map -->|two models in different graph databases| xdb["Refused — a link joins two models in one graph database"]
   st -->|Discard| map
   st -->|Commit| run["A run writes its relationships"]
   run -->|refused by a rule · no connection| rf["Refused — the reason · the link stays staged"]
   run --> act(["Active · questions cross both models · every later load joins new records"])
   act -->|Remove link| rm["A run withdraws what it wrote"] --> map
   map -->|Export| ex1(["One file: the model, or the model and its records · confidential and personal values left out, and named"])
-  ex1 --> imp["SE-16 · Import into another Graph"]
+  ex1 --> imp["SE-16 · Import into another deployment"]
   imp -->|name taken| nt["Named — another name, or a new version · Restore an earlier version"]
   imp -->|kinds this database cannot hold| np["A draft that cannot publish, naming them"]
   imp --> dr(["A draft — publish it here (SE-F02)"])
@@ -56,7 +57,7 @@ sequenceDiagram
   participant R as Run
   M->>S: a key on each side
   S->>E: count what this rule joins
-  E->>R: preview, under the Graph's rules
+  E->>R: preview, under the deployment's rules
   R-->>S: 1,284 of 1,310 join · the 26 that do not
   M->>S: Stage this link · Commit
   S->>E: commit the staged links
@@ -75,13 +76,14 @@ sequenceDiagram
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read the map, a model, a kind, the links between models and their history | Every signed-in person — Operator, Modeller, Admin | — |
-| Link two models · commit or discard staged links · remove a link | Modeller · Admin | *Link models* disabled — *Needs the Modeller role — ask an Admin*; a drag between models does nothing and says why |
-| Rename a model · change its description | Modeller · Admin | *Rename* disabled — *Needs the Modeller role — ask an Admin* |
-| Export a model, with or without its records | Every signed-in person — Operator, Modeller, Admin; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
-| Import a model · restore an earlier version | Modeller · Admin | *Import a model file* disabled — *Needs the Modeller role — ask an Admin* |
+| Read the map, a model, a kind, the links between models and their history | Read on `model/<model>` | — |
+| Link two models · commit or discard staged links · remove a link | Edit on `model/<model>` | *Link models* disabled — *Needs Edit on the {model} model — ask {who can grant}*; a drag between models does nothing and says why |
+| Rename a model · change its description | Edit on `model/<model>` | *Rename* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
+| Export a model, with or without its records | Read on `model/<model>`; the records in the file are those the person's default agent may read, and an export passes [the outbound check](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine) with lineage | — |
+| Import a model file as a new model | Create on `model/*` | *Import a model file* disabled — *Needs Create on Models — ask {who can grant}* |
+| Restore an earlier version, or a model file onto a model of the same name | Edit on `model/<model>` | *Restore* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## States
 
@@ -91,24 +93,26 @@ sequenceDiagram
 | Empty after a filter | *Show* one model, or a search on links that matches none: *No link matches "<text>"* · *Clear* |
 | Loading | The map lays out and frames itself before it shows; a link's count reads *Counting…*; the links count reads `—`, never `0` |
 | Has data | Frames per model in their own hue, links dashed, the left section listing models, kinds and links |
-| Failed | A refused link names the side, kind or key; a commit or removal refused by a rule or a missing connection keeps the link as it was; an unreadable file says why |
+| Failed | A refused link names the side, kind or key, or the two graph databases when its models are in different ones; a commit or removal refused by a rule or a missing connection keeps the link as it was; an unreadable file says why |
 | Agent working or proposing | A run counting, writing or withdrawing a link's relationships; an ontology's equivalences offered as links to confirm |
-| No access | The map, kinds and links read; linking, committing, removing and importing are disabled with *Needs the Modeller role — ask an Admin* |
+| No access | The map, kinds and links read; linking, committing, removing and restoring are disabled with *Needs Edit on the {model} model — ask {who can grant}*; importing is disabled with *Needs Create on Models — ask {who can grant}* |
 
 ## Rules
 
 | Rule | Detail |
 |---|---|
+| One graph database | A link joins two models bound to the same graph database ([SE-F01](../SE-F01-start-a-model/feature.md#rules)), and writes its relationships there. Two models in different graph databases are never linked: the drag and the card refuse it, naming both graph databases. A link, a join or an answer across graph databases is later |
+| A label belongs to one model | A kind's label in a graph database is one model's; several models may sit in one graph database, each with its own labels. Another model shares that label only through a *Same thing* link between models, never by declaring it too ([SE-F02](../SE-F02-change-and-publish-a-model/feature.md#rules)). A link between models stays inside one graph database; links across graph databases are a later direction, not a rule |
 | Declared, never guessed | Every link is declared by a person, on a key on each side matched exactly or ignoring case; nothing is inferred, no similarity score, no key guessed from a name |
 | Two kinds of link | *Same thing* — two kinds are one entity, both kept, joined by a *same as* relationship. *Relationship* — a relationship between two kinds, its ends found by a key on each side, or by its own rows in a load — never both |
-| Linking never merges | Both records stay; questions cross the link |
+| Linking never merges | Both records stay; questions cross the link, inside its graph database |
 | Three shapes, and nothing else is a link | *Same thing* on keys that differ in name — `Company.ticker` is `Stock.nse_symbol`, matched exactly, both records stay · *Relationship* on keys the records already carry — `Order.instrument_isin` to `Stock.isin`, because an order is not a stock · *Relationship* from its own rows — `Observation` to `Stock`, when each relationship is a fact of its own in a load's rows |
 | Links bind published versions | A draft cannot be linked. A new version carries its links; links on the version it replaced stay as history |
 | The whole model is derived | Every published model plus its active links, computed when read, never stored — and it is what every question is grounded in |
 | A link stages before it counts | Declared links are listed, drawn and counted as *staged* and change no answer until committed; *Commit* activates every staged link at once, *Discard* drops them |
 | An active link stands | Committing writes its relationships; every later load joins the records it brings. Writing again never writes twice |
 | A link's relationships say so | Each is marked as made by its link, with the rule and when; removing the link removes exactly those, and only once they are gone does the link go |
-| Every read and write is a run, under the Graph's rules | Counting, committing and removing a link; a rule that denies either model refuses it, with the reason — never counted around |
+| Every read and write is a run, under the deployment's rules | Counting, committing and removing a link; a rule that denies either model refuses it, with the reason — never counted around |
 | A model travels as one file | A published version exports with its kinds, keys and constraints; links travel only when both ends are in the same file. Its identity is its package and its content, not its name, so a later import is recognised as a new version. Files and git are the registry |
 | An export is a send | A model file with its records leaves the platform, so it passes the outbound check ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#engine)) with lineage: confidential and personal values are left out and the file names what was left out; the records are only those the person's default agent may read |
 | Three kinds of mapping | *Model to model* — a link between models, above · *Model to standard* — a kind or property means a standard's term or value, staged in the model's draft and published with it; a question may then be asked in the standard's words · *Standard to standard* — a term or value in one standard is the same as, broader than or narrower than one in another, kept on the newer standard's version |
@@ -119,7 +123,7 @@ sequenceDiagram
 
 | Record | Read or write |
 |---|---|
-| Model versions — published, and each kind's latest record count | Read |
+| Model versions — published, each kind's latest record count, and the version, source and source IRI each property came in with | Read |
 | Link between models — kind, both models and kinds, both keys, match, relationship, status, who declared it, when, where from, relationships held | Read · write |
 | Relationships a link writes in the graph | Write on commit and on each load · delete on removal |
 | The link's history — declared, committed, removed, with the rule and what was withdrawn | Read · write |
@@ -138,7 +142,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Table | Columns | Notes |
 |---|---|---|
-| `model_links` | `graph_id` · `kind` (`same` · `relationship`) · `status` (`staged` · `active`) · `source_version_id` · `target_version_id` · `source_type` · `target_type` · `source_property` · `target_property` · `match` (`exact` · `ignore_case`) · `edge_type` · `source_model_id` · `edges` · `declared_by_id` · `declared_at` | One per pair of kinds, staged or active. `edges` is null until the first solve. `source_model_id` is set on a relationship from its own rows, which carries no keys |
+| `model_links` | `database_id` · `kind` (`same` · `relationship`) · `status` (`staged` · `active`) · `source_version_id` · `target_version_id` · `source_type` · `target_type` · `source_property` · `target_property` · `match` (`exact` · `ignore_case`) · `edge_type` · `source_model_id` · `edges` · `declared_by_id` · `declared_at` | One per pair of kinds, staged or active. `database_id` is the graph database both sides' models are bound to. `edges` is null until the first solve. `source_model_id` is set on a relationship from its own rows, which carries no keys |
 
 ### Reads
 
@@ -146,16 +150,16 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 |---|---|
 | Models and their published versions | [SE-F01](../SE-F01-start-a-model/feature.md#engine) · [SE-F02](../SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Each kind's latest record count · the queries that crossed a link | [SE-F10](../SE-F10-health-and-history/feature.md#engine) |
-| The Graph's rules on properties a count, commit or removal runs under · the touches it records | [SE-F09](../SE-F09-views-of-the-graph/feature.md#engine) |
+| The deployment's Access Policies a count, commit or removal runs under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Loads that join new records and bring a relationship's rows · record stamps | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | Standards a mapping names | [SE-F05](../SE-F05-standards/feature.md#engine) |
-| Committing and withdrawing a link's relationships · identity links and the join across graph databases | [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md#engine) |
+| Committing and withdrawing a link's relationships | [GP-F01](../../../../os/graph/features/GP-F01-data/feature.md#engine) |
 | Runs and the packaged plans they run | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/model` | Does | Story |
+| Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
 | `GET /links` · `POST /links` | The links with `edges`, no history · stage one | SE-01 · SE-03 |
 | `GET /links/{id}` | One link whole: `declared_by` · `declared_at` · `history[]` (its declare and commit events) and each end's latest counted `records` | SE-03 |
@@ -179,14 +183,16 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A link, commit, removal or import by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-03.18 · SE-16.12 |
+| 403 | A link, commit, removal or restore by someone without Edit on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-03.18 · SE-16.12 |
+| 403 | An import by someone without Create on `model/*` | *Needs Create on models — ask {who can grant}.* | SE-16.12 |
 | 422 | A side's kind its published version does not declare (`type_not_in_version`) | *{model} v{n} has no kind {kind}.* | API only — the card offers only declared kinds |
 | 422 | A side that is a draft, the same model on both sides, or a model with nothing published (`version_is_draft`) | *A link joins two published models — {why}.* | SE-03.8 |
+| 422 | Two models bound to different graph databases (`link_across_graph_databases`) | *{source} is in {database} and {target} in {database} — a link joins two models in one graph database.* | SE-03.20 |
 | 422 | A key not on its kind, or a kind with no properties | *{side}: {kind} has no property {key}.* | SE-03.6 |
 | 422 | A *same thing* link or a keyed relationship without a key on each side (`key_required_on_each_side`) | *Name a key on each side.* | API only — the card asks both keys |
 | 422 | A *same thing* link with a relationship name or a source model (`edge_type_on_anchor` · `source_model_on_anchor`) · a relationship without its name or its ends (`edge_type_required` · `endpoints_required`) · with keys and rows together (`keys_and_source_model`) | *{field}: {why}.* | API only — the card offers each field only for its kind |
 | 409 | A pair already linked, staged or active (`link_already_declared`) — carries the existing link's rule | *{source} and {target} are already linked by {rule}.* | SE-03.7 |
-| 409 | A count, commit or removal a rule in the Graph's rules refuses (`preview_refused`) — the link stays as it was | *{rule} denies {model} — nothing was counted.* | SE-03.13 |
+| 409 | A count, commit or removal a rule in the deployment's rules refuses (`preview_refused`) — the link stays as it was | *{rule} denies {model} — nothing was counted.* | SE-03.13 |
 | 409 | A count while the preview is queued (`preview_queued`) | *The count is waiting for a worker — try again.* | SE-03.19 |
 | 409 | A commit with nothing staged, no connection, or a read-only connection — before a run exists | *{why} — nothing was written.* | SE-03.13 |
 
@@ -201,8 +207,8 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 
 | Mechanism | How |
 |---|---|
-| Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the Graph's rules on properties, awaited; a rule naming a kind or key the rules deny comes back refused, never counted around |
-| Committing and removing write through Data | *Commit* starts `stitch-commit@1` and *Remove link* `stitch-withdraw@1`; what each kind writes, the marks on every relationship, joining later loads, counting `edges` and withdrawing exactly what a link wrote — with the identity links and the join across graph databases — are [GP-F01 › Mechanisms](../../../../os/graph/features/GP-F01-data/feature.md#mechanisms). A staged link's row is deleted with no run |
+| Counting is a run | A run of `graph.stitch.preview` bound `graph_read`, under the person's and the agent's Access Policies, awaited; a rule naming a kind or key the policies deny comes back refused, never counted around |
+| Committing and removing write through Data | *Commit* starts `stitch-commit@1` and *Remove link* `stitch-withdraw@1`; what each kind writes, the marks on every relationship, joining later loads, counting `edges` and withdrawing exactly what a link wrote — are [GP-F01 › Mechanisms](../../../../os/graph/features/GP-F01-data/feature.md#mechanisms). A staged link's row is deleted with no run |
 | A touch per side | Counting, committing and withdrawing record one touch per model with the relationships written into it; a side a rule refuses skips that link only; a model checked but not written gets no touch |
 | A new version carries its links | Publishing re-binds active links to the new version; links on the replaced version stay as history, not counted twice |
 | The whole model | Computed on each read of `GET /global-model`; the database's own label count is compared, never added |
@@ -225,7 +231,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | Decision | Detail |
 |---|---|
 | The map is Model's landing | Every published model on one full-bleed canvas, each a frame in its own hue with its kinds inside; a link is the only line that crosses a frame, and every link is dashed. *Show* draws all models or one; *Detail* is circles · cards · property cards. Map · Health · History are its tabs |
-| The left section lists | Models · Kinds of node · Links between models, each with its count; a model is opened from the list, the map or a breadcrumb |
+| The left section is the Models tree | Models are grouped by graph database: each graph database is a folder holding the models bound to it, and a link never crosses folders. Under each model, a tree of its Kinds and Relationships; then Links between models, each with its count; Kinds and Relationships are not boards of their own — the tree, a kind (`model.models · Kind`) and a relationship (`model.models · Relationship`) and every state of them are `model.models`. A model is opened from the tree, the map or a breadcrumb |
 | A kind opens in a peek | Its properties with type and *Must be*, its records, its key, *Change in a draft* and *Open <kind>*; open, it is a page of its model with Properties · Indexes · Constraints · Mappings |
 | Link from the map or the list | Dragging a kind onto a kind in another model, or *Link models*, opens one card with both sides filled: *Same thing* or *Relationship*, *Source* and *Target*, a key on each side; a relationship adds its name and where its ends come from — *These keys* or *Its own rows* |
 | The count fires itself | Naming both keys counts what they join — *1,284 of 1,310 join* — before anything is made; a zero disables *Stage this link* and offers *Try another key*, listing the keys that matched nothing |
@@ -243,7 +249,11 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | A hue is a slot of the categorical ramp, chosen by name | A model's slot comes from its name, so it keeps its hue when another model is added, deleted or re-sorted; a kind's comes from its own name, so it wears the colour Explore paints it. A frame is washed in its model's hue — a 10% fill, a 60% border, the name on its tab |
 | A link is dashed; a model's own relationship is solid | A link joins two models' kinds by a rule, and the dash keeps it from reading as a relationship the model declares. A staged link is dashed in the success tone. Its hover card reads its kind, the rule and the match |
 | A drag links only on purpose | A plain drag moves a kind; **Shift**-drag from a kind onto a kind in another model, or the header's *Link mode* toggle, declares a link. The drag never adds a line: a link is a declared row and returns as data, dashed and staged |
+| A link stays in one graph database | The card's *Target* lists every published model; one bound to another graph database is disabled — *In {database} — a link joins two models in one graph database*. A Shift-drag onto a kind in such a model draws nothing and the footer says why. Linking across graph databases is later, so nothing is designed for it now |
 | The link card docks | An accepted drag docks its card on the right, not in a modal, so both frames stay in view while the keys are named; the dock closes when the card does |
+| The map has a minimap and zoom | A minimap of every frame and a zoom with *Fit* belong to the map, so a deployment of many models stays readable at any Detail |
+| A selected link is thick, dashed and green | The link read whole is the one drawn heavy; the others dim, so its two ends stay in view |
+| The property table carries Index and Constraint columns | A kind's page shows what the database holds for a property beside its type and where it came from; *+ staged* marks what only the draft holds |
 
 ## Open questions
 
@@ -259,6 +269,7 @@ between models is *stitch*: the packaged plans, the catalogue keys `graph.stitch
 | Merging linked records | Lossy, with no undo |
 | A stored whole model | Derived when read, so nothing to keep in sync |
 | Linking drafts | Links bind published versions |
+| Links, identity links and joins across graph databases | Later. Each graph database answers on its own; a link writes relationships inside one graph database, and nothing joins records held in two |
 | Composite keys | One property a side — a rule read in one line is a rule someone audits |
 | A relationship with both keys and its own rows | Two sources of truth for one relationship |
 | Editing a model on the map | The map draws published versions; a model changes in its draft |

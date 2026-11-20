@@ -3,8 +3,9 @@ id: PJ-07
 title: Record a verdict and a decision the rules check
 feature: PJ-F03
 status: idea
+milestone: MVP
 personas: [decision-maker]
-boards: [projects.decide]
+boards: [projects.branches, projects.projects]
 ---
 
 # PJ-07 · Record a verdict and a decision the rules check
@@ -17,13 +18,13 @@ Tasks: [task.md](task.md) · Feature: [PJ-F03](../../feature.md)
 
 ## Who can
 
-*Branches, findings and decisions* is *Acts* for every role in the [role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table),
+*Branches, findings and decisions* follows the [permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue),
 on every project the person can see ([PJ-F01](../../../PJ-F01-projects-and-tasks/feature.md#access)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Record a verdict and a decision on any branch they can see; supersede the current decision | Nobody edits or deletes a decision; on an archived project *Decide* is disabled |
-| Operator | The same; a Modeller the same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
+| Operator | The same | As Admin. Another person's run: that it ran, its status and its tokens — *How it got here* reads *Content withheld* |
 
 ## Flow
 
@@ -71,15 +72,17 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Decide | Admin | — | — | projects.decide · Recording | projects.decide | projects.decide · Could not record | projects.decide · From a proposal | — |
-| Decide | Operator | — | — | projects.decide · Recording | projects.decide | projects.decide · Could not record | projects.decide · From a proposal | projects.decide · Archived |
-| Refused by a rule | Admin | — | — | — | — | projects.decide · Refused by a rule | projects.decide · Refused by a rule · From a proposal | — |
-| Refused by a rule | Operator | — | — | — | — | projects.decide · Refused by a rule | projects.decide · Refused by a rule · From a proposal | — |
-| Recorded with a warning | Admin | — | — | — | projects.decide · Recorded with a warning | — | — | — |
-| Recorded with a warning | Operator | — | — | — | projects.decide · Recorded with a warning | — | — | — |
-| Supersede | Admin | — | — | — | projects.decide · Supersede | projects.decide · Supersede refused | — | — |
-| Supersede | Operator | — | — | — | projects.decide · Supersede | projects.decide · Supersede refused | — | projects.decide · Archived |
-| A branch's decisions | Admin | projects.decide · No decision yet | — | projects.decide · Loading | projects.decide · This branch | projects.decide · Could not load | — | projects.project · Not found |
-| A branch's decisions | Operator | projects.decide · No decision yet | — | projects.decide · Loading | projects.decide · This branch | projects.decide · Could not load | — | projects.project · Not found |
+| Decide | Admin | — | — | projects.branches · Decide · Recording | projects.branches · Decide | projects.branches · Decide · Could not record | projects.branches · Decide · From a proposal | — |
+| Decide | Operator | — | — | projects.branches · Decide · Recording | projects.branches · Decide | projects.branches · Decide · Could not record | projects.branches · Decide · From a proposal | projects.branches · Decide · Archived |
+| Refused by a rule | Admin | — | — | — | — | projects.branches · Decide · Refused by a rule | projects.branches · Decide · Refused by a rule · From a proposal | — |
+| Refused by a rule | Operator | — | — | — | — | projects.branches · Decide · Refused by a rule | projects.branches · Decide · Refused by a rule · From a proposal | — |
+| Recorded with a warning | Admin | — | — | — | projects.branches · Decide · Recorded with a warning | — | — | — |
+| Recorded with a warning | Operator | — | — | — | projects.branches · Decide · Recorded with a warning | — | — | — |
+| Supersede | Admin | — | — | — | projects.branches · Decide · Supersede | projects.branches · Decide · Supersede refused | — | — |
+| Supersede | Operator | — | — | — | projects.branches · Decide · Supersede | projects.branches · Decide · Supersede refused | — | projects.branches · Decide · Archived |
+| A branch's decisions | Admin | projects.branches · Decide · No decision yet | — | projects.branches · Decide · Loading | projects.branches · Decide · This branch | projects.branches · Decide · Could not load | — | projects.projects · Detail · Not found |
+| A branch's decisions | Operator | projects.branches · Decide · No decision yet | — | projects.branches · Decide · Loading | projects.branches · Decide · This branch | projects.branches · Decide · Could not load | — | projects.projects · Detail · Not found |
+| Decide · record it | Admin | projects.branches · Decide | — | projects.branches · Decide · Recording | projects.branches · Decide · Recorded | projects.branches · Decide · Could not record | — | — |
+| Decide · record it | Operator | projects.branches · Decide | — | projects.branches · Decide · Recording | projects.branches · Decide · Recorded | projects.branches · Decide · Could not record | — | — |

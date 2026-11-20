@@ -2,9 +2,9 @@
 id: AC-46
 title: Forget a subject everywhere memory cites them
 feature: AC-F12
-status: idea
+status: later
 personas: [admin]
-boards: [access.forget, settings.keeping, access.locked]
+boards: [settings.keeping]
 ---
 
 # AC-46 · Forget a subject everywhere memory cites them
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Forget a subject — a graph database, a kind and a record ID, with a reason — after its preview, signing in again; read the subjects forgotten | — |
-| Operator | — ; a Modeller the same | *Forget a subject* and the subjects forgotten are not offered |
+| Operator | — | *Forget a subject* and the subjects forgotten are not offered |
 
 ## Flow
 
@@ -51,15 +51,15 @@ flowchart TD
 | AC-46.7 | A record nothing in memory cites | the Admin previews it | it reads *Nothing in memory cites it*; confirming still records that it was forgotten |
 | AC-46.8 | A graph database the deployment does not have | it is named | it is refused — *{database} is not connected* |
 | AC-46.9 | Subjects forgotten | *Leaving and keeping* is read by an Admin | each reads its database, kind, keyed hash, reason, who and when, newest first; a filter that matches none reads *Nothing matches* with *Clear filters* |
-| AC-46.10 | An Operator or a Modeller | they open *Leaving and keeping*, or call the route | *Forget a subject* is not offered; the API refuses it |
+| AC-46.10 | A person without Edit on `setting/retention` | they open *Leaving and keeping*, or call the route | *Forget a subject* is not offered; the API refuses it |
 | AC-46.11 | A forget sent with a key | it is sent | it is refused — it needs a person's session |
 | AC-46.12 | Forgetting could not finish | it is sent | nothing is erased in the store that failed, the modal says which, with *Try again* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Forget a subject | Admin | access.forget · Nothing cites it | — | access.forget · Counting | access.forget · Preview | access.forget · Could not finish | — | access.forget · On hold |
-| Forget a subject | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Forget a subject | Admin | settings.keeping · Forget · Nothing cites it | — | settings.keeping · Forget · Counting | settings.keeping · Forget · Preview | settings.keeping · Forget · Could not finish | — | settings.keeping · Forget · On hold |
+| Forget a subject | Operator | — | — | — | — | — | — | settings.keeping · Forget · Locked · Keeping |
 | Subjects forgotten | Admin | settings.keeping · None forgotten | settings.keeping · Nothing matches | settings.keeping · Loading | settings.keeping · Forgotten | settings.keeping · Could not load | — | — |
-| Subjects forgotten | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Subjects forgotten | Operator | — | — | — | — | — | — | settings.keeping · Locked · Keeping |

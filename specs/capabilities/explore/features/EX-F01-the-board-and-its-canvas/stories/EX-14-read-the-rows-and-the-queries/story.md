@@ -4,7 +4,7 @@ title: Read the rows and the queries
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.board.console]
+boards: [explore.board]
 ---
 
 # EX-14 · Read the rows and the queries
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read Data and Queries on any board; re-run a query step | — |
-| Operator | Read Data on a board they open; read Queries and re-run a step of their own conversation's runs, or of one shared with them; a Modeller the same | A step of a run they may not read: that it ran, its status and tokens — *Content withheld* |
+| Operator | Read Data on a board they open; read Queries and re-run a step of their own conversation's runs, or of one shared with them | A step of a run they may not read: that it ran, its status and tokens — *Content withheld* |
 
 ## Flow
 
@@ -58,9 +58,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Console · Data | Admin | explore.board.console · Nothing drawn | — | explore.board.console · Loading | explore.board.console | — | explore.board.console · Running | — |
-| Console · Data | Operator | explore.board.console · Nothing drawn | — | explore.board.console · Loading | explore.board.console | — | explore.board.console · Running | — |
-| Console · Queries | Admin | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | — |
-| Console · Queries | Operator | explore.board.console · Nothing ran | — | explore.board.console · Loading | explore.board.console · Queries | explore.board.console · Query failed | explore.board.console · Running | explore.board.console · Content withheld |
+| Console · Data | Admin | explore.board · Console · Nothing drawn | — | explore.board · Console · Loading | explore.board · Console | — | explore.board · Console · Running | — |
+| Console · Data | Operator | explore.board · Console · Nothing drawn | — | explore.board · Console · Loading | explore.board · Console | — | explore.board · Console · Running | — |
+| Console · Queries | Admin | explore.board · Console · Nothing ran | — | explore.board · Console · Loading | explore.board · Console · Queries | explore.board · Console · Query failed | explore.board · Console · Running | — |
+| Console · Queries | Operator | explore.board · Console · Nothing ran | — | explore.board · Console · Loading | explore.board · Console · Queries | explore.board · Console · Query failed | explore.board · Console · Running | explore.board · Console · Content withheld |
+| Console · Data · JSON | Admin | — | — | explore.board · Console · Loading | explore.board · Console · JSON | — | — | — |
+| Console · Data · JSON | Operator | — | — | explore.board · Console · Loading | explore.board · Console · JSON | — | — | — |

@@ -4,7 +4,7 @@ title: Present a board
 feature: EX-F02
 status: idea
 personas: [analyst]
-boards: [explore.board.present]
+boards: [explore.board]
 ---
 
 # EX-17 · Present a board
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Present any board, from the first step or any reply's step | — |
-| Operator | Present any board — presenting is read-only; a Modeller the same | A link to a board that does not exist: *Not found* |
+| Operator | Present any board — presenting is read-only | A link to a board that does not exist: *Not found* |
 
 ## Flow
 
@@ -55,7 +55,9 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Presenting | Admin | explore.board.present · Too few steps | — | explore.board.present · Step settling | explore.board.present | explore.board.present · Step failed | — | — |
-| Presenting | Operator | explore.board.present · Too few steps | — | explore.board.present · Step settling | explore.board.present | explore.board.present · Step failed | — | — |
+| Presenting | Admin | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |
+| Presenting | Operator | explore.board · Present · Too few steps | — | explore.board · Present · Step settling | explore.board · Present | explore.board · Present · Step failed | — | — |
+| Presenting · Your changes | Admin | — | — | — | explore.board · Present · Your changes | — | — | — |
+| Presenting · Your changes | Operator | — | — | — | explore.board · Present · Your changes | — | — | — |

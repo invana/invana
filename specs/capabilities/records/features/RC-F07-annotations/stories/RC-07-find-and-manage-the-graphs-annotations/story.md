@@ -1,32 +1,32 @@
 ---
 id: RC-07
-title: Find and manage the Graph's annotations
+title: Find and manage every annotation in Graph Data
 feature: RC-F07
 status: idea
 personas: [analyst, curator]
 boards: [data.annotations]
 ---
 
-# RC-07 · Find and manage the Graph's annotations
+# RC-07 · Find and manage every annotation in Graph Data
 
-**As** an analyst **I want** every annotation in the Graph in one place, found by record, author or kind **so that** I see what others found and clear what does not hold any more.
+**As** an analyst **I want** every annotation in Graph Data in one place, found by record, author or kind **so that** I see what others found and clear what does not hold any more.
 
 Tasks: [task.md](task.md) · Feature: [RC-F07](../../feature.md)
 
 ## Who can
 
-Every role reads annotations and changes its own; an Admin deletes any ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *annotations*).
+Anyone with Read on `data/<graph database>/<kind>` reads annotations; Edit on the kind changes one's own; Edit on `data/<graph database>` deletes any ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *annotations*).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every annotation; edit or delete any, with a reason kept | — |
-| Operator | Read every annotation; edit or delete their own; a Modeller the same | Off on others' — *Only Priya Nair can change it* |
+| Operator | Read every annotation; edit or delete their own | Off on others' — *Only Priya Nair can change it* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([Records › Annotations]) --> l[Every annotation · filter]
+  a([Model › Graph Data › Annotations]) --> l[Every annotation · filter]
   l -->|open| b([Its records on a board])
   l -->|edit or delete| d{Its author?}
   d -->|yes| ok([Changed · in History])
@@ -46,7 +46,7 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Annotations | Admin | data.annotations · Nothing annotated | data.annotations · Nothing matches | data.annotations · Loading | data.annotations | data.annotations · Could not load | — | — |
 | Annotations | Operator | data.annotations · Nothing annotated | data.annotations · Nothing matches | data.annotations · Loading | data.annotations | data.annotations · Could not load | — | data.annotations · Not the author |

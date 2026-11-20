@@ -4,6 +4,7 @@
 
 Each test builds a small spec tree in a temporary folder and points the checker at it. Standard library only.
 """
+import json
 import sys
 import tempfile
 import unittest
@@ -28,12 +29,16 @@ class Tree(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name).resolve()
         self.specs = self.root / 'specs'
-        patches = [mock.patch.object(check, 'ROOT', self.root), mock.patch.object(check, 'SPECS', self.specs)]
+        patches = [mock.patch.object(check, 'ROOT', self.root), mock.patch.object(check, 'SPECS', self.specs),
+                   mock.patch.object(check, 'MILESTONES', self.specs / 'milestones.md'),
+                   mock.patch.object(check, 'CANVAS', self.root / '.design' / 'canvas-invana' / 'project'),
+                   mock.patch.object(check, 'FLOWS_JSON', self.root / '.design' / 'flows.json')]
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
-        check.errors.clear()
-        self.addCleanup(check.errors.clear)
+        for found in (check.errors, check.warnings):
+            found.clear()
+            self.addCleanup(found.clear)
         self.addCleanup(self.tmp.cleanup)
 
     def write(self, rel, text=''):
@@ -197,6 +202,125 @@ class JourneyDiagram(Tree):
         self.assertTrue(any('`stories` names GR-04, not on The journey diagram' in e for e in errors), errors)
         self.assertTrue(any('draws AC-03, missing from `stories`' in e for e in errors), errors)
         self.assertEqual(len(errors), 3, errors)
+
+MILESTONES_MD = ('# Milestones\n\n## Milestones\n\n| ID | Name | Waits on | Done when | Journeys |\n|---|---|---|---|---|\n'
+                 '| MVP | MVP | — | x | {cell} |\n\n## How\n')
+
+
+class Milestones(Tree):
+    """``milestone:`` values, parked stories and confirmed milestone journeys are held to milestones.md."""
+
+    def setUp(self):
+        super().setUp()
+        patch = mock.patch.object(check, 'MILESTONES', self.specs / 'milestones.md')
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def docs(self, story_milestones, status='idea', journey_stories='GR-01, GR-02'):
+        docs = {}
+        for sid, m in story_milestones.items():
+            path = self.write(f'specs/os/graph/features/GR-F01-x/stories/{sid}-x/story.md')
+            fm = {'id': sid, 'status': status, **({'milestone': m} if m else {})}
+            docs[path] = ('story', fm, '')
+        path = self.write('specs/journeys/J01-x.md')
+        docs[path] = ('journey', {'id': 'J01', 'stories': [s.strip() for s in journey_stories.split(',')]}, '')
+        return docs
+
+    def run_check(self, cell, **kw):
+        self.write('specs/milestones.md', MILESTONES_MD.format(cell=cell))
+        check.check_milestones(self.docs(**kw))
+        return check.errors
+
+    def test_a_listed_journey_with_all_its_stories_in_the_milestone_passes(self):
+        self.assertEqual(self.run_check('[J01](journeys/J01-x.md)', story_milestones={'GR-01': 'MVP', 'GR-02': 'MVP'}), [])
+
+    def test_an_unknown_milestone_and_a_parked_story_with_one_fail(self):
+        errors = self.run_check('—', story_milestones={'GR-01': 'V9'})
+        self.assertTrue(any('`V9` is not a row of milestones.md' in e for e in errors), errors)
+        check.errors.clear()
+        errors = self.run_check('—', story_milestones={'GR-01': 'MVP'}, status='later')
+        self.assertTrue(any('a `later` story carries no milestone' in e for e in errors), errors)
+
+    def test_a_confirmed_journey_with_a_story_outside_fails_but_a_proposed_one_does_not(self):
+        stories = {'GR-01': 'MVP', 'GR-02': None}
+        errors = self.run_check('[J01](journeys/J01-x.md)', story_milestones=stories)
+        self.assertTrue(any('lists J01, but GR-02 are not in it' in e for e in errors), errors)
+        check.errors.clear()
+        self.assertEqual(self.run_check('*Proposed:* [J01](journeys/J01-x.md)', story_milestones=stories), [])
+
+
+class BoardIds(Tree):
+    """Flow and journey board ids follow design-language §7."""
+
+    def test_valid_ids_pass(self):
+        check.check_board_ids({'flow.create_agent', 'journey.j01', 'agents.runs'}, {'J01'})
+        self.assertEqual(check.errors, [])
+
+    def test_bad_flow_and_journey_ids_fail(self):
+        check.check_board_ids({'flow.Create-Agent', 'journey.1', 'journey.j99'}, {'J01'})
+        self.assertEqual(len(check.errors), 3, check.errors)
+        self.assertTrue(any('journey J99, which no journey defines' in e for e in check.errors))
+
+
+SCREENS = ('## Screens\n\n| Surface | Lens | a | b | c | d | e | f | g |\n|---|---|---|---|---|---|---|---|---|\n'
+           '| Limits | Admin | — | — | — | settings.limits | settings.limits · Could not save | — | — |\n'
+           '| Edit | Admin | — | — | — | settings.limits · Edit limits | {extra} | — | — |\n')
+FLOW_HTML = '<script>\nconst FLOW = {data};\n</script>\n'
+
+
+class FlowStates(Tree):
+    """Each flow board's frames are in its stories' Screens, and each Screens node is on its click path."""
+
+    def setUp(self):
+        super().setUp()
+        canvas = self.root / 'canvas' / 'project'
+        manifest = self.root / 'canvas' / 'clickthrough' / 'flows.json'
+        for p in (mock.patch.object(check, 'CANVAS', canvas), mock.patch.object(check, 'FLOWS_JSON', manifest)):
+            p.start()
+            self.addCleanup(p.stop)
+        frames =[{'n': 1, 'board': 'settings.limits', 'state': 'has data', 'stories': ['CP-11']},
+                  {'n': 2, 'board': 'settings.limits', 'state': 'Edit limits', 'stories': ['CP-11']}]
+        self.write('canvas/project/flow.set_limits.dc.html',
+                   FLOW_HTML.replace('{data}', json.dumps({'id': 'flow.set_limits', 'frames': frames})))
+        path = {'name': 'fails', 'steps': [{'click': 'Edit limits', 'state': 'Edit limits'},
+                                           {'click': 'Could not save', 'state': 'Could not save'}]}
+        self.write('canvas/clickthrough/flows.json', json.dumps({'flows': [
+            {'id': 'flow.set_limits', 'status': 'active', 'paths': [path],
+             'start': {'board': 'settings.limits', 'view': 'List', 'state': 'has data'}}]}))
+
+    def run_check(self, extra, strict=False):
+        story = self.write('specs/s/story.md')
+        check.check_flows({story: ('story', {'id': 'CP-11', 'status': 'designed'}, SCREENS.format(extra=extra))},
+                          strict=strict)
+        return check.warnings, check.errors
+
+    def test_frames_and_paths_covering_the_screens_pass(self):
+        self.assertEqual(self.run_check('settings.limits · Could not save'), ([], []))
+        self.assertEqual(self.run_check('—', strict=True), ([], []))
+
+    def test_a_loose_frame_and_an_unreached_node_warn_and_fail_with_flows(self):
+        self.write('canvas/project/flow.set_limits.dc.html', FLOW_HTML.replace('{data}', json.dumps(
+            {'id': 'flow.set_limits', 'frames': [{'n': 1, 'board': 'settings.limits', 'state': 'Saving',
+                                                  'stories': ['CP-11']}]})))
+        warns, errs = self.run_check('settings.limits · Saved')
+        self.assertEqual(errs, [])
+        self.assertEqual(len(warns), 1, warns)
+        self.assertIn('1 frame(s) in no ## Screens', warns[0])
+        self.assertIn('· 1 ## Screens node(s)', warns[0])  # Saved: the flows.json path reaches the rest
+        check.warnings.clear()
+        _warns, errs = self.run_check('settings.limits · Saved', strict=True)
+        self.assertTrue(any('frame 1 `settings.limits · Saving` is in no ## Screens of CP-11' in e for e in errs), errs)
+        self.assertTrue(any('`settings.limits · Saved` is reached by no frame of flow.set_limits' in e for e in errs),
+                        errs)
+        self.assertEqual(len(errs), 2, errs)
+
+
+class IndexLink(Tree):
+    def test_the_index_header_links_milestones(self):
+        self.write('specs/milestones.md')
+        with mock.patch.object(check, 'MILESTONES', self.specs / 'milestones.md'):
+            check.index({}, {})
+        self.assertIn('[milestones](milestones.md)', (self.specs / 'README.md').read_text())
 
 
 if __name__ == '__main__':

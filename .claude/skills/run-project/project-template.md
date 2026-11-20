@@ -64,6 +64,7 @@ failures*: a JSON list, in this folder, of e2e or knip items that already failed
 | Stories | <story IDs it delivers (`RC-08 · RC-09`) — the agent adds and works its role's tasks in each `task.md`; — for a phase with no story> |
 | Done when | <the observable result — what a reviewer checks> |
 | Lands | <files, routes or surfaces it adds or changes> |
+| Deliverable | <optional: backticked paths or globs (its report, at least) that must exist and change since `<scope>/<ID>-start` before the phase closes; else a fix round, then `blocked`> |
 | Boards | <board names it implements, or —> |
 | Review | qa — pass 1 always; pass 2 (design) when *Boards* names boards. Blank: no QA |
 | Approve | <Ravi — the runner pauses after this phase until he starts it again; blank or — when not needed> |
@@ -72,8 +73,8 @@ failures*: a JSON list, in this folder, of e2e or knip items that already failed
 
 ## Log
 
-Status is the runner's: `pending` · `in progress` · `gates` · `qa` · `fixing N` · `done` · `blocked`. A session sets
-only `partial` (it handed off) or `blocked` (with the question).
+Status is the runner's: `pending` · `in progress` · `gates` · `qa` · `fixing N` · `done` · `blocked`. A session hands off
+through its note file (the runner sets `partial`) or sets `blocked` (with the question).
 
 | ID | Phase | Needs | Status | Date | Notes |
 |---|---|---|---|---|---|

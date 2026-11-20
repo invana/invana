@@ -6,8 +6,8 @@ status: idea
 personas: [admin, builder]
 stories: [CP-05, CP-06, CP-07, CP-08, CP-09, CP-10, CP-65]
 journeys: [J07, J10]
-boards: [settings.workers, agents.run]
-nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14]
+boards: [settings.workers, agents.runs]
+nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14, NFR-SEC-15, NFR-SEC-17, NFR-SEC-18]
 depends_on: [CP-F02, CP-F04, CP-F10, AC-F02]
 ---
 
@@ -25,10 +25,10 @@ Journeys this feature is a step of: [J07 · Ready a deployment](../../../../jour
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers]) --> lim(["CP-F04 · Limits per team, user and agent"])
+  s([Settings › Workers › Groups]) --> lim(["CP-F04 · Settings › Workers › Limits · limits per team, user and agent"])
   s --> wk["CP-09 · Workers: each group, its workers, what each runs"]
   wk -->|no workers| nw["Steps run inside the engine · Add workers"]
-  wk --> cap["CP-08 · Where steps wait · how many workers would clear it"]
+  wk --> cap["CP-08 · Slots total · busy · free · where steps wait · add workers, or drain idle ones"]
   cap -->|a group is short| add["CP-10 · Add workers: where · group · join key · run it · joined"]
   add -->|a check fails| fx["Says which check and what to look at"]
   add -->|first heartbeat| j(["Joined · takes work"])
@@ -36,11 +36,12 @@ flowchart TD
   flow --> ord["CP-06 · The order work is taken: questions · project tasks · batch"]
   flow --> co["CP-07 · The coordinators · a lost one's runs move on"]
   flow --> adm(["CP-F04 · Admitted, waiting or refused · rate limits · held runs"])
-  wk -->|without Admin| ro(["Reads · acts disabled · Needs the Admin role — ask {admins}"])
+  wk -->|without the permission| ro(["Reads · acts disabled · Needs {permission} on worker/{group} — ask {who can grant}"])
   add -->|the group carries a runtime| rt(["CP-64 · Claude Code · Codex installed on the group"])
   task([A task's run on an outside runtime]) --> sbx["CP-65 · A worker that carries its runtime · its workspace · the sandbox from the agent's policies"]
   sbx -->|no group carries the runtime| nr(["Waits, naming the runtime · then fails"])
-  sbx --> ses["A session: the allow list generated · the credential injected · data only through Invana's tools"]
+  sbx --> ses["A session: the allow list generated · no credential in the sandbox · data and outside tools only through Invana's tools"]
+  ses -->|reaches a code host or a tracker directly| ref
   ses -->|touches what no rule allows| ref(["Refused at the operating system · security alert (CP-F11)"])
   ses -->|session budget reached| ho(["AG-62 · A hand-off note · a fresh session in the same workspace"])
   ses -->|fails| fl(["The task fails · never re-run · task failed alert"])
@@ -74,12 +75,13 @@ sequenceDiagram
   participant T as Invana's MCP tools
   E->>W: a session of a task's run · the runtime · the agent
   W->>W: the task's workspace — opened, or kept from the last session
-  W->>E: the agent's allow list for this session
-  E-->>W: generated from its Access Policies · the connection's credential
-  W->>S: fs/ · cmd/ · net/ rules · the credential injected
+  W->>E: start the session under its lease
+  E-->>W: the allow list from its Access Policies · a token for Invana's tools · a proxy token for the model · no credential
+  W->>S: fs/ · cmd/ · net/ rules · no code host · no credential
   S->>R: start the runtime in the workspace · the skills as folders
-  R->>T: read data
-  T-->>R: redacted by lineage · through the outbound check · ledgered
+  R->>T: read data · call an outside tool
+  T->>E: the engine's client calls with the connection it holds · policy · outbound check · ledger
+  T-->>R: redacted by lineage · outside text marked · ledgered
   R->>S: a file, a program, a host
   S-->>R: allowed · or refused at the operating system
   S->>E: a refusal — control.sandbox.refuse
@@ -101,14 +103,14 @@ sequenceDiagram
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table);
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue);
 this is what it means here.
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read Workers — groups, workers, the runtimes each carries, where work waits, coordinators, rate limits | Operator · Modeller · Admin | — |
-| Add workers · make or change a worker group, its runtimes among them · mint and revoke join keys · drain a worker or a group | Admin | Each act disabled — *Needs the Admin role — ask {admins}* |
-| Read a run's sessions on a worker — its workspace, the sandbox's refusals | The person behind the run · Admin; content as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | That a session ran and was refused; what it touched *withheld*, naming who may read it |
+| Read Workers — groups, workers, the runtimes each carries, where work waits, coordinators, rate limits | Read on `worker/<group>` | — |
+| Add workers · make or change a worker group, its runtimes among them · mint and revoke join keys · drain a worker or a group | Create on `worker/<group>` to add workers, make a group and mint a join key · Edit to change a group or its runtimes and revoke a join key · Manage to drain a worker or a group | Each act disabled — *Needs {permission} on worker/{group} — ask {who can grant}* |
+| Read a run's sessions on a worker — its workspace, the sandbox's refusals | None — the person behind the run · Read on `run/*`, with a logged reason; content as [AC-31](../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md) | That a session ran and was refused; what it touched *withheld*, naming who may read it |
 | Say what an agent may touch on a worker | The agent's Access Policies alone ([AC-37](../../../access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)); nothing on a worker grants | — |
 
 ## States
@@ -119,9 +121,9 @@ this is what it means here.
 | Empty after a filter | Workers filtered to a state none has: *No worker matches* |
 | Loading | The section opens at once; rows fill in place |
 | Has data | Each worker group with its workers, what each runs, where steps wait and how many workers would clear it |
-| Failed | A join that failed, naming the check; a lost worker, with how many steps were handed on; a step no group covers, naming the missing label; a session no group carries the runtime for, naming the runtime; a sandbox refusal, naming the file, program or host and the rule |
+| Failed | A join that failed, naming the check; a lost worker, with how many steps were handed on; a step no group covers, naming the missing label; a session no group carries the runtime for, naming the runtime; a sandbox refusal, naming the file, program or host and the rule; a worker call refused outside its lease, naming the run or secret |
 | Agent working or proposing | A run waiting names its position and what it waits behind; a session in a workspace names its runtime and its worker |
-| No access | Everything reads; every act is disabled — *Needs the Admin role — ask {admins}* |
+| No access | Everything reads; every act is disabled — *Needs {permission} on worker/{group} — ask {who can grant}* |
 
 ## Rules
 
@@ -130,7 +132,8 @@ this is what it means here.
 | A run waiting is not a run running | It holds no slot, uses no worker and costs nothing |
 | Questions go first | Work is taken in this order: a question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents). People whose work waits share the workers equally, by the person behind each run; an idle person's share is lent |
 | Waiting always says why | A waiting run names its position and what it waits behind — *a person is waiting* · *helper — counts as a run* · *schedule* — or the limit, the AI model's rate limit or the worker group |
-| Agents never start machines | Workers are added and scaled by a person; Invana says where steps wait and how many workers would clear them |
+| Agents never start or stop machines | Workers are added, scaled and drained by a person; Invana says where steps wait and advises, per group, how many workers to add or which idle ones to drain — it never starts or stops a machine on that advice |
+| Slots say how much work fits | A slot is one agent step a worker takes at once; Workers reads the slots of every worker together — total, busy, free — overall and per group |
 | Work goes by labels | A step goes to a worker group whose labels cover what its function needs; a step no live group covers waits, naming the missing label, then fails |
 | A worker dials out | Over HTTPS with its own credential; no inbound port, no database credential; it runs steps under the agent's access, never its own |
 | A worker carries runtimes | A worker group carries the runtimes an Admin installed on it — Invana's always, Claude Code and Codex when their runtime plugins are installed ([CP-64](../CP-F02-plugins-and-outside-tools/stories/CP-64-install-an-agent-runtime/story.md)). A session goes to a group that carries its agent's runtime and the `code` label; with none, it waits, naming the runtime, then fails |
@@ -138,10 +141,12 @@ this is what it means here.
 | The sandbox enforces the agent's policies | Every session on a worker runs inside a sandbox that enforces the agent's `fs/` · `cmd/` · `net/` rules at the operating system, whatever the runtime asks for ([AC-37](../../../access/features/AC-F02-access-policies/stories/AC-37-say-what-an-agent-may-touch-on-a-worker/story.md)); a refusal is recorded on the run and raises a security alert ([CP-F11](../CP-F11-ops-alerting/feature.md)). The sandbox only narrows: nothing on a worker grants |
 | Derived, never hand-kept | An outside runtime's own allow list is generated from the agent's Access Policies at the start of every session; a policy change reaches the next session |
 | Data only through Invana's tools | An outside runtime reaches data only through Invana's MCP tools — redacted by lineage, through the outbound check and ledgered at the tool ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md)); the sandbox limits its network to the agent's `net/` rules and the engine |
-| The credential is injected | The connection a session uses — a work connection, or the personal connection of the person who started the run ([CP-F02](../CP-F02-plugins-and-outside-tools/feature.md)) — is injected into the sandbox on the worker for that session only and never written to the workspace |
+| A sandbox holds no credential | Nothing a runtime can read — its environment, files, the process list, the workspace — holds a connection's credential, an AI model provider's key or the worker's own credential. An outside tool is called through Invana's MCP endpoint, whose client in the engine holds the agent's work connection and applies its policy, the outbound check and the ledger; a clone, a branch upload and a pull-request call are made by the worker's trusted process outside the sandbox ([CP-F12](../CP-F12-issue-trackers/feature.md#mechanisms)); the runtime's model is reached with a per-session proxy token through the AI model client. A connected code host or tracker is never a `net/` target of a session ([NFR-SEC-17](../../../../system-design.md#3-non-functional-requirements)) |
 | A failed task is never re-run | A task whose run fails closes *Failed*, raises a task failed alert and waits on a fix task; nothing re-runs it. A plan step's bounded `repeat` stays a step's signal inside a run and never re-runs a failed task |
 | A lost worker loses no work | No heartbeat for 30 s is lost; its steps go to another worker and run once |
-| Join keys are shown once | Scoped to one worker group, with an expiry and a cap on how many may join; revoking stops new joins; draining stops a worker after what it holds |
+| Join keys are shown once | Scoped to one worker group, with an expiry — 1 hour unless the Admin sets another — and a cap on how many may join — 1 unless the Admin sets another; revoking stops new joins; draining stops a worker after what it holds |
+| A join key never sits on a command line | *Run it* passes the key as an environment file, an environment variable set from a file, or a Kubernetes Secret — never as an argument a process list or a shell history keeps |
+| A worker acts only under its lease | Every worker call that starts a session, resolves a secret or posts an outcome names the lease it holds; the engine answers only when the lease is live, is this worker's, came from a queue its group serves, and — for a secret — the step's function declares that secret. What it unseals is good for that lease alone, once. A call outside a lease is refused, unseals nothing, is recorded on the worker and raises a security alert ([CP-F11](../CP-F11-ops-alerting/feature.md)) |
 | A library runs where it is installed | A library added in Agents (AG-F08) must be installed on the workers of the groups that run its functions; Workers shows which groups carry it |
 | The engine counts | Every number on Workers and Usage — busy, waiting, oldest, suggested — is stored by the engine; Studio only shows it |
 | Leans on | Limits and the session budget (CP-F04) · runs and their sessions (CP-F10) · plugins, runtime plugins and connections (CP-F02) · Access Policies and worker rules (AC-F02) · continuation (AG-F05) · alerts (CP-F11) |
@@ -170,8 +175,9 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | Table | Columns | Notes |
 |---|---|---|
 | `control_worker_pools` | `name` · `runs_on` (`docker` · `python` · `kubernetes`) · `labels` (`cpu` · `llm` · `egress` · `gpu` · `code`) · `slots_per_worker` (4) · `plugins` · `runtimes[]` (`claude_code` · `codex` — runtime plugins it carries; Invana's is always carried) · `secrets` (names only) · `egress` (outbound domains) · `min_workers` · `max_workers` · `set_by` (`hand` · `replicas`) · `replicas?` | A worker group; `name` unique for the deployment. `replicas` is what a person declared for a Kubernetes group — Invana never starts them |
-| `control_workers` | `pool_id` · `name` · `node` · `version` · `labels` · `plugins` · `runtimes[]` (each `name@version` it loaded) · `slots` · `slots_busy` · `cpu?` · `state` (`starting` · `busy` · `idle` · `draining` · `lost` · `stopped`) · `credential_hash` · `previous_credential_hash` · `credential_rotated_at` · `queue_worker_id` · `joined_via` · `joined_at` · `last_heartbeat_at` · `from_ip` · `redelivered` | One joined worker; `queue_worker_id` is the queue's own id for it |
-| `control_worker_events` | `pool_id` · `worker_id?` · `change` (`joined` · `lost` · `drained` · `stopped` · `replicas` · `changed` · `revoked`) · `detail` · `why` · `actor_id?` · `at` | A group's changes, newest first; append-only |
+| `control_workers` | `pool_id` · `name` · `node` · `version` · `labels` · `plugins` · `runtimes[]` (each `name@version` it loaded) · `region?` (a tag, set when it joins — [CP-F13](../CP-F13-data-stores/feature.md#rules)) · `slots` · `slots_busy` · `cpu?` · `state` (`starting` · `busy` · `idle` · `draining` · `lost` · `stopped`) · `credential_hash` · `previous_credential_hash` · `credential_rotated_at` · `queue_worker_id` · `joined_via` · `joined_at` · `last_heartbeat_at` · `from_ip` · `redelivered` | One joined worker; `queue_worker_id` is the queue's own id for it |
+| `control_worker_leases` | `id` · `worker_id` · `pool_id` · `queue` · `run_id` · `node_id` · `attempt` · `session_seq?` · `secrets_declared[]` (names the step's function declares) · `secrets_resolved[]` (names, each once) · `granted_at` · `expires_at` (the step's `timeout_s` and the queue-wait allowance) · `state` (`live` · `settled` · `lapsed`) | One row per step or session a worker leases; the only key to a session start, a secret and an outcome |
+| `control_worker_events` | `pool_id` · `worker_id?` · `change` (`joined` · `lost` · `drained` · `stopped` · `replicas` · `changed` · `revoked` · `refused_outside_lease`) · `detail` · `why` · `actor_id?` · `at` | A group's changes, newest first; append-only |
 | `control_worker_stats` | `pool_id` · `at` · `workers` · `starting` · `lost` · `slots` · `slots_busy` · `ready` · `oldest_s` · `envelopes` · `suggested` | Written every 30 s per group; every number Workers shows |
 | `control_worker_logs` | `worker_id` · `at` · `level` · `line` | A worker's recent log, kept beyond its process; trimmed to the newest 1,000 lines a worker |
 | `control_envelope_outcomes` | `idempotency_key` (`run_id:node_id:attempt`, the key) · `run_id` · `outcome` (`out` · `failure` · `needs_input` · `cannot_answer` · `converse`, with `_worker` — id · group · duration — and `_artifacts`) · `created_at` | A step's outcome as a worker posted it; the first one stands |
@@ -195,7 +201,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | The session budget | [CP-F04](../CP-F04-limits/feature.md#engine) |
 | `fs/` · `cmd/` · `net/` rules and `decide()` | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | The tasks a workspace belongs to, and their state | [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
-| Join keys — a service account's keys scoped to one group | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
+| The person who mints a join key, active or not | [AC-F03](../../../access/features/AC-F03-directory/feature.md#engine) |
 | Libraries a group must carry | [AG-F08](../../../../capabilities/agents/features/AG-F08-portable-agents-and-skills/feature.md#engine) |
 | Pauses — approvals, clarifications, verdicts — and who answers | [AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | History rows of every join, mint, drain, revoke and group change | [AC-F06](../../../access/features/AC-F06-history/feature.md#engine) |
@@ -210,13 +216,15 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | `GET /pools/{name}/events` | Its changes, newest first | CP-09 |
 | `POST /pools/{name}/drain` · `POST /{id}/drain` | Drain a group · a worker | CP-09 |
 | `GET /{id}` | One worker — what it runs now, steps this hour, failures, recent log | CP-09 |
-| `GET /capacity` | Per group: steps waiting, the oldest, workers, suggested, as last stored | CP-08 |
+| `GET /capacity` | Per group and overall: `slots` · `slots_busy` · `slots_free` · steps waiting · the oldest · workers · `idle` · `suggested` · `advice` (`add` · `drain` · `keep`) with `advice_count`, as last stored | CP-08 |
+| `GET /capacity/history` | Per group and overall over `window` (`1h` · `24h` · `7d`): the stored points of `control_worker_stats` — workers, `slots_busy`, steps waiting — and the `control_worker_events` inside the window, each with `why` and who | CP-08 |
 | `GET /work` | Runs by stage — started · admitted · running · waiting — each count as stored, each waiting run with its reason and how long; the order work is taken in and each person's share | CP-05 · CP-06 |
 | `GET /coordinators` | Each coordinator, its state, the runs it holds, when it last renewed | CP-07 |
 | `GET /join-keys` · `POST /pools/{name}/join-keys` · `POST /join-keys/{id}/revoke` | List keys (prefix, expiry, joined of cap, revoked) · mint one `{expires_at, cap}` → its secret once and the commands · revoke | CP-10 |
-| `POST /join` · `POST /heartbeat` · `POST /lease` · `POST /outcome` | The worker's own: join with a key, labels, plugins and runtimes → its credential · heartbeat · long-poll for one step (20 s) · post a step's outcome | CP-10 |
-| `POST /sessions/start` | The worker's own: `{run_id, seq}` → the session's allow list generated from the agent's Access Policies, the connection's credential for this session, the skills to copy in as folders, the MCP endpoint and a session token for Invana's tools | CP-65 |
-| `POST /sessions/refusal` · `POST /sessions/end` | The worker's own: a sandbox refusal `{run_id, seq, act, target, verb}` · a session's end `{run_id, seq, ended_because, tokens_in, tokens_out, model_reported, runtime_version}` | CP-65 |
+| `POST /join` · `POST /heartbeat` · `POST /lease` · `POST /outcome` | The worker's own: join with a key, labels, plugins and runtimes → its credential · heartbeat · long-poll for one step (20 s) → the envelope and its `lease_id` · post a step's outcome `{lease_id, …}` | CP-10 · CP-09 |
+| `POST /secrets/resolve` | The worker's own: `{lease_id, name}` → that secret, once, when the lease's function declares it; for the worker's trusted process, never a sandbox | CP-09 |
+| `POST /sessions/start` | The worker's own: `{lease_id}` → the session's allow list generated from the agent's Access Policies, the skills to copy in as folders, Invana's MCP endpoint with a token scoped to this run, and a per-session proxy token for the runtime's model — never a connection's or a provider's credential | CP-65 |
+| `POST /sessions/refusal` · `POST /sessions/end` | The worker's own: a sandbox refusal `{lease_id, act, target, verb}` · a session's end `{lease_id, ended_because, tokens_in, tokens_out, model_reported, runtime_version}` | CP-65 |
 | `GET /runs/{run_id}/refusals` | A run's sandbox refusals — the session, the act, the target, the rule and policy; content-gated as the run is | CP-65 |
 
 ### Events
@@ -229,29 +237,32 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | `control.coordinators.takeover` | A coordinator's lease lapses and another takes its runs |
 | `control.workspaces.open` · `.remove` | A task's workspace is made on a worker · removed |
 | `control.sandbox.refuse` | The sandbox refused an act — `run_id` · `session_seq` · `act` · `target` · `rule?` · `policy?`; CP-F11 raises a security alert from it |
+| `control.workers.refused` | A worker call outside a live lease of its own — `worker_id` · `route` · the run or secret it named · why (`no_lease` · `not_this_worker` · `not_this_group` · `lapsed` · `undeclared_secret` · `used`); CP-F11 raises a security alert from it |
 
 ### Refusals
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A group change, mint, revoke or drain by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-08.7 · CP-09.10 · CP-10.10 |
+| 403 | A group change, mint, revoke or drain without Create, Edit or Manage on `worker/<group>` | *Needs {permission} on worker/{group} — ask {who can grant}.* | CP-08.7 · CP-09.10 · CP-10.10 |
 | 409 | A group name already taken | *{name} is taken.* | CP-10.3 |
 | 422 | Labels outside `cpu` · `llm` · `egress` · `gpu` · `code` | *{label} is not a worker label.* | CP-10.3 |
 | 401 | A join with an expired, revoked or used-up key | *This join key {why}.* | CP-10.8 |
 | 422 | A join whose labels the group does not allow, or missing the group's plugins or runtimes | *{labels, plugins or runtimes} do not fit {group}.* | CP-10.8 · CP-10.15 |
 | 422 | A group given a runtime that is not installed, or an outside runtime without the `code` label | *{runtime} is not installed.* · *A group that carries {runtime} needs the code label.* | CP-10.14 |
 | 401 | A drained or stopped worker's credential | *This worker has stopped — join again.* | API only — the worker process reads it and exits |
+| 403 | A session start, a secret or an outcome with no live lease of this worker, from a queue its group does not serve, for a secret the step does not declare, or a second time | *{worker} holds no lease on {run} — refused and recorded.* | CP-09.18 |
 | step failed | No live group carries a step's labels past its allowance — `transient · worker_unavailable` | *No worker took this — no group carries {label}. Add workers: {command}.* | CP-04.16 · CP-08.5 · CP-16.8 |
 | step failed | A function `key@version` the process has not loaded — `defect · unknown_task_type` | *{key@version} is not loaded on {worker} — restart the workers with the engine.* | API only — an install fault named on the step |
 | step failed | No live group carries the session's runtime past the queue-wait allowance — `transient · runtime_unavailable` | *No worker carries {runtime} — install it on a worker group.* | CP-65.3 |
 | refused in the sandbox | A file, program or host no `fs/` · `cmd/` · `net/` rule of the agent allows, or one a rule denies | *The sandbox refused {act} {target} — {rule or *no rule allows it*}.* | CP-65.6 · AC-37.5 |
-| step failed | The session's connection cannot sign in | *{connection} cannot sign in — {why}.* | CP-65.9 |
+| refused in the sandbox | A connected code host's or tracker's address reached directly from a session, whatever a `net/` rule says | *A code host is reached only through Invana's tools.* | CP-65.18 |
+| step failed | The work connection the engine calls with for the session cannot sign in | *{connection} cannot sign in — {why}.* | CP-65.9 |
 
 ### CLI
 
 | Command | Does |
 |---|---|
-| `invana worker --engine --token --pool [--labels] [--slots] [--name]` | Join and run steps from the group's queues; env `INVANA_ENGINE_URL` · `INVANA_JOIN_TOKEN` · `INVANA_POOL` · `INVANA_LABELS` · `INVANA_SLOTS`; the image `invana/worker:<engine version>` runs the same |
+| `invana worker --engine --token-file --pool [--labels] [--slots] [--name]` | Join and run steps from the group's queues; the join key from `--token-file` or the env `INVANA_JOIN_TOKEN`, never an argument; env `INVANA_ENGINE_URL` · `INVANA_JOIN_TOKEN` · `INVANA_POOL` · `INVANA_LABELS` · `INVANA_SLOTS`; the image `invana/worker:<engine version>` runs the same with `--env-file` |
 | `invana worker install-service` | Prints a systemd or launchd unit for the same command |
 
 ### Mechanisms
@@ -269,7 +280,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | Cancellation | Cooperative: every step gets a cancel token and honours it at its await points; one that ignores it is cancelled at its `timeout_s`. Nothing new dispatches once a run is cancelling; cancelling cancels every descendant, each recorded; a cancelled child settles `cancelled` and its parent applies its edge rule |
 | Resume | On restart or a coordinator takeover, a `running` step closes `interrupted` and re-dispatches as a new attempt if its retry allows, else fails the run with a diagnosis; the frontier resumes from the database |
 | Opening a run | `triggered_by` `user` · `task` · `schedule` · `automation` (the automation and its event recorded) · `delegation` · `canvas` · `mcp` · `system`. The same call for every opener; the same `idem_key` twice returns the existing run |
-| Interactive runs | `run_inline` runs a committed run inside the caller's request — same plan, view, stream and trace, admission still applied; under contention a `canvas` run waits with a `user` run's precedence and a `system` run with a schedule's. Their cost is measured — runs a minute a person, rows and bytes a run, latency added, the window anyone reads — and turned down in order: coarser steps · shorter retention · prune steps and stream, keep the row · reference the plan and view, not copy them |
+| Interactive runs | `run_inline` runs a committed run inside the caller's request — same plan, stream and trace, admission still applied; under contention a `canvas` run waits with a `user` run's precedence and a `system` run with a schedule's. Their cost is measured — runs a minute a person, rows and bytes a run, latency added, the window anyone reads — and turned down in order: coarser steps · shorter retention · prune steps and stream, keep the row · reference the plan and view, not copy them |
 | A step travels as an envelope | `TaskEnvelope` — `run_id` · `node_id` · `attempt` · `plugin` (`name@version`) · `task` (`key@version`) · `args` (resolved, JSON only) · `actor_id?` · `behind_user_id`. No session, connection or secret rides it; the worker rebuilds the step's context from ids with the same `run_vars` the interpreter uses |
 | `run_envelope()` is the one call | In-process and on every worker; it applies `timeout_s` (`transient · task_timeout`); a `key@version` not loaded is `defect · unknown_task_type` before any context opens |
 | Idempotency | The key is `run_id:node_id:attempt`; redelivery keeps it, a retry the coordinator decides changes it; a key already in `control_envelope_outcomes` returns that outcome and runs nothing |
@@ -278,23 +289,28 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | The worker owns its transaction | It commits when the function returns, rolls back when it raises; it settles the step's row through the engine |
 | In-process by default | `INVANA_EXECUTOR` — `procrastinate` (default with PostgreSQL) sends steps to the queue · `inline` calls `run_envelope` in the API process. procrastinate is the `workers` extra, on the app's PostgreSQL, its tables applied by `invana migrate`; with any other database the engine refuses to start, naming `INVANA_EXECUTOR=inline` |
 | What stays in-process | A step that hands over through run vars rather than declared outputs — the import stages, the question-answering chain — runs in the engine until that state is an output |
-| Join | Checked in order — key, group, labels, plugins — and refused, making no worker, with the reason. A joined worker gets `invana_wkr_…`, stored as sha256, rotated hourly; the previous one stays valid until the next heartbeat |
+| Join | Checked in order — key, group, labels, plugins — and refused, making no worker, with the reason. A key's default expiry is 1 hour and its default cap 1. A joined worker gets `invana_wkr_…`, stored as sha256, rotated hourly; the previous one stays valid until the next heartbeat. The `invana_wkr_…` credential alone unseals nothing: every unseal also needs a live lease of that worker |
 | Heartbeat and loss | Every 2 s. A sweep every 5 s marks a worker silent 30 s `lost` and requeues its steps under the same idempotency key; a lost worker that heartbeats again is revived under a new `queue_worker_id` and runs none of them |
 | Drain | A draining worker takes no new step; when it reports no busy slot it is `stopped` and its credential refused |
 | Queues | A step's queue is `tools.<labels>` — its function's `resources`, sorted and joined by `+` (`tools.cpu`, `tools.cpu+gpu`) — one per label set and step class; a worker leases from every queue its labels cover. The step's frames land in the run's stream by run id |
 | The order work is taken | A question someone waits on · a project task picked up · batch (schedules, sweeps, runs past twenty agents); within a class first in, first served; a delegated child takes its parent's class. People whose work waits share the workers equally, by the person behind each run; an idle person's share is lent. Position is stored and readable |
 | Suggested | Steps ready ÷ steps a worker took over the last ten minutes, written to `control_worker_stats` every 30 s; clamped to the group's `min_workers` · `max_workers` and to the worker time an hour of each binding limit ([CP-F04](../CP-F04-limits/feature.md)). A step waiting on an AI model's rate limit is not counted |
-| Idle drain | A worker idle 5 minutes in a group above its `min_workers` is drained, then stopped; a person starts every machine |
+| Advice | `add` when `suggested` > workers, by the difference · `drain` when workers idle over the last ten minutes and `suggested` < workers, by the lesser of the idle count and workers − max(`suggested`, `min_workers`) · else `keep`. Stored with the stats every 30 s; advice never acts |
 | No group carries the label | Past the step's limit plus the queue-wait allowance, the step fails `transient · worker_unavailable`, naming the label and the command that adds a worker; the envelope stays queued |
 | A worker dials out | It long-polls `POST /lease` over HTTPS with its own credential: no inbound port, no database credential. It resolves only the secrets its step's function declares |
+| Leases | `POST /lease` writes a `control_worker_leases` row `live` and returns its id with the envelope. `sessions/start`, `secrets/resolve` and `outcome` load the lease under a lock and check, in order: it exists and is `live` before `expires_at` · its `worker_id` is the caller's · its `queue` is one the caller's group serves · for a secret, the name is in `secrets_declared` and not yet in `secrets_resolved`. Any failure answers 403, unseals nothing, writes `control_worker_events` `refused_outside_lease` and emits `control.workers.refused`. An outcome settles the lease; a lost worker's leases lapse and its steps requeue under new leases. This is the one-use grant per step |
 | One coordinator | The engine process whose `control_coordinators` row is `holding` hands out steps, renewing every 5 s; a lease unrenewed for 15 s lapses, another process takes it, woken by `LISTEN/NOTIFY`, and the lost one's runs resume from their last settled step |
 | Artifacts stay at home | A remote worker keeps artifacts in its own network; the engine holds each one's digest (CP-F10) |
 | A session on an outside runtime | A step whose agent runs with `claude_code` or `codex` ([AG-F01](../../../../capabilities/agents/features/AG-F01-build-an-agent/feature.md#engine)) goes to the queue `runtime.<name>`; a worker leases from it only when its group carries that runtime and the `code` label. Each lease is one session — a `control_run_sessions` row (CP-F10) |
 | The workspace | The first session of a task's run opens a `control_workspaces` row and a folder on the worker; a continuing session is leased first by the worker that holds the run's `kept` workspace, for the queue-wait allowance, then by any worker, which opens a fresh workspace and starts from the task's inputs and the hand-off note. The task closing removes it |
-| Starting a session | `POST /sessions/start` runs `decide()` for the agent over its `fs/` · `cmd/` · `net/` rules ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine)) and returns the allow list, generated for this session only; the connection's secret is unsealed for this session and injected into the sandbox's environment, never written to the workspace or the log. The runtime gets the agent's skills as folders ([AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md)) and Invana's MCP endpoint with a token scoped to this run, which every tool call carries |
+| Starting a session | `POST /sessions/start` checks the lease (*Leases*), runs `decide()` for the agent over its `fs/` · `cmd/` · `net/` rules ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine)) and returns the allow list, generated for this session only, with every connected code host's and tracker's address left out whatever a rule says. The runtime gets the agent's skills as folders ([AG-F04](../../../../capabilities/agents/features/AG-F04-skills/feature.md)), Invana's MCP endpoint with a token scoped to this run, which every tool call carries, and a per-session proxy token for its model. No connection's secret is unsealed to the worker for a session; the session's environment is built from an empty one, never the worker's |
+| Outside tools through the engine | A runtime's call to an outside tool goes to Invana's MCP endpoint; the engine's MCP client ([CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#engine)) makes it with the agent's work connection, under its Access Policy, through the outbound check, and ledgers it; its result returns marked as outside text ([NFR-SEC-15](../../../../system-design.md#3-non-functional-requirements)) |
+| Git by the trusted process | A code-host task's clone into the workspace, its branch upload and its pull-request calls run in the worker's trusted process, outside the sandbox, with the connection unsealed under that act's lease and dropped after it ([CP-F12 › The coding flow's writes](../CP-F12-issue-trackers/feature.md#mechanisms)) |
+| The model's proxy token | A runtime that reaches its model sends each call with a token minted for this session to the AI model client's proxy (NFR-SEC-3), which holds the provider key, applies the outbound check and the ledger, and refuses the token once the session ends |
+| The escape suite | Per runtime plugin: read the environment, `/proc`, the workspace, the runtime's config files and the process list for any credential; reach a connected code host or tracker directly. Every probe finds nothing or is refused (NFR-SEC-17 · NFR-SEC-14) |
 | The sandbox | The worker starts the runtime in an operating-system sandbox: the filesystem is the workspace, with `fs/` rules mapped to read or write paths inside it; a program runs only when a `cmd/` rule allows it; the network reaches only the hosts `net/` rules allow and the engine. An Ask rule pauses the session on an ask ([AC-F05](../../../access/features/AC-F05-asks-and-approvals/feature.md)); a refusal is posted to `POST /sessions/refusal`, written to `control_sandbox_refusals`, recorded on the run's trace and emitted as `control.sandbox.refuse` |
 | Data through Invana's tools | The runtime holds no graph database credential and no route to one; it reads data only through Invana's MCP tools, each call checked, redacted by lineage, through the outbound check and ledgered at the tool ([AC-F09](../../../access/features/AC-F09-what-left-the-platform/feature.md#engine)) |
-| A runtime's model | Where a runtime's model runs is its plugin's declaration (`model_runs` — [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#engine)); an `external` one makes every session's prompt an outbound exit through the outbound check. The session posts the model the runtime reports it ran on; the model set is the agent's pin |
+| A runtime's model | Where a runtime's model runs is its plugin's declaration (`model_runs` — [CP-F02](../CP-F02-plugins-and-outside-tools/feature.md#engine)); an `external` one makes every session's prompt an outbound exit through the outbound check. The runtime reaches it only with the session's proxy token, never the provider key. The session posts the model the runtime reports it ran on; the model set is the agent's pin |
 | A session ends | `POST /sessions/end` closes the `control_run_sessions` row with why — `finished` · `session_budget` · `stopped` · `failed` · `refused`. `session_budget` hands the run to continuation ([AG-F05](../../../../capabilities/agents/features/AG-F05-delegation-and-outside-agents/feature.md#engine)); `failed` fails the run, and a task's run that fails closes its task *Failed* ([PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine)) |
 
 ## System impact
@@ -303,24 +319,27 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 |---|---|---|
 | § 6 Data and storage | Nine runtime tables — workspaces and sandbox refusals among them; procrastinate's queue tables on the app's PostgreSQL | — |
 | § 7 Architecture and components | The runtime (planner, interpreter, executor) in the engine; workers as optional processes that dial out, carrying runtimes, a sandbox and a workspace per task | — |
-| § 8 APIs and events | `/api/v1/control/workers` routes, the worker's own seven, `control.workers.*`, `control.workspaces.*` and `control.sandbox.refuse` events | — |
+| § 8 APIs and events | `/api/v1/control/workers` routes, the worker's own eight — each that unseals or settles under a lease — `control.workers.*`, `control.workspaces.*` and `control.sandbox.refuse` events | — |
 | § 9 Distributed execution | Steps as envelopes over a procrastinate queue; one coordinator by lease; outcomes through a row; redelivery under one idempotency key; workers by label and by runtime; a session per lease | — |
 | § 10 AI and agents | Outside runtimes — Claude Code, Codex — run an agent's sessions on workers | — |
 | § 11 Failure modes and the outside boundary | A lost worker requeues its steps; a lost coordinator's runs move on; no worker for a label or a runtime fails, never hangs; a failed task is never re-run | — |
-| § 12 Qualities | Security: workers hold no database credential and no inbound port; secrets never ride an envelope; the sandbox enforces `fs/` · `cmd/` · `net/` at the operating system; a credential is injected per session | NFR-SEC-14 |
+| § 12 Qualities | Security: workers hold no database credential and no inbound port; secrets never ride an envelope; every unseal, secret and outcome is bound to a live lease of that worker; the sandbox enforces `fs/` · `cmd/` · `net/` at the operating system and holds no credential — outside tools through the engine, git by the trusted process, the model by a proxy token | NFR-SEC-14 · NFR-SEC-15 · NFR-SEC-17 · NFR-SEC-18 |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| Workers is the Control Plane's | One section with Workers · Where work waits · Join keys; a worker group or a worker opens in place, with a breadcrumb; Add workers is a modal |
+| Workers is a section of Settings | *Settings › Workers*, in the large modal — Groups · All workers · Queue · Limits · Alerts; join keys sit with Groups; a worker group or a worker opens in place and the path grows (*Workers / Groups / gpu-k8s*). Whether the workers keep up shows in the Agents glance ([CP-72](../CP-F10-runs-and-how-the-agents-are-doing/stories/CP-72-glance-at-the-agents-without-leaving-my-work/story.md)); workers by group — busy, idle, draining — and the queue's waiting and oldest also show in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)) |
+| Add workers is a 720 px modal with a step strip | Where · Group · Join key · Run it · Joined — the one create with a step strip, because a worker joins after the Admin runs the command |
 | Worker groups are the deployment's | An Admin names the groups a team, user or agent may use in its limits ([CP-F04](../CP-F04-limits/feature.md)); a heavy agent gets its own, others share |
 | Suggested is the engine's | Steps ready ÷ steps a worker took over the last ten minutes, every 30 s |
 | Every group is scaled by hand | Docker, Python or Kubernetes; Invana never starts a machine and holds no cloud keys |
 | Outside runtimes run on workers | Claude Code and Codex run an agent's sessions on a worker group that carries their runtime plugin, inside the sandbox, in the task's workspace — never in the engine serving Studio |
 | The sandbox is the last word on a worker | Whatever a runtime's own settings allow, the sandbox enforces the agent's `fs/` · `cmd/` · `net/` rules at the operating system; its allow list is generated each session, never kept by hand |
+| The sandbox holds no credential | A runtime that read a planted instruction could use any credential it can read against the host's whole API, past the adapter's seventeen methods; so outside calls go through the engine, git through the worker's trusted process and the model through a proxy token. The cost is one more hop for each outside call |
+| A worker unseals only under its lease | A worker's own credential proves who it is, not what it may hold; each unseal, secret and outcome names a live lease of that worker, used once, so a leaked worker credential or a compromised remote worker reaches nothing beyond the step it holds |
 | No retry for a task | A failed task alerts and waits on a fix task; re-running blind repeats what failed. A step's bounded `repeat` inside a run stays |
-| Scale-out keeps its pools, not an autoscaler | Pools carry the labels `cpu` · `llm` · `egress` · `gpu` · `code`, with one queue per label and step class (a question · a project task · batch). The engine's desired-workers figure — steps ready ÷ steps a worker runs at once — is clamped to the pool's min and max and to the worker time an hour of each binding limit; a worker idle 5 minutes is drained, then stopped. A person adds every machine; the engine shape is [Engine](#engine) |
+| Scale-out keeps its pools, not an autoscaler | Pools carry the labels `cpu` · `llm` · `egress` · `gpu` · `code`, with one queue per label and step class (a question · a project task · batch). The engine's desired-workers figure — steps ready ÷ steps a worker runs at once — is clamped to the pool's min and max and to the worker time an hour of each binding limit; it is advice only — a person adds every machine and drains every worker with *Drain*; the engine shape is [Engine](#engine) |
 
 ## Open questions
 

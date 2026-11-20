@@ -4,7 +4,7 @@ title: See each model's health
 feature: SE-F10
 status: idea
 personas: [modeller]
-boards: [model.health, model.board.draft]
+boards: [model.health, model.models]
 ---
 
 # SE-07 · See each model's health
@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [SE-F10](../../feature.md)
 
 ## Who can
 
-Acting on what Health finds is the Modeller's and the Admin's; a suggested index is the Admin's alone ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Acting on what Health finds needs Edit on `model/<model>`; a suggested index needs Edit on `setting/graph-databases` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Read every tab for all models or one, save a report, and act on what it finds — read the database, add a drift to a draft, add a suggested index to a draft (an Admin alone), archive a model | — |
-| Operator | Read every tab for all models or one, and save a report. A Modeller acts on drift, archives and restores as an Admin does; a suggested index stays an Admin's | The acts are absent; drift rows read *Needs the Modeller role — ask an Admin*; a suggested index reads *Needs the Admin role — ask an Admin* |
+| Admin | Read every tab for all models or one, save a report, and act on what it finds — read the database, add a drift to a draft, add a suggested index to a draft (with Edit on `setting/graph-databases`), archive a model | — |
+| Operator | Read every tab for all models or one, and save a report. With Edit on the model, acts on drift, archives and restores as an Admin does; a suggested index needs Edit on `setting/graph-databases` | The acts are absent; drift rows read *Needs Edit on the {model} model — ask {who can grant}*; a suggested index reads *Needs Edit on Graph database settings — ask {who can grant}* |
 
 ## Flow
 
@@ -47,29 +47,34 @@ flowchart LR
 | SE-07.3 | Health | the person picks 7, 30 or 90 days | every number re-reads over that window; Database greys the window and says it does not use it |
 | SE-07.4 | The Database tab | it opens | kinds of node, relationships, indexes and constraints each show *in both*, *model only* or *database only* with the database's count, unmodelled ones first, and the time the database was read |
 | SE-07.5 | A database never read, or read before the last load | Database opens | it reads *Not read yet*, or the read time in the warning tone, with *Read the database* |
-| SE-07.6 | A *database only* row and a Modeller or an Admin | they pick *Add it in a draft* | the kind or property is staged on the model's draft |
+| SE-07.6 | A *database only* row and a person with Edit on the model | they pick *Add it in a draft* | the kind or property is staged on the model's draft |
 | SE-07.7 | The Usage tab with 50 or more queries in the window | it opens | each kind carries its signals — Unused · Empty · Cold property · Hot · Hot and slow · Supernode — by the fixed rules, with queries split by agent · plan · Explore · API, last touched, and the links between models each query crossed |
 | SE-07.8 | Fewer than 50 queries in the window | Usage opens | it reads *n queries in 7 days — too few to call anything unused* and shows counts without signals |
 | SE-07.9 | The Performance tab | it opens | tiles — queries · p50 · p95 · errors · slow shapes · advice — p95 a day, and a row per query shape with callers, calls, p50, p95, rows, kinds touched and advice; a row opens its slowest calls, each linking to its run |
-| SE-07.10 | An index the engine suggests for a model's kind and an Admin | they pick *Add index to draft* | the index is staged on that model's draft; nothing is written to the database until it is published |
+| SE-07.10 | An index the engine suggests for a model's kind and a person with Edit on `setting/graph-databases` | they pick *Add index to draft* | the index is staged on that model's draft; nothing is written to the database until it is published |
 | SE-07.11 | A database that cannot explain queries or list its indexes | Performance or Database opens | that column or section says *not available on <database>*; cold properties are not called |
 | SE-07.12 | The Growth tab | it opens | records over time stack by model, or by kind for one model, moving only on days something wrote, each mark naming the read, load or link commit that wrote |
+| SE-07.26 | The Usage tab with 50 or more queries in the window | it opens | queries per kind draw as bars grouped by model, each kind marked with its signal — Unused · Hot — and the links between models crossed by no query listed beside them; *View as table* shows the same rows as a table |
+| SE-07.27 | A graph database that cannot explain queries | the Usage tab opens | counts, callers and *Unused* read as usual; the *Hot and slow* signal reads *not available on <database>* and no kind is called slow |
 | SE-07.13 | A published model with nothing loaded | Usage or Growth opens | it names the model with *Bring records in* — no chart of zeros |
 | SE-07.14 | No published model | Overview opens | it says so with *From an ontology* and *New model*; Usage, Performance and Growth say why they are empty |
 | SE-07.15 | A reading the engine does not measure yet | its tab opens | it reads *Not measured yet*, naming what it reads from |
 | SE-07.16 | Any tab | the person picks *Save report* | the tab's tiles and tables are kept at its scope and window; opened later it reads *Saved report · <what> · kept by <who> on <date> · it will not change* with *Back to live*, and a link lands on it |
-| SE-07.17 | A published model with no active link and a Modeller or an Admin | they archive it | it leaves the map and Health; its versions still resolve for every answer and load that used them; *Show archived* lists it with *Restore*. With an active link, archiving is refused, naming each link |
+| SE-07.17 | A published model with no active link and a person with Edit on the model | they archive it | it leaves the map and Health; its versions still resolve for every answer and load that used them; *Show archived* lists it with *Restore*. With an active link, archiving is refused, naming each link |
 | SE-07.18 | Any number on the page | it shows | it is the engine's, as stored; Studio formats it |
-| SE-07.19 | An Operator | they open Health | every tab reads; *Add it in a draft*, *Add index to draft*, *Read the database* and Archive are absent, and drift and advice rows read *Needs the Modeller role — ask an Admin* |
-| SE-07.20 | A model never published and a Modeller or an Admin | they delete it from its `⋯` | It is gone after a confirm; deleting a model that was ever published is refused, offering *Archive* |
+| SE-07.19 | An Operator | they open Health | every tab reads; *Add it in a draft*, *Add index to draft*, *Read the database* and Archive are absent, and drift and advice rows read *Needs Edit on the {model} model — ask {who can grant}* |
+| SE-07.20 | A model never published and a person with Edit on the model | they delete it from its `⋯` | It is gone after a confirm; deleting a model that was ever published is refused, offering *Archive* |
 | SE-07.21 | An active link | the Database tab lists the relationship it writes | The row is *in both*, naming the link's two models — never *database only* |
-| SE-07.22 | An archived model and a Modeller or an Admin | they restore it | It is back on the map with its versions; History records who restored it |
-| SE-07.23 | A Modeller | they open a suggested index | *Add index to draft* is absent and the row reads *Needs the Admin role — ask an Admin* |
+| SE-07.22 | An archived model and a person with Edit on the model | they restore it | It is back on the map with its versions; History records who restored it |
+| SE-07.23 | A person with Edit on the model, without Edit on `setting/graph-databases` | they open a suggested index | *Add index to draft* is absent and the row reads *Needs Edit on Graph database settings — ask {who can grant}* |
 | SE-07.24 | Questions that failed in the window — *cannot answer*, refused, or erroring | Performance opens for a model | each kind shows its failed questions with their reason, counted by the engine, each linking to its run |
+| SE-07.25 | A slow query shape whose plan the database can explain | its row opens | its advice names a faster way to reach the same records, each in one line with the step it would change — *add an index on Order.placed_at*, *start from the kind, not every node*, *bound this hop to 3*, *filter by relationship kind before expanding the supernode Airport*, *these two patterns multiply — join them on a key* — and only an index offers an act (*Add index to draft*); the rest is read by whoever writes the plan, the function or the query |
+| SE-07.28 | The models of a graph database | *Overview* is opened | one row per model reads its health, usage and speed, and what needs attention, each number the engine's; a row opens that model's health |
+| SE-07.29 | A graph database with no model yet | *Overview* is opened | it says *No models yet* with the way to make one (SE-06) |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Health · Overview | Admin | model.health · No model yet | model.health · Nothing in window | model.health · Loading | model.health | model.health · Could not load | — | — |
 | Health · Overview | Operator | model.health · No model yet | model.health · Nothing in window | model.health · Loading | model.health | model.health · Could not load | — | model.health · Read only |
@@ -83,5 +88,9 @@ flowchart LR
 | Health · Growth | Operator | model.health · Nothing loaded | model.health · Nothing in window | model.health · Loading | model.health · Growth | model.health · Not measured yet | — | model.health · Read only |
 | Saved report | Admin | — | — | model.health · Loading | model.health · Saved report | model.health · Could not load | — | — |
 | Saved report | Operator | — | — | model.health · Loading | model.health · Saved report | model.health · Could not load | — | — |
-| The draft · index or drift added | Admin | — | — | — | model.board.draft | — | — | — |
+| The draft · index or drift added | Admin | — | — | — | model.models · Draft | — | — | — |
 | The draft · index or drift added | Operator | — | — | — | — | — | — | — |
+| Health · Usage · slow signal | Admin | — | — | model.health · Loading | model.health · Usage · Not available | — | — | — |
+| Health · Usage · slow signal | Operator | — | — | model.health · Loading | model.health · Usage · Not available | — | — | model.health · Read only |
+| Models overview | Admin | model.models · Overview · No models yet | model.models · Overview · Nothing matches | model.models · Overview · Loading | model.models · Overview | model.models · Overview · Could not load | — | — |
+| Models overview | Operator | model.models · Overview · No models yet | model.models · Overview · Nothing matches | model.models · Overview · Loading | model.models · Overview | model.models · Overview · Could not load | — | model.models · Read only |

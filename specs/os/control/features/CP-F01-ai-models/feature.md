@@ -6,7 +6,7 @@ status: idea
 personas: [admin, builder]
 stories: [CP-01, CP-61]
 journeys: [J01, J07]
-boards: [settings.ai]
+boards: [settings.ai, access.signin]
 nfrs: [NFR-SEC-2, NFR-SEC-3, NFR-SEC-8, NFR-PERF-3, NFR-COST-1]
 depends_on: [AG-F01, AC-F09]
 ---
@@ -23,7 +23,7 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  s([Control Plane › AI models]) --> l["CP-01 · Every version · its endpoint · local or external · who pins it · status · the default"]
+  s([Settings › Connections › AI models]) --> l["CP-01 · Every version · its endpoint · local or external · who pins it · status · the default"]
   l -->|none yet| e["No endpoint · Add an endpoint"]
   l --> add["CP-01 · Add an endpoint: kind · name · its own fields · key"]
   add --> loc["CP-61 · Local or external — an outside provider is external"]
@@ -49,14 +49,13 @@ flowchart TD
 
 ## Access
 
-The role × feature table is [AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)
-(*Workers and the queue · limits · AI models · skill scripts*: Operator Reads · Modeller Reads · Admin Acts); this is
-what it means here.
+The permission each act needs is in [AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)
+(*Settings* and *AI models*); this table names the acts. *Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
 
-| Act | Role | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every endpoint, model version, local or external, status, the default and who pins it | Operator · Modeller · Admin | — |
-| Add, edit, rename or remove an endpoint · mark it local or external · ping it · offer or stop offering a version · choose the default | Admin, with the password again for a key or a change to local | *Add an endpoint* and each act disabled — *Needs the Admin role — ask {admins}*; the key is never shown |
+| Read every endpoint, model version, local or external, status, the default and who pins it | Read on `setting/ai-models` and `llm/<endpoint>/<version>` | — |
+| Add, edit, rename or remove an endpoint · mark it local or external · ping it · offer or stop offering a version · choose the default | Create on `setting/ai-models` to add; Edit on `setting/ai-models` to edit, rename, remove, mark, ping, offer, stop offering or choose the default — with the password again for a key or a change to local | *Add an endpoint* and each act disabled — *Needs Edit on AI model settings — ask {who can grant}*; the key is never shown |
 | Pin a version on an agent | As AG-29 | As AG-29 |
 
 ## States
@@ -149,7 +148,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Any write by anyone but an Admin | *Needs the Admin role — ask {admins}.* | CP-01.12 |
+| 403 | Any write without Create or Edit on `setting/ai-models` | *Needs Edit on setting/ai-models — ask {who can grant}.* | CP-01.12 |
 | 401 | Setting a key or marking an endpoint local without the password, with a wrong one, or with a key | *Enter your password again to do this.* | CP-61.6 |
 | 422 | An endpoint name outside `^[a-z0-9][a-z0-9_-]*$` | *Use lowercase letters, digits, hyphens and underscores.* | CP-01.9 |
 | 409 | An endpoint name already taken | *{name} is taken.* | API only — the form checks it as it is typed |
@@ -193,9 +192,10 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| AI models are the Control Plane's | *AI models* lists every endpoint and version; an endpoint's detail and adding one are modals |
+| AI models live in Settings › Connections › AI models | It lists every endpoint and version; an endpoint's detail is a modal; adding one is a create modal of numbered sections — name (optional), the provider as a card grid, its details | 
+| Health shows in Operations | Each pinned exact version's latency and error rate over the last hour reads in the Operations dropdown ([CP-70](../CP-F09-overview/stories/CP-70-see-what-the-deployment-is-doing-from-the-header/story.md)), computed by the engine |
 | Local is a claim the engine checks | An Admin says local; the engine believes it only while the address resolves inside the deployment |
-| One default model | With no per-question picker and no view of the graph, the default is what answers when an agent pins nothing |
+| One default model | With no per-question picker, the default is what answers when an agent pins nothing |
 | A ping is a run | Who proved an endpoint worked, when, and what it said, is a run like any other |
 | A model is ranked when offered | Cost and capability ranks come from the published rate; a deployment on a negotiated rate sets its own; a subscription endpoint ranks in the middle |
 | One model per call | No automatic failover — a silent switch changes what produced an answer |

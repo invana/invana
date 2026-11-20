@@ -8,8 +8,8 @@ personas: [analyst, builder, modeller, decision-maker, admin]
 
 # Graph Plane
 
-> What Invana reads and what it remembers: **Data** — the customer's Graph, read in place through a connector per
-> graph database, in each database's own language, joined across graph databases on identity links — and **Memory** —
+> What Invana reads and what it remembers: **Data** — the customer's Graph Data, read in place through a connector per
+> graph database, in each database's own language, each graph database's results kept apart — and **Memory** —
 > Invana's own graph of the work: activity, runs, sessions, hand-off notes, tasks, findings, decisions and their
 > relations, each with its lineage. The decision it helps make: *what does this answer rest on, and what has been
 > learned and decided before?*
@@ -27,7 +27,7 @@ followed back. Without one home for both, every capability reads the databases i
 
 | Persona | Comes here to |
 |---|---|
-| Analyst · Decision maker | Ask across every graph database as one Graph; follow a decision back to its sources in Memory; see what any copy was read from and know it shows only as far as their own agent may read |
+| Analyst · Decision maker | Ask Graph Data across every graph database their agent may read, each one's results side by side; follow a decision back to its sources in Memory; see what any copy was read from and know it shows only as far as their own agent may read |
 | Agent builder | See what agents' runs left in Memory, what served and what failed |
 | Modeller | Rely on one shape of answer from every connector while shaping the model across them |
 | Admin | Trust that every read is a read the database enforces, every raw query is checked and every call is recorded; the Admin's controls for graph databases are [CP-F05](../control/features/CP-F05-graph-databases/feature.md) |
@@ -43,23 +43,23 @@ followed back. Without one home for both, every capability reads the databases i
 
 | ID | Feature | Stories | Status |
 |---|---|---|---|
-| GP-F01 | [Data — the customer's Graph, read in place](features/GP-F01-data/feature.md) | GP-01 · GP-02 · GP-04 · GP-05 | idea |
+| GP-F01 | [Data — the customer's Graph Data, read in place](features/GP-F01-data/feature.md) | GP-01 · GP-02 · GP-04 · GP-05 | idea |
 | GP-F02 | [Memory — Invana's own graph of the work](features/GP-F02-memory/feature.md) | GP-03 · GP-06 · GP-07 | idea |
 
 ## Surfaces
 
 | Surface | Tier | Board |
 |---|---|---|
-| Memory — the thinking graph, a node and its sources | page | `agents.thinking` |
-| A copy's sources, and a copy redacted | panel | `graph.memory.lineage` |
-| A raw query refused or filtered | — | `explore.board.console` — the console is [EX-F03](../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)'s |
+| Memory — the thinking graph, a node and its sources | page | `graph.memory · Thinking` |
+| A copy's sources, and a copy redacted | panel | `graph.memory · Lineage` |
+| A raw query refused or filtered | — | `explore.board · Console` — the console is [EX-F03](../../capabilities/explore/features/EX-F03-ask-a-question/feature.md)'s |
 | A step through a connector | — | No board: the asking surface — Explore, a board, a run — is its own story's |
 
 ## Decisions
 
 | Decision | Detail |
 |---|---|
-| Two graphs, never mixed | **Data** is the customer's Graph: their records, read in place and never copied. **Memory** is Invana's own graph, held in the system graph: never customer data — record IDs and keyed hashes, never a record's values |
+| Two graphs, never mixed | **Data** is the customer's Graph Data: their records, read in place and never copied. **Memory** is Invana's own graph, held in the system graph: never customer data — record IDs and keyed hashes, never a record's values |
 | The Admin's controls stay in Control | Installing a connector, connecting a graph database, its mode, switches, health and practice graph databases are [CP-F05](../control/features/CP-F05-graph-databases/feature.md)'s; how a connector reads and writes is Data's |
 | Thinking stays in Agents | What an agent learns from Memory — recall, outcome labels, marks, evidence and suggested changes — is [AG-F09 · Learn from memory](../../capabilities/agents/features/AG-F09-learn-from-memory/feature.md)'s; Memory is the store it reads |
 | One memory, no team memory | Memory is one for the deployment: project memory sits on its project, agent learnings on their agent, org knowledge on the deployment. No team holds memory of its own |
@@ -74,14 +74,14 @@ followed back. Without one home for both, every capability reads the databases i
 |---|---|
 | Control Plane | The graph databases, their mode, switches and health ([CP-F05](../control/features/CP-F05-graph-databases/feature.md)); runs ([CP-F10](../control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 | Access Plane | The Access Policies every read and write passes ([AC-F02](../access/features/AC-F02-access-policies/feature.md)); the ledger ([AC-F09](../access/features/AC-F09-what-left-the-platform/feature.md)); History ([AC-F06](../access/features/AC-F06-history/feature.md)) |
-| Semantics | The published model a plan is checked against; the match rules identity links come from ([SE-F06](../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
+| Semantics | The published model a plan is checked against; links between models, inside one graph database ([SE-F06](../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md)) |
 | Agents · Projects | The runs, findings and decisions Memory holds ([AG-F06](../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md) · [PJ-F03](../../capabilities/projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) |
 
 ## Not building
 
 | Item | Why not |
 |---|---|
-| A copy of the customer's records | The Graph is read in place; Memory holds IDs and keyed hashes |
+| A copy of the customer's records | Graph Data is read in place; Memory holds IDs and keyed hashes |
 | Team-scoped memory | Memory is the deployment's; what a person reads of it follows run privacy and the agent's Access Policies |
 | A second memory store beside the system graph | One store, one truth, rebuilt from History |
 | A copy that shows without its sources | A copy with no recorded sources is not shown; no role overrides lineage |

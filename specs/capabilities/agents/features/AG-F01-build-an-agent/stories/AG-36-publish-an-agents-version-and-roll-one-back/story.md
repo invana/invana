@@ -4,7 +4,7 @@ title: Publish an agent's version and roll one back
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.agent, agents]
+boards: [agents.agents]
 ---
 
 # AG-36 · Publish an agent's version and roll one back
@@ -17,12 +17,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md) · Its evals: [
 
 ## Who can
 
-Publishing and rolling back is the Modeller's and the Admin's ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Publishing and rolling back needs Publish on `agent/<name>` ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Publish a version of any agent not built in, roll back to an earlier one | A built-in agent has no *Publish* — *Built in — copy it to change it* |
-| Operator | Read every version, its reason and its eval result. A Modeller does what an Admin does | *Publish* and *Roll back* disabled, naming the role — *Needs the Modeller role — ask an Admin* |
+| Operator | Read every version, its reason and its eval result. With Publish on the agent, does what an Admin does | *Publish* and *Roll back* disabled, naming the permission — *Needs Publish on the {agent} agent — ask {who can grant}* |
 
 ## Flow
 
@@ -43,7 +43,7 @@ flowchart LR
 
 | # | Given | When | Then |
 |---|---|---|---|
-| AG-36.1 | A draft | its sheet opens | the head reads *Draft* with *Run the evals* and *Publish version N*; Lifecycle reads the live version and since when, and this draft with how many changes it holds |
+| AG-36.1 | A draft | its page opens | the head reads *Draft* with *Run the evals* and *Publish version N*; Lifecycle reads the live version and since when, and this draft with how many changes it holds |
 | AG-36.4 | A draft whose eval run failed a hard check | the builder presses *Publish* | publishing is refused, naming the failing case and its check (AG-F10) |
 | AG-36.5 | A draft whose eval run warned | the builder publishes | they are asked for a reason, kept with the version |
 | AG-36.6 | A draft with no eval case | the builder publishes | it publishes, and the version says nothing was checked |
@@ -52,19 +52,23 @@ flowchart LR
 | AG-36.9 | Versions | the tab opens | every version with its date, who published it, its reason and its eval result; a voice change, a model move and an instructions publish each read as their own row |
 | AG-36.10 | An earlier version | the builder presses *Roll back* | it becomes a draft of the next version and passes the evals before it publishes, like any other |
 | AG-36.11 | A draft | anyone asks it, gives it a task, schedules it, delegates to it or makes it the default | it is refused, naming that it is a draft |
-| AG-36.14 | An Operator | they open a draft or Versions | the results and every version read; *Publish* and *Roll back* are disabled, naming the role — *Needs the Modeller role — ask an Admin* |
-| AG-36.17 | The command line | `invana agents push` writes a draft's instructions from a file and `invana agents publish` publishes it | each passes the same gate as Studio and needs the same role, refused naming it |
+| AG-36.14 | An Operator | they open a draft or Versions | the results and every version read; *Publish* and *Roll back* are disabled, naming the permission — *Needs Publish on the {agent} agent — ask {who can grant}* |
+| AG-36.17 | The command line | `invana agents push` writes a draft's instructions from a file and `invana agents publish` publishes it | each passes the same gate as Studio and needs the same permission, refused naming it |
 | AG-36.18 | A draft with active eval cases and no settled eval run over its exact text and model version, or one still running | the builder presses *Create*, *Publish* or *Roll back* | it is refused where the act was, naming the case count, with *Run the evals*; Studio never predicts the gate |
 | AG-36.19 | A draft with no Access Policy attached | the builder presses *Create* or *Publish* | it is refused — *may touch nothing — ask an Admin to attach an Access Policy* — and nothing goes live |
-| AG-36.20 | An Operator | they open Versions | every version reads; *Publish* and *Roll back* are disabled — *Needs the Modeller role — ask an Admin* |
+| AG-36.20 | An Operator | they open Versions | every version reads; *Publish* and *Roll back* are disabled — *Needs Publish on the {agent} agent — ask {who can grant}* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A draft's head and Lifecycle | Admin | agents.agent · Unchecked draft | — | agents.agent · Loading | agents.agent | agents.agent · Publish refused | agents.agent · Evals running | — |
-| A draft's head and Lifecycle | Operator | agents.agent · Unchecked draft | — | agents.agent · Loading | agents.agent · Read only | agents.agent · Publish refused | agents.agent · Evals running | agents.agent · Read only |
-| Versions | Admin | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | — |
-| Versions | Operator | agents.agent · Versions one | — | agents.agent · Loading | agents.agent · Versions | agents.agent · Could not load | — | agents.agent · Versions |
-| Agents — a draft in the list | Admin | — | agents · No agents match | agents · Loading | agents · Draft | — | — | — |
-| Agents — a draft in the list | Operator | — | agents · No agents match | agents · Loading | agents · Draft | — | — | agents · Draft |
+| A draft's head and Lifecycle | Admin | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Loading | agents.agents · Detail | agents.agents · Detail · Publish refused | agents.agents · Detail · Evals running | — |
+| A draft's head and Lifecycle | Operator | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Loading | agents.agents · Detail · Read only | agents.agents · Detail · Publish refused | agents.agents · Detail · Evals running | agents.agents · Detail · Read only |
+| Versions | Admin | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | — |
+| Versions | Operator | agents.agents · Detail · Versions one | — | agents.agents · Detail · Loading | agents.agents · Detail · Versions | agents.agents · Detail · Could not load | — | agents.agents · Detail · Versions |
+| Agents — a draft in the list | Admin | — | agents.agents · No agents match | agents.agents · Loading | agents.agents · Draft | — | — | — |
+| Agents — a draft in the list | Operator | — | agents.agents · No agents match | agents.agents · Loading | agents.agents · Draft | — | — | agents.agents · Draft |
+| Publish a version | Admin | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Evals running | agents.agents · Detail · Published | agents.agents · Detail · Publish refused | — | — |
+| Publish a version | Operator | agents.agents · Detail · Unchecked draft | — | agents.agents · Detail · Evals running | agents.agents · Detail · Published | agents.agents · Detail · Publish refused | — | — |
+| Roll back a version | Admin | agents.agents · Detail · Versions | — | agents.agents · Detail · Rolling back | agents.agents · Detail · Rolled back | agents.agents · Detail · Roll back refused | — | — |
+| Roll back a version | Operator | agents.agents · Detail · Versions | — | agents.agents · Detail · Rolling back | agents.agents · Detail · Rolled back | agents.agents · Detail · Roll back refused | — | agents.agents · Detail · Locked |

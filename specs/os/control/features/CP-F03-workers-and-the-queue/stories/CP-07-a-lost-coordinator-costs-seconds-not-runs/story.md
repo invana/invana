@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every coordinator, the runs it holds and when it last renewed | — |
 | Operator | Read every coordinator, the runs it holds and when it last renewed | — |
@@ -25,7 +25,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F03](../../feature.md)
 
 ```mermaid
 flowchart TD
-  s([Control Plane › Workers › Coordinators]) --> l["Each coordinator: runs it holds · last renewed"]
+  s([Settings › Workers › Queue › Coordinators]) --> l["Each coordinator: runs it holds · last renewed"]
   l -->|stops renewing| lost["Lost after 15 s"]
   lost --> mv(["Its runs move to another · resume from their last saved step"])
   l -->|only one| one["Runs here · a crash pauses work until it restarts"]
@@ -43,7 +43,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Coordinators | Admin | settings.workers · One coordinator | — | settings.workers · Loading | settings.workers · Coordinators | settings.workers · Coordinator lost | — | — |
 | Coordinators | Operator | settings.workers · One coordinator | — | settings.workers · Loading | settings.workers · Coordinators | settings.workers · Coordinator lost | — | — |

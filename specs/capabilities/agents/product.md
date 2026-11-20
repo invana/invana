@@ -54,14 +54,14 @@ again from nothing; a failed run nobody can open cannot be fixed; and what one r
 
 | Surface | Tier | Board |
 |---|---|---|
-| Agents | modal | `agents` |
-| An agent | sheet | `agents.agent` |
-| A new agent | modal | `agents.new` |
-| Skills · a skill | modal · sheet | `agents.skills` · `agents.skill` |
-| Workflows · functions | modal | `agents.skills` |
-| A workflow | sheet | `agents.workflow` |
-| The thinking graph — Memory, browsed ([GP-F02](../../os/graph/features/GP-F02-memory/feature.md)) | modal | `agents.thinking` |
-| Schedules | modal | `agents.schedules` |
+| Agents | mode | `agents.agents` |
+| An agent | mode | `agents.agents · Detail` |
+| A new agent | modal | `agents.agents · New` |
+| Skills · a skill | mode | `agents.skills` · `agents.skills · Detail` |
+| Workflows · functions | mode | `agents.skills` |
+| A workflow | mode | `agents.skills · Workflow` |
+| The thinking graph — Memory, browsed ([GP-F02](../../os/graph/features/GP-F02-memory/feature.md)) | modal | `graph.memory · Thinking` |
+| Schedules | mode | `agents.schedules` |
 
 ## Decisions
 

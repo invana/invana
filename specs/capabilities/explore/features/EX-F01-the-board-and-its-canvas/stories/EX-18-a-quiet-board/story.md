@@ -4,7 +4,7 @@ title: A quiet board
 feature: EX-F01
 status: idea
 personas: [analyst]
-boards: [explore.ask, explore.board, explore.board.left_closed, explore.board.menu]
+boards: [explore.board]
 ---
 
 # EX-18 · A quiet board
@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F01](../../feature.md)
 
 ## Who can
 
-The board is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); saving edits is *Edit on the board*.
+The board needs no permission of its own ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); saving edits is *Edit on the board*.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Every mode, every tool, every menu item on any board | — |
-| Operator | Look, pick a mode, open every menu on any board; a Modeller the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs the Modeller role — ask an Admin*. A link to a board that does not exist: *Not found* |
+| Operator | Look, pick a mode, open every menu on any board; with Edit on the graph database, the same, and also saves edits (EX-F06) | Edit and Annotate open; *Save n changes* is disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}*. A link to a board that does not exist: *Not found* |
 
 ## Flow
 
@@ -31,7 +31,7 @@ flowchart LR
   q -->|no| e["What it is for · Ask your first question"]
   q -->|yes| b["The row · the rail · the dock · the footer"]
   b -->|right-click a thing| m["Its menu: node · relationship · selection · board · minimap"]
-  m -->|an item the person may not take| dis["Disabled, naming the role, the missing agent or the rule"]
+  m -->|an item the person may not take| dis["Disabled, naming the permission, the missing agent or the rule"]
   b -->|mode picker| md{Mode}
   md -->|Focus| f["The drawing alone · the picker fades"]
   md -->|Edit · Annotate| w["The board ringed · the mode's tools"]
@@ -53,17 +53,17 @@ flowchart LR
 | EX-18.7 | A board in Edit or Annotate | it is open | the board is ringed — Edit in the primary colour, Annotate in the warning colour — and the mode is not saved with the board |
 | EX-18.8 | No board open | the person opens Explore | the board is one question box, *What do you want to know?*, with their boards under it — never a blank grid |
 | EX-18.9 | The board is slow to draw a large answer | the solve runs past 400 ms | the footer counts it and one toast says the graph appears when it settles, with *Cancel* |
-| EX-18.10 | An Operator | they open every menu | every look and arrange item works; an item their role does not hold is disabled, naming the role it needs |
+| EX-18.10 | An Operator | they open every menu | every look and arrange item works; an item whose permission they do not hold is disabled, naming the permission it needs |
 | EX-18.11 | An answer of 100,000 nodes | it draws | the count shows first, and pan and zoom keep answering while it draws |
 | EX-18.12 | A board that does not exist, or was deleted | a person opens its address | it reads *Not found* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The board | Admin | explore.ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | — |
-| The board | Operator | explore.ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | explore.board · No access |
-| The left section collapsed | Admin | — | — | — | explore.board.left_closed | — | — | — |
-| The left section collapsed | Operator | — | — | — | explore.board.left_closed | — | — | — |
-| A right-click menu | Admin | — | — | — | explore.board.menu | — | — | — |
-| A right-click menu | Operator | — | — | — | explore.board.menu | — | — | explore.board.menu · No access |
+| The board | Admin | explore.board · Ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | — |
+| The board | Operator | explore.board · Ask | explore.board · Empty after a filter | explore.board · Loading | explore.board | explore.board · Failed | explore.board · Agent working | explore.board · No access |
+| The left section collapsed | Admin | — | — | — | explore.board · Left closed | — | — | — |
+| The left section collapsed | Operator | — | — | — | explore.board · Left closed | — | — | — |
+| A right-click menu | Admin | — | — | — | explore.board · Menu | — | — | — |
+| A right-click menu | Operator | — | — | — | explore.board · Menu | — | — | explore.board · Menu · No access |

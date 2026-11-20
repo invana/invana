@@ -3,8 +3,9 @@ id: EX-04
 title: See how the answer got here
 feature: EX-F04
 status: idea
+milestone: MVP
 personas: [analyst, decision-maker]
-boards: [explore.board.why, agents.run.answer, projects.task.thinking]
+boards: [explore.board, agents.runs, projects.tasks]
 ---
 
 # EX-04 · See how the answer got here
@@ -16,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F04](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Open *Why?* and *How it got here* on any answer; copy a compiled query and run it in the composer through the Query console | — |
-| Operator | The same on an answer they may read — their own, or one shared with them; running a copied query needs the Query console; a Modeller the same ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *the answer*) | Another person's answer: that it ran, its status and its tokens — the trace reads *Content withheld* ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
+| Operator | The same on an answer they may read — their own, or one shared with them; running a copied query needs the Query console; the same for every holder ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *the answer*) | Another person's answer: that it ran, its status and its tokens — the trace reads *Content withheld* ([CP-F10](../../../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md)) |
 
 ## Flow
 
@@ -33,7 +34,6 @@ flowchart LR
   st -->|understanding| u["What was sent · what it settled"]
   st -->|the plan| pl["The typed plan · the check per kind and graph database"]
   st -->|a compiled query| q["Exactly as run, on its graph database · copy · run it yourself"]
-  st -->|the join| j["Rows joined on identity links · how many crossed"]
   st -->|reading| rows["Rows read → a record → its load"]
   st -->|a delegated run| child["Collapsed · the child agent named"]
   run -->|purged| pg["Steps and counts stay · payloads say purged"]
@@ -58,16 +58,20 @@ flowchart LR
 | EX-04.11 | A run older than its payloads' window | the person opens it | the steps and their counts show, and each payload says it was purged |
 | EX-04.12 | A task an agent ran | the person opens it in Projects | the same trace is reached from the task |
 | EX-04.13 | A person who may read the answer | they open the trace | they see its prompts, plan and queries; nothing in it can be edited. A person who may not read it gets *Content withheld* in Studio and *Not found* from the API |
-| EX-04.14 | An answer joined across two graph databases | the person opens the join step | it shows each step's graph database and row count, the identity links that joined them and how many rows crossed |
-| EX-04.15 | A step that called an AI model | the person opens it | it says whether the call was schema-only or data-bearing, whether the model is local or external, and what it recorded in *What left the platform* ([AC-F09](../../../../../../os/access/features/AC-F09-what-left-the-platform/feature.md)) |
+| EX-04.14 | An answer that read two graph databases | the person opens its run | it shows one query step per graph database, each naming its graph database and its row count, and no join step |
+| EX-04.15 | A step that called an AI model | the person opens it | it says whether the call was schema-only or data-bearing, whether the model is local or external, and what it recorded in History |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Why? | Admin | — | — | explore.board.why · Loading | explore.board.why | explore.board.why · Purged | — | — |
-| Why? | Operator | — | — | explore.board.why · Loading | explore.board.why | explore.board.why · Purged | — | — |
-| The run's trace | Admin | — | — | agents.run.answer · Loading | agents.run.answer | agents.run.answer · Step failed | agents.run.answer · Running | — |
-| The run's trace | Operator | — | — | agents.run.answer · Loading | agents.run.answer | agents.run.answer · Step failed | agents.run.answer · Running | agents.run.answer · Content withheld |
-| The trace on a task | Admin | — | — | projects.task.thinking · Loading | projects.task.thinking | projects.task.thinking · Step failed | projects.task.thinking · Working | — |
-| The trace on a task | Operator | — | — | projects.task.thinking · Loading | projects.task.thinking | projects.task.thinking · Step failed | projects.task.thinking · Working | — |
+| Why? | Admin | — | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
+| Why? | Operator | — | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
+| The run's trace | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | — |
+| The run's trace | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |
+| The trace on a task | Admin | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Step failed | projects.tasks · Detail · How it got here · Working | — |
+| The trace on a task | Operator | — | — | projects.tasks · Detail · How it got here · Loading | projects.tasks · Detail · How it got here | projects.tasks · Detail · How it got here · Step failed | projects.tasks · Detail · How it got here · Working | — |
+| Why? · from an answer | Admin | explore.board · Answered | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
+| Why? · from an answer | Operator | explore.board · Answered | — | explore.board · Why · Loading | explore.board · Why | explore.board · Why · Purged | — | — |
+| Why? · open its run | Admin | explore.board · Why | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Step failed | — | — |
+| Why? · open its run | Operator | explore.board · Why | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer | agents.runs · Detail · Answer · Step failed | — | — |

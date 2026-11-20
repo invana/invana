@@ -3,6 +3,7 @@ id: CP-01
 title: Offer the model versions agents may pin
 feature: CP-F01
 status: idea
+milestone: MVP
 personas: [admin]
 boards: [settings.ai]
 ---
@@ -17,16 +18,16 @@ Tasks: [task.md](task.md) · Feature: [CP-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add, edit, rename and remove an endpoint; ping it; offer and stop offering a version; make one the default | — |
-| Operator | Operator · Modeller: read every endpoint, version, local or external, status, the default and who pins it ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)) | *Add an endpoint*, *Ping* and each act disabled — *Needs the Admin role — ask {admins}*; keys are never shown |
+| Admin | With Create or Edit on `setting/ai-models`: add, edit, rename and remove an endpoint; ping it; offer and stop offering a version; make one the default | — |
+| Operator | Read every endpoint, version, local or external, status, the default and who pins it ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | *Add an endpoint*, *Ping* and each act disabled — *Needs Edit on AI model settings — ask {who can grant}*; keys are never shown |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Control Plane › AI models]) --> l["Versions: exact name · endpoint · local or external · pinned by · status · Default"]
+  s([Settings › Connections › AI models]) --> l["Versions: exact name · endpoint · local or external · pinned by · status · Default"]
   l -->|no endpoint| e["Add an endpoint"]
   e --> k["Kind → its own fields · name · key"]
   k --> loc["Local or external · CP-61"] --> sv(["Saved"]) --> p{"Ping"}
@@ -62,7 +63,7 @@ flowchart TD
 | CP-01.9 | An endpoint name | it is not lowercase letters, digits, hyphens and underscores | it is refused — *Use lowercase letters, digits, hyphens and underscores* |
 | CP-01.10 | A provider that rate-limits, a local model that is not running, or a rotated key | a run calls it | the run fails, naming the endpoint and the provider's message — never as *cannot answer* |
 | CP-01.11 | A ping | it runs | it is a run; History records who pinged, when and the result (AC-F06) |
-| CP-01.12 | An Operator or a Modeller | they open AI models, or call a write route | everything reads but keys; *Add an endpoint*, *Ping* and every act are disabled — *Needs the Admin role — ask {admins}* — and the route answers 403 |
+| CP-01.12 | An Operator | they open AI models, or call a write route without Create or Edit on `setting/ai-models` | everything reads but keys; *Add an endpoint*, *Ping* and every act are disabled — *Needs Edit on AI model settings — ask {who can grant}* — and the route answers 403 |
 | CP-01.13 | A model version | it is read | it shows *Local* or *External*, its endpoint's mark (CP-61) |
 | CP-01.14 | An Admin | they make an offered version the *Default* | it reads *Default* and no other version does; an agent that pins none runs on it |
 | CP-01.15 | An endpoint marked local | a call goes to it | it counts as local only when the engine resolves its address to loopback or a private network at that call, rebinding checked; one that resolves elsewhere is treated as external, and *What left the platform* records it so (CP-61 · AC-F09) |
@@ -73,12 +74,19 @@ flowchart TD
 | CP-01.20 | An Admin | they remove an endpoint | it is refused while something pins one of its versions or one is the default — *{address} is named by {pins}*; otherwise the endpoint and its versions are removed |
 | CP-01.21 | Anyone on the command line | they run `invana llms list` or `invana llms models` | the endpoints, their model versions and local or external read as the section shows them, never a key |
 | CP-01.22 | An agent that pins no version, with no default set | a person asks a question or an agent run starts | it is refused before the run starts — *No AI model answers — ask {admins}* |
+| CP-01.23 | An endpoint saved | *Save and ping* is pressed | *Pinging* reads, then *Proven* with *Open*, which opens the endpoint on its *Locality*; a failure reads *Ping failed* with the provider's message and keeps *Back* and *Ping again* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | AI models | Admin | settings.ai · No endpoint | settings.ai · Nothing matches | settings.ai · Loading | settings.ai | settings.ai · Withdrawn | — | — |
 | AI models | Operator | settings.ai · No endpoint | settings.ai · Nothing matches | settings.ai · Loading | settings.ai · Read only | settings.ai · Withdrawn | — | settings.ai · Read only |
-| An endpoint | Admin | settings.ai · Add an endpoint | — | settings.ai · Pinging | settings.ai · Endpoint | settings.ai · Ping failed | — | — |
+| Add an endpoint · 1 Name · 2 Kind · 3 Its fields | Admin | settings.ai · New | — | — | settings.ai · New · Kind picked | — | — | — |
+| Add an endpoint · 1 Name · 2 Kind · 3 Its fields | Operator | — | — | — | — | — | — | settings.ai · Read only |
+| Add an endpoint · saved and pinged | Admin | — | — | settings.ai · New · Pinging | settings.ai · New · Proven | settings.ai · New · Ping failed | — | — |
+| Add an endpoint · saved and pinged | Operator | — | — | — | — | — | — | settings.ai · Read only |
+| An endpoint | Admin | — | — | settings.ai · Pinging | settings.ai · Endpoint | settings.ai · Ping failed | — | — |
 | An endpoint | Operator | — | — | settings.ai · Loading | settings.ai · Endpoint · Read only | settings.ai · Ping failed | — | settings.ai · Read only |
+| Add an endpoint · Open | Admin | — | — | — | settings.ai · Endpoint · Locality | — | — | — |
+| Add an endpoint · Open | Operator | — | — | — | — | — | — | settings.ai · Read only |

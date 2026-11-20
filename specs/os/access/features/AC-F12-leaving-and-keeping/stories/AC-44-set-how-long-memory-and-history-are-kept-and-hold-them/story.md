@@ -2,9 +2,9 @@
 id: AC-44
 title: Set how long memory and History are kept, and hold them
 feature: AC-F12
-status: idea
+status: later
 personas: [admin]
-boards: [settings.keeping, access.locked]
+boards: [settings.keeping]
 ---
 
 # AC-44 · Set how long memory and History are kept, and hold them
@@ -17,16 +17,16 @@ Tasks: [task.md](task.md) · Feature: [AC-F12](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read and set each store's period, or *Keep*; place and lift a legal hold on memory or History, with a reason. Each change asks them to sign in again | — |
-| Operator | Read each store's period, the holds and who set them; a Modeller reads the same | *Set*, *Place a hold* and *Lift* disabled — *Needs the Admin role — ask Priya or Lee* |
+| Operator | Read each store's period, the holds and who set them | *Set*, *Place a hold* and *Lift* disabled — *Needs Edit on Retention settings — ask Priya or Lee* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Settings › People and access › Leaving and keeping]) --> l["Each store: period · set by · last pruned · held"]
+  s([Access › Keeping]) --> l["Each store: period · set by · last pruned · held"]
   l -->|not an Admin| ro(["Reads · acts disabled, naming the Admins"])
   l -->|Set| p{"Keep · or a number of days"}
   p -->|under a day| r1["Refused · keep at least a day"]
@@ -54,17 +54,17 @@ flowchart TD
 | AC-44.7 | A store on hold | its prune comes, or someone forgets a subject or a person leaves | no prune runs on it; forgetting is refused (AC-46.6); a departed person's erasure from memory waits, reading *Waiting for the hold on memory to lift* (AC-45.6) |
 | AC-44.8 | A store already on hold | an Admin places another hold on it | it is refused — *{store} is already on hold* |
 | AC-44.9 | A hold | an Admin lifts it and signs in again | the store's prunes resume and every erasure waiting on it runs, oldest first; History records who lifted it and when |
-| AC-44.10 | An Operator or a Modeller | they open *Leaving and keeping* | each store, hold and setting reads; *Set*, *Place a hold* and *Lift* are disabled, naming the Admin role and the Admins; the API refuses the write |
+| AC-44.10 | A person without Edit on `setting/retention` | they open *Leaving and keeping* | each store, hold and setting reads; *Set*, *Place a hold* and *Lift* are disabled, naming Edit on `setting/retention` and who can grant it; the API refuses the write |
 | AC-44.11 | A retention or hold change made with a key | it is sent | it is refused — it needs a person's session |
-| AC-44.12 | The settings could not load or save | the sheet opens or a change is sent | it reads what failed, with *Try again*; nothing changes |
+| AC-44.12 | The settings could not load or save | the section opens or a change is sent | it reads what failed, with *Try again*; nothing changes |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Stores and holds | Admin | settings.keeping · Keep everything | — | settings.keeping · Loading | settings.keeping | settings.keeping · Could not load | settings.keeping · Waiting on a hold | — |
-| Stores and holds | Operator | access.locked · Keeping · Keep everything | — | access.locked · Keeping · Loading | access.locked · Keeping | access.locked · Keeping · Could not load | access.locked · Keeping · Waiting on a hold | access.locked · Keeping |
+| Stores and holds | Operator | settings.keeping · Locked · Keeping · Keep everything | — | settings.keeping · Locked · Keeping · Loading | settings.keeping · Locked · Keeping | settings.keeping · Locked · Keeping · Could not load | settings.keeping · Locked · Keeping · Waiting on a hold | settings.keeping · Locked · Keeping |
 | Set a period — preview | Admin | — | — | settings.keeping · Counting | settings.keeping · Preview | settings.keeping · Under a day | — | — |
-| Set a period — preview | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Set a period — preview | Operator | — | — | — | — | — | — | settings.keeping · Locked · Keeping |
 | Place or lift a hold | Admin | — | — | — | settings.keeping · Hold | settings.keeping · Already held | — | — |
-| Place or lift a hold | Operator | — | — | — | — | — | — | access.locked · Keeping |
+| Place or lift a hold | Operator | — | — | — | — | — | — | settings.keeping · Locked · Keeping |

@@ -3,6 +3,7 @@ id: CP-39
 title: Switch a graph database on or off
 feature: CP-F05
 status: idea
+milestone: MVP
 personas: [admin, analyst]
 boards: [settings.databases]
 ---
@@ -17,9 +18,9 @@ Tasks: [task.md](task.md) · Feature: [CP-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Turn a graph database on or off for the deployment; turn one off or on for their own runs | — |
+| Admin | With Edit on `setting/graph-databases`: turn a graph database on or off for the deployment; turn one off or on for their own runs | — |
 | Operator | Turn a graph database off, or back on, for the runs they are behind | The deployment's switch reads, with who set it and when; it reads *Ask an Admin* |
 
 ## Flow
@@ -54,10 +55,15 @@ flowchart TD
 | CP-39.8 | A schedule whose work needs a graph database that is off | it fires | it skips the firing and raises an ops alert to its creator and the Admins |
 | CP-39.9 | A workflow whose steps name a graph database that is off | the list of workflows reads | it is flagged, naming the graph database, and its runs are refused until it is on |
 | CP-39.10 | A person's own switch | another person's run reads the graph database | it is unaffected |
+| CP-39.11 | An Admin | they turn a graph database off for the deployment | its row reads *Off for the deployment*, naming who and when; turning it on again reads *On*; a refusal reads *Could not switch* and the switch is unchanged |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Switches in the list | Admin | settings.databases · New and off | — | settings.databases · Loading | settings.databases | settings.databases · Could not switch | — | — |
 | Switches in the list | Operator | settings.databases · New and off · Read only | — | settings.databases · Loading | settings.databases · My switch | settings.databases · Off for the deployment | — | settings.databases · Read only |
+| Switch off for the deployment | Admin | — | — | settings.databases · Loading | settings.databases · Off for the deployment | settings.databases · Could not switch | — | — |
+| Switch off for the deployment | Operator | — | — | — | — | — | — | settings.databases · Read only |
+| Switch on | Admin | — | — | settings.databases · Loading | settings.databases · On | settings.databases · Could not switch | — | — |
+| Switch on | Operator | — | — | — | — | — | — | settings.databases · Read only |

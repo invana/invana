@@ -314,6 +314,24 @@ rewrites the report but adds a row to its `## Rounds` table, so an earlier FAIL 
 | `## Checked` (QA, security) | Each check run: the criterion, board or scanner (with its version) · the command or screenshot · its result. A check not run is a `note`, never a pass; a PASS without this section is not a PASS |
 | `## Requests` | The table above: To · Type · About · Ask · Recommend · Blocking |
 | `## Rounds` | One row per run of this report: round · RESULT · blockers — never rewritten |
+| `## Review links` | Every report that drew, changed, checked or names a board: one row per board, flow, journey or page — What · Link · Set (the View · State · Lens to switch to) |
+
+### Links
+
+Ravi never searches the canvas or the folders for what he must review: every report, hand-back, project-lead update and
+reply that names a design or a report carries its link.
+
+| Names | Link |
+|---|---|
+| A board | `https://claude.ai/artifact/PgtkC6KygGZz2u8fYq1LWX#artboard-<board>` — the board id with each `.` as `-`: `settings.workers` → `#artboard-settings-workers` |
+| A flow or journey to click through | `…#play-<board>` — `flow.add_workers` → `#play-flow-add_workers` |
+| A canvas page | `…#page-<id>` — the page id in `project/canvas.json` |
+| A state | The link opens the board, not its state: add the switches to set — `View · State · Lens`, e.g. *Detail · Test failed · Operator* |
+| A report | A markdown link from the repo root — `[platform-design-3-gaps](.agent-reports/project-lead/platform-design-3-e2e-gaps.md)` — first in the hand-back, before its summary |
+| A spec or project file | A markdown link from the repo root, with the section or row ID |
+
+The canvas is the one in `specs/design-language.md` and the project's *References*; a board on another canvas carries
+that canvas's URL with the same anchors.
 
 ## 4. When to stop and ask Ravi
 

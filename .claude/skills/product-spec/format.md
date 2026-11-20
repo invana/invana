@@ -43,7 +43,7 @@ specs/
 | Acceptance criterion | `<story>.<n>` | `RC-08.2` |
 | Journey | `J<nn>` | `J02` |
 | Non-functional requirement | `NFR-<PILLAR>-<n>` — `REL` · `SEC` · `PERF` · `COST` · `OPS` · `SUS` · `UX` | `NFR-PERF-2` |
-| Board | `area.feature.surface.variant`, lower snake | `model.kind.load_data.map` |
+| Board | `area.feature`, lower snake, one per place — a cell reads `<board> · <view or overlay> · <state>` (`specs/design-language.md` §7) | `model.kinds · Detail · Edit` |
 
 - An ID is never reused. A deleted story's ID stays retired.
 - Numbers are assigned in order of creation, not in reading order.
@@ -120,7 +120,7 @@ it, empty, with the story; each role adds its own rows when the story reaches it
 |---|---|
 | Product | `id · title · status · owner · personas` |
 | Feature | `id · title · product · status · personas · stories · journeys · boards · nfrs · depends_on` |
-| Story | `id · title · feature · status · personas · boards` |
+| Story | `id · title · feature · status · personas · boards` · optional `milestone` (one ID of `specs/milestones.md`; none when `later`) |
 | Journey | `id · title · personas · stories · boards` |
 
 The front-matter is what `check.py` reads to build the index and to catch broken links. Keep it in step with the body.

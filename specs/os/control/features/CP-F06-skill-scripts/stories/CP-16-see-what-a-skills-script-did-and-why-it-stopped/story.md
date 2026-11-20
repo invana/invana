@@ -4,7 +4,7 @@ title: See what a skill's script did and why it stopped
 feature: CP-F06
 status: idea
 personas: [builder, admin]
-boards: [agents.run, agents.skill]
+boards: [agents.runs, agents.skills]
 ---
 
 # CP-16 · See what a skill's script did and why it stopped
@@ -16,12 +16,12 @@ Tasks: [task.md](task.md) · Feature: [CP-F06](../../feature.md)
 
 ## Who can
 
-Running a test is the Modeller's and the Admin's ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); a script step reads as the run's content does (AC-31), the role adding none.
+Running a test needs Run on `skill/<name>` ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); a script step reads as the run's content does (AC-31), the permission adding none.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the script steps of a run whose content they may read; run a test of a draft that calls a script | A run whose content they may not read: a script step shows only that it ran, its status and its time |
-| Operator | Read the script steps of a run whose content they may read — one they are behind, or a project's run whose sources their default agent may read (AC-31) | *Run a test* disabled — *Needs the Modeller role — ask Priya or Lee*; with the Modeller role, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
+| Operator | Read the script steps of a run whose content they may read — one they are behind, or a project's run whose sources their default agent may read (AC-31) | *Run a test* disabled — *Needs Run on the {name} skill — ask {who can grant}*; with Run on the skill, as Admin for their own drafts. On any other run a script step shows only that it ran, its status and its time |
 
 ## Flow
 
@@ -57,11 +57,11 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A script step on a run | Admin | — | — | agents.run · Loading | agents.run · Script step | agents.run · Script stopped | agents.run · Script running | — |
-| A script step on a run | Operator | — | — | agents.run · Loading | agents.run · Script step | agents.run · Script stopped | agents.run · Script running | agents.run · Content withheld |
-| A refused script step | Admin | — | — | — | agents.run · Script refused | agents.run · Script refused | — | — |
-| A refused script step | Operator | — | — | — | agents.run · Script refused | agents.run · Script refused | — | agents.run · Content withheld |
-| A test that runs a script | Admin | — | — | agents.skill · Loading | agents.skill · Tests | agents.skill · Script refused | agents.skill · Testing | — |
-| A test that runs a script | Operator | — | — | agents.skill · Loading | agents.skill · Tests | agents.skill · Script refused | agents.skill · Testing | agents.skill · Tests |
+| A script step on a run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Script step | agents.runs · Detail · Script stopped | agents.runs · Detail · Script running | — |
+| A script step on a run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Script step | agents.runs · Detail · Script stopped | agents.runs · Detail · Script running | agents.runs · Detail · Content withheld |
+| A refused script step | Admin | — | — | — | agents.runs · Detail · Script refused | agents.runs · Detail · Script refused | — | — |
+| A refused script step | Operator | — | — | — | agents.runs · Detail · Script refused | agents.runs · Detail · Script refused | — | agents.runs · Detail · Content withheld |
+| A test that runs a script | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Script refused | agents.skills · Detail · Testing | — |
+| A test that runs a script | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Tests | agents.skills · Detail · Script refused | agents.skills · Detail · Testing | agents.skills · Detail · Tests |

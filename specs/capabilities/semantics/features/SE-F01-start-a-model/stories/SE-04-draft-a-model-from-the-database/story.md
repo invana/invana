@@ -3,8 +3,9 @@ id: SE-04
 title: Draft a model from the database
 feature: SE-F01
 status: idea
+milestone: MVP
 personas: [modeller]
-boards: [settings.databases.connect, settings.databases.connect.shape, model.board.draft, model.health]
+boards: [settings.databases, model.models, model.health]
 ---
 
 # SE-04 · Draft a model from the database
@@ -16,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [SE-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read a graph database, see what it holds, and start a draft model from it | — |
-| Operator | See what each graph database holds and the drafts on the map; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *Ontology*) | *Read the database* and *Start a model from it* disabled — *Needs the Modeller role — ask an Admin* |
+| Operator | See what each graph database holds and the drafts on the map; with Create on models, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *Ontology*) | *Read the database* and *Start a model from it* disabled — *Needs Create on Models — ask {who can grant}* |
 
 ## Flow
 
@@ -32,7 +33,7 @@ flowchart LR
   m --> d{The person decides}
   d -->|Start a model from it| dr(["A draft bound to that graph database · the assistant docked · nothing published"])
   d -->|Not now| k(["Kept as what the graph database holds"])
-  d -->|no access| na["Needs the Modeller role — ask an Admin"]
+  d -->|no access| na["Needs Create on Models — ask {who can grant}"]
 ```
 
 ## Acceptance criteria
@@ -46,21 +47,24 @@ flowchart LR
 | SE-04.5 | Kinds or property types the model cannot hold | the graph database is read | they are listed as *Not supported*, each with its reason, and left out of the draft |
 | SE-04.6 | A graph database with hundreds of kinds | it is read | the counts show first and kinds page in; *Start a model from it* does not wait for every kind to draw |
 | SE-04.7 | A published model | its graph database is read again | what it holds is replaced with the new read and its time; every published version is unchanged |
-| SE-04.8 | A draft started from a graph database | nobody publishes it | it stays a draft; nothing reaches the stitched model everyone asks against |
+| SE-04.8 | A draft started from a graph database | nobody publishes it | it stays a draft; nothing reaches the whole model everyone asks against |
 | SE-04.9 | An Access Policy rule that denies agents a kind | the graph database is read | the read still lists that kind: the Modeller agent reads the schema whole, and no record |
 | SE-04.10 | A read has finished | the person opens *How it got here* on what the graph database holds | it shows the run that read it, the person behind it, when, the calls it made marked schema-only, and what was left out and why |
-| SE-04.11 | An Operator | they open Model's health | *Read the database* is disabled with *Needs the Modeller role — ask an Admin*; what each graph database holds still reads |
+| SE-04.11 | An Operator | they open Model's health | *Read the database* is disabled with *Needs Create on Models — ask {who can grant}*; what each graph database holds still reads |
 | SE-04.12 | A drafted model | it opens | it lists the assumptions the draft rests on and the option it recommends where it had a choice, each with its reason |
+| SE-04.13 | A model drafted from a graph database | the draft opens beside the assistant | the assistant says what it read — *Read n nodes · sampled n* — and, for each choice it made, the evidence and the result: *airport.code is unique → key*, *route.dist mixes int and float → float*; every count is the engine's, and *Review and publish* sits under the message |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Connect a graph database · the database | Admin | settings.databases.connect | — | settings.databases.connect · Testing | settings.databases.connect · Connected | settings.databases.connect · Unreachable | — | — |
+| Connect a graph database · the database | Admin | settings.databases · Connect | — | settings.databases · Connect · Testing | settings.databases · Connect · Connected | settings.databases · Connect · Unreachable | — | — |
 | Connect a graph database · the database | Operator | — | — | — | — | — | — | — |
-| Connect a graph database · shape the model | Admin | settings.databases.connect.shape · Nothing there yet | — | settings.databases.connect.shape · Reading | settings.databases.connect.shape | settings.databases.connect.shape · Unreachable | settings.databases.connect.shape · Drafting | — |
+| Connect a graph database · shape the model | Admin | settings.databases · Connect · Shape · Nothing there yet | — | settings.databases · Connect · Shape · Reading | settings.databases · Connect · Shape | settings.databases · Connect · Shape · Unreachable | settings.databases · Connect · Shape · Drafting | — |
 | Connect a graph database · shape the model | Operator | — | — | — | — | — | — | — |
-| The draft | Admin | — | — | model.board.draft · Arriving | model.board.draft | — | model.board.draft · Assistant docked | — |
-| The draft | Operator | — | — | — | model.board.draft · Read only | — | — | model.board.draft · Read only |
+| The draft | Admin | — | — | model.models · Draft · Arriving | model.models · Draft | — | model.models · Draft · Assistant docked | — |
+| The draft | Operator | — | — | — | model.models · Draft · Read only | — | — | model.models · Draft · Read only |
 | What a graph database holds | Admin | model.health · Database not read | — | model.health · Reading the database | model.health · Database | model.health · Unreachable | — | — |
 | What a graph database holds | Operator | model.health · Database not read | — | model.health · Reading the database | model.health · Database | model.health · Unreachable | — | model.health · Database read only |
+| The draft · discard | Admin | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |
+| The draft · discard | Operator | model.models · Draft · Discard confirm | — | — | model.models · Draft · Discarded | — | — | — |

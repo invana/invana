@@ -2,9 +2,9 @@
 id: CP-63
 title: Connect my own accounts for my own runs
 feature: CP-F02
-status: idea
+status: later
 personas: [analyst, builder, admin]
-boards: [settings.me, settings.plugins, agents.run]
+boards: [settings.me, agents.runs, settings.plugins]
 ---
 
 # CP-63 · Connect my own accounts for my own runs
@@ -17,21 +17,21 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | The same as every person for their own connections and switches; read which runs used any person's personal connection | — |
-| Operator | Read, for each of their personal connections, the runs that used it; turn a plugin off for the runs they start (CP-04); a Modeller the same | Another person's connections and the runs that used them are absent; what another person's personal connection returned reads withheld |
+| Operator | Read, for each of their personal connections, the runs that used it; turn a plugin off for the runs they start (CP-04) | Another person's connections and the runs that used them are absent; what another person's personal connection returned reads withheld |
 
 ## Flow
 
 ```mermaid
 flowchart TD
   r([A step calls an outside server]) --> w{"The agent has a work connection there?"}
-  w -->|yes| wk(["Called with the work connection (CP-62)"])
+  w -->|yes| wk(["Called with the work connection (CP-80)"])
   w -->|no| who{"Did a person start this run, or the run it helps?"}
-  who -->|no — a schedule, a pick-up, a service user| rf(["Refused before the call · a Modeller or an Admin attaches a work connection"])
+  who -->|no — a schedule, a pick-up, a project key| rf(["Refused before the call · someone with Edit on the agent attaches a work connection"])
   who -->|yes| pc{"That person has a personal connection there?"}
   pc -->|no or expired| cn(["Refused · Connect your account (CP-43)"])
   pc -->|yes| call(["Called as that person · recorded"])
@@ -49,7 +49,7 @@ flowchart TD
 | CP-63.1 | A run a person started, whose agent has no work connection on a server, and that person's personal connection there | a step calls the server | the call is made with their personal connection, and *What left the platform* names it |
 | CP-63.2 | A helper run the person's run delegated to | it calls that server and its agent has no work connection there | it uses the same person's personal connection |
 | CP-63.3 | An agent with a work connection on the server | a person who also has a personal connection there starts a run | the work connection is used, never the personal one |
-| CP-63.4 | A schedule, a picked-up task or a service user's run | a step needs the server and its agent has no work connection there | it is refused before the call; no person's personal connection is used |
+| CP-63.4 | A schedule, a picked-up task or a project key's run | a step needs the server and its agent has no work connection there | it is refused before the call; no person's personal connection is used |
 | CP-63.5 | What a personal connection returned — in an answer, a finding, a report or a memory node | another person, an Admin included, opens it | it reads *Withheld — from {person}'s own connection*, with when and who made it (GP-F02) |
 | CP-63.6 | A person on *Personal connections* | they open one | it lists the runs that used it, newest first, each opening the run |
 | CP-63.7 | A person who turned a plugin or a graph database off for themselves | a run they started, or its helper, needs it | it is refused before it starts, saying they switched it off, with *Turn it on* |
@@ -58,13 +58,13 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Runs that used my connection | Admin | settings.me · Not used yet | — | settings.me · Loading | settings.me · Runs that used it | settings.me · Could not load | — | — |
-| Runs that used my connection | Operator | settings.me · Not used yet | — | settings.me · Loading | settings.me · Runs that used it | settings.me · Could not load | — | — |
-| A call refused for a missing connection | Admin | — | — | — | agents.run · No connection | — | agents.run · No connection | — |
-| A call refused for a missing connection | Operator | — | — | — | agents.run · No connection | — | agents.run · No connection | — |
-| A copy from another person's connection | Admin | — | — | — | agents.run · Withheld · Personal connection | — | — | agents.run · Withheld · Personal connection |
-| A copy from another person's connection | Operator | — | — | — | agents.run · Withheld · Personal connection | — | — | agents.run · Withheld · Personal connection |
+| Runs that used my connection | Admin | settings.me · Connections · Not used yet | — | settings.me · Connections · Loading | settings.me · Connections · Runs that used it | settings.me · Connections · Could not load | — | — |
+| Runs that used my connection | Operator | settings.me · Connections · Not used yet | — | settings.me · Connections · Loading | settings.me · Connections · Runs that used it | settings.me · Connections · Could not load | — | — |
+| A call refused for a missing connection | Admin | — | — | — | agents.runs · Detail · No connection | — | agents.runs · Detail · No connection | — |
+| A call refused for a missing connection | Operator | — | — | — | agents.runs · Detail · No connection | — | agents.runs · Detail · No connection | — |
+| A copy from another person's connection | Admin | — | — | — | agents.runs · Detail · Withheld · Personal connection | — | — | agents.runs · Detail · Withheld · Personal connection |
+| A copy from another person's connection | Operator | — | — | — | agents.runs · Detail · Withheld · Personal connection | — | — | agents.runs · Detail · Withheld · Personal connection |
 | My own switch | Admin | settings.plugins · My switch | — | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Off for the deployment | — | — |
 | My own switch | Operator | settings.plugins · My switch | — | settings.plugins · Loading | settings.plugins · My switch | settings.plugins · Off for the deployment | — | — |

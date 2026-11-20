@@ -4,9 +4,9 @@ title: Graph databases
 product: CP
 status: idea
 personas: [admin, modeller, builder, analyst]
-stories: [CP-22, CP-25, CP-26, CP-27, CP-24, CP-38, CP-39, CP-40, CP-35, CP-41, CP-17]
+stories: [CP-22, CP-25, CP-26, CP-27, CP-24, CP-38, CP-39, CP-40, CP-35, CP-41]
 journeys: [J01, J07]
-boards: [start.home, start.setup, settings.databases, settings.databases.database, settings.databases.connect, settings.databases.connect.files, settings.databases.connect.shape, settings.databases.connect.ready, access.sign_in_again]
+boards: [start.home, settings.databases, access.signin, settings.connectors]
 nfrs: [NFR-REL-3, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-9, NFR-PERF-3]
 depends_on: [AC-F01, AC-F02, AC-F06, SE-F01, RC-F02, CP-F01, GP-F01]
 ---
@@ -15,7 +15,7 @@ depends_on: [AC-F01, AC-F02, AC-F06, SE-F01, RC-F02, CP-F01, GP-F01]
 
 > The Admin's controls for the graph databases the deployment connects — installing a connector, connecting one with
 > its one credential, read-only or read + write, switched on or off, healthy or not, a practice graph database — and
-> the steps from a fresh deployment to its first answer. How a connector reads, writes and joins them into the Graph is
+> the steps from a fresh deployment to its first answer. How a connector reads, writes and joins them into Graph Data is
 > [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md). The decision it helps make: *which graph databases
 > may agents read and write, and is each one working?*
 
@@ -31,7 +31,7 @@ flowchart TD
   q -->|Try it on demo data| dm(["Explore, on the demo graph database"])
   q -->|Connect a graph database| c["CP-25 · One modal: Name · Connect · Shape · Ready"]
   c --> pk{"Its connector installed?"}
-  pk -->|no| pkn["CP-17 · Not offered · names the package to install"]
+  pk -->|no| pkn["CP-79 · Not offered · names the package to install"]
   pk -->|yes| t{"Test connection"}
   t -->|fails| tf["The database's own words · Continue stays off"] --> t
   t -->|holds records| hd["CP-26 · What is there · the agent drafts the model"]
@@ -41,13 +41,13 @@ flowchart TD
   rd --> on["CP-39 · Turn it on"]
   on --> su["CP-24 · Set-up: what is left before the first answer"]
   su -->|all four done| ans(["The first answer"])
-  f -->|some| ls["CP-40 · Settings › Invana › Graph databases: mode · switch · health"]
+  f -->|some| ls["CP-40 · Settings › Connections › Graph databases: mode · switch · health"]
   ls --> md["CP-38 · Read-only or read + write · sign in again"]
   ls --> sw["CP-39 · On or off — for the deployment, or for my own runs"]
   ls --> one["CP-35 · One graph database: connection · test · reconnect · version · remove"]
   one -->|unreachable| rc["Reconnect · retried with a doubling delay"]
   ls --> pr["CP-41 · Name a practice graph database"]
-  ls -->|an Operator or Modeller| ro(["Reads every one · acts read Ask an Admin"])
+  ls -->|an Operator| ro(["Reads every one · acts read Ask an Admin"])
   sw -->|work needs one that is off| off(["Refused before it starts, naming who switched it off"])
   ans --> rw(["Agents read and write in each database's language — GP-F01"])
 ```
@@ -79,7 +79,7 @@ sequenceDiagram
 | ID | Story | Status |
 |---|---|---|
 | CP-22 | [Start a fresh deployment from a question](stories/CP-22-start-a-fresh-deployment-from-a-question/story.md) | idea |
-| CP-25 | [Connect a graph database in one modal of steps](stories/CP-25-connect-a-graph-database-in-one-modal-of-steps/story.md) | idea |
+| CP-25 | [Connect a graph database in one modal](stories/CP-25-connect-a-graph-database-in-one-modal-of-steps/story.md) | idea |
 | CP-26 | [Connect a graph database that already holds data](stories/CP-26-connect-a-graph-database-that-already-holds-data/story.md) | idea |
 | CP-27 | [Start from files with an empty graph database](stories/CP-27-start-from-files-with-an-empty-graph-database/story.md) | later |
 | CP-24 | [See what is left before the first answer](stories/CP-24-see-what-is-left-before-the-first-answer/story.md) | idea |
@@ -88,26 +88,27 @@ sequenceDiagram
 | CP-40 | [See every graph database and its health](stories/CP-40-see-every-graph-database-and-its-health/story.md) | idea |
 | CP-35 | [Keep a graph database connected](stories/CP-35-keep-a-graph-database-connected/story.md) | idea |
 | CP-41 | [Name a practice graph database](stories/CP-41-name-a-practice-graph-database/story.md) | idea |
-| CP-17 | [Install a graph connector and see it offered](stories/CP-17-install-a-graph-connector-and-see-it-offered/story.md) | idea |
 
 ## Access
 
-The role each act needs is the one role table's row *Graph databases — connect, mode, switch, health*
-([AC-F02 › The role table](../../../access/features/AC-F02-access-policies/feature.md#the-role-table)); this table
+The permission each act needs is the permission catalogue's row for `setting/graph-databases` — connect, mode, switch, health
+([AC-F02 › The permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this table
 names the acts.
 
-| Act | Role | Everyone else sees |
+*Admins* is [defined in AC-F02](../../../access/features/AC-F02-access-policies/feature.md#decisions).
+
+| Act | Permission ([the permission catalogue](../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read every graph database — name, connector, address, database, mode, switch, health, server version, practice; never its credential | Operator · Modeller · Admin | — |
-| Connect a graph database · change its connection · test · reconnect · read its types again · declare or accept a server version · remove it | Admin | The list and each graph database read; each act reads *Ask an Admin* |
-| Set read-only or read + write | Admin, signing in again for read + write | The mode reads; *Change* reads *Ask an Admin* |
-| Turn a graph database on or off for the deployment | Admin | The switch reads, with who set it and when; it reads *Ask an Admin* |
-| Turn a graph database off, or back on, for the runs one is behind | Every signed-in person, for themselves | — |
-| Name or unname a practice graph database | Admin | *Practice* reads; the act reads *Ask an Admin* |
-| Install or remove a connector package | Admin — on the engine's machine, outside Studio | — |
+| Read every graph database — name, connector, address, database, mode, switch, health, server version, practice; never its credential | Read on `setting/graph-databases` | — |
+| Connect a graph database · change its connection · test · reconnect · read its types again · declare or accept a server version · remove it | Create on `setting/graph-databases` to connect · Edit to change, test, reconnect, declare, accept or remove | The list and each graph database read; each act reads *Ask an Admin* |
+| Set read-only or read + write | Edit on `setting/graph-databases`, signing in again for read + write | The mode reads; *Change* reads *Ask an Admin* |
+| Turn a graph database on or off for the deployment | Edit on `setting/graph-databases` | The switch reads, with who set it and when; it reads *Ask an Admin* |
+| Turn a graph database off, or back on, for the runs one is behind | None — one's own | — |
+| Name or unname a practice graph database | Edit on `setting/graph-databases` | *Practice* reads; the act reads *Ask an Admin* |
+| Install or remove a connector package | None in Studio — done on the engine's machine, outside Invana | — |
 | Read, write or search a graph database | An agent, within the mode and both switches set here ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) | Refused before it starts, naming the rule, the mode or who switched it off |
-| Start on a fresh deployment — *Connect a graph database* | Admin | *No graph database yet — Ask an Admin* |
-| Try it on demo data | Operator · Modeller · Admin, when a demo graph database is on | — |
+| Start on a fresh deployment — *Connect a graph database* | Create on `setting/graph-databases` | *No graph database yet — Ask an Admin* |
+| Try it on demo data | Read on `setting/graph-databases`, when a demo graph database is on | — |
 
 ## States
 
@@ -125,9 +126,10 @@ names the acts.
 
 | Rule | Detail |
 |---|---|
-| A graph database is one connection | One connector, one address, one database, one credential. The Graph is every graph database the deployment has on |
+| A graph database is one connection | One connector, one address, one database, one credential. Graph Data is what every graph database the deployment has on holds |
 | Its name is a resource segment | Lowercase letters, digits and `_`, unique, fixed once saved — it is the `<graph database>` of `data/<graph database>/<kind>` in every rule |
 | A test gates every save | Nothing is saved until the details passed a test — on the first save and on every change to address, user, password, database |
+| A connector declares itself | Every connector carries a `connector.yaml` manifest — its `config` schema, secret names, capabilities and scopes — read at start ([CP-F02 › Mechanisms](../CP-F02-plugins-and-outside-tools/feature.md#mechanisms)); the connect form is drawn from it |
 | The connector is fixed once saved | Address, user, password and database stay editable; a different connector is a different graph database |
 | The credential is write-only | Sealed like every secret; the user reads back, the password field is blank — *Stored encrypted. Leave blank to keep it* |
 | Read-only by default | A new graph database is read-only. Read + write is a second, deliberate act by an Admin who signs in again; both directions are History rows. A write to a read-only graph database is refused before the wire, naming it; every read is a read whatever the mode ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) |
@@ -136,13 +138,13 @@ names the acts.
 | Off means refused, named | Work that needs a graph database that is off — for the deployment or for the person behind it — is refused before it starts, naming who switched it off; a schedule skips its firing and raises an ops alert; a workflow that depends on it is flagged and its runs refused until it is on |
 | Health is honest | Connected · unreachable · degraded, with the last time it connected and its latency; rotated credentials read unreachable, never silence. Work that needs no step on an unreachable graph database keeps answering |
 | The server version decides the property types | Detected on connect, or declared by an Admin; a version Invana has not tested keeps the graph database read-only until an Admin accepts it |
-| A practice graph database is never the Graph | It stands in for one graph database in an agent's or a skill's tests; no question, board, schedule or workflow reads it |
-| Removing never touches the data | Removing a graph database removes Invana's records of it; the database's own data is untouched. It is refused while a rule, a match rule or a workflow names it |
-| Set-up is the deployment's | Four required steps — a graph database is connected and on · a model is published · the Graph holds records · an AI model answers. Each is done because its fact exists, whoever made it and from wherever; only a skipped offer is stored |
+| A practice graph database is never part of Graph Data | It stands in for one graph database in an agent's or a skill's tests; no question, board, schedule or workflow reads it |
+| Removing never touches the data | Removing a graph database removes Invana's records of it; the database's own data is untouched. It is refused while a rule, a project or a workflow names it |
+| Set-up is the deployment's | Four required steps — a graph database is connected and on · a model is published · Graph Data holds records · an AI model answers. Each is done because its fact exists, whoever made it and from wherever; only a skipped offer is stored |
 | Each step opens a gate | *Connected* — reading the graph databases · *Modelled* — loading data and links between models · *Grounded* — answers that cite a record · *Answering* — asking, the Assistant and every agent run. A surface waits on the one gate it needs and names the step that opens it |
-| Set-up owns no forms | Each step opens the place that makes its fact — Graph databases, Model, Records, AI models — with its command beside it |
+| Set-up owns no forms | Each step opens the place that makes its fact — Graph databases, Model, Graph Data, AI models — with its command beside it |
 | Agents read the schema, never records, to draft | The draft model comes from the kinds, properties and counts the database reports ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) |
-| How a connector reads and writes | One package per database, two languages, one shape of answer, declared unsupported acts, the database's own vector index and the join across graph databases are [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md)'s |
+| How a connector reads and writes | One package per database, two languages, one shape of answer, declared unsupported acts and the database's own vector index are [GP-F01 · Data](../../../graph/features/GP-F01-data/feature.md)'s |
 | Leans on | How a connector reads and writes ([GP-F01](../../../graph/features/GP-F01-data/feature.md)) · signing in again ([AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md)) · Access Policies on `data/…` ([AC-F02](../../../access/features/AC-F02-access-policies/feature.md)) · History ([AC-F06](../../../access/features/AC-F06-history/feature.md)) · drafting a model ([SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md)) · loads ([RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md)) · AI models ([CP-F01](../CP-F01-ai-models/feature.md)) |
 
 ## Data touched
@@ -173,9 +175,9 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Record | Owner |
 |---|---|
-| Who may act and the role table | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
+| Who may act and the permission catalogue | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) |
 | Signing in again for an act | [AC-F01](../../../access/features/AC-F01-sign-in-account-and-sessions/feature.md#engine) |
-| Rules, match rules and workflows that name a graph database | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [SE-F06](../../../../capabilities/semantics/features/SE-F06-links-and-mappings/feature.md#engine) · [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
+| Rules, projects and workflows that name a graph database | [AC-F02](../../../access/features/AC-F02-access-policies/feature.md#engine) · [PJ-F01](../../../../capabilities/projects/features/PJ-F01-projects-and-tasks/feature.md#engine) · [AG-F06](../../../../capabilities/agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | The drafted model, and whether a model is published | [SE-F01](../../../../capabilities/semantics/features/SE-F01-start-a-model/feature.md#engine) · [SE-F02](../../../../capabilities/semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) |
 | Loads — the first that succeeded | [RC-F02](../../../../capabilities/records/features/RC-F02-bring-records-in/feature.md#engine) |
 | The default AI model and its last check | [CP-F01](../CP-F01-ai-models/feature.md#engine) |
@@ -199,7 +201,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `POST /graph-databases/{name}/introspect` | *Read types again*, in the background | CP-35 |
 | `POST /graph-databases/{name}/acknowledge-version` · `PUT /graph-databases/{name}/version` | Accept an untested server version · declare one the connector cannot detect | CP-35 |
 | `GET /setup` · `POST /setup/{step}` | The four required steps and the offers, derived on every read — `{step, done, completed_at?, skipped_at?, required, gate?, blocked_by?, broken?}` · `{act: skip · reset}` on an offer | CP-24 |
-| `GET /connectors` | Every installed connector — `name` · `language` (`opencypher` · `gremlin`) · `package` · `version` · `state` (`loaded` · `failed`) · `error?` | CP-17 |
+| `GET /connectors` | Every installed connector — `name` · `language` (`opencypher` · `gremlin`) · `package` · `version` · `state` (`loaded` · `failed`) · `error?` · `graph_databases` (how many use it) · `used_by_agents` | CP-79 |
 
 ### Events
 
@@ -218,7 +220,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | Any write by a person whose role is not Admin — `role_required` | *This needs an Admin — ask {admins}.* | CP-40.6 · CP-35.13 · CP-38.6 · CP-39.7 · CP-41.5 |
+| 403 | Any write without Create or Edit on `setting/graph-databases` | *Needs Edit on setting/graph-databases — ask {who can grant}.* | CP-40.6 · CP-35.13 · CP-38.6 · CP-39.7 · CP-41.5 |
 | 401 | Read + write, a credential change or removal without the password, or with a key | *Sign in again to do this.* | CP-38.3 · CP-35.14 |
 | 409 | A name another graph database holds | *{name} is already a graph database.* | CP-25.3 |
 | 422 | A name with characters outside `[a-z0-9_]`, or a field past its length | *{field}: {why}.* | CP-25.3 |
@@ -228,14 +230,14 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | 409 | A write to a read-only graph database, or one on an untested server version, by any path — before the wire | *{name} is read-only — {why}.* | CP-38.5 · CP-35.17 |
 | 409 | Work that needs a graph database that is off — `switched_off`, with who and when | *{name} is off — switched off by {person} {when}.* | CP-39.4 · CP-39.5 |
 | 409 | Turning on, for oneself, a graph database the deployment has off | *{name} is off for the deployment — ask {admin}.* | CP-39.6 |
-| 409 | Removing a graph database a rule, a match rule or a workflow names | *{name} is named by {what} — change {it} first.* | CP-35.12 |
+| 409 | Removing a graph database a rule, a project or a workflow names | *{name} is named by {what} — change {it} first.* | CP-35.12 |
 | 422 | Removing with a `confirm` that is not its name | *Type {name} to remove it.* | CP-35.11 |
 | 422 | A practice graph database standing in for itself, for a practice one, or for one with another connector | *{name} cannot stand in for {other} — {why}.* | CP-41.4 |
 | 409 | A question, board, schedule or workflow step on a practice graph database | *{name} is for practice — it is never asked.* | CP-41.3 |
 | 409 | A route whose gate is shut — `setup_incomplete`, with `gate` and `missing` | *{surface} opens when {step}.* | CP-24.6 |
 | 422 | Skipping a required step | *{step} is required — it cannot be skipped.* | API only — Studio offers *Skip* only on an offer |
 | 503 | *Read types again* while it is not connected | *{name} is not connected — reconnect first.* | CP-35.18 |
-| 409 | A graph database whose connector is not installed | *{connector} is not installed — install {package}.* | CP-17.7 |
+| 409 | A graph database whose connector is not installed | *{connector} is not installed — install {package}.* | CP-79.15 |
 
 ### CLI
 
@@ -274,21 +276,26 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Decision | Detail |
 |---|---|
-| Graph databases are the deployment's | Settings › Invana › Graph databases; one list, Admin acts, everyone reads |
-| Connecting is a modal of steps | Name · Connect · Shape · Ready on a step strip; it shows a person's own data back to them and asks for a decision at each step |
+| Installed connectors read in Settings › Connections | Settings › Connections › Connectors (`settings.connectors`, CP-79) lists each installed graph connector with *Used by n graph databases*; installing one is a package, never an act in Studio |
+| Graph databases are the deployment's | Settings › Connections › Graph databases; one list, Admin acts, everyone reads |
+| Connecting is one modal of sections | Name (optional) · the type as a grouped card grid · its details once a type is picked · Shape once the test passes — one page and one act, *Connect*; it shows a person's own data back to them before anything is saved |
+| A blank name takes the type's | The engine names it after its type, made unique (`neo4j`, `neo4j_2`), and shows that name before *Connect*, so every graph database still has the fixed name rules use |
 | The model is shaped while connecting | The Modeller agent reads the schema and proposes a draft before anything is saved; publishing happens in Model |
 | The name is fixed | It is the resource segment every rule names; renaming would silently change what rules reach |
 | Read + write needs the password | It widens what agents can do to customer data — a change to access ([NFR-SEC-4](../../../../system-design.md#3-non-functional-requirements)) |
-| Reconnecting is an Admin's | It changes nothing the graph database holds, but the one role table gives Operators and Modellers reads only; an unreachable database raises an ops alert to the Admins |
+| Reconnecting needs Edit on `setting/graph-databases` | It changes nothing the graph database holds, but the permission catalogue gives a reader of the setting reads only; an unreachable database raises an ops alert to the Admins |
 | Demo data is a graph database | The developer setup connects one, marked demo; *Try it on demo data* opens Explore on it. An Admin switches it off or removes it like any other |
+| Home is the only place before set-up | Until a graph database is connected or someone picks *Try it on demo data*, mode switches are disabled and the leftNav holds no views; an Operator is offered *Ask {Admin}* where an Admin sees *Connect a graph database* |
+| Connecting starts in two places | Settings › Connections › Graph databases and Home before set-up — never the switcher's *New* |
 | The first-run question carries into the first ask | *What are you trying to decide?* is kept in the browser and put in the Assistant's composer when set-up is done — never sent by itself |
+| Connectors live in Settings › Connections | *Settings › Connections › Connectors* lists every installed connector with *Used by n agents*; the graph databases themselves are Settings › Connections › Graph databases |
 | Connectors need no switch | Installed is offered; a connector reaches a graph database, not the outside, so it is not a plugin |
 
 ## Open questions
 
 | Question | Who answers |
 |---|---|
-| The one role table has no row for a person's own graph database switch; this feature lets every signed-in person narrow their own runs, as the glossary's *On · Off* says. Recommend: add *Graph databases — a person's own switch: Own · Own · Own* beside the plugins' row | Ravi |
+| The permission catalogue has no row for a person's own graph database switch; this feature lets every signed-in person narrow their own runs, as the glossary's *On · Off* says. Recommend: add *Graph databases — a person's own switch: Own · Own · Own* beside the plugins' row | Ravi |
 
 ## Not building
 
@@ -299,3 +306,4 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Connection pooling settings in Studio | Tuning belongs to configuration |
 | A tour or a set-up page of its own | Each step opens the place that makes its fact; set-up steps aside at the first answer |
 | Writing demo data into a person's own database | Demo data lives in its own graph database |
+| CP-17 — merged into CP-79 | One story installs every connector: [CP-79](../CP-F02-plugins-and-outside-tools/stories/CP-79-install-a-connector/story.md) |

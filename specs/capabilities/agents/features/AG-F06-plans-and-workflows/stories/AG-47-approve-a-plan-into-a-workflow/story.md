@@ -4,7 +4,7 @@ title: Approve a plan into a workflow
 feature: AG-F06
 status: idea
 personas: [builder, admin]
-boards: [inbox, agents.workflow]
+boards: [inbox, agents.skills]
 ---
 
 # AG-47 · Approve a plan into a workflow
@@ -18,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [AG-F06](../../feature.md)
 
 ## Who can
 
-Answering an ask is every role's, for an ask that names the person ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)).
+Answering an ask needs no permission, for an ask that names the person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Approve or decline a proposal when named, when the agent has no other approver to route to, or when it is escalated to them | A proposal they made themselves: *Not yours to answer — it waits on {approvers}* |
-| Operator | Approve or decline a proposal for an agent they are a named approver of — never one they proposed; a Modeller the same | *Approve* and *Decline* absent: *Not yours to answer — it waits on {approvers}* |
+| Operator | Approve or decline a proposal for an agent they are a named approver of — never one they proposed | *Approve* and *Decline* absent: *Not yours to answer — it waits on {approvers}* |
 
 ## Flow
 
@@ -60,7 +60,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The proposal ask | Admin | inbox · Nothing waiting | — | inbox · Loading | inbox · Make this a workflow | inbox · Key taken | inbox · Make this a workflow | inbox · Not yours to answer |
 | The proposal ask | Operator | inbox · Nothing waiting | — | inbox · Loading | inbox · Make this a workflow | inbox · Key taken | inbox · Make this a workflow | inbox · Not yours to answer |
@@ -68,5 +68,5 @@ flowchart TD
 | The proposal ask — content withheld | Operator | — | — | inbox · Loading | inbox · Make this a workflow, content withheld | — | — | — |
 | Declined or expired | Admin | — | — | — | inbox · Proposal declined | inbox · Proposal expired | — | — |
 | Declined or expired | Operator | — | — | — | inbox · Proposal declined | inbox · Proposal expired | — | — |
-| An approved workflow | Admin | — | — | agents.workflow · Loading | agents.workflow · Approved by | agents.workflow · Could not load | — | — |
-| An approved workflow | Operator | — | — | agents.workflow · Loading | agents.workflow · Approved by | agents.workflow · Could not load | — | — |
+| An approved workflow | Admin | — | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Approved by | agents.skills · Workflow · Could not load | — | — |
+| An approved workflow | Operator | — | — | agents.skills · Workflow · Loading | agents.skills · Workflow · Approved by | agents.skills · Workflow · Could not load | — | — |

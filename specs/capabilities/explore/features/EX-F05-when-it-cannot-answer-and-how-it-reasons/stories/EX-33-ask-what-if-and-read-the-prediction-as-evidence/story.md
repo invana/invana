@@ -4,7 +4,7 @@ title: Ask what if, and read the prediction as evidence
 feature: EX-F05
 status: idea
 personas: [decision-maker, analyst]
-boards: [explore.ask, explore.board, explore.board.save_derived, agents.run.answer]
+boards: [explore.board, agents.runs]
 ---
 
 # EX-33 · Ask what if, and read the prediction as evidence
@@ -17,10 +17,10 @@ Tasks: [task.md](task.md) · Feature: [EX-F05](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask *what if* or pick *What-if*, read the predicted part and its run, add it to a project, save it as derived records on a read + write graph database | — |
-| Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; a Modeller as Admin ([role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs the Modeller role — ask an Admin*. Another person's run: that it ran, its status and its tokens |
+| Operator | Ask *what if*, read the predicted part and its run on their own runs, add it to a project; with Create on the graph database, the same as Admin ([permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *how it reasons* · *bring records in*) | *Save as derived records* disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}*. Another person's run: that it ran, its status and its tokens |
 
 ## Flow
 
@@ -36,9 +36,9 @@ flowchart LR
   sm --> pr["A part marked Predicted · beside the records, never mixed"]
   pr --> how["How it got here · simulator, seed, pinned loads"]
   pr -->|Add to a project| fd(["A finding, still Predicted"])
-  pr -->|Save as derived records| sv{"Modeller · read + write · Write allowed?"}
+  pr -->|Save as derived records| sv{"Holds Edit on data/<graph database>/<kind> · read + write?"}
   sv -->|yes| dr(["Derived records · labelled derived · lineage kept"])
-  sv -->|an Operator| od["Disabled — Needs the Modeller role"]
+  sv -->|an Operator| od["Disabled — Needs Create on {kind} in {graph database}"]
   sv -->|read-only · no rule · a kind that does not fit| rr["Refused · named, in the dialog"]
 ```
 
@@ -57,11 +57,11 @@ flowchart LR
 | EX-33.9 | The simulator cannot use the data | the step settles | it is failed with the simulator's own sentence; the records stand as the answer and nothing is written |
 | EX-33.10 | More than 20 loads behind the starting records, or one undone or unreadable to the person | the simulate step opens | it is refused, naming the limit of 20 or the load, and nothing runs |
 | EX-33.11 | A what-if with no seed given | it runs | the seed Invana picked is kept; the same simulator version, change, pinned loads and seed give the same rows |
-| EX-33.12 | A predicted part, a Modeller or an Admin, a read + write graph database and a rule allowing the Loader Write on `data/<graph database>/<kind>` | they choose *Save as derived records* and pick the graph database and the kind | the rows are written to that graph database as records of the kind, each labelled *derived* with the simulator and its version; their lineage — the run and its pinned loads — is kept, and *How it got here* on a saved record shows it |
+| EX-33.12 | A predicted part, a person with Create on the graph database, a read + write graph database and a rule allowing the Loader Write on `data/<graph database>/<kind>` | they choose *Save as derived records* and pick the graph database and the kind | the rows are written to that graph database as records of the kind, each labelled *derived* with the simulator and its version; their lineage — the run and its pinned loads — is kept, and *How it got here* on a saved record shows it |
 | EX-33.13 | A read-only graph database picked | the person saves | it is refused in the dialog, naming the graph database and that it is read-only; nothing is written |
 | EX-33.14 | No rule allowing the Loader Write on the kind in that graph database | the person saves | it is refused in the dialog, naming the policy and the rule |
 | EX-33.15 | A kind the rows do not fit | the person saves | it is refused in the dialog, naming the field that does not fit |
-| EX-33.16 | An Operator | they read a predicted part | *Save as derived records* is disabled — *Needs the Modeller role — ask an Admin* |
+| EX-33.16 | An Operator | they read a predicted part | *Save as derived records* is disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}* |
 | EX-33.17 | A predicted part | the person opens *How it got here* | it shows the steps, the change, the simulator and its version, the seed, the pinned loads and the tokens |
 | EX-33.18 | A predicted part | the person chooses *Add to a project* | it becomes a finding still marked *Predicted*, citing the run ([PJ-F03](../../../../../projects/features/PJ-F03-branches-findings-and-decisions/feature.md)) |
 | EX-33.19 | A simulator removed since a what-if ran | the conversation is opened | the predicted part still reads, naming the simulator version it ran |
@@ -69,13 +69,13 @@ flowchart LR
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| What-if in the composer | Admin | explore.ask · Act as, built-in only | — | — | explore.ask · What-if picked | — | explore.ask · Assumptions before the run | — |
-| What-if in the composer | Operator | explore.ask · Act as, built-in only | — | — | explore.ask · What-if picked | — | explore.ask · Assumptions before the run | — |
+| What-if in the composer | Admin | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · What-if picked | — | explore.board · Ask · Assumptions before the run | — |
+| What-if in the composer | Operator | explore.board · Ask · Act as, built-in only | — | — | explore.board · Ask · What-if picked | — | explore.board · Ask · Assumptions before the run | — |
 | The predicted part | Admin | explore.board · No simulator | — | explore.board · Simulating | explore.board · Predicted | explore.board · Simulation failed | explore.board · Simulating | — |
 | The predicted part | Operator | explore.board · No simulator | — | explore.board · Simulating | explore.board · Predicted | explore.board · Simulation failed | explore.board · Simulating | explore.board · Save disabled |
-| Save as derived records | Admin | — | — | explore.board.save_derived · Saving | explore.board.save_derived | explore.board.save_derived · Refused | — | — |
+| Save as derived records | Admin | — | — | explore.board · Save derived · Saving | explore.board · Save derived | explore.board · Save derived · Refused | — | — |
 | Save as derived records | Operator | — | — | — | — | — | — | explore.board · Save disabled |
-| The run's trace | Admin | — | — | agents.run.answer · Loading | agents.run.answer · Simulation | agents.run.answer · Step failed | agents.run.answer · Running | — |
-| The run's trace | Operator | — | — | agents.run.answer · Loading | agents.run.answer · Simulation | agents.run.answer · Step failed | agents.run.answer · Running | agents.run.answer · Content withheld |
+| The run's trace | Admin | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Simulation | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | — |
+| The run's trace | Operator | — | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Simulation | agents.runs · Detail · Answer · Step failed | agents.runs · Detail · Answer · Running | agents.runs · Detail · Answer · Content withheld |

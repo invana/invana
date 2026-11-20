@@ -16,7 +16,7 @@ Tasks: [task.md](task.md) · Feature: [GP-F01](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Search by similarity through the agents they may use, on any kind those agents may read | — |
 | Operator | The same as an Admin | A kind no agent of theirs may read is refused, naming the rule |
@@ -53,7 +53,7 @@ flowchart TD
 
 No board: the asking surface is its own story's.
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | A similarity search | Admin | — | — | — | — | — | — | — |
 | A similarity search | Operator | — | — | — | — | — | — | — |

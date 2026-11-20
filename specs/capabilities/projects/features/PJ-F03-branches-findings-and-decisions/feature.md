@@ -4,9 +4,9 @@ title: Branches, findings and decisions
 product: PJ
 status: idea
 personas: [decision-maker, analyst]
-stories: [PJ-03, PJ-04, PJ-05, PJ-06, PJ-07, PJ-08, PJ-10, PJ-11, PJ-13]
+stories: [PJ-03, PJ-04, PJ-05, PJ-06, PJ-07, PJ-08, PJ-10, PJ-11, PJ-13, PJ-32]
 journeys: [J03]
-boards: [projects.project, projects.options, projects.finding, projects.task.thinking, projects.decide]
+boards: [projects.projects, projects.graph, projects.branches, projects.tasks]
 nfrs: [NFR-PERF-5]
 depends_on: [PJ-F01, RC-F02, EX-F01, EX-F02, EX-F05, CP-F10, SE-F07, AG-F09]
 ---
@@ -38,6 +38,7 @@ flowchart TD
   add -->|a cite does not resolve| rc["Names the cite · nothing added"]
   explore([Explore › Add to a project — EX-12]) --> add
   whatif([A what-if answer — EX-33]) -->|predicted evidence| add
+  sim([PJ-32 · Simulate options against targets]) -->|predicted evidence| add
   add --> fd["PJ-06 · A finding: records · origin · reviewed by · How it got here"]
   fd -->|an agent added it| rev["Unreviewed until a person reviews it"] --> fd
   fd -->|a load it cites is undone| rt["Marked: a load undone"]
@@ -106,18 +107,19 @@ sequenceDiagram
 | PJ-10 | [See what a decision reaches](stories/PJ-10-see-what-a-decision-reaches/story.md) | idea |
 | PJ-11 | [Follow a decision back to the original authors](stories/PJ-11-follow-a-decision-back-to-the-original-authors/story.md) | idea |
 | PJ-13 | [Audit every decision in one place](stories/PJ-13-audit-every-decision-in-one-place/story.md) | idea |
+| PJ-32 | [Simulate options against targets on a branch](stories/PJ-32-simulate-options-against-targets-on-a-branch/story.md) | idea |
 
 ## Access
 
-Who may do what is the [role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table):
-*Branches, findings and decisions* is *Acts* for Operator, Modeller and Admin — on every project the person's default
+Who may do what is the [permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue):
+*Branches, findings and decisions* needs no permission of its own — on every project the person's default
 agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), reading records through the agents granted to them.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read a project's branches, findings, decisions, proposals, lineage and the Decisions page | Anyone whose default agent may Read `project/<key>` | The project's head; the rest reads *Withheld — your agent may not read `project/{key}`* |
-| Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person whose default agent may Read the project — Operator · Modeller · Admin | On an archived project, each act is disabled, saying it is archived |
-| Accept or reject a proposal | The project's members, people only ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)) | The proposal reads; *Accept* and *Reject* disabled — *Members only* |
+| Read a project's branches, findings, decisions, proposals, lineage and the Decisions page | Anyone who may read `project/<key>` | The project's head; the rest reads *Withheld — join the team or ask {who can grant}* |
+| Fork, merge, add or review a finding, record a verdict and a decision, file a task on a branch | A person who may read the project | On an archived project, each act is disabled, saying it is archived |
+| Accept or reject a proposal | The people on the project's team ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)) | The proposal reads; *Accept* and *Reject* disabled — *Join the team to change it* |
 | Add findings, propose a fork or a decision | An agent, in a run on the project | A proposal reads as waiting, with its rationale and *How it got here* |
 | Record a verdict or a decision | A person, never an agent | An agent can only propose |
 | Read the records a finding cites, and an impact reach | Through the agents the reader may use, under their Access Policies ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md)) | A kind the reader's agents may not read is not shown and never reached |
@@ -134,7 +136,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | Has data | The overview, tree, branch, finding, impact, decisions and lineage as their stories describe |
 | Failed | The page could not load, saying why, with *Try again*; an act the engine refuses names the reason and changes nothing; an impact reach that cannot read a graph database names it |
 | Agent working or proposing | A proposal waits on its branch, an agent's finding reads *Unreviewed*; each opens *How it got here*; an impact reach says which hop it is on |
-| No access | A project the reader's default agent may not Read shows its head only, the rest *Withheld*. A run the reader may not read shows that it ran, its status and its tokens — *Content withheld*. A record the reader's agents may not read is not shown |
+| No access | A project the reader may not read shows its head only, the rest *Withheld*. A run the reader may not read shows that it ran, its status and its tokens — *Content withheld*. A record the reader's agents may not read is absent, with no note |
 
 ## Rules
 
@@ -155,17 +157,17 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | Superseded, never edited | A decision is never edited or deleted. Revisiting one is a new decision that names the one it supersedes, links back to it and cites a finding added after it; the older one reads *Superseded*, linking to the decision that supersedes it |
 | Immutable | A decision belongs to its project, is the organisation's and names who decided; nobody hands it over or changes it |
 | Merge is a decision | It carries chosen findings into another branch of the same project; findings are shared, never copied; both branches keep their history; the source is always marked merged |
-| Agents propose | A fork or a decision, with a rationale; a person accepts or rejects; accepting a decision runs the full rule check as the accepting person. An open proposal is listed in the Inbox › Needs you of the project's members ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)). The project assistant's proposals — tasks, groups, checks, relations, recommendations and asks — are the same record ([PJ-F01 › Rules](../PJ-F01-projects-and-tasks/feature.md#rules)) |
-| Impact starts from the evidence | Impact starts from the records the branch's findings cite, every stance, and walks 1, 2 or 3 hops (2 by default) across every graph database, joined on identity links; each hop is what the one before reached, less what was already reached |
+| Agents propose | A fork or a decision, with a rationale; a person accepts or rejects; accepting a decision runs the full rule check as the accepting person. An open proposal is listed in the Inbox › Needs you of the project's people ([CP-F08](../../../../os/control/features/CP-F08-the-inbox/feature.md)). The project assistant's proposals — tasks, groups, checks, relations, recommendations and asks — are the same record ([PJ-F01 › Rules](../PJ-F01-projects-and-tasks/feature.md#rules)) |
+| Impact starts from the evidence | Impact starts from the records the branch's findings cite, every stance, and walks 1, 2 or 3 hops (2 by default), each record's hops inside its own graph database — never across graph databases, and only those the reader's agent may read; each hop is what the one before reached, less what was already reached |
 | Impact is bounded, and says so | At most 12 records expanded per hop, each to 50 neighbours, the most reached first; a cut reach reads *A sample — more lies beyond* (NFR-PERF-5) |
 | Impact reads as the person | An impact reach is one run of the built-in Assistant with the reader behind it, under its Access Policies; a kind the reader's agent may not read is never reached; every read is in the ledger |
 | How sure is the evidence's | How many of the findings it starts from a person reviewed, and the sources of the loads they cite — upload, CLI, API or by hand — and their licences — never a score |
 | Reach only | Impact reads what a decision touches; it predicts nothing — a what-if is a question in Explore ([EX-F05](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md)). No figure in any currency |
-| Loads cited | The loads a branch's findings cite — no second list. A load undone in Records flags every finding and decision that cites it |
+| Loads cited | The loads a branch's findings cite — no second list. A load undone in Graph Data flags every finding and decision that cites it |
 | Run privacy | The run and steps behind a finding, a proposal or a lineage node read to the person behind the run and, for a run of a project, to anyone whose default agent may see every source ([AC-F09](../../../../os/access/features/AC-F09-what-left-the-platform/feature.md#rules)); anyone else reads that it ran, its status and its tokens |
 | Archived | An archived project reads; every act is disabled |
 | Numbers are the engine's | Branch, finding, decision and proposal numbers, balances, impact counts and *current · recorded* are stored or counted by the engine; Studio formats them |
-| Leans on | Projects and tasks (PJ-F01) · loads and undoing a load (RC-F02) · adding an answer as a finding (EX-F02) · what-if answers (EX-F05) · expanding records (EX-F01) · runs, run privacy and *How it got here* (CP-F10) · rules (SE-F07) · the thinking graph (AG-F09) · identity links (SE-F06) |
+| Leans on | Projects and tasks (PJ-F01) · loads and undoing a load (RC-F02) · adding an answer as a finding (EX-F02) · what-if answers (EX-F05) · expanding records (EX-F01) · runs, run privacy and *How it got here* (CP-F10) · rules (SE-F07) · the thinking graph (AG-F09) |
 
 | Project type | A project is a | A task is a | A branch is a | Evidence is a | Verdict | Decision |
 |---|---|---|---|---|---|---|
@@ -177,7 +179,7 @@ agent may Read ([PJ-F01](../PJ-F01-projects-and-tasks/feature.md#access)), readi
 | A type also carries | Detail |
 |---|---|
 | Default rules | The rules in force on a new project of the type (SE-F07); its members may add more |
-| Suggested agents and skills | Offered first when adding members to the project or assigning a task; never added without a person's yes |
+| Suggested agents and skills | Offered first when adding to the project's team or assigning a task; never added without a person's yes |
 | A report template | What a report of the type opens with (PJ-F05) |
 
 ## Data touched
@@ -223,7 +225,6 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | The thinking graph — node and edge kinds, a decision's sources | [AG-F09](../../../agents/features/AG-F09-learn-from-memory/feature.md#engine) |
 | Evidence labelled *predicted* from a what-if | [EX-F05](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine) |
 | Expanding a record to its neighbours, through an agent | [EX-F01](../../../explore/features/EX-F01-the-board-and-its-canvas/feature.md#engine) |
-| Identity links that join records across graph databases | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | Rules in force, and the rule-check event | [SE-F07](../../../semantics/features/SE-F07-rules/feature.md#engine) |
 | An Explore answer added as a finding | [EX-F02](../../../explore/features/EX-F02-share-and-present-an-answer/feature.md#engine) |
 | The Assistant and its Access Policies | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
@@ -243,6 +244,8 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | `GET /{key}/branches/{n}/impact/{run_id}` | `ImpactRead` — the hops landed so far, while the run goes on | PJ-10 |
 | `GET /{key}/findings/{n}` · `POST /{key}/findings/{n}/review` | A finding · a person reviews it | PJ-06 |
 | `GET /{key}/proposals` · `POST /{key}/proposals/{n}/accept` · `POST /{key}/proposals/{n}/reject` | Proposals · accept · reject | PJ-05 |
+| `POST /{key}/branches/{n}/simulate` | `{options[], targets[{measure, op, value}], seed?}` → `202` `{run_id}` — opens the simulation as a what-if run of the Assistant ([EX-33](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)), the caller behind it | PJ-32 |
+| `GET /{key}/branches/{n}/simulate/{run_id}` | `SimulationRead` — the options ranked by the share of predicted outcomes meeting every target, each measure as mean and spread, the simulator and its version, the seed and the pinned loads | PJ-32 |
 | `GET /{key}/decisions` · `GET /decisions` | A project's decisions · every decision the reader may see, across projects | PJ-11 · PJ-13 |
 | `GET /{key}/decisions/{n}/lineage` | The decision's lineage: its findings, their steps, runs, evidence, records and loads, and each load's authors | PJ-11 |
 
@@ -264,14 +267,19 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | `projects.findings.add` · `projects.findings.review` | A finding added · reviewed |
 | `projects.decisions.record` | A decision recorded, a merge included |
 | `projects.proposals.submit` · `accept` · `reject` | A proposal's three acts |
+| — | A simulation writes its run's events (CP-F10) and none of its own; a finding added from it is `projects.findings.add` |
 | — | An impact reach writes its run's events ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) and none of its own |
 
 ### Refusals
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
+| 422 | A simulation with fewer than two options, or a target with no value | *Pick at least two options.* · *{measure} needs a value.* | PJ-32.2 · PJ-32.3 |
+| 409 | A simulation with no simulator installed | *Simulation needs a simulator, and none is installed.* | PJ-32.4 |
+| 403 | A simulation whose plugin is off, or no rule allows Run on it | *{plugin} is switched off by {person}.* · *{rule} on {policy} does not allow it.* | PJ-32.5 |
+| 422 | A simulation behind more than 20 loads, or a load undone | *A simulation reads at most 20 loads.* · *{load} was undone.* | PJ-32.6 |
 | 403 | A project the caller's default agent may not Read | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-03.9 · PJ-11.8 · PJ-13.6 |
-| 403 | Accepting or rejecting a proposal by someone not a member | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-05.17 |
+| 403 | Accepting or rejecting a proposal by someone not on the team | [PJ-F01 › Refusals](../PJ-F01-projects-and-tasks/feature.md#refusals) | PJ-05.17 |
 | 403 | An agent records a verdict or a decision | *An agent proposes — a person decides.* | PJ-05.13 · PJ-07.15 |
 | 422 | A fork with a child not titled | *Each child needs a title.* | PJ-04.7 |
 | 422 | A record, load, run or step cite that does not resolve | *`{cite}` does not resolve — nothing was added.* | PJ-06.3 |
@@ -311,10 +319,10 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | Accepting a proposal | Accepting a decision proposal runs the full decide as the accepting person; a refusal leaves it open. No route takes an agent as the decider |
 | A merge with no findings named | Carries every finding linked to the source |
 | A load undone | Read on every read of a finding or decision that cites it, never stored |
-| Records read as the reader | A record cite opens, and a lineage or impact reads, through the built-in Assistant with the reader behind it; a kind its policies deny is left out, `records_withheld` counted |
+| Records read as the reader | A record cite opens, and a lineage or impact reads, through the built-in Assistant with the reader behind it; a kind its policies hide is left out, uncounted |
 | Run content withheld | A run or step cite the reader may not read ([CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine)) returns `{run_id, status, tokens, content_withheld: true}` |
 | Lineage | `GET /{key}/decisions/{n}/lineage` walks the thinking graph from the decision ([AG-F09 `GET /thinking/decisions/{id}/sources`](../../../agents/features/AG-F09-learn-from-memory/feature.md#routes)) and adds each cited load's authors and source file from RC-F02 — every node a stored record, nothing inferred |
-| The impact reach | One run of the built-in Assistant, the caller behind it. Hop 0 is the records the branch's findings cite, every stance; each hop expands at most 12 records — the most reached first — each to at most 50 neighbours, through one query step per graph database joined on identity links; a record already reached is not counted again. The run writes `rings[]` as each hop lands; `sample` is set when a bound cut it. A graph database unreachable or switched off is skipped and named in `unread[]`. Every read is a ledger row |
+| The impact reach | One run of the built-in Assistant, the caller behind it. Hop 0 is the records the branch's findings cite, every stance; each hop expands at most 12 records — the most reached first — each to at most 50 neighbours, through one query step per graph database, never joined; a record already reached is not counted again. The run writes `rings[]` as each hop lands; `sample` is set when a bound cut it. A graph database unreachable or switched off is skipped and named in `unread[]`. Every read is a ledger row |
 | Impact counts | `rings[].by_kind`, `links[]`, `most_reached[]` and `how_sure` are counted by the engine; Studio formats them |
 | Decision counts | `GET /{key}/decisions` and `GET /decisions` return `total` and `current` — the listed decisions no later one supersedes |
 | Reading a project | Every read here reads the project through the caller's default agent, as [PJ-F01 › Mechanisms](../PJ-F01-projects-and-tasks/feature.md#mechanisms) says |
@@ -341,9 +349,10 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | A finding's page | The statement is its title; *Added by* and *reviewed by* name the person or agent, as *By* does on Decisions; a run cite reads `run 8195c5e8` and a step cite `run 8195c5e8 · step 4`, each opening the run |
 | A decision cites findings, not steps | A decision weighs findings; the steps, runs and records it rests on are reached through them in the thinking graph — one path, so lineage and recall agree |
 | Lineage is built from records | A decision, the findings it weighed, their steps, runs, evidence and loads, each load's author chain — never inferred; every node opens its source; *Show* narrows the loads and their authors to one source; a list of every node's hops under the drawing serves readers who cannot use it |
-| Who decided | Decisions names the decider for every reader whose default agent may Read the project; *Export for audit* is a CSV of the rows shown |
+| Who decided | Decisions names the decider for every reader who may read the project; *Export for audit* is a CSV of the rows shown |
 | Current is counted by the engine | *2 current · 5 recorded*; it reads *5* alone when they match |
 | Add from Explore | A settled answer reaches *Add a finding* through *Add to a project* (EX-12); a what-if answer arrives the same way, its evidence *predicted* |
+| A simulation is a what-if from a branch | *Simulate* on a branch opens the what-if run of Explore with the branch's options and targets; the result is predicted evidence, ranked, and reaches the branch only as a finding the person adds, still *Predicted*. The simulator is a plugin the deployment installs; the project names no domain |
 | Impact is a tab of the project | The branch and the hops are picked on it and kept on reload; it is read each time, never saved as a record |
 | One branch at a time | Impact shows one branch's reach; switching the branch replaces it |
 | Words for every reader | The impact rings are also listed in words, every group and link, for a reader who cannot see them |
@@ -368,7 +377,6 @@ An impact reach stores nothing of its own: it is a run ([CP-F10](../../../../os/
 | A *Loads* tab, and a branch's *Runs* and *Schedules* tabs | Not yet: the Overview lists the loads cited; runs and schedules are listed elsewhere |
 | A *stays parked* choice on merge | A merge always marks the source merged |
 | Lineage and impact from the command line | Not yet; Studio draws them from the same records |
-| Simulating on a branch | A what-if is a question in Explore whose answer is *predicted* evidence ([EX-33](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/stories/EX-33-ask-what-if-and-read-the-prediction-as-evidence/story.md)); it reaches a branch as a finding |
 | What-if values per node in impact | Impact reads reach only |
 | Comparing two branches' impact side by side | One branch at a time |
 | Impact saved as a record | A decision cites findings, not a reach |

@@ -4,11 +4,11 @@ title: Change and publish a model
 product: SE
 status: idea
 personas: [modeller]
-stories: [SE-05, SE-08]
+stories: [SE-05, SE-08, SE-23]
 journeys: [J01]
-boards: [model.board, model.board.kind, model.board.draft, model.board.draft.publish, inbox]
+boards: [model.models, inbox]
 nfrs: [NFR-PERF-5, NFR-SEC-9]
-depends_on: [SE-F01]
+depends_on: [SE-F01, CP-F13]
 ---
 
 # Change and publish a model
@@ -24,14 +24,17 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  start([A published model on the map]) --> may{Modeller or Admin?}
-  may -->|no| ro["Read only — Change in a draft disabled · Needs the Modeller role"]
+  start([A published model on the map]) --> may{Edit on the model?}
+  may -->|no| ro["Read only — Change in a draft disabled · Needs Edit on the model"]
   may -->|yes| d["SE-05 · Change in a draft · kinds, relationships, properties"]
   d --> held{Someone else holds the draft?}
   held -->|yes| hro["Read only · who holds it"]
   held -->|no| ch["Each change staged · the draft bar counts it · discard one or all"]
   ch --> c["SE-08 · Constrain a property: a range or a standard's values · Reject or Flag"]
   c -->|today n records break it| ch
+  ch --> h["SE-23 · Say where the kind's rows live: the graph database · a table · a time series"]
+  h -->|no data store connected · no Edit| hn(["Only the graph database is offered · Ask an Admin"])
+  h --> ch
   ch --> cmp["SE-05 · Compare on the map: + added · ~ changed · − removed"]
   cmp --> p["Publish: Invana classifies the draft"]
   p -->|nothing staged| none["Nothing to publish"]
@@ -72,18 +75,19 @@ sequenceDiagram
 |---|---|---|
 | SE-05 | [Change a model and publish it](stories/SE-05-change-a-model-and-publish-it/story.md) | idea |
 | SE-08 | [Constrain a property's values](stories/SE-08-constrain-a-propertys-values/story.md) | idea |
+| SE-23 | [Store a kind's rows in a table](stories/SE-23-store-a-kinds-rows-in-a-table/story.md) | idea |
 
 ## Access
 
-The role each act needs is the role table's *Ontology* row
-([AC-F02 › The role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); this
+The permission each act needs is the *Model* row of
+([AC-F02 › The permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); this
 table names the acts.
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Read a model, its draft, its comparison and its reviews | Operator · Modeller · Admin | — |
-| Change in a draft · stage, discard · constrain a property | Modeller · Admin, through the Modeller agent | *Change in a draft* disabled — *Needs the Modeller role — ask an Admin* |
-| Publish a draft that only adds · request approval for a breaking one | Modeller · Admin, through the Modeller agent | *Publish* hidden; the draft reads |
+| Read a model, its draft, its comparison and its reviews | Read on `model/<model>` | — |
+| Change in a draft · stage, discard · constrain a property | Edit on `model/<model>`, through the Modeller agent | *Change in a draft* disabled — *Needs Edit on the {model} model — ask {who can grant}* |
+| Publish a draft that only adds · request approval for a breaking one | Publish on `model/<model>`, through the Modeller agent | *Publish* hidden; the draft reads |
 | Approve or decline a breaking publish | The Modeller agent's named approvers, never the requester ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md)) | Not asked; the review reads *waiting on approval* |
 
 ## States
@@ -96,7 +100,7 @@ table names the acts.
 | Has data | The draft on its canvas, changed kinds chipped, the draft bar `n staged · Discard · Publish vN` |
 | Failed | A refused change says why where it was made; a failed preview says why and keeps the draft; a stale review says what moved |
 | Agent working or proposing | An agent's changes arrive staged on the same draft as a person's; the preview run scanning records |
-| No access | The model and its draft read; every change disabled with *Needs the Modeller role — ask an Admin* |
+| No access | The model and its draft read; every change disabled with *Needs Edit on the {model} model — ask {who can grant}* |
 
 ## Rules
 
@@ -106,16 +110,19 @@ table names the acts.
 | One draft, one writer at a time | The draft is kept by Invana, survives a reload and is seen by everyone; while one person holds it, others read it |
 | An agent stages like a person | A run's changes join the same draft and the same publish |
 | A published version never changes | Changing it publishes the next version; answers and loads that used the old one still resolve to it |
-| Breaking, change by change | A draft breaks when any one change does: a kind removed · a property removed · a property's type changed · a property narrowed (list to single, list to set, a unique or exists constraint, a range or a standard's values added or changed) · a relationship's ends narrowed · its multiplicity changed · a key added, removed or changed · a kind's validation, parent or abstract flag changed. Adding, widening, removing a constraint that is not a key, an index or a description only adds |
+| Breaking, change by change | A draft breaks when any one change does: a kind removed · a property removed · a property's type changed · a property narrowed (list to single, list to set, a unique or exists constraint, a range or a standard's values added or changed) · a relationship's ends narrowed · its multiplicity changed · a key added, removed or changed · a kind's validation, parent or abstract flag changed · a kind's home changed after it published. Adding, widening, removing a constraint that is not a key, an index or a description only adds |
+| A label belongs to one model | Two models in one graph database never declare the same label. A kind whose label another model of that graph database already holds is refused at publish; the other model's kind is brought in through a *Same thing* link between models instead ([SE-F06](../SE-F06-links-and-mappings/feature.md#rules)) |
 | A model never published only adds | There is nothing in its graph database it can break |
 | One way past a breaking change | A review: a preview that writes nothing, a named approver's yes, then the change runs. Nothing bypasses it |
 | Statements need read + write | Publishing pushes constraints and indexes to the model's graph database only when it is read + write; on a read-only one the version publishes and each statement reads *not pushed — read-only*, so drift (SE-F10) is measured against the version |
 | Counts are of what was read | The preview reads at most 1,000 records a kind and says so — *first 1,000 of 52,310* — never extrapolating |
 | Data is never rewritten | Publishing changes what the model says; records that do not fit the new version are listed, never changed or deleted |
-| Who reads it | The loads into a touched kind, the rules and derivations on it, the links between models and identity match rules on it, and the workflows that name it. Runs do not pin a model version, so a run is not a reader |
+| Who reads it | The loads into a touched kind, the rules and derivations on it, the links between models on it, and the workflows that name it. Runs do not pin a model version, so a run is not a reader |
 | A constraint is one property on one kind | A range with a unit, or one standard's values; Reject or Flag for review. Checked by one check wherever a record lands — every load and every edit on a board |
 | One constraint a property, versioned with the model | Saving a range or a standard replaces the one the property had; a pattern or a length rule stays beside it. A kind carries its own properties — a broader kind is meaning only (SE-F04) — so a constraint is always on the kind that has the property. A constraint is staged, compared and published with the draft like a property |
-| Leans on | SE-F01 — the draft · SE-F06 — links and match rules that read a model · SE-F05 — the standards a constraint names · RC-F02 — the loads into it · AC-F05 — the approval |
+| A kind declares where its rows live | A kind's **home** is `graph` (its records are nodes in the graph database — the default), `table`, `series`, `collection` or `files`, the last four in a connected data store ([CP-F13](../../../../os/control/features/CP-F13-data-stores/feature.md#rules)). The home is part of the kind in the draft, versioned and published with it. A store offers only the homes its connector declares |
+| The graph points, never copies | A record of a kind whose home is not `graph` is one node holding its key, its pointer — store, table or series, key — and the properties the kind marks *kept in the graph*; every other property is read from the store when someone looks at it, and bulk rows, points and file bytes are never copied into the graph database ([system-design.md §6](../../../../system-design.md#6-data-and-storage)) |
+| Leans on | SE-F01 — the draft · SE-F06 — links between models that read a model · SE-F05 — the standards a constraint names · RC-F02 — the loads into it · AC-F05 — the approval |
 
 ## Data touched
 
@@ -141,6 +148,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `model_versions` | `model_id` · `number` · `state` (`draft` · `published`) · `content_hash` · `axes` (`time` · `geo` · `dims`) · `held_by_id` · `published_by_id` · `published_at` · `why` | One `draft` row a model; `held_by_id` is who holds it. A published row never changes |
 | `model_property_keys` | `version_id` · `name` · `type` · `cardinality` (`single` · `list` · `set`) · `source_iri?` (≤2048) | Shared by every kind in the version |
 | `model_node_types` · `model_edge_types` | `version_id` · `name` · `description` · `source_iri?` (≤2048); an edge type adds its source and target kinds and its multiplicity | — |
+| `model_node_types` (added columns) | `home` (`graph` · `table` · `series` · `collection` · `files`, default `graph`) · `store_id?` (the data store, [CP-F13](../../../../os/control/features/CP-F13-data-stores/feature.md#engine)) · `store_ref?` (≤255: the table, series, collection or bucket path) · `time_key?` (a series: the time property) | A `graph` kind has none of the three; the others need `store_id` and `store_ref` |
 | `model_type_properties` | `type_id` · `key_id` · `order` | Which key a kind carries |
 | `model_validation_rules` | `version_id` · `type_property_id?` · `key_id?` · `rule_type` (`range` · `standard` · `pattern` · `enum` · `min_length` · `max_length`) · `min` · `max` · `unit` (≤32, a label) · `standard_version_id?` · `standard_ref` (`publisher/name@v`) · `term` · `params` · `on_break` (`reject` · `flag`) | On a kind's mapping of a key, or on the key itself. `params` holds the standard's values copied at save; `standard_version_id` is `SET NULL` when that version goes |
 | `model_constraints` · `model_indexes` | `version_id` · `type_id` · `properties` · `kind` (`unique` · `exists`, constraints only) | Staged like a kind |
@@ -153,13 +161,14 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 |---|---|
 | The model, its name and status | [SE-F01](../SE-F01-start-a-model/feature.md#engine) |
 | Standards and their versions | [SE-F05](../SE-F05-standards/feature.md#engine) |
-| Links between models and identity match rules on a touched kind | [SE-F06](../SE-F06-links-and-mappings/feature.md#engine) |
+| Links between models on a touched kind | [SE-F06](../SE-F06-links-and-mappings/feature.md#engine) |
 | Rules and derivations on a touched kind | [SE-F07](../SE-F07-rules/feature.md#engine) · [SE-F08](../SE-F08-inference/feature.md#engine) |
 | The Modeller agent's Access Policies a preview and a change run under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Loads into a touched kind · the load that checks a constraint | [RC-F02](../../../records/features/RC-F02-bring-records-in/feature.md#engine) |
 | The approval a breaking publish waits for, its deadline and reminder | [AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine) |
 | Runs and the built-in workflows they run | [CP-F10](../../../../os/control/features/CP-F10-runs-and-how-the-agents-are-doing/feature.md#engine) · [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md#engine) |
 | The graph database's mode and the server version's property types | [CP-F05](../../../../os/control/features/CP-F05-graph-databases/feature.md#engine) |
+| A data store — its mode, its switch, its homes and the column types it holds | [CP-F13](../../../../os/control/features/CP-F13-data-stores/feature.md#engine) |
 | History — every event this feature writes | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md#engine) |
 
 ### Routes
@@ -169,6 +178,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | `GET /versions` · `GET /versions/{vid}` | A model's versions and its draft · one version whole | SE-05 · SE-09 |
 | `GET /versions/{vid}/node-types` · `/edge-types` · `/property-keys` · `/constraints` · `/indexes` — each `GET` · `POST` · `PATCH` · `DELETE` on the draft | Read a version's parts · stage a change on the draft | SE-05 |
 | `GET /versions/{to}/diff?against=` | Compare any two: marks per kind, lines with signs, `next_version`; a first version against nothing reads every kind added | SE-05 · SE-09 |
+| `PUT /versions/{draft}/node-types/{id}/home` | Stage where a kind's rows live: `{home, store_id?, store_ref?, time_key?, kept_in_graph[]}` · `graph` takes none of the others | SE-23 |
 | `PUT /versions/{draft}/property-constraints` · `DELETE /versions/{draft}/property-constraints/{rule_id}` | Stage one constraint on a kind's property — `kind` (`range` · `standard`), `min` · `max` · `unit`, or `standard` and `term`, and `on_break` (default `reject`) · stage its removal | SE-08 |
 | `POST /versions/{draft}/property-constraints/check` | *Today n records break it*: `label` · `counted` · `breaking` · up to five `samples` · `reason` when it cannot count; writes nothing | SE-08 |
 | `GET /draft/staged` · `POST /draft/discard` | The staged changes · discard one or all | SE-05 |
@@ -180,7 +190,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Route, after `/api/v1/model` | Does | Story |
 |---|---|---|
 | `GET /models/property-constraints/standards` | The standards with a term that has values: `standard` · `title` · `version` · `term` · `values` (a count) | SE-08 |
-| `GET /schema/active-version` | Each model's published version the stitched model reads now | SE-05 |
+| `GET /schema/active-version` | Each model's published version the whole model reads now | SE-05 |
 
 ### Events
 
@@ -194,12 +204,18 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 403 | A change, constraint or publish by someone without the Modeller role | *Needs the Modeller role — ask an Admin.* | SE-05.22 · SE-08.16 |
+| 403 | A change, constraint or publish by someone without Edit (a publish, Publish) on the model | *Needs Edit on model/{model} — ask {who can grant}.* | SE-05.22 · SE-08.16 · SE-23.15 |
 | 409 | A change to a draft another person holds | *{person} holds this draft — it reads only.* | SE-05.6 |
 | 422 | A property type the connected server version cannot hold | *{type} is not available on {database} {version}.* | SE-05.27 |
 | 409 | Publishing a draft with nothing staged | *Nothing to publish.* | SE-05.10 |
+| 409 | Publishing a draft with a kind whose label another model in the same graph database holds | *{label} belongs to {model} — link the two with a same thing link instead.* | SE-05.28 |
 | 409 | Publishing a model whose kinds use a property type the server cannot hold | *{model} uses {types}, which {database} {version} cannot hold.* | SE-05.24 |
-| 409 | A breaking publish with no approver but the requester, or with a review already open on the model | *Nobody but you can approve this — ask an Admin to name an approver for the Modeller agent.* · *{model} already has a review open — {review}.* | SE-05.13 |
+| 409 | A breaking publish with no approver but the requester, or with a review already open on the model | *Nobody but you can approve this — ask someone with Manage on the Modeller agent to name an approver.* · *{model} already has a review open — {review}.* | SE-05.13 |
+| 422 | A publish an agent starts that writes a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | SE-05.29 |
+| 422 | A home the chosen data store's connector does not offer | *{store} cannot hold a {home}.* | SE-23.4 |
+| 422 | A series with no time property | *A series needs a time property — {kind} has none.* | SE-23.5 |
+| 422 | A property type the chosen data store cannot hold | *{type} is not available in {store}.* | SE-23.6 |
+| 409 | Publishing a kind whose data store is off or gone | *{store} is off — switch it on, or pick another home for {kind}.* | SE-23.9 |
 | 422 | A range on a text property, a minimum above the maximum, or a term with no values | *{property}: {why}.* | SE-08.7 |
 | 422 | A record a load or a board edit writes outside a published `reject` constraint — on the writing route | *`{Kind}.{property}` breaks its constraint {label}: {value}.* | SE-08.11 |
 
@@ -225,6 +241,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Approvers | The Modeller agent's named approvers, never the requester ([AC-F05](../../../../os/access/features/AC-F05-asks-and-approvals/feature.md#engine)); `deadline_s` defaults to 72 hours; reminders, escalation and expiry are AC-F05's |
 | The clock moves it | The access clock settles a preview into an approval, opens the change run after a yes, expires a review past its deadline and fails one whose run ended without its result |
 | Exactly what was approved | The change run (`model.migrate`, `apply = true`) checks `draft_hash` and the base version; a difference sets `stale` and publishes nothing. On success it publishes and lists the records that do not fit, unchanged |
+| A home is pushed like a statement | Publishing a kind with a table or series home creates or checks its table in the data store only when that store is read + write, through the connector's `project_kind`, writing a `model_schema_projections` row with `pushed`; on a read-only store the version publishes and the row reads *not pushed — read-only*, and the table must already exist to be read |
 | Pushing statements | Publishing pushes constraints and indexes only through the function `project_model`, and only to a read + write graph database, writing a `model_schema_projections` row per statement with `pushed`; the engine never writes the database's data here |
 | An agent stages | `model.understand_ask` binds the draft and the conversation; `model.validate_proposal` (needs `model.propose`) checks referential integrity and stages. Both write the draft, never the database |
 | Discard | A draft is not a version: discarding removes its rows |
@@ -233,7 +250,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 
 | HLD section | Change | NFRs |
 |---|---|---|
-| § 6 Data and storage | The version, key, kind, constraint, projection and review tables in Postgres | — |
+| § 6 Data and storage | The version, key, kind, constraint, projection and review tables in Postgres; a kind's `home`, `store_id`, `store_ref` and `time_key`; the graph holds a pointer, never the bulk rows | — |
 | § 8 APIs and events | The routes and events above, under `model` | — |
 | § 9 Distributed execution | The preview and the change are runs of the built-in workflow `model-migration@1`, moved by the access clock | — |
 | § 10 AI and agents | Two agent functions stage on the draft: `model.understand_ask` · `model.validate_proposal` | — |
@@ -257,6 +274,7 @@ The low-level design: what this feature stores, serves and refuses. Conventions 
 | Reject is the default | Flag lets the record land and lists it in the load's report and in the constraint's count |
 | *Today n records break it* is counted by the engine | Before saving, with up to five named; nothing written. A database it cannot count on says so, and the constraint still saves |
 | A property is named on its kind | Naming a property on a kind makes its key, or reuses the key of that name; keys are shared by every kind in the version |
+| A home is a draft change | Where a kind's rows live stages, compares and publishes with the kind; changing it after publish is breaking, since rows would have to move |
 | Indexes and keys stage like kinds | An index, a unique and an exists constraint are added and removed in the draft; an index only adds, a unique or exists constraint breaks |
 
 ## Open questions

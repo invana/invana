@@ -3,8 +3,9 @@ id: EX-15
 title: Share an answer
 feature: EX-F02
 status: idea
+milestone: MVP
 personas: [analyst]
-boards: [explore.share]
+boards: [explore.board]
 ---
 
 # EX-15 · Share an answer
@@ -17,12 +18,12 @@ Tasks: [task.md](task.md) · Feature: [EX-F02](../../feature.md)
 
 ## Who can
 
-Sharing is *Acts* for Operator, Modeller and Admin ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
+Sharing is *Acts* for every signed-in person ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); what an opened copy shows is as far as the person's default agent reads. A link carries no access.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Share any board's answer with users and teams, stop sharing, export PNG · CSV · Markdown; open any link | — |
-| Operator | The same; a Modeller the same | Without the Assistant: *Share with* disabled — *{person} may not use Assistant — ask an Admin*; export still works. A link to a board or snapshot that does not exist: *Not found* |
+| Operator | The same | Without the Assistant: *Share with* disabled — *{person} may not use Assistant — ask an Admin*; export still works. A link to a board or snapshot that does not exist: *Not found* |
 
 ## Flow
 
@@ -42,7 +43,7 @@ flowchart LR
   l --> o{Does the board or snapshot still exist?}
   s --> o
   o -->|yes| lin{Does the person's agent read every source?}
-  lin -->|no| red([Listed · content Withheld, naming what the agent may not read])
+  lin -->|no| red([Not found · as for a copy that does not exist])
   lin -->|yes| seen([The board and its answers · or the snapshot as it was])
   o -->|no| nf([Not found])
 ```
@@ -67,18 +68,22 @@ flowchart LR
 | EX-15.14 | The dialog on a shared board | a person reads *Shared with* | each user and team is listed with who shared it and when, each with *Stop sharing*; stopping takes it off their *Shared with me* |
 | EX-15.15 | A live link opened by a person who was not behind its runs | they open an answer's *How it got here* | it reads that the answer ran, its agent, its status and its tokens — *Content withheld*; its steps and queries read only to the person behind the run; nothing in it can be changed |
 | EX-15.16 | A shared answer, a live link or a snapshot | it is made | it records the resources it was read from — kind, graph database and level — as its sources, and its level is the highest of them |
-| EX-15.17 | A shared answer or snapshot with a source the person's default agent may not Read | they open it | it lists — the question, when, who made it — and its content reads *Withheld — your agent may not read {resource}*, naming each resource; nothing of the withheld content loads, and an Admin meets the same rule through their own default agent |
+| EX-15.17 | A shared answer or snapshot with a source the person's default agent may not Read | they open it | it reads *Not found*, as for a copy that does not exist; nothing loads and nothing names a source, and an Admin meets the same rule through their own default agent |
 | EX-15.18 | A shared answer or snapshot whose sources the person's default agent may Read in full | they open it | it shows as it was, in full |
 | EX-15.19 | An export — PNG, CSV or Markdown — of an answer carrying a confidential or personal value | the person exports | the value is left out of the file, and the file and the dialog name each property and level left out; the export is recorded with its sources |
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Share | Admin | explore.share · Nothing drawn | explore.share · No one matches | explore.share · Keeping | explore.share | explore.share · Failed | — | — |
-| Share | Operator | explore.share · Nothing drawn | explore.share · No one matches | explore.share · Keeping | explore.share | explore.share · Failed | — | explore.share · Not an owner |
-| A shared link opened | Admin | — | — | explore.share · Opening | explore.share · Shared board | — | — | — |
-| A shared link opened | Operator | — | — | explore.share · Opening | explore.share · Shared board | — | — | explore.share · Not found |
-| A shared link opened, sources withheld | Admin | — | — | — | explore.share · Shared board · Redacted | — | — | — |
-| A shared link opened, sources withheld | Operator | — | — | — | explore.share · Shared board · Redacted | — | — | explore.share · Shared board · Redacted |
-| An export · values left out | Admin | — | — | — | explore.share · Export · Redacted | — | — | — |
-| An export · values left out | Operator | — | — | — | explore.share · Export · Redacted | — | — | — |
+| Share | Admin | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | — |
+| Share | Operator | explore.board · Share · Nothing drawn | explore.board · Share · No one matches | explore.board · Share · Keeping | explore.board · Share | explore.board · Share · Failed | — | explore.board · Share · Not an owner |
+| A shared link opened | Admin | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | — |
+| A shared link opened | Operator | — | — | explore.board · Share · Opening | explore.board · Share · Shared board | — | — | explore.board · Share · Not found |
+| An export · values left out | Admin | — | — | — | explore.board · Share · Export · Redacted | — | — | — |
+| An export · values left out | Operator | — | — | — | explore.board · Share · Export · Redacted | — | — | — |
+| Share · Export | Admin | explore.board · Share | — | — | explore.board · Share · Export | explore.board · Share · Failed | — | — |
+| Share · Export | Operator | explore.board · Share | — | — | explore.board · Share · Export | explore.board · Share · Failed | — | — |
+| Share · Stop sharing | Admin | explore.board · Share · Stop sharing | — | explore.board · Share · Stopping | explore.board · Share · Stopped | explore.board · Share · Failed | — | — |
+| Share · Stop sharing | Operator | explore.board · Share · Stop sharing | — | explore.board · Share · Stopping | explore.board · Share · Stopped | explore.board · Share · Failed | — | — |
+| Share · not an owner | Admin | — | — | — | — | — | — | — |
+| Share · not an owner | Operator | — | — | — | — | — | — | explore.board · Share · Not an owner |

@@ -4,7 +4,7 @@ title: Let the assistant draft and explain an agent
 feature: AG-F01
 status: idea
 personas: [builder, admin]
-boards: [agents.new, agents.agent]
+boards: [agents.agents]
 ---
 
 # AG-26 · Let the assistant draft and explain an agent
@@ -17,20 +17,19 @@ Tasks: [task.md](task.md) · Feature: [AG-F01](../../feature.md)
 
 ## Who can
 
-Drafting and changing an agent follow building one ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)); explaining is every signed-in person's.
+Drafting and changing an agent follow building one ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)); explaining is every signed-in person's.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Ask the Assistant to draft an agent, propose changes to any agent not built in, run its evals in the practice graph database and explain; apply or discard every proposal | — |
-| Modeller | Ask for drafts and proposals on any agent not built in, and apply or discard them; ask for an explanation of any agent | On a built-in agent, a request to change it is answered with an explanation and *I can't change this agent — it is built in; copy it* |
-| Operator | Ask the Assistant to explain an agent — a setting, a skill's need, a refusal | A request to draft or change an agent is answered with an explanation and *I can't change this agent — that needs the Modeller role* |
+| Operator | Ask the Assistant to explain an agent — a setting, a skill's need, a refusal. With Create or Edit on the agent, asks for drafts and proposals on any agent not built in, and applies or discards them | A request to draft or change an agent is answered with an explanation and *I can't change this agent — that needs Edit on agent/{name}*; on a built-in agent, the answer is *I can't change this agent — it is built in; copy it* |
 
 ## Flow
 
 ```mermaid
 flowchart LR
   w(["What it should do, in plain words"]) --> a["The Assistant drafts"]
-  a -->|no AI model offered| ax["Says it cannot draft, linking Control Plane › AI models"]
+  a -->|no AI model offered| ax["Says it cannot draft, linking Settings › Connections › AI models"]
   a -->|fails| af["Says why; the form is untouched"]
   a --> p["A proposal — instructions · skills · voice · effort · policies to ask for, each part apart"]
   p -->|Apply a part| d["Part of the draft"]
@@ -48,23 +47,23 @@ flowchart LR
 | AG-26.1 | *New agent* with what it should do in plain words | the builder asks the Assistant to draft it | the Assistant proposes instructions, skills to add, voice, effort and the Access Policies to ask an Admin for, each part shown apart with *Apply* and *Discard*; nothing is saved until a part is applied |
 | AG-26.2 | A proposal being drafted | the modal is open | it says the Assistant is drafting and fills in each part as it lands; the form stays editable |
 | AG-26.3 | A proposed part | the builder presses *Apply* | it joins the draft and can be edited like anything typed; *Discard* leaves the draft as it was |
-| AG-26.4 | An agent's sheet | the builder asks for a change — *make it ask before sending* | the Assistant proposes what would move, shown against what is saved, and applies nothing until the builder does; a change to what it may touch is proposed as a policy change for an Admin to save |
-| AG-26.5 | A proposal that would widen what the agent may touch or its limits | it is shown | the widening is marked as an Admin's act, never applied with the rest |
+| AG-26.4 | An agent's page | the builder asks for a change — *make it ask before sending* | the Assistant proposes what would move, shown against what is saved, and applies nothing until the builder does; a change to what it may touch is proposed as a policy change for an Admin to save |
+| AG-26.5 | A proposal that would widen what the agent may touch or its limits | it is shown | the widening is marked as needing Manage on `access/policies` or Edit on `setting/deployment`, never applied with the rest |
 | AG-26.6 | A draft | the builder asks the Assistant to run its evals | it asks first, then runs the agent's eval set in the practice graph database and reports the checks; it never publishes |
 | AG-26.7 | Any signed-in person | they ask why a skill is refused, why a run was refused or what a limit does | the Assistant explains, citing the settings, the rule and policy, and the refusal it read |
-| AG-26.8 | No AI model offered in the deployment | the builder asks for a draft | the Assistant says it cannot draft, linking Control Plane › AI models; the form still saves by hand |
+| AG-26.8 | No AI model offered in the deployment | the builder asks for a draft | the Assistant says it cannot draft, linking Settings › Connections › AI models; the form still saves by hand |
 | AG-26.9 | A draft that fails | it ends | the Assistant says why in a sentence; the form is untouched |
 | AG-26.10 | A proposal | the builder opens *How it got here* | its steps and the sources it read are shown, each assumption marked *Challenge this* |
-| AG-26.11 | An Operator | they ask the Assistant to draft or change an agent | it explains instead and says it cannot change the agent, naming the role |
+| AG-26.11 | A person without Edit on the agent | they ask the Assistant to draft or change an agent | it explains instead and says it cannot change the agent, naming the permission it needs |
 | AG-26.12 | A drafted part of an agent | it is proposed | it names the option the Assistant recommends and why, beside *Apply* |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| The Assistant's draft in New agent | Admin | agents.new | — | — | agents.new · Proposal | agents.new · Could not draft | agents.new · Drafting | — |
-| The Assistant's draft in New agent | Operator | — | — | — | — | — | — | agents · New agent disabled |
-| A proposed change on the sheet | Admin | — | — | — | agents.agent · Proposal | agents.agent · Could not draft | agents.agent · Drafting | — |
-| A proposed change on the sheet | Operator | — | — | — | — | — | — | agents.agent · Read only |
-| An explanation | Admin | — | — | — | agents.agent · Explained | agents.agent · Could not load | agents.agent · Drafting | — |
-| An explanation | Operator | — | — | — | agents.agent · Explained | agents.agent · Could not load | agents.agent · Drafting | — |
+| The Assistant's draft in New agent | Admin | agents.agents · New | — | — | agents.agents · New · Proposal | agents.agents · New · Could not draft | agents.agents · New · Drafting | — |
+| The Assistant's draft in New agent | Operator | — | — | — | — | — | — | agents.agents · New agent disabled |
+| A proposed change on the page | Admin | — | — | — | agents.agents · Detail · Proposal | agents.agents · Detail · Could not draft | agents.agents · Detail · Drafting | — |
+| A proposed change on the page | Operator | — | — | — | — | — | — | agents.agents · Detail · Read only |
+| An explanation | Admin | — | — | — | agents.agents · Detail · Explained | agents.agents · Detail · Could not load | agents.agents · Detail · Drafting | — |
+| An explanation | Operator | — | — | — | agents.agents · Detail · Explained | agents.agents · Detail · Could not load | agents.agents · Detail · Drafting | — |

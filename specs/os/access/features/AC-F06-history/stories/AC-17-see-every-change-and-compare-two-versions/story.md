@@ -4,7 +4,7 @@ title: See every change and compare two versions
 feature: AC-F06
 status: idea
 personas: [admin, modeller, builder]
-boards: [inbox.history]
+boards: [settings.history]
 ---
 
 # AC-17 · See every change and compare two versions
@@ -17,16 +17,16 @@ Tasks: [task.md](task.md) · Feature: [AC-F06](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every change and compare any two versions of any record | — |
-| Operator | Read every change and compare any two versions of a record they can open | A record they cannot open reads as absent. Restoring is on the record's own page, by its own role |
+| Operator | Read every change and compare any two versions of a record they can open | A record they cannot open reads as absent. Restoring is on the record's own page, by the permission it needs |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  s([Inbox › History › Changes]) -->|nothing versioned| e["No changes yet"]
+  s([Access › Record › History › Changes]) -->|nothing versioned| e["No changes yet"]
   s --> c["A change: when · who · product · record vA → vB · why · effect after"]
   c -->|Compare| cmp["Two versions side by side: each changed field · the workflow · the model · the policy's rules"]
   cmp -->|pick other versions| cmp
@@ -57,12 +57,13 @@ flowchart LR
 | AC-17.16 | A compare | the reader wants an earlier version back | *Restore* is on the record's own page, makes a new version, and History keeps both |
 | AC-17.17 | A record the reader cannot open | its compare is followed | it reads as absent, not forbidden |
 | AC-17.18 | Changes filtered by product or person | nothing matches | it reads *0 of N match*, with *Clear all* |
+| AC-17.19 | The event list or its live tail | a person without Read on `access/history` reads it | they get their own acts and the change events of records they can open; another person's sign-ins, keys, clients and refusals never arrive. A reader of `access/history` gets every event |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| History › Changes | Admin | inbox.history · No changes yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history | inbox.history · Could not load | — | — |
-| History › Changes | Operator | inbox.history · No changes yet | inbox.history · Nothing matches | inbox.history · Loading | inbox.history | inbox.history · Could not load | — | inbox.history |
-| A compare | Admin | inbox.history · Nothing to compare | — | inbox.history · Loading | inbox.history · Compare | inbox.history · Not found | — | — |
-| A compare | Operator | inbox.history · Nothing to compare | — | inbox.history · Loading | inbox.history · Compare | inbox.history · Not found | — | inbox.history · Not found |
+| History › Changes | Admin | settings.history · No changes yet | settings.history · Nothing matches | settings.history · Loading | settings.history | settings.history · Could not load | — | — |
+| History › Changes | Operator | settings.history · No changes yet | settings.history · Nothing matches | settings.history · Loading | settings.history | settings.history · Could not load | — | settings.history |
+| A compare | Admin | settings.history · Nothing to compare | — | settings.history · Loading | settings.history · Compare | settings.history · Not found | — | — |
+| A compare | Operator | settings.history · Nothing to compare | — | settings.history · Loading | settings.history · Compare | settings.history · Not found | — | settings.history · Not found |

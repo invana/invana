@@ -4,7 +4,7 @@ title: Turn a failed run into a better skill
 feature: CP-F10
 status: idea
 personas: [builder, analyst]
-boards: [agents.run, agents.skill, inbox]
+boards: [agents.runs, agents.skills, inbox]
 ---
 
 # CP-56 · Turn a failed run into a better skill
@@ -16,10 +16,10 @@ Tasks: [task.md](task.md) · Feature: [CP-F10](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | *Improve this skill* from any failed run | — |
-| Operator | A Modeller: *Improve this skill* from a failed run they may read. An Operator: read the failed run they may read | An Operator sees *Request a change* where *Improve this skill* would stand, sent to the Modellers and the Admins with the run attached ([the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table): skills are the Modeller's and the Admin's); a failed run whose content they may not read shows neither ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Admin | *Improve this skill* from any failed run, with Edit on `skill/<name>` | — |
+| Operator | With Edit on `skill/<name>`: *Improve this skill* from a failed run they may read. Without it: read the failed run they may read | Without Edit on the skill, *Request a change* stands where *Improve this skill* would, sent to those who can Edit the skill and the Admins with the run attached ([the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue): Edit on `skill/<name>`); a failed run whose content they may not read shows neither ([AC-31](../../../../../access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 
@@ -32,7 +32,7 @@ flowchart LR
   d --> t["Tests run on the draft (AG-F04)"]
   t -->|publish| b(["Back to the run — re-run it on the new version"])
   t -->|a test fails| d
-  s -->|an Operator| q["Request a change"] --> i(["The Modellers and Admins, in Inbox › Needs you"])
+  s -->|an Operator| q["Request a change"] --> i(["Those who can Edit the skill, and the Admins, in Inbox › Needs you"])
 ```
 
 ## Acceptance criteria
@@ -41,21 +41,28 @@ flowchart LR
 |---|---|---|---|
 | CP-56.1 | A failed run | a step that failed opens | it reads its input, output and the skill it applied, with *Improve this skill* |
 | CP-56.2 | A failed step | the Assistant reads it | it proposes why it failed and a fix to the skill, citing the step; *How it got here* shows its steps and sources |
-| CP-56.3 | A Modeller or an Admin | they press *Improve this skill* | the skill's draft opens with this run added as a test, and a way back to the run |
+| CP-56.3 | A person with Edit on the skill | they press *Improve this skill* | the skill's draft opens with this run added as a test, and a way back to the run |
 | CP-56.4 | The draft published | the person who published it goes back | the run reads that a newer version of its skill exists, with *Re-run* on it (CP-54) |
 | CP-56.5 | A run whose skill already has a draft | *Improve this skill* is pressed | the run is added as a test to that draft; a second draft is never made |
-| CP-56.6 | An Operator | they read a failed run they may read | *Request a change* is in its place; it sends the Modellers and the Admins a request with the run attached, to *Needs you* |
+| CP-56.6 | An Operator | they read a failed run they may read | *Request a change* is in its place; it sends those who can Edit the skill, and the Admins, a request with the run attached, to *Needs you* |
 | CP-56.7 | A failed run that applied no skill | the step opens | *Improve this skill* is absent |
 | CP-56.8 | A proposed change to a skill from a failed run | it is shown | it names the change it recommends and why, beside the alternatives it weighed |
 | CP-56.9 | A failed run whose content the reader may not read | they open it | its steps read *withheld*; neither *Improve this skill* nor *Request a change* is offered |
+| CP-56.10 | A failed step | the reader presses *Adopt it into a skill* or *Request a change* | *Adopt* opens the skill's draft from the run (*Adopting*, then *From a run*, or *Test failed* naming why); *Request a change* sends the request to *Needs you* for those who may change the skill |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| A failed step on the run | Admin | — | — | agents.run · Loading | agents.run · Step failed | agents.run · Could not load | agents.run · Proposing a fix | — |
-| A failed step on the run | Operator | — | — | agents.run · Loading | agents.run · Request a change | agents.run · Could not load | agents.run · Proposing a fix | agents.run · Content withheld |
-| The skill's draft, the run as a test | Admin | — | — | agents.skill · Loading | agents.skill · From a run | agents.skill · Test failed | agents.skill · Testing | — |
-| The skill's draft, the run as a test | Operator | — | — | agents.skill · Loading | agents.skill · Read only | agents.skill · Test failed | — | agents.skill · Read only |
+| A failed step on the run | Admin | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Step failed | agents.runs · Detail · Could not load | agents.runs · Detail · Proposing a fix | — |
+| A failed step on the run | Operator | — | — | agents.runs · Detail · Loading | agents.runs · Detail · Request a change | agents.runs · Detail · Could not load | agents.runs · Detail · Proposing a fix | agents.runs · Detail · Content withheld |
+| The skill's draft, the run as a test | Admin | — | — | agents.skills · Detail · Loading | agents.skills · Detail · From a run | agents.skills · Detail · Test failed | agents.skills · Detail · Testing | — |
+| The skill's draft, the run as a test | Operator | — | — | agents.skills · Detail · Loading | agents.skills · Detail · Read only | agents.skills · Detail · Test failed | — | agents.skills · Detail · Read only |
 | The request in Needs you | Admin | — | — | inbox · Loading | inbox · Request a change | — | — | — |
 | The request in Needs you | Operator | — | — | inbox · Loading | inbox · Request sent | — | — | inbox · Request sent |
+| Adopt it into a skill | Admin | — | — | agents.skills · Detail · Adopting | agents.skills · Detail · From a run | agents.skills · Detail · Test failed | — | — |
+| Adopt it into a skill | Operator | — | — | — | — | — | — | agents.skills · Detail · Read only |
+| Request a change | Admin | — | — | — | agents.runs · Detail · Request a change | — | — | — |
+| Request a change | Operator | — | — | — | inbox · Request sent | — | — | inbox · Request sent |
+| Request a change · In Needs you | Admin | — | — | — | inbox · Request a change | — | — | — |
+| Request a change · In Needs you | Operator | — | — | — | — | — | — | inbox · Request sent |

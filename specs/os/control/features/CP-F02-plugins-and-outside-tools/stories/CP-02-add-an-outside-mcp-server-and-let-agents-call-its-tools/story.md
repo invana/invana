@@ -4,7 +4,7 @@ title: Add an outside MCP server and let agents call its tools
 feature: CP-F02
 status: idea
 personas: [admin, builder]
-boards: [settings.plugins.server]
+boards: [settings.plugins]
 ---
 
 # CP-02 · Add an outside MCP server and let agents call its tools
@@ -17,18 +17,18 @@ Tasks: [task.md](task.md) · Feature: [CP-F02](../../feature.md)
 
 ## Who can
 
-Roles are [the role table](../../../../../access/features/AC-F02-access-policies/feature.md#the-role-table).
+The permission each act needs is in [the permission catalogue](../../../../../access/features/AC-F02-access-policies/feature.md#the-permission-catalogue).
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
-| Admin | Add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
-| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; a Modeller the same | *Add a server* and *Read its tools again* are disabled, naming the Admins |
+| Admin | With Create on `plugin/<name>`: add a server by address and name; read its tools again; switch it as any plugin (CP-04) | — |
+| Operator | Read every server, its tools and their versions, what each needs and the server's own read-only hint; with Create on `plugin/<name>`, the same as Admin | *Add a server* and *Read its tools again* are disabled — *Needs Create on Plugins — ask {who can grant}* |
 
 ## Flow
 
 ```mermaid
 flowchart TD
-  s([Settings › Invana › Plugins › Outside servers]) --> a["Add a server: address · name · how Invana signs in (CP-42)"]
+  s([Settings › Plugins › Outside servers]) --> a["Add a server: address · name · how Invana signs in (CP-42)"]
   a --> n{"Name free and well-formed · address allowed?"}
   n -->|no| nf["Says which · nothing stored"]
   n -->|yes| l{"Lists its tools?"}
@@ -65,14 +65,20 @@ flowchart TD
 | CP-02.14 | Anyone on the command line | they run `invana plugins mcp add` or `mcp refresh` | each does what its Studio act does, under the same checks |
 | CP-02.15 | A call whose arguments carry a value of a confidential or personal property | it is about to leave | it is refused before it leaves, naming the property and its level (AC-42) |
 | CP-02.16 | A tool's result | it comes back | it carries its lineage — the server, the tool and the connection — so every copy made from it shows only as far as its sources allow (GP-F02) |
+| CP-02.18 | A tool's result | the run reads it | it is outside text: fenced and labelled as data with the server and tool, and the run is marked as holding outside text, so every outward act after it asks, showing the result's text (AC-15.35, NFR-SEC-15) |
+| CP-02.17 | An Admin | they list the tools of a new server and press *Add the server, off* | *Listing its tools* reads, then *Tools listed*; adding reads *Added* and the server's tools open; a name already used reads *Name taken* in place |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| Outside servers | Admin | settings.plugins.server · No servers | settings.plugins · Nothing matches | settings.plugins.server · Loading | settings.plugins.server | settings.plugins.server · Could not load | — | — |
-| Outside servers | Operator | settings.plugins.server · No servers · Read only | settings.plugins · Nothing matches | settings.plugins.server · Loading | settings.plugins.server · Read only | settings.plugins.server · Could not load | — | settings.plugins.server · Read only |
-| Add a server | Admin | settings.plugins.server · Add a server | — | settings.plugins.server · Listing its tools | settings.plugins.server · Tools listed | settings.plugins.server · Server unreachable | — | — |
-| Add a server | Operator | — | — | — | — | — | — | settings.plugins.server · Read only |
-| A server's tools | Admin | — | — | settings.plugins.server · Loading | settings.plugins.server · Tools | settings.plugins.server · Address refused | — | — |
-| A server's tools | Operator | — | — | settings.plugins.server · Loading | settings.plugins.server · Tools · Read only | settings.plugins.server · Address refused | — | settings.plugins.server · Read only |
+| Outside servers | Admin | settings.plugins · Servers · No servers | settings.plugins · Nothing matches | settings.plugins · Servers · Loading | settings.plugins · Servers | settings.plugins · Servers · Could not load | — | — |
+| Outside servers | Operator | settings.plugins · Servers · No servers · Read only | settings.plugins · Nothing matches | settings.plugins · Servers · Loading | settings.plugins · Servers · Read only | settings.plugins · Servers · Could not load | — | settings.plugins · Servers · Read only |
+| Add a server | Admin | settings.plugins · Servers · Add | — | settings.plugins · Servers · Add · Listing its tools | settings.plugins · Servers · Add · Tools listed | settings.plugins · Servers · Add · Server unreachable | — | — |
+| Add a server | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |
+| A server's tools | Admin | — | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Tools | settings.plugins · Servers · Address refused | — | — |
+| A server's tools | Operator | — | — | settings.plugins · Servers · Loading | settings.plugins · Servers · Tools · Read only | settings.plugins · Servers · Address refused | — | settings.plugins · Servers · Read only |
+| Add a server · A token | Admin | — | — | — | settings.plugins · Servers · Add · A token | settings.plugins · Servers · Add · Name taken | — | — |
+| Add a server · A token | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |
+| Add a server · Added | Admin | — | — | — | settings.plugins · Servers · Added | — | — | — |
+| Add a server · Added | Operator | — | — | — | — | — | — | settings.plugins · Servers · Read only |

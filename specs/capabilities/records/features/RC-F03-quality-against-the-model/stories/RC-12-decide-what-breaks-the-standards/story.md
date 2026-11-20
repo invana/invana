@@ -4,7 +4,7 @@ title: Decide what breaks the standards
 feature: RC-F03
 status: idea
 personas: [curator]
-boards: [data.checks]
+boards: [data.quality]
 ---
 
 # RC-12 · Decide what breaks the standards
@@ -17,18 +17,18 @@ Tasks: [task.md](task.md) · Feature: [RC-F03](../../feature.md)
 
 ## Who can
 
-Fixing one record changes data, never the model or its standards, so every role may start it ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table) › *quality*); which records the fix reaches is the agent's Access Policies alone.
+Fixing one record changes data, never the model or its standards, so anyone with Edit on the kind may start it ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue) › *quality*); which records the fix reaches is the agent's Access Policies alone.
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read every problem; fix any, on a connection that writes | — |
-| Operator | Read every problem on kinds they may read; fix, on a connection that writes. A Modeller does the same | A record the agent granted to them may not write: *Fix* disabled, naming the Access Policy that stops it |
+| Operator | Read every problem on kinds they may read; fix, on a connection that writes | A record the agent granted to them may not write: *Fix* disabled, naming the Access Policy that stops it |
 
 ## Flow
 
 ```mermaid
 flowchart LR
-  a([Records › Quality · To decide]) --> q{Any problem?}
+  a([Model › Graph Data › Quality · To decide]) --> q{Any problem?}
   q -->|no| e["Nothing to decide"]
   q -->|yes| l["Each: kind · standard@v or constraint · property · problem · score"]
   l -->|narrow to one kind| n["That kind's problems · its total"]
@@ -48,19 +48,23 @@ flowchart LR
 | RC-12.2 | Records that break a constraint or a standard their kind is held to | *To decide* opens | each lists the kind, the standard version or constraint, the property and the problem; each kind carries its score — the share of its records that conform; the totals and scores are the engine's |
 | RC-12.3 | The queue | the person narrows it to one kind | only that kind's problems list, with its own total; one with none reads *Nothing to decide for this kind* and offers *Clear* |
 | RC-12.4 | One problem | the person opens it | it shows the record, the term, the value and why it breaks the standard or constraint |
-| RC-12.5 | A person of any role, a problem, and an agent granted to them that may write the record | they fix it with another value and a reason | the value is written as one run, the reason its *why*, and the record's provenance names the fix (RC-F06) |
+| RC-12.5 | A person with Edit on the kind, a problem, and an agent granted to them that may write the record | they fix it with another value and a reason | the value is written as one run, the reason its *why*, and the record's provenance names the fix (RC-F06) |
 | RC-12.6 | A record changed since the item opened | the fix is saved | it is refused, asking the person to reload and fix again |
 | RC-12.7 | A fixed record that conforms | the queue reloads | the item has left it |
-| RC-12.8 | Kinds a view hides | the queue opens | they are counted as not readable, never left out silently |
+| RC-12.8 | Kinds the person's Access Policies do not allow | the queue opens | they are left out of rows and totals, with no count and no note |
 | RC-12.9 | A problem on a record the person's agent may not write | they open it | it reads; *Fix* is disabled, naming the Access Policy that stops it |
-| RC-12.10 | A Graph whose connection is read-only | a fix is saved | it is refused, naming the connection setting; nothing is written |
+| RC-12.10 | A graph database whose connection is read-only | a fix is saved | it is refused, naming the connection setting; nothing is written |
 | RC-12.11 | A fix whose value still breaks the rule, or with no reason | it is saved | it is refused, naming the rule or asking for the reason; nothing is written |
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
-| To decide | Admin | data.checks · Nothing to decide | data.checks · Nothing for this kind | data.checks · Loading | data.checks | data.checks · Could not load | — | — |
-| To decide | Operator | data.checks · Nothing to decide | data.checks · Nothing for this kind | data.checks · Loading | data.checks | data.checks · Could not load | — | — |
-| A problem | Admin | — | — | data.checks · Loading | data.checks · Problem | data.checks · Fix refused | — | — |
-| A problem | Operator | — | — | data.checks · Loading | data.checks · Problem | data.checks · Fix refused | — | data.checks · Fix needs a grant |
+| To decide | Admin | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |
+| To decide | Operator | data.quality · Checks · Nothing to decide | data.quality · Checks · Nothing for this kind | data.quality · Checks · Loading | data.quality · Checks | data.quality · Checks · Could not load | — | — |
+| A problem | Admin | — | — | data.quality · Checks · Loading | data.quality · Checks · Problem | data.quality · Checks · Fix refused | — | — |
+| A problem | Operator | — | — | data.quality · Checks · Loading | data.quality · Checks · Problem | data.quality · Checks · Fix refused | — | data.quality · Checks · Fix needs a grant |
+| A problem · fix | Admin | data.quality · Checks · Problem | — | data.quality · Checks · Fixing | data.quality · Checks · Fixed | data.quality · Checks · Fix refused | — | — |
+| A problem · fix | Operator | data.quality · Checks · Problem | — | data.quality · Checks · Fixing | data.quality · Checks · Fixed | data.quality · Checks · Fix refused | — | — |
+| A problem · changed meanwhile | Admin | data.quality · Checks · Problem | — | — | — | data.quality · Checks · Changed meanwhile | — | — |
+| A problem · changed meanwhile | Operator | data.quality · Checks · Problem | — | — | — | data.quality · Checks · Changed meanwhile | — | — |

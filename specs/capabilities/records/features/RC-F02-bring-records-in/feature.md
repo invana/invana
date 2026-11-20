@@ -6,7 +6,7 @@ status: idea
 personas: [curator, modeller]
 stories: [RC-08, RC-09, RC-10, RC-11]
 journeys: [J01]
-boards: [data.upload, data.collect, agents.run, explore.board.menu]
+boards: [data.loads, agents.runs, explore.board]
 nfrs: [NFR-REL-1, NFR-PERF-3]
 depends_on: [SE-F02, SE-F07]
 ---
@@ -24,11 +24,11 @@ Journeys this feature is a step of: [J01 · From a fresh deployment to a first a
 
 ```mermaid
 flowchart TD
-  start([Records › Bring records in]) --> how{How do the records arrive?}
+  start([Model › Graph Data › Loads › Bring records in]) --> how{How do the records arrive?}
   how -->|a file in the browser| up["RC-08 · Upload: a file, the model it goes into, its key, licence"]
   up --> prev["What it becomes — columns, the kinds and properties each maps to, examples"]
   prev -->|missing or repeated keys| upx["Refused — names the first five rows"]
-  prev -->|an Operator| una["Upload disabled — Needs the Modeller role"]
+  prev -->|without Create on the kind| una["Upload disabled — Needs Create on the kind"]
   prev -->|Load| run
   how -->|a pipeline · the command line or the API| cli["RC-09 · A load into a model"]
   cli -->|no such model · read-only connection| clx["Refused before anything is written"]
@@ -59,12 +59,12 @@ flowchart TD
 
 ## Access
 
-| Act | Role ([the role table](../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | Everyone else sees |
+| Act | Permission ([the permission catalogue](../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | Everyone else sees |
 |---|---|---|
-| Load into a model — upload, command line, API, a bundle, records by hand | Modeller · Admin, through an agent granted to them | *Upload* and *Add records* disabled — *Needs the Modeller role — ask an Admin*; the command line and API refuse before anything is written |
-| Read the loads, what each rejected and what landed | Every role — Operator, Modeller, Admin | — |
-| Export a load with its provenance | Every role — Operator, Modeller, Admin | — |
-| Undo a load | Modeller · Admin | *Undo load* disabled — *Needs the Modeller role — ask an Admin* |
+| Load into a model — upload, command line, API, a bundle, records by hand | Create on `data/<graph database>/<kind>`, through an agent the person may Run (`agent/loader`) | *Upload* and *Add records* disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}*; the command line and API refuse before anything is written |
+| Read the loads, what each rejected and what landed | Read on `data/<graph database>` | — |
+| Export a load with its provenance | Read on `data/<graph database>` | — |
+| Undo a load | Edit on `data/<graph database>/<kind>` | *Undo load* disabled — *Needs Edit on {kind} in {graph database} — ask {who can grant}* |
 | Cancel a load | Who started it, where they started it | Studio offers no cancel: a load is stopped where it was started |
 
 ## States
@@ -77,7 +77,7 @@ flowchart TD
 | Has data | A preview of what the file becomes; loads newest first with records written and rejected; a run's outcome, steps, what was rejected, its log and what landed |
 | Failed | A refused upload names the rows or the reason; a failed load shows its diagnosis and the next step where its counts are |
 | Agent working or proposing | — |
-| No access | Loading acts are disabled — *Needs the Modeller role — ask an Admin*; every load still reads |
+| No access | Loading acts are disabled — *Needs Create on {kind} in {graph database} — ask {who can grant}*; every load still reads |
 
 ## Rules
 
@@ -119,7 +119,7 @@ flowchart TD
 
 | Table | Columns | Notes |
 |---|---|---|
-| `record_loads` | `id` · `graph_id` · `model_id` · `model_version` · `file_name` · `file_hash` · `licence` · `source` (`upload` · `cli` · `api` · `bundle` · `by_hand` · `bulk` · `run`) · `run_id` · `bundle_run_id?` · `from_run_id?` · `status` (`running` · `succeeded` · `partly_rejected` · `failed` · `cancelled` · `undone`) · `written` · `created` · `updated` · `rejected` · `created_by` · `created_at` · `undone_at` · `undone_by` | `id` is stable and citable; `file_hash` is SHA-256 of the file's bytes, or of the records' canonical JSON when there is no file (`by_hand` · `run`); counts are written when the run settles; a bulk load is `source = bulk` and is never citable. `run_id` is the load's own run; `bundle_run_id` the bundle run it is a lane of; `from_run_id` the run whose result a `source = run` load saves |
+| `record_loads` | `id` · `database_id` · `model_id` · `model_version` · `file_name` · `file_hash` · `licence` · `source` (`upload` · `cli` · `api` · `bundle` · `by_hand` · `bulk` · `run`) · `run_id` · `bundle_run_id?` · `from_run_id?` · `status` (`running` · `succeeded` · `partly_rejected` · `failed` · `cancelled` · `undone`) · `written` · `created` · `updated` · `rejected` · `created_by` · `created_at` · `undone_at` · `undone_by` | `id` is stable and citable; `file_hash` is SHA-256 of the file's bytes, or of the records' canonical JSON when there is no file (`by_hand` · `run`); counts are written when the run settles; a bulk load is `source = bulk` and is never citable. `run_id` is the load's own run; `bundle_run_id` the bundle run it is a lane of; `from_run_id` the run whose result a `source = run` load saves |
 | `record_load_inputs` | `load_id` · `input_load_id` | A `source = run` load only: one row per load the run it saves was pinned to. Its records are *derived*; their provenance is `from_run_id` and these loads |
 | `record_load_rejections` | `load_id` · `record_ref` · `field` · `reason` · `sample` | One row per rejected record; grouped by `reason` when read |
 
@@ -133,14 +133,14 @@ flowchart TD
 | The packaged plans `model-import@1` · `bundle-import@1` · `bulk-load@1` and the functions their steps call | [AG-F06](../../../agents/features/AG-F06-plans-and-workflows/feature.md) |
 | Workers and the queue a load runs on | [CP-F03](../../../../os/control/features/CP-F03-workers-and-the-queue/feature.md) |
 | History — every value a load wrote | [AC-F06](../../../../os/access/features/AC-F06-history/feature.md) |
-| The view a load runs under, and the touches it records | [SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine) |
+| The Access Policies a load runs under | [AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#engine) |
 | Active links between models a load resolves | [SE-F06](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) |
 | The task raised for a bundle's broken file | [PJ-F01 › Engine](../../../projects/features/PJ-F01-projects-and-tasks/feature.md#engine) |
 | The simulation run a `source = run` load saves | [EX-F05 › Engine](../../../explore/features/EX-F05-when-it-cannot-answer-and-how-it-reasons/feature.md#engine) |
 
 ### Routes
 
-| Route, after `/api/v1/u/{u}/{g}/records` | Does | Story |
+| Route, after `/api/v1/records` | Does | Story |
 |---|---|---|
 | `POST /loads` | Start a load into a model — a file, a stream of records, or `{from_run_id, kind}` to save a run's result as derived records | RC-08 · RC-09 · RC-11 · EX-33 |
 | `POST /loads/preview` | What a file becomes against a model, before anything is written | RC-08 |
@@ -165,11 +165,12 @@ flowchart TD
 
 | Status | When | Sentence | Criterion |
 |---|---|---|---|
-| 404 | The load names no model, or one the Graph lacks | *No model `{name}` in this graph — it has {models}.* | RC-09.1 |
-| 409 | The Graph's connection is read-only | *This graph's connection is read-only — loading needs a writable connection.* | RC-09.2 |
+| 404 | The load names no model, or one the deployment lacks | *No model `{name}` — the published models are {models}.* | RC-09.1 |
+| 409 | The graph database's connection is read-only | *This graph database's connection is read-only — loading needs a writable connection.* | RC-09.2 |
 | 403 | A rule refuses writing into the model | *Cannot answer — `{rule}` refuses writing into `{model}`.* | RC-09.3 |
-| 403 | The caller is an Operator | *Needs the Modeller role — ask an Admin.* | RC-08.9 |
+| 403 | The caller lacks Create on the kind | *Needs Create on data/{graph database}/{kind} — ask {who can grant}.* | RC-08.9 |
 | 415 | A file that is not rows with a header — a document, a paper, free text | *Only rows that fit a kind can be loaded — extract them first.* | RC-08.10 |
+| 422 | A load an agent starts that names a kind or a property *Hidden from agents* hides | *There is no kind {kind}.* · *{kind} has no property {property}.* — the same sentence as for one that does not exist | RC-08.11 |
 | 422 | Rows without a key, or two rows with one key, in an upload | *{n} rows have no key or repeat one — the first five: {rows}.* | RC-08.4 |
 | 409 | A record added by hand whose key already exists | *`{key}` already exists — a new record never overwrites one.* | RC-11.4 |
 | 409 | Undo of a bulk load, or of a load already undone | *This load cannot be undone — {reason}.* | RC-09.20 |
@@ -181,10 +182,10 @@ flowchart TD
 
 | Command | Does |
 |---|---|
-| `invana load <file> --graph <g> --model <m> [--licence <l>]` | One load into one model; exits non-zero past the rejection threshold; progress on `stderr` (a rewriting counter on a terminal, a line a step otherwise), the summary alone on `stdout` |
-| `invana load --bundle <folder> --graph <g> [--check]` | Check, then load a bundle as one run; `--check` runs the offline check alone and writes nothing; one progress line per lane; exits non-zero when any file failed |
-| `invana load --bulk <path> --graph <g>` | The marked fast path: no checks, no provenance; the Graph supplies the connector, URI and credentials, and `--connector` · `--uri` · `--username` · `--password` each override one part |
-| `invana load --bulk <path> --connector <c> --uri <u>` | Without `--graph`: runs direct, records nothing and says so — credentials never ride a run's params |
+| `invana load <file> --database <name> --model <m> [--licence <l>]` | One load into one model; exits non-zero past the rejection threshold; progress on `stderr` (a rewriting counter on a terminal, a line a step otherwise), the summary alone on `stdout` |
+| `invana load --bundle <folder> --database <name> [--check]` | Check, then load a bundle as one run; `--check` runs the offline check alone and writes nothing; one progress line per lane; exits non-zero when any file failed |
+| `invana load --bulk <path> --database <name>` | The marked fast path: no checks, no provenance; the graph database supplies the connector, URI and credentials, and `--connector` · `--uri` · `--username` · `--password` each override one part |
+| `invana load --bulk <path> --connector <c> --uri <u>` | Without `--database`: runs direct, records nothing and says so — credentials never ride a run's params |
 
 ### Mechanisms
 
@@ -196,8 +197,8 @@ flowchart TD
 | Per-record check | Each record is checked against its kind's properties, constraints and standards; a break of a `reject` rule rejects it, a break of a `flag` rule writes it for RC-F03 to list ([SE-F02 › Engine](../../../semantics/features/SE-F02-change-and-publish-a-model/feature.md#engine) `on_break`); the run never stops for a bad record |
 | Provenance stamps | Every node and relationship written carries `_inv_load_id` · `_inv_model_id` · `_inv_record_id` · `_inv_file` · `_inv_run_id`; a node's peek reads them off the element with no request. An element with none was written by a bulk load or before Invana ([RC-F06](../RC-F06-provenance/feature.md#engine) reads them) |
 | A loaded link row carries both marks | A relationship a link file writes carries the load's stamps and its link's, as [SE-F06 › Engine](../../../semantics/features/SE-F06-links-and-mappings/feature.md#engine) says |
-| Link rows from a file | A file ships a link's rows in `stitches/<RELATIONSHIP>.json` (`{id, from, to, properties}`); the Graph must hold an active link naming this load's model and that relationship, or the file is reported `no_stitch_for_edge` and nothing of it is written |
-| A load is governed | The run freezes the Graph's view at open; Write engages the version the open pinned and records one touch with what it wrote; Stitch touches every model its relationships joined; Validate and Snapshot touch nothing. A rule that refuses the model ends the load *cannot answer*, naming it, before anything is written ([SE-F09 › Engine](../../../semantics/features/SE-F09-views-of-the-graph/feature.md#engine)) |
+| Link rows from a file | A file ships a link's rows in `stitches/<RELATIONSHIP>.json` (`{id, from, to, properties}`); the deployment must hold an active link naming this load's model and that relationship, or the file is reported `no_stitch_for_edge` and nothing of it is written |
+| A load is governed | The run freezes the policies that reach it at open; Write engages the version the open pinned and records what it wrote; Stitch reaches every model its relationships joined; Validate and Snapshot write nothing. A policy that refuses the model ends the load *Not allowed by your access*, naming it, before anything is written ([AC-F02](../../../../os/access/features/AC-F02-access-policies/feature.md#property-access)) |
 | A failure is its step's | A failure is attributed to the step in flight; the database's refusal of a write becomes a diagnosis with the next step, never a stack trace |
 | The version holds | A model published mid-run does not switch the run; it keeps and reports the version it opened with |
 | Cancel | Accepted records stay; the run is `cancelled` and the report says where it stopped; a bundle says which files had finished |
@@ -206,11 +207,11 @@ flowchart TD
 | The bundle manifest | `stitches.json` at the folder's root: `name` · `datasets[]` (folders, each declaring its model in `graph-model.json`, by `package_id` then `name`; two may declare one model) · `stitches[]` — `id` (a label for the report) · `kind` (`anchor` · `relationship`) · `source` · `target` (`<folder>:<Kind>.<property>`) · `identity_match` (`exact` · `case_insensitive`) · `edge_type` · `rows` (a rows file when there is no key pair) · `partial` (the sides overlap, not match fully) |
 | The offline check | `data.bundle.check`, before anything is written: `node_ids_unique` · `identity_key_present` · `identity_key_unique` · `node_type_declared` · `edge_type_declared` · `property_declared` · `property_type` · `enum_value` · `endpoint_types`; each rule between files resolves and is counted by distinct key values, failing when it leaves values unresolved unless `partial`; `endpoint_resolves` is reported deferred, never failed |
 | `bundle-import@1` | **check** (the offline check) · **load** — one lane per file, up to 4 at once, each inlining `model-import@1` by `uses` so a lane and a single load never drift; a failed lane does not stop the others · **stitch** — once, over everything that landed; skipped when every lane failed, and the run fails with a diagnosis · **report** — each file's counts rolled into the run · **triage** — a task naming a failed file, assigned to the person who started the bundle or left unassigned. Lanes and events are the runtime's; no table of its own |
-| `bulk-load@1` | A run of kind `bulk`, one step `graph.write.bulk` through the connector's bulk write — counts, log and who ran it, no report and no provenance. With no model version to pin, the Graph's grounding version governs it |
+| `bulk-load@1` | A run of kind `bulk`, one step `graph.write.bulk` through the connector's bulk write — counts, log and who ran it, no report and no provenance. With no model version to pin, the deployment's grounding version governs it |
 | A Python call | `load_records(...)` for an orchestrator that holds the records in memory: the same load, returning its run to wait on, with an `on_progress` callback |
 | A saved result | `POST /loads` with `from_run_id` and a kind: one `source = run` load of that kind, keyed by each row's label, one property per figure; `record_load_inputs` copies the run's pinned loads. Every value it writes reads *derived*, its provenance the run and those loads |
 | Undo | Removes the nodes and relationships the load created; reverts a value it wrote only when no later write changed it, and lists the rest as kept; sets `undone_at` and emits `records.load.undo` with what cites the load — findings, reports, simulations and every `source = run` load whose inputs name it |
-| Counts | `written` · `created` · `updated` · `rejected` are stored when the run settles; the tiles are the runtime's run statistics for this Graph; Studio never derives them |
+| Counts | `written` · `created` · `updated` · `rejected` are stored when the run settles; the tiles are the runtime's run statistics for the deployment; Studio never derives them |
 
 ## System impact
 
@@ -222,7 +223,7 @@ flowchart TD
 
 | Decision | Detail |
 |---|---|
-| Loads live in Records › Bring records in | *Loads — from the CLI, the API and here*: one row per load, newest first; a row opens the run as a sheet |
+| Loads live in Model › Graph Data › Loads › Bring records in | *Loads — from the CLI, the API and here*: one row per load, newest first; a row opens the run's page |
 | Rejections group by reason | One bad column is one line with its count and sample rows, not thousands |
 | A run's page reads in audit order | Outcome · Steps · What was rejected · Log · What landed |
 | What landed names its version | Counts per kind sit beside *Checked against Model@v3* |
@@ -231,8 +232,8 @@ flowchart TD
 | Purged rows say so | A run past retention keeps its counts and says its rows are gone |
 | The browser reads the file | Rows left out for having no key are listed in the load's report |
 | Records by hand are a load | The new records are one load, its source *by hand*, the person its author; a new record never overwrites a key; above 5,000 records the form points to the command |
-| A bulk load is listed when it names its Graph | The Graph supplies the connection and the load is listed; a connection typed on the command line runs direct and is not listed, because credentials never ride a run — the command says so |
-| Loading needs the Modeller role | Writing records into a Graph's model is the Modeller's and the Admin's, in the browser, the CLI and the API alike; which records a load reaches is the agent's Access Policies |
+| A bulk load is listed when it names its graph database | The graph database supplies the connection and the load is listed; a connection typed on the command line runs direct and is not listed, because credentials never ride a run — the command says so |
+| Loading needs Create on the kind | Writing records into a model needs Create on `data/<graph database>/<kind>`, in the browser, the CLI and the API alike; which records a load reaches is also the agent's Access Policies |
 | Experimental | Records by hand carry an *Experimental* badge on their act and page head |
 | A saved result is a load | Records saved from a run's result are one load, its source *run*, naming that run and the loads it was pinned to; its records read *derived*, and undoing an input flags it like any other citation |
 

@@ -3,8 +3,9 @@ id: AG-50
 title: The next run builds on the last
 feature: AG-F09
 status: idea
+milestone: MVP
 personas: [analyst, builder]
-boards: [explore.board, agents.run.answer]
+boards: [explore.board, agents.runs]
 ---
 
 # AG-50 · The next run builds on the last
@@ -17,10 +18,10 @@ Tasks: [task.md](task.md) · Feature: [AG-F09](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Read the recall step of a run they may read — its query, its items, each item's label and why it ranks, and the records it cites | On a run they may not read, the recall step is withheld, naming who may read it |
-| Operator | Read the recall step of a run they are behind or, for a project's run, whose sources their default agent may see; a Modeller the same ([the role table](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-role-table)) | On anyone else's run, the recall step is withheld, naming who may read it ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
+| Operator | Read the recall step of a run they are behind or, for a project's run, whose sources their default agent may see ([the permission catalogue](../../../../../../os/access/features/AC-F02-access-policies/feature.md#the-permission-catalogue)) | On anyone else's run, the recall step is withheld, naming who may read it ([AC-31](../../../../../../os/access/features/AC-F09-what-left-the-platform/stories/AC-31-keep-a-runs-content-to-those-who-may-read-it/story.md)) |
 
 ## Flow
 
@@ -36,7 +37,7 @@ flowchart TD
   r -->|yes| rk["Ranked · marked good · accepted · served"]
   r -->|failed · marked bad · contradicted later| av["Handed to the planner as avoid"]
   rk --> fr["Cited records read fresh through the agent's Access Policies"]
-  fr -->|a policy refuses one| wd(["Counted as withheld · never shown"])
+  fr -->|a policy refuses one| wd(["Left out · no count · no note"])
   fr --> pl["The plan step picks a rung"]
   av --> pl
   pl --> ans(["The answer cites what it recalled"])
@@ -52,7 +53,7 @@ flowchart TD
 | AG-50.3 | Items found | the step settles | they are ranked *marked good* · *accepted* · *served*, newest first within each, and each names its label and why it ranks |
 | AG-50.4 | An item that failed, is *marked bad* or was *contradicted later* | the step settles | it is handed to the planner as *avoid*, never as something to build on, and the plan step names what it avoided |
 | AG-50.5 | Recalled findings and decisions | the answer is written | it cites them inline, each opening its node in the thinking graph |
-| AG-50.6 | A record a recalled item cites | the step reads it | it reads it fresh through the agent's Access Policies; a record the policies refuse is never shown, and the step says how many were withheld |
+| AG-50.6 | A record a recalled item cites | the step reads it | it reads it fresh through the agent's Access Policies; a record the policies refuse is left out, with no count and no note |
 | AG-50.7 | Nothing inside the window | the step settles | it states *Nothing to recall for this work*, with the query, and is never skipped silently |
 | AG-50.8 | A node older than 180 days | a recall step runs | it is not recalled; it stays readable in the thinking graph |
 | AG-50.9 | An item from a run the person behind the new run may not read | it is recalled | it carries only the plan or workflow, its outcome labels and record IDs — never that run's content |
@@ -66,9 +67,9 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | The recall step on the answer | Admin | explore.board · Nothing to recall | explore.board · Nothing to recall | explore.board · Recalling | explore.board · Recall | explore.board · Planned without recall | explore.board · Recall behind | — |
 | The recall step on the answer | Operator | explore.board · Nothing to recall | explore.board · Nothing to recall | explore.board · Recalling | explore.board · Recall | explore.board · Planned without recall | explore.board · Recall behind | — |
-| The recall step in the run's trace | Admin | agents.run.answer · Nothing to recall | — | agents.run.answer · Loading | agents.run.answer · Recall | agents.run.answer · Planned without recall | agents.run.answer · Recalling | — |
-| The recall step in the run's trace | Operator | agents.run.answer · Nothing to recall | — | agents.run.answer · Loading | agents.run.answer · Recall | agents.run.answer · Planned without recall | agents.run.answer · Recalling | agents.run.answer · Withheld |
+| The recall step in the run's trace | Admin | agents.runs · Detail · Answer · Nothing to recall | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Recall | agents.runs · Detail · Answer · Planned without recall | agents.runs · Detail · Answer · Recalling | — |
+| The recall step in the run's trace | Operator | agents.runs · Detail · Answer · Nothing to recall | — | agents.runs · Detail · Answer · Loading | agents.runs · Detail · Answer · Recall | agents.runs · Detail · Answer · Planned without recall | agents.runs · Detail · Answer · Recalling | agents.runs · Detail · Answer · Withheld |

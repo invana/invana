@@ -18,7 +18,7 @@ Tasks: [task.md](task.md) · Feature: [CP-F08](../../feature.md)
 
 ## Who can
 
-| Lens | Can | Otherwise sees |
+| Access | Can | Otherwise sees |
 |---|---|---|
 | Admin | Choose where their own asks and alerts reach them | — |
 | Operator | Choose where their own asks and alerts reach them | Another person's choices are absent |
@@ -56,7 +56,7 @@ flowchart TD
 
 ## Screens
 
-| Surface | Lens | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
+| Surface | Access | First use | Empty after a filter | Loading | Has data | Failed | Agent working or proposing | No access |
 |---|---|---|---|---|---|---|---|---|
 | Where asks reach me | Admin | settings.me · In app only | — | settings.me · Loading | settings.me · Where asks reach me | settings.me · Not found in Slack | — | — |
 | Where asks reach me | Operator | settings.me · In app only | — | settings.me · Loading | settings.me · Where asks reach me | settings.me · Not found in Slack | — | — |
