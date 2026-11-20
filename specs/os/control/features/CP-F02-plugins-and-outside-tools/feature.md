@@ -7,7 +7,7 @@ personas: [admin, builder, analyst, curator]
 stories: [CP-04, CP-44, CP-02, CP-42, CP-43, CP-63, CP-03, CP-75, CP-20, CP-64, CP-77, CP-79, CP-80, CP-81, CP-82, CP-83]
 journeys: [J07, J10]
 boards: [settings.connectors, settings.plugins, access.signin, agents.agents, settings.me, settings.people, agents.runs, settings.mcp, settings.packs, settings.policies, settings.workers, flow.install_plugin, flow.manage_pack, flow.manage_credential, flow.add_credential, flow.install_connector, flow.connect_client_with_key]
-nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-SEC-9, NFR-SEC-15, NFR-PERF-3]
+nfrs: [NFR-SEC-1, NFR-SEC-2, NFR-SEC-4, NFR-SEC-5, NFR-SEC-6, NFR-SEC-7, NFR-SEC-8, NFR-SEC-9, NFR-SEC-15, NFR-SEC-17, NFR-PERF-3]
 depends_on: [AC-F02, AC-F04, AC-F05, AC-F09, AC-F10, AC-F11, CP-F03, AG-F06, RC-F02]
 ---
 

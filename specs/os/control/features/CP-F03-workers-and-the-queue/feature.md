@@ -7,7 +7,7 @@ personas: [admin, builder]
 stories: [CP-05, CP-06, CP-07, CP-08, CP-09, CP-10, CP-65]
 journeys: [J07, J10]
 boards: [settings.workers, agents.runs, flow.add_workers, flow.drain_worker]
-nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14, NFR-SEC-15, NFR-SEC-17]
+nfrs: [NFR-REL-1, NFR-REL-2, NFR-PERF-1, NFR-PERF-2, NFR-COST-3, NFR-UX-2, NFR-SEC-14, NFR-SEC-15, NFR-SEC-17, NFR-SEC-18]
 depends_on: [CP-F02, CP-F04, CP-F10, AC-F02]
 ---
 
@@ -323,7 +323,7 @@ workers that run its steps. Conventions — naming, errors, lists, events — ar
 | § 9 Distributed execution | Steps as envelopes over a procrastinate queue; one coordinator by lease; outcomes through a row; redelivery under one idempotency key; workers by label and by runtime; a session per lease | — |
 | § 10 AI and agents | Outside runtimes — Claude Code, Codex — run an agent's sessions on workers | — |
 | § 11 Failure modes and the outside boundary | A lost worker requeues its steps; a lost coordinator's runs move on; no worker for a label or a runtime fails, never hangs; a failed task is never re-run | — |
-| § 12 Qualities | Security: workers hold no database credential and no inbound port; secrets never ride an envelope; every unseal, secret and outcome is bound to a live lease of that worker; the sandbox enforces `fs/` · `cmd/` · `net/` at the operating system and holds no credential — outside tools through the engine, git by the trusted process, the model by a proxy token | NFR-SEC-14 · NFR-SEC-15 · NFR-SEC-17 |
+| § 12 Qualities | Security: workers hold no database credential and no inbound port; secrets never ride an envelope; every unseal, secret and outcome is bound to a live lease of that worker; the sandbox enforces `fs/` · `cmd/` · `net/` at the operating system and holds no credential — outside tools through the engine, git by the trusted process, the model by a proxy token | NFR-SEC-14 · NFR-SEC-15 · NFR-SEC-17 · NFR-SEC-18 |
 
 ## Decisions
 
